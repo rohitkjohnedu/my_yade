@@ -14,6 +14,7 @@
 #include<lib/opengl/OpenGLWrapper.hpp>
 #include<core/Body.hpp>
 #include<core/Scene.hpp>
+#include<core/Bound.hpp>
 #include<core/Interaction.hpp>
 #include<core/DisplayParameters.hpp>
 #include<boost/algorithm/string.hpp>
@@ -373,6 +374,11 @@ void GLViewer::centerScene(){
 			if(!b) continue;
 			max=max.cwiseMax(b->state->pos);
 			min=min.cwiseMin(b->state->pos);
+			Bound* aabb=dynamic_cast<Bound*>(b->bound.get());
+			if(aabb){
+				max=max.cwiseMax(b->state->pos+aabb->max);
+				min=min.cwiseMin(b->state->pos+aabb->min);
+			}
 		}
 		if(math::isinf(min[0])||math::isinf(min[1])||math::isinf(min[2])||math::isinf(max[0])||math::isinf(max[1])||math::isinf(max[2])){ LOG_DEBUG("No min/max computed from bodies either, setting cube (-1,-1,-1)×(1,1,1)"); min=-Vector3r::Ones(); max=Vector3r::Ones(); }
 	} else {LOG_DEBUG("Using scene's Aabb");}
