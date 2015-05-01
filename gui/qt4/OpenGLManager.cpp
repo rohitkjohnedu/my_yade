@@ -54,9 +54,9 @@ void OpenGLManager::closeViewSlot(int id){
 		else{ LOG_INFO("Cannot close primary view, secondary views still exist."); }
 	}
 }
-void OpenGLManager::centerAllViews(){
+void OpenGLManager::centerAllViews(Real suggestedRadius){
 	const std::lock_guard<std::mutex> lock(viewsMutex);
-	FOREACH(const shared_ptr<GLViewer>& g, views){ if(!g) continue; g->centerScene(); }
+	FOREACH(const shared_ptr<GLViewer>& g, views){ if(!g) continue; g->centerScene(suggestedRadius); }
 }
 void OpenGLManager::startTimerSlot(){
 	startTimer(50);
@@ -73,7 +73,7 @@ int OpenGLManager::waitForNewView(double timeout,bool center){
 			LOG_ERROR("Timeout waiting for the new view to open, giving up."); return -1;
 		}
 	}
-	if(center)(*views.rbegin())->centerScene();
+	if(center)(*views.rbegin())->centerScene(-1);
 	return (*views.rbegin())->viewId; 
 }
 

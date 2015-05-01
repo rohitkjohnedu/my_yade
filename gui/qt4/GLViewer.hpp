@@ -86,7 +86,7 @@ class GLViewer : public QGLViewer
 		virtual void draw();
 		virtual void drawWithNames();
 		void displayMessage(const std::string& s){ QGLViewer::displayMessage(QString(s.c_str()));}
-		void centerScene();
+		void centerScene(Real suggestedRadius);
 		void centerPeriodic();
 		void mouseMovesCamera();
 		void mouseMovesManipulatedFrame(qglviewer::Constraint* c=NULL);
