@@ -1,0 +1,1 @@
+timeStep	time	unbalancedForce	kineticEnergy	waterLevel	boundary_phi	displacementW	displacementM	displacementE	displacementWx	displacementMx	displacementEx	displacementWy	displacementMy	displacementEy	velocityW	velocityM	velocityE	CohesionBrokenNo	TensionBrokenNo
