@@ -180,11 +180,9 @@ void GLViewer::postDraw(){
 		if(drawGrid & 4) {glColor3(0.1,0.1,0.4); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
 	}
 	if(displayGridNumbers and drawGrid){
-	// FIXME - gdzieś jak robiłem rysowanie tych porów w cieczy i pisanie ich numerka ID, zrobiłem
-	//         żeby te numerki były białe i kompletnie nic ich nie zasłaniało.
-	//         jeszcze bym mógł im dorobić jakieś tło, żeby były czytelne i byłoby super.
-	//         i potem przyciski w samym okienku, żeby można było je przełączać.
-	//         np. takie okieneczko rysuję z tytułem 'toggle help 'H' or 'h' [x]' i pod spodem można klikać, zeby przełączać różne opcje rysowania.
+		// disabling lighting & depth test makes sure that text is always above everything, readable.
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
 		const Vector3r& h(Vector3r(1,1,1));
 		for(int xyz(-nHalfSegments) ; xyz<=nHalfSegments ; xyz++)
 		{ // write text - coordinate numbers on grid
@@ -204,6 +202,9 @@ void GLViewer::postDraw(){
 		if((drawGrid & 2) or (drawGrid & 4)) GLUtils::GLDrawText("-X",Vector3r(-pos,0,0),h);
 		if((drawGrid & 1) or (drawGrid & 4)) GLUtils::GLDrawText("-Y",Vector3r(0,-pos,0),h);
 		if((drawGrid & 1) or (drawGrid & 2)) GLUtils::GLDrawText("-Z",Vector3r(0,0,-pos),h);
+		// enable back lighting & depth test
+		glEnable(GL_LIGHTING);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	// scale
