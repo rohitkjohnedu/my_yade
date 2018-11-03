@@ -263,8 +263,8 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	// *** Fabric tensor ***/
 	fabric=Matrix3r::Zero(); 
 	int count=0; // number of interactions
-	py::tuple aabb = Shop::aabbExtrema(cutoff);
-	Vector3r bbMin = py::extract<Vector3r>(aabb[0]), bbMax = py::extract<Vector3r>(aabb[1]);
+	vector<Vector3r> aabb = Shop::aabbExtrema(cutoff);
+	Vector3r bbMin = aabb[0], bbMax = aabb[1];
 	Vector3r cp;
 	
 	Fmean=0; // initialize average contact force for split = 1 fabric measurements
@@ -349,8 +349,8 @@ Matrix3r Shop::getStress(Real volume){
 	Scene* scene=Omega::instance().getScene().get();
 	Real volumeNonPeri = 0;
 	if ( volume==0 && !scene->isPeriodic ) {
-	  py::tuple extrema = Shop::aabbExtrema();
-	  volumeNonPeri = py::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
+	  vector<Vector3r> extrema = Shop::aabbExtrema();
+	  volumeNonPeri = (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]);
 	}
 	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():volumeNonPeri;
 	Matrix3r stressTensor = Matrix3r::Zero();
@@ -368,6 +368,58 @@ Matrix3r Shop::getStress(Real volume){
 	return stressTensor/volume;
 }
 
+
+py::list Shop::getDynamicStress()
+{
+	Scene* scene=Omega::instance().getScene().get();
+	py::list kineticStressTensors;
+    Vector3r averageVelocity(Vector3r::Zero());
+
+	//
+	//Dynamic contribution to the stress tensor
+	//
+	for(unsigned int i(0);i<scene->bodies->size();i++)
+    {
+        const shared_ptr<Body>& b = Body::byId(i, scene);
+		Vector3r vFluct = (scene->isPeriodic) ? scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,scene->cell->velGrad) : b->state->vel;
+		
+        Sphere * s = YADE_CAST<Sphere*>(b->shape.get());
+        
+        if(s)
+            kineticStressTensors.append(-(3.0/(4.0*M_PI*pow(s->radius,3)))*b->state->mass*vFluct*vFluct.transpose());
+        else
+            kineticStressTensors.append(Matrix3r::Zero());
+	}
+	
+	return kineticStressTensors;
+}
+
+Matrix3r Shop::getTotalDynamicStress(Real volume)
+{
+	Scene* scene=Omega::instance().getScene().get();
+	Matrix3r kineticStressTensor(Matrix3r::Zero());
+    
+    if(volume == 0)
+    {
+        if(scene->isPeriodic)
+            volume = scene->cell->getVolume();
+        else
+        {
+            LOG_ERROR("Must provide volume if scene is not periodic!");
+            return kineticStressTensor;
+        }
+    }
+
+    for(unsigned int i(0);i<scene->bodies->size();i++)
+    {
+        const shared_ptr<Body>& b = Body::byId(i, scene);
+		Vector3r vFluct = (scene->isPeriodic) ? scene->cell->bodyFluctuationVel(b->state->pos,b->state->vel,scene->cell->velGrad) : b->state->vel;
+		
+        kineticStressTensor+=b->state->mass*vFluct*vFluct.transpose();
+	}
+	
+	return kineticStressTensor/volume;
+}
 
 py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ){
 	int minZ=0;
@@ -475,8 +527,91 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 	return py::make_tuple(stressTensorProfile,kineticStressTensorProfile,granularTemperatureProfile);
 }
 
+py::tuple Shop::getStressProfile_contact(Real volume, int nCell, Real dz, Real zRef){
+	int minZ=0;
+	int maxZ=0;
+	Real minPosZ=0.;
+	Real maxPosZ=0.;
+	Scene* scene=Omega::instance().getScene().get();
+	vector<Matrix3r> stressTensorProfile(nCell,Matrix3r::Zero());
+	vector<Real> numPart(nCell,0.0);
 
-py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy){
+	const bool isPeriodic = scene->isPeriodic;
+	//
+	//Love Weber contribution (same as getStress(), but with different layers)
+	//
+	FOREACH(const shared_ptr<Interaction>&I,  *scene->interactions){	// loop over the interactions 
+                if (!I->isReal()) continue;
+		shared_ptr<Body> b1 = Body::byId(I->getId1(),scene);
+		shared_ptr<Body> b2 = Body::byId(I->getId2(),scene);
+
+		if ((b1->state->blockedDOFs!=State::DOF_ALL)||(b2->state->blockedDOFs!=State::DOF_ALL)){// to remove annoying contribution from the fixed particles
+			//Layers in which the particle center is contained
+			int Np1 = floor((b1->state->pos[2] - zRef)/dz);
+			int Np2 = floor((b2->state->pos[2] - zRef)/dz);
+			//Vector between the two centers, from 2 to 1
+			Vector3r branch = b1->state->pos -b2->state->pos;
+			if (isPeriodic) branch -= scene->cell->hSize*I->cellDist.cast<Real>();//to handle periodicity
+				
+			//Contact vector (from 1 to 2)
+			NormShearPhys* nsi=YADE_CAST<NormShearPhys*> ( I->phys.get() );
+			Vector3r fContact = nsi->normalForce + nsi->shearForce;
+
+			//The contribution to the stress tensor is taken such that only the part of the branch vector 
+			//inside the cell is taken into account
+			//If the whole vector is in the cell, add the whole contribution to the cell
+			if (Np1==Np2){
+				if ((Np1>=0) && (Np1<nCell)){ 
+					stressTensorProfile[Np1]+= 1/volume*fContact*branch.transpose();
+				}
+			}
+			//Otherwise, find out the cell crossed by the branch vector and assign it the contribution from this part. 
+			else {	
+				//Find which one is above the other to prepare the loop
+				if (Np1>Np2){
+					minZ = Np2;
+					minPosZ = b2->state->pos[2]-zRef;
+					maxZ = Np1;
+					maxPosZ = b1->state->pos[2]-zRef;
+				}
+				else if (Np2>Np1) {
+					minZ = Np1;
+					minPosZ = b1->state->pos[2]-zRef;
+					maxZ = Np2;
+					maxPosZ = b2->state->pos[2]-zRef;
+				}
+		
+				Real branchS_x = pow(branch[0],2.0);
+				Real branchS_y = pow(branch[1],2.0);
+				Real branchS_z = pow(branch[2],2.0);
+
+				//Normalize the branch vector
+				branch/=sqrt(branchS_x + branchS_y+branchS_z);
+
+				//Loop over the cell containing the branch vector
+				int numLayer = minZ;
+				while (numLayer<=maxZ){
+					if ((numLayer>= 0)&&(numLayer<nCell)){
+						//Evaluate the branch height inside the cell
+						Real deltaZ = dz;
+						if (numLayer==minZ) deltaZ = dz - (minPosZ - minZ*dz);
+						else if (numLayer==maxZ) deltaZ = maxPosZ - maxZ*dz;
+						//From it, trigonometry gives us the vector contained in the cell
+						Vector3r branchVectCell = deltaZ*sqrt(1.0 + 1.0/branchS_z*(branchS_x + branchS_y))*branch;
+						//Add the contribution to the stress tensor
+						stressTensorProfile[numLayer]+= 1.0/volume*fContact*branchVectCell.transpose();
+					}
+					//Increment the layer/cell number
+					numLayer+=1;
+						
+				}
+			}
+		}
+	}
+	return py::make_tuple(stressTensorProfile);
+}
+
+py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy, int dir){
 	//Initialization
 	int minZ;
 	int maxZ;
@@ -498,7 +633,7 @@ py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool 
 			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 			if (sphere->radius!=radiusPy) continue;
 		} //select diameters asked
-		const Real zPos = b->state->pos[2]-zRef;
+                const Real zPos = b->state->pos[dir]-zRef;
 		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 
 		minZ= floor((zPos-s->radius)/dz);
@@ -543,6 +678,52 @@ py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool 
 	return py::make_tuple(phiAverage,velAverageX,velAverageY,velAverageZ);
 }
 
+
+// Same as getDepthProfiles but taking into account the particles as a point
+py::tuple Shop::getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRef,bool activateCond, Real radiusPy){
+	//Initialization
+	Real volPart;
+
+	vector<Real> velAverageX(nCell,0.0);
+        vector<Real> velAverageY(nCell,0.0);
+        vector<Real> velAverageZ(nCell,0.0);
+	vector<Real> phiAverage(nCell,0.0);
+	vector<Real> Npart(nCell,0.0);
+
+	//Loop over the particles
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		if (activateCond==true){
+			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
+			if (sphere->radius!=radiusPy) continue;
+		} //select diameters asked
+		const Real zPos = b->state->pos[2]-zRef;
+		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
+
+		if ((Np>=0)&&(Np<nCell)){
+			volPart =4./3.* Mathr::PI*pow(s->radius,3);
+			phiAverage[Np]+=volPart/vCell;
+			Npart[Np]+=1.;
+			velAverageX[Np]+=b->state->vel[0];
+		        velAverageY[Np]+=b->state->vel[1];
+		        velAverageZ[Np]+=b->state->vel[2];
+		}
+	}
+	//Normalized the weighted velocity by the volume of particles contained inside the cell
+	for(int n=0;n<nCell;n++){
+		if (Npart[n]!=0){
+			velAverageX[n]/=Npart[n];
+                        velAverageY[n]/=Npart[n];
+                        velAverageZ[n]/=Npart[n];
+		}
+		else {
+			velAverageX[n] = 0.0;
+                        velAverageY[n] = 0.0;
+                        velAverageZ[n] = 0.0;
+		}
+	}
+	return py::make_tuple(phiAverage,velAverageX,velAverageY,velAverageZ);
+}
 
 
 Matrix3r Shop::getCapillaryStress(Real volume, bool mindlin){
@@ -644,8 +825,16 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		//We grow only spheres and clumps 
 		if(b->isClump() or sphereIdx == b->shape->getClassIndex()){			
 			if (updateMass) {b->state->mass*=pow(multiplier,3); b->state->inertia*=pow(multiplier,5);}
-			// for clumps we updated inertia, nothing else to do
-			if (b->isClump()) continue;
+			if (b->isClump())  {
+				//update local Se3 of each clump member
+				//FIXME: the velocity of clump members is invalid after a growth since the growth is not reflected (see Clump::moveMembers)
+				// for clumps we updated inertia, nothing else to do
+				FOREACH(Clump::MemberMap::value_type& B, YADE_PTR_CAST<Clump>(b->shape)->members){
+					// B.first is Body::id_t, B.second is local Se3r of that body in the clump
+					B.second.position *= multiplier;}
+				// for clumps we are done
+				continue;
+			}
 			// for spheres, we update radius
 			(YADE_CAST<Sphere*> (b->shape.get()))->radius *= multiplier;
 			// and if they are clump members,clump volume variation with homothetic displacement of all members
@@ -653,9 +842,9 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 		}
 	}
 	FOREACH(const shared_ptr<Interaction>& ii, *scene->interactions){
-		int ci1=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
-		int ci2=(*(scene->bodies))[ii->getId2()]->shape->getClassIndex();
 		if (ii->isReal()) {
+			int ci1=(*(scene->bodies))[ii->getId1()]->shape->getClassIndex();
+			int ci2=(*(scene->bodies))[ii->getId2()]->shape->getClassIndex();
 			GenericSpheresContact* contact = YADE_CAST<GenericSpheresContact*>(ii->geom.get());
 			if ((!dynamicOnly || (*(scene->bodies))[ii->getId1()]->isDynamic()) && ci1==sphereIdx)
 				contact->refR1 = YADE_CAST<Sphere*>((* (scene->bodies))[ii->getId1()]->shape.get())->radius;
@@ -682,18 +871,22 @@ void Shop::growParticle(Body::id_t bodyID, Real multiplier, bool updateMass)
 	}
 }
 
-py::tuple Shop::aabbExtrema(Real cutoff, bool centers){
+vector<Vector3r> Shop::aabbExtrema(Real cutoff, bool centers){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		if(!b) continue;
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
 		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
 	}
 	Vector3r dim=maximum-minimum;
-	return py::make_tuple(Vector3r(minimum+.5*cutoff*dim),Vector3r(maximum-.5*cutoff*dim));
+	vector<Vector3r> ret;
+	ret.push_back(minimum+.5*cutoff*dim);
+	ret.push_back(maximum-.5*cutoff*dim);
+	return ret;
 }
 
 /*! Added function for 2D calculation: sphere volume. Optional. By Ning Guo */

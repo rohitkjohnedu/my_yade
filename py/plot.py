@@ -79,7 +79,7 @@ scatterMarkerKw=dict(verts=[(0.,0.),(-30.,10.),(-25,0),(-30.,-10.)],marker=None)
 
 
 componentSeparator='_'
-componentSuffixes={Vector2:{0:'x',1:'y'},Vector3:{0:'x',1:'y',2:'z'},Matrix3:{(0,0):'xx',(1,1):'yy',(2,2):'zz',(0,1):'xy',(0,2):'xz',(1,2):'yz',(1,0):'yz',(2,0):'zx',(2,1):'zy'}}
+componentSuffixes={Vector2:{0:'x',1:'y'},Vector3:{0:'x',1:'y',2:'z'},Matrix3:{(0,0):'xx',(1,1):'yy',(2,2):'zz',(0,1):'xy',(0,2):'xz',(1,2):'yz',(1,0):'yx',(2,0):'zx',(2,1):'zy'}}
 # if a type with entry in componentSuffixes is given in addData, columns for individual components are synthesized using indices and suffixes given for each type, e.g. foo=Vector3r(1,2,3) will result in columns foox=1,fooy=2,fooz=3
 
 def reset():
@@ -223,17 +223,19 @@ def addData(*d_in,**kw):
 	>>> plot.resetData()
 	>>> plot.addData(c=Vector3(5,6,7),d=Matrix3(8,9,10, 11,12,13, 14,15,16))
 	>>> pprint(plot.data)
- 	{'c_x': [5.0],
+	{'c_x': [5.0],
 	 'c_y': [6.0],
 	 'c_z': [7.0],
 	 'd_xx': [8.0],
 	 'd_xy': [9.0],
 	 'd_xz': [10.0],
+	 'd_yx': [11.0],
 	 'd_yy': [12.0],
-	 'd_yz': [11.0],
+	 'd_yz': [13.0],
 	 'd_zx': [14.0],
 	 'd_zy': [15.0],
 	 'd_zz': [16.0]}
+
 
 	"""
 	import numpy
@@ -609,7 +611,7 @@ def plot(noShow=False,subPlots=True):
 		if len(figs)==1: return figs[0]
 		else: return figs
 
-def saveDataTxt(fileName,vars=None):
+def saveDataTxt(fileName,vars=None, headers=None):
 	"""Save plot data into a (optionally compressed) text file. The first line contains a comment (starting with ``#``) giving variable name for each of the columns. This format is suitable for being loaded for further processing (outside yade) with ``numpy.genfromtxt`` function, which recognizes those variable names (creating numpy array with named entries) and handles decompression transparently.
 
 	>>> from yade import plot
@@ -629,6 +631,7 @@ def saveDataTxt(fileName,vars=None):
 
 	:param fileName: file to save data to; if it ends with ``.bz2`` / ``.gz``, the file will be compressed using bzip2 / gzip. 
 	:param vars: Sequence (tuple/list/set) of variable names to be saved. If ``None`` (default), all variables in :yref:`yade.plot.plot` are saved.
+	:param headers: Set of parameters to write on header
 	"""
 	import bz2,gzip
 	if not vars:
@@ -636,6 +639,12 @@ def saveDataTxt(fileName,vars=None):
 	if fileName.endswith('.bz2'): f=bz2.BZ2File(fileName,'w')
 	elif fileName.endswith('.gz'): f=gzip.GzipFile(fileName,'w')
 	else: f=open(fileName,'w')
+	
+	if headers:
+		k = headers.keys();
+		for i in range(len(k)):
+			f.write("# "+k[i]+"=\t"+str(headers[k[i]])+"\n");
+	
 	f.write("# "+"\t\t".join(vars)+"\n")
 	for i in range(len(data[vars[0]])):
 		f.write("\t".join([str(data[var][i]) for var in vars])+"\n")

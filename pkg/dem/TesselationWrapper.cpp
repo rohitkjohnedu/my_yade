@@ -29,17 +29,17 @@ struct RTraits_for_spatial_sort : public CGT::SimpleTriangulationTypes::RTriangu
 
 	struct Less_x_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
-			return Gt::Less_x_3()(* (p.first),* (q.first));
+			return Gt::Less_x_3()( p.first->point() , q.first->point() );
 		}
 	};
 	struct Less_y_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
-			return Gt::Less_y_3()(* (p.first),* (q.first));
+			return Gt::Less_y_3()( p.first->point(), q.first->point());
 		}
 	};
 	struct Less_z_3 {
 		bool operator()(const Point_3& p,const Point_3& q) const {
-			return Gt::Less_z_3()(* (p.first),* (q.first));
+			return Gt::Less_z_3()( p.first->point(), q.first->point());
 		}
 	};
 	Less_x_3  less_x_3_object() const {return Less_x_3();}
@@ -390,6 +390,55 @@ boost::python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		ret["poro"]=poro;
  		if (deformation) ret["def"]=def;
  		return ret;
+}
+
+
+boost::python::list TesselationWrapper::getAlphaFaces(double alpha)
+{
+	vector<AlphaFace> faces;
+	Tes->setAlphaFaces(faces,alpha);
+	boost::python::list ret;
+	for (auto f=faces.begin();f!=faces.end();f++)
+		ret.append(boost::python::make_tuple(Vector3i(f->ids[0],f->ids[1],f->ids[2]),makeVector3r(f->normal)));
+	return ret;
+}
+
+boost::python::list TesselationWrapper::getAlphaCaps(double alpha, double shrinkedAlpha, bool fixedAlpha)
+{
+  vector<AlphaCap> caps;
+  Tes->setExtendedAlphaCaps(caps,alpha,shrinkedAlpha,fixedAlpha);
+  boost::python::list ret;
+   for (auto f=caps.begin();f!=caps.end();f++)
+    ret.append(boost::python::make_tuple(f->id,makeVector3r(f->normal)));
+//    cerr<<"number of caps="<<caps.size()<<endl;
+  return ret;
+}
+
+void TesselationWrapper::applyAlphaForces(Matrix3r stress, double alpha, double shrinkedAlpha, bool fixedAlpha)
+{
+	Scene* scene = Omega::instance().getScene().get();
+	if (Tes->Triangulation().number_of_vertices()<=0) build_triangulation_with_ids(scene->bodies,*this,true);//if not already triangulated do it now	
+	vector<AlphaCap> caps;
+	Tes->setExtendedAlphaCaps(caps,alpha,shrinkedAlpha,fixedAlpha);
+	for (auto f=caps.begin();f!=caps.end();f++) scene->forces.setPermForce(f->id,stress*makeVector3r(f->normal));
+}
+
+boost::python::list TesselationWrapper::getAlphaGraph(double alpha, double shrinkedAlpha, bool fixedAlpha)
+{
+  vector<Vector3r> segments=Tes->getExtendedAlphaGraph(alpha,shrinkedAlpha,fixedAlpha);
+  boost::python::list ret;
+  for (auto f=segments.begin();f!=segments.end();f++)
+        ret.append(*f);
+  return ret;
+}
+
+boost::python::list TesselationWrapper::getAlphaVertices(double alpha)
+{
+	vector<int> vertices=Tes->getAlphaVertices(alpha);
+	boost::python::list ret;
+	for (auto f=vertices.begin();f!=vertices.end();f++)
+		ret.append(*f);
+	return ret;
 }
 
 #endif /* YADE_CGAL */

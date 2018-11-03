@@ -20,6 +20,10 @@ Welcome to Yade's documentation!
 
   installation.rst
 
+  amazonEC2.rst
+
+  GPUacceleration.rst
+
   github.rst
 
   formulation.rst
@@ -29,6 +33,8 @@ Welcome to Yade's documentation!
   modules.rst
 
   FEMxDEM.rst
+
+  acousticemissions.rst
 
   citing.rst
 

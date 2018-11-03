@@ -39,6 +39,9 @@
 
 #include <core/Timing.hpp>
 #include <lib/serialization/ObjectIO.hpp>
+#include <csignal>
+
+#include <pkg/common/KinematicEngines.hpp>
 
 namespace py = boost::python;
 
@@ -124,7 +127,7 @@ class pyBodyContainer{
 		const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(clumpBody->shape));
 		if (clump->members.size()==1 ){
 			Clump::del(clumpBody,memberBody); //phD was not commented out
-			for (int i=0; i<clump->ids.size(); i++){
+			for (unsigned i=0; i<clump->ids.size(); i++){
 				if (clump->ids[i] == memberBody->getId()){
 					clump->ids.erase(clump->ids.begin()+i);
 				}
@@ -134,7 +137,7 @@ class pyBodyContainer{
 			
 		}else{
 			Clump::del(clumpBody,memberBody); //pHD was not commented out
-			for (int i=0; i<clump->ids.size(); i++){
+			for (unsigned i=0; i<clump->ids.size(); i++){
 				if (clump->ids[i] == memberBody->getId()){
 					clump->ids.erase(clump->ids.begin()+i);
 				}
@@ -563,6 +566,10 @@ class pyOmega{
 			if(coll){ _DO_FUNCTORS(coll->boundDispatcher->functors,BoundFunctor); }
 			#undef _DO_FUNCTORS
 			#undef _TRY_DISPATCHER
+			CombinedKinematicEngine* cke=dynamic_cast<CombinedKinematicEngine*>(e.get());
+			if (cke) {
+				FOREACH(const shared_ptr<KinematicEngine>& ke, cke->comb){ if(!ke->label.empty()){ pyRunString("__builtins__."+ke->label+"=Omega().labeledEngine('"+ke->label+"')"); } }
+			}
 		}
 	}
 	py::object labeled_engine_get(string label){
@@ -581,6 +588,10 @@ class pyOmega{
 			if(coll){ _DO_FUNCTORS(coll->boundDispatcher->functors,BoundFunctor); }
 			#undef _DO_FUNCTORS
 			#undef _TRY_DISPATCHER
+			CombinedKinematicEngine* cke=dynamic_cast<CombinedKinematicEngine*>(e.get());
+			if (cke) {
+				FOREACH(const shared_ptr<KinematicEngine>& ke, cke->comb){ if(ke->label==label) return py::object(ke); }
+			}
 		}
 		throw std::invalid_argument(string("No engine labeled `")+label+"'");
 	}
@@ -899,7 +910,7 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__len__",&pyInteractionContainer::len)
 		.def("has",&pyInteractionContainer::has,"Tell if a pair of ids corresponds to an existing interaction (real or not)")
 		.def("countReal",&pyInteractionContainer::countReal,"Return number of interactions that are \"real\", i.e. they have phys and geom.")
-		.def("nth",&pyInteractionContainer::pyNth,"Return n-th interaction from the container (usable for picking random interaction).")
+		.def("nth",&pyInteractionContainer::pyNth,"Return n-th interaction from the container (usable for picking random interaction). The virtual interactions are not reached.")
 		.def("withBody",&pyInteractionContainer::withBody,"Return list of real interactions of given body.")
 		.def("withBodyAll",&pyInteractionContainer::withBodyAll,"Return list of all (real as well as non-real) interactions of given body.")
 		.def("all",&pyInteractionContainer::getAll,(py::arg("onlyReal")=false),"Return list of all interactions. Virtual interaction are filtered out if onlyReal=True, else (default) it dumps the full content.")

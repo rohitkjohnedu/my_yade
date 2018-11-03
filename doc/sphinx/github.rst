@@ -86,7 +86,7 @@ Then you proceed to commit through terminal::
  git commit path/to/new_or_modified/file.cpp -m'Commit message'``  #Validate a change. It can be done several times after every sufficient change. No equivalent in bzr, it's like commiting to your own local repository
  git push  #Push your changes into GitHub. Equivalent of "bzr commit", except that your are commiting to your own remote branch
 
-Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" [5] or create a patch from your commit via::
+Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" (see github website for help) or create a patch from your commit via::
 
  git format-patch origin  #create patch file in current folder)
 
@@ -144,19 +144,20 @@ To avoid confusing logs after each commit/pull/push cycle, it is better to setup
 
  git config --global branch.autosetuprebase always
 
-Now your file ~/.gitconfig should include:
+Now your file ~/.gitconfig should include::
 
- [branch]
-   autosetuprebase = always
+	  [branch]
+	    autosetuprebase = always
 
-Check also .git/config file in your local trunk folder (rebase = true):
+Check also .git/config file in your local trunk folder (rebase = true)::
 
- [branch "master"]
-   remote = origin
-
-   merge = refs/heads/master
-
-   rebase = true
+	  [remote "origin"]
+	    url = git@github.com:yade/trunk.git
+	    fetch = +refs/heads/*:refs/remotes/origin/*
+	  [branch "master"]
+	    remote = origin
+	    merge = refs/heads/master
+	    rebase = true
 
 Auto-rebase may have unpleasant side effects by blocking "pull" if you have uncommited changes. In this case you can use "git stash"::
 

@@ -376,7 +376,7 @@ def unv(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 	unvReader = UNVReader(fileName,shift,scale,returnConnectivityTable,**kw)
 	if returnConnectivityTable:
 		return unvReader.facets, unvReader.nodes, unvReader.elements
-	return facets
+	return unvReader.facets
 
 
 def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
@@ -492,6 +492,7 @@ def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Qua
 				vertLoad.append(pos)
 				i+=1
 			polR = polyhedra_utils.polyhedra(material=material,v=vertLoad,**kw)
-			ret.append(polR)
+			if (polR != -1):
+				ret.append(polR)
 			i= i + surfs - 1
 	return ret
