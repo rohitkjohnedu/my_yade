@@ -1,0 +1,24 @@
+image: "registry.gitlab.com/remche/docker-yade"
+stages:
+  - cmake
+  - build
+  
+cmake:
+  stage: cmake
+  script:
+    - mkdir build && cd build
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=/install ..
+  artifacts:
+    paths:
+      - build
+      
+make:
+  stage: build
+  script:
+    - cd build
+    - make
+  artifacts:
+    paths:
+      - build
+  dependencies: 
+    - cmake
