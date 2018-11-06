@@ -1,4 +1,4 @@
-image: "registry.gitlab.com/remche/docker-yade"
+image: registry.gitlab.com/remche/docker-yade
 stages:
   - cmake
   - build
@@ -16,7 +16,7 @@ make:
   stage: build
   script:
     - cd build
-    - make
+    - make -j 4
   artifacts:
     paths:
       - build
