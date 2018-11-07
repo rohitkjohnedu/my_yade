@@ -2,7 +2,9 @@ image: registry.gitlab.com/remche/docker-yade
 stages:
   - cmake
   - build
-  
+  - install
+  - test
+
 cmake:
   stage: cmake
   script:
@@ -21,4 +23,32 @@ make:
     paths:
       - build
   dependencies: 
-    - cmake
+    - cmake      
+
+install:
+  stage: install
+  script:
+    - cd build
+    - make install
+  artifacts:
+    paths:
+      - /install
+  dependencies: 
+    - make
+
+test:
+  stage: test
+  script:
+    - /install/bin/yade-ci --test
+  dependencies:
+    - install
+
+
+check:
+  stage: test
+  script:
+    - /install/bin/yade-ci --checks
+  dependencies:
+    - install
+
+
