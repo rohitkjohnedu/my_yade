@@ -16,7 +16,7 @@ make:
   stage: build
   script:
     - cd build
-    - make -j 4
+    - make -j 16
   artifacts:
     paths:
       - build
