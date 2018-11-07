@@ -3,6 +3,7 @@ stages:
   - cmake
   - build
   - test
+  - doc
 
 cmake:
   stage: cmake
@@ -33,7 +34,6 @@ test:
   dependencies:
     - make
 
-
 check:
   stage: test
   script:
@@ -41,4 +41,16 @@ check:
   dependencies:
     - make
 
+pages:
+  stage: doc
+  script:
+    - cd build
+    - xvfb-run make doc
+    - mv ../install/share/doc/yade-ci/html ../public
+  dependencies:
+    - cmake
+    - make
+  artifacts:
+    paths:
+      - public
 
