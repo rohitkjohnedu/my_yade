@@ -9,7 +9,7 @@ cmake:
   stage: cmake
   script:
     - mkdir build && cd build
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=/install -DDISABLE_SAVE_TEMPS=1 ..
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=install -DDISABLE_SAVE_TEMPS=1 ..
   artifacts:
     paths:
       - build
@@ -19,6 +19,7 @@ make:
   script:
     - cd build
     - make -j 16
+    - make clean
   artifacts:
     paths:
       - build
@@ -32,14 +33,14 @@ install:
     - make install
   artifacts:
     paths:
-      - /install
+      - install
   dependencies: 
     - make
 
 test:
   stage: test
   script:
-    - /install/bin/yade-ci --test
+    - install/bin/yade-ci --test
   dependencies:
     - install
 
@@ -47,7 +48,7 @@ test:
 check:
   stage: test
   script:
-    - /install/bin/yade-ci --checks
+    - install/bin/yade-ci --checks
   dependencies:
     - install
 
