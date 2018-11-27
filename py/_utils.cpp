@@ -2,8 +2,8 @@
 #include <numpy/arrayobject.h>
 
 py::tuple negPosExtremeIds(int axis, Real distFactor){
-	vector<Vector3r> extrema=Shop::aabbExtrema();
-	Real minCoord=extrema[0][axis],maxCoord=extrema[1][axis];
+	py::tuple extrema=Shop::aabbExtrema();
+	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();
 	py::list minIds,maxIds;
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
