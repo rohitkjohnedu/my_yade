@@ -6,7 +6,7 @@ Simulating Acoustic Emissions in Yade
 
 *Suggested citation:*
 
-Caulk, R. (2018), Stochastic Augmentation of the Discrete Element Method for Investigation of Tensile Rupture in Heterogeneous Rock. *Yade Technical Archive*. DOI 10.5281/zenodo.1202039. `download full text <https://www.yade-dem.org/w/images/f/f3/Caulkr_stochasticaugmentationofDEM-031618.pdf>`__
+Caulk, R. (2018), Stochastic Augmentation of the Discrete Element Method for Investigation of Tensile Rupture in Heterogeneous Rock. *Yade Technical Archive*. DOI 10.5281/zenodo.1202039. `download full text <https://www.yade-dem.org/publi/YadeTechnicalArchive/Caulkr_stochasticaugmentationofDEM-301118.pdf>`__
 
 Summary
 =======
