@@ -397,7 +397,7 @@ void HydroForceEngine::fluidResolution(double tfin,double dt)
 {
 	//Variables declaration
 	int i,j,maxiter,q,ii;
-	double phi_nodej,termeVisco_j, termeVisco_jp1,termeTurb_j,termeTurb_jp1,viscof,dz,sum,phi_lim,dudz,ustar,fluidHeight,urel,urel_bound,Re,eps,ff,ffold,delta,dddiv;
+	double phi_nodej,termeVisco_j, termeVisco_jp1,termeTurb_j,termeTurb_jp1,viscof,dz,sum,phi_lim,dudz,ustar,fluidHeight,urel,urel_bound,Re,eps,ff,ffold,delta,dddiv,ejm1,phijm1,upjm1,ejp1,phijp1,upjp1,secondMemberPart;
 	vector<double> sig(nCell,0.0), dsig(nCell-1,0.), viscoeff(nCell,0.), ufn(nCell+1,0.), wallFriction(nCell-1,0.),viscoft(nCell,0.),ufnp(nCell+1,0.),a(nCell+1,0.),b(nCell+1,0.),c(nCell+1,0.),s(nCell+1,0.),lm(nCell,0.),ddem(nCell+1,0.),ddfm(nCell+1,0.),deltaz(nCell,0.),epsilon_node(nCell,0.),epsilon(nCell,0.);
 
 	//Initialisation
@@ -573,13 +573,20 @@ void HydroForceEngine::fluidResolution(double tfin,double dt)
 			termeTurb_j = dt/dsig[j]*epsilon_node[j]*viscoft[j]/deltaz[j];
 			termeTurb_jp1 = dt/dsig[j]*epsilon_node[j+1]*viscoft[j+1]/deltaz[j+1];
 
+			if (j==0){ejm1 = epsilon[j]; phijm1 = phiPart[j]; upjm1 = vxPart[j];}
+			else {ejm1 = epsilon[j-1]; phijm1 = phiPart[j-1]; upjm1 = vxPart[j-1];}
+			if (j==nCell-1) {ejp1 = epsilon[j];phijp1=phiPart[j]; upjp1 = vxPart[j];}
+			else {ejp1 = epsilon[j+1];phijp1=phiPart[j+1]; upjp1 = vxPart[j+1];}
+
+			secondMemberPart = dt*epsilon[j]/dsig[j]*(viscoeff[j+1]/deltaz[j+1]*(phijp1*upjp1-phiPart[j]*vxPart[j])-viscoeff[j]/deltaz[j]*(phiPart[j]*vxPart[j]-phijm1*upjm1));
+
 			// LHS: algebraic system coefficients
-			a[j+1] = - termeVisco_j - termeTurb_j; //eq. 24 of the manual Maurin 2018
-			b[j+1] =  termeVisco_jp1 + termeVisco_j + termeTurb_jp1 + termeTurb_j + epsilon[j] + dt*taufsi[j] + imp*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2);//eq. 25 of the manual Maurin 2018 + fluid wall correction
-			c[j+1] = - termeVisco_jp1 - termeTurb_jp1;//eq. 26 of the manual Maurin 2018
+			a[j+1] = - termeVisco_j*ejm1 - termeTurb_j; //eq. 24 of the manual Maurin 2018
+			b[j+1] =  termeVisco_jp1*epsilon[j] + termeVisco_j*epsilon[j] + termeTurb_jp1 + termeTurb_j + epsilon[j] + dt*taufsi[j] + imp*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2);//eq. 25 of the manual Maurin 2018 + fluid wall correction
+			c[j+1] = - termeVisco_jp1*ejp1 - termeTurb_jp1;//eq. 26 of the manual Maurin 2018
 
 			// RHS: unsteady, gravity, drag, pressure gradient, lateral wall friction
-			s[j+1]= ufn[j+1]*epsilon[j] + epsilon[j]*dt*std::abs(gravity[0]) + dt*taufsi[j]*vxPart[j] - (1.-imp)*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2) -  epsilon[j]*dpdx/densFluid*dt;//eq. 27 of the manual Maurin 2018 + fluid wall correction and pressure gradient forcing. 
+			s[j+1]= ufn[j+1]*epsilon[j] + epsilon[j]*dt*std::abs(gravity[0]) + dt*taufsi[j]*vxPart[j] + secondMemberPart - (1.-imp)*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2) -  epsilon[j]*dpdx/densFluid*dt;//eq. 27 of the manual Maurin 2018 + fluid wall correction and pressure gradient forcing. 
 		}
 		//////////////////////////////////
 
