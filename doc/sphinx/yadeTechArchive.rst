@@ -22,24 +22,23 @@ YTA seeks a variety of Yade related materials including, but not limited to:
 
 Contact
 =======
-If you wish to contribute, please contact the `YTA maintainer <rob.caulk@gmail.com>`__. Questions about individual publications are referred to the email address attached to the document description. If you have general questions regarding code, we refer you to `our Q&A forum <https://answers.launchpad.net/yade>`__. 
+If you wish to contribute, please contact rob.caulk@gmail.com. Questions about individual publications are referred to the email address attached to the document description. If you have general questions regarding code, we refer you to `our Q&A forum <https://answers.launchpad.net/yade>`__. 
 
 
 Archive
 =======
 Maurin, Raphael (2018), YADE 1D vertical VANS fluid resolution: Numerical
 resolution details. *Yade Technical Archive*. 
-`download full text <https://yade-dem.org/w/images/4/46/Yade1DFluidVANS_NumericalResolution.pdf>`__, 
+`download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_NumericalResolution.pdf>`__, 
 send an email raphael.maurin@imft.fr
-
 
 Maurin, Raphael (2018), YADE 1D vertical VANS fluid resolution: Theoretical
 basis. *Yade Technical Archive*. 
-`download full text <https://yade-dem.org/w/images/b/b8/Yade1DFluidVANS_TheoreticalBasis.pdf>`__, 
+`download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_TheoreticalBasis.pdf>`__, 
 send an email raphael.maurin@imft.fr
 
 Maurin, Raphael (2018), YADE 1D vertical VANS fluid resolution: validations. *Yade Technical Archive*. 
-`download full text <https://yade-dem.org/w/images/e/ee/Yade1DFluidVANS_Validations.pdf>`__, send an email raphael.maurin@imft.fr
+`download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_Validations.pdf>`__, send an email raphael.maurin@imft.fr
 
 Caulk, Robert (2018), Stochastic Augmentation of the Discrete Element Method for Investigation of Tensile Rupture in Heterogeneous Rock. *Yade Technical Archive*. DOI 10.5281/zenodo.1202039. 
 `download full text <https://www.yade-dem.org/publi/YadeTechnicalArchive/Caulkr_stochasticaugmentationofDEM-301118.pdf>`__
