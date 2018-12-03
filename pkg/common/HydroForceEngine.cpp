@@ -89,7 +89,7 @@ void HydroForceEngine::averageProfile(){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const double zPos = b->state->pos[2]-zRef;
 		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
-		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
+//		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
 
 		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
 		if ((Np>=0)&&(Np<nCell)){
@@ -211,6 +211,67 @@ void HydroForceEngine::averageProfile(){
 	vxPart2 = velAverageX2;
 	vyPart2 = velAverageY2;
 	vzPart2 = velAverageZ2;
+}
+
+
+
+void HydroForceEngine::averageProfilePP(){
+	//Initialization
+	double volPart;
+	Vector3r uRel = Vector3r::Zero();
+	Vector3r fDrag  = Vector3r::Zero();
+
+	int nMax = nCell;
+	vector<double> velAverageX(nMax,0.0);
+        vector<double> velAverageY(nMax,0.0);
+        vector<double> velAverageZ(nMax,0.0);
+	vector<double> phiAverage(nMax,0.0);
+	vector<double> dragAverage(nMax,0.0);
+
+	//Loop over the particles
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		const double zPos = b->state->pos[2]-zRef;
+		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. 
+		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
+		if ((Np>=0)&&(Np<nCell)){
+			uRel = Vector3r(vxFluid[Np+1]+vFluctX[b->id], vFluctY[b->id],vFluctZ[b->id]) - b->state->vel;
+			// Drag force with a Dallavalle formulation (drag coef.) and Richardson-Zaki Correction (hindrance effect)
+			fDrag = 0.5*Mathr::PI*pow(s->radius,2.0)*densFluid*(0.44*uRel.norm()+24.4*viscoDyn/(densFluid*2.0*s->radius))*pow((1-phiPart[Np]),-expoRZ)*uRel;
+		}
+		else fDrag = Vector3r::Zero();
+		if ((Np>=0)&&(Np<nCell)){
+			volPart = 4./3.*Mathr::PI*pow(s->radius,3);
+			phiAverage[Np]+=1.;
+			velAverageX[Np]+=b->state->vel[0];
+			velAverageY[Np]+=b->state->vel[1];
+			velAverageZ[Np]+=b->state->vel[2];
+			dragAverage[Np]+=fDrag[0];
+		}
+	}
+	//Normalized the weighted velocity by the volume of particles contained inside the cell
+	for(int n=0;n<nMax;n++){
+		if (phiAverage[n]!=0){
+			velAverageX[n]/=phiAverage[n];
+                        velAverageY[n]/=phiAverage[n];
+                        velAverageZ[n]/=phiAverage[n];
+			dragAverage[n]/=phiAverage[n];
+			//Normalize the concentration after
+			phiAverage[n]*=(volPart/vCell);
+		}
+		else {
+			velAverageX[n] = 0.0;
+                        velAverageY[n] = 0.0;
+                        velAverageZ[n] = 0.0;
+			dragAverage[n] = 0.0;
+		}
+	}
+	//Assign the results to the global/public variables of HydroForceEngine
+	phiPart = phiAverage;
+	vxPart = velAverageX;
+	vyPart = velAverageY;
+        vzPart = velAverageZ;
+	averageDrag = dragAverage;
 }
 
 
