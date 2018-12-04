@@ -152,16 +152,28 @@ Real Law2_ScGeom_ImplicitLubricationPhys::DichoAdimExp_integrate_u(Real const& u
 	// Init: search for interval that contain sign change
 	Real inc = (F_left < 0.) ? 1. : -1;
 	inc = (F_left < F_right) ? inc : -inc;
-	while(F_left*F_right >= 0.) {
+	while(F_left*F_right >= 0. && std::isfinite(F_left) && std::isfinite(F_right)) {
 		d_left += inc;
 		d_right += inc;
 		F_left = ObjF(un, eps, alpha, prevDotU, dt, prev_d, undot, d_left);
 		F_right = ObjF(un, eps, alpha, prevDotU, dt, prev_d, undot, d_right);
 	}
 	
-	if(debug && (!std::isfinite(F_left) || !std::isfinite(F_right)))
-		LOG_ERROR("Initial point problem!! d_left=" << d_left << " F_left=" << F_left << " d_right=" << d_right << " F_right=" << F_right);
-	
+	if((!std::isfinite(F_left) || !std::isfinite(F_right))) {
+		if(debug) LOG_WARN("Wrong direction");
+		inc = -inc; // RE-INIT
+		d_left = prev_d-1.;
+		d_right = prev_d+1.;
+		while(F_left*F_right >= 0. && std::isfinite(F_left) && std::isfinite(F_right)) {
+	                d_left += inc;
+        	        d_right += inc;
+                	F_left = ObjF(un, eps, alpha, prevDotU, dt, prev_d, undot, d_left);
+               	 	F_right = ObjF(un, eps, alpha, prevDotU, dt, prev_d, undot, d_right);
+        	}
+	}
+
+	if(!std::isfinite(F_left) || !std::isfinite(F_right)) LOG_ERROR("Initial point problem!! d_left=" << d_left << " F_left=" << F_left << " d_right=" << d_right << " F_right=" << F_right);
+
 	// Iterate to find the zero.
 	int i;
 	for(i=0;i<MaxIter;i++) {
@@ -183,7 +195,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::DichoAdimExp_integrate_u(Real const& u
 		}
 	}
 	
-	if(i == MaxIter)
+	if(debug && (i == MaxIter))
 		LOG_WARN("Max iteration reach: d_left=" << d_left << " F_left=" << F_left << " d_right=" << d_right << " F_right=" << F_right);
 	
 	Real a = (std::exp(d) < eps) ? alpha : 0.;
