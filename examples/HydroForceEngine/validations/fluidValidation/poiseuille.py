@@ -33,7 +33,7 @@ vxFluid =np.zeros(ndimz)
 
 ################################
 # CREATE THE ASSOCIATED HYDROFORCEENGINE OBJECT FOR THE FLUID RESOLUTION
-a = HydroForceEngine(densFluid=densFluid,viscoDyn=kinematicViscoFluid*densFluid,deltaZ=dz,nCell=ndimz,vxFluid=np.array(vxFluid),dpdx=dpdx,gravity = Vector3(0,0,-9.81),phiMax=0.61,turbulentViscosity = np.zeros(ndimz),iturbu=0,iusl=0,phiPart=np.zeros(ndimz),vxPart = np.zeros(ndimz),averageDrag=np.zeros(ndimz))# Define the minimum parameters of the HydroForceEngine for the fluid resolution
+a = HydroForceEngine(densFluid=densFluid,viscoDyn=kinematicViscoFluid*densFluid,deltaZ=dz,nCell=ndimz,vxFluid=np.array(vxFluid),dpdx=dpdx,gravity = Vector3(0,0,-9.81),phiMax=0.61,turbulentViscosity = np.zeros(ndimz),iturbu=0,iusl=0,uTop=0.,phiPart=np.zeros(ndimz),vxPart = np.zeros(ndimz),averageDrag=np.zeros(ndimz))# Define the minimum parameters of the HydroForceEngine for the fluid resolution
 
 ################################
 # FLUID RESOLUTION

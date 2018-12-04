@@ -89,7 +89,7 @@ void HydroForceEngine::averageProfile(){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const double zPos = b->state->pos[2]-zRef;
 		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
-		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
+//		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
 
 		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
 		if ((Np>=0)&&(Np<nCell)){
@@ -211,6 +211,67 @@ void HydroForceEngine::averageProfile(){
 	vxPart2 = velAverageX2;
 	vyPart2 = velAverageY2;
 	vzPart2 = velAverageZ2;
+}
+
+
+
+void HydroForceEngine::averageProfilePP(){
+	//Initialization
+	double volPart;
+	Vector3r uRel = Vector3r::Zero();
+	Vector3r fDrag  = Vector3r::Zero();
+
+	int nMax = nCell;
+	vector<double> velAverageX(nMax,0.0);
+        vector<double> velAverageY(nMax,0.0);
+        vector<double> velAverageZ(nMax,0.0);
+	vector<double> phiAverage(nMax,0.0);
+	vector<double> dragAverage(nMax,0.0);
+
+	//Loop over the particles
+	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
+		const double zPos = b->state->pos[2]-zRef;
+		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. 
+		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
+		if ((Np>=0)&&(Np<nCell)){
+			uRel = Vector3r(vxFluid[Np+1]+vFluctX[b->id], vFluctY[b->id],vFluctZ[b->id]) - b->state->vel;
+			// Drag force with a Dallavalle formulation (drag coef.) and Richardson-Zaki Correction (hindrance effect)
+			fDrag = 0.5*Mathr::PI*pow(s->radius,2.0)*densFluid*(0.44*uRel.norm()+24.4*viscoDyn/(densFluid*2.0*s->radius))*pow((1-phiPart[Np]),-expoRZ)*uRel;
+		}
+		else fDrag = Vector3r::Zero();
+		if ((Np>=0)&&(Np<nCell)){
+			volPart = 4./3.*Mathr::PI*pow(s->radius,3);
+			phiAverage[Np]+=1.;
+			velAverageX[Np]+=b->state->vel[0];
+			velAverageY[Np]+=b->state->vel[1];
+			velAverageZ[Np]+=b->state->vel[2];
+			dragAverage[Np]+=fDrag[0];
+		}
+	}
+	//Normalized the weighted velocity by the volume of particles contained inside the cell
+	for(int n=0;n<nMax;n++){
+		if (phiAverage[n]!=0){
+			velAverageX[n]/=phiAverage[n];
+                        velAverageY[n]/=phiAverage[n];
+                        velAverageZ[n]/=phiAverage[n];
+			dragAverage[n]/=phiAverage[n];
+			//Normalize the concentration after
+			phiAverage[n]*=(volPart/vCell);
+		}
+		else {
+			velAverageX[n] = 0.0;
+                        velAverageY[n] = 0.0;
+                        velAverageZ[n] = 0.0;
+			dragAverage[n] = 0.0;
+		}
+	}
+	//Assign the results to the global/public variables of HydroForceEngine
+	phiPart = phiAverage;
+	vxPart = velAverageX;
+	vyPart = velAverageY;
+        vzPart = velAverageZ;
+	averageDrag = dragAverage;
 }
 
 
@@ -397,7 +458,7 @@ void HydroForceEngine::fluidResolution(double tfin,double dt)
 {
 	//Variables declaration
 	int i,j,maxiter,q,ii;
-	double phi_nodej,termeVisco_j, termeVisco_jp1,termeTurb_j,termeTurb_jp1,viscof,dz,sum,phi_lim,dudz,ustar,fluidHeight,urel,urel_bound,Re,eps,ff,ffold,delta,dddiv;
+	double phi_nodej,termeVisco_j, termeVisco_jp1,termeTurb_j,termeTurb_jp1,viscof,dz,sum,phi_lim,dudz,ustar,fluidHeight,urel,urel_bound,Re,eps,ff,ffold,delta,dddiv,ejm1,phijm1,upjm1,ejp1,phijp1,upjp1,secondMemberPart;
 	vector<double> sig(nCell,0.0), dsig(nCell-1,0.), viscoeff(nCell,0.), ufn(nCell+1,0.), wallFriction(nCell-1,0.),viscoft(nCell,0.),ufnp(nCell+1,0.),a(nCell+1,0.),b(nCell+1,0.),c(nCell+1,0.),s(nCell+1,0.),lm(nCell,0.),ddem(nCell+1,0.),ddfm(nCell+1,0.),deltaz(nCell,0.),epsilon_node(nCell,0.),epsilon(nCell,0.);
 
 	//Initialisation
@@ -573,13 +634,20 @@ void HydroForceEngine::fluidResolution(double tfin,double dt)
 			termeTurb_j = dt/dsig[j]*epsilon_node[j]*viscoft[j]/deltaz[j];
 			termeTurb_jp1 = dt/dsig[j]*epsilon_node[j+1]*viscoft[j+1]/deltaz[j+1];
 
+			if (j==0){ejm1 = epsilon[j]; phijm1 = phiPart[j]; upjm1 = vxPart[j];}
+			else {ejm1 = epsilon[j-1]; phijm1 = phiPart[j-1]; upjm1 = vxPart[j-1];}
+			if (j==nCell-1) {ejp1 = epsilon[j];phijp1=phiPart[j]; upjp1 = vxPart[j];}
+			else {ejp1 = epsilon[j+1];phijp1=phiPart[j+1]; upjp1 = vxPart[j+1];}
+
+			secondMemberPart = dt*epsilon[j]/dsig[j]*(viscoeff[j+1]/deltaz[j+1]*(phijp1*upjp1-phiPart[j]*vxPart[j])-viscoeff[j]/deltaz[j]*(phiPart[j]*vxPart[j]-phijm1*upjm1));
+
 			// LHS: algebraic system coefficients
-			a[j+1] = - termeVisco_j - termeTurb_j; //eq. 24 of the manual Maurin 2018
-			b[j+1] =  termeVisco_jp1 + termeVisco_j + termeTurb_jp1 + termeTurb_j + epsilon[j] + dt*taufsi[j] + imp*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2);//eq. 25 of the manual Maurin 2018 + fluid wall correction
-			c[j+1] = - termeVisco_jp1 - termeTurb_jp1;//eq. 26 of the manual Maurin 2018
+			a[j+1] = - termeVisco_j*ejm1 - termeTurb_j; //eq. 24 of the manual Maurin 2018
+			b[j+1] =  termeVisco_jp1*epsilon[j] + termeVisco_j*epsilon[j] + termeTurb_jp1 + termeTurb_j + epsilon[j] + dt*taufsi[j] + imp*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2);//eq. 25 of the manual Maurin 2018 + fluid wall correction
+			c[j+1] = - termeVisco_jp1*ejp1 - termeTurb_jp1;//eq. 26 of the manual Maurin 2018
 
 			// RHS: unsteady, gravity, drag, pressure gradient, lateral wall friction
-			s[j+1]= ufn[j+1]*epsilon[j] + epsilon[j]*dt*std::abs(gravity[0]) + dt*taufsi[j]*vxPart[j] - (1.-imp)*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2) -  epsilon[j]*dpdx/densFluid*dt;//eq. 27 of the manual Maurin 2018 + fluid wall correction and pressure gradient forcing. 
+			s[j+1]= ufn[j+1]*epsilon[j] + epsilon[j]*dt*std::abs(gravity[0]) + dt*taufsi[j]*vxPart[j] + secondMemberPart - (1.-imp)*dt*epsilon[j]*2./channelWidth*0.125*wallFriction[j]*pow(ufn[j+1],2) -  epsilon[j]*dpdx/densFluid*dt;//eq. 27 of the manual Maurin 2018 + fluid wall correction and pressure gradient forcing. 
 		}
 		//////////////////////////////////
 
