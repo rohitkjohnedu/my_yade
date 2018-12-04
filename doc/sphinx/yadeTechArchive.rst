@@ -30,15 +30,15 @@ Archive
 Maurin, Raphael (2018), YADE 1D vertical VANS fluid resolution: Numerical
 resolution details. *Yade Technical Archive*. 
 `download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_NumericalResolution.pdf>`__, 
-send an email raphael.maurin@imft.fr
+send an email raphael.maurin@imft.fr, follow the tutorial: :ref:`HydroForceEngine`
 
 Maurin, Raphael (2018), YADE 1D vertical VANS fluid resolution: Theoretical
 basis. *Yade Technical Archive*. 
 `download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_TheoreticalBasis.pdf>`__, 
-send an email raphael.maurin@imft.fr
+send an email raphael.maurin@imft.fr, follow the tutorial: :ref:`HydroForceEngine`
 
 Maurin, Raphael (2018), YADE 1D vertical VANS fluid resolution: validations. *Yade Technical Archive*. 
-`download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_Validations.pdf>`__, send an email raphael.maurin@imft.fr
+`download full text <https://yade-dem.org/publi/YadeTechnicalArchive/Yade1DFluidVANS_Validations.pdf>`__, send an email raphael.maurin@imft.fr, follow the tutorial: :ref:`HydroForceEngine`
 
 Caulk, Robert (2018), Stochastic Augmentation of the Discrete Element Method for Investigation of Tensile Rupture in Heterogeneous Rock. *Yade Technical Archive*. DOI 10.5281/zenodo.1202039. 
 `download full text <https://www.yade-dem.org/publi/YadeTechnicalArchive/Caulkr_stochasticaugmentationofDEM-301118.pdf>`__
