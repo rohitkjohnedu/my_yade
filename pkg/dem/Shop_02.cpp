@@ -104,7 +104,11 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	IGeomDispatcher* geomMeta=NULL;
 	IPhysDispatcher* physMeta=NULL;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	if(rb->interactions->find(Body::id_t(id1),Body::id_t(id2))!=0) throw runtime_error(string("Interaction #")+boost::lexical_cast<string>(id1)+"+#"+boost::lexical_cast<string>(id2)+" already exists.");
+	shared_ptr<Interaction> i = rb->interactions->find(Body::id_t(id1),Body::id_t(id2));
+	if(i) {
+		if (i->isReal()) throw runtime_error(string("Interaction #")+ boost::lexical_cast<string>(id1)+ "+#"+boost::lexical_cast<string>(id2)+" already exists.");
+		else rb->interactions->erase(id1,id2,i->linIx);
+	} 
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<IGeomDispatcher*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<IPhysDispatcher*>(e.get()); if(physMeta) continue; }
@@ -117,7 +121,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	if(!b1) throw runtime_error(("No body #"+boost::lexical_cast<string>(id1)).c_str());
 	if(!b2) throw runtime_error(("No body #"+boost::lexical_cast<string>(id2)).c_str());
-	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2,/*force*/force);
+	i=geomMeta->explicitAction(b1,b2,/*force*/force);
 	assert(force && i);
 	if(!i) return i;
 	physMeta->explicitAction(b1->material,b2->material,i);
