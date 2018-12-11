@@ -215,6 +215,48 @@ template <typename T> int sign(T val) {
     return (int)(T(0) < val) - (val < T(0));
 }
 
+// Dimentionless exact solution, with contact prediction
+Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trpz_adim(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew) {
+		// Dry contact
+	if(phys->nun <= 0.) {
+		if(!warnedOnce) LOG_WARN("Can't solve with dimentionless-exponential method without fluid! using dimentional exact.");
+		warnedOnce = true;
+		return normalForce_trapezoidal(phys, geom, undot, isNew); }
+	
+	Real a((geom->radius1+geom->radius2)/2.);
+	if(isNew) { phys->u = -geom->penetrationDepth; }
+	
+	phys->u = a*trapz_integrate_u_adim(-geom->penetrationDepth/a, phys->eps, scene->dt*a*phys->kn/phys->nun, phys->u/a, phys->prevDotU);
+	
+	phys->normalForce = phys->kn*(-geom->penetrationDepth-phys->u)*geom->normal;
+	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-phys->u,0.))*geom->normal) : phys->normalForce;
+	phys->normalLubricationForce = phys->kn*a*phys->prevDotU*geom->normal;
+	
+	phys->contact = phys->normalContactForce.norm() != 0;
+	phys->ue = -geom->penetrationDepth - phys->u;
+	
+	return phys->u;
+}
+
+// Dimentionless exact solution solver
+Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n, Real const& eps, Real const& dt, Real const& prev_u, Real & prevDotU) {
+	Real dtc((prev_u - eps)/(eps*(eps-u_n))); // Critical timestep
+	Real u_(prev_u);
+	bool c(u_ < eps);
+	Real dt_(dt);
+	
+	if(dtc > 0. && dt > dtc) { c = !c; u_ = eps; dt_ = dt - dtc; } // Contact transition will occur. Starting from intermediate solution.
+	
+	Real a((c) ? 1. : 0.);
+	
+	Real b(theta*(u_n + a*eps) - 1./dt_);
+	Real ac(4.*theta*(1.+a)*((1.-theta)*prevDotU - u_/dt_));
+	
+	Real u = (b + std::sqrt(b*b-ac))/(2.*theta*(1.+a));
+	prevDotU = -(1.+a)*u + a*eps + u_n; // dotu/u
+	return u;
+}
+
 // Exact solution
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trapezoidal(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew)
 {
@@ -426,6 +468,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 			case 0: normalForce_trapezoidal(phys,geom, undot, isNew); break;
 			case 1: normalForce_AdimExp(phys, geom, undot, isNew, false); break;
 			case 2: normalForce_AdimExp(phys, geom, undot, isNew, true); break;
+			case 3: normalForce_trpz_adim(phys, geom, undot, isNew); break;
 			default:
 				LOG_WARN("Nonexistant resolution method. Using exact (0).");
 				normalForce_trapezoidal(phys,geom, undot, isNew);
@@ -438,7 +481,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	Vector3r C1 = Vector3r::Zero();
 	Vector3r C2 = Vector3r::Zero();
 	
-	if(resolution == 0)
+	if(resolution == 0 || resolution == 3)
 		computeShearForceAndTorques(phys, geom, s1, s2, C1, C2);
 	else
 		computeShearForceAndTorques_log(phys, geom, s1, s2, C1, C2);
