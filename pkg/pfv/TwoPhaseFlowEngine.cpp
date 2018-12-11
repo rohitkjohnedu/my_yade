@@ -265,7 +265,7 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
 	    if(M.determinant() > 0.0){initialSign = true;} // Initial D is positive
 	  }
 	
-	  if(std::abs(M.determinant()) < 1E-30){check = true;}	
+	  if(std::abs(M.determinant()) < 1E-100){check = true;} //TODO:M.determinant should be converted to dimensionless.
 	
 	  if((initialSign==true) && (check ==false)){
 	    if(M.determinant() < 0.0){
