@@ -11,7 +11,7 @@ You can help us: if you publish or you know publications related to Yade do not 
 
 Citing Yade
 ---------------------
-Corresponding bibtex entries `here <https://github.com/yade/trunk/blob/master/doc/citing_yade.bib>`_. Pdf versions are available for each of them. See also `"Acknowledging Yade" <citing.html>`_.
+Corresponding bibtex entries `here <https://gitlab.com/yade-dev/trunk/blob/master/doc/citing_yade.bib>`_. Pdf versions are available for each of them. See also `"Acknowledging Yade" <citing.html>`_.
 
 @bib2rst.bib2rst('../yade-docref.bib')@
 

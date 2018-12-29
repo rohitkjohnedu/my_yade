@@ -23,8 +23,8 @@ postprocessing and debugging.
 
 - Tarballs of different versions: 
 
-  - https://github.com/yade/trunk/tags
-  - Repository on github.com: https://github.com/yade
+  - https://gitlab.com/yade-dev/trunk/tags
+  - Repository on gitlab.com: https://gitlab.com/yade-dev/trunk/-/archive/master/trunk-master.tar.gz
   - Repository on git.debian.org: http://git.debian.org/?p=debian-science/packages/yade.git
 
 **Teams involved:**

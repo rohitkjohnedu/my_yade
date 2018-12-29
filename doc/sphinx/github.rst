@@ -1,7 +1,7 @@
 .. _yade-github-label:
 
 ##############
-Yade on GitHub
+Yade on GitLab
 ##############
 
 ************************************************
@@ -10,22 +10,20 @@ Fast checkout without GitHub account (read-only)
  
 Getting the source code without registering on GitHub can be done via a single command. It will not allow interactions with the remote repository, which you access the read-only way::
 
- git clone https://github.com/yade/trunk.git
+ git clone https://gitlab.com/yade-dev/trunk.git
 
-***************************************************************************
-Using branches on GitHub (for frequent commits see git/trunk section below)
-***************************************************************************
+************************
+Using branches on GitHub
+************************
 
 Most usefull commands are below. For more details, see for instance http://gitref.org/index.html and https://help.github.com/articles/set-up-git
 
 Setup
 =====
 
-1. Register on github.com
+1. Register on gitlab.com
 
-2. Add your `SSH key <https://help.github.com/articles/generating-ssh-keys>`_ to GitHub:
-
- On the GitHub site Click “Account Settings” (top right) > Click “SSH keys” > Click “Add SSH key”
+2. Add your `SSH key <https://gitlab.com/profile/keys>`_ to GitLab:
 
 3. Set your username and email through terminal:
 
@@ -39,25 +37,25 @@ Setup
 
 4. `Fork a repo <https://help.github.com/articles/fork-a-repo>`_:
 
- Click the “Fork” button on the https://github.com/yade/trunk
+ Click the “Fork” button on the https://gitlab.com/yade-dev/trunk
 
 5. Set Up Your Local Repo through terminal:
 
  ::
 
-  git clone git@github.com:username/trunk.git
+  git clone git@gitlab.com:username/trunk.git
 
- This creates a new folder, named trunk, that contains the whole code.
+ This creates a new folder, named trunk, that contains the whole code (make sure username is replaced by your GitLab name).
 
-6. Configure remotes
+6. Configure remotes (optional)
 
  ::
 
   cd to/newly/created/folder
-  git remote add upstream git@github.com:yade/trunk.git
-  git fetch upstream
+  git remote add upstream git@gitlab.com:yade-dev/trunk.git
+  git remote update
 
- Now, your "trunk" folder is linked with the code hosted on github.com. Through appropriate commands explained below, you will be able to update your code to include changes commited by others, or to commit yourself changes that others can get.
+ Now, your "trunk" folder is linked with two remote repositories both hosted on gitlab.com, the original trunk from yade-dev (called "upstream" after the last command) and the fork which resides in your personal account (called "origin" and always configured by default). Through appropriate commands explained below, you will be able to update your code to include changes commited by others, or to commit yourself changes that others can get.
 
 Retrieving older Commits
 ========================
@@ -84,9 +82,9 @@ Then you proceed to commit through terminal::
 
  git add path/to/new/file.cpp  #Version a newly created file: equivalent of "bzr add"
  git commit path/to/new_or_modified/file.cpp -m'Commit message'``  #Validate a change. It can be done several times after every sufficient change. No equivalent in bzr, it's like commiting to your own local repository
- git push  #Push your changes into GitHub. Equivalent of "bzr commit", except that your are commiting to your own remote branch
+ git push  #Push your changes into GitLab. Equivalent of "bzr commit", except that your are commiting to your own remote branch
 
-Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" (see github website for help) or create a patch from your commit via::
+Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" from your fork to yade-dev repo (see gitlab website for help) or create a patch from your commit via::
 
  git format-patch origin  #create patch file in current folder)
 
@@ -106,9 +104,9 @@ Alternatively, this will do fetch+merge all at once (discouraged if you have unc
 
  git pull
 
-****************************************************************
-Working directly on git/trunk (recommended for frequent commits)
-****************************************************************
+**********************************************************************************************
+Working directly on git/trunk (not possible after GitLab migration - section will get updates)
+**********************************************************************************************
 
 This direct access to trunk will sound more familiar to `bzr <http://bazaar.canonical.com/en/>`_ or `svn <https://subversion.apache.org/>`_ users. It is only possible for members of the git team "developpers". Send an email at yade-dev@lists.launchpad.net to join this team (don't forget to tell your git account name).
 
@@ -173,7 +171,7 @@ Auto-rebase may have unpleasant side effects by blocking "pull" if you have unco
 General guidelines for pushing to yade/trunk
 ********************************************
 
-1. Set autorebase once on the computer! (see above)
+1. Set autorebase once on the computer (see above). Non-rebased pull requests will not be accepted on the upstream. This is to keep history linear, and avoid the merge commits.  
 
 2. Inspect the diff to make sure you will not commit junk code (typically some "cout<<" left here and there), using in terminal:
 

@@ -7,7 +7,7 @@ Yade Technical Archive
 About
 =====
 
-The Yade Technical Archive (YTA) seeks to improve the reproducibility of Yade related publications by clarifying the theory that underlies `Yade's opensource code <https://github.com/yade>`__, explaining algorithmic implementations, and providing practical tutorials. In doing so, YTA removes the opacity that commonly exists between readers and computational journal articles, strengthens and improves visibility of existing Yade journal papers, enables academic collaborations, and broadens open access academia.
+The Yade Technical Archive (YTA) seeks to improve the reproducibility of Yade related publications by clarifying the theory that underlies `Yade's opensource code <https://gitlab.com/yade-dev>`__, explaining algorithmic implementations, and providing practical tutorials. In doing so, YTA removes the opacity that commonly exists between readers and computational journal articles, strengthens and improves visibility of existing Yade journal papers, enables academic collaborations, and broadens open access academia.
 
 Contribute
 ==========

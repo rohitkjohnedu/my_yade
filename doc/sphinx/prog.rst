@@ -109,9 +109,9 @@ The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
 tutorial can be found in :ref:`yade-github-label`. 
 GIT is a distributed revision control system. It is available packaged for all major linux distributions.
 
-The source code is hosted on `GitHub <https://github.com/yade/>`__ , which is periodically
+The source code is hosted on `GitHub <https://gitlab.com/yade-dev/>`__ , which is periodically
 imported to Launchpad for building PPA-packages.
-The repository `can be http-browsed <https://github.com/yade/trunk>`__.
+The repository `can be http-browsed <https://gitlab.com/yade-dev/trunk>`__.
 
 Build robot
 -----------

@@ -51,7 +51,7 @@ This method maintains a physical reference strain energy for the calculation of 
 
 	Example of clustered broken bonds (colored lines) and the final AE events (colored circles) with their event magnitudes. 
 
-For a detailed look at the underlying algorithm, please refer to the `source code <https://github.com/yade/trunk/blob/master/pkg/dem/JointedCohesiveFrictionalPM.cpp>`__. 
+For a detailed look at the underlying algorithm, please refer to the `source code <https://gitlab.com/yade-dev/trunk/blob/master/pkg/dem/JointedCohesiveFrictionalPM.cpp>`__. 
 
 Activating the algorithm within Yade
 ====================================

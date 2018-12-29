@@ -27,5 +27,5 @@ The second edition of Yade documentation is seen as a collection with the three 
 * Fundamentals of the DEM as implemented in Yade are explained in `(pdf version) <https://www.yade-dem.org/publi/documentation_2nd_ed/YadeTheory.pdf>`__:
 	V. Šmilauer et al. (2015), Dem formulation. In Yade Documentation 2nd ed. The Yade Project , DOI 10.5281/zenodo.34044 (http://yade-dem.org/doc/)
 
-Plain bibtex items can be `found here <https://github.com/yade/trunk/blob/master/doc/citing_yade.bib>`_.
+Plain bibtex items can be `found here <https://gitlab.com/yade-dev/trunk/blob/master/doc/citing_yade.bib>`_.
 

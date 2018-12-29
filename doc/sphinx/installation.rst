@@ -33,9 +33,9 @@ After that you can normally start Yade using the command ``yadedaily`` or ``yade
 ``yadedaily`` on older distributions can have some disabled features due to older library
 versions, shipped with particular distribution. 
 
-The Git-repository for packaging stuff is available on `GitHub <https://github.com/yade/yadedaily/>`_. 
+The Git-repository for packaging stuff is available on `GitHub <https://gitlab.com/yade-dev/yadedaily/>`_. 
 Each branch corresponds to one distribution, e.g., xenial, stretch etc.
-The scripts for building all of this stuff are `here <https://github.com/yade/trunk/tree/master/scripts/ppa>`__. 
+The scripts for building all of this stuff are `here <https://gitlab.com/yade-dev/trunk/tree/master/scripts/ppa>`__. 
 It uses "pbuilder" to build packages, so all packages are built in a clean environment.
 
 If you do not need ``yadedaily``-package anymore, just remove the
@@ -85,24 +85,23 @@ versions will not be updated (except for updates due to critical and
 easy-to-fix bugs), but generally they are more stable than the trunk.
 
 #. Releases can be downloaded from the `download page <https://launchpad.net/yade/+download>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
-#. The development version (``trunk``) can be obtained from the `code repository <https://github.com/yade/>`_ at GitHub.
+#. The development version (``trunk``) can be obtained from the `code repository <https://gitlab.com/yade-dev/>`_ at GitHub.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
-management (install the ``git`` package on your system and create a `GitHub account <https://github.com/join/>`__)::
+management (install the ``git`` package on your system and create a `GitLab account <https://gitlab.com/users/sign_in>`__)::
 
-		git clone git@github.com:yade/trunk.git
+		git clone git@gitlab.com:yade-dev/trunk.git
 
 will download the whole code repository of the ``trunk``. Check out :ref:`yade-github-label`
 for more details on how to collaborate using ``git``.
 
 Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the trunk version)::
 
-		git clone https://github.com/yade/trunk.git
+		git clone https://gitlab.com/yade-dev/trunk.git
    
-For those behind a firewall, you can download the sources from our `GitHub <https://github.com/yade>`__ repository as compressed archive.
+For those behind a firewall, you can download the sources from our `GitLab <https://gitlab.com/yade-dev>`__ repository as compressed archive.
 
-Release and trunk sources are compiled in exactly the same way. In order to get notifications about changes
-to the truck (i.e., ``commits``), use `watch option on GitHub <https://help.github.com/articles/watching-repositories/>`_.
+Release and trunk sources are compiled in exactly the same way.
 
 Prerequisites
 ^^^^^^^^^^^^^
@@ -200,7 +199,7 @@ You should create a separate build-place-folder, where Yade will be configured
 and where the source code will be compiled. Here is an example for a folder structure::
 
 	myYade/       		## base directory
-		trunk/		## folder for source code in which you use github
+		trunk/		## folder for source code in which you use git
 		build/		## folder in which the sources will be compiled; build-directory; use cmake here
 		install/	## install folder; contains the executables
 
@@ -217,7 +216,7 @@ syntax::
 
 	cmake -DOPTION1=VALUE1 -DOPTION2=VALUE2
 	
-As of Yade version git-2315bd8 (or 2018.02b release), the following options are available: (see the `source code <https://github.com/yade/trunk/blob/master/CMakeLists.txt>`_ for a most up-to-date list)
+As of Yade version git-2315bd8 (or 2018.02b release), the following options are available: (see the `source code <https://gitlab.com/yade-dev/trunk/blob/master/CMakeLists.txt>`_ for a most up-to-date list)
 	
 	* CMAKE_INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
