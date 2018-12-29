@@ -265,7 +265,7 @@ void TwoPhaseFlowEngine::computePoreBodyRadius()
 	    if(M.determinant() > 0.0){initialSign = true;} // Initial D is positive
 	  }
 	
-	  if(std::abs(M.determinant()) < 1E-30){check = true;}	
+	  if(std::abs(M.determinant()) < 1E-100){check = true;} //TODO:M.determinant should be converted to dimensionless.
 	
 	  if((initialSign==true) && (check ==false)){
 	    if(M.determinant() < 0.0){
@@ -434,8 +434,7 @@ void TwoPhaseFlowEngine::savePhaseVtk(const char* folder, bool withBoundaries)
 	basicVTKwritter vtkfile(0,0);
 	solver->saveMesh(vtkfile,withBoundaries,allIds,fictiousN,filename);
 	solver->noCache=initNoCache;
-	RTriangulation& Tri = solver->tesselation().Triangulation();
-	
+		
 	vtkfile.begin_data("Pressure",CELL_DATA,SCALARS,FLOAT);
 	for (unsigned kk=0; kk<allIds.size(); kk++) vtkfile.write_data(solver->tesselation().cellHandles[allIds[kk]]->info().p());
 	vtkfile.end_data();

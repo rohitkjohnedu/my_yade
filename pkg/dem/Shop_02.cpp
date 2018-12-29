@@ -104,7 +104,11 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	IGeomDispatcher* geomMeta=NULL;
 	IPhysDispatcher* physMeta=NULL;
 	shared_ptr<Scene> rb=Omega::instance().getScene();
-	if(rb->interactions->find(Body::id_t(id1),Body::id_t(id2))!=0) throw runtime_error(string("Interaction #")+boost::lexical_cast<string>(id1)+"+#"+boost::lexical_cast<string>(id2)+" already exists.");
+	shared_ptr<Interaction> i = rb->interactions->find(Body::id_t(id1),Body::id_t(id2));
+	if(i) {
+		if (i->isReal()) throw runtime_error(string("Interaction #")+ boost::lexical_cast<string>(id1)+ "+#"+boost::lexical_cast<string>(id2)+" already exists.");
+		else rb->interactions->erase(id1,id2,i->linIx);
+	} 
 	FOREACH(const shared_ptr<Engine>& e, rb->engines){
 		if(!geomMeta) { geomMeta=dynamic_cast<IGeomDispatcher*>(e.get()); if(geomMeta) continue; }
 		if(!physMeta) { physMeta=dynamic_cast<IPhysDispatcher*>(e.get()); if(physMeta) continue; }
@@ -117,7 +121,7 @@ shared_ptr<Interaction> Shop::createExplicitInteraction(Body::id_t id1, Body::id
 	shared_ptr<Body> b1=Body::byId(id1,rb), b2=Body::byId(id2,rb);
 	if(!b1) throw runtime_error(("No body #"+boost::lexical_cast<string>(id1)).c_str());
 	if(!b2) throw runtime_error(("No body #"+boost::lexical_cast<string>(id2)).c_str());
-	shared_ptr<Interaction> i=geomMeta->explicitAction(b1,b2,/*force*/force);
+	i=geomMeta->explicitAction(b1,b2,/*force*/force);
 	assert(force && i);
 	if(!i) return i;
 	physMeta->explicitAction(b1->material,b2->material,i);
@@ -263,8 +267,8 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	// *** Fabric tensor ***/
 	fabric=Matrix3r::Zero(); 
 	int count=0; // number of interactions
-	vector<Vector3r> aabb = Shop::aabbExtrema(cutoff);
-	Vector3r bbMin = aabb[0], bbMax = aabb[1];
+	py::tuple aabb = Shop::aabbExtrema(cutoff);
+	Vector3r bbMin = py::extract<Vector3r>(aabb[0]), bbMax = py::extract<Vector3r>(aabb[1]);
 	Vector3r cp;
 	
 	Fmean=0; // initialize average contact force for split = 1 fabric measurements
@@ -349,8 +353,8 @@ Matrix3r Shop::getStress(Real volume){
 	Scene* scene=Omega::instance().getScene().get();
 	Real volumeNonPeri = 0;
 	if ( volume==0 && !scene->isPeriodic ) {
-	  vector<Vector3r> extrema = Shop::aabbExtrema();
-	  volumeNonPeri = (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]);
+	  py::tuple extrema = Shop::aabbExtrema();
+	  volumeNonPeri = py::extract<Real>( (extrema[1][0] - extrema[0][0])*(extrema[1][1] - extrema[0][1])*(extrema[1][2] - extrema[0][2]) );
 	}
 	if (volume==0) volume = scene->isPeriodic?scene->cell->hSize.determinant():volumeNonPeri;
 	Matrix3r stressTensor = Matrix3r::Zero();
@@ -871,22 +875,18 @@ void Shop::growParticle(Body::id_t bodyID, Real multiplier, bool updateMass)
 	}
 }
 
-vector<Vector3r> Shop::aabbExtrema(Real cutoff, bool centers){
+py::tuple Shop::aabbExtrema(Real cutoff, bool centers){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
-		if(!b) continue;
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));
 		maximum=maximum.cwiseMax(b->state->pos+(centers?Vector3r::Zero():rrr));
 	}
 	Vector3r dim=maximum-minimum;
-	vector<Vector3r> ret;
-	ret.push_back(minimum+.5*cutoff*dim);
-	ret.push_back(maximum-.5*cutoff*dim);
-	return ret;
+	return py::make_tuple(Vector3r(minimum+.5*cutoff*dim),Vector3r(maximum-.5*cutoff*dim));
 }
 
 /*! Added function for 2D calculation: sphere volume. Optional. By Ning Guo */
