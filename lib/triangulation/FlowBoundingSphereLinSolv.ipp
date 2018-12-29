@@ -168,7 +168,7 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::resetLinearSystem() {
 template<class _Tesselation, class FlowType>
 int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 {
-	
+	#ifdef SUITESPARSE_VERSION_4
 	if (!multithread && factorExists && useSolver==4){
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);	
 		cholmod_l_free_sparse(&Achol, &com);
@@ -187,6 +187,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		factorExists=false;	
 
 	}
+	#endif
 
 	if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);
 

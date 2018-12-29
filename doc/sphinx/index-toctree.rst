@@ -24,6 +24,8 @@ Welcome to Yade's documentation!
 
   GPUacceleration.rst
 
+  HydroForceEngine.rst
+
   github.rst
 
   formulation.rst
@@ -39,6 +41,8 @@ Welcome to Yade's documentation!
   citing.rst
 
   publications.rst
+
+  yadeTechArchive.rst
 
   references.rst
 

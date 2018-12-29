@@ -18,7 +18,7 @@ make:
   stage: build
   script:
     - cd build
-    - make -j 16
+    - make -j 6
     - make install
     - make clean
   artifacts:

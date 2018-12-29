@@ -1,6 +1,6 @@
 /*CWBoon 2016 */
 /* Please cite: */
-/* CW Boon, GT Houlsby, S Utili (2013).  A new algorithm for contact detection between convex polygonal and polyhedral particles in the discrete element method.  Computers and Geotechnics 44, 73-82. */
+/* CW Boon, GT Houlsby, S Utili (2012).  A new algorithm for contact detection between convex polygonal and polyhedral particles in the discrete element method.  Computers and Geotechnics 44, 73-82. */
 /* The numerical library is changed from CPLEX to CLP because subscription to the academic initiative is required to use CPLEX for free */
 
 
