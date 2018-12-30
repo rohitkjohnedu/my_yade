@@ -171,7 +171,7 @@ Auto-rebase may have unpleasant side effects by blocking "pull" if you have unco
 General guidelines for pushing to yade/trunk
 ********************************************
 
-1. Set autorebase once on the computer (see above). Non-rebased pull requests will not be accepted on the upstream. This is to keep history linear, and avoid the merge commits.  
+1. Set autorebase globaly on the computer (only once see above), or at least on current local branch. Non-rebased pull requests will not be accepted on the upstream. This is to keep history linear, and avoid the merge commits.  
 
 2. Inspect the diff to make sure you will not commit junk code (typically some "cout<<" left here and there), using in terminal:
 
