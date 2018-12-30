@@ -33,7 +33,7 @@ After that you can normally start Yade using the command ``yadedaily`` or ``yade
 ``yadedaily`` on older distributions can have some disabled features due to older library
 versions, shipped with particular distribution. 
 
-The Git-repository for packaging stuff is available on `GitHub <https://gitlab.com/yade-dev/yadedaily/>`_. 
+The Git-repository for packaging stuff is available on `GitLab <https://gitlab.com/yade-dev/yadedaily/>`_. 
 Each branch corresponds to one distribution, e.g., xenial, stretch etc.
 The scripts for building all of this stuff are `here <https://gitlab.com/yade-dev/trunk/tree/master/scripts/ppa>`__. 
 It uses "pbuilder" to build packages, so all packages are built in a clean environment.
@@ -85,7 +85,7 @@ versions will not be updated (except for updates due to critical and
 easy-to-fix bugs), but generally they are more stable than the trunk.
 
 #. Releases can be downloaded from the `download page <https://launchpad.net/yade/+download>`_, as compressed archive. Uncompressing the archive gives you a directory with the sources.
-#. The development version (``trunk``) can be obtained from the `code repository <https://gitlab.com/yade-dev/>`_ at GitHub.
+#. The development version (``trunk``) can be obtained from the `code repository <https://gitlab.com/yade-dev/>`_ at GitLab.
 
 We use `GIT <http://git-scm.com/>`_ (the ``git`` command) for code 
 management (install the ``git`` package on your system and create a `GitLab account <https://gitlab.com/users/sign_in>`__)::
@@ -95,7 +95,7 @@ management (install the ``git`` package on your system and create a `GitLab acco
 will download the whole code repository of the ``trunk``. Check out :ref:`yade-github-label`
 for more details on how to collaborate using ``git``.
 
-Alternatively, a read-only checkout is possible via https without a GitHub account (easier if you don't want to modify the trunk version)::
+Alternatively, a read-only checkout is possible via https without a GitLab account (easier if you don't want to modify the trunk version)::
 
 		git clone https://gitlab.com/yade-dev/trunk.git
    

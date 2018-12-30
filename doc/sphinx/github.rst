@@ -5,15 +5,15 @@ Yade on GitLab
 ##############
 
 ************************************************
-Fast checkout without GitHub account (read-only)
+Fast checkout without GitLab account (read-only)
 ************************************************
  
-Getting the source code without registering on GitHub can be done via a single command. It will not allow interactions with the remote repository, which you access the read-only way::
+Getting the source code without registering on GitLab can be done via a single command. It will not allow interactions with the remote repository, which you access the read-only way::
 
  git clone https://gitlab.com/yade-dev/trunk.git
 
 ************************
-Using branches on GitHub
+Using branches on GitLab
 ************************
 
 Most usefull commands are below. For more details, see for instance http://gitref.org/index.html and https://help.github.com/articles/set-up-git
@@ -114,7 +114,7 @@ This direct access to trunk will sound more familiar to `bzr <http://bazaar.cano
 
  ::
 
-  git clone git@github.com:yade/trunk.git
+  git clone git@gitlab.com:yade-dev/trunk.git
 
  This creates a new folder, named trunk, that contains the whole code.
 
@@ -150,7 +150,7 @@ Now your file ~/.gitconfig should include::
 Check also .git/config file in your local trunk folder (rebase = true)::
 
 	  [remote "origin"]
-	    url = git@github.com:yade/trunk.git
+	    url = git@gitlab.com:yade-dev/trunk.git
 	    fetch = +refs/heads/*:refs/remotes/origin/*
 	  [branch "master"]
 	    remote = origin
