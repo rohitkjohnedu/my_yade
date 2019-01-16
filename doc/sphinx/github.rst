@@ -84,7 +84,15 @@ Then you proceed to commit through terminal::
  git commit path/to/new_or_modified/file.cpp -m'Commit message'``  #Validate a change. It can be done several times after every sufficient change. No equivalent in bzr, it's like commiting to your own local repository
  git push  #Push your changes into GitLab. Equivalent of "bzr commit", except that your are commiting to your own remote branch
 
-Changes will be pushed to your personal "fork", If you have tested your changes and you are ready to push them into the main trunk, just do a "pull request" from your fork to yade-dev repo (see gitlab website for help) or create a patch from your commit via::
+Changes will be pushed to your personal "fork".
+
+Requesting merge into upstream repository
+-----------------------------------------
+
+If you have tested your changes and you are ready to push them into the main trunk, you'll have to make a "pull request" from the gitlab.com interface (see the "+" button at the top of your personal project). Set source branch and target branch - typically from user/trunk/master to yade-dev/trunk/master. Sending the merge request will trigger a `pipeline <https://gitlab.com/yade-dev/trunk/pipelines>`_ which includes compiling, running regression tests, and generating the documentation (the `newly built <https://yade-dev.gitlab.io/trunk>`_ documentation is accessible via settings->pages).
+If the full pipeline succeeds the merge request can be merged into the upstream repository.
+
+Alternatively, create a patch from your commit via::
 
  git format-patch origin  #create patch file in current folder)
 
