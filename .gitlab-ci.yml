@@ -9,6 +9,7 @@ cmake:
   stage: cmake
   only:
     - master
+    - merge_request
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
@@ -20,6 +21,7 @@ make:
   stage: build
   only:
     - master
+    - merge_request
   script:
     - cd build
     - make -j 12
@@ -35,6 +37,7 @@ test:
   stage: test
   only:
     - master
+    - merge_request
   script:
     - install/bin/yade-ci --test
   dependencies:
@@ -44,6 +47,7 @@ check:
   stage: test
   only:
     - master
+    - merge_request
   script:
     - install/bin/yade-ci --checks
   dependencies:
@@ -53,6 +57,7 @@ pages:
   stage: doc
   only:
     - master
+    - merge_request
   script:
     - cd build
     - xvfb-run -s "-screen 0 1600x1200x24" make doc
