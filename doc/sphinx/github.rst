@@ -75,22 +75,35 @@ You may start by inspecting your changes with a few commands. For the "diff" com
  git status
  git diff path/to/modified/file.cpp
 
-Committing changes
-------------------
+Pushing changes to remote repository
+------------------------------------
 
-Then you proceed to commit through terminal::
+1. Push to personnal repository
 
- git add path/to/new/file.cpp  #Version a newly created file: equivalent of "bzr add"
- git commit path/to/new_or_modified/file.cpp -m'Commit message'``  #Validate a change. It can be done several times after every sufficient change. No equivalent in bzr, it's like commiting to your own local repository
- git push  #Push your changes into GitLab. Equivalent of "bzr commit", except that your are commiting to your own remote branch
+After previous steps proceed to commit through terminal::
 
-Changes will be pushed to your personal "fork".
+ git add path/to/new/file.cpp  #Version a newly created file
+ git commit path/to/new_or_modified/file.cpp -m 'Commit message'  #stage (register) change in the local repository
+ git push  #Push all commits to the remote branch
+
+Changes will be pushed to your personal fork.
+
+2. Push to yade-dev
+
+Merging changes into the master branch cannot be done directly with a push, only by merge request (see below). It is possible however to push changes to a new branch of yade-dev repository for members of that group. It is `currently <https://gitlab.com/gitlab-org/gitlab-ce/issues/23902>`_ the only way to have merge requests tested by the gitlab CI pipeline before being effectively merged. To push to a new yade-dev/branch::
+
+ git push upstream master:newlyCreatedBranch #Push all commits to a new remote branch.
+
+in that command ``newlyCreatedBranch`` will be the name of that branch. Please hoose a descriptive name as much as you can.
 
 Requesting merge into upstream repository
 -----------------------------------------
 
-If you have tested your changes and you are ready to push them into the main trunk, you'll have to make a "pull request" from the gitlab.com interface (see the "+" button at the top of your personal project). Set source branch and target branch - typically from user/trunk/master to yade-dev/trunk/master. Sending the merge request will trigger a `pipeline <https://gitlab.com/yade-dev/trunk/pipelines>`_ which includes compiling, running regression tests, and generating the documentation (the `newly built <https://yade-dev.gitlab.io/trunk>`_ documentation is accessible via settings->pages).
+If you have tested your changes and you are ready to push them into the main trunk, you'll have to make a "merge request" (MR) from the gitlab.com interface (see the "+" button at the top of the repository webpage). Set source branch and target branch - typically from user/trunk/master (or yade-dev/newlyCreatedBranch/master) to yade-dev/trunk/master. The MR will trigger a `pipeline <https://gitlab.com/yade-dev/trunk/pipelines>`_ which includes compiling, running regression tests, and generating the documentation (the `newly built <https://yade-dev.gitlab.io/trunk>`_ documentation is accessible via settings->pages).
 If the full pipeline succeeds the merge request can be merged into the upstream repository.
+
+If the MR is from personnal to yade-dev repository the pipeline needs runners available to the forked repository (check this with your local IT support). If the MR is from a branch of yade-dev/trunk group runners attached to yade-dev will handle it (the group runners are kindly provided by `3SR <https://www.3sr-grenoble.fr/?lang=en>`_ and `UMS Gricad <https://gricad.univ-grenoble-alpes.fr/>`_).
+
 
 Alternatively, create a patch from your commit via::
 
