@@ -80,23 +80,23 @@ ok │ok │   └── wiretensiltest.py         Spams terminal with message
 OK │x  │   ├── simple-scene-plot-NewtonIntegrator.py
 OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
    │   ├── agglomerate
-   │OK │   ├── compress.py
+ok │OK │   ├── compress.py
 ok │OK │   ├── divide.py
 ok │OK │   ├── makeCloud.py
-   │OK │   └── simulation.py
+x  │OK │   └── simulation.py             AttributeError: 'Body' object has no attribute 'agglomerate'
    │   ├── baraban
-   │   │   ├── BicyclePedalEngine.py
-   │   │   ├── baraban.py
-   │   │   └── rotating-cylinder.py
-   │   ├── billiard.py
-   │   ├── bouncingbubble.py
+OK │x  │   ├── BicyclePedalEngine.py
+OK │x  │   ├── baraban.py
+ok │x  │   └── rotating-cylinder.py      a little too slow
+OK │OK ├── billiard.py
+OK │x  ├── bouncingbubble.py             Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
    │   ├── bulldozer
-   │   │   ├── bulldozer.py
-   │   │   └── bulldozerVTK.py
+OK │ok │   ├── bulldozer.py
+OK │ok │   └── bulldozerVTK.py
    │   ├── capillary
-   │   │   ├── capillar.py
-   │   │   └── liquidmigration
-   │   │       └── showcase.py
+OK │ok?│   ├── capillar.py
+   │   │   └── liquidmigration           NameError: name 'LiqControl' is not defined ; I guess need to recompile with LIQMIGRATION or something like that
+x  │ok?│       └── showcase.py
    │   ├── capillaryLaplaceYoung
    │   │   ├── CapillaryPhys-example.py
    │   │   ├── capillaryBridge.py
