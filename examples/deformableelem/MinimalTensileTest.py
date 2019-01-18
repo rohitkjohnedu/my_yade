@@ -190,7 +190,7 @@ O.engines=[ForceResetter(),
 
 
 
-O.dt=1e-7;
+O.dt=0.5e-7;
 
 from yade import plot
 

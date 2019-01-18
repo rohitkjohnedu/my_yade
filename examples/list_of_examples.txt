@@ -127,20 +127,20 @@ OK │OK │   └── conveyor.py
    │   ├── cylinders
 OK │OK │   ├── bendingbeams.py
 OK │OK │   ├── cylinder-cylinder.py
-   │   │   ├── cylinderconnection-roots.py
-   │   │   └── mikado.py
+OK │OK │   ├── cylinderconnection-roots.py
+OK │OK │   └── mikado.py
    │   ├── deformableelem
-   │   │   ├── Minimal.py
-   │   │   ├── MinimalTensileTest.py
-   │   │   ├── main.py
-   │   │   ├── testDeformableBodies.py
-   │   │   └── testDeformableBodies_pressure.py
-   │   ├── funnel.py
+ok?│x  │   ├── Minimal.py                   the graphs are empty
+ok │x  │   ├── MinimalTensileTest.py
+?? │x  │   ├── main.py
+ok?│x  │   ├── testDeformableBodies.py            It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
+ok?│ok │   └── testDeformableBodies_pressure.py   It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
+OK │OK ├── funnel.py
    │   ├── grids
-   │   │   ├── CohesiveGridConnectionSphere.py
-   │   │   ├── GridConnection_Spring.py
-   │   │   ├── Simple_GridConnection_Falling.py
-   │   │   └── Simple_Grid_Falling.py
+OK │OK │   ├── CohesiveGridConnectionSphere.py
+OK │x  │   ├── GridConnection_Spring.py
+OK │x  │   ├── Simple_GridConnection_Falling.py
+OK │x  │   └── Simple_Grid_Falling.py
    │   ├── gts-horse
    │   │   ├── gts-horse.py
    │   │   ├── gts-operators.py

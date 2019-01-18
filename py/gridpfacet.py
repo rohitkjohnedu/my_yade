@@ -52,7 +52,7 @@ def chainedCylinder(begin=Vector3(0,0,0),end=Vector3(1.,0.,0.),radius=0.2,dynami
 	"""
 
 	import warnings
-	warnings.warn('\033[1;31mchainedCylinder is deprecated and will be removed in the future, use GridConnection instead.\033[1;0m',category=UserWarning)
+	warnings.warn('\033[1;31mchainedCylinder is deprecated and will be removed in the future, use GridConnection instead. See examples/grids/CohesiveGridConnectionSphere.py.\033[1;0m',category=UserWarning)
 
 	segment=end-begin
 	b=Body()
