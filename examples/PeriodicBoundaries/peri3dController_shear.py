@@ -2,7 +2,7 @@
 # script, that explains funcionality and input parameters of Peri3dController on the example of
 # shear test with rotated periodic cell (that enables strain localization).
 #   The simulation is run on rotated cell to enable localization and strain softening
-# (you can also try simulation with different angles of rotation to pbtain different results.
+# (you can also try simulation with different angles of rotation to obtain different results.
 
 
 from yade import pack,plot,qt

@@ -4,7 +4,7 @@
 #  2nd column: whether there is a brief explanation at the top of the file what this example is demonstrating
 # Notation: 'OK' - very good, 'ok' - acceptable, 'OK?' - works but looks suspicious, 'ok?' - even worse, 'x' - very bad/missing/not working
 
-#  # tree -P "*.py" > list_of_examples.txt
+# the list below was created with command: tree -P "*.py" > list_of_examples.txt
 #
 # works? 
 #  │explained inside what it is demonstrating?
@@ -14,7 +14,7 @@ OK │ok ├── 2D-Tori.py
 x  │ok │   ├── LOedometricDeform.py   NameError: name 'DeformControl' is not defined
 x  │ok?│   └── OedometricDeform.py    NameError: name 'DeformControl' is not defined
    │   ├── FEMxDEM
-x  │x  │   ├── biaxialSmooth.py       ImportError: No module named esys.escript
+x  │x  │   ├── biaxialSmooth.py       ImportError: No module named esys.escript; apt install esys-particle changes error to ImportError: No module named escript
 x  │x  │   ├── footing.py             ImportError: No module named esys.escript
 OK │x  │   ├── prepareRVE.py
 x  │x  │   ├── retainingSmooth.py     ImportError: No module named esys.escript
@@ -24,7 +24,7 @@ x  │x  │   └── undrain.py             ImportError: No module named e
 OK │OK │   └── buoyancy.py
    │   ├── FluidCouplingPFV
 OK?│OK │   ├── drainage-2PFV-Yuan_and_Chareyre_2017.py  note: no visuals, I guess I would have to wait longer to see anything
-OK?│OK │   └── oedometer.py                             note: The graph is rather surprising - contains only one point.
+OK │OK │   └── oedometer.py
    │   ├── HydroForceEngine
    │   │   ├── oneWayCoupling
 OK │OK │   │   ├── buoyantParticles.py
@@ -52,39 +52,38 @@ x  │x  │   ├── LudingPM_1.py     NewtonIntegrator: NaN force acting 
 x  │x  │   └── LudingPM_2.py     NewtonIntegrator: NaN force acting on #0.
 OK │x  ├── PIDController.py
    │   ├── PeriodicBoundaries
-   │   │   ├── cellFlipping.py
-   │   │   ├── peri3dController_example1.py
-   │   │   ├── peri3dController_shear.py
-   │   │   ├── peri3dController_triaxialCompression.py
-   │   │   ├── periodic-compress.py
-   │   │   ├── periodic-grow.py
-   │   │   ├── periodic-shear.py
-   │   │   ├── periodic-simple-shear.py
-   │   │   ├── periodic-simple.py
-   │   │   ├── periodic-triax-settingHsize.py
-   │   │   ├── periodic-triax.py
-   │   │   └── periodicSandPile.py
+ok?│OK │   ├── cellFlipping.py
+OK │ok │   ├── peri3dController_example1.py
+OK │OK │   ├── peri3dController_shear.py
+OK │OK │   ├── peri3dController_triaxialCompression.py
+OK │ok │   ├── periodic-compress.py
+OK?│OK │   ├── periodic-grow.py                           note: no visuals, I guess I would have to wait longer to see anything
+OK │x  │   ├── periodic-shear.py
+OK │ok │   ├── periodic-simple-shear.py
+OK │ok │   ├── periodic-simple.py
+OK │OK │   ├── periodic-triax-settingHsize.py
+OK │ok │   ├── periodic-triax.py
+OK │OK │   └── periodicSandPile.py
    │   ├── PotentialBlocks
-   │   │   ├── WedgeYADE.py
-   │   │   ├── cubePBscaled.py
-   │   │   └── joints
+x  │ok │   ├── WedgeYADE.py    NameError: name 'BlockGen' ; Recompile with ENABLE_POTENTIAL_BLOCKS=ON, apt install coinor-clp coinor-libclp-dev coinor-libclp1 coinor-libosi1v5
+x  │ok │   └── cubePBscaled.py NameError: name 'PotentialBlock2AABB' is not defined
    │   ├── PotentialParticles
-   │   │   ├── basic.py
-   │   │   └── cubePPscaled.py
-   │   ├── ResetRandomPosition.py
-   │   ├── ViscElMatchMaker.py
+x  │x  │   ├── basic.py        NameError: name 'PotentialParticle2AABB' is not defined
+x  │x  │   └── cubePPscaled.py NameError: name 'PotentialParticle2AABB' is not defined
+ok?│x  ├── ResetRandomPosition.py        SIGSEGV/SIGABRT handler called; gdb
+OK │OK ├── ViscElMatchMaker.py
    │   ├── WireMatPM
-   │   │   ├── wirecontacttest.py
-   │   │   ├── wirepackings.py
-   │   │   └── wiretensiltest.py
+ok │x  │   ├── wirecontacttest.py        Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
+ok │ok │   ├── wirepackings.py
+ok │ok │   └── wiretensiltest.py         Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
    │   ├── adaptiveintegrator
-   │   │   ├── simple-scene-plot-NewtonIntegrator.py
-   │   │   └── simple-scene-plot-RungeKuttaCashKarp54.py
+OK │x  │   ├── simple-scene-plot-NewtonIntegrator.py
+OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
    │   ├── agglomerate
-   │   │   ├── compress.py
-   │   │   ├── divide.py
-   │   │   ├── makeCloud.py
-   │   │   └── simulation.py
+   │OK │   ├── compress.py
+ok │OK │   ├── divide.py
+ok │OK │   ├── makeCloud.py
+   │OK │   └── simulation.py
    │   ├── baraban
    │   │   ├── BicyclePedalEngine.py
    │   │   ├── baraban.py
@@ -292,6 +291,3 @@ OK │x  ├── PIDController.py
    │   │   ├── script-session1.py
    │   │   └── script-session2.py
    │   └── tunnel-pack.py
-   │   
-   │   62 directories, 225 files
-   

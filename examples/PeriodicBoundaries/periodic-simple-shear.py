@@ -30,7 +30,7 @@ def triaxDone():
 	global phase
 	if phase==0:
 		print 'Here we are: stress',triax.stress,'strain',triax.strain,'stiffness',triax.stiff
-		print 'Now shearing.'
+		print '\nNow shearing. Press ▶ (the start button) to start shearing.\n'
 		O.cell.velGrad=Matrix3(0,6,0, 0,0,0, 0,0,0)
 		triax.stressMask=7
 		triax.goal=[-1e4,-1e4,-1e4]
@@ -43,6 +43,7 @@ def triaxDone():
 		##O.pause()
 		
 O.dt=PWaveTimeStep()
+
 #O.run(7000);
 #qt.View()
 ##r=qt.Renderer()

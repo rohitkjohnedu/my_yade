@@ -163,4 +163,6 @@ print "starting oedometer simulation"
 O.run(200,1)
 timing.stats()
 
+print "\nPress ▶ (the start button) to see graph.\n"
+
 ## Make more steps to see the convergence to the stationnary solution

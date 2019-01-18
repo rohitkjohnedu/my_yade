@@ -13,6 +13,7 @@ O.materials.append(CpmMat(neverDamage=True,frictionAngle=0))
 
 # load spheres from file, including information of their agglomerates ids
 attrs = []
+print "\nPlease see README if you have errors when running this example.\n"
 sp = ymport.textExt('/tmp/compressed.txt',format='x_y_z_r_attrs',attrs=attrs)
 n = max(int(a[0]) for a in attrs)+1
 colors = [randomColor() for _ in xrange(n)]

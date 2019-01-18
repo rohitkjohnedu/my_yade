@@ -45,4 +45,6 @@ plot.plot()
 
 O.engines=O.engines+[PyRunner(command='if O.cell.hSize[0,1]>O.cell.hSize[0,0]: flipCell()',iterPeriod=20)]
 
+print "\nPress ▶ (the start button) to see graph.\n"
+
 #now click play and watch the flips happening, the evolution of stress or unbalanced force should not show any discontinuity
