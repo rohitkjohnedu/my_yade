@@ -34,8 +34,8 @@ OK │   │   └── sedimentTransportExample_1DRANSCoupling.py
    │       │   │   │   ├── Frey2014_EXP14.py
    │       │   │   │   ├── Frey2014_EXP20.py
    │       │   │   │   └── Frey2014_EXP6.py
-   │       │   │   ├── postProcessValidMaurin2015.py
-   │       │   │   └── validMaurin2015.py
+OK?│       │   │   ├── postProcessValidMaurin2015.py  Note: Plot of time vs. Qs is empty. Got: RuntimeWarning: invalid value encountered in divide
+OK │       │   │   └── validMaurin2015.py
    │       │   └── Maurinetal2016_r2d6s2
    │       │       ├── DATAr2d6s2_Maurinetal2016.py
    │       │       ├── postProcessing_sedim.py

@@ -51,12 +51,15 @@ widthCell = 6.5/6.	#Spanwise length of the periodic cell, in diameter
 if sim6==1:
 	fluidHeight = 5.3e-2	#Height of the flow from the bottom of the sample, in m
 	Nlayer = 7.08	#nb of layer of particle, in diameter
+	nbSim=6
 elif sim14==1:
 	fluidHeight = 5.7e-2	#Height of the flow from the bottom of the sample, in m
 	Nlayer = 7.37	#nb of layer of particle, in diameter
+	nbSim=14
 elif sim20==1:
 	fluidHeight = 5.9e-2	#Height of the flow from the bottom of the sample, in m
 	Nlayer = 7.30	#nb of layer of particle, in diameter
+	nbSim=20
 else:
 	print '\n At least one of the option sim6, sim14 or sim20 should be equal to 1 !! Exit !\n'
 	exit()
@@ -283,7 +286,7 @@ def measure():
 
 	if saveData==1:	#Save data for postprocessing
 		global fileNumber
-		nameFile = scriptPath + '/data/'+ str(fileNumber)+'.py'	# Name of the file that will be saved
+		nameFile = scriptPath + '/sim'+ str(nbSim) + '/data/'+ str(fileNumber)+'.py'	# Name of the file that will be saved
 		globalParam =  ['qsMean','phiPartPY','vxPartPY','vxFluidPY','zAxis']	# Variables to save
 		Save(nameFile, globalParam)	#Save
 		fileNumber+=1	#Increment the file number
@@ -305,8 +308,8 @@ plot.plot()
 fileNumber = 0	# Counter for the file saved
 if saveData==1:	#If saveData option is activated, requires a folder data
 	scriptPath = os.path.abspath(os.path.dirname(sys.argv[-1])) #Path where the script is stored
-	if os.path.exists(scriptPath +'/data/')==False:
-		os.mkdir(scriptPath +'/data/')
+	if os.path.exists(scriptPath + '/sim'+ str(nbSim) +'/data/')==False:
+		os.makedirs(scriptPath + '/sim'+ str(nbSim) +'/data/')
 	else:
 		print '\n!! Save data: overwrite the files contains in the folder data/ !!\n'
 #Function to save global variables in a python file which can be re-executed for post-processing
