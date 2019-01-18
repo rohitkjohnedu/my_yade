@@ -2,7 +2,7 @@ from yade import qt
 from yade.gridpfacet import *
 import gts, os.path, locale
 
-locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')   # Note: gts is locale-dependend. If, for example, german locale is used, gts.read()-function does not import floats normally
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')   # Note: gts is locale-dependent. If, for example, german locale is used, gts.read()-function does not import floats normally
 
 '''
 if you get "Error: unsupported locale setting"

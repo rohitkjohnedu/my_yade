@@ -2,7 +2,7 @@
 # Status of all examples:
 #  1st column: whether they are working
 #  2nd column: whether there is a brief explanation at the top of the file what this example is demonstrating
-# Notation: 'OK' - very good, 'ok' - acceptable, 'OK?' - works but looks suspicious, 'ok?' - even worse, 'x' - very bad/missing/not working
+# Notation: 'OK' - runs and does not produce obvious errors, 'ok' - acceptable, 'OK?' - works but looks suspicious, 'ok?' - even worse, 'x' - very bad/missing/not working
 
 # the list below was created with command: tree -P "*.py" > list_of_examples.txt
 #
@@ -152,30 +152,29 @@ OK │OK │   └── hourglass.py
    │   ├── jointedCohesiveFrictionalPM
 OK │ok │   ├── gravityBis.py
 x  │x  │   ├── gravityLoading.py                  No such file or directory: 'parallellepiped_10_persistentPlane30Deg.spheres'
-   │   │   ├── identifBis.py
-   │   │   ├── identificationSpheresOnJoint.py
-   │   │   ├── packInGtsSurface.py
-   │   │   └── testingJoint.py
-   │   ├── mill.py
+x  │x  │   ├── identificationSpheresOnJoint.py    No such file or directory: 'parallellepiped_10.spheres'
+x  │x  │   ├── packInGtsSurface.py                spams messages: UnbalancedForce=-nan, rel stress nan
+OK │ok │   └── testingJoint.py
+OK │OK ├── mill.py
    │   ├── mortar
    │   │   └── modelTests
-   │   │       ├── compression.py
-   │   │       ├── failureEnvelope.py
-   │   │       └── shear.py
+ok?│ok │       ├── compression.py                 IndexError: No such interaction (after it goes through)
+x  │ok │       ├── failureEnvelope.py             MortarMat.cpp:12 go: MortarMat not implemented for non-cohesive contacts
+ok │ok │       └── shear.py
    │   ├── not-working
-   │   │   ├── Se3Interpolator.py
-   │   │   ├── facet-topo.py
-   │   │   ├── insertion-sort-collider.py
-   │   │   └── triax-identical-results.py
+x  │x  │   ├── Se3Interpolator.py                 NameError: name 'Se3Interpolator' is not defined
+x  │x  │   ├── facet-topo.py                      Recompile with FACET_TOPO
+?? │x  │   ├── insertion-sort-collider.py         something works, then SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   └── triax-identical-results.py         NameError: name 'spheresToFile' is not defined
    │   ├── oar
-   │   │   └── sim.py
+x  │x  │   └── sim.py                             KeyError: 'Invalid key: description.'
    │   ├── packs
-   │   │   └── packs.py
+OK │OK │   └── packs.py
    │   ├── pfacet
-   │   │   ├── gts-pfacet.py
-   │   │   ├── mesh-pfacet.py
-   │   │   ├── pFacets_grids_spheres_interacting.py
-   │   │   └── pfacetcreators.py
+OK │x  │   ├── gts-pfacet.py
+OK │x  │   ├── mesh-pfacet.py
+OK │ok │   ├── pFacets_grids_spheres_interacting.py
+OK │x  │   └── pfacetcreators.py
    │   ├── polyhedra
    │   │   ├── ball.py
    │   │   ├── clump.py
