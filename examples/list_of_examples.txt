@@ -132,7 +132,7 @@ OK │OK │   └── mikado.py
    │   ├── deformableelem
 ok?│x  │   ├── Minimal.py                   the graphs are empty
 ok │x  │   ├── MinimalTensileTest.py
-?? │x  │   ├── main.py
+?? │x  │   ├── main.py                            I suppose this file is here by mistake ?
 ok?│x  │   ├── testDeformableBodies.py            It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
 ok?│ok │   └── testDeformableBodies_pressure.py   It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
 OK │OK ├── funnel.py
@@ -142,16 +142,16 @@ OK │x  │   ├── GridConnection_Spring.py
 OK │x  │   ├── Simple_GridConnection_Falling.py
 OK │x  │   └── Simple_Grid_Falling.py
    │   ├── gts-horse
-   │   │   ├── gts-horse.py
-   │   │   ├── gts-operators.py
-   │   │   ├── gts-random-pack-obb.py
-   │   │   └── gts-random-pack.py
-   │   ├── hdaps.py
+OK │ok │   ├── gts-horse.py
+OK │OK │   ├── gts-operators.py
+ok │ok │   ├── gts-random-pack-obb.py             note: super slow
+OK │OK │   └── gts-random-pack.py
+.. │ok ├── hdaps.py                               can't tell if it works, I don't have /sys/devices/platform/hdaps/ interface
    │   ├── hourglass
-   │   │   └── hourglass.py
+OK │OK │   └── hourglass.py
    │   ├── jointedCohesiveFrictionalPM
-   │   │   ├── gravityBis.py
-   │   │   ├── gravityLoading.py
+OK │ok │   ├── gravityBis.py
+x  │x  │   ├── gravityLoading.py                  No such file or directory: 'parallellepiped_10_persistentPlane30Deg.spheres'
    │   │   ├── identifBis.py
    │   │   ├── identificationSpheresOnJoint.py
    │   │   ├── packInGtsSurface.py
