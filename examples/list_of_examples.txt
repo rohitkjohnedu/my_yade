@@ -98,37 +98,35 @@ OK │ok?│   ├── capillar.py
    │   │   └── liquidmigration           NameError: name 'LiqControl' is not defined ; I guess need to recompile with LIQMIGRATION or something like that
 x  │ok?│       └── showcase.py
    │   ├── capillaryLaplaceYoung
-   │   │   ├── CapillaryPhys-example.py
-   │   │   ├── capillaryBridge.py
-   │   │   ├── solveLaplace_uc.py
-   │   │   └── solveLiqBridge.py
+OK?│OK │   ├── CapillaryPhys-example.py
+OK │ok?│   └── capillaryBridge.py
    │   ├── chained-cylinders
-   │   │   ├── CohesiveCylinderSphere.py
-   │   │   ├── chained-cylinder-roots.py
-   │   │   └── chained-cylinder-spring.py
+OK?│x  │   ├── CohesiveCylinderSphere.py   UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
+OK?│ok?│   ├── chained-cylinder-roots.py   UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
+OK?│ok?│   └── chained-cylinder-spring.py  UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
    │   ├── clumps
-   │   │   ├── addToClump-example.py
-   │   │   ├── apply-buoyancy-clumps.py
-   │   │   ├── clump-hopper-test.py
-   │   │   ├── clump-hopper-viscoelastic.py
-   │   │   ├── clump-inbox-viscoelastic.py
-   │   │   ├── clump-viscoelastic.py
-   │   │   ├── releaseFromClump-example.py
-   │   │   ├── replaceByClumps-example.py
-   │   │   ├── save-load-clumps.py
-   │   │   └── triax-basic-with-clumps.py
+ok?│ok │   ├── addToClump-example.py        SIGSEGV/SIGABRT handler called; gdb
+OK │OK │   ├── apply-buoyancy-clumps.py
+OK?│x  │   ├── clump-hopper-test.py         spams with messages: Body #282 vanished, erasing intr #282+#721!
+OK │x  │   ├── clump-hopper-viscoelastic.py
+OK │x  │   ├── clump-inbox-viscoelastic.py
+OK │x  │   ├── clump-viscoelastic.py
+OK │ok │   ├── releaseFromClump-example.py
+OK │ok │   ├── replaceByClumps-example.py
+x  │ok │   ├── save-load-clumps.py          SIGSEGV/SIGABRT handler called; gdb
+OK │ok │   └── triax-basic-with-clumps.py
    │   ├── concrete
-   │   │   ├── brazilian.py
-   │   │   ├── interaction-histogram.py
-   │   │   ├── periodic.py
-   │   │   ├── triax.py
-   │   │   ├── uniax-post.py
-   │   │   └── uniax.py
+OK │ok │   ├── brazilian.py
+OK │x  │   ├── interaction-histogram.py
+OK?│ok │   ├── periodic.py                  spams with messages: action: 0: strain=0.00169673, goal=1, cellGrow=1.71367
+OK │ok │   ├── triax.py
+OK │ok?│   ├── uniax-post.py
+OK │OK │   └── uniax.py
    │   ├── conveyor
-   │   │   └── conveyor.py
+OK │OK │   └── conveyor.py
    │   ├── cylinders
-   │   │   ├── bendingbeams.py
-   │   │   ├── cylinder-cylinder.py
+OK │OK │   ├── bendingbeams.py
+OK │OK │   ├── cylinder-cylinder.py
    │   │   ├── cylinderconnection-roots.py
    │   │   └── mikado.py
    │   ├── deformableelem

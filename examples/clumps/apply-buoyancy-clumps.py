@@ -1,4 +1,4 @@
-!/usr/bin/python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 '''	The script shows how to include the effect of buoyancy in a particle assembly 
