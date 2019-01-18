@@ -1,293 +1,297 @@
+# 2019-01-18
+# Status of all examples:
+#  1st column: whether they are working
+#  2nd column: whether there is a brief explanation at the top of the file what this example is demonstrating
+# Notation: 'OK' - very good, 'ok' - acceptable, 'OK?' - works but looks suspicious, 'ok?' - even worse, 'x' - very bad/missing/not working
+
 #  # tree -P "*.py" > list_of_examples.txt
-# works?
-   .
-OK ├── 2D-Tori.py
-   ├── DeformEngine
-x  │   ├── LOedometricDeform.py   NameError: name 'DeformControl' is not defined
-x  │   └── OedometricDeform.py    NameError: name 'DeformControl' is not defined
-   ├── FEMxDEM
-x  │   ├── biaxialSmooth.py       ImportError: No module named esys.escript
-x  │   ├── footing.py             ImportError: No module named esys.escript
-OK │   ├── prepareRVE.py
-x  │   ├── retainingSmooth.py     ImportError: No module named esys.escript
-x  │   ├── triaxialRough.py       ImportError: No module named esys.escript
-x  │   └── undrain.py             ImportError: No module named esys.escript
-   ├── FluidCouplingLBM
-OK │   └── buoyancy.py
-   ├── FluidCouplingPFV
-OK?│   ├── drainage-2PFV-Yuan_and_Chareyre_2017.py  note: no visuals, I guess I would have to wait longer to see anything
-OK?│   └── oedometer.py                             note: The graph is rather surprising - contains only one point.
-   ├── HydroForceEngine
-   │   ├── oneWayCoupling
-OK │   │   ├── buoyantParticles.py
-OK │   │   ├── fluidizedBed.py
-OK │   │   ├── postProcessing_sedim.py
-OK │   │   └── sedimentTransportExample.py
-   │   ├── twoWayCoupling
-OK │   │   ├── laminarShearFlow.py
-x  │   │   ├── postProcessing_sedim.py  line:49 ValueError: operands could not be broadcast together with shapes (900,) (901,) (900,)
-OK │   │   └── sedimentTransportExample_1DRANSCoupling.py
-   │   └── validations
-   │       ├── DEMCoupling
-   │       │   ├── Maurinetal2015
-   │       │   │   ├── expData
-   │       │   │   │   ├── Frey2014_EXP14.py
-   │       │   │   │   ├── Frey2014_EXP20.py
-   │       │   │   │   └── Frey2014_EXP6.py
-OK?│       │   │   ├── postProcessValidMaurin2015.py  Note: Plot of time vs. Qs is empty. Got: RuntimeWarning: invalid value encountered in divide
-OK │       │   │   └── validMaurin2015.py
-   │       │   └── Maurinetal2016_r2d6s2
-   │       │       ├── DATAr2d6s2_Maurinetal2016.py
-   │       │       ├── postProcessing_sedim.py
-   │       │       └── sedimentTransportExample_1DRANSCoupling.py
-   │       └── fluidValidation
-   │           ├── logProfile.py
-   │           └── poiseuille.py
-   ├── LudingPM
-   │   ├── LudingPM_1.py
-   │   └── LudingPM_2.py
-   ├── PIDController.py
-   ├── PeriodicBoundaries
-   │   ├── cellFlipping.py
-   │   ├── peri3dController_example1.py
-   │   ├── peri3dController_shear.py
-   │   ├── peri3dController_triaxialCompression.py
-   │   ├── periodic-compress.py
-   │   ├── periodic-grow.py
-   │   ├── periodic-shear.py
-   │   ├── periodic-simple-shear.py
-   │   ├── periodic-simple.py
-   │   ├── periodic-triax-settingHsize.py
-   │   ├── periodic-triax.py
-   │   └── periodicSandPile.py
-   ├── PotentialBlocks
-   │   ├── WedgeYADE.py
-   │   ├── cubePBscaled.py
-   │   └── joints
-   ├── PotentialParticles
-   │   ├── basic.py
-   │   └── cubePPscaled.py
-   ├── ResetRandomPosition.py
-   ├── ViscElMatchMaker.py
-   ├── WireMatPM
-   │   ├── wirecontacttest.py
-   │   ├── wirepackings.py
-   │   └── wiretensiltest.py
-   ├── adaptiveintegrator
-   │   ├── simple-scene-plot-NewtonIntegrator.py
-   │   └── simple-scene-plot-RungeKuttaCashKarp54.py
-   ├── agglomerate
-   │   ├── compress.py
-   │   ├── divide.py
-   │   ├── makeCloud.py
-   │   └── simulation.py
-   ├── baraban
-   │   ├── BicyclePedalEngine.py
-   │   ├── baraban.py
-   │   └── rotating-cylinder.py
-   ├── billiard.py
-   ├── bouncingbubble.py
-   ├── bulldozer
-   │   ├── bulldozer.py
-   │   └── bulldozerVTK.py
-   ├── capillary
-   │   ├── capillar.py
-   │   └── liquidmigration
-   │       └── showcase.py
-   ├── capillaryLaplaceYoung
-   │   ├── CapillaryPhys-example.py
-   │   ├── capillaryBridge.py
-   │   ├── solveLaplace_uc.py
-   │   └── solveLiqBridge.py
-   ├── chained-cylinders
-   │   ├── CohesiveCylinderSphere.py
-   │   ├── chained-cylinder-roots.py
-   │   └── chained-cylinder-spring.py
-   ├── clumps
-   │   ├── addToClump-example.py
-   │   ├── apply-buoyancy-clumps.py
-   │   ├── clump-hopper-test.py
-   │   ├── clump-hopper-viscoelastic.py
-   │   ├── clump-inbox-viscoelastic.py
-   │   ├── clump-viscoelastic.py
-   │   ├── releaseFromClump-example.py
-   │   ├── replaceByClumps-example.py
-   │   ├── save-load-clumps.py
-   │   └── triax-basic-with-clumps.py
-   ├── concrete
-   │   ├── brazilian.py
-   │   ├── interaction-histogram.py
-   │   ├── periodic.py
-   │   ├── triax.py
-   │   ├── uniax-post.py
-   │   └── uniax.py
-   ├── conveyor
-   │   └── conveyor.py
-   ├── cylinders
-   │   ├── bendingbeams.py
-   │   ├── cylinder-cylinder.py
-   │   ├── cylinderconnection-roots.py
-   │   └── mikado.py
-   ├── deformableelem
-   │   ├── Minimal.py
-   │   ├── MinimalTensileTest.py
-   │   ├── main.py
-   │   ├── testDeformableBodies.py
-   │   └── testDeformableBodies_pressure.py
-   ├── funnel.py
-   ├── grids
-   │   ├── CohesiveGridConnectionSphere.py
-   │   ├── GridConnection_Spring.py
-   │   ├── Simple_GridConnection_Falling.py
-   │   └── Simple_Grid_Falling.py
-   ├── gts-horse
-   │   ├── gts-horse.py
-   │   ├── gts-operators.py
-   │   ├── gts-random-pack-obb.py
-   │   └── gts-random-pack.py
-   ├── hdaps.py
-   ├── hourglass
-   │   └── hourglass.py
-   ├── jointedCohesiveFrictionalPM
-   │   ├── gravityBis.py
-   │   ├── gravityLoading.py
-   │   ├── identifBis.py
-   │   ├── identificationSpheresOnJoint.py
-   │   ├── packInGtsSurface.py
-   │   └── testingJoint.py
-   ├── mill.py
-   ├── mortar
-   │   └── modelTests
-   │       ├── compression.py
-   │       ├── failureEnvelope.py
-   │       └── shear.py
-   ├── not-working
-   │   ├── Se3Interpolator.py
-   │   ├── facet-topo.py
-   │   ├── insertion-sort-collider.py
-   │   └── triax-identical-results.py
-   ├── oar
-   │   └── sim.py
-   ├── packs
-   │   └── packs.py
-   ├── pfacet
-   │   ├── gts-pfacet.py
-   │   ├── mesh-pfacet.py
-   │   ├── pFacets_grids_spheres_interacting.py
-   │   └── pfacetcreators.py
-   ├── polyhedra
-   │   ├── ball.py
-   │   ├── clump.py
-   │   ├── free-fall.py
-   │   ├── horse.py
-   │   ├── irregular.py
-   │   ├── sphere-interaction.py
-   │   ├── splitter.py
-   │   ├── tests
-   │   │   ├── interactinDetectionFactor.py
-   │   │   └── scGeom.py
-   │   ├── textExport.py
-   │   └── wall.py
-   ├── polyhedraBreak
-   │   └── uniaxial_compression.py
-   ├── ring2d
-   │   ├── ringCundallDamping.py
-   │   └── ringSimpleViscoelastic.py
-   ├── rod-penetration
-   │   └── model.py
-   ├── rotationalResistance.py
-   ├── simple-scene
-   │   ├── 2SpheresNormVisc.py
-   │   ├── save-then-reload.py
-   │   ├── simple-scene-default-engines.py
-   │   ├── simple-scene-energy-tracking.py
-   │   ├── simple-scene-plot.py
-   │   └── simple-scene.py
-   ├── sph
-   │   ├── cpt
-   │   ├── dam_break.py
-   │   ├── sph_box.py
-   │   ├── testKernelFunc.py
-   │   ├── toystar.py
-   │   └── watercolumn.py
-   ├── spheresFactory.py
-   ├── stl-gts
-   │   └── gts-stl.py
-   ├── tesselationwrapper
-   │   └── tesselationWrapper.py
-   ├── test
-   │   ├── Damping_HM.py
-   │   ├── WireMatPM
-   │   │   ├── net-2part-displ-unloading.py
-   │   │   ├── net-2part-displ.py
-   │   │   └── net-2part-strain.py
-   │   ├── batch
-   │   │   └── sim.py
-   │   ├── beam-l6geom.py
-   │   ├── callback.py
-   │   ├── clump-facet.py
-   │   ├── clump.py
-   │   ├── clumpPack.py
-   │   ├── collider-stride-triax.py
-   │   ├── collider-stride.py
-   │   ├── collider-sweep-simple.py
-   │   ├── combined-kinematic-engine.py
-   │   ├── energy.py
-   │   ├── exact-rot-facet.py
-   │   ├── exact-rot.py
-   │   ├── facet-box.py
-   │   ├── facet-sphere-ViscElBasic-peri.py
-   │   ├── facet-sphere-ViscElBasic.py
-   │   ├── facet-sphere.py
-   │   ├── flat-collider.py
-   │   ├── force-move.py
-   │   ├── force-network-video.py
-   │   ├── genCylLSM.py
-   │   ├── helix.py
-   │   ├── interpolating-force.py
-   │   ├── kinematic.py
-   │   ├── mindlin.py
-   │   ├── multi
-   │   │   └── multi.py
-   │   ├── pack-cloud.py
-   │   ├── pack-inConvexPolyhedron.py
-   │   ├── pack-predicates.py
-   │   ├── paraview-spheres-solid-section
-   │   │   ├── export_text.py
-   │   │   └── pv_section.py
-   │   ├── performance
-   │   │   └── checkPerf.py
-   │   ├── periodic-geom-compare.py
-   │   ├── psd.py
-   │   ├── qt4-attributes.py
-   │   ├── qt4-pyqglviewer.py
-   │   ├── remove-body.py
-   │   ├── shear.py
-   │   ├── sphere-sphere-ViscElBasic-peri.py
-   │   ├── subdomain-balancer.py
-   │   ├── test-sphere-facet-corner.py
-   │   ├── test-sphere-facet.py
-   │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py
-   │   ├── triax-basic.py
-   │   ├── triax-cohesive.py
-   │   ├── unv-read
-   │   │   ├── unvRead.py
-   │   │   └── unvReadVTKExport.py
-   │   ├── vtk-exporter
-   │   │   └── vtkExporter.py
-   │   ├── vtkPeriodicCell.py
-   │   ├── wall.py
-   │   └── wm3-wrap.py
-   ├── tetra
-   │   ├── oneTetra.py
-   │   ├── oneTetraPoly.py
-   │   ├── twoTetras.py
-   │   └── twoTetrasPoly.py
-   ├── timeStepperUsage.py
-   ├── triax-tutorial
-   │   ├── script-session1.py
-   │   └── script-session2.py
-   └── tunnel-pack.py
-   
-   62 directories, 225 files
+#
+# works? 
+#  │explained inside what it is demonstrating?
+   │   │
+OK │ok ├── 2D-Tori.py
+   │   ├── DeformEngine
+x  │ok │   ├── LOedometricDeform.py   NameError: name 'DeformControl' is not defined
+x  │ok?│   └── OedometricDeform.py    NameError: name 'DeformControl' is not defined
+   │   ├── FEMxDEM
+x  │x  │   ├── biaxialSmooth.py       ImportError: No module named esys.escript
+x  │x  │   ├── footing.py             ImportError: No module named esys.escript
+OK │x  │   ├── prepareRVE.py
+x  │x  │   ├── retainingSmooth.py     ImportError: No module named esys.escript
+x  │x  │   ├── triaxialRough.py       ImportError: No module named esys.escript
+x  │x  │   └── undrain.py             ImportError: No module named esys.escript
+   │   ├── FluidCouplingLBM
+OK │OK │   └── buoyancy.py
+   │   ├── FluidCouplingPFV
+OK?│OK │   ├── drainage-2PFV-Yuan_and_Chareyre_2017.py  note: no visuals, I guess I would have to wait longer to see anything
+OK?│OK │   └── oedometer.py                             note: The graph is rather surprising - contains only one point.
+   │   ├── HydroForceEngine
+   │   │   ├── oneWayCoupling
+OK │OK │   │   ├── buoyantParticles.py
+OK │OK │   │   ├── fluidizedBed.py
+OK │OK │   │   ├── postProcessing_sedim.py
+OK │OK │   │   └── sedimentTransportExample.py
+   │   │   ├── twoWayCoupling
+OK │ok │   │   ├── laminarShearFlow.py
+x  │OK │   │   ├── postProcessing_sedim.py  line:49 ValueError: operands could not be broadcast together with shapes (900,) (901,) (900,)
+OK │OK │   │   └── sedimentTransportExample_1DRANSCoupling.py
+   │   │   └── validations
+   │   │       ├── DEMCoupling
+   │   │       │   ├── Maurinetal2015
+OK?│ok │       │   │   ├── postProcessValidMaurin2015.py  Note: Plot of time vs. Qs is empty. Got: RuntimeWarning: invalid value encountered in divide
+OK │OK │       │   │   └── validMaurin2015.py
+   │   │       │   └── Maurinetal2016_r2d6s2
+   │   │       │       ├── DATAr2d6s2_Maurinetal2016.py
+OK?│OK │       │       ├── postProcessing_sedim.py        Note: Plot of time vs. Qs is empty.
+OK │OK │       │       └── sedimentTransportExample_1DRANSCoupling.py
+   │   │       └── fluidValidation
+OK │OK │           ├── logProfile.py   FIXME: this should go to yade --test or --check, because that's a test actually.
+OK │OK │           └── poiseuille.py   FIXME: this should go to yade --test or --check, because that's a test actually.
+   │   ├── LudingPM
+x  │x  │   ├── LudingPM_1.py     NewtonIntegrator: NaN force acting on #0.
+x  │x  │   └── LudingPM_2.py     NewtonIntegrator: NaN force acting on #0.
+OK │x  ├── PIDController.py
+   │   ├── PeriodicBoundaries
+   │   │   ├── cellFlipping.py
+   │   │   ├── peri3dController_example1.py
+   │   │   ├── peri3dController_shear.py
+   │   │   ├── peri3dController_triaxialCompression.py
+   │   │   ├── periodic-compress.py
+   │   │   ├── periodic-grow.py
+   │   │   ├── periodic-shear.py
+   │   │   ├── periodic-simple-shear.py
+   │   │   ├── periodic-simple.py
+   │   │   ├── periodic-triax-settingHsize.py
+   │   │   ├── periodic-triax.py
+   │   │   └── periodicSandPile.py
+   │   ├── PotentialBlocks
+   │   │   ├── WedgeYADE.py
+   │   │   ├── cubePBscaled.py
+   │   │   └── joints
+   │   ├── PotentialParticles
+   │   │   ├── basic.py
+   │   │   └── cubePPscaled.py
+   │   ├── ResetRandomPosition.py
+   │   ├── ViscElMatchMaker.py
+   │   ├── WireMatPM
+   │   │   ├── wirecontacttest.py
+   │   │   ├── wirepackings.py
+   │   │   └── wiretensiltest.py
+   │   ├── adaptiveintegrator
+   │   │   ├── simple-scene-plot-NewtonIntegrator.py
+   │   │   └── simple-scene-plot-RungeKuttaCashKarp54.py
+   │   ├── agglomerate
+   │   │   ├── compress.py
+   │   │   ├── divide.py
+   │   │   ├── makeCloud.py
+   │   │   └── simulation.py
+   │   ├── baraban
+   │   │   ├── BicyclePedalEngine.py
+   │   │   ├── baraban.py
+   │   │   └── rotating-cylinder.py
+   │   ├── billiard.py
+   │   ├── bouncingbubble.py
+   │   ├── bulldozer
+   │   │   ├── bulldozer.py
+   │   │   └── bulldozerVTK.py
+   │   ├── capillary
+   │   │   ├── capillar.py
+   │   │   └── liquidmigration
+   │   │       └── showcase.py
+   │   ├── capillaryLaplaceYoung
+   │   │   ├── CapillaryPhys-example.py
+   │   │   ├── capillaryBridge.py
+   │   │   ├── solveLaplace_uc.py
+   │   │   └── solveLiqBridge.py
+   │   ├── chained-cylinders
+   │   │   ├── CohesiveCylinderSphere.py
+   │   │   ├── chained-cylinder-roots.py
+   │   │   └── chained-cylinder-spring.py
+   │   ├── clumps
+   │   │   ├── addToClump-example.py
+   │   │   ├── apply-buoyancy-clumps.py
+   │   │   ├── clump-hopper-test.py
+   │   │   ├── clump-hopper-viscoelastic.py
+   │   │   ├── clump-inbox-viscoelastic.py
+   │   │   ├── clump-viscoelastic.py
+   │   │   ├── releaseFromClump-example.py
+   │   │   ├── replaceByClumps-example.py
+   │   │   ├── save-load-clumps.py
+   │   │   └── triax-basic-with-clumps.py
+   │   ├── concrete
+   │   │   ├── brazilian.py
+   │   │   ├── interaction-histogram.py
+   │   │   ├── periodic.py
+   │   │   ├── triax.py
+   │   │   ├── uniax-post.py
+   │   │   └── uniax.py
+   │   ├── conveyor
+   │   │   └── conveyor.py
+   │   ├── cylinders
+   │   │   ├── bendingbeams.py
+   │   │   ├── cylinder-cylinder.py
+   │   │   ├── cylinderconnection-roots.py
+   │   │   └── mikado.py
+   │   ├── deformableelem
+   │   │   ├── Minimal.py
+   │   │   ├── MinimalTensileTest.py
+   │   │   ├── main.py
+   │   │   ├── testDeformableBodies.py
+   │   │   └── testDeformableBodies_pressure.py
+   │   ├── funnel.py
+   │   ├── grids
+   │   │   ├── CohesiveGridConnectionSphere.py
+   │   │   ├── GridConnection_Spring.py
+   │   │   ├── Simple_GridConnection_Falling.py
+   │   │   └── Simple_Grid_Falling.py
+   │   ├── gts-horse
+   │   │   ├── gts-horse.py
+   │   │   ├── gts-operators.py
+   │   │   ├── gts-random-pack-obb.py
+   │   │   └── gts-random-pack.py
+   │   ├── hdaps.py
+   │   ├── hourglass
+   │   │   └── hourglass.py
+   │   ├── jointedCohesiveFrictionalPM
+   │   │   ├── gravityBis.py
+   │   │   ├── gravityLoading.py
+   │   │   ├── identifBis.py
+   │   │   ├── identificationSpheresOnJoint.py
+   │   │   ├── packInGtsSurface.py
+   │   │   └── testingJoint.py
+   │   ├── mill.py
+   │   ├── mortar
+   │   │   └── modelTests
+   │   │       ├── compression.py
+   │   │       ├── failureEnvelope.py
+   │   │       └── shear.py
+   │   ├── not-working
+   │   │   ├── Se3Interpolator.py
+   │   │   ├── facet-topo.py
+   │   │   ├── insertion-sort-collider.py
+   │   │   └── triax-identical-results.py
+   │   ├── oar
+   │   │   └── sim.py
+   │   ├── packs
+   │   │   └── packs.py
+   │   ├── pfacet
+   │   │   ├── gts-pfacet.py
+   │   │   ├── mesh-pfacet.py
+   │   │   ├── pFacets_grids_spheres_interacting.py
+   │   │   └── pfacetcreators.py
+   │   ├── polyhedra
+   │   │   ├── ball.py
+   │   │   ├── clump.py
+   │   │   ├── free-fall.py
+   │   │   ├── horse.py
+   │   │   ├── irregular.py
+   │   │   ├── sphere-interaction.py
+   │   │   ├── splitter.py
+   │   │   ├── tests
+   │   │   │   ├── interactinDetectionFactor.py
+   │   │   │   └── scGeom.py
+   │   │   ├── textExport.py
+   │   │   └── wall.py
+   │   ├── polyhedraBreak
+   │   │   └── uniaxial_compression.py
+   │   ├── ring2d
+   │   │   ├── ringCundallDamping.py
+   │   │   └── ringSimpleViscoelastic.py
+   │   ├── rod-penetration
+   │   │   └── model.py
+   │   ├── rotationalResistance.py
+   │   ├── simple-scene
+   │   │   ├── 2SpheresNormVisc.py
+   │   │   ├── save-then-reload.py
+   │   │   ├── simple-scene-default-engines.py
+   │   │   ├── simple-scene-energy-tracking.py
+   │   │   ├── simple-scene-plot.py
+   │   │   └── simple-scene.py
+   │   ├── sph
+   │   │   ├── cpt
+   │   │   ├── dam_break.py
+   │   │   ├── sph_box.py
+   │   │   ├── testKernelFunc.py
+   │   │   ├── toystar.py
+   │   │   └── watercolumn.py
+   │   ├── spheresFactory.py
+   │   ├── stl-gts
+   │   │   └── gts-stl.py
+   │   ├── tesselationwrapper
+   │   │   └── tesselationWrapper.py
+   │   ├── test
+   │   │   ├── Damping_HM.py
+   │   │   ├── WireMatPM
+   │   │   │   ├── net-2part-displ-unloading.py
+   │   │   │   ├── net-2part-displ.py
+   │   │   │   └── net-2part-strain.py
+   │   │   ├── batch
+   │   │   │   └── sim.py
+   │   │   ├── beam-l6geom.py
+   │   │   ├── callback.py
+   │   │   ├── clump-facet.py
+   │   │   ├── clump.py
+   │   │   ├── clumpPack.py
+   │   │   ├── collider-stride-triax.py
+   │   │   ├── collider-stride.py
+   │   │   ├── collider-sweep-simple.py
+   │   │   ├── combined-kinematic-engine.py
+   │   │   ├── energy.py
+   │   │   ├── exact-rot-facet.py
+   │   │   ├── exact-rot.py
+   │   │   ├── facet-box.py
+   │   │   ├── facet-sphere-ViscElBasic-peri.py
+   │   │   ├── facet-sphere-ViscElBasic.py
+   │   │   ├── facet-sphere.py
+   │   │   ├── flat-collider.py
+   │   │   ├── force-move.py
+   │   │   ├── force-network-video.py
+   │   │   ├── genCylLSM.py
+   │   │   ├── helix.py
+   │   │   ├── interpolating-force.py
+   │   │   ├── kinematic.py
+   │   │   ├── mindlin.py
+   │   │   ├── multi
+   │   │   │   └── multi.py
+   │   │   ├── pack-cloud.py
+   │   │   ├── pack-inConvexPolyhedron.py
+   │   │   ├── pack-predicates.py
+   │   │   ├── paraview-spheres-solid-section
+   │   │   │   ├── export_text.py
+   │   │   │   └── pv_section.py
+   │   │   ├── performance
+   │   │   │   └── checkPerf.py
+   │   │   ├── periodic-geom-compare.py
+   │   │   ├── psd.py
+   │   │   ├── qt4-attributes.py
+   │   │   ├── qt4-pyqglviewer.py
+   │   │   ├── remove-body.py
+   │   │   ├── shear.py
+   │   │   ├── sphere-sphere-ViscElBasic-peri.py
+   │   │   ├── subdomain-balancer.py
+   │   │   ├── test-sphere-facet-corner.py
+   │   │   ├── test-sphere-facet.py
+   │   │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py
+   │   │   ├── triax-basic.py
+   │   │   ├── triax-cohesive.py
+   │   │   ├── unv-read
+   │   │   │   ├── unvRead.py
+   │   │   │   └── unvReadVTKExport.py
+   │   │   ├── vtk-exporter
+   │   │   │   └── vtkExporter.py
+   │   │   ├── vtkPeriodicCell.py
+   │   │   ├── wall.py
+   │   │   └── wm3-wrap.py
+   │   ├── tetra
+   │   │   ├── oneTetra.py
+   │   │   ├── oneTetraPoly.py
+   │   │   ├── twoTetras.py
+   │   │   └── twoTetrasPoly.py
+   │   ├── timeStepperUsage.py
+   │   ├── triax-tutorial
+   │   │   ├── script-session1.py
+   │   │   └── script-session2.py
+   │   └── tunnel-pack.py
+   │   
+   │   62 directories, 225 files
    
