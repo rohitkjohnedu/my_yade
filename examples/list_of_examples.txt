@@ -176,30 +176,30 @@ OK │x  │   ├── mesh-pfacet.py
 OK │ok │   ├── pFacets_grids_spheres_interacting.py
 OK │x  │   └── pfacetcreators.py
    │   ├── polyhedra
-   │   │   ├── ball.py
-   │   │   ├── clump.py
-   │   │   ├── free-fall.py
-   │   │   ├── horse.py
-   │   │   ├── irregular.py
-   │   │   ├── sphere-interaction.py
-   │   │   ├── splitter.py
+OK │x  │   ├── ball.py
+OK │x  │   ├── clump.py
+OK │x  │   ├── free-fall.py
+OK │x  │   ├── horse.py
+OK │ok │   ├── irregular.py
+OK │x  │   ├── sphere-interaction.py
+OK │ok │   ├── splitter.py
    │   │   ├── tests
-   │   │   │   ├── interactinDetectionFactor.py
-   │   │   │   └── scGeom.py
-   │   │   ├── textExport.py
-   │   │   └── wall.py
+ok?│x  │   │   ├── interactinDetectionFactor.py
+OK │x  │   │   └── scGeom.py
+OK │x  │   ├── textExport.py
+OK │x  │   └── wall.py
    │   ├── polyhedraBreak
-   │   │   └── uniaxial_compression.py
+OK │ok?│   └── uniaxial_compression.py
    │   ├── ring2d
-   │   │   ├── ringCundallDamping.py
-   │   │   └── ringSimpleViscoelastic.py
+OK │x  │   ├── ringCundallDamping.py
+OK │x  │   └── ringSimpleViscoelastic.py
    │   ├── rod-penetration
-   │   │   └── model.py
-   │   ├── rotationalResistance.py
+ok │x  │   └── model.py
+ok │x  ├── rotationalResistance.py
    │   ├── simple-scene
-   │   │   ├── 2SpheresNormVisc.py
+OK │ok │   ├── 2SpheresNormVisc.py
    │   │   ├── save-then-reload.py
-   │   │   ├── simple-scene-default-engines.py
+OK │ok │   ├── simple-scene-default-engines.py
    │   │   ├── simple-scene-energy-tracking.py
    │   │   ├── simple-scene-plot.py
    │   │   └── simple-scene.py

@@ -1,3 +1,4 @@
+# This script demonstrates polyhedra splitting/crushing under compression.
 from yade import polyhedra_utils
 
 gravel1 = PolyhedraMat()
