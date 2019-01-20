@@ -92,9 +92,9 @@ Changes will be pushed to your personal fork.
 
 Merging changes into the master branch cannot be done directly with a push, only by merge request (see below). It is possible however to push changes to a new branch of yade-dev repository for members of that group. It is `currently <https://gitlab.com/gitlab-org/gitlab-ce/issues/23902>`_ the only way to have merge requests tested by the gitlab CI pipeline before being effectively merged. To push to a new yade-dev/branch::
 
- git push upstream master:newlyCreatedBranch #Push all commits to a new remote branch.
+ git push upstream yourBranch:newlyCreatedBranch #Push all commits to a new remote branch.
 
-in that command ``newlyCreatedBranch`` will be the name of that branch. Please choose a descriptive name as much as you can.
+in that command ``yourBranch`` is the local branch name on which you were working (usually ``master``) and ``newlyCreatedBranch`` will be the name of that branch. Please choose a descriptive name as much as you can.
 
 Requesting merge into upstream repository
 -----------------------------------------
