@@ -94,7 +94,7 @@ Merging changes into the master branch cannot be done directly with a push, only
 
  git push upstream master:newlyCreatedBranch #Push all commits to a new remote branch.
 
-in that command ``newlyCreatedBranch`` will be the name of that branch. Please hoose a descriptive name as much as you can.
+in that command ``newlyCreatedBranch`` will be the name of that branch. Please choose a descriptive name as much as you can.
 
 Requesting merge into upstream repository
 -----------------------------------------
