@@ -12,7 +12,7 @@
    │   │
 OK │ok ├── 2D-Tori.py
 OK │x  ├── PIDController.py
-ok?│x  ├── ResetRandomPosition.py        SIGSEGV/SIGABRT handler called; gdb
+ok?│x  ├── ResetRandomPosition.py     SIGSEGV/SIGABRT handler called; gdb
 OK │OK ├── ViscElMatchMaker.py
 OK │OK ├── billiard.py
 OK │x  ├── bouncingbubble.py          Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
@@ -216,43 +216,43 @@ x  │x  │   ├── testKernelFunc.py                  AttributeError: No
 x  │x  │   ├── toystar.py                         AttributeError: No such attribute: h.
 x  │x  │   └── watercolumn.py                     AttributeError: No such attribute: h.
    │   ├── stl-gts
-OK │OK │   └── gts-stl.py
+OK │OK │   └── gts-stl.py                         NOTE: apt install gmsh libgts-bin
    │   ├── tesselationwrapper
 OK │ok │   └── tesselationWrapper.py
    │   ├── test
-   │   │   ├── Damping_HM.py
+OK │ok │   ├── Damping_HM.py
    │   │   ├── WireMatPM
-   │   │   │   ├── net-2part-displ-unloading.py
-   │   │   │   ├── net-2part-displ.py
-   │   │   │   └── net-2part-strain.py
+OK │ok │   │   ├── net-2part-displ-unloading.py
+ok │ok │   │   ├── net-2part-displ.py
+x  │ok │   │   └── net-2part-strain.py            SIGSEGV/SIGABRT handler called; gdb
    │   │   ├── batch
-   │   │   │   └── sim.py
-   │   │   ├── beam-l6geom.py
-   │   │   ├── callback.py
-   │   │   ├── clump-facet.py
-   │   │   ├── clump.py
-   │   │   ├── clumpPack.py
-   │   │   ├── collider-stride-triax.py
-   │   │   ├── collider-stride.py
-   │   │   ├── collider-sweep-simple.py
-   │   │   ├── combined-kinematic-engine.py
-   │   │   ├── energy.py
-   │   │   ├── exact-rot-facet.py
-   │   │   ├── exact-rot.py
-   │   │   ├── facet-box.py
-   │   │   ├── facet-sphere-ViscElBasic-peri.py
-   │   │   ├── facet-sphere-ViscElBasic.py
-   │   │   ├── facet-sphere.py
-   │   │   ├── flat-collider.py
-   │   │   ├── force-move.py
-   │   │   ├── force-network-video.py
-   │   │   ├── genCylLSM.py
-   │   │   ├── helix.py
-   │   │   ├── interpolating-force.py
-   │   │   ├── kinematic.py
-   │   │   ├── mindlin.py
+x  │x  │   │   └── sim.py                         KeyError: 'Invalid key: description.'
+OK │OK │   ├── beam-l6geom.py
+ok │x  │   ├── callback.py
+OK │x  │   ├── clump-facet.py
+OK │x  │   ├── clump.py
+OK │ok?│   ├── clumpPack.py
+OK │ok │   ├── collider-stride-triax.py
+OK │ok │   ├── collider-stride.py
+ok?│x  │   ├── collider-sweep-simple.py
+OK │ok?│   ├── combined-kinematic-engine.py
+OK │x  │   ├── energy.py
+x  │x  │   ├── exact-rot-facet.py                 SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   ├── exact-rot.py                       SIGSEGV/SIGABRT handler called; gdb
+ok │x  │   ├── facet-box.py
+OK │OK │   ├── facet-sphere-ViscElBasic-peri.py
+OK │OK │   ├── facet-sphere-ViscElBasic.py
+OK │ok │   ├── facet-sphere.py
+OK │x  │   ├── flat-collider.py                   (a bit slow, but ok)
+ok?│x  │   ├── force-move.py
+OK │OK │   ├── force-network-video.py
+x  │OK │   ├── genCylLSM.py                       NOTE: apt install  python-demgengeo   ; InsertGenerator3D::seedParticles bbx: SIGSEGV/SIGABRT handler called; gdb
+x  │ok?│   ├── helix.py                           script runs and is not crashing, but nothing happens
+ok?│ok │   ├── interpolating-force.py
+OK │ok │   ├── kinematic.py
+OK │ok │   ├── mindlin.py
    │   │   ├── multi
-   │   │   │   └── multi.py
+ok?│ok?│   │   └── multi.py                       refers to https://yade-dem.org/wiki/ScriptParametricStudy
    │   │   ├── pack-cloud.py
    │   │   ├── pack-inConvexPolyhedron.py
    │   │   ├── pack-predicates.py
