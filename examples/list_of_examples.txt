@@ -12,29 +12,29 @@
    │   │
 OK │ok ├── 2D-Tori.py
 OK │x  ├── PIDController.py
-ok?│x  ├── ResetRandomPosition.py     SIGSEGV/SIGABRT handler called; gdb
+ok?│x  ├── ResetRandomPosition.py                 SIGSEGV/SIGABRT handler called; gdb
 OK │OK ├── ViscElMatchMaker.py
 OK │OK ├── billiard.py
-OK │x  ├── bouncingbubble.py          Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
+OK │x  ├── bouncingbubble.py                      Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
 OK │OK ├── funnel.py
-.. │ok ├── hdaps.py                   can't tell if it works, I don't have /sys/devices/platform/hdaps/ interface
+.. │ok ├── hdaps.py                               can't tell if it works, I don't have /sys/devices/platform/hdaps/ interface
 OK │OK ├── mill.py
 ok │x  ├── rotationalResistance.py
 OK │OK ├── spheresFactory.py
-OK │ok ├── timeStepperUsage.py        (a bit slow, but ok)
-OK │ok ├── tunnel-pack.py             (a bit slow, but ok)
+OK │ok ├── timeStepperUsage.py                    (a bit slow, but ok)
+OK │ok ├── tunnel-pack.py                         (a bit slow, but ok)
    │   │
    │   │
    │   ├── DeformEngine
-x  │ok │   ├── LOedometricDeform.py   NameError: name 'DeformControl' is not defined
-x  │ok?│   └── OedometricDeform.py    NameError: name 'DeformControl' is not defined
+x  │ok │   ├── LOedometricDeform.py               NameError: name 'DeformControl' is not defined
+x  │ok?│   └── OedometricDeform.py                NameError: name 'DeformControl' is not defined
    │   ├── FEMxDEM
-x  │x  │   ├── biaxialSmooth.py       ImportError: No module named esys.escript; apt install esys-particle changes error to ImportError: No module named escript
-x  │x  │   ├── footing.py             ImportError: No module named esys.escript
+x  │x  │   ├── biaxialSmooth.py                   ImportError: No module named esys.escript; apt install esys-particle changes error to ImportError: No module named escript
+x  │x  │   ├── footing.py                         ImportError: No module named esys.escript
 OK │x  │   ├── prepareRVE.py
-x  │x  │   ├── retainingSmooth.py     ImportError: No module named esys.escript
-x  │x  │   ├── triaxialRough.py       ImportError: No module named esys.escript
-x  │x  │   └── undrain.py             ImportError: No module named esys.escript
+x  │x  │   ├── retainingSmooth.py                 ImportError: No module named esys.escript
+x  │x  │   ├── triaxialRough.py                   ImportError: No module named esys.escript
+x  │x  │   └── undrain.py                         ImportError: No module named esys.escript
    │   ├── FluidCouplingLBM
 OK │OK │   └── buoyancy.py
    │   ├── FluidCouplingPFV
@@ -48,7 +48,7 @@ OK │OK │   │   ├── postProcessing_sedim.py
 OK │OK │   │   └── sedimentTransportExample.py
    │   │   ├── twoWayCoupling
 OK │ok │   │   ├── laminarShearFlow.py
-x  │OK │   │   ├── postProcessing_sedim.py  line:49 ValueError: operands could not be broadcast together with shapes (900,) (901,) (900,)
+x  │OK │   │   ├── postProcessing_sedim.py        line:49 ValueError: operands could not be broadcast together with shapes (900,) (901,) (900,)
 OK │OK │   │   └── sedimentTransportExample_1DRANSCoupling.py
    │   │   └── validations
    │   │       ├── DEMCoupling
@@ -60,18 +60,18 @@ OK │OK │       │   │   └── validMaurin2015.py
 OK?│OK │       │       ├── postProcessing_sedim.py        Note: Plot of time vs. Qs is empty.
 OK │OK │       │       └── sedimentTransportExample_1DRANSCoupling.py
    │   │       └── fluidValidation
-OK │OK │           ├── logProfile.py   FIXME: this should go to yade --test or --check, because that's a test actually.
-OK │OK │           └── poiseuille.py   FIXME: this should go to yade --test or --check, because that's a test actually.
+OK │OK │           ├── logProfile.py              FIXME: this should go to yade --test or --check, because that's a test actually.
+OK │OK │           └── poiseuille.py              FIXME: this should go to yade --test or --check, because that's a test actually.
    │   ├── LudingPM
-x  │x  │   ├── LudingPM_1.py     NewtonIntegrator: NaN force acting on #0.
-x  │x  │   └── LudingPM_2.py     NewtonIntegrator: NaN force acting on #0.
+x  │x  │   ├── LudingPM_1.py                      NewtonIntegrator: NaN force acting on #0.
+x  │x  │   └── LudingPM_2.py                      NewtonIntegrator: NaN force acting on #0.
    │   ├── PeriodicBoundaries
 ok?│OK │   ├── cellFlipping.py
 OK │ok │   ├── peri3dController_example1.py
 OK │OK │   ├── peri3dController_shear.py
 OK │OK │   ├── peri3dController_triaxialCompression.py
 OK │ok │   ├── periodic-compress.py
-OK?│OK │   ├── periodic-grow.py                           note: no visuals, I guess I would have to wait longer to see anything
+OK?│OK │   ├── periodic-grow.py                   note: no visuals, I guess I would have to wait longer to see anything
 OK │x  │   ├── periodic-shear.py
 OK │ok │   ├── periodic-simple-shear.py
 OK │ok │   ├── periodic-simple.py
@@ -80,14 +80,14 @@ OK │ok │   ├── periodic-triax.py
 OK │OK │   └── periodicSandPile.py
    │   ├── PotentialBlocks
 x  │ok │   ├── WedgeYADE.py    NameError: name 'BlockGen' ; Recompile with ENABLE_POTENTIAL_BLOCKS=ON, apt install coinor-clp coinor-libclp-dev coinor-libclp1 coinor-libosi1v5
-x  │ok │   └── cubePBscaled.py NameError: name 'PotentialBlock2AABB' is not defined
+x  │ok │   └── cubePBscaled.py                    NameError: name 'PotentialBlock2AABB' is not defined
    │   ├── PotentialParticles
-x  │x  │   ├── basic.py        NameError: name 'PotentialParticle2AABB' is not defined
-x  │x  │   └── cubePPscaled.py NameError: name 'PotentialParticle2AABB' is not defined
+x  │x  │   ├── basic.py                           NameError: name 'PotentialParticle2AABB' is not defined
+x  │x  │   └── cubePPscaled.py                    NameError: name 'PotentialParticle2AABB' is not defined
    │   ├── WireMatPM
-ok │x  │   ├── wirecontacttest.py        Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
+ok │x  │   ├── wirecontacttest.py                 Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
 ok │ok │   ├── wirepackings.py
-ok │ok │   └── wiretensiltest.py         Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
+ok │ok │   └── wiretensiltest.py                  Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
    │   ├── adaptiveintegrator
 OK │x  │   ├── simple-scene-plot-NewtonIntegrator.py
 OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
@@ -95,40 +95,40 @@ OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
 ok │OK │   ├── compress.py
 ok │OK │   ├── divide.py
 ok │OK │   ├── makeCloud.py
-x  │OK │   └── simulation.py             AttributeError: 'Body' object has no attribute 'agglomerate'
+x  │OK │   └── simulation.py                      AttributeError: 'Body' object has no attribute 'agglomerate'
    │   ├── baraban
 OK │x  │   ├── BicyclePedalEngine.py
 OK │x  │   ├── baraban.py
-ok │x  │   └── rotating-cylinder.py      a little too slow
+ok │x  │   └── rotating-cylinder.py               a little too slow
    │   ├── bulldozer
 OK │ok │   ├── bulldozer.py
 OK │ok │   └── bulldozerVTK.py
    │   ├── capillary
 OK │ok?│   ├── capillar.py
-   │   │   └── liquidmigration           NameError: name 'LiqControl' is not defined ; I guess need to recompile with LIQMIGRATION or something like that
+   │   │   └── liquidmigration                    NameError: name 'LiqControl' is not defined ; I guess need to recompile with LIQMIGRATION or something like that
 x  │ok?│       └── showcase.py
    │   ├── capillaryLaplaceYoung
 OK?│OK │   ├── CapillaryPhys-example.py
 OK │ok?│   └── capillaryBridge.py
    │   ├── chained-cylinders
-OK?│x  │   ├── CohesiveCylinderSphere.py   UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
-OK?│ok?│   ├── chained-cylinder-roots.py   UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
-OK?│ok?│   └── chained-cylinder-spring.py  UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
+OK?│x  │   ├── CohesiveCylinderSphere.py          UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
+OK?│ok?│   ├── chained-cylinder-roots.py          UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
+OK?│ok?│   └── chained-cylinder-spring.py         UserWarning: chainedCylinder is deprecated and will be removed in the future, use GridConnection instead.
    │   ├── clumps
-ok?│ok │   ├── addToClump-example.py        SIGSEGV/SIGABRT handler called; gdb
+ok?│ok │   ├── addToClump-example.py              SIGSEGV/SIGABRT handler called; gdb
 OK │OK │   ├── apply-buoyancy-clumps.py
-OK?│x  │   ├── clump-hopper-test.py         spams with messages: Body #282 vanished, erasing intr #282+#721!
+OK?│x  │   ├── clump-hopper-test.py               spams with messages: Body #282 vanished, erasing intr #282+#721!
 OK │x  │   ├── clump-hopper-viscoelastic.py
 OK │x  │   ├── clump-inbox-viscoelastic.py
 OK │x  │   ├── clump-viscoelastic.py
 OK │ok │   ├── releaseFromClump-example.py
 OK │ok │   ├── replaceByClumps-example.py
-x  │ok │   ├── save-load-clumps.py          SIGSEGV/SIGABRT handler called; gdb
+x  │ok │   ├── save-load-clumps.py                SIGSEGV/SIGABRT handler called; gdb
 OK │ok │   └── triax-basic-with-clumps.py
    │   ├── concrete
 OK │ok │   ├── brazilian.py
 OK │x  │   ├── interaction-histogram.py
-OK?│ok │   ├── periodic.py                  spams with messages: action: 0: strain=0.00169673, goal=1, cellGrow=1.71367
+OK?│ok │   ├── periodic.py                        spams with messages: action: 0: strain=0.00169673, goal=1, cellGrow=1.71367
 OK │ok │   ├── triax.py
 OK │ok?│   ├── uniax-post.py
 OK │OK │   └── uniax.py
@@ -140,7 +140,7 @@ OK │OK │   ├── cylinder-cylinder.py
 OK │OK │   ├── cylinderconnection-roots.py
 OK │OK │   └── mikado.py
    │   ├── deformableelem
-ok?│x  │   ├── Minimal.py                   the graphs are empty
+ok?│x  │   ├── Minimal.py                         the graphs are empty
 ok │x  │   ├── MinimalTensileTest.py
 ?? │x  │   ├── main.py                            I suppose this file is here by mistake ?
 ok?│x  │   ├── testDeformableBodies.py            It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
@@ -253,35 +253,35 @@ OK │ok │   ├── kinematic.py
 OK │ok │   ├── mindlin.py
    │   │   ├── multi
 ok?│ok?│   │   └── multi.py                       refers to https://yade-dem.org/wiki/ScriptParametricStudy
-   │   │   ├── pack-cloud.py
-   │   │   ├── pack-inConvexPolyhedron.py
-   │   │   ├── pack-predicates.py
+OK │ok │   ├── pack-cloud.py
+ok?│x  │   ├── pack-inConvexPolyhedron.py
+x  │x  │   ├── pack-predicates.py
    │   │   ├── paraview-spheres-solid-section
-   │   │   │   ├── export_text.py
-   │   │   │   └── pv_section.py
+OK │ok │   │   ├── export_text.py
+x  │x  │   │   └── pv_section.py                  NOTE: apt instal paraview-python   ; AttributeError: Attribute UseInteractiveRenderingForSceenshots does not exist.
    │   │   ├── performance
-   │   │   │   └── checkPerf.py
-   │   │   ├── periodic-geom-compare.py
-   │   │   ├── psd.py
-   │   │   ├── qt4-attributes.py
-   │   │   ├── qt4-pyqglviewer.py
-   │   │   ├── remove-body.py
-   │   │   ├── shear.py
-   │   │   ├── sphere-sphere-ViscElBasic-peri.py
-   │   │   ├── subdomain-balancer.py
-   │   │   ├── test-sphere-facet-corner.py
-   │   │   ├── test-sphere-facet.py
-   │   │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py
-   │   │   ├── triax-basic.py
-   │   │   ├── triax-cohesive.py
+ok?│x  │   │   └── checkPerf.py                   note: no visuals
+OK │ok?│   ├── periodic-geom-compare.py
+x  │ok?│   ├── psd.py                             the scene is empty, apparently makeCloud didn't do anything. Or I would have to wait longer.
+x  │x  │   ├── qt4-attributes.py                  Error: already imported an Incompatible QT Binding: pyqt5
+x  │x  │   ├── qt4-pyqglviewer.py                 ImportError: No module named PyQGLViewer
+x  │x  │   ├── remove-body.py                     AttributeError: No such attribute: nBins
+x  │ok?│   ├── shear.py                           sp_member_access<T>::type = IGeomFunctor*: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
+OK │ok │   ├── sphere-sphere-ViscElBasic-peri.py
+OK │x  │   ├── subdomain-balancer.py
+OK │x  │   ├── test-sphere-facet-corner.py
+OK?│OK │   ├── test-sphere-facet.py
+x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb
+OK │ok │   ├── triax-basic.py
+OK │ok │   ├── triax-cohesive.py
    │   │   ├── unv-read
-   │   │   │   ├── unvRead.py
-   │   │   │   └── unvReadVTKExport.py
+ok?│x  │   │   ├── unvRead.py
+x  │x  │   │   └── unvReadVTKExport.py            TypeError: facet() got an unexpected keyword argument 'returnElementMap'
    │   │   ├── vtk-exporter
-   │   │   │   └── vtkExporter.py
-   │   │   ├── vtkPeriodicCell.py
-   │   │   ├── wall.py
-   │   │   └── wm3-wrap.py
+ok │x  │   │   └── vtkExporter.py
+OK │ok │   ├── vtkPeriodicCell.py
+OK │OK │   ├── wall.py
+ok │ok │   └── wm3-wrap.py
    │   ├── tetra
 OK │OK │   ├── oneTetra.py
 OK │OK │   ├── oneTetraPoly.py
