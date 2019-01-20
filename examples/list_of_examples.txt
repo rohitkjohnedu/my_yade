@@ -9,7 +9,22 @@
 # works? 
 #  │explained inside what it is demonstrating?
    │   │
+   │   │
 OK │ok ├── 2D-Tori.py
+OK │x  ├── PIDController.py
+ok?│x  ├── ResetRandomPosition.py        SIGSEGV/SIGABRT handler called; gdb
+OK │OK ├── ViscElMatchMaker.py
+OK │OK ├── billiard.py
+OK │x  ├── bouncingbubble.py          Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
+OK │OK ├── funnel.py
+.. │ok ├── hdaps.py                   can't tell if it works, I don't have /sys/devices/platform/hdaps/ interface
+OK │OK ├── mill.py
+ok │x  ├── rotationalResistance.py
+OK │OK ├── spheresFactory.py
+OK │ok ├── timeStepperUsage.py        (a bit slow, but ok)
+OK │ok ├── tunnel-pack.py             (a bit slow, but ok)
+   │   │
+   │   │
    │   ├── DeformEngine
 x  │ok │   ├── LOedometricDeform.py   NameError: name 'DeformControl' is not defined
 x  │ok?│   └── OedometricDeform.py    NameError: name 'DeformControl' is not defined
@@ -50,7 +65,6 @@ OK │OK │           └── poiseuille.py   FIXME: this should go to yade
    │   ├── LudingPM
 x  │x  │   ├── LudingPM_1.py     NewtonIntegrator: NaN force acting on #0.
 x  │x  │   └── LudingPM_2.py     NewtonIntegrator: NaN force acting on #0.
-OK │x  ├── PIDController.py
    │   ├── PeriodicBoundaries
 ok?│OK │   ├── cellFlipping.py
 OK │ok │   ├── peri3dController_example1.py
@@ -70,8 +84,6 @@ x  │ok │   └── cubePBscaled.py NameError: name 'PotentialBlock2AABB'
    │   ├── PotentialParticles
 x  │x  │   ├── basic.py        NameError: name 'PotentialParticle2AABB' is not defined
 x  │x  │   └── cubePPscaled.py NameError: name 'PotentialParticle2AABB' is not defined
-ok?│x  ├── ResetRandomPosition.py        SIGSEGV/SIGABRT handler called; gdb
-OK │OK ├── ViscElMatchMaker.py
    │   ├── WireMatPM
 ok │x  │   ├── wirecontacttest.py        Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
 ok │ok │   ├── wirepackings.py
@@ -88,8 +100,6 @@ x  │OK │   └── simulation.py             AttributeError: 'Body' obje
 OK │x  │   ├── BicyclePedalEngine.py
 OK │x  │   ├── baraban.py
 ok │x  │   └── rotating-cylinder.py      a little too slow
-OK │OK ├── billiard.py
-OK │x  ├── bouncingbubble.py             Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
    │   ├── bulldozer
 OK │ok │   ├── bulldozer.py
 OK │ok │   └── bulldozerVTK.py
@@ -135,7 +145,6 @@ ok │x  │   ├── MinimalTensileTest.py
 ?? │x  │   ├── main.py                            I suppose this file is here by mistake ?
 ok?│x  │   ├── testDeformableBodies.py            It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
 ok?│ok │   └── testDeformableBodies_pressure.py   It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
-OK │OK ├── funnel.py
    │   ├── grids
 OK │OK │   ├── CohesiveGridConnectionSphere.py
 OK │x  │   ├── GridConnection_Spring.py
@@ -146,7 +155,6 @@ OK │ok │   ├── gts-horse.py
 OK │OK │   ├── gts-operators.py
 ok │ok │   ├── gts-random-pack-obb.py             note: super slow
 OK │OK │   └── gts-random-pack.py
-.. │ok ├── hdaps.py                               can't tell if it works, I don't have /sys/devices/platform/hdaps/ interface
    │   ├── hourglass
 OK │OK │   └── hourglass.py
    │   ├── jointedCohesiveFrictionalPM
@@ -155,7 +163,6 @@ x  │x  │   ├── gravityLoading.py                  No such file or di
 x  │x  │   ├── identificationSpheresOnJoint.py    No such file or directory: 'parallellepiped_10.spheres'
 x  │x  │   ├── packInGtsSurface.py                spams messages: UnbalancedForce=-nan, rel stress nan
 OK │ok │   └── testingJoint.py
-OK │OK ├── mill.py
    │   ├── mortar
    │   │   └── modelTests
 ok?│ok │       ├── compression.py                 IndexError: No such interaction (after it goes through)
@@ -195,26 +202,23 @@ OK │x  │   ├── ringCundallDamping.py
 OK │x  │   └── ringSimpleViscoelastic.py
    │   ├── rod-penetration
 ok │x  │   └── model.py
-ok │x  ├── rotationalResistance.py
    │   ├── simple-scene
 OK │ok │   ├── 2SpheresNormVisc.py
-   │   │   ├── save-then-reload.py
+OK │ok │   ├── save-then-reload.py
 OK │ok │   ├── simple-scene-default-engines.py
-   │   │   ├── simple-scene-energy-tracking.py
-   │   │   ├── simple-scene-plot.py
-   │   │   └── simple-scene.py
+OK │x  │   ├── simple-scene-energy-tracking.py
+OK │x  │   ├── simple-scene-plot.py
+OK │OK │   └── simple-scene.py
    │   ├── sph
-   │   │   ├── cpt
-   │   │   ├── dam_break.py
-   │   │   ├── sph_box.py
-   │   │   ├── testKernelFunc.py
-   │   │   ├── toystar.py
-   │   │   └── watercolumn.py
-   │   ├── spheresFactory.py
+x  │x  │   ├── dam_break.py                       AttributeError: No such attribute: KernFunctionPressure. , I guess must Recompile with SPH
+x  │x  │   ├── sph_box.py                         AttributeError: No such attribute: h.
+x  │x  │   ├── testKernelFunc.py                  AttributeError: No such attribute: KernFunctionPressure.
+x  │x  │   ├── toystar.py                         AttributeError: No such attribute: h.
+x  │x  │   └── watercolumn.py                     AttributeError: No such attribute: h.
    │   ├── stl-gts
-   │   │   └── gts-stl.py
+OK │OK │   └── gts-stl.py
    │   ├── tesselationwrapper
-   │   │   └── tesselationWrapper.py
+OK │ok │   └── tesselationWrapper.py
    │   ├── test
    │   │   ├── Damping_HM.py
    │   │   ├── WireMatPM
@@ -279,12 +283,10 @@ OK │ok │   ├── simple-scene-default-engines.py
    │   │   ├── wall.py
    │   │   └── wm3-wrap.py
    │   ├── tetra
-   │   │   ├── oneTetra.py
-   │   │   ├── oneTetraPoly.py
-   │   │   ├── twoTetras.py
-   │   │   └── twoTetrasPoly.py
-   │   ├── timeStepperUsage.py
-   │   ├── triax-tutorial
-   │   │   ├── script-session1.py
-   │   │   └── script-session2.py
-   │   └── tunnel-pack.py
+OK │OK │   ├── oneTetra.py
+OK │OK │   ├── oneTetraPoly.py
+OK │OK │   ├── twoTetras.py
+OK │OK │   └── twoTetrasPoly.py
+   │   └── triax-tutorial
+OK │OK     ├── script-session1.py
+x  │OK     └── script-session2.py                 AttributeError: No such attribute: sigma1
