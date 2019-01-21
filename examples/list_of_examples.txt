@@ -12,7 +12,7 @@
    │   │
 OK │ok ├── 2D-Tori.py
 OK │x  ├── PIDController.py
-ok?│x  ├── ResetRandomPosition.py                 SIGSEGV/SIGABRT handler called; gdb
+x  │x  ├── ResetRandomPosition.py                 [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
 OK │OK ├── ViscElMatchMaker.py
 OK │OK ├── billiard.py
 OK │x  ├── bouncingbubble.py                      Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
@@ -105,8 +105,8 @@ OK │ok │   ├── bulldozer.py
 OK │ok │   └── bulldozerVTK.py
    │   ├── capillary
 OK │ok?│   ├── capillar.py
-   │   │   └── liquidmigration                    NameError: name 'LiqControl' is not defined ; I guess need to recompile with LIQMIGRATION or something like that
-x  │ok?│       └── showcase.py
+   │   │   └── liquidmigration
+x  │ok?│       └── showcase.py                    NameError: name 'LiqControl' is not defined ; I guess need to recompile with LIQMIGRATION or something like that
    │   ├── capillaryLaplaceYoung
 OK?│OK │   ├── CapillaryPhys-example.py
 OK │ok?│   └── capillaryBridge.py
@@ -123,7 +123,7 @@ OK │x  │   ├── clump-inbox-viscoelastic.py
 OK │x  │   ├── clump-viscoelastic.py
 OK │ok │   ├── releaseFromClump-example.py
 OK │ok │   ├── replaceByClumps-example.py
-x  │ok │   ├── save-load-clumps.py                SIGSEGV/SIGABRT handler called; gdb
+x  │ok │   ├── save-load-clumps.py                Assertion `member->isClumpMember()' failed. SIGSEGV/SIGABRT handler called; gdb
 OK │ok │   └── triax-basic-with-clumps.py
    │   ├── concrete
 OK │ok │   ├── brazilian.py
@@ -140,9 +140,9 @@ OK │OK │   ├── cylinder-cylinder.py
 OK │OK │   ├── cylinderconnection-roots.py
 OK │OK │   └── mikado.py
    │   ├── deformableelem
-ok?│x  │   ├── Minimal.py                         the graphs are empty
+x  │x  │   ├── Minimal.py                         the graphs are empty
 ok │x  │   ├── MinimalTensileTest.py
-?? │x  │   ├── main.py                            I suppose this file is here by mistake ?
+x  │x  │   ├── main.py                            I suppose this file is here by mistake ?
 ok?│x  │   ├── testDeformableBodies.py            It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
 ok?│ok │   └── testDeformableBodies_pressure.py   It works?? But prints this ERROR: DeformableCohesiveElement.hpp:49 operator<: Incomplete 'if' sequence
    │   ├── grids
@@ -224,7 +224,7 @@ OK │ok │   ├── Damping_HM.py
    │   │   ├── WireMatPM
 OK │ok │   │   ├── net-2part-displ-unloading.py
 ok │ok │   │   ├── net-2part-displ.py
-x  │ok │   │   └── net-2part-strain.py            SIGSEGV/SIGABRT handler called; gdb
+x  │ok │   │   └── net-2part-strain.py            UniaxialStrainer::action(): Assertion `posIds.size()==posCoords.size()……… SIGSEGV/SIGABRT handler called; gdb
    │   │   ├── batch
 x  │x  │   │   └── sim.py                         KeyError: 'Invalid key: description.'
 OK │OK │   ├── beam-l6geom.py
@@ -237,8 +237,8 @@ OK │ok │   ├── collider-stride.py
 ok?│x  │   ├── collider-sweep-simple.py
 OK │ok?│   ├── combined-kinematic-engine.py
 OK │x  │   ├── energy.py
-x  │x  │   ├── exact-rot-facet.py                 SIGSEGV/SIGABRT handler called; gdb
-x  │x  │   ├── exact-rot.py                       SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   ├── exact-rot-facet.py                 [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   ├── exact-rot.py                       [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
 ok │x  │   ├── facet-box.py
 OK │OK │   ├── facet-sphere-ViscElBasic-peri.py
 OK │OK │   ├── facet-sphere-ViscElBasic.py
@@ -255,7 +255,7 @@ OK │ok │   ├── mindlin.py
 ok?│ok?│   │   └── multi.py                       refers to https://yade-dem.org/wiki/ScriptParametricStudy
 OK │ok │   ├── pack-cloud.py
 ok?│x  │   ├── pack-inConvexPolyhedron.py
-x  │x  │   ├── pack-predicates.py
+x  │x  │   ├── pack-predicates.py                 nothing happens, scene is empty
    │   │   ├── paraview-spheres-solid-section
 OK │ok │   │   ├── export_text.py
 x  │x  │   │   └── pv_section.py                  NOTE: apt instal paraview-python   ; AttributeError: Attribute UseInteractiveRenderingForSceenshots does not exist.
