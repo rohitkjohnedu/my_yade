@@ -83,7 +83,7 @@ x  │ok │   ├── WedgeYADE.py                       terminal is spamme
 x  │ok │   └── cubePBscaled.py                    print 20*'*'+' UNEXPECTED EXCEPTION WHILE RUNNING TESTS '+20*'*' ; print 'WARNING: compiled without OpenMP, -j/--threads/--cores have no effect.' ; scene looks empty iuntil I click Display->inrAllWire
    │   ├── PotentialParticles
 x  │x  │   ├── basic.py                           The sphere does not collide with the box, it goes through.
-x  │x  │   └── cubePPscaled.py                    Drawing shapes is super slow, so it's hard to tell if it runs correctly. I disabled drawing of shapes, enabled intrAllWire. Ran simulation a bit to - seemed to work, then I clicked to enabled drawing shapes and I got SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   └── cubePPscaled.py                    Drawing shapes is slow, hard to tell if it runs correctly. I disabled drawing of shapes, enabled intrAllWire. Ran simulation a bit to - seemed to work, then I clicked to enabl drawing shapes and I got SIGSEGV/SIGABRT handler called; gdb
    │   ├── WireMatPM
 ok │x  │   ├── wirecontacttest.py                 Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
 ok │ok │   ├── wirepackings.py
