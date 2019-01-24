@@ -172,6 +172,7 @@ def fixSrc(app,docname,source):
 	source[0]=replaceLaTeX(source[0])
 
 def fixDocstring(app,what,name,obj,options,lines):
+	for i in range(0,len(lines)): lines[i]=lines[i].decode('utf-8')
 	# remove empty default roles, which is not properly interpreted by docutils parser
 	for i in range(0,len(lines)):
 		lines[i]=lines[i].replace(':ydefault:``','')
@@ -187,8 +188,9 @@ def fixDocstring(app,what,name,obj,options,lines):
 			lines[i]=l2[i] if i<len(l2) else ''
 	elif isBoostMethod(what,obj):
 		l2=boostFuncSignature(name,obj)[1]
-		for i in range(0,len(lines)):
-			lines[i]=l2[i] if i<len(l2) else ''
+                if (l2):
+                    for i in range(0,len(lines)):
+                            lines[i]=l2[i] if i<len(l2) else ''
 	# LaTeX: replace $...$ by :math:`...`
 	# must be done after calling boostFuncSignature which uses original docstring
 	for i in range(0,len(lines)): lines[i]=replaceLaTeX(lines[i])

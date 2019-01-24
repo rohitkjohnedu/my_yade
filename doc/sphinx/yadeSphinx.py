@@ -4,6 +4,8 @@
 # module documentation
 #
 import sys,os,os.path
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 outDir=sys.argv[2] if len(sys.argv)>2 else '_build'
 for d in (outDir,outDir+'/latex',outDir+'/html'):
