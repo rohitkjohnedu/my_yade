@@ -5,6 +5,8 @@
 from yade import pack
 import math
 
+Gl1_PotentialParticle().store=True
+
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([PotentialParticle2AABB()],verletDist=0),
