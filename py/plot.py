@@ -621,9 +621,9 @@ def saveDataTxt(fileName,vars=None, headers=None):
 	>>> plot.addData(a=2,b=12,c=22,d=32)
 	>>> pprint(plot.data)
 	{'a': [1, 2], 'b': [11, 12], 'c': [21, 22], 'd': [31, 32]}
-	>>> plot.saveDataTxt('/tmp/dataFile.txt.bz2',vars=('a','b','c'))
+	>>> plot.saveDataTxt('/tmp/dataFile.txt.tar.gz',vars=('a','b','c'))
 	>>> import numpy
-	>>> d=numpy.genfromtxt('/tmp/dataFile.txt.bz2',dtype=None,names=True)
+	>>> d=numpy.genfromtxt('/tmp/dataFile.txt.tar.gz',dtype=None,names=True)
 	>>> d['a']
 	array([1, 2])
 	>>> d['b']
