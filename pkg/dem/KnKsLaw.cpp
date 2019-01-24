@@ -30,7 +30,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	PotentialParticle *s2=static_cast<PotentialParticle*>(shape2);
 	Vector3r& shearForce = phys->shearForce;
 	Real un=geom->penetrationDepth;
-	TRVAR3(geom->penetrationDepth,de1->se3.position,de2->se3.position);
+	//TRVAR3(geom->penetrationDepth,de1->se3.position,de2->se3.position);
 
 	/* Need to initialise in python.  In the 1st time step.  All the particles in contact (controlled by initialOverlap) are identified.  The interactions are set to tensile and cohesive (tensionBroken = false and cohesionBroken = false).  If there is no initial tension or cohesion, the contact law is run in a tensionless or cohesionless mode */
 
