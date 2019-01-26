@@ -4,7 +4,7 @@
 #  2nd column: whether there is a brief explanation at the top of the file what this example is demonstrating
 # Notation: 'OK' - runs and does not produce obvious errors, 'ok' - acceptable, 'OK?' - works but looks suspicious, 'ok?' - even worse, 'x' - very bad/missing/not working
 
-# the list below was created with command: tree -P "*.py" > list_of_examples.txt
+# the list below was created with command: tree -P "*.py" > list_of_examples.txt ; tree -P "*.py" ../doc/sphinx/tutorial >> list_of_examples.txt
 #
 # works? 
 #  │explained inside what it is demonstrating?
@@ -290,3 +290,16 @@ OK │OK │   └── twoTetrasPoly.py
    │   └── triax-tutorial
 OK │OK     ├── script-session1.py
 OK │OK     └── script-session2.py
+   │   │
+   │   ../doc/sphinx
+   │   │
+   │   └── tutorial
+OK │OK     ├── 01-bouncing-sphere.py
+OK │OK     ├── 02-gravity-deposition.py
+OK │OK     ├── 03-oedometric-test.py
+ok?│OK     ├── 04-periodic-simple-shear.py        see:  https://bugs.launchpad.net/yade/+bug/1634434
+ok?│OK     ├── 05-3d-postprocessing.py            see:  https://bugs.launchpad.net/yade/+bug/1621869
+OK │OK     ├── 06-periodic-triaxial-test.py
+ok?│ok?    ├── make-simulation-video.py
+ok │x      └── peri-triax.py                      looks like duplicate of 06-periodic-triaxial-test.py
+
