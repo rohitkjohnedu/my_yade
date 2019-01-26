@@ -80,12 +80,13 @@ def inheritanceDiagram(klass):
 	Classes in the docClasses set (already documented) are framed differently and the inheritance tree stops there.
 	"""
 	global docClasses
+	global writer
 	def mkUrl(c):
 		global writer
 		# useless, doesn't work in LaTeX anyway...
 		return ('#yade.wrapper.%s'%c if writer=='html' else '%%yade.wrapper#yade.wrapper.%s'%c) # HTML/LaTeX
-	def mkNode(c,style='solid',fillcolor=None): return '\t\t"%s" [shape="box",fontsize=8,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#yade.wrapper.%s"];\n'%(c,style,'fillcolor=%s,'%fillcolor if fillcolor else '',c)
-	ret=".. graphviz::\n\n\tdigraph %s {\n\t\trankdir=RL;\n\t\tmargin=.2;\n"%klass+mkNode(klass)
+	def mkNode(c,style='solid',fillcolor=None): return '\t\t"%s" [shape="box",fontsize=%i,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#yade.wrapper.%s"];\n'%(c,8 if writer=='html' else 20,style,'fillcolor=%s,'%fillcolor if fillcolor else '',c)
+	ret=".. graphviz::\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin=.2;\n"+mkNode(klass)
 	childs=yade.system.childClasses(klass)
 	if len(childs)==0: return ''
 	for c in childs:
