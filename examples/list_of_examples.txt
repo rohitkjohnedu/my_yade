@@ -12,7 +12,7 @@
    │   │
 OK │ok ├── 2D-Tori.py
 OK │x  ├── PIDController.py
-x  │x  ├── ResetRandomPosition.py                 [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
+x  │x  ├── ResetRandomPosition.py                 [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb; Dispatching.cpp:85 null pointer, I guess that the problem is again with I->functorCache.geom
 OK │OK ├── ViscElMatchMaker.py
 OK │OK ├── billiard.py
 OK │x  ├── bouncingbubble.py                      Note: whoa, a Law2_ScGeom_BubblePhys_Bubble is used here. Never saw this one ;)
@@ -83,7 +83,7 @@ x  │ok │   ├── WedgeYADE.py                       terminal is spamme
 x  │ok │   └── cubePBscaled.py                    print 20*'*'+' UNEXPECTED EXCEPTION WHILE RUNNING TESTS '+20*'*' ; print 'WARNING: compiled without OpenMP, -j/--threads/--cores have no effect.' ; scene looks empty iuntil I click Display->inrAllWire
    │   ├── PotentialParticles
 x  │x  │   ├── basic.py                           The sphere does not collide with the box, it goes through.
-x  │x  │   └── cubePPscaled.py                    Drawing shapes is slow, hard to tell if it runs correctly. I disabled drawing of shapes, enabled intrAllWire. Ran simulation a bit to - seemed to work, then I clicked to enabl drawing shapes and I got SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   └── cubePPscaled.py                    Drawing shapes is slow, hard to tell if it runs correctly. I disabled drawing of shapes, enabled intrAllWire. Ran simulation a bit to - seemed to work, then I clicked to enable drawing shapes and I got SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1813222
    │   ├── WireMatPM
 ok │x  │   ├── wirecontacttest.py                 Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
 ok │ok │   ├── wirepackings.py
@@ -171,7 +171,7 @@ ok │ok │       └── shear.py
    │   ├── not-working
 x  │x  │   ├── Se3Interpolator.py                 NameError: name 'Se3Interpolator' is not defined
 x  │x  │   ├── facet-topo.py                      Recompile with FACET_TOPO
-?? │x  │   ├── insertion-sort-collider.py         something works, then SIGSEGV/SIGABRT handler called; gdb
+?? │x  │   ├── insertion-sort-collider.py         something works, then SIGSEGV/SIGABRT handler called; gdb; in PersistentTriangulationCollider.cpp:110 the interaction==nullptr
 x  │x  │   └── triax-identical-results.py         NameError: name 'spheresToFile' is not defined
    │   ├── oar
 x  │x  │   └── sim.py                             KeyError: 'Invalid key: description.'
@@ -224,7 +224,7 @@ OK │ok │   ├── Damping_HM.py
    │   │   ├── WireMatPM
 OK │ok │   │   ├── net-2part-displ-unloading.py
 ok │ok │   │   ├── net-2part-displ.py
-x  │ok │   │   └── net-2part-strain.py            UniaxialStrainer::action(): Assertion `posIds.size()==posCoords.size()……… SIGSEGV/SIGABRT handler called; gdb
+x  │ok │   │   └── net-2part-strain.py            UniaxialStrainer::action(): Assertion `posIds.size()==posCoords.size()……… SIGSEGV/SIGABRT handler called; UniaxialStrainer.cpp:86: virtual void UniaxialStrainer::action(): Assertion posIds.size()==posCoords.size() failed.
    │   │   ├── batch
 x  │x  │   │   └── sim.py                         KeyError: 'Invalid key: description.'
 OK │OK │   ├── beam-l6geom.py
@@ -237,8 +237,8 @@ OK │ok │   ├── collider-stride.py
 ok?│x  │   ├── collider-sweep-simple.py
 OK │ok?│   ├── combined-kinematic-engine.py
 OK │x  │   ├── energy.py
-x  │x  │   ├── exact-rot-facet.py                 [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
-x  │x  │   ├── exact-rot.py                       [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   ├── exact-rot-facet.py                 [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb; the I->functorCache.geom==nullptr in Dispatching.cpp:129
+x  │x  │   ├── exact-rot.py                       [with T = IGeomFunctor; typename boost::detail::sp_member_access<T>::type = IGeomFunctor*]: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb; the I->functorCache.geom==nullptr in Dispatching.cpp:129
 ok │x  │   ├── facet-box.py
 OK │OK │   ├── facet-sphere-ViscElBasic-peri.py
 OK │OK │   ├── facet-sphere-ViscElBasic.py
@@ -246,7 +246,7 @@ OK │ok │   ├── facet-sphere.py
 OK │x  │   ├── flat-collider.py                   (a bit slow, but ok)
 ok?│x  │   ├── force-move.py
 OK │OK │   ├── force-network-video.py
-x  │OK │   ├── genCylLSM.py                       NOTE: apt install  python-demgengeo   ; InsertGenerator3D::seedParticles bbx: SIGSEGV/SIGABRT handler called; gdb
+x  │OK │   ├── genCylLSM.py                       NOTE: apt install  python-demgengeo   ; InsertGenerator3D::seedParticles bbx: SIGSEGV/SIGABRT handler called; gdb; gdb; segfault appears inside gengeom function fit_3d_sphere_fn::operator() and InsertGenerator3D::fillIn(…), I guess that the arguments for calling it were prepared incorrectly.
 x  │ok?│   ├── helix.py                           script runs and is not crashing, but nothing happens
 ok?│ok │   ├── interpolating-force.py
 OK │ok │   ├── kinematic.py
@@ -266,12 +266,12 @@ OK │ok │   ├── psd.py                             testing+plotting s
 x  │x  │   ├── qt4-attributes.py                  Error: already imported an Incompatible QT Binding: pyqt5
 x  │x  │   ├── qt4-pyqglviewer.py                 ImportError: No module named PyQGLViewer
 x  │x  │   ├── remove-body.py                     AttributeError: No such attribute: nBins
-x  │ok?│   ├── shear.py                           sp_member_access<T>::type = IGeomFunctor*: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb
+x  │ok?│   ├── shear.py                           sp_member_access<T>::type = IGeomFunctor*: Assertion `px != 0' failed. SIGSEGV/SIGABRT handler called; gdb; the I->functorCache.geom==nullptr in Dispatching.cpp:129
 OK │ok │   ├── sphere-sphere-ViscElBasic-peri.py
 OK │x  │   ├── subdomain-balancer.py
 OK │x  │   ├── test-sphere-facet-corner.py
 OK?│OK │   ├── test-sphere-facet.py
-x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb
+x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1475844
 OK │ok │   ├── triax-basic.py
 OK │ok │   ├── triax-cohesive.py
    │   │   ├── unv-read
