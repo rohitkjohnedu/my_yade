@@ -29,7 +29,7 @@ OK │ok ├── tunnel-pack.py                         (a bit slow, but ok)
 x  │ok │   ├── LOedometricDeform.py               NameError: name 'DeformControl' is not defined
 x  │ok?│   └── OedometricDeform.py                NameError: name 'DeformControl' is not defined
    │   ├── FEMxDEM
-x  │x  │   ├── biaxialSmooth.py                   ImportError: No module named esys.escript
+x  │x  │   ├── biaxialSmooth.py                   ImportError: No module named esys.escript, see https://launchpad.net/escript-finley; apt install python-escript; run-escript ; from esys.escript import * ; OK, but this does not work in ipython or yade. 
 x  │x  │   ├── footing.py                         ImportError: No module named esys.escript
 OK │x  │   ├── prepareRVE.py
 x  │x  │   ├── retainingSmooth.py                 ImportError: No module named esys.escript
