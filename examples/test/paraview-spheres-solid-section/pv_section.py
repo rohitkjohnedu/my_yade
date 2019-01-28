@@ -42,13 +42,15 @@ clipDisplay = Show(clip, view)
 ColorBy(clipDisplay, ('POINTS', 'radius'))
 radiusLUT = GetColorTransferFunction('radius')
 radiusLUT.RescaleTransferFunction(0.0, maxRadius)
-HideScalarBarIfNotNeeded(radiusLUT, view)
+#FIXME maybe it depends on paraview version? I have here 5.1.2. Can we chack paraview version inside script? Maybe https://public.kitware.com/pipermail/paraview/2014-May/031180.html
+#HideScalarBarIfNotNeeded(radiusLUT, view)
 
 sectionsDisplay = Show(sections, view)
 ColorBy(sectionsDisplay, ('POINTS', 'radiusOrig'))
 radiusOrigLUT = GetColorTransferFunction('radiusOrig')
 radiusOrigLUT.RescaleTransferFunction(0.0, maxRadius)
-HideScalarBarIfNotNeeded(radiusOrigLUT, view)
+#FIXME maybe it depends on paraview version? I have here 5.1.2
+#HideScalarBarIfNotNeeded(radiusOrigLUT, view)
 
 SetActiveSource(sections)
 

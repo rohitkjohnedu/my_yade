@@ -95,7 +95,7 @@ OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
 ok │OK │   ├── compress.py
 ok │OK │   ├── divide.py
 ok │OK │   ├── makeCloud.py
-ok │OK │   └── simulation.py
+OK │OK │   └── simulation.py
    │   ├── baraban
 OK │x  │   ├── BicyclePedalEngine.py
 OK │x  │   ├── baraban.py
@@ -253,7 +253,7 @@ ok?│x  │   ├── pack-inConvexPolyhedron.py
 x  │x  │   ├── pack-predicates.py                 nothing happens, scene is empty
    │   │   ├── paraview-spheres-solid-section
 OK │ok │   │   ├── export_text.py
-OK │ok │   │   └── pv_section.py                  NOTE: apt instal paraview-python
+OK │ok │   │   └── pv_section.py                  NOTE: apt install paraview-python
    │   │   ├── performance
 ok?│x  │   │   └── checkPerf.py                   note: no visuals
 OK │ok?│   ├── periodic-geom-compare.py
@@ -270,8 +270,8 @@ x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collisi
 OK │ok │   ├── triax-basic.py
 OK │ok │   ├── triax-cohesive.py
    │   │   ├── unv-read
-ok │ok │   │   ├── unvRead.py
-ok │ok │   │   └── unvReadVTKExport.py
+OK │ok │   │   ├── unvRead.py
+OK │ok │   │   └── unvReadVTKExport.py
    │   │   ├── vtk-exporter
 ok │x  │   │   └── vtkExporter.py
 OK │ok │   ├── vtkPeriodicCell.py
