@@ -391,7 +391,7 @@ extensions = [
 		'sphinx.ext.autodoc',
 		'sphinx.ext.autosummary',
 		'sphinx.ext.coverage',
-		'sphinx.ext.pngmath',
+		'sphinx.ext.mathjax',
 		'sphinx.ext.graphviz',
 		'sphinx.ext.viewcode',
 		'sphinx.ext.inheritance_diagram',
