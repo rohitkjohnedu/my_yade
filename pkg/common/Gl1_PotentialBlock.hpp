@@ -2,6 +2,9 @@
 #ifdef YADE_POTENTIAL_BLOCKS
 
 #pragma once
+#ifdef YADE_OPENGL
+	#include<pkg/common/GLDrawFunctors.hpp>
+#endif
 #include<pkg/dem/PotentialBlock.hpp>
 #include<pkg/dem/PotentialBlock2AABB.hpp>
 #include<pkg/common/GLDrawFunctors.hpp>

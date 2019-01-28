@@ -2,6 +2,9 @@
 #ifdef YADE_POTENTIAL_BLOCKS
 
 #include "Gl1_PotentialBlock.hpp"
+#ifdef YADE_OPENGL
+	#include<lib/opengl/OpenGLWrapper.hpp>
+#endif
 
 //#include<lib-opengl/OpenGLWrapper.hpp>
 #include <vtkFloatArray.h>
