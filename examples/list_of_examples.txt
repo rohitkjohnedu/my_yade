@@ -85,9 +85,9 @@ x  │ok │   └── cubePBscaled.py                    print 20*'*'+' UNE
 x  │x  │   ├── basic.py                           The sphere does not collide with the box, it goes through.
 x  │x  │   └── cubePPscaled.py                    Drawing shapes is slow, hard to tell if it runs correctly. I disabled drawing of shapes, enabled intrAllWire. Ran simulation a bit to - seemed to work, then I clicked to enable drawing shapes and I got SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1813222
    │   ├── WireMatPM
-ok │x  │   ├── wirecontacttest.py                 Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
+ok │x  │   ├── wirecontacttest.py
 ok │ok │   ├── wirepackings.py
-ok │ok │   └── wiretensiltest.py                  Spams terminal with messages: WirePM.cpp:85 go: Law2_ScGeom_WirePhys_WirePM::go - contact law
+ok │ok │   └── wiretensiltest.py
    │   ├── adaptiveintegrator
 OK │x  │   ├── simple-scene-plot-NewtonIntegrator.py
 OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
@@ -117,7 +117,7 @@ OK?│ok?│   └── chained-cylinder-spring.py         UserWarning: chain
    │   ├── clumps
 ok?│ok │   ├── addToClump-example.py              SIGSEGV/SIGABRT handler called; gdb
 OK │OK │   ├── apply-buoyancy-clumps.py
-OK?│x  │   ├── clump-hopper-test.py               spams with messages: Body #282 vanished, erasing intr #282+#721!
+OK │x  │   ├── clump-hopper-test.py               spams with messages: DomainLimiter::erase 2342
 OK │x  │   ├── clump-hopper-viscoelastic.py
 OK │x  │   ├── clump-inbox-viscoelastic.py
 OK │x  │   ├── clump-viscoelastic.py
@@ -128,7 +128,7 @@ OK │ok │   └── triax-basic-with-clumps.py
    │   ├── concrete
 OK │ok │   ├── brazilian.py
 OK │x  │   ├── interaction-histogram.py
-OK?│ok │   ├── periodic.py                        spams with messages: action: 0: strain=0.00169673, goal=1, cellGrow=1.71367
+OK │ok │   ├── periodic.py
 OK │ok │   ├── triax.py
 OK │ok?│   ├── uniax-post.py
 OK │OK │   └── uniax.py
