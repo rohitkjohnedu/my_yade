@@ -37,10 +37,10 @@ class BlockGen : public FileGenerator
 		
 
 	protected:
-		std::ofstream output2;
-		std::string myfile;
+//		std::ofstream output2;        // it was always creating files "BlkGen" "BlockGenFindExtreme.txt", but they are not used in the code, so I commented this out, Janek
+//		std::string myfile;
 		std::string Key;
-		static std::ofstream output;
+//		static std::ofstream output;
 		
 	public : 
 		~BlockGen ();
@@ -242,8 +242,8 @@ class BlockGen : public FileGenerator
 		,
 		/* constructor for private */
 		Key			="";
-		myfile = "./BlkGen"+Key;
-		output2.open(myfile.c_str(), fstream::app);
+//		myfile = "./BlkGen"+Key;
+//		output2.open(myfile.c_str(), fstream::app);
 
 		,
 		//.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")

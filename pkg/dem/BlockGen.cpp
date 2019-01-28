@@ -65,7 +65,7 @@ YADE_PLUGIN((BlockGen));
 
 
 BlockGen::~BlockGen () {}
-std::ofstream BlockGen::output("BlockGenFindExtreme.txt", fstream::trunc); 
+//std::ofstream BlockGen::output("BlockGenFindExtreme.txt", fstream::trunc); // it was always creating files "BlkGen" "BlockGenFindExtreme.txt", but they are not used in the code, so I commented this out, Janek
 bool BlockGen::generate(string& message)
 {
 
