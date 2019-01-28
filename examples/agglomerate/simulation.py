@@ -43,6 +43,8 @@ ig2sss.interactionDetectionFactor = bo1aabbs.aabbEnlargeFactor = 1
 # delete the inter-agglomerate interactions
 for i in O.interactions:
 	b1,b2 = [O.bodies[ii] for ii in (i.id1,i.id2)]
+	if not (isinstance(b1.shape,Sphere) and isinstance(b2.shape,Sphere)):
+		continue
 	if b1.agglomerate != b2.agglomerate:
 		O.interactions.erase(i.id1,i.id2)
 O.step()

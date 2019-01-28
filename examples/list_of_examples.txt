@@ -95,7 +95,7 @@ OK │x  │   └── simple-scene-plot-RungeKuttaCashKarp54.py
 ok │OK │   ├── compress.py
 ok │OK │   ├── divide.py
 ok │OK │   ├── makeCloud.py
-x  │OK │   └── simulation.py                      AttributeError: 'Body' object has no attribute 'agglomerate'
+ok │OK │   └── simulation.py
    │   ├── baraban
 OK │x  │   ├── BicyclePedalEngine.py
 OK │x  │   ├── baraban.py
@@ -163,11 +163,6 @@ x  │x  │   ├── gravityLoading.py                  No such file or di
 x  │x  │   ├── identificationSpheresOnJoint.py    No such file or directory: 'parallellepiped_10.spheres'
 x  │x  │   ├── packInGtsSurface.py                spams messages: UnbalancedForce=-nan, rel stress nan
 OK │ok │   └── testingJoint.py
-   │   ├── mortar
-   │   │   └── modelTests
-ok?│ok │       ├── compression.py                 IndexError: No such interaction (after it goes through)
-x  │ok │       ├── failureEnvelope.py             MortarMat.cpp:12 go: MortarMat not implemented for non-cohesive contacts
-ok │ok │       └── shear.py
    │   ├── not-working
 x  │x  │   ├── Se3Interpolator.py                 NameError: name 'Se3Interpolator' is not defined
 x  │x  │   ├── facet-topo.py                      Recompile with FACET_TOPO
@@ -247,7 +242,7 @@ OK │x  │   ├── flat-collider.py                   (a bit slow, but o
 ok?│x  │   ├── force-move.py
 OK │OK │   ├── force-network-video.py
 x  │OK │   ├── genCylLSM.py                       NOTE: apt install  python-demgengeo   ; InsertGenerator3D::seedParticles bbx: SIGSEGV/SIGABRT handler called; gdb; gdb; segfault appears inside gengeom function fit_3d_sphere_fn::operator() and InsertGenerator3D::fillIn(…), I guess that the arguments for calling it were prepared incorrectly.
-x  │ok?│   ├── helix.py                           script runs and is not crashing, but nothing happens
+ok │ok │   ├── helix.py
 ok?│ok │   ├── interpolating-force.py
 OK │ok │   ├── kinematic.py
 OK │ok │   ├── mindlin.py
@@ -258,7 +253,7 @@ ok?│x  │   ├── pack-inConvexPolyhedron.py
 x  │x  │   ├── pack-predicates.py                 nothing happens, scene is empty
    │   │   ├── paraview-spheres-solid-section
 OK │ok │   │   ├── export_text.py
-x  │x  │   │   └── pv_section.py                  NOTE: apt instal paraview-python   ; AttributeError: Attribute UseInteractiveRenderingForSceenshots does not exist.
+OK │ok │   │   └── pv_section.py                  NOTE: apt instal paraview-python
    │   │   ├── performance
 ok?│x  │   │   └── checkPerf.py                   note: no visuals
 OK │ok?│   ├── periodic-geom-compare.py
@@ -271,12 +266,12 @@ OK │ok │   ├── sphere-sphere-ViscElBasic-peri.py
 OK │x  │   ├── subdomain-balancer.py
 OK │x  │   ├── test-sphere-facet-corner.py
 OK?│OK │   ├── test-sphere-facet.py
-x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1475844
+x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1475844 (NOTE not reproduced in 2018.02b, needs further investigation)
 OK │ok │   ├── triax-basic.py
 OK │ok │   ├── triax-cohesive.py
    │   │   ├── unv-read
-ok?│x  │   │   ├── unvRead.py
-x  │x  │   │   └── unvReadVTKExport.py            TypeError: facet() got an unexpected keyword argument 'returnElementMap'
+ok │ok │   │   ├── unvRead.py
+ok │ok │   │   └── unvReadVTKExport.py
    │   │   ├── vtk-exporter
 ok │x  │   │   └── vtkExporter.py
 OK │ok │   ├── vtkPeriodicCell.py
