@@ -136,7 +136,7 @@ bool BlockGen::generate(string& message)
 		int count = 0;
 		Vector3r jointCentre(0,0,0);
 		const double PI = std::atan(1.0)*4;
-		int abdCount=0;  Vector3r planeNormal(0,0,0);  int jointNo = 0; double persistenceA=0; double persistenceB=0; double spacing = 0;
+		/* int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //double persistenceA=0; double persistenceB=0; double spacing = 0;
 		while ( file.good() )
 		{
 		    	count ++;
@@ -252,7 +252,7 @@ bool BlockGen::generate(string& message)
 		getline ( file, value); 
 		int count = 0; 
 		const double PI = std::atan(1.0)*4;
-		int boundaryNo = 0; int boundaryCount = 0; int abdCount=0;  Vector3r planeNormal(0,0,0);  int jointNo = 0; double persistenceA=0; double persistenceB=0; double spacing = 0;double a,b,c,d,l = 0.0;
+		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  /* int jointNo = 0; double persistenceA=0; double persistenceB=0; */ double spacing = 0; double a,b,c /* d */, l = 0.0;
 		while ( file.good() )
 		{
 		    	count ++;
@@ -323,10 +323,10 @@ bool BlockGen::generate(string& message)
 		string value;
 		/* skip first line */
 		getline ( file, value); 
-		int count = 0; int linecount = 0; 
+		int count = 0; //int linecount = 0; 
 		Real dip = 0.0;Real dipdir = 0.0; Vector3r jointCentre(0,0,0);
 		const double PI = std::atan(1.0)*4;
-		int boundaryNo = 0; int boundaryCount = 0; int abdCount=0;  Vector3r planeNormal(0,0,0);  int jointNo = 0; double persistenceA=0; double persistenceB=0; double spacing = 0;
+		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //double persistenceA=0; double persistenceB=0; double spacing = 0;
 		boost::normal_distribution<> nd(0.0, 1.0);
 		boost::variate_generator<boost::mt19937,boost::normal_distribution<> > generator(boost::mt19937(time(0)),nd);
 		while ( file.good() )
@@ -544,10 +544,10 @@ bool BlockGen::generate(string& message)
 		string value;
 		/* skip first line */
 		getline ( file, value); 
-		int count = 0; int linecount = 0; 
+		int count = 0; //int linecount = 0; 
 		Vector3r jointCentre(0,0,0);
-		const double PI = std::atan(1.0)*4;
-		int boundaryNo = 0; int boundaryCount = 0; int abdCount=0;  Vector3r planeNormal(0,0,0);  int jointNo = 0; double persistenceA=0; double persistenceB=0; double spacing = 0;
+		//const double PI = std::atan(1.0)*4;
+		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //double persistenceA=0; double persistenceB=0; double spacing = 0;
 		while ( file.good() )
 		{
 		    	count ++;
@@ -645,7 +645,7 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 					if(presentBlock.isBoundary == true && joint[j].sliceBoundaries == false){ continue;}
 					if(presentBlock.isBoundary == false && joint[j].sliceBoundaries == true){ continue;}
 					
-					Real fns = evaluateFNoSphere(presentBlock, vertexFrJoint);
+					//Real fns = evaluateFNoSphere(presentBlock, vertexFrJoint);
 					//std::cout<<"fns: "<<fns<<endl;		
 					/* Split the block into two */ //shrink d
 
@@ -842,7 +842,7 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 					if(joint[j].isBoundary == true){
 						Vector3r startingPt = Vector3r(0,0,0); //centroid
 						//bool converge=startingPointFeasibility(blkA, startingPt);
-						double radius  = inscribedSphereCLP(blkA, startingPt, twoDimension);						
+						//double radius  = inscribedSphereCLP(blkA, startingPt, twoDimension);						
 						Vector3r centroidA = blkA.centre+startingPt;
 						double fA = joint[j].a*(centroidA.x()-joint[j].centre.x()) + joint[j].b*(centroidA.y()-joint[j].centre.y()) + joint[j].c*(centroidA.z()-joint[j].centre.z()) - joint[j].d;
 						if (fA>0.0){
@@ -858,7 +858,7 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 					/* Prune blocks that are too small or too elongated */
 					bool tooSmall = false; 
 					if(joint[j].throughGoing == false){
-						double conditioningFactor = 1.0;
+						//double conditioningFactor = 1.0;
 						Real minX = 0.0; Real minY = 0.0; Real minZ = 0.0;
 						Real maxX = 0.0; Real maxY = 0.0; Real maxZ = 0.0;
 					
@@ -1156,10 +1156,10 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 
 
 	/* NEW Find temp centre and remove redundant planes */
-	for (int i=0; i<blk.size(); i++){
+	for (unsigned int i=0; i<blk.size(); i++){
 		std::cout<<"Redundancy progress.... block no: "<<i+1<<"/"<<blk.size()<<endl;
 		if(blk[i].subMembers.size()>0){
-			for(int j=0; j<blk[i].subMembers.size();j++){
+			for(unsigned int j=0; j<blk[i].subMembers.size();j++){
 				/* Adjust block centroid, after every discontinuity is introduced */
 					Vector3r startingPt = blk[i].subMembers[j].centre; //centroid
 					
@@ -1187,7 +1187,7 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 
 			
 					/* Identify redundant planes */
-					for(int k=0; k<blk[i].subMembers[j].a.size(); k++){//The last plane is the new discontinuity.  It is definitely part of the new blocks.
+					for(unsigned int k=0; k<blk[i].subMembers[j].a.size(); k++){//The last plane is the new discontinuity.  It is definitely part of the new blocks.
 						Discontinuity plane=Discontinuity(blk[i].subMembers[j].centre);
 						plane.a=blk[i].subMembers[j].a[k];
 						plane.b=blk[i].subMembers[j].b[k];
@@ -1262,7 +1262,7 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 
 			
 					/* Identify redundant planes */
-					for(int k=0; k<blk[i].a.size(); k++){//The last plane is the new discontinuity.  It is definitely part of the new blocks.
+					for(unsigned int k=0; k<blk[i].a.size(); k++){//The last plane is the new discontinuity.  It is definitely part of the new blocks.
 						Discontinuity plane=Discontinuity(blk[i].centre);
 						plane.a=blk[i].a[k];
 						plane.b=blk[i].b[k];
@@ -1332,7 +1332,7 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 
 			vector<int> memberId;
 			int clumpMemberCount = 0;
-		       	for(int j=0; j<blk[i].subMembers.size();j++){
+		       	for(unsigned int j=0; j<blk[i].subMembers.size();j++){
 				if(createBlock(body,blk[i].subMembers[j],shapeIDcount /* j */) ){
 						//scene->bodies->insert(body);
 						 Body::id_t lastId=(Body::id_t)scene->bodies->insert(body);
@@ -1346,8 +1346,8 @@ std::cout<<"joint_a.size(): "<<joint_a.size()<<", joint size: "<<joint.size()<<e
 			}
 
 			if(clumpMemberCount > 1){
-				Body::id_t clumpId=scene->bodies->insert(clumpBody); //std::cout<<"ok 1"<<endl;
-				for(int j=0; j<memberId.size(); j++){
+				//Body::id_t clumpId=scene->bodies->insert(clumpBody); //std::cout<<"ok 1"<<endl;
+				for(unsigned int j=0; j<memberId.size(); j++){
 				 	Clump::addNonSpherical(clumpBody, /* body*/  Body::byId(memberId[j],scene) ); //std::cout<<"ok 2"<<endl;
 					clump->ids.push_back(memberId[j]);  //std::cout<<"ok 3"<<endl;
 					
@@ -1460,8 +1460,8 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 	
 //  }	
 	
-	bool converge = true; 
-        Vector3r startingPt = Vector3r(0,0,0); //0.5*Vector3r(minX+maxX,minY+maxY,minZ+maxZ);
+	//bool converge = true; 
+        //Vector3r startingPt = Vector3r(0,0,0); //0.5*Vector3r(minX+maxX,minY+maxY,minZ+maxZ);
 
 	Vector3r centroid = block.centre;
 	double blockVol = 0.0;
@@ -1500,9 +1500,9 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 	pBlock->maxAabbRotated = 1.02*max;
 
 	body->setDynamic(true);
-	Real volume = 0.0;
+	//Real volume = 0.0;
 	Real Ixx = 0.0; Real Iyy = 0.0; Real Izz = 0.0; Real Ixy = 0.0; Real Ixz = 0.0; Real Iyz = 0.0;
-	Vector3r boundingDist = Vector3r(fabs(max[0]+min[0]),fabs(max[1]+min[1]),fabs(max[2]+min[2]));
+	//Vector3r boundingDist = Vector3r(fabs(max[0]+min[0]),fabs(max[1]+min[1]),fabs(max[2]+min[2]));
 
 //std::cout<<"beforeInertia"<<endl;
 	calculateInertia(block,Ixx,Iyy,Izz, Ixy, Ixz, Iyz);
@@ -1655,7 +1655,7 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 		if (contactBoundaryLPCLP(plane,block,falseVertex) ){	
 			maxZ = falseVertex.z();
 		}else{return false;}
-		Vector3r oldmax = max;
+		//Vector3r oldmax = max;
 		min = Vector3r(-minX,-minY,-minZ);
 		max = Vector3r(maxX,maxY,maxZ);
 		//std::cout<<"number: "<<number<<", min : "<<min<<", max: "<<max<<endl;
@@ -1699,7 +1699,7 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 				Vector3r plane2 = Vector3r(pBlock->a[j],pBlock->b[j], pBlock->c[j]);	
 				Vector3r plane3 = Vector3r(pBlock->a[k],pBlock->b[k], pBlock->c[k]);	
 				
-				Vector3r centre = body->state->pos;
+				//Vector3r centre = body->state->pos;
 				double d1 = pBlock->d[i]+pBlock->r;	
 				double d2 = pBlock->d[j]+pBlock->r;
 				double d3 = pBlock->d[k]+pBlock->r;
@@ -1710,10 +1710,10 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 				Ax[0]=plane1.x(); Ax[3]=plane1.y(); Ax[6]=plane1.z();  Aplanes(0,0)= Ax[0]; Aplanes(0,1) = Ax[3]; Aplanes(0,2) = Ax[6];
 				Ax[1]=plane2.x(); Ax[4]=plane2.y(); Ax[7]=plane2.z();  Aplanes(1,0) = Ax[1]; Aplanes(1,1) = Ax[4];Aplanes(1,2) = Ax[7];
 				Ax[2]=plane3.x(); Ax[5]=plane3.y(); Ax[8]=plane3.z();  Aplanes(2,0) = Ax[2]; Aplanes(2,1) = Ax[5];Aplanes(2,2) = Ax[8];
-				bool parallel = false;
-				if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
-				if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
-				if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
+				//bool parallel = false;
+				//if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
+				//if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
+				//if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
 				double det = Aplanes.determinant();
 				
 				if(fabs(det)>pow(10,-15) ){
@@ -1874,8 +1874,8 @@ Real BlockGen::evaluateFNoSphere(struct Block block, Vector3r presentTrial){
 		pSum2 += pow(p[i],2);
 	}
 	Real r = block.r; 
-	Real R = block.R; 
-	Real k = block.k; 
+	//Real R = block.R; 
+	//Real k = block.k; 
 	/* Additional sphere */
 	
 	/* Complete potential particle */
@@ -1967,10 +1967,10 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 				Ax[0]=plane1.x(); Ax[3]=plane1.y(); Ax[6]=plane1.z();  Aplanes(0,0)= Ax[0];  Aplanes(0,1) = Ax[3]; Aplanes(0,2) = Ax[6];
 				Ax[1]=plane2.x(); Ax[4]=plane2.y(); Ax[7]=plane2.z();  Aplanes(1,0)= Ax[1];  Aplanes(1,1) = Ax[4]; Aplanes(1,2) = Ax[7];
 				Ax[2]=plane3.x(); Ax[5]=plane3.y(); Ax[8]=plane3.z();  Aplanes(2,0)= Ax[2];  Aplanes(2,1) = Ax[5]; Aplanes(2,2) = Ax[8];
-				bool parallel = false;
-				if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
-				if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
-				if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
+				//bool parallel = false;
+				//if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
+				//if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
+				//if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
 				double det = Aplanes.determinant();
 				
 				if(fabs(det)>pow(10,-15) ){
@@ -1997,11 +1997,11 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 	  }
 
 	  vector<Vector3r> verticesOnPlane; vector<Vector3r> oriVerticesOnPlane;
-	  for (int j=0; j<block.a.size(); j++){
+	  for (unsigned int j=0; j<block.a.size(); j++){
 		if(verticesOnPlane.size()>0){
 			verticesOnPlane.clear(); oriVerticesOnPlane.clear();
 		}
-		for (int i=0; i<vertices.size();i++){		
+		for (unsigned int i=0; i<vertices.size();i++){		
 			Vector3r vertex =vertices[i]; /*local coordinates*/
 			double plane = block.a[j]*vertex.x() + block.b[j]*vertex.y() + block.c[j]*vertex.z() - block.d[j] - block.r; 
 			if( fabs(plane) < pow(10,-3) ){
@@ -2024,12 +2024,12 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 		if(verticesOnPlane.size() == 0 ){continue;}
 		/* REORDER VERTICES counterclockwise positive*/
 		vector<Vector3r> orderedVerticesOnPlane; vector<Vector3r> oriOrderedVerticesOnPlane;
-		int h = 0; int k = 1; int m =2;
+		unsigned int h = 0; unsigned int k = 1; unsigned int m =2;
 		Vector3r pt1 = verticesOnPlane[h];
 		Vector3r pt2 = verticesOnPlane[k];
 		Vector3r pt3 = verticesOnPlane[m];
 		orderedVerticesOnPlane.push_back(pt1);	 oriOrderedVerticesOnPlane.push_back(oriVerticesOnPlane[0]);
-		int counter = 1;
+		unsigned int counter = 1;
 		while(counter<verticesOnPlane.size()){		
 				
 				while (m<verticesOnPlane.size()){	
@@ -2070,7 +2070,7 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 
 		Eigen::MatrixXd vertexOnPlane(orderedVerticesOnPlane.size()+1,2);
 		Vector3r baseOnPolygon (0,0,0); Vector3r oriBaseOnPolygon (0,0,0);
-		for(int i=0; i< orderedVerticesOnPlane.size(); i++){
+		for(unsigned int i=0; i< orderedVerticesOnPlane.size(); i++){
 			vertexOnPlane(i,0)=orderedVerticesOnPlane[i].x(); vertexOnPlane(i,1)=orderedVerticesOnPlane[i].y(); //vertexOnPlane(i,2)=orderedVerticesOnPlane[i].z();		
 			//std::cout<<"vertexOnPlane0: "<<vertexOnPlane(i,0)<<", vertexOnPlane1: "<<vertexOnPlane(i,1)<<endl;
 			baseOnPolygon += orderedVerticesOnPlane[i];
@@ -2160,10 +2160,10 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 				Ax[0]=plane1.x(); Ax[3]=plane1.y(); Ax[6]=plane1.z();  Aplanes(0,0)= Ax[0];  Aplanes(0,1) = Ax[3]; Aplanes(0,2) = Ax[6];
 				Ax[1]=plane2.x(); Ax[4]=plane2.y(); Ax[7]=plane2.z();  Aplanes(1,0)= Ax[1];  Aplanes(1,1) = Ax[4]; Aplanes(1,2) = Ax[7];
 				Ax[2]=plane3.x(); Ax[5]=plane3.y(); Ax[8]=plane3.z();  Aplanes(2,0)= Ax[2];  Aplanes(2,1) = Ax[5]; Aplanes(2,2) = Ax[8];
-				bool parallel = false;
-				if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
-				if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
-				if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
+				//bool parallel = false;
+				//if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
+				//if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
+				//if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
 				double det = Aplanes.determinant();
 				
 				if(fabs(det)>pow(10,-15) ){
@@ -2192,11 +2192,11 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 	  	
 
 	  vector<Vector3r> verticesOnPlane; vector<Vector3r> oriVerticesOnPlane;
-	  for (int j=0; j<block.a.size(); j++){
+	  for (unsigned int j=0; j<block.a.size(); j++){
 		if(verticesOnPlane.size()>0){
 			verticesOnPlane.clear(); oriVerticesOnPlane.clear();
 		}
-		for (int i=0; i<vertices.size();i++){		
+		for (unsigned int i=0; i<vertices.size();i++){		
 			Vector3r vertex =vertices[i]; /*local coordinates*/
 			double plane = block.a[j]*vertex.x() + block.b[j]*vertex.y() + block.c[j]*vertex.z() - block.d[j] - block.r; 
 			if( fabs(plane) < pow(10,-3) ){
@@ -2219,12 +2219,12 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 		if(verticesOnPlane.size() == 0 ){continue;}
 		/* REORDER VERTICES counterclockwise positive*/
 		vector<Vector3r> orderedVerticesOnPlane; vector<Vector3r> oriOrderedVerticesOnPlane;
-		int h = 0; int k = 1; int m =2;
+		unsigned int h = 0; unsigned int k = 1; unsigned int m =2;
 		Vector3r pt1 = verticesOnPlane[h];
 		Vector3r pt2 = verticesOnPlane[k];
 		Vector3r pt3 = verticesOnPlane[m];
 		orderedVerticesOnPlane.push_back(pt1);	 oriOrderedVerticesOnPlane.push_back(oriVerticesOnPlane[0]);
-		int counter = 1;
+		unsigned int counter = 1;
 		while(counter<verticesOnPlane.size()){		
 				
 				while (m<verticesOnPlane.size()){	
@@ -2265,7 +2265,7 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 
 		Eigen::MatrixXd vertexOnPlane(orderedVerticesOnPlane.size()+1,2);
 		Vector3r baseOnPolygon (0,0,0); Vector3r oriBaseOnPolygon (0,0,0);
-		for(int i=0; i< orderedVerticesOnPlane.size(); i++){
+		for(unsigned int i=0; i< orderedVerticesOnPlane.size(); i++){
 			vertexOnPlane(i,0)=orderedVerticesOnPlane[i].x(); vertexOnPlane(i,1)=orderedVerticesOnPlane[i].y(); //vertexOnPlane(i,2)=orderedVerticesOnPlane[i].z();		
 			//std::cout<<"vertexOnPlane0: "<<vertexOnPlane(i,0)<<", vertexOnPlane1: "<<vertexOnPlane(i,1)<<endl;
 			baseOnPolygon += orderedVerticesOnPlane[i];
@@ -2335,7 +2335,7 @@ bool BlockGen::contactDetectionLPCLPglobal(struct Discontinuity joint, struct Bl
   int NUMCON = 1 /* equality */ + planeNoA /*block inequality */ + persistenceNoA /*persistence inequalities */; 
   int NUMVAR = 3/*3D */ + 1 /* s */; 
   double s = 0.0;
-  bool converge = true;
+  //bool converge = true;
 
   double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
   double xlocalB=0; double ylocalB = 0; double zlocalB = 0;
@@ -2449,8 +2449,8 @@ if(block.tooSmall == true){return false;}
 /* Variables to keep things neat */
   int NUMCON = planeNoA /*block inequality */; 
   int NUMVAR = 3/*3D */; 
-  double s = 0.0;
-  double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
+  //double s = 0.0;
+  //double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
   Vector3r localA (0,0,0);
   Vector3r xGlobalA (0,0,0);
 
@@ -2527,8 +2527,8 @@ if(block.tooSmall == true){return false;}
 /* Variables to keep things neat */
   int NUMCON = planeNoA /*block inequality */ + 1; 
   int NUMVAR = 3 +1/*3D */; 
-  double s = 0.0;
-  double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
+  //double s = 0.0;
+  //double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
   Vector3r localA (0,0,0);
   Vector3r xGlobalA (0,0,0);
 
@@ -2572,8 +2572,8 @@ ClpSimplex  model2;
              
  // Now elements
 
-  Matrix3r Q1 = Matrix3r::Identity(); // toRotationMatrix() conjugates 
-  Matrix3r Q2 = Matrix3r::Identity();
+  //Matrix3r Q1 = Matrix3r::Identity(); // toRotationMatrix() conjugates 
+  //Matrix3r Q2 = Matrix3r::Identity();
 
 
 
@@ -2636,7 +2636,7 @@ model2.setLogLevel(0);
    model2.primal();
   // model2.writeMps("contactBoundary.mps");
           // Print column solution
-          int numberColumns = model2.numberColumns();
+          //int numberColumns = model2.numberColumns();
 
           // Alternatively getColSolution()
           double * columnPrimal = model2.primalColumnSolution();
@@ -2670,8 +2670,8 @@ if(block.tooSmall == true){return false;}
 /* Variables to keep things neat */
   int NUMCON = planeNoA /*block inequality */; 
   int NUMVAR = 3/*3D */; 
-  double s = 0.0;
-  double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
+  //double s = 0.0;
+  //double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
   Vector3r localA (0,0,0);
   Vector3r xGlobalA (0,0,0);
 
@@ -2712,8 +2712,8 @@ ClpSimplex  model2;
                // assign to matrix
 
 
-  Matrix3r Q1 = Matrix3r::Identity(); // toRotationMatrix() conjugates 
-  Matrix3r Q2 = Matrix3r::Identity();
+  //Matrix3r Q1 = Matrix3r::Identity(); // toRotationMatrix() conjugates 
+  //Matrix3r Q2 = Matrix3r::Identity();
   /* column 0 xA*/
   starts[0] = 0;
   CoinBigIndex put = 0;
@@ -2754,7 +2754,7 @@ model2.setLogLevel(0);
    model2.dual();
  //  model2.writeMps("redundancy.mps");
           // Print column solution
-          int numberColumns = model2.numberColumns();
+          //int numberColumns = model2.numberColumns();
 
           // Alternatively getColSolution()
           double * columnPrimal = model2.primalColumnSolution();
@@ -2779,11 +2779,11 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 
 /* minimise s */
 /* s.t. Ax - s <= d*/
-  bool converge = true;
+//  bool converge = true;
 /* Parameters for particles A and B */
   double s = 0.0; /* get value of x[3] after optimization */
   int planeNoA = block.a.size(); 
-vector<int> plane2Dno;
+vector<unsigned int> plane2Dno;
 if (twoDimension == true){
 	for (int i=0; i<planeNoA; i++){
 		Vector3r plane = Vector3r(block.a[i],block.b[i],block.c[i]);
@@ -2828,7 +2828,7 @@ if(twoDimension == true){ model2.setColumnLower(1, 0.0);model2.setColumnUpper(1,
 int planeIndex[planeNoA];     
 		// Rows
 		int counter = 0;
-		for(int i=0; i<block.a.size(); i++  ){
+		for(unsigned int i=0; i<block.a.size(); i++  ){
 		    if (twoDimension == true){
 				if (i==plane2Dno[0] || i==plane2Dno[1] ){
 					continue;

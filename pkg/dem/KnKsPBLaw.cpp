@@ -17,7 +17,7 @@ CREATE_LOGGER(Law2_SCG_KnKsPBPhys_KnKsPBLaw);
 
 
 bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry */, shared_ptr<IPhys>& ip /* contact physics */, Interaction* contact){
-	const Real& dt = scene->dt; /* size of time step */
+	//const Real& dt = scene->dt; /* size of time step */
 	int id1 = contact->getId1();  /* id of Body1 */
 	int id2 = contact->getId2(); /* id of Body2 */
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get()); /* contact geometry */
@@ -52,7 +52,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	Vector3r shiftVel = Vector3r(0,0,0); //scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
 	geom->rotateNonSpherical(shearForce); /*rotate shear force according to new contact plane (normal) */ 
 	Vector3r oriShear = shearForce; 
-	Vector3r oriNormalF = phys->normalForce;
+	//Vector3r oriNormalF = phys->normalForce;
 
 	/* CALCULATE SHEAR INCREMENT */
 	Vector3r shift2(0,0,0);
@@ -274,7 +274,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	/* SHEAR CORRECTION */
 	Vector3r dampedShearForce = shearForce; 
 	double cohesiveForce = phys->cohesion*std::max(pow(10,-15),phys->contactArea);
-	Real maxFs = 0.0; double maxShear = 0.0;
+	Real maxFs = 0.0; //double maxShear = 0.0;
 	if (useIterativeMethod == false){
 	
 			double fN = phys->normalForce.dot(geom->normal);
@@ -303,7 +303,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	}else{
 		Vector3r Fs_prev = oriShear; /* shear force before stress update */
 		Vector3r delta_us = -shearIncrement; /* increment of shear displacement */
-		double beta = 0.0; /* rate of plastic multiplier */
+		//double beta = 0.0; /* rate of plastic multiplier */
 		double beta_prev = phys->cumulative_us; /* accumulated plastic mutliplier before stress update */
 		double fN = phys->normalForce.norm(); //std::max(pow(10,-15),phys->contactArea);
 		if(std::isnan(fN)){fN=0.0;} 
@@ -338,7 +338,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	Vector3r force = -phys->normalForce-dampedShearForce;
 	scene->forces.addForce(id1,force);
 	scene->forces.addForce(id2,-force);
-	Vector3r normal = geom->normal;
+	//Vector3r normal = geom->normal;
 	scene->forces.addTorque(id1,c1x.cross(force));
 	scene->forces.addTorque(id2,-(c2x).cross(force));
 	phys->prevNormal = geom->normal;
@@ -375,7 +375,7 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& ip, con
 	// Define beta as the rate of plastic multiplier at the current time step
 	// Fs_new = Fs_prev + dF
 	// dF = Ks*du_elastic = Ks*(du - du_plastic) = Ks*(du - beta*du_p)  
-	double beta = 0.0; //beta is the plastic multiplier
+	//double beta = 0.0; //beta is the plastic multiplier
 	double effective_phi = phi_b;
 	double tan_effective_phi = tan(effective_phi/180.0*PI);
 	double miu_peak = tan_effective_phi ;
@@ -397,7 +397,7 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& ip, con
 		/* EQUATION TO SOLVE */
 		/* Solve for beta */
 		// Fs + Ks*(du - beta*du_p) = N*( miu_peak-delta_miu*(1-exp(beta_prev + beta) ) )
-		beta = 0.0;
+		//beta = 0.0;
 
 		
 
@@ -486,7 +486,7 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>
 	// Define beta as the rate of plastic multiplier at the current time step
 	// Fs_new = Fs_prev + dF
 	// dF = Ks*du_elastic = Ks*(du - du_plastic) = Ks*(du - beta*du_p)  
-	double beta = 0.0; //beta is the plastic multiplier
+	//double beta = 0.0; //beta is the plastic multiplier
 	double effective_phi = phi_b;
 	double tan_effective_phi = tan(effective_phi/180.0*PI);
 	double miu_peak = tan_effective_phi ;
@@ -507,7 +507,7 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>
 		/* EQUATION TO SOLVE */
 		/* Solve for beta */
 		// Fs + Ks*(du - beta*du_p) = N*( miu_peak-delta_miu*(1-exp(beta_prev + beta) ) )
-		beta = 0.0;
+		//beta = 0.0;
 
 		
 

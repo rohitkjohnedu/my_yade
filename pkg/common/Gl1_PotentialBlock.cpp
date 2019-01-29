@@ -72,9 +72,9 @@ void Gl1_PotentialBlock::calcMinMax(const PotentialBlock& pp)
 		}
 	}
 
-	Real R = pp.R;
-	Real r = pp.r;
-	Real maxTip = R; //std::max(maxD + r, R);
+	//Real R = pp.R;
+	//Real r = pp.r;
+	//Real maxTip = R; //std::max(maxD + r, R);
 	min = -aabbEnlargeFactor*pp.minAabbRotated;
 	max =  aabbEnlargeFactor*pp.maxAabbRotated;
 	
@@ -196,9 +196,9 @@ void Gl1_PotentialBlock::go( const shared_ptr<Shape>& cm, const shared_ptr<State
 double Gl1_PotentialBlock::evaluateF(const PotentialBlock& pp, double x, double y, double z){
 
 		
-		Real k = pp.k;
+		//Real k = pp.k;
 		Real r = pp.r;
-		Real R = pp.R;	
+		//Real R = pp.R;	
 
 
 		int planeNo = pp.a.size();
@@ -274,7 +274,7 @@ double ImpFuncPB::FunctionValue(double x[3])
 			p.push_back(plane);
 			pSum2 += pow(p[i],2);
 		   }			
-		   double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
+		 //  double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
 		 //  Real f = (1.0-k)*(pSum2/pow(r,2) - 1.0)+k*(sphere/pow(R,2)-1.0);
 		   Real f = (pSum2 - 1.0*pow(r,2) );
   		 return f;
@@ -294,7 +294,7 @@ double ImpFuncPB::FunctionValue(double x[3])
 			p.push_back(plane);
 			pSum2 += pow(p[i],2);
 		   }			
-		   double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
+		  // double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
 		  // Real f = (1.0-k)*(pSum2/pow(r,2) - 1.0)+k*(sphere/pow(R,2)-1.0);
 		   Real f = (pSum2 - 1.5*pow(r,2) );
 		return f;
@@ -486,13 +486,13 @@ void PotentialBlockVTKRecorderTunnel::action(){
 		}else if(b->isClump() == true){
 			//const Clump* clump = dynamic_cast<Clump*>(b->shape.get()); 
 			const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(b->shape)); 
-			bool firstBound = true;
+			//bool firstBound = true;
 
 			//vtkSmartPointer<ImpFunc> functionBool [clump->ids.size()];
 			functionBool = new vtkSmartPointer<ImpFuncPB> [clump->ids.size()];
 			ImplicitBoolNo = clump->ids.size();
 			
-			for (int i=0; i<clump->ids.size();i++){
+			for (unsigned int i=0; i<clump->ids.size();i++){
 				const shared_ptr<Body>  clumpMember = Body::byId(clump->ids[i],scene);
 				const PotentialBlock* pbShape =dynamic_cast<PotentialBlock*>(clumpMember->shape.get()); 
 				functionBool[i] = vtkSmartPointer<ImpFuncPB>::New();
@@ -506,7 +506,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 
 				//Eigen::Matrix3d directionCos = clumpMember->state->ori.conjugate().toRotationMatrix();  //FIXME
 				Eigen::Matrix3d rotation = clumpMember->state->ori.toRotationMatrix(); //*pbShape->oriAabb.conjugate(); 
-				for (int j=0; j<pbShape->a.size();j++){
+				for (unsigned int j=0; j<pbShape->a.size();j++){
 									
 					Vector3r plane = rotation*Vector3r(pbShape->a[j], pbShape->b[j], pbShape->c[j]);
 					double d = pbShape->d[j]; //-1.0*(plane.x()*(b->state->pos.x()-clumpMember->state->pos.x() ) + plane.y()*(b->state->pos.y()-clumpMember->state->pos.y() ) + plane.z()*(b->state->pos.z()-clumpMember->state->pos.z() ) - pbShape->d[j]);
@@ -524,7 +524,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 					//ymax = aabb->max.y();
 					//zmin = aabb->min.z();
 					//zmax = aabb->max.z();
-					firstBound = false;
+					//firstBound = false;
 					particleColour = pbShape->color;
 				//}else{
 					xmin=std::min(xmin,aabb->min.x()- b->state->pos.x() );
@@ -609,7 +609,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 		
 		Vector3r centre (b->state->pos[0], b->state->pos[1], b->state->pos[2]);
 		Quaternionr orientation= b->state->ori; orientation.normalize();
-		AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ double angle = aa.angle()/3.14159*180.0;	double xAxis = axis[0]; double yAxis = axis[1]; double zAxis = axis[2];	
+		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ double angle = aa.angle()/3.14159*180.0;	double xAxis = axis[0]; double yAxis = axis[1]; double zAxis = axis[2];	
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData( polydata );
 		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
@@ -748,8 +748,8 @@ void PotentialBlockVTKRecorderTunnel::action(){
 				pbCellsContact->InsertNextCell(1,pid);
 				//intrBodyPos->InsertNextPoint(geom->contactPoint[0],geom->contactPoint[1],geom->contactPoint[2]); 
 				// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
-				float fn[3]={phys->normalForce[0],phys->normalForce[1], phys->normalForce[2]};
-				float fs[3]={phys->shearForce[0], phys->shearForce[1],  phys->shearForce[2]};
+				float fn[3]={(float)phys->normalForce[0], (float)phys->normalForce[1], (float)phys->normalForce[2]};
+				float fs[3]={(float)phys->shearForce[0],  (float)phys->shearForce[1],  (float)phys->shearForce[2]};
 				float totalForce[3] = {fn[0]+fs[0], fn[1]+fs[1], fn[2]+fs[2]};
 				float totalStress[3] = {0.0,0.0,0.0}; //{totalForce[0]/phys->contactArea, totalForce[1]/phys->contactArea, totalForce[2]/phys->contactArea}; 
 				float mobilizedShear = phys->mobilizedShear;
@@ -908,7 +908,7 @@ void PotentialBlockVTKRecorder::action(){
 
 		vtkSmartPointer<vtkSampleFunction> sample = vtkSampleFunction::New();
 		sample->SetImplicitFunction(function);
-		double value = 1.05*pb->R; 
+		//double value = 1.05*pb->R; 
 
 		
 		double xmin = -pb->halfSize.x(); double xmax = pb->halfSize.x(); double ymin = -pb->halfSize.y(); double ymax=pb->halfSize.y(); double zmin=-pb->halfSize.z(); double zmax=pb->halfSize.z();
@@ -959,7 +959,7 @@ void PotentialBlockVTKRecorder::action(){
 
 		Vector3r centre (b->state->pos[0], b->state->pos[1], b->state->pos[2]);
 		Quaternionr orientation= b->state->ori; orientation.normalize();
-		AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ double angle = aa.angle()/3.14159*180.0;	double xAxis = axis[0]; double yAxis = axis[1]; double zAxis = axis[2];	
+		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ double angle = aa.angle()/3.14159*180.0;	double xAxis = axis[0]; double yAxis = axis[1]; double zAxis = axis[2];	
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData( polydata );
 		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
@@ -1066,8 +1066,8 @@ void PotentialBlockVTKRecorder::action(){
 				pbCellsContact->InsertNextCell(1,pid);
 				//intrBodyPos->InsertNextPoint(geom->contactPoint[0],geom->contactPoint[1],geom->contactPoint[2]); 
 				// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
-				float fn[3]={phys->normalForce[0],phys->normalForce[1], phys->normalForce[2]};
-				float fs[3]={phys->shearForce[0], phys->shearForce[1],  phys->shearForce[2]};
+				float fn[3]={(float)phys->normalForce[0], (float)phys->normalForce[1], (float)phys->normalForce[2]};
+				float fs[3]={(float)phys->shearForce[0],  (float)phys->shearForce[1],  (float)phys->shearForce[2]};
 				pbNormalForce->InsertNextTupleValue(fn);
 				pbShearForce->InsertNextTupleValue(fs);
 				count++;

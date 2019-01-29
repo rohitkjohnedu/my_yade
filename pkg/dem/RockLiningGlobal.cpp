@@ -98,7 +98,7 @@ void RockLiningGlobal::action(){
 			Shape* shape1 = Body::byId(closestID,scene)->shape.get();
 			PotentialBlock *pb=static_cast<PotentialBlock*>(shape1);
 			int totalPlanes = pb->a.size();
-			int intersectNo = 0;
+			//int intersectNo = 0;
 			Vector3r nodeLocalPos(0,0,0); Vector3r nodeGlobalPos(0,0,0);
 //std::cout<<"totalPlanes: "<<totalPlanes<<endl;
 			double closestPlaneDist = 1000000;
@@ -192,8 +192,8 @@ void RockLiningGlobal::action(){
 				
 				double deformedAngle = refAngle[j];// - thetaA;
 
-				double temperatureForce = expansionFactor*lengthNode[j]*EA; 
-				Vector3r tempForceGlobal = Vector3r(temperatureForce*cos(refAngle[j] ) , 0.0,-temperatureForce*sin(refAngle[j] ) ) ; //Ttranspose
+				//double temperatureForce = expansionFactor*lengthNode[j]*EA; 
+				//Vector3r tempForceGlobal = Vector3r(temperatureForce*cos(refAngle[j] ) , 0.0,-temperatureForce*sin(refAngle[j] ) ) ; //Ttranspose
 				
 				
 				Vector3r globalDispA = state1->pos - refPos[j];
@@ -396,25 +396,25 @@ void RockLiningGlobal::action(){
 			Vector3r plotDirection = midPoint; 
 			plotDirection.normalize();
 			Vector3r nodalMoment = moment[i]*plotDirection;
-			float m[3]={nodalMoment[0],nodalMoment[1],nodalMoment[2]};
+			float m[3]={(float)nodalMoment[0], (float)nodalMoment[1], (float)nodalMoment[2]};
 			liningNodalMoment->InsertNextTupleValue(m);
 
 			Vector3r axialForce = -axialForces[i]*plotDirection;
-			float fa[3]={axialForce[0],axialForce[1],axialForce[2]};
+			float fa[3]={(float)axialForce[0], (float)axialForce[1], (float)axialForce[2]};
 			liningAxialForce->InsertNextTupleValue(fa);
 
 			Vector3r shearForce = shearForces[i]*plotDirection;
-			float fs[3]={shearForce[0],shearForce[1],shearForce[2]};
+			float fs[3]={(float)shearForce[0], (float)shearForce[1], (float)shearForce[2]};
 			liningShearForce->InsertNextTupleValue(fs);
 
 			Vector3r normalP = pb->liningNormalPressure;
 			Vector3r totalP = pb->liningTotalPressure;
-			float pN[3] = {normalP[0], normalP[1],normalP[2]};
-			float pT[3] = {totalP[0], totalP[1], totalP[2]};
+			float pN[3] = {(float)normalP[0], (float)normalP[1], (float)normalP[2]};
+			float pT[3] = {(float)totalP[0],  (float)totalP[1],  (float)totalP[2]};
 			liningNormalPressure->InsertNextTupleValue(pN);
 			liningTotalPressure->InsertNextTupleValue(pT);
 			Vector3r normalPideal=-1.0*(normalP.norm())*plotDirection;
-			float pNi[3] = {normalPideal[0], normalPideal[1],normalPideal[2]};
+			float pNi[3] = {(float)normalPideal[0], (float)normalPideal[1], (float)normalPideal[2]};
 			liningNormalPressureIdeal->InsertNextTupleValue(pNi);
 //#endif
 			
@@ -502,7 +502,7 @@ int RockLiningGlobal::insertNode(Vector3r pos, double mass, double intervalLengt
 
 
 Vector3r RockLiningGlobal::getNodeDistance(const PotentialBlock* cm1,const State* state1,const PotentialBlock* cm2,const State* state2, const Vector3r localPt1, const Vector3r localPt2){
-	Vector3r nodeDist = Vector3r(0,0,0.0);
+	//Vector3r nodeDist = Vector3r(0,0,0.0);
 	Vector3r global1 = state1->ori*localPt1 + state1->pos;
 	Vector3r global2 = state2->ori*localPt2 + state2->pos;
 	
@@ -542,7 +542,7 @@ double RockLiningGlobal::evaluateFNoSphereVol(const PotentialBlock* s1,const Sta
 
 bool RockLiningGlobal::installLining(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt){
 
-    Vector3r endPt = startingPt + length*direction;
+    //Vector3r endPt = startingPt + length*direction;
   
  // PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
   int planeNoA = s1->a.size();
@@ -560,7 +560,7 @@ bool RockLiningGlobal::installLining(const PotentialBlock* s1,const State* state
   int NUMCON = 3 /* equality */ + planeNoA /*block inequality */; 
   int NUMVAR = 3/*3D */ + 1 /*t */+ 1 /* s */; 
   double s = 0.0;
-  bool converge = true;
+  //bool converge = true;
 
   Matrix3r Q1 = (state1->ori.conjugate()).toRotationMatrix(); 
   Eigen::MatrixXd A1 = Eigen::MatrixXd::Zero(planeNoA,3);
@@ -667,17 +667,17 @@ model2.primal();
 
 
 bool RockLiningGlobal::intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt, const Vector3r plane, const double planeD){
-  bool feasible = true;
-  Vector3r endPt = startingPt + length*direction;
+  //bool feasible = true;
+  //Vector3r endPt = startingPt + length*direction;
   
  // PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
-  int planeNoA = s1->a.size();
+  //int planeNoA = s1->a.size();
 
 /* Variables to keep things neat */
   int NUMCON = 3 /* equality */ + 1 /*planeEquality */; 
   int NUMVAR = 3/*3D */ + 1 /*t */; 
   double t = 0.0;
-  bool converge = true;
+  //bool converge = true;
 
 /* line equality */
 // x = x0 + t*dirX

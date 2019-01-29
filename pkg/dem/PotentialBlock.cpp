@@ -50,10 +50,10 @@ void PotentialBlock::postLoad(PotentialBlock&)
 				Ax[0]=plane1.x(); Ax[3]=plane1.y(); Ax[6]=plane1.z();  Aplanes(0,0)= Ax[0]; Aplanes(0,1) = Ax[3]; Aplanes(0,2) = Ax[6];
 				Ax[1]=plane2.x(); Ax[4]=plane2.y(); Ax[7]=plane2.z();  Aplanes(1,0) = Ax[1]; Aplanes(1,1) = Ax[4];Aplanes(1,2) = Ax[7];
 				Ax[2]=plane3.x(); Ax[5]=plane3.y(); Ax[8]=plane3.z();  Aplanes(2,0) = Ax[2]; Aplanes(2,1) = Ax[5];Aplanes(2,2) = Ax[8];
-				bool parallel = false;
-				if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
-				if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
-				if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
+				//bool parallel = false;
+				//if (fabs(plane1.dot(plane2))<1.0002 && fabs(plane1.dot(plane2))>0.9998){parallel = true;}
+				//if (fabs(plane1.dot(plane3))<1.0002 && fabs(plane1.dot(plane3))>0.9998){parallel = true;}
+				//if (fabs(plane2.dot(plane3))<1.0002 && fabs(plane2.dot(plane3))>0.9998){parallel = true;}
 				double det = Aplanes.determinant();
 				
 				if(fabs(det)>pow(10,-15) ){

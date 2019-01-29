@@ -9,7 +9,7 @@ void PotentialBlock2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv,
 	PotentialBlock* pp = static_cast<PotentialBlock*>(cm.get());
 	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }	
 	Aabb* aabb = static_cast<Aabb*>(bv.get());
-	Matrix3r r = se3.orientation.toRotationMatrix();
+	//Matrix3r r = se3.orientation.toRotationMatrix();
 
 	if(pp->AabbMinMax == false){
 		Real distFromCentre = 1.05*pp->R; // std::max(maxD, pp->R);

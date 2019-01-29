@@ -182,7 +182,7 @@ void RockBolt::action(){
 				PotentialBlock *s2=static_cast<PotentialBlock*>(shape2);
 				Vector3r nodeDistance = getNodeDistance(s1,state1,s2,state2,localCoordinates[2*j-1],localCoordinates[2*j]); /* 2 minus 1, from 1 to 2 */
 				
-				if (initialLength.size() < blockNo-1 ){ /*not initialized */
+				if (initialLength.size() < abs(blockNo-1 )){ /*not initialized */
 					initialLength.push_back(nodeDistance.norm()*Mathr::Sign(nodeDistance.dot(boltDirection) )); /* negative if there is overlap */
 					initialDirection.push_back(nodeDistance);
 					forces.push_back(0.0); axialForces.push_back(0.0); shearForces.push_back(0.0);ruptured.push_back(false);
@@ -292,15 +292,15 @@ void RockBolt::action(){
 				}
 				plotDirection.normalize();
 				Vector3r nodalForce = forces[i]*plotDirection;
-				float f[3]={nodalForce[0],nodalForce[1],nodalForce[2]};
+				float f[3]={(float)nodalForce[0], (float)nodalForce[1], (float)nodalForce[2]};
 				boltNodalForce->InsertNextTupleValue(f);
 
 				Vector3r axialForce = axialForces[i]*plotDirection;
-				float fa[3]={axialForce[0],axialForce[1],axialForce[2]};
+				float fa[3]={(float)axialForce[0], (float)axialForce[1], (float)axialForce[2]};
 				boltAxialForce->InsertNextTupleValue(fa);
 
 				Vector3r shearForce = shearForces[i]*plotDirection;
-				float fs[3]={shearForce[0],shearForce[1],shearForce[2]};
+				float fs[3]={(float)shearForce[0], (float)shearForce[1], (float)shearForce[2]};
 				boltShearForce->InsertNextTupleValue(fs);
 
 			}
@@ -344,7 +344,7 @@ void RockBolt::action(){
 
 
 Vector3r RockBolt::getNodeDistance(const PotentialBlock* cm1,const State* state1,const PotentialBlock* cm2,const State* state2, const Vector3r localPt1, const Vector3r localPt2){
-	Vector3r nodeDist = Vector3r(0,0,0.0);
+	//Vector3r nodeDist = Vector3r(0,0,0.0);
 	Vector3r global1 = state1->ori*localPt1 + state1->pos;
 	Vector3r global2 = state2->ori*localPt2 + state2->pos;
 	
@@ -383,7 +383,7 @@ double RockBolt::evaluateFNoSphereVol(const PotentialBlock* s1,const State* stat
 
 bool RockBolt::installBolts(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt){
 
-  Vector3r endPt = startingPt + length*direction;
+  //Vector3r endPt = startingPt + length*direction;
   
  // PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
   int planeNoA = s1->a.size();
@@ -401,7 +401,7 @@ bool RockBolt::installBolts(const PotentialBlock* s1,const State* state1,const V
   int NUMCON = 3 /* equality */ + planeNoA /*block inequality */; 
   int NUMVAR = 3/*3D */ + 1 /*t */+ 1 /* s */; 
   double s = 0.0;
-  bool converge = true;
+  //bool converge = true;
 
   Matrix3r Q1 = (state1->ori.conjugate()).toRotationMatrix(); 
   Eigen::MatrixXd A1 = Eigen::MatrixXd::Zero(planeNoA,3);
@@ -505,17 +505,17 @@ model2.primal();
 
 
 bool RockBolt::intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt, const Vector3r plane, const double planeD){
-  bool feasible = true;
-  Vector3r endPt = startingPt + length*direction;
+  //bool feasible = true;
+  //Vector3r endPt = startingPt + length*direction;
   
  // PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
-  int planeNoA = s1->a.size();
+  //int planeNoA = s1->a.size();
 
 /* Variables to keep things neat */
   int NUMCON = 3 /* equality */ + 1 /*planeEquality */; 
   int NUMVAR = 3/*3D */ + 1 /*t */; 
   double t = 0.0;
-  bool converge = true;
+  //bool converge = true;
 
 /* line equality */
 // x = x0 + t*dirX
