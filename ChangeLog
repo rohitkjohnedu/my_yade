@@ -1,4 +1,400 @@
 ==================================================
+yade-2019.02a
+Tue, Jan 29 19:59:30 2019 +0100
+
+Alexander Eulitz (9):
+      fix typo
+      fix typo
+      missing link replaced by short description
+      updated Engine names
+      Merge remote-tracking branch 'upstream/master'
+      Added MPI Developergroup
+      Merge pull request #54 from Kubeu/master
+      solved import problem of ASCII STL models
+      added .git config file for directly working on trunk
+
+Anton Gladky (6):
+      Remove RELEASE file
+      Fix doctest fail with numpy 1.14
+      Fix doc compilation with the new sphinx
+      Use mathjax instead of pngmath.
+      Remove execution bit from some scripts
+      Add RELEASE file
+
+Boon Chiaweng (7):
+      example files for Potential Blocks and Buoyancy routine
+      Local repository is outdated
+      Update Potential Block Examples
+      Update Potential Block Examples
+      Update Potential Block Examples
+      fixed the description for variables in PotentialBlocks
+      commented TRVAR3 in KnKsPBPhys and remove Potential Particles basic.py
+
+Bruno Chareyre (102):
+      FlowEngine::getDiffusionCoeff introduced, returning throat's area/length ratio
+      more consistency in the 'stress' vs. 'force'  semantic
+      some improvements following https://lists.launchpad.net/yade-dev/msg13714.html (thx Jerome)
+      fix compilation without gpu for older suitesparse
+      a latex typo in doc - blocking buildbot
+      Revert "Code comment in Ip2_FrictMat_FrictMat_FrictPhys: removing from the comment the erroneous 2 with respect to harmonic average expression"
+      fix/add some hyperlinks in doc
+      minor comment
+      theta-method for implicit integration of lubrication forces
+      better user control on theta method in Law2_ScGeom_ImplicitLubricationPhys, stiffness made linear, roughness!=0 improved and tested (warning: reverts 24b1cac, sorry)
+      An interesting new shape in Zhao et al. (2017)
+      suffusion modelized by Aboul Hosn et al. (2018)
+      better initialization of scaled densities when Newton::densityScaling is true
+      DomainLimiter now compatible with clumps, not just spheres
+      added comment to O.interactions.nth() docstring
+      minor inline comment
+      enable detachement of contacts following gap=0 in Lubrication law
+      inversion of integer matrix in flipCell (thx Vaclav for the hint https://github.com/yade/trunk/commit/2d7afba)
+      Rotations calculated with the integrator for spherical bodies if one rotational DOF is blocked
+      an exemple for saviing/reloading with user defined variables and functions
+      1-phase solver for clusters and more python wrapping
+      helper function for finding opposite edge
+      add libparmetis variant of libmetis to cmake
+      initialize CellInfo::index in ctor
+      optimized local update of clusters after each pore invasion
+      TwoPhaseFlow clusters: some bug fixing and more python wrapping
+      Merge branch 'master' of github.com:yade/trunk
+      bugfix in TesselationWrapper::getAlphaCaps as reported by Gerald Pekmezi
+      a function applying forces based on alphaShape
+      remove unneccesary lines
+      TwoPhaseFlow cluster management extended to imbibition
+      fix FindMetis.cmake (was looking for all variants instead of just one)
+      +1 paper Suhr et al. 2017
+      some code cleaning
+      returns merged clusters after pore imbibition
+      fix erroneuous condition in cluster drainage
+      Some bugfix in TwoPhaseFlow::Cluster's handling
+      further smallfix of clusters
+      saveVtk() includes boundary cells
+      saveVtk() include more boundary cells
+      final integration of bounding cells display
+      code cleaning and doc
+      remove deprecated savePhaseVtkIncludeBoundaryCells, replaced by savePhaseVtk(...,withBoundaries=True)
+      smallfix
+      fix capillary forces calculation (include revert of 8074a80a89bd451c8a) + fix a compile error for c++ < 11
+      fix timing.stats() runtime error when ParallelEngine has a sublist of engines (the results are still not ok)
+      fix some output string of timing.stats
+      calculate and retunr consistent timing.stats() with ParallelEngine
+      use numSolveThreads and numFactorizeThreads for FlowEngine::solver=4, as it is for solver=3; improve timing.stats()
+      mention 3SR hosting
+      document code and remove a cerr<<
+      a complete example script with spheres, grids, pFacets interactin (by Marcus Guadagnin Moravia)
+      augmented version of a pFacet example (thx Marcus)
+      re-apply: augmented version of a pFacet example (thx Marcus)
+      Fix inspector for PFacets/GridConnexions/GridNodes
+      fix compilation error when TWOPHASEFLOW is enabled with PFVFLOW disabled (now disabling PFVFLOW also disable TWOPHASEFLOW automatically). Ref. https://answers.launchpad.net/yade/+question/672510
+      fix compilation with vtk>8 (Thanks to Luc Oger)
+      starting points for thermal engine by Rob. Caulk
+      '#ifdef THERMAL' guards for Thermal module + fix compile error
+      added comment on converting State to ThermalState
+      update installation doc for ubuntu 18
+      update/highlight using yade without linux in doc
+      oedometer.py: remesh right after changing the boundary condition
+      partial fix of the display problems when PFacets are clumped together
+      fix broken ipython terminal (bugs.launchpad.net/yade/+bug/1604266)
+      improved density scaling, fixing wrong behaviour when stiffness!=0 at iter=0
+      updated publications and publication page
+      missing file 663546f (update publications page)
+      fix dt=0 in GSTimestepper when viscEl=True (ref https://lists.launchpad.net/yade-dev/msg14195.html)
+      fix bug/1794479 (doc fix)
+      fix https://bugs.launchpad.net/yade/+bug/1455621 (doc fix)
+      safer cast's in PDFEngine
+      doc
+      fix compile warning
+      wrapper for CGAL's incident_cells accessor (available in FlowEngine and friends)
+      fix return type of FlowEngine::getIncidentCell()
+      Revert "Changes in Python-exposed functions to accomodate the (somewhat new) list-return-type of aabbExtrema. See bug LP: #1804621"
+      Fix LP:1804621; revert Shop::aabbExtrema() from boost::python::tuple to std::vector<Vector3r> git:1db13fb
+      Merge pull request #55 from booncw/master
+      enable createInteraction(id1,id2) when (id1,id2) is a virtual interaction
+      introduce regression testing module for utils
+      make -j6
+      Merge remote-tracking branch 'github/master'
+      Merge branch 'master' into 'master'
+      replace github by gitlab in doc and sources
+      Merge branch 'master' of gitlab.com:yade-dev/trunk
+      small change on gitlab doc (test push)
+      remove remaining occurences of github
+      github->gitlab in html homepage
+      Merge branch 'master' of github.com:yade/trunk
+      Merge from github/yade
+      Revert "Merge from github/yade"
+      Merge branch 'master' into 'master'
+      increase make -j12
+      increased documentation of merge requests
+      CI pipeline triggered by master branch only
+      fix syntax in .gitlab-ci.yml
+      CI pipeline for merge_request's also
+      document the two ways for merge requests and whether they will use group runners
+      Merge branch 'master' of https://github.com/booncw/trunk into potentialBlocks
+      fix script-seesion2.py and mark psd.py OK
+      fix typo in index.html
+
+Chao Yuan (4):
+      add a tempoary saveVtk to plot bounding cells.
+      -fix bug on computing fluid forces. the error computes fluidForce twice.
+      Merge branch 'master' of github.com:yade/trunk
+      temporary fix the solution of pore body radius. the previous one doesn't work if the radius of grain is smaller than 1e-5.
+
+Jan Stránský (5):
+      removed utils.UnstructuredGrid
+      fixed some warnings for sphinx doc compilation
+      added publications
+      Making doc of Body.intrs() clear to return real interactions
+      added brazilian splitting test example script
+
+Janek Kozicki (35):
+      Fix all compilation warnings
+      Fix last compilation warning
+      Fix compilation errors with CGAL 4.11 (again), guys please use Tri.locate(CGT::Sphere(…)) and ->point().point()
+      Update .mailcap
+      Small improvement in SerializableEditor.py, it will now detect types starting with std:: or boost::
+      Initial idea for fixing CGAL 4.13 interface changes.
+      fix typo
+      Add info about how to push a non-master branch into yade-dev
+      Checked first 20 examples. Fixed 2. Created full list examples/list_of_examples.txt to track progress.
+      Partial fix of postProcessValidMaurin2015.py
+      Fixed postProcessing_sedim.py; added in list_of_examples.txt whether the example is explained inside the script.
+      Checked next 25 examples. Added some explanations or very small fixes in 8 examples.
+      Checked 10 more examples.
+      Check 24 more scripts, fix 2.
+      Check 12 examples. Fix 2.
+      Check 8 more examples
+      Checked 17 more examples. Didn't fix the 8 broken ones.
+      Checked 18, fixed 2
+      Checked 17 more examples
+      Check 27 more examples
+      Checked last 25 examples. Conclusion: 215 examples, 46 are not working at the moment. That is 21% of examples are broken.
+      Fix bug#1813229. Class Inheritance graphs in Yade.pdf now have dpi=300 and larger font.
+      I tried the -DENABLE_POTENTIAL_BLOCKS=ON -DENABLE_POTENTIAL_PARTICLES=ON examples. They start and seem to run, but still do not work.
+      Oops, has some merge conflicts
+      I tried PotentialBlocks once again. I am still suspicious about whether those examples work.
+      Fix error GUI → Display → Gl1_CpmPhys : UnicodeDecodeError: 'ascii' codec can't decode byte 0xc3 in position 87
+      Adding Gl1_PotentialParticle().store=True to example file seems to fix the display issues. But there must be a reason why it is false by default?
+      Comment out last remaining //TRVAR3(…) which was spamming the terminal.
+      Fix indentation in list_of_examples.txt
+      Checked all examples in doc/sphinx/tutorial.
+      Walked again through all examples to identify the source of each SIGSEGV/SIGABRT segfault.
+      Notes about what I achieved when trying to make this line work: 'from esys.escript import *'
+      Two of FEMxDEM scripts started to sort-of work: biaxialSmooth.py and retainingSmooth.py
+      Added missing references to my articles using yade. Also my first Quantum Mechanics paper ;)
+      Maybe embedding videos with https will make them work on the website?
+
+Jerome Duriez (44):
+      Ip2_FrictMat_FrictMat_FrictPhys doc: correcting typo (see previous commit comment)
+      Code comment in Ip2_FrictMat_FrictMat_FrictPhys: removing from the comment the erroneous 2 with respect to harmonic average expression
+      Capillary scripts: minor changes in writesCapFile
+      Code comment in FrictPhys: we are adding compliances, I do not think we average them. See also https://github.com/yade/trunk/commit/1f013766d191a0e931d3c1653242d22f28e36dd5
+      Capillary scripts: minor correction in writesCapFile.m affecting the search for maximum suction when contact angle # 0
+      Capillary scripts: improving search for maximum suction in writesCapFile.m
+      Typo corrected in makeCloud() doc
+      Doc (Programmer s manual) typos corrected
+      FileGenerators: removing deprecated CapillaryTriaxialTest and CohesiveTriaxialTest. Fixing bugs https://bugs.launchpad.net/yade/+bug/1625850 and https://bugs.launchpad.net/yade/+bug/1764753
+      Doc: Timing section of Programmer manual. Correcting typos and small changes in wording regarding instantiation which is already done in the mother classes (and does not need to be redone in the Engine/Functor to measure)
+      Bibtex entry for the 2nd YADE workshop proceedings. Thanks to all yade-dev authors !
+      Shop::growParticles(), fixing bug https://bugs.launchpad.net/yade/+bug/1767601. There was some interaction access before checking the real nature of interactions, leading to crash with erased bodies
+      Doc typo corrected
+      Programmer s Doc: removing Debian packaging section. Fixes bug LP:1773337
+      Doc: updating my affiliation
+      +2 journal papers
+      +1 journal paper (Mede et al.)
+      Doc typo
+      InteractionLoop doc typo and small precisions
+      Merge pull request #52 from jandepue/master
+      Code cleaning after previous commit about a new matchmaker in CohFrict model
+      Doc
+      Correcting previous doc commit (orientation attribute for utils.box())
+      Doc typo
+      Docstring typo in pack module (better sphinx output now)
+      Doc typo
+      Removing deprecated pack particleSD*()
+      Doc typo
+      Merge branch 'master' of github.com:yade/trunk
+      Adding some kind of warning in SPH examples README
+      State doc typo
+      Doc VTKRecorder: typo and minor changes for bstresses
+      VTKRecorder bstresses: removing useless code for sorting principal particle stresses: Eigen already does it
+      Shop::aabbExtrema() from boost::python::tuple to std::vector<Vector3r>
+      Including new type (from -1 commit) in aabbExtrema doc
+      MeasureCapStress: fixing bug LP: 1764424 and change of attribute names
+      Doc typo (McNamara doi)
+      Formulation doc typo (wrong superscript for \omega somewhere)
+      Publications: adding full bibliographic details for one paper
+      Doc for compilation options, some sync between the doc and CMakeLists.txt. See https://lists.launchpad.net/yade-dev/msg14108.html
+      Moving isInBB from py/_utils* to pkg/dem/Shop*
+      Doc typo in URL link (correcting 0a292779)
+      Changes in Python-exposed functions to accomodate the (somewhat new) list-return-type of aabbExtrema. See bug LP: #1804621
+      Doc for pack module: fixing broken links
+
+Luc Scholtes (2):
+      Back to previous configuration (Timos's version) - Robert's add ons commented - More testing needed
+      add the possibility to distinguish cracks from matrix and joint interactions in Paraview
+
+Robert Caulk (48):
+      throw error at user for trying to useSolver=4 with multithread=False
+      Add acoustic emission collection algorithm to JCFpm. Add acoustic emission post processing tools to VTKRecorder.
+      Add guide for simulating acoustic emissions
+      clean up installation and GPU doc
+      convert pdf images to png for AE guide
+      fix doc build failure
+      fix figure web sizes
+      edit concrete example to aboid ZeroDivisionError
+      revert doModes back to original value
+      Add eventnumber post processing category for acoustic emissions alg
+      move trickperm to fix broken blockhook
+      add ability to artificially correct cell volumes based on a desired porosity (EXPERIMENTAL)
+      add functionality to collect start time of acoustic emission event
+      clarify citation, equations, images for acoustic emissions tutorial doc
+      remove DFNFlow from default compilation
+      Parallelize mesh interpolation
+      open useSolver=4 to singlethreaded operation
+      fix bug with singlethreaded GPU flow solver
+      add ability to measure some FlowEngine and CHOLMOD timings
+      Merge branch 'master' of github.com:yade/trunk
+      set openblas_num_threads = flow.ompThreads
+      Basic functionality for fixing triangulation and updating linearsystem with trickPermeability
+      comment out update positions
+      add functionality for resuing CHOLMOD ordering (avoid unnecessary CHOLMOD analyzing)
+      erase random comment
+      Fix typo
+      Add ifdef for LINSOLV=OFF in FlowEninge and force TWOPHASEFLOW dependency on LINSOLV=ON
+      advection function added to flowengine, thermal properties added to cells
+      Merge remote-tracking branch 'refs/remotes/origin/master'
+      remove unnecessary variable initializations
+      add functional conduction engine
+      consolidate thermal engine, fix #ifdefs
+      Merge branch 'master' of https://github.com/yade/trunk
+      add thermal mechanical coupling, enable individual control of advection or conduction
+      add ability to set conduction boundary conditions
+      add start of thermal-mechanical fluid coupling
+      add full thermomechanical fluid coupling, automatic timestepper, refactor, clean
+      fix indentation
+      improve readability and add ability to decouple forces in flowengine
+      adapt thermal state info and engine for compatability with special states (e.g. jcfpm). Add cmake flag for thermal engine.
+      add Yade Technical Archive to website and doc
+      change links for yade tech archive to /publi, add yade tech archive references to reference page
+      #ifdef factorexists
+      update YTA hyperlinks
+      add comma
+      update YTA hyperlinks
+      Update YTA tutorial refs
+      Fix memory leak in FlowEngine
+
+William Chèvremont (72):
+      hide debug messages
+      Merge branch 'master' of https://github.com/yade/trunk
+      Merge branch 'master' of https://github.com/yade/trunk
+      Merge branch 'master' of https://github.com/yade/trunk
+      Physics update in Lubrication law for bodyStressTensor
+      Merge branch 'master' of https://github.com/yade/trunk
+      Merge branch 'master' of https://github.com/yade/trunk
+      add stresses calculation to implicit lubrification
+      Merge branch 'master' of https://github.com/yade/trunk
+      Fix normal lubrication
+      Merge branch 'master' of https://github.com/yade/trunk
+      Fix lubrication laws
+      Merge branch 'master' of https://github.com/yade/trunk
+      Fix lubrication compile error
+      Fix compilation error: missing include
+      ccache doesnt support -save-temps
+      Add dynamic stress calculation alone
+      Delete LubricationPhys, add stress calculations for each component, change resolution method
+      Missing replacement of EIGENSPARSE_LIB to CHOLMOD_LIBS (see commit f9cac61952163e0897942e596fa5bb24a55c9f5d)
+      Fix time stepper stiffness
+      Add scripts replacement tags
+      Modification to OAR launch script
+      Modification on lubrication's laws
+      Adding possibility of saving a dict of parameters
+      add oar-properties support
+      fix constrain orders -oar
+      Change lubrication calculation structure
+      Fix Dynamic stress calculation
+      add normal viscosity for timestepper
+      Encapsulation of resulution method into functions
+      Change some default values
+      Give a default value to RealName (getpwuid(geteuid()) fail on some clusters but not so critical)
+      Add Newton-Rafson resolution method
+      Add newton-rafson method with nonlinear contact
+      Fix compile cast error
+      Add NewtonRafson-Exponential resolution method
+      Nonlinear contact only belong to contact part
+      Documentation improvement
+      Move non-normal calculation to a function (help for inheritance purposes)
+      Fix doc warnings
+      Switch to implicit resolution
+      Fix warning
+      Add stress calculation
+      Fix OAR launchscript bugs
+      Add log-calculation of shear and torques component
+      Switch to log-shear resolution
+      Fix DLVO equations
+      Fix substepping distance
+      Reduce warning verbosity
+      fix script path for logfile
+      Fix Electrostatic + lubrication
+      Add dichotomic method for resolution
+      End of Dichotomy implementation, renaming
+      Fix compile error
+      bugfixes
+      Add VdW cutoff length
+      Add Stress PDF for lubrication
+      Switch to template implementation for PDF
+      Fix buildbot error?
+      PDFEngine creation
+      Move PDF to new file, exemple for lubrication
+      Add distance, velocity and intrs PDF integrator
+      Add Distance, Velocity and Intrs calculation for Lubrication
+      fix compile warnings
+      Add default data for PDFEngine
+      Doc for yade-oar
+      Check for initial proble
+      Fix NaN function problem at initial point
+      Regula Falsi
+      Code refactoring
+      Fix starting point
+      Merge branch 'master' of https://github.com/yade/trunk
+
+jan (1):
+      Added frictionAngle Matchmaker to cohesive frictional contact law (based on Frictphys) see https://answers.launchpad.net/yade/+question/670376
+
+raphm1 (15):
+      HydroForceEngine: Re-organize fluidResolution to make it clearer. Remove lines and tab the text according to the different loop Remove the subfunctions which are not usefull anymore Uncomment the calculation of taufsi
+      HydroForceEngine: fluidResolution modifications Modify the grid definition and the extrapolations of variables in order to fit exactly the staggered grid and the averaging performed. Modify the example scripts accordingly. This modification fixes former errors in the formulation of the fluid resolution. Change the variables name to be consistent with the future documentation
+      HydroForceEngine: error in the pressure term + validation Correct an error in the pressure term of the fluid resolution Introduce a fitting coefficient in the wall friction Adapt the validation script to the mesh
+      HydroForceEngine: add validations scripts Add a script to reproduce the experimental comparison performed in Maurin et al 2015 Add a script to reproduce the case r2d6s2 of Maurin et al 2016 Add post-processing scripts to extract corresponding figures
+      HydroForceEngine, fluid resolution: add the possibility to impose a fluid velocity at the top of the sample.
+      HydroForceEngine: modify the example folder organisation
+      HydroForceEngine examples: modify the fixed bottom generation
+      HydroForceEngine: add an example script of laminar shear flow over a granular bed
+      HydroForceEngine: add a new effective viscosity modelling
+      Add references
+      Fix error in the previous commit in references
+      Add a documentation page for HydroForceEngine
+      second part Add a documentation page for HydroForceEngine
+      HydroForceEngine: correct the viscous contribution Modify the viscous contribution in the fluid resolution, in order to account for the fact that the closures for the viscous stress tensor should be written as a function of the total (fluid+solid) shear rate tensor. As a consequence, the fluid viscous contribution are multiplied by the fluid volume fraction at the square, and the second member includes a contribution from the solid phase. Also, the poiseuille validation script has been very slightly modified to account for recent code modification
+      HydroForceEngine: add a point particle averaging function
+
+remche (14):
+      adding gitlab-ci
+      4 cpu for build
+      16 cpu for compilation
+      more complete ci
+      disabling save temps
+      clean build for artifact and relative path for install
+      make and install in the same job
+      fix install dir
+      test doc generation
+      fi xvfb-run
+      fix depth for xvfb-run
+      uploading pdf and epub doc to pages
+      Adding DISABLE_SAVE_TEMPS flag to Cmake
+      doc: fix jquery for searchbox
+
+==================================================
 yade-2018.02b
 Tue, Feb 20 18:55:30 2018 +0100
 
