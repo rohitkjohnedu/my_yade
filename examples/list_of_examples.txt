@@ -79,11 +79,10 @@ OK │OK │   ├── periodic-triax-settingHsize.py
 OK │ok │   ├── periodic-triax.py
 OK │OK │   └── periodicSandPile.py
    │   ├── PotentialBlocks
-x  │ok │   ├── WedgeYADE.py                       terminal is spammed with messages like KnKsPBLaw.cpp:34 go: geom->penetrationDepth=0.00155115; de1->se3.position=-14.8839 8.48539 26.8419; de2->se3.position=-17.682 -6.95829 26.8667; The scene is empty until I click Display->intrAllWire
-x  │ok │   └── cubePBscaled.py                    print 20*'*'+' UNEXPECTED EXCEPTION WHILE RUNNING TESTS '+20*'*' ; print 'WARNING: compiled without OpenMP, -j/--threads/--cores have no effect.' ; scene looks empty iuntil I click Display->inrAllWire
+OK │ok │   ├── WedgeYADE.py
+OK │ok │   └── cubePBscaled.py
    │   ├── PotentialParticles
-x  │x  │   ├── basic.py                           The sphere does not collide with the box, it goes through.
-x  │x  │   └── cubePPscaled.py                    Drawing shapes is slow, hard to tell if it runs correctly. I disabled drawing of shapes, enabled intrAllWire. Ran simulation a bit to - seemed to work, then I clicked to enable drawing shapes and I got SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1813222
+OK │x  │   └── cubePPscaled.py                    Note: clicking GUI→Display→intrAllWire will cause crash see: https://bugs.launchpad.net/yade/+bug/1813222
    │   ├── WireMatPM
 ok │x  │   ├── wirecontacttest.py
 ok │ok │   ├── wirepackings.py

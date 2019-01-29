@@ -17,6 +17,14 @@
 #coinor-libclp1, 
 #coinor-libosi1v5
 
+import os
+import errno
+try:
+   os.mkdir('./vtk/')
+except OSError as exc:
+   if exc.errno != errno.EEXIST:
+      raise
+   pass
 
 name ='BlockGeneration' # PLEASE CHECK THIS  
 

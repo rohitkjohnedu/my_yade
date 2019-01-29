@@ -19,6 +19,14 @@
 from yade import pack
 import math
 
+import os
+import errno
+try:
+   os.mkdir('./vtk/')
+except OSError as exc:
+   if exc.errno != errno.EEXIST:
+      raise
+   pass
 
 O.engines=[
 	ForceResetter(),
