@@ -88,7 +88,7 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	                        daily-1+3021+27~lucid1/scripts/test/checks/README
 	  --performance         Starts a test to measure the productivity
 	  --no-gdb              Do not show backtrace when yade crashes (only
-	                        effective with \-\-debug).
+	                        effective with \-\-debug) [#fdbg]_.
 
 .. rubric:: Footnotes
 
@@ -103,17 +103,24 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 
 .. [#f2] Plain Python interpreter exits once it finishes running the script. The reason why Yade does the contrary is that most of the time script only sets up simulation and lets it run; since computation typically runs in background thread, the script is technically finished, but the computation is running.
 
+.. [#fdbg] On some linux systems stack trace will not be shown and a message ``ptrace: Operation not permitted`` will appear instead. To enable stack trace issue command: ``sudo echo 0 > /proc/sys/kernel/yama/ptrace_scope``. To disable stack trace issue command ``sudo echo 1 > /proc/sys/kernel/yama/ptrace_scope``.
+
 
 Creating simulation
 --------------------
 To create simulation, one can either use a specialized class of type :yref:`FileGenerator` to create full scene, possibly receiving some parameters. Generators are written in c++ and their role is limited to well-defined scenarios. For instance, to create triaxial test scene:
 
+.. comment: we need to import yade to make following work. The @suppress keyword is from https://ipython.readthedocs.io/en/stable/sphinxext.html#pseudo-decorators
+
 .. ipython::
 	:okexcept:
 
+	@suppress
+	In [1]: import yade
+
 	In [1]: TriaxialTest(numberOfGrains=200).load()
 
-	In [2]: len(O.bodies)
+	In [1]: len(O.bodies)
 	1006
 
 Generators are regular yade objects that support attribute access.
