@@ -57,6 +57,8 @@ Setup
     git remote update
     
    Now, your "trunk" folder is linked with two remote repositories both hosted on gitlab.com, the original trunk from yade-dev (called "upstream" after the last command) and the fork which resides in your personal account (called "origin" and always configured by default). Through appropriate commands explained below, you will be able to update your code to include changes commited by others, or to commit yourself changes that others can get.
+   
+   Holding a fork under personnal account is in fact not strictly necessary. It is recommended, however, and in what follows it is assumed that the above steps have been followed.
 
 Retrieving older Commits
 ========================
@@ -66,12 +68,10 @@ In case you want to work with, or compile, an older version of Yade which is not
 Committing and updating 
 ========================
 
-For those used to other version control systems, note that the commit mechanisms in Git significantly differs from that of `Bazaar <http://bazaar.canonical.com/en/>`_ or `SVN <https://subversion.apache.org/>`_. Therefore, don't expect to find a one-to-one command replacement. In some cases, however, the equivalent bazaar command is indicated below to ease the transition.
-
 Inspecting changes
 ------------------
 
-You may start by inspecting your changes with a few commands. For the "diff" command, it is convenient to copy from the output of "status" instead of typing the path to modified files. ::
+After changing the source code in the local repository you may start by inspecting them with a few commands. For the "diff" command, it is convenient to copy from the output of "status" instead of typing the path to modified files. ::
 
    git status
    git diff path/to/modified/file.cpp
@@ -81,22 +81,26 @@ Pushing changes to remote repository
 
 1. Push to personnal repository
 
-   After previous steps proceed to commit through terminal::
+   After previous steps proceed to commit through terminal, "localBranch" should be replaced by a relevant name (e.g. "fixBug457895")::
 
+      git branch localBranch
+      git checkout localBranch
       git add path/to/new/file.cpp  #Version a newly created file
       git commit path/to/new_or_modified/file.cpp -m 'Commit message'  #stage (register) change in the local repository
       git push  #Push all commits to the remote branch
   
    The changes will be pushed to your personal fork.
+   The first two lines are optional, if ignored the commits will go the to the default branch, called "master".
 
 
 2. Push to yade-dev
 
    Merging changes into yade-dev's master branch cannot be done directly with a push, only by merge request (see below). It is possible however to push changes to a new branch of yade-dev repository for members of that group. It is `currently <https://gitlab.com/gitlab-org/gitlab-ce/issues/23902>`_ the only way to have merge requests tested by the gitlab CI pipeline before being effectively merged. To push to a new yade-dev/branch::
 
-      git push upstream yourBranch:newlyCreatedBranch #Push all commits to a new remote branch.
+      git pull --rebase upstream master #get updated version of sources from yade-dev repo and apply your commits on the top of them
+      git push upstream localBranch:newlyCreatedBranch #Push all commits to a new remote branch.
 
-   in that command ``yourBranch`` is the local branch name on which you were working (possibly ``master``) and ``newlyCreatedBranch`` will be the name of that branch on the remote. Please choose a descriptive name as much as you can.
+   in that command ``localBranch`` is the local branch name on which you were working (possibly ``master``) and ``newlyCreatedBranch`` will be the name of that branch on the remote. Please choose a descriptive name as much as you can.
 
 Requesting merge into yade-dev master branch
 --------------------------------------------
@@ -119,50 +123,23 @@ When the pull request has been reviewed and accepted, your changes are integrate
 Updating
 --------
 
-You may want to get changes done by others::
+You may want to get changes done by others to keep your local and remote repositories synced with the upstream::
 
- git fetch upstream  #Pull new updates from the upstream to your branch. Eq. of "bzr update", updating the remote branch from the upstream yade/trunk
- git merge upstream/master  #Merge upstream changes into your master-branch (eq. of "bzr update", updating your local repository from the remote branch)
+ git pull --rebase upstream master #Pull new updates from the upstream to your branch. Eq. of "bzr update", updating the local branch from the upstream yade-dev/trunk/master
+ git push  #Merge changes from upstream into your gitlab repo (origin)
 
-Alternatively, this will do fetch+merge all at once (discouraged if you have uncommited changes)::
+If you have local uncommited changes this will return an error. A workaround to update while preserving them is to "stash"::
 
- git pull
+ git stash #backup and hide changes
+ git pull --rebase upstream master
+ git push
+ git stash pop #restore backed up changes
 
-**********************************************************************************************
-Working directly on git/trunk (not possible after GitLab migration - section will get updates)
-**********************************************************************************************
 
-This direct access to trunk will sound more familiar to `bzr <http://bazaar.canonical.com/en/>`_ or `svn <https://subversion.apache.org/>`_ users. It is only possible for members of the git team "developpers". Send an email at yade-dev@lists.launchpad.net to join this team (don't forget to tell your git account name).
+auto-rebase
+-----------
 
-* Get trunk:
-
-   ::
-
-    git clone git@gitlab.com:yade-dev/trunk.git
-
-   This creates a new folder, named trunk, that contains the whole code.
-
-* Update
-
-   ::
-
-    git pull
-
-* Commit to local repository
-
-   ::
-
-    git commit filename1 filename2 ...
-
-* Push changes to remote trunk
-
-   ::
-
-    git push
-
-   Now, the changes you made are included in the on-line code, and can be get back by every user.
-
-   To avoid confusing logs after each commit/pull/push cycle, it is better to setup automatic rebase::
+We promote "rebasing" to avoid confusing logs after each commit/pull/push cycle. It can be convenient to setup automatic rebase, so it does not have to be added everytime in the above commands::
 
     git config --global branch.autosetuprebase always
 
@@ -181,15 +158,7 @@ This direct access to trunk will sound more familiar to `bzr <http://bazaar.cano
 	    merge = refs/heads/master
 	    rebase = true
 
-   Auto-rebase may have unpleasant side effects by blocking "pull" if you have uncommited changes. In this case you can use "git stash"::
 
- git pull
- lib/SConscript: needs update
- refusing to pull with rebase: your working tree is not up-to-date
- git stash #hide the uncommited changes away
- git pull  #now it's ok
- git push  #push the commited changes
- git stash pop #get uncommited changes back
 
 ********************************************
 General guidelines for pushing to yade/trunk
@@ -222,15 +191,10 @@ General guidelines for pushing to yade/trunk
 
  ::
 
-  git pull
+  git pull --rebase upstream master
 
 5. Make sure it compiles and that regression tests pass: try ``yade --test`` and ``yade --check``.
 
-6. You can finally let all Yade-users enjoy your work:
-
- ::
-
-  git push
 
 
 **Thanks a lot for your cooperation to Yade!**
