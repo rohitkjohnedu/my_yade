@@ -486,4 +486,11 @@ float YadeCamera::zNear() const
   return z;
 }
 
+QString GLViewer::helpString() const
+{
+	//QString text("<h2>Y a d e</h2>"); // the <h2> html-style syntax will work
+	//FIXME: we could add here more useful text
+	QString text("See <b>Keyboard</b> and <b>Mouse</b> tabs for the list of commands.");
+	return text;
+}
 
