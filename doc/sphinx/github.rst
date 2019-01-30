@@ -160,6 +160,27 @@ We promote "rebasing" to avoid confusing logs after each commit/pull/push cycle.
 
 
 
+Pulling a rebased branch
+------------------------
+
+In case if someone else rebased on the gitlab server the branch on which you are working locally, the command ``git pull`` may complain that the branches have diverged, and refuse to perform operation, in that case this command::
+
+ git pull --rebase upstream branchName
+
+Will match your local branch history with the one present on the gitlab server.
+
+In case if you are afraid of messing up your local branch you can always make a copy of this branch with command::
+
+ git branch backupCopyName
+
+In case if you forgot to make that backup-copy and want to go back, then make a copy anyway and go back with this command::
+
+ git reset --merge ORIG_HEAD
+
+The ``ORIG_HEAD`` backs up the position of HEAD before a potentially dangerous operation (merge, rebase, etc.).
+
+
+
 ********************************************
 General guidelines for pushing to yade/trunk
 ********************************************
@@ -194,7 +215,6 @@ General guidelines for pushing to yade/trunk
   git pull --rebase upstream master
 
 5. Make sure it compiles and that regression tests pass: try ``yade --test`` and ``yade --check``.
-
 
 
 **Thanks a lot for your cooperation to Yade!**
