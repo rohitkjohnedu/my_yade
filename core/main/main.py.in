@@ -227,9 +227,9 @@ def userSession(gui='none',qapp=None):
 		# and: https://github.com/ipython/ipython/pull/11426/commits/e08dc1b4dd30e8d2b607134693f226e8a22100ec#diff-d47c339db04f28c44a59c6662dbd53eaR228
 		registry=None
 		# depending on version the keybindigs registry sits in different places
-		if hasattr(ipshell, 'pt_cli'):
+		if hasattr(ipshell, 'pt_cli') and hasattr(ipshell.pt_cli, 'application') and hasattr(ipshell.pt_cli.application, 'key_bindings_registry'):
 			registry = ipshell.pt_cli.application.key_bindings_registry
-		if hasattr(ipshell, 'pt_app'):
+		if hasattr(ipshell, 'pt_app') and hasattr(ipshell.pt_app, 'key_bindings'):
 			registry = ipshell.pt_app.key_bindings
 		if(registry != None):
 			from prompt_toolkit.keys import Keys
