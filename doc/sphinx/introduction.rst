@@ -346,7 +346,7 @@ Since till now the simulation was empty, its id is 0 for the first sphere and 1 
 	In [1]: O.bodies[1].state.pos
 	<Body instance at 0x92e8f60>
 
-	In [2]: O.bodies[100]    # error because there are only two spheres
+	In [2]: O.bodies[100]    # error because there are only two bodies
 	IndexError: Body id out of range.
 
 Adding the same body twice is, for reasons of the id uniqueness, not allowed:
@@ -354,7 +354,7 @@ Adding the same body twice is, for reasons of the id uniqueness, not allowed:
 .. ipython::
 	:okexcept:
 	
-	In [1]: O.bodies.append(s)
+	In [1]: O.bodies.append(s)  # error because this sphere was already added
 
 Bodies can be iterated over using standard python iteration syntax:
 
@@ -406,7 +406,7 @@ Suppose now interactions have been already created. We can access them by the id
 	In [5]: i.phys
 	<ElasticContactInteraction instance at 0x94038d0>
 
-	In [6]: O.interactions[100,10111]
+	In [6]: O.interactions[100,10111]     # asking for non existing interaction throws exception
 	ValueError: No such interaction
 
 
@@ -498,13 +498,22 @@ There are 3 fundamental types of Engines:
 Dispatchers and functors
 """""""""""""""""""""""""
 
-For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box<Aabb>`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. The line::
+For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box<Aabb>`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. In the ``O.engines=`` declared above the line::
 
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 
 creates :yref:`InsertionSortCollider` (it internally uses :yref:`BoundDispatcher`, but that is a detail). It traverses all bodies and will, based on :yref:`shape<Shape>` type of each :yref:`body<Body>`, dispatch one of the functors to create/update :yref:`bound<Bound>` for that particular body. In the case shown, it has 2 functors, one handling :yref:`spheres<Sphere>`, another :yref:`facets<Facet>`. 
 	
 The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`), which accepts ``1`` type :yref:`Sphere` and creates an :yref:`Aabb` (axis-aligned bounding box; it is derived from :yref:`Bound`). The :yref:`Aabb` objects are used by :yref:`InsertionSortCollider` itself. All ``Bo1`` functors derive from :yref:`BoundFunctor`.
+
+
+.. _img-bound-functors:
+.. figure:: fig/bound-functors.*
+	:width: 15cm
+
+	Example :yref:`bound functors<BoundFunctor>` producing :yref:`Aabb` accepting various different types, such as :yref:`Sphere`, :yref:`Facet` or :yref:`Cylinder`. In the case shown, the ``Bo1`` functors produce :yref:`Aabb` instances from one specific :yref:`Shape`, hence the number ``1`` in the functor name. Each of those functors has specific formula that uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`Facet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`Aabb`.
+
+.. comment: FIXME that link :ref:`boundfunctors` or :yref:`bound functors<BoundFunctor>` should point to the place above so that the graph is visible.
 
 The next part, reading
 
