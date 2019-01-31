@@ -23,7 +23,7 @@ You are advised to try all commands described yourself. Don't be afraid to exper
 Starting yade
 -------------
 
-Yade is being run primarily from terminal; the name of command is ``yade``. [#f1]_ (In case you did not install from package, you might need to give specific path to the command [#fcmd]_ )::
+Yade is being run primarily from terminal; the name of command is ``yade``. [#f1]_ (In case you did not install from package, you might need to give specific path to the command [#fcmd]_)::
 
 	\$ yade
 	Welcome to Yade
@@ -106,6 +106,22 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 .. [#fdbg] On some linux systems stack trace will not be shown and a message ``ptrace: Operation not permitted`` will appear instead. To enable stack trace issue command: ``sudo echo 0 > /proc/sys/kernel/yama/ptrace_scope``. To disable stack trace issue command ``sudo echo 1 > /proc/sys/kernel/yama/ptrace_scope``.
 
 
+Quick inline help
+--------------------
+All of functions callable from `ipython <http://ipython.scipy.org>`_ shell have a quickly accessible help by appending ``?`` to the function name, or calling ``help(…)`` command on them:
+
+.. ipython::
+	:okexcept:
+
+	In [1]: O.run?
+	run( (Omega)arg1 [, (int)nSteps=-1 [, (bool)wait=False]]) -> None :
+	    Run the simulation. *nSteps* how many steps to run, then stop (if positive); *wait* will cause not returning to python until simulation will have stopped.
+	Type:      instancemethod
+
+	In [1]: help(O.pause)
+
+A quick way to discover available functions is by using the tab-completion mechanism, e.g. type ``O.`` then press tab.
+
 Creating simulation
 --------------------
 To create simulation, one can either use a specialized class of type :yref:`FileGenerator` to create full scene, possibly receiving some parameters. Generators are written in c++ and their role is limited to well-defined scenarios. For instance, to create triaxial test scene:
@@ -157,7 +173,7 @@ As explained below, the loop consists in running defined sequence of engines. St
 	In [1]: O.time
 	1e-4
 
-Normal simulations, however, are run continuously. Starting/stopping the loop is done by ``O.run()`` and ``O.pause()``; note that ``O.run()`` returns control to Python and the simulation runs in background; if you want to wait for it finish, use ``O.wait()``. Fixed number of steps can be run with ``O.run(1000)``, ``O.run(1000,True)`` will run and wait. To stop at absolute step number, ``O.stopAtIter`` can be set and ``O.run()`` called normally.
+Normal simulations, however, are run continuously. Starting/stopping the loop is done by ``O.run()`` and ``O.pause()``; note that ``O.run()`` returns control to Python and the simulation runs in background; if you want to wait for it to finish, use ``O.wait()``. Fixed number of steps can be run with ``O.run(1000)``, ``O.run(1000,True)`` will run and wait. To stop at absolute step number, ``O.stopAtIter`` can be set and ``O.run()`` called normally.
 
 .. ipython::
 
@@ -175,6 +191,8 @@ Normal simulations, however, are run continuously. Starting/stopping the loop is
 
 	In [1]: O.stopAtIter=500000
 
+	In [1]: O.run()
+
 	In [1]: O.wait()
 
 	In [1]: O.iter
@@ -187,7 +205,7 @@ Simulation can be saved at any point to a binary file (optionaly compressed if t
 Saving to a XML file is also possible though resulting in larger files and slower save/load, it is used when the filename contains "xml". With some limitations,
 it is generally possible to load the scene later and resume the simulation as if it were not
 interrupted. Note that since the saved scene is a dump of Yade's internal objects, it might not
-(probably will not) open with different Yade version.
+(probably will not) open with different Yade version. This problem can be sometimes solved by migrating the saved file using ".xml" format.
 
 .. ipython::
 
@@ -225,7 +243,7 @@ primary and secondary simulation.
 
 Graphical interface
 --------------------
-Yade can be optionally compiled with qt4-based graphical interface. It can be started by pressing ``F12`` in the command-line, and also is started automatically when running a script.
+Yade can be optionally compiled with `QT <http://qt.io>`_ based graphical interface (qt4 and qt5 are supported). It can be started by pressing ``F12`` in the command-line, and also is started automatically when running a script.
 
 .. image:: fig/qt-gui.png
 
@@ -235,8 +253,11 @@ The windows with buttons is called ``Controller`` (can be invoked by ``yade.qt.C
 #. The *Display* tab has various rendering-related options, which apply to all opened views (they can be zero or more, new one is opened by the *New 3D* button).
 #. The *Python* tab has only a simple text entry area; it can be useful to enter python commands while the command-line is blocked by running script, for instance.
 
+.. FIXME currently there is a maximum of only one 3D View window allowed.
+
 3d views can be controlled using mouse and keyboard shortcuts; help is displayed if you press the ``h`` key while in the 3d view. Note that having the 3d view open can slow down running simulation significantly, it is meant only for quickly checking whether the simulation runs smoothly. Advanced post-processing is described in dedicated section.
 
+.. FIXME add link to that "dedicated section"
 
 Architecture overview
 ======================
@@ -282,9 +303,9 @@ Each :yref:`Body` comprises the following:
 :yref:`Material`
 	stores characteristics pertaining to mechanical behavior, such as Young's modulus or density, which are independent on particle's shape and dimensions; usually constant, might be shared amongst multiple bodies.
 :yref:`State`
-	contains state variable variables, in particular spatial :yref:`position<State::pos>` and :yref:`orientation<State::ori>`, :yref:`linear<State::vel>` and :yref:`angular<State::angVel>` velocity, :yref:`linear<State::accel>` and :yref:`angular<State::angAccel>` accelerator; it is updated by the :yref:`integrator<NewtonIntegrator>` at every step.
+	contains state variable variables, in particular spatial :yref:`position<State::pos>` and :yref:`orientation<State::ori>`, :yref:`linear<State::vel>` and :yref:`angular<State::angVel>` velocity; it is updated by the :yref:`integrator<NewtonIntegrator>` at every step.
 
-	Derived classes can hold additional data, e.g. :yref:`averaged damage<Cpm::normDmg>`.
+	Derived classes can hold additional data, e.g. :yref:`averaged damage<CpmState::normDmg>` or :yref:`broken links<WireState::numBrokenLinks>` between components.
 :yref:`Bound`
 	is used for approximate ("pass 1") contact detection; updated as necessary following body's motion. Currently, :yref:`Aabb` is used most often as :yref:`Bound`. Some bodies may have no :yref:`Bound`, in which case they are exempt from contact detection.
 
@@ -325,7 +346,7 @@ Since till now the simulation was empty, its id is 0 for the first sphere and 1 
 	In [1]: O.bodies[1].state.pos
 	<Body instance at 0x92e8f60>
 
-	In [2]: O.bodies[100]
+	In [2]: O.bodies[100]    # error because there are only two spheres
 	IndexError: Body id out of range.
 
 Adding the same body twice is, for reasons of the id uniqueness, not allowed:
@@ -361,15 +382,13 @@ Interactions
 Suppose now interactions have been already created. We can access them by the id pair:
 
 .. ipython::
-	:suppress:
+	:okexcept:
 
+	@suppress
 	In [1]: O.engines=[InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[])]
 
+	@suppress
 	In [2]: utils.createInteraction(0,1);
-
-
-.. ipython::
-	:okexcept:
 
 	In [1]: O.interactions[0,1]
 	<Interaction instance at 0x93f9528>
@@ -400,6 +419,9 @@ Generalized forces include force, torque and forced displacement and rotation; t
 	:okexcept:
 
 	Yade [1]: O.forces.f(0)
+
+	@suppress
+	Yade [2]: from yade import Vector3
 
 	Yade [2]: O.forces.addF(0,Vector3(1,2,3))
 
@@ -466,7 +488,7 @@ There are 3 fundamental types of Engines:
 	operating on the whole simulation (e.g. :yref:`GravityEngine` looping over all bodies and applying force based on their mass)
 
 :yref:`PartialEngine<PartialEngine>`
-	operating only on some pre-selected bodies (e.g. :yref:`ForceEngine` applying constant force to some bodies)
+	operating only on some pre-selected bodies (e.g. :yref:`ForceEngine` applying constant force to some :yref:`selected<ForceEngine::ids>` bodies)
 
 :yref:`Dispatchers<Dispatcher>`
 	do not perform any computation themselves; they merely call other functions, represented by function objects, :yref:`Functors<Functor>`. Each functor is specialized, able to handle certain object types, and will be dispatched if such obejct is treated by the dispatcher. 
@@ -476,7 +498,7 @@ There are 3 fundamental types of Engines:
 Dispatchers and functors
 """""""""""""""""""""""""
 
-For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. The line::
+For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box<Aabb>`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. The line::
 
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 
