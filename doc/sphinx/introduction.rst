@@ -485,7 +485,7 @@ Simulation loop, shown at img. img-yade-iter-loop_, can be described as follows 
 There are 3 fundamental types of Engines:
 
 :yref:`GlobalEngines<GlobalEngine>`
-	operating on the whole simulation (e.g. :yref:`GravityEngine` looping over all bodies and applying force based on their mass)
+	operating on the whole simulation (e.g. :yref:`ForceResetter` which zeroes forces acting on bodies or :yref:`GravityEngine` looping over all bodies and applying force based on their mass)
 
 :yref:`PartialEngine<PartialEngine>`
 	operating only on some pre-selected bodies (e.g. :yref:`ForceEngine` applying constant force to some :yref:`selected<ForceEngine::ids>` bodies)
@@ -498,7 +498,7 @@ There are 3 fundamental types of Engines:
 Dispatchers and functors
 """""""""""""""""""""""""
 
-For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box<Aabb>`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. In the ``O.engines=`` declared above the line::
+For approximate collision detection (pass 1), we want to compute :yref:`bounds<Body::bound>` for all :yref:`bodies<Body>` in the simulation; suppose we want bound of type :yref:`axis-aligned bounding box<Aabb>`. Since the exact algorithm is different depending on particular :yref:`shape<Body::shape>`, we need to provide functors for handling all specific cases. In the ``O.engines=[…]`` declared above, the line::
 
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()])
 
@@ -511,9 +511,9 @@ The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`)
 .. figure:: fig/bound-functors.*
 	:width: 15cm
 
-	Example :yref:`bound functors<BoundFunctor>` producing :yref:`Aabb` accepting various different types, such as :yref:`Sphere`, :yref:`Facet` or :yref:`Cylinder`. In the case shown, the ``Bo1`` functors produce :yref:`Aabb` instances from one specific :yref:`Shape`, hence the number ``1`` in the functor name. Each of those functors has specific formula that uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`Facet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`Aabb`.
+	Example :yref:`bound functors<BoundFunctor>` producing :yref:`Aabb` accepting various different types, such as :yref:`Sphere`, :yref:`Facet` or :yref:`Cylinder`. In the case shown, the ``Bo1`` functors produce :yref:`Aabb` instances from single specific :yref:`Shape`, hence the number ``1`` in the functor name. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`Facet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`Aabb`.
 
-.. comment: FIXME that link :ref:`boundfunctors` or :yref:`bound functors<BoundFunctor>` should point to the place above so that the graph is visible.
+.. comment: FIXME that link :ref:`boundfunctors` or :yref:`bound functors<BoundFunctor>` should point to the place above so that the inheritance graph is visible.
 
 The next part, reading
 
@@ -528,13 +528,24 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`IGeomDispatcher`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection.
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap).
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
 	#. The second functor, :yref:`Ig2_Facet_Sphere_ScGeom`, is called for interaction of :yref:`Facet` with :yref:`Sphere` and might create (again) a :yref:`ScGeom` instance.
 
 	All ``Ig2`` functors derive from :yref:`IGeomFunctor` (they are documented at the same place).
+
+.. comment: Ig2_Sphere_Sphere_ScGeom , Ig2_Wall_Sphere_ScGeom , Ig2_Sphere_PFacet_ScGridCoGeom , Ig2_Sphere_Polyhedra_ScGeom, Ig2_Wall_PFacet_ScGeom, Ig2_PFacet_PFacet_ScGeom
+
+.. _img-shape-functors:
+.. figure:: fig/shape-functors.*
+	:width: 15cm
+
+	Example :yref:`interaction geometry functors<IGeomFunctor>` producing :yref:`ScGeom` or :yref:`ScGridCoGeom` accepting two various different types (hence ``2`` in their name ``Ig2``), such as :yref:`Sphere`, :yref:`Wall` or :yref:`PFacet`. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`PFacet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`interaction geometry<IGeom>`.
+
+.. comment: yade.wrapper.html#iphysfunctor
+
 
 :yref:`IPhysDispatcher`
 	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`IPhys` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
