@@ -124,7 +124,7 @@ A quick way to discover available functions is by using the tab-completion mecha
 
 Creating simulation
 --------------------
-To create simulation, one can either use a specialized class of type :yref:`FileGenerator` to create full scene, possibly receiving some parameters. Generators are written in c++ and their role is limited to well-defined scenarios. For instance, to create triaxial test scene:
+To create simulation, one can either use a specialized class of type :yref:`FileGenerator` to create full scene, possibly receiving some parameters. Generators are written in C++ and their role is limited to well-defined scenarios. For instance, to create triaxial test scene:
 
 .. comment: we need to import yade to make following work. The @suppress keyword is from https://ipython.readthedocs.io/en/stable/sphinxext.html#pseudo-decorators
 
@@ -303,9 +303,8 @@ Each :yref:`Body` comprises the following:
 :yref:`Material`
 	stores characteristics pertaining to mechanical behavior, such as Young's modulus or density, which are independent on particle's shape and dimensions; usually constant, might be shared amongst multiple bodies.
 :yref:`State`
-	contains state variable variables, in particular spatial :yref:`position<State::pos>` and :yref:`orientation<State::ori>`, :yref:`linear<State::vel>` and :yref:`angular<State::angVel>` velocity; it is updated by the :yref:`integrator<NewtonIntegrator>` at every step.
+	contains state variables, in particular spatial :yref:`position<State::pos>` and :yref:`orientation<State::ori>`, :yref:`linear<State::vel>` and :yref:`angular<State::angVel>` velocity; it is updated by the :yref:`integrator<NewtonIntegrator>` at every step. The derived classes would contain other information related to current state of this body, e.g. its temperature, :yref:`averaged damage<CpmState::normDmg>` or :yref:`broken links<WireState::numBrokenLinks>` between components.
 
-	Derived classes can hold additional data, e.g. :yref:`averaged damage<CpmState::normDmg>` or :yref:`broken links<WireState::numBrokenLinks>` between components.
 :yref:`Bound`
 	is used for approximate ("pass 1") contact detection; updated as necessary following body's motion. Currently, :yref:`Aabb` is used most often as :yref:`Bound`. Some bodies may have no :yref:`Bound`, in which case they are exempt from contact detection.
 
@@ -345,7 +344,7 @@ We see that a sphere with material of type :yref:`FrictMat` (default, unless you
 
 In each case, return value is :yref:`Body.id` of the body inserted. 
 
-Since till now the simulation was empty, its id is 0 for the first sphere and 1 for the second one. Saving the id value is not necessary, unless you want access this particular body later; it is remembered internally in :yref:`Body` itself. You can address bodies by their id:
+Since till now the simulation was empty, its id is 0 for the first sphere and 1 for the second one. Saving the id value is not necessary, unless you want to access this particular body later; it is remembered internally in :yref:`Body` itself. You can address bodies by their id:
 
 .. ipython::
 	:okexcept:
@@ -577,7 +576,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 
 :yref:`LawDispatcher`
-	dispatches to the third set of functors, based on combinations of :yref:`IGeom` and :yref:`IPhys` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent "constitutive law"; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
+	dispatches to the third set of functors, based on combinations of :yref:`IGeom` and :yref:`IPhys` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent constitutive law; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
 
 	``Law2`` functors all inherit from :yref:`LawFunctor`.
 
@@ -585,7 +584,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 .. figure:: fig/law-functors.*
 	:width: 15cm
 
-	Example :yref:`physics law functors<LawFunctor>` (:yref:`Law2_CylScGeom_FrictPhys_CundallStrack`, :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_ScGridCoGeom_FrictPhys_CundallStrack`) each of them performing calcuation of forces according to selected physical law.
+	Example :yref:`LawFunctors<LawFunctor>` (:yref:`Law2_CylScGeom_FrictPhys_CundallStrack`, :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_ScGridCoGeom_FrictPhys_CundallStrack`) each of them performing calcuation of forces according to selected constitutive law.
 
 
 There is chain of types produced by earlier functors and accepted by later ones; the user is responsible to satisfy type requirement (see img. img-dispatch-loop_). An exception (with explanation) is raised in the contrary case.
