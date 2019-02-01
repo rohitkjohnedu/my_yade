@@ -311,6 +311,13 @@ Each :yref:`Body` comprises the following:
 
 (In addition to these 4 components, bodies have several more minor data associated, such as :yref:`Body::id` or :yref:`Body::mask`.)
 
+.. _img-body-classes:
+.. figure:: fig/body-classes.*
+	:width: 13cm
+
+	Examples of concrete classes that might be used to describe a :yref:`Body`: :yref:`<State>`, :yref:`CpmState`, :yref:`ChainedState`, :yref:`ElastMat`, :yref:`FrictMat`, :yref:`FrictViscoMat`, :yref:`Polyhedra`, :yref:`PFacet`, :yref:`GridConnection`, :yref:`Aabb`.
+
+
 All these four properties can be of different types, derived from their respective base types. Yade frequently makes decisions about computation based on those types: :yref:`Sphere` + :yref:`Sphere` collision has to be treated differently than :yref:`Facet` + :yref:`Sphere` collision. Objects making those decisions are called :yref:`Dispatcher`'s and are essential to understand Yade's functioning; they are discussed below. 
 
 Explicitly assigning all 4 properties to each particle by hand would be not practical; there are utility functions defined to create them with all necessary ingredients. For example, we can create sphere particle using :yref:`yade.utils.sphere`:
@@ -378,6 +385,13 @@ Interactions
 	Based on combination of types of :yref:`Shapes<Shape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<ScGeom>`, :yref:`Cylinder+Sphere<CylScGeom>` etc. Note, however, that it is possible to represent many type of contacts with the basic sphere-sphere geometry (for instance in :yref:`Ig2_Wall_Sphere_ScGeom`).
 :yref:`IPhys`
 	representing non-geometrical features of the interaction; some are computed from :yref:`Materials<Material>` of the particles in contact using some averaging algorithm (such as contact stiffness from Young's moduli of particles), others might be internal variables like damage.
+
+
+.. _img-interaction-classes:
+.. figure:: fig/interaction-classes.*
+	:width: 13cm
+
+	Examples of concrete classes that might be used to describe an :yref:`Interaction`: :yref:`<GenericSpheresContact>`, :yref:`PolyhedraGeom`, :yref:`CylScGeom`, :yref:`NormPhys`, :yref:`NormShearPhys`, :yref:`FrictPhys`.
 
 Suppose now interactions have been already created. We can access them by the id pair:
 
