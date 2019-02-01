@@ -19,6 +19,8 @@ class Interaction: public Serializable{
 		bool isReal() const {return (bool)geom && (bool)phys;}
 		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
 		bool isFresh(Scene* rb);
+		// FIXME - it is set to true, and never set to false. What is the purpose to have it? just try: grep -E "\<isActive\>" . -rn --include='*pp' --color
+		//         But it looks like it can be removed, after stable release.
 		bool isActive;
 
 		Interaction(Body::id_t newId1,Body::id_t newId2);

@@ -509,7 +509,7 @@ The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`)
 
 .. _img-bound-functors:
 .. figure:: fig/bound-functors.*
-	:width: 15cm
+	:width: 12cm
 
 	Example :yref:`bound functors<BoundFunctor>` producing :yref:`Aabb` accepting various different types, such as :yref:`Sphere`, :yref:`Facet` or :yref:`Cylinder`. In the case shown, the ``Bo1`` functors produce :yref:`Aabb` instances from single specific :yref:`Shape`, hence the number ``1`` in the functor name. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`Facet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`Aabb`.
 
@@ -528,7 +528,7 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`IGeomDispatcher`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well fail on approximate interactions, indicating there is no real contact between the bodies, even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap).
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, bod the shapes did not). In that case the attribute `<Interaction::isReal>` is set to false and interaction is scheduled for removal.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
@@ -537,6 +537,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 	All ``Ig2`` functors derive from :yref:`IGeomFunctor` (they are documented at the same place).
 
 .. comment: Ig2_Sphere_Sphere_ScGeom , Ig2_Wall_Sphere_ScGeom , Ig2_Sphere_PFacet_ScGridCoGeom , Ig2_Sphere_Polyhedra_ScGeom, Ig2_Wall_PFacet_ScGeom, Ig2_PFacet_PFacet_ScGeom
+.. comment: Hmm, there are PFacets on the picture, but in the example above are Facets. Maybe a good occasion for the reader to notice the difference between Facet and PFacet :)
 
 .. _img-shape-functors:
 .. figure:: fig/shape-functors.*
@@ -544,7 +545,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 	Example :yref:`interaction geometry functors<IGeomFunctor>` producing :yref:`ScGeom` or :yref:`ScGridCoGeom` accepting two various different types (hence ``2`` in their name ``Ig2``), such as :yref:`Sphere`, :yref:`Wall` or :yref:`PFacet`. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`PFacet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`interaction geometry<IGeom>`.
 
-.. comment: yade.wrapper.html#iphysfunctor
+.. comment: FIXME: I don't know how to link to html/yade.wrapper.html#iphysfunctor , the :yref:`IGeomFunctor` html/yade.wrapper.html#yade.wrapper.IGeomFunctor
 
 
 :yref:`IPhysDispatcher`
