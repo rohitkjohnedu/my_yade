@@ -528,7 +528,7 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`IGeomDispatcher`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, bod the shapes did not). In that case the attribute `<Interaction::isReal>` is set to false and interaction is scheduled for removal.
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, bod the shapes did not). In that case the attribute :yref:`<Interaction::isReal>` is set to false and interaction is scheduled for removal.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
@@ -553,16 +553,32 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 	
 	``Ip2`` functors are derived from :yref:`IPhysFunctor`.
 
+
+.. _img-phys-functors:
+.. figure:: fig/phys-functors.*
+	:width: 15cm
+
+	Example :yref:`interaction physics functors<IPhysFunctor>` (:yref:`Ip2_FrictMat_CpmMat_FrictPhys`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` and :yref:`Ip2_FrictViscoMat_CFrictMat_FrictViscoPhys`) producing :yref:`FrictPhys` or :yref:`FrictViscoPhys` accepting two various different types of :yref:`Material` (hence ``Ip2``), such as :yref:`CpmMat`, :yref:`FrictMat` or :yref:`FrictViscoMat`.
+
+
+
 :yref:`LawDispatcher`
 	dispatches to the third set of functors, based on combinations of :yref:`IGeom` and :yref:`IPhys` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent "constitutive law"; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
 
 	``Law2`` functors all inherit from :yref:`LawFunctor`.
 
+.. _img-law-functors:
+.. figure:: fig/law-functors.*
+	:width: 15cm
+
+	Example :yref:`physics law functors<LawFunctor>` (:yref:`Law2_CylScGeom_FrictPhys_CundallStrack`, :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_ScGridCoGeom_FrictPhys_CundallStrack`) each of them performing calcuation of forces according to selected physical law.
+
+
 There is chain of types produced by earlier functors and accepted by later ones; the user is responsible to satisfy type requirement (see img. img-dispatch-loop_). An exception (with explanation) is raised in the contrary case.
 
 .. _img-dispatch-loop:
 .. figure:: fig/dispatch-loop.*
-	:width: 13cm
+	:width: 15cm
 
 	Chain of functors producing and accepting certain types. In the case shown, the ``Ig2`` functors produce :yref:`ScGeom` instances from all handled :yref:`Shape` combinations; the ``Ig2`` functor produces :yref:`FrictMat`. The constitutive law functor ``Law2`` accepts the combination of types produced. Note that the types are stated in the functor's class names.
 
