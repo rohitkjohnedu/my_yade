@@ -312,9 +312,9 @@ Each :yref:`Body` comprises the following:
 
 .. _img-body-classes:
 .. figure:: fig/body-classes.*
-	:width: 13cm
+	:width: 13.8cm
 
-	Examples of concrete classes that might be used to describe a :yref:`Body`: :yref:`<State>`, :yref:`CpmState`, :yref:`ChainedState`, :yref:`ElastMat`, :yref:`FrictMat`, :yref:`FrictViscoMat`, :yref:`Polyhedra`, :yref:`PFacet`, :yref:`GridConnection`, :yref:`Aabb`.
+	Examples of concrete classes that might be used to describe a :yref:`Body`: :yref:`State`, :yref:`CpmState`, :yref:`ChainedState`, :yref:`ElastMat`, :yref:`FrictMat`, :yref:`FrictViscoMat`, :yref:`Polyhedra`, :yref:`PFacet`, :yref:`GridConnection`, :yref:`Aabb`.
 
 
 All these four properties can be of different types, derived from their respective base types. Yade frequently makes decisions about computation based on those types: :yref:`Sphere` + :yref:`Sphere` collision has to be treated differently than :yref:`Facet` + :yref:`Sphere` collision. Objects making those decisions are called :yref:`Dispatcher`'s and are essential to understand Yade's functioning; they are discussed below. 
@@ -332,7 +332,7 @@ Explicitly assigning all 4 properties to each particle by hand would be not prac
    In [7]: s.shape.radius
 
 
-We see that a sphere with material of type :yref:`FrictMat` (default, unless you provide another :yref:`Material`) and bounding volume of type :yref:`Aabb` (axis-aligned bounding box) was created. Its position is at origin and its radius is 1.0. Finally, this object can be inserted into the simulation; and we can insert yet one sphere as well.
+We see that a sphere with material of type :yref:`FrictMat` (default, unless you provide another :yref:`Material`) and bounding volume of type :yref:`Aabb` (axis-aligned bounding box) was created. Its position is at the origin and its radius is 1.0. Finally, this object can be inserted into the simulation; and we can insert yet one sphere as well.
 
 .. ipython::
 
@@ -388,9 +388,9 @@ Interactions
 
 .. _img-interaction-classes:
 .. figure:: fig/interaction-classes.*
-	:width: 13cm
+	:width: 13.8cm
 
-	Examples of concrete classes that might be used to describe an :yref:`Interaction`: :yref:`<GenericSpheresContact>`, :yref:`PolyhedraGeom`, :yref:`CylScGeom`, :yref:`NormPhys`, :yref:`NormShearPhys`, :yref:`FrictPhys`.
+	Examples of concrete classes that might be used to describe an :yref:`Interaction`: :yref:`GenericSpheresContact`, :yref:`PolyhedraGeom`, :yref:`CylScGeom`, :yref:`NormPhys`, :yref:`NormShearPhys`, :yref:`FrictPhys`.
 
 Suppose now interactions have been already created. We can access them by the id pair:
 
@@ -426,7 +426,7 @@ Suppose now interactions have been already created. We can access them by the id
 Generalized forces
 """"""""""""""""""""
 
-Generalized forces include force, torque and forced displacement and rotation; they are stored only temporarliy, during one computation step, and reset to zero afterwards. For reasons of parallel computation, they work as accumulators, i.e. only can be added to, read and reset.
+Generalized forces include force, torque and forced displacement and rotation; they are stored only temporariliy, during one computation step, and reset to zero afterwards. For reasons of parallel computation, they work as accumulators, i.e. only can be added to, read and reset.
 
 .. ipython::
 	:okexcept:
@@ -464,8 +464,9 @@ In a typical DEM simulation, the following sequence is run repeatedly:
 
 .. _img-yade-iter-loop:
 .. figure:: fig/yade-iter-loop.*
+	:width: 15.8cm
 
-	Typical simulation loop; each step begins at body-centered bit at 11 o'clock, continues with interaction bit, force application bit, miscillanea and ends with time update.
+	Typical simulation loop; each step begins at body-centered bit at 11 o'clock, continues with interaction bit, force application bit, miscellanea and ends with time update.
 
 Each of these actions is represented by an :yref:`Engine<Engine>`, functional element of simulation. The sequence of engines is called *simulation loop*.
 
@@ -541,7 +542,7 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`IGeomDispatcher`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, bod the shapes did not). In that case the attribute :yref:`<Interaction::isReal>` is set to false and interaction is scheduled for removal.
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, but the shapes did not). In that case the attribute :yref:`<Interaction::isReal>` is set to false and interaction is scheduled for removal.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
@@ -554,7 +555,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 .. _img-shape-functors:
 .. figure:: fig/shape-functors.*
-	:width: 15cm
+	:width: 16cm
 
 	Example :yref:`interaction geometry functors<IGeomFunctor>` producing :yref:`ScGeom` or :yref:`ScGridCoGeom` accepting two various different types (hence ``2`` in their name ``Ig2``), such as :yref:`Sphere`, :yref:`Wall` or :yref:`PFacet`. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`PFacet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`interaction geometry<IGeom>`.
 
@@ -569,7 +570,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 .. _img-phys-functors:
 .. figure:: fig/phys-functors.*
-	:width: 15cm
+	:width: 16cm
 
 	Example :yref:`interaction physics functors<IPhysFunctor>` (:yref:`Ip2_FrictMat_CpmMat_FrictPhys`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` and :yref:`Ip2_FrictViscoMat_CFrictMat_FrictViscoPhys`) producing :yref:`FrictPhys` or :yref:`FrictViscoPhys` accepting two various different types of :yref:`Material` (hence ``Ip2``), such as :yref:`CpmMat`, :yref:`FrictMat` or :yref:`FrictViscoMat`.
 
@@ -582,7 +583,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 .. _img-law-functors:
 .. figure:: fig/law-functors.*
-	:width: 15cm
+	:width: 16cm
 
 	Example :yref:`LawFunctors<LawFunctor>` (:yref:`Law2_CylScGeom_FrictPhys_CundallStrack`, :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_ScGridCoGeom_FrictPhys_CundallStrack`) each of them performing calcuation of forces according to selected constitutive law.
 
@@ -591,7 +592,7 @@ There is chain of types produced by earlier functors and accepted by later ones;
 
 .. _img-dispatch-loop:
 .. figure:: fig/dispatch-loop.*
-	:width: 15cm
+	:width: 14.5cm
 
 	Chain of functors producing and accepting certain types. In the case shown, the ``Ig2`` functors produce :yref:`ScGeom` instances from all handled :yref:`Shape` combinations; the ``Ig2`` functor produces :yref:`FrictMat`. The constitutive law functor ``Law2`` accepts the combination of types produced. Note that the types are stated in the functor's class names.
 
