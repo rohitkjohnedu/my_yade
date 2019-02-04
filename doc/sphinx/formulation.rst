@@ -584,7 +584,7 @@ In Yade, damping :eq:`eq-damping-yade` is implemented in the :yref:`NewtonIntegr
 Stability considerations
 ------------------------------------------------------
 ..
-	\def\Dtcr{\Dt_{\rm cr}}
+	\newcommand{\Dtcr}{\Dt_{\rm cr}}
 	% http://en.wikipedia.org/wiki/Harmonic_oscillator
 	% eigenfrequency is (1/2π)√(k/m) for simple harmonic oscillator
 	% Bruno gives √(m/k) 
