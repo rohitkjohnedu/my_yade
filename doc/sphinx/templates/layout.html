@@ -17,7 +17,9 @@
 
 {% block header %}
     <div style="display:none">
+    {% raw %}
     \(
+
 % symbols
 \let\mat\boldsymbol % matrix
 \let\vec\boldsymbol % vector
@@ -83,8 +85,10 @@
 \def\sortSep{||}
 \def\sortInv{\hbox{\phantom{||}}}
 \def\sortlines#1{\xymatrix@=3pt{#1}}
+\def\crossBound{||\mkern-18mu<}
 
     \)
+    {% endraw %}
     </div>
     {{ super() }}
 {% endblock %}
