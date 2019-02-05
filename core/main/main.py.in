@@ -235,17 +235,29 @@ def userSession(gui='none',qapp=None):
 			from prompt_toolkit.keys import Keys
 			@registry.add_binding(Keys.F12, eager=True)
 			def invokeController_(event):
-				yade.qt.Controller()
+				try:
+					yade.qt.Controller()
+				except Exception as e:
+					print e
 			@registry.add_binding(Keys.F11, eager=True)
 			def invokeView_(event):
-				yade.qt.View()
+				try:
+					yade.qt.View()
+				except Exception as e:
+					print e
 			@registry.add_binding(Keys.F10, eager=True)
 			def invokeBoth_(event):
-				yade.qt.View()
-				yade.qt.Controller()
+				try:
+					yade.qt.View()
+					yade.qt.Controller()
+				except Exception as e:
+					print e
 			@registry.add_binding(Keys.F9, eager=True)
 			def invokeGenerator_(event):
-				yade.qt.Generator()
+				try:
+					yade.qt.Generator()
+				except Exception as e:
+					print e
 			@registry.add_binding(Keys.F8, eager=True)
 			def invokeGenerator_(event):
 				try:
