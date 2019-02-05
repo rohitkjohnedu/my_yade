@@ -20,6 +20,19 @@
     {% raw %}
     \(
 
+\usepackage{euler} % must be loaded before fontspec for the whole doc (below); this must be kept for pngmath, however
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsbsy}
+%\usepackage{mathabx}
+\usepackage{underscore}
+\usepackage[all]{xy}
+
+% Metadata of the pdf output
+\hypersetup{pdftitle={Yade Documentation}}
+\hypersetup{pdfauthor={Smilauer, V., et al.}}
+\hypersetup{pdfkeywords={Discrete element method, granular materials, contact law, hydromechanical coupling}}
+
 % symbols
 \let\mat\boldsymbol % matrix
 \let\vec\boldsymbol % vector
