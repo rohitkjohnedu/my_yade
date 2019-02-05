@@ -100,7 +100,7 @@ def inheritanceDiagram(klass):
         except NameError:
             pass
     # https://www.graphviz.org/doc/info/attrs.html , http://www.sphinx-doc.org/en/master/usage/extensions/graphviz.html , http://www.markusz.io/posts/drafts/graphviz-sphinx/
-    # margin size is in inches. The text area on page in .pdf is 6.3in by 9.8in. I'll use a default that each class uses one fourth of page width. If depth>5 then the image just gets smaller.
+    # margin size is in inches. The text area on page in .pdf is 6.3in by 9.8in. I'll use a default that each class uses one fourth of page width. If maxDepth>=5 then the image just gets smaller.
     pageWidth=6.3
     pageFraction=4
     fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
