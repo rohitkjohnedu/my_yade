@@ -86,8 +86,25 @@ def inheritanceDiagram(klass):
         # useless, doesn't work in LaTeX anyway...
         return ('#yade.wrapper.%s'%c if writer=='html' else '%%yade.wrapper#yade.wrapper.%s'%c) # HTML/LaTeX
     def mkNode(c,style='solid',fillcolor=None): return '\t\t"%s" [shape="box",fontsize=%i,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#yade.wrapper.%s"];\n'%(c,8 if writer=='html' else 20,style,'fillcolor=%s,'%fillcolor if fillcolor else '',c)
-    ret=".. graphviz::\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin=.2;\n"+mkNode(klass)
     childs=yade.system.childClasses(klass)
+    maxDepth=1
+    def countUp(c , klass):
+        ret , base = 2 , eval(c).__bases__[0].__name__
+        while(base != klass):
+            ret += 1
+            base = eval(base).__bases__[0].__name__
+        return ret
+    for c in childs:
+        try:
+            maxDepth=max(maxDepth,countUp(c,klass))
+        except NameError:
+            pass
+    # https://www.graphviz.org/doc/info/attrs.html , http://www.sphinx-doc.org/en/master/usage/extensions/graphviz.html , http://www.markusz.io/posts/drafts/graphviz-sphinx/
+    # margin size is in inches. The text area on page in .pdf is 6.3in by 9.8in. I'll use a default that each class uses one fourth of page width. If depth>5 then the image just gets smaller.
+    pageWidth=6.3
+    pageFraction=4
+    fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
+    ret=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
     if len(childs)==0: return ''
     for c in childs:
         try:
