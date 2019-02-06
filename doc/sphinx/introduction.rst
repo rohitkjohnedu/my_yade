@@ -583,16 +583,16 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 
 
-:yref:`LawDispatcher`
+:yref:`LawDispatcher` which uses :ref:`LawFunctor<inheritanceGraphLawFunctor>`
 	dispatches to the third set of functors, based on combinations of :yref:`IGeom` and :yref:`IPhys` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent constitutive law; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
 
-	``Law2`` functors all inherit from :yref:`LawFunctor`.
+	``Law2`` functors all inherit from :ref:`LawFunctor<inheritanceGraphLawFunctor>`.
 
 .. _img-law-functors:
 .. figure:: fig/law-functors.*
 	:width: 16cm
 
-	Example :yref:`LawFunctors<LawFunctor>` (:yref:`Law2_CylScGeom_FrictPhys_CundallStrack`, :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_ScGridCoGeom_FrictPhys_CundallStrack`) each of them performing calcuation of forces according to selected constitutive law.
+	Example :ref:`LawFunctors<inheritanceGraphLawFunctor>` (:yref:`Law2_CylScGeom_FrictPhys_CundallStrack`, :yref:`Law2_ScGeom_FrictPhys_CundallStrack` and :yref:`Law2_ScGridCoGeom_FrictPhys_CundallStrack`) each of them performing calcuation of forces according to selected constitutive law.
 
 
 There is chain of types produced by earlier functors and accepted by later ones; the user is responsible to satisfy type requirement (see img. img-dispatch-loop_). An exception (with explanation) is raised in the contrary case.

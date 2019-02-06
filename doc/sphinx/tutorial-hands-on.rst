@@ -336,7 +336,7 @@ In order to avoid such tasks, shorthand functions are defined in the :yref:`yade
 
 In the last example, the particle was fixed in space by the ``fixed=True`` parameter to :yref:`yade.utils.sphere`; such a particle will not move, creating a primitive boundary condition.
 
-A particle object is not yet part of the simulation; in order to do so, a special function :yref:`O.bodies.append<BodyContainer::append>` (inside :yref:`Scene`) is called:
+A particle object is not yet part of the simulation; in order to do so, a special function :yref:`O.bodies.append<BodyContainer::append>` (also see :yref:`Omega::bodies` and :yref:`Scene`) is called:
 
 .. ipython::
 

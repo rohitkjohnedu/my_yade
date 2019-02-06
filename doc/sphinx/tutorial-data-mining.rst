@@ -27,6 +27,7 @@ All data of the simulation are accessible from python; when you open the *Inspec
    	O.bodies[0]                                                         # first body
    	[b.shape.radius for b in O.bodies if isinstance(b.shape,Sphere)]    # list of radii of all spherical bodies
    	sum([b.state.mass for b in O.bodies])                               # sum of masses of all bodies
+   	numpy.average([b.state.vel[0] for b in O.bodies])                   # average velocity in x direction
 
    .. note:: Uniqueness of :yref:`Body.id` is not guaranteed, since newly created bodies might recycle :yref:`ids<Body.id>` of :yref:`deleted<BodyContainer.erase>` ones.
 
@@ -64,7 +65,7 @@ Labels
 
 	Yade [1]: O.engines[0].damping   # O.engines[0] and newton are the same objects
 
-        Yade [1]: newton==O.engines[0]
+        Yade [1]: newton==O.engines[0]   # O.engines[0] and newton are the same objects
 
 .. rubric:: Exercises
 
@@ -111,7 +112,7 @@ Save
 PyRunner
 ^^^^^^^^^
 
-To save data that we just learned to access, we need to call Python from within the *simulation loop*. :yref:`PyRunner` is created just for that; it inherits periodicy control from :yref:`PeriodicEngine` and takes the code to run as text (must be quoted, i.e. inside ``'...'``) attributed called *command*. For instance, adding this to :yref:`O.engines<Omega.engines>` will print the current step number every second wall clock time::
+To save data that we just learned to access, we need to call Python from within the *simulation loop*. :yref:`PyRunner` is created just for that; it inherits periodicy control from :yref:`PeriodicEngine` and takes the code to run as text (must be quoted, i.e. inside ``'...'``) attributed called *command*. For instance, adding this to :yref:`O.engines<Omega.engines>` will print the current step number every one second wall clock time::
 
 	O.engines=O.engines+[ PyRunner(command='print O.iter',realPeriod=1) ]
 
@@ -188,6 +189,7 @@ Plotting all energy contributions would be difficult, since names of all energie
 
 .. rubric:: Exercises
 
+#. Calculate average momentum in y direction.
 #. Run the gravity deposition script, plotting unbalanced force and kinetic energy.
 #. While the script is running, try changing the :yref:`NewtonIntegrator.damping` parameter (do it from both *Inspector* and from the command-line). What influence does it have on the evolution of unbalanced force and kinetic energy?
 #. Think about and write down all energy sources (input); write down also all energy sinks (dissipation).
