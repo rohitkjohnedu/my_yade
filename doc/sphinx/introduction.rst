@@ -245,15 +245,16 @@ Graphical interface
 --------------------
 Yade can be optionally compiled with `QT <http://qt.io>`_ based graphical interface (qt4 and qt5 are supported). It can be started by pressing ``F12`` in the command-line, and also is started automatically when running a script.
 
+.. _imgQtGui:
 .. image:: fig/qt-gui.png
 
-The windows with buttons is called ``Controller`` (can be invoked by ``yade.qt.Controller()`` from python):
+The control window on the left (fig. imgQtGui_) is called ``Controller`` (can be invoked by ``yade.qt.Controller()`` from python):
 
 #. The *Simulation* tab is mostly self-explanatory, and permits basic simulation control.
 #. The *Display* tab has various rendering-related options, which apply to all opened views (they can be zero or more, new one is opened by the *New 3D* button).
 #. The *Python* tab has only a simple text entry area; it can be useful to enter python commands while the command-line is blocked by running script, for instance.
 
-Inside the *Inspect* window all simulation data can be examined and modified in realtime.
+Inside the *Inspect* window (on the right in fig. imgQtGui_) all simulation data can be examined and modified in realtime.
 
 #. Clicking left mouse button on any of the blue hyperlinks will open documentation.
 #. Clicking middle mouse button will copy the fully qualified python name into clipboard, which can be pasted into terminal by clicking middle mouse button in the terminal.
@@ -299,18 +300,18 @@ Data components
 Bodies
 """""""
 
-Yade simulation (class ``Scene``, but hidden inside :yref:`Omega` in Python) is represented by :yref:`Bodies<Body>`, their :yref:`Interactions<Interaction>` and resultant generalized :yref:`forces<Omega.forces>` (all stored internally in special containers).
+Yade simulation (class :yref:`Scene`, but hidden inside :yref:`Omega` in Python) is represented by :yref:`Bodies<Body>`, their :yref:`Interactions<Interaction>` and resultant generalized :yref:`forces<Omega.forces>` (all stored internally in special containers).
 
 Each :yref:`Body` comprises the following:
 
-:yref:`Shape`
+:ref:`Shape<inheritanceGraphShape>`
 	represents particle's geometry (neutral with regards to its spatial orientation), such as :yref:`Sphere`, :yref:`Facet` or inifinite :yref:`Wall`; it usually does not change during simulation.
-:yref:`Material`
+:ref:`Material<inheritanceGraphMaterial>`
 	stores characteristics pertaining to mechanical behavior, such as Young's modulus or density, which are independent on particle's shape and dimensions; usually constant, might be shared amongst multiple bodies.
-:yref:`State`
+:ref:`State<inheritanceGraphState>`
 	contains state variables, in particular spatial :yref:`position<State::pos>` and :yref:`orientation<State::ori>`, :yref:`linear<State::vel>` and :yref:`angular<State::angVel>` velocity; it is updated by the :yref:`integrator<NewtonIntegrator>` at every step. The derived classes would contain other information related to current state of this body, e.g. its temperature, :yref:`averaged damage<CpmState::normDmg>` or :yref:`broken links<WireState::numBrokenLinks>` between components.
 
-:yref:`Bound`
+:ref:`Bound<inheritanceGraphBound>`
 	is used for approximate ("pass 1") contact detection; updated as necessary following body's motion. Currently, :yref:`Aabb` is used most often as :yref:`Bound`. Some bodies may have no :yref:`Bound`, in which case they are exempt from contact detection.
 
 (In addition to these 4 components, bodies have several more minor data associated, such as :yref:`Body::id` or :yref:`Body::mask`.)
@@ -319,7 +320,7 @@ Each :yref:`Body` comprises the following:
 .. figure:: fig/body-classes.*
 	:width: 13.8cm
 
-	Examples of concrete classes that might be used to describe a :yref:`Body`: :yref:`State`, :yref:`CpmState`, :yref:`ChainedState`, :yref:`ElastMat`, :yref:`FrictMat`, :yref:`FrictViscoMat`, :yref:`Polyhedra`, :yref:`PFacet`, :yref:`GridConnection`, :yref:`Aabb`.
+	Examples of concrete classes that might be used to describe a :yref:`Body`: :ref:`State<inheritanceGraphState>`, :yref:`CpmState`, :yref:`ChainedState`, :ref:`Material<inheritanceGraphMaterial>`, :yref:`ElastMat`, :yref:`FrictMat`, :yref:`FrictViscoMat`, :ref:`Shape<inheritanceGraphShape>`, :yref:`Polyhedra`, :yref:`PFacet`, :yref:`GridConnection`, :ref:`Bound<inheritanceGraphBound>`, :yref:`Aabb`.
 
 
 All these four properties can be of different types, derived from their respective base types. Yade frequently makes decisions about computation based on those types: :yref:`Sphere` + :yref:`Sphere` collision has to be treated differently than :yref:`Facet` + :yref:`Sphere` collision. Objects making those decisions are called :yref:`Dispatcher`'s and are essential to understand Yade's functioning; they are discussed below. 
@@ -383,11 +384,12 @@ Interactions
 
 :yref:`Interactions<Interaction>` are always between pair of bodies; usually, they are created by the collider based on spatial proximity; they can, however, be created explicitly and exist independently of distance. Each interaction has 2 components:
 
-:yref:`IGeom`
+:ref:`IGeom<inheritanceGraphIGeom>`
 	holding geometrical configuration of the two particles in collision; it is updated automatically as the particles in question move and can be queried for various geometrical characteristics, such as penetration distance or shear strain.
 	
 	Based on combination of types of :yref:`Shapes<Shape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<ScGeom>`, :yref:`Cylinder+Sphere<CylScGeom>` etc. Note, however, that it is possible to represent many type of contacts with the basic sphere-sphere geometry (for instance in :yref:`Ig2_Wall_Sphere_ScGeom`).
-:yref:`IPhys`
+
+:ref:`IPhys<inheritanceGraphIPhys>`
 	representing non-geometrical features of the interaction; some are computed from :yref:`Materials<Material>` of the particles in contact using some averaging algorithm (such as contact stiffness from Young's moduli of particles), others might be internal variables like damage.
 
 
@@ -395,7 +397,7 @@ Interactions
 .. figure:: fig/interaction-classes.*
 	:width: 13.8cm
 
-	Examples of concrete classes that might be used to describe an :yref:`Interaction`: :yref:`GenericSpheresContact`, :yref:`PolyhedraGeom`, :yref:`CylScGeom`, :yref:`NormPhys`, :yref:`NormShearPhys`, :yref:`FrictPhys`.
+	Examples of concrete classes that might be used to describe an :yref:`Interaction`: :ref:`IGeom<inheritanceGraphIGeom>`, :yref:`GenericSpheresContact`, :yref:`PolyhedraGeom`, :yref:`CylScGeom`, :ref:`IPhys<inheritanceGraphIPhys>`, :yref:`NormPhys`, :yref:`NormShearPhys`, :yref:`FrictPhys`.
 
 Suppose now interactions have been already created. We can access them by the id pair:
 
@@ -480,7 +482,7 @@ Each of these actions is represented by an :yref:`Engine<Engine>`, functional el
 Engines
 """""""""
 
-Simulation loop, shown at img. img-yade-iter-loop_, can be described as follows in Python (details will be explained later); each of the ``O.engine`` items is instance of a type deriving from :yref:`Engine`:
+Simulation loop, shown at fig. img-yade-iter-loop_, can be described as follows in Python (details will be explained later); each of the ``O.engine`` items is instance of a type deriving from :yref:`Engine`:
 
 .. code-block:: python
  
@@ -503,10 +505,10 @@ Simulation loop, shown at img. img-yade-iter-loop_, can be described as follows 
 
 There are 3 fundamental types of Engines:
 
-:yref:`GlobalEngines<GlobalEngine>`
+:ref:`GlobalEngines<inheritanceGraphGlobalEngine>`
 	operating on the whole simulation (e.g. :yref:`ForceResetter` which zeroes forces acting on bodies or :yref:`GravityEngine` looping over all bodies and applying force based on their mass)
 
-:yref:`PartialEngine<PartialEngine>`
+:ref:`PartialEngine<inheritanceGraphPartialEngine>`
 	operating only on some pre-selected bodies (e.g. :yref:`ForceEngine` applying constant force to some :yref:`selected<ForceEngine::ids>` bodies)
 
 :yref:`Dispatchers<Dispatcher>`
@@ -523,14 +525,14 @@ For approximate collision detection (pass 1), we want to compute :yref:`bounds<B
 
 creates :yref:`InsertionSortCollider` (it internally uses :yref:`BoundDispatcher`, but that is a detail). It traverses all bodies and will, based on :yref:`shape<Shape>` type of each :yref:`body<Body>`, dispatch one of the functors to create/update :yref:`bound<Bound>` for that particular body. In the case shown, it has 2 functors, one handling :yref:`spheres<Sphere>`, another :yref:`facets<Facet>`. 
 	
-The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`), which accepts ``1`` type :yref:`Sphere` and creates an :yref:`Aabb` (axis-aligned bounding box; it is derived from :yref:`Bound`). The :yref:`Aabb` objects are used by :yref:`InsertionSortCollider` itself. All ``Bo1`` functors derive from :yref:`BoundFunctor`.
+The name is composed from several parts: ``Bo`` (functor creating :yref:`Bound`), which accepts ``1`` type :yref:`Sphere` and creates an :yref:`Aabb` (axis-aligned bounding box; it is derived from :yref:`Bound`). The :yref:`Aabb` objects are used by :yref:`InsertionSortCollider` itself. All ``Bo1`` functors derive from :ref:`BoundFunctor<inheritanceGraphBoundFunctor>`.
 
 
 .. _img-bound-functors:
 .. figure:: fig/bound-functors.*
 	:width: 12cm
 
-	Example :yref:`bound functors<BoundFunctor>` producing :yref:`Aabb` accepting various different types, such as :yref:`Sphere`, :yref:`Facet` or :yref:`Cylinder`. In the case shown, the ``Bo1`` functors produce :yref:`Aabb` instances from single specific :yref:`Shape`, hence the number ``1`` in the functor name. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`Facet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`Aabb`.
+	Example :ref:`bound functors<inheritanceGraphBoundFunctor>` producing :yref:`Aabb` accepting various different types, such as :yref:`Sphere`, :yref:`Facet` or :yref:`Cylinder`. In the case shown, the ``Bo1`` functors produce :yref:`Aabb` instances from single specific :yref:`Shape`, hence the number ``1`` in the functor name. Each of those functors uses specific geometry of the :ref:`Shape<inheritanceGraphShape>` i.e. position of nodes in :yref:`Facet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`Aabb`.
 
 .. comment: FIXME that link :ref:`boundfunctors` or :yref:`bound functors<BoundFunctor>` should point to the place above so that the inheritance graph is visible.
 
@@ -546,14 +548,14 @@ The next part, reading
 
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
-:yref:`IGeomDispatcher`
+:yref:`IGeomDispatcher` which uses :ref:`IGeomFunctor<inheritanceGraphIGeomFunctor>`
 	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, but the shapes did not). In that case the attribute :yref:`<Interaction::isReal>` is set to false and interaction is scheduled for removal.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
 	#. The second functor, :yref:`Ig2_Facet_Sphere_ScGeom`, is called for interaction of :yref:`Facet` with :yref:`Sphere` and might create (again) a :yref:`ScGeom` instance.
 
-	All ``Ig2`` functors derive from :yref:`IGeomFunctor` (they are documented at the same place).
+	All ``Ig2`` functors derive from :ref:`IGeomFunctor<inheritanceGraphIGeomFunctor>` (they are documented at the same place).
 
 .. comment: Ig2_Sphere_Sphere_ScGeom , Ig2_Wall_Sphere_ScGeom , Ig2_Sphere_PFacet_ScGridCoGeom , Ig2_Sphere_Polyhedra_ScGeom, Ig2_Wall_PFacet_ScGeom, Ig2_PFacet_PFacet_ScGeom
 .. comment: Hmm, there are PFacets on the picture, but in the example above are Facets. Maybe a good occasion for the reader to notice the difference between Facet and PFacet :)
@@ -562,22 +564,22 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 .. figure:: fig/shape-functors.*
 	:width: 16cm
 
-	Example :yref:`interaction geometry functors<IGeomFunctor>` producing :yref:`ScGeom` or :yref:`ScGridCoGeom` accepting two various different types (hence ``2`` in their name ``Ig2``), such as :yref:`Sphere`, :yref:`Wall` or :yref:`PFacet`. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`PFacet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`interaction geometry<IGeom>`.
+	Example :ref:`interaction geometry functors<inheritanceGraphIGeomFunctor>` producing :yref:`ScGeom` or :yref:`ScGridCoGeom` accepting two various different types (hence ``2`` in their name ``Ig2``), such as :yref:`Sphere`, :yref:`Wall` or :yref:`PFacet`. Each of those functors uses specific geometry of the :yref:`Shape` i.e. position of nodes in :yref:`PFacet` or :yref:`radius of sphere<Sphere::radius>` to calculate the :yref:`interaction geometry<IGeom>`.
 
 .. comment: FIXME: I don't know how to link to html/yade.wrapper.html#iphysfunctor , the :yref:`IGeomFunctor` html/yade.wrapper.html#yade.wrapper.IGeomFunctor
 
 
-:yref:`IPhysDispatcher`
+:yref:`IPhysDispatcher` which uses :ref:`IPhysFunctor<inheritanceGraphIPhysFunctor>`
 	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`IPhys` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
 	
-	``Ip2`` functors are derived from :yref:`IPhysFunctor`.
+	``Ip2`` functors are derived from :ref:`IPhysFunctor<inheritanceGraphIPhysFunctor>`.
 
 
 .. _img-phys-functors:
 .. figure:: fig/phys-functors.*
 	:width: 16cm
 
-	Example :yref:`interaction physics functors<IPhysFunctor>` (:yref:`Ip2_FrictMat_CpmMat_FrictPhys`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` and :yref:`Ip2_FrictViscoMat_CFrictMat_FrictViscoPhys`) producing :yref:`FrictPhys` or :yref:`FrictViscoPhys` accepting two various different types of :yref:`Material` (hence ``Ip2``), such as :yref:`CpmMat`, :yref:`FrictMat` or :yref:`FrictViscoMat`.
+	Example :ref:`interaction physics functors<inheritanceGraphIPhysFunctor>` (:yref:`Ip2_FrictMat_CpmMat_FrictPhys`, :yref:`Ip2_FrictMat_FrictMat_FrictPhys` and :yref:`Ip2_FrictViscoMat_CFrictMat_FrictViscoPhys`) producing :yref:`FrictPhys` or :yref:`FrictViscoPhys` accepting two various different types of :yref:`Material` (hence ``Ip2``), such as :yref:`CpmMat`, :yref:`FrictMat` or :yref:`FrictViscoMat`.
 
 
 
