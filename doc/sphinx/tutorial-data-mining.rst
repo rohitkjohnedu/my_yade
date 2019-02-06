@@ -44,7 +44,9 @@ All data of the simulation are accessible from python; when you open the *Inspec
 
    	O.interactions[0,1]   # interactions of #0 with #1
    	O.interactions[1,0]   # the same object
-   	O.bodies[0].intrs     # all interactions of body #0
+   	O.bodies[0].intrs()   # all interactions of body #0
+   	for i in O.bodies[12].intrs(): print (i.isReal,i.id1,i.id2)    # get some info about interactions of body #12
+   	[(i.isReal,i.id1,i.id2) for i in O.bodies[12].intrs()]         # same thing, but make a list
 
 Labels
 """""""

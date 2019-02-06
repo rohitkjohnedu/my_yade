@@ -257,7 +257,7 @@ The control window on the left (fig. imgQtGui_) is called ``Controller`` (can be
 Inside the *Inspect* window (on the right in fig. imgQtGui_) all simulation data can be examined and modified in realtime.
 
 #. Clicking left mouse button on any of the blue hyperlinks will open documentation.
-#. Clicking middle mouse button will copy the fully qualified python name into clipboard, which can be pasted into terminal by clicking middle mouse button in the terminal.
+#. Clicking middle mouse button will copy the fully qualified python name into clipboard, which can be pasted into terminal by clicking middle mouse button in the terminal (or pressing ``Ctrl-V``).
 
 .. FIXME currently there is a maximum of only one 3D View window allowed.
 

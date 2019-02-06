@@ -61,6 +61,7 @@ class Interaction: public Serializable{
 		,
 		/* ctor */ init(),
 		/*py*/
+		// FIXME - Inspector does not show isReal in GUI, it should be there with Attr::readonly so that we could see it.
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
 		.def_readwrite("isActive",&Interaction::isActive,"True if this interaction is active. Otherwise the forces from this interaction will not be taken into account. True by default.")
 	);
