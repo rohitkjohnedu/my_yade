@@ -87,13 +87,13 @@ Global data
 Useful measures of what happens in the simulation globally:
 
 unbalanced force
-	ratio of maximum contact force and maximum per-body force; measure of staticity, computed with :yref:`yade.utils.unbalancedForce`.
+	ratio of maximum contact force and maximum per-body force; measure of staticity, computed with :yref:`unbalancedForce<yade._utils.unbalancedForce>`.
 porosity
-	ratio of void volume and total volume; computed with :yref:`yade.utils.porosity`.
+	ratio of void volume and total volume; computed with :yref:`porosity<yade._utils.porosity>`.
 coordination number
 	average number of interactions per particle, :yref:`avgNumInteractions<yade.utils.avgNumInteractions>`
 stress tensor (periodic boundary conditions)
-	averaged force in interactions, computed with :yref:`yade.utils.normalShearStressTensor` and :yref:`yade.utils.stressTensorOfPeriodicCell`
+	averaged force in interactions, computed with :yref:`normalShearStressTensors<yade._utils.normalShearStressTensors>`
 fabric tensor
 	distribution of contacts in space (not yet implemented); can be visualized with :yref:`plotDirections<yade.utils.plotDirections>`
 
