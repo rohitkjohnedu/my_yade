@@ -36,8 +36,22 @@ yade.%s module
 # put all yade modules here, as {module:[submodules]}
 #
 # don't forget to put the module in index.rst as well!
-#
-mods={'export':[],'post2d':[],'pack':['_packSpheres','_packPredicates','_packObb'],'plot':[],'timing':[],'utils':['_utils'],'polyhedra_utils':['_polyhedra_utils'],'ymport':[],'geom':[],'bodiesHandling':[],'qt':['qt._GLViewer'],'linterpolation':[],'gridpfacet':[]}
+# FIXED: in file doc/sphinx/conf.py there is a moduleMap={……} variable which must reflect what is written below.
+mods={
+          'export'          : []
+        , 'post2d'          : []
+        , 'pack'            : ['_packSpheres','_packPredicates','_packObb']
+        , 'plot'            : []
+        , 'timing'          : []
+        , 'utils'           : ['_utils']
+        , 'polyhedra_utils' : ['_polyhedra_utils']
+        , 'ymport'          : []
+        , 'geom'            : []
+        , 'bodiesHandling'  : []
+        , 'qt'              : ['qt._GLViewer']
+        , 'linterpolation'  : []
+        , 'gridpfacet'      : []
+    }
 #
 # generate documentation, in alphabetical order
 mm=mods.keys(); mm.sort()
