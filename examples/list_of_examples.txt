@@ -291,8 +291,8 @@ OK │OK     └── script-session2.py
 OK │OK     ├── 01-bouncing-sphere.py
 OK │OK     ├── 02-gravity-deposition.py
 OK │OK     ├── 03-oedometric-test.py
-ok?│OK     ├── 04-periodic-simple-shear.py        see:  https://bugs.launchpad.net/yade/+bug/1634434
-ok?│OK     ├── 05-3d-postprocessing.py            see:  https://bugs.launchpad.net/yade/+bug/1621869
+ok?│OK     ├── 04-periodic-simple-shear.py        see:  https://bugs.launchpad.net/yade/+bug/1634434 → https://gitlab.com/yade-dev/trunk/issues/30
+ok?│OK     ├── 05-3d-postprocessing.py            see:  https://bugs.launchpad.net/yade/+bug/1621869 → https://gitlab.com/yade-dev/trunk/issues/29
 OK │OK     ├── 06-periodic-triaxial-test.py
 ok?│ok?    ├── make-simulation-video.py
 ok │x      └── peri-triax.py                      looks like duplicate of 06-periodic-triaxial-test.py

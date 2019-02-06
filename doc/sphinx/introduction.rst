@@ -253,11 +253,16 @@ The windows with buttons is called ``Controller`` (can be invoked by ``yade.qt.C
 #. The *Display* tab has various rendering-related options, which apply to all opened views (they can be zero or more, new one is opened by the *New 3D* button).
 #. The *Python* tab has only a simple text entry area; it can be useful to enter python commands while the command-line is blocked by running script, for instance.
 
+Inside the *Inspect* window all simulation data can be examined and modified in realtime.
+
+#. Clicking left mouse button on any of the blue hyperlinks will open documentation.
+#. Clicking middle mouse button will copy the fully qualified python name into clipboard, which can be pasted into terminal by clicking middle mouse button in the terminal.
+
 .. FIXME currently there is a maximum of only one 3D View window allowed.
 
-3d views can be controlled using mouse and keyboard shortcuts; help is displayed if you press the ``h`` key while in the 3d view. Note that having the 3d view open can slow down running simulation significantly, it is meant only for quickly checking whether the simulation runs smoothly. Advanced post-processing is described in dedicated section.
+3d views can be controlled using mouse and keyboard shortcuts; help is displayed if you press the ``h`` key while in the 3d view. Note that having the 3d view open can slow down running simulation significantly, it is meant only for quickly checking whether the simulation runs smoothly. Advanced post-processing is described in dedicated section :ref:`tutorialDataMining`.
 
-.. FIXME add link to that "dedicated section"
+.. FIXED add link to that "dedicated section", I guess it is tutorial-data-mining.html, to write that put .. _tutorialDataMining: on first line in ./doc/sphinx/tutorial-data-mining.rst
 
 Architecture overview
 ======================

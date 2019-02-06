@@ -1,3 +1,5 @@
+.. _tutorialDataMining:
+
 Data mining
 =============
 
@@ -16,19 +18,19 @@ All data of the simulation are accessible from python; when you open the *Inspec
    	O.engines[0]      # first engine
    	O.engines[-1]     # last engine
 
-   .. note:: The index can change if :yref:`O.engines<Omega.engines>` is modified. *Labeling* introduced below is a better solution for reliable access to a particular engine.
+   .. note:: The index can change if :yref:`O.engines<Omega.engines>` is modified. *Labeling* introduced in the section below is a better solution for reliable access to a particular engine.
 
 #. :yref:`O.bodies<Omega.bodies>`
 
    Bodies are identified by their :yref:`id<Body.id>`, which is guaranteed to not change during the whole simulation::
 
-   	O.bodies[0]                                                   # first body
-   	[b.shape.radius in O.bodies if isinstance(b.shape,Sphere)]    # list of radii of all spherical bodies
-   	sum([b.state.mass for b in O.bodies])                         # sum of masses of all bodies
+   	O.bodies[0]                                                         # first body
+   	[b.shape.radius for b in O.bodies if isinstance(b.shape,Sphere)]    # list of radii of all spherical bodies
+   	sum([b.state.mass for b in O.bodies])                               # sum of masses of all bodies
 
    .. note:: Uniqueness of :yref:`Body.id` is not guaranteed, since newly created bodies might recycle :yref:`ids<Body.id>` of :yref:`deleted<BodyContainer.erase>` ones.
 
-#. :yref:`O.force<Omega.force>`
+#. :yref:`O.forces<Omega.forces>`
 
    Generalized forces (forces, torques) acting on each particle. They are (usually) reset at the beginning of each step with :yref:`ForceResetter`, subsequently forces from individual interactions are accumulated in :yref:`InteractionLoop`. To access the data, use::
 
@@ -62,6 +64,8 @@ Labels
 
 	Yade [1]: O.engines[0].damping   # O.engines[0] and newton are the same objects
 
+        Yade [1]: newton==O.engines[0]
+
 .. rubric:: Exercises
 
 #. Find meaning of this
@@ -86,11 +90,11 @@ unbalanced force
 porosity
 	ratio of void volume and total volume; computed with :yref:`yade.utils.porosity`.
 coordination number
-	average number of interactions per particle, :yref:`yade.utils.avgNumInteractions`
+	average number of interactions per particle, :yref:`avgNumInteractions<yade.utils.avgNumInteractions>`
 stress tensor (periodic boundary conditions)
 	averaged force in interactions, computed with :yref:`yade.utils.normalShearStressTensor` and :yref:`yade.utils.stressTensorOfPeriodicCell`
 fabric tensor
-	distribution of contacts in space (not yet implemented); can be visualized with :yref:`yade.utils.plotDirections`
+	distribution of contacts in space (not yet implemented); can be visualized with :yref:`plotDirections<yade.utils.plotDirections>`
 
 Energies
 """"""""
@@ -107,7 +111,7 @@ Save
 PyRunner
 ^^^^^^^^^
 
-To save data that we just learned to access, we need to call Python from within the *simulation loop*. :yref:`PyRunner` is created just for that; it inherits periodicy control from :yref:`PeriodicEngine` and takes the code to run as text (must be quoted, i.e. inside ``'...'``) attributed called *command*. For instance, adding this to :yref:`O.engines<Omega.engines>` will print the current step number every second::
+To save data that we just learned to access, we need to call Python from within the *simulation loop*. :yref:`PyRunner` is created just for that; it inherits periodicy control from :yref:`PeriodicEngine` and takes the code to run as text (must be quoted, i.e. inside ``'...'``) attributed called *command*. For instance, adding this to :yref:`O.engines<Omega.engines>` will print the current step number every second wall clock time::
 
 	O.engines=O.engines+[ PyRunner(command='print O.iter',realPeriod=1) ]
 
@@ -141,13 +145,13 @@ Yade provides the :yref:`yade.plot` module used for storing and plotting variabl
 
 	from yade import plot
 	O.engines=[  # ...,
-		PyRunner(command='addPlotData()',realPeriod=2)                 # call the addPlotData function every 2 seconds of human time
+		PyRunner(command='addPlotData()',iterPeriod=20)                 # call the addPlotData function every 20 iterations
 	]
 	def addPlotData():
 		# this function adds current values to the history of data, under the names specified
 		plot.addData(i=O.iter,t=O.time,Ek=utils.kineticEnergy(),coordNum=utils.avgNumInteractions(),unForce=utils.unbalancedForce())
 
-History is stored in :yref:`yade.plot.data`, and can be accessed using the variable name, e.g. ``plot.data['Ek']``, and saved to text file (for post-processing outside yade) with :yref:`yade.plot.saveTxt`.
+History is stored in :yref:`yade.plot.data`, and can be accessed using the variable name, e.g. ``plot.data['Ek']``, and saved to text file (for post-processing outside yade) with :yref:`yade.plot.saveDataTxt`.
 
 Plot
 -----

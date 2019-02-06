@@ -67,7 +67,8 @@ def autodocDerived(klass,doSections=True):
     global docClasses
     ret=''
     if doSections: ret+='%s\n'%klass+'^'*100+'\n\n'
-    #ret+='.. inheritance-diagram:: %s\n\n'%klass
+    #the hyperlinks to those graphs work like: :ref:`inheritanceGraphBoundFunctor`  or  :ref:`BoundFunctor<inheritanceGraphBoundFunctor>`
+    ret+=".. _inheritanceGraph%s:\n\n"%klass
     ret+=inheritanceDiagram(klass)
     ret+=autodocClass(klass)
     childs=list(yade.system.childClasses(klass));
