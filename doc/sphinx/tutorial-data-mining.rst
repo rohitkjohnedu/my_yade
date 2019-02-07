@@ -126,11 +126,21 @@ Writing complicated code inside *command* is awkward; in such case, we define a 
 		if utils.unbalancedForce()<0.05:
 			print 'Unbalanced force is smaller than 0.05, pausing.'
 			O.pause()
+
+Now this function can be added to :yref:`O.engines<Omega.engines>`::
+
+	O.engines+=[PyRunner(command='myFunction()',iterPeriod=100)]
+
+or, in general, like that::
+
 	O.engines=[
 		# ...
 		PyRunner(command='myFunction()',iterPeriod=100) # call myFunction every 100 steps
 	]
 
+
+.. comment: sphinx syntax examples: https://sphinx-rtd-theme.readthedocs.io/en/latest/demo/demo.html https://raw.githubusercontent.com/rtfd/sphinx_rtd_theme/master/docs/demo/demo.rst
+..          https://github.com/sphinx-doc/sphinx/issues/2640
 
 .. warning::
 	If a function was declared inside a *live* yade session (`ipython <http://ipython.scipy.org>`_) then an error ``NameError: name 'myFunction' is not defined`` will occur unless python globals() are updated with command
@@ -144,7 +154,7 @@ Writing complicated code inside *command* is awkward; in such case, we define a 
 
 #. Run the gravity deposition simulation, but change it such that:
 
-   #. :yref:`yade.utils.unbalancedForce` is printed every 2 seconds.
+   #. :yref:`yade._utils.unbalancedForce` is printed every 2 seconds.
    #. check every 1000 steps the value of unbalanced force
 
       * if smaller than 0.2, set :yref:`damping<NewtonIntegrator.damping>` to 0.8 (hint: use labels)
