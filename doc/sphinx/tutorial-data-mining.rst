@@ -216,9 +216,29 @@ Plotting all energy contributions would be difficult, since names of all energie
 
 #. Data to plot are specified using a *function* that gives names of data to plot, rather than providing the data names directly::
 
-   	plot.plots={'i':['total',O.energy.keys()]}     
+   	plot.plots={'i':['total']+O.energy.keys()}
 
    where ``total`` is the name we gave to ``O.energy.total()`` above, while ``O.energy.keys()`` will always return list of currently defined energies.
+
+Energy plot example
+"""""""""""""""""""
+
+Plotting energies inside a *live* yade session, for example by launching ``examples/test/triax-basic-without-plots.py`` would look following::
+
+	from yade import plot
+	O.trackEnergy=True
+	O.step()                          # performing a single simulation step is necessary to populate O.energy.keys()
+	plot.plots={'t':O.energy.keys()+['total']}
+
+	def addPlotData():
+		# this function adds current values to the history of data, under the names specified
+		plot.addData(t=O.time,total=O.energy.total(),**O.energy)
+
+	O.engines+=[PyRunner(command='addPlotData()',iterPeriod=20)]
+
+	globals().update(locals())        # do this only because this is an example of a live yade session
+
+Press F8 to show plot window and F11 to show 3D view, then press ▶ to start simulation.
 
 .. rubric:: Exercises
 
