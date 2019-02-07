@@ -163,15 +163,27 @@ or, in general, like that::
 Keeping history
 ^^^^^^^^^^^^^^^^^
 
-Yade provides the :yref:`yade.plot` module used for storing and plotting variables (plotting itself will be discussed later). Periodic storing of data is done with :yref:`PyRunner` and the :yref:`yade.plot.addData` function, for instance::
+Yade provides the :yref:`yade.plot` module used for storing and plotting variables (plotting itself will be discussed later). Let us start by importing this module and declare variable names that will be plotted::
 
 	from yade import plot
-	O.engines=[  # ...,
-		PyRunner(command='addPlotData()',iterPeriod=20)                 # call the addPlotData function every 20 iterations
-	]
+	plot.plots={'t':('coordNum','unForce',None,'Ek')}                # kinetic energy will have legend on the right as indicated by None separator.
+
+Periodic storing of data is done with :yref:`PyRunner` and the :yref:`yade.plot.addData` function. Also let's enable energy tracking::
+
+	O.trackEnergy=True
 	def addPlotData():
 		# this function adds current values to the history of data, under the names specified
-		plot.addData(i=O.iter,t=O.time,Ek=utils.kineticEnergy(),coordNum=utils.avgNumInteractions(),unForce=utils.unbalancedForce())
+		plot.addData(t=O.time,Ek=utils.kineticEnergy(),coordNum=utils.avgNumInteractions(),unForce=utils.unbalancedForce())
+
+Now this function can be added to :yref:`O.engines<Omega.engines>`::
+
+	O.engines+=[PyRunner(command='addPlotData()',iterPeriod=20)]
+
+or, in general, like that::
+
+	O.engines=[  # ...,
+		PyRunner(command='addPlotData()',iterPeriod=20)         # call the addPlotData function every 20 iterations
+	]
 
 History is stored in :yref:`yade.plot.data`, and can be accessed using the variable name, e.g. ``plot.data['Ek']``, and saved to text file (for post-processing outside yade) with :yref:`yade.plot.saveDataTxt`.
 
