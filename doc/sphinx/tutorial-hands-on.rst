@@ -431,15 +431,15 @@ Engines define processes undertaken by particles. As we know from the theoretica
 	   ...:        [Ip2_FrictMat_FrictMat_FrictPhys()],
 	   ...:        [Law2_ScGeom_FrictPhys_CundallStrack()]
 	   ...:    ),
-	   ...:    NewtonIntegrator(damping=.2,label='newton')      # define a name under which we can access this engine easily
+	   ...:    NewtonIntegrator(damping=.2,label='newtonCustomLabel')      # define a label newtonCustomLabel under which we can access this engine easily
 	   ...: ]
 	   ...:
 
 	Yade [1]: O.engines
 
-	Yade [1]: O.engines[-1]==newton    # is it the same object?
+	Yade [1]: O.engines[-1]==newtonCustomLabel    # is it the same object?
 
-	Yade [1]: newton.damping
+	Yade [1]: newtonCustomLabel.damping
 
 Instead of typing everything into the command-line, one can describe simulation in a file (*script*) and then run yade with that file as an argument. We will therefore no longer show the command-line unless necessary; instead, only the script part will be shown. Like this::
 
@@ -451,8 +451,8 @@ Instead of typing everything into the command-line, one can describe simulation 
 			 [Ip2_FrictMat_FrictMat_FrictPhys()],
 			 [Law2_ScGeom_FrictPhys_CundallStrack()]
 		),
-		GravityEngine(gravity=(0,0,-9.81)),              # 9.81 is the gravity acceleration, and we say that
-		NewtonIntegrator(damping=.2,label='newton')      # define a name under which we can access this engine easily
+		GravityEngine(gravity=(0,0,-9.81)),                    # 9.81 is the gravity acceleration, and we say that
+		NewtonIntegrator(damping=.2,label='newtonCustomLabel') # define a label under which we can access this engine easily
 	]
 
 Besides engines being run, it is likewise important to define how often they will run. Some engines can run only sometimes (we will see this later), while most of them will run always; the time between two successive runs of engines is *timestep* ($\Dt$). There is a mathematical limit on the timestep value, called *critical timestep*, which is computed from properties of particles. Since there is a function for that, we can just set timestep using :yref:`yade.utils.PWaveTimeStep`::

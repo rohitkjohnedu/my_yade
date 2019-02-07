@@ -59,15 +59,15 @@ Labels
 	Yade [1]: from yade import *
 	
 	Yade [1]: O.engines=[
-	   ...:    NewtonIntegrator(damping=.2,label='newton')
+	   ...:    NewtonIntegrator(damping=.2,label='newtonCustomLabel')
 	   ...: ]
 	   ...:
 
-	Yade [1]: newton.damping=.4
+	Yade [1]: newtonCustomLabel.damping=.4
 
-	Yade [1]: O.engines[0].damping   # O.engines[0] and newton are the same objects
+	Yade [1]: O.engines[0].damping              # O.engines[0] and newtonCustomLabel are the same objects
 
-        Yade [1]: newton==O.engines[0]   # O.engines[0] and newton are the same objects
+        Yade [1]: newtonCustomLabel==O.engines[0]   # O.engines[0] and newtonCustomLabel are the same objects
 
 .. rubric:: Exercises
 
