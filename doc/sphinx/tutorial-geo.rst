@@ -38,7 +38,7 @@ Suppose we want to study the influence of :yref:`damping<NewtonIntegrator.dampin
       O.run()               # run forever, until stopped by checkUnbalancedForce()
       utils.waitIfBatch()   # do not finish the script until the simulation ends; does nothing in non-batch mode
 
-The *parameter table* is a simple text-file, where each line specifies a simulation to run::
+The *parameter table* is a simple text-file (e.g. ``params.txt`` ), where each line specifies a simulation to run::
 
 	# comments start with # as in python
 	damping     # first non-comment line is variable name
@@ -48,13 +48,14 @@ The *parameter table* is a simple text-file, where each line specifies a simulat
 
 Finally, the simulation is run using the special batch command::
 
-   user@machine:~\$ yade-batch parameters.table simulation.py
+   user@machine:~\$ yade-batch params.txt simulation.py
 
 .. todo:: Parametric studies need to be described better. Perhaps the behavior should be changed so that in batch mode, :yref:`O.run<Omega.run>` and :yref:`yade.utils.waitIfBatch` are run from the main yade script by default. That would however make it only possible to exit the batch via ``sys.exit(0)``, or by a new function like ``utils.exitBatch()`` (which would call ``sys.exit(0)`` for now anyway)
 
 .. rubric:: Exercises
 
-#. Run the :ref:`gravity-deposition` script in batch mode, varying :yref:`damping<NewtonIntegrator.damping>` to take values of ``.2``, ``.4``, ``.6``. See the http://localhost:9080 overview page while the batch is running.
+#. Run the :ref:`gravity-deposition` script in batch mode, varying :yref:`damping<NewtonIntegrator.damping>` to take values of ``.2``, ``.4``, ``.6``.
+#. See the http://localhost:9080 overview page while the batch is running.
 
 
 Boundary
