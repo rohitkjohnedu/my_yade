@@ -1,3 +1,5 @@
+.. _refUsersManual:
+
 ###################
 User's manual
 ###################
