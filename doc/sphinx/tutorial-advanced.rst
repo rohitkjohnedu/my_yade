@@ -14,7 +14,7 @@ Clumps
 Testing laws
 ------------
 
-:yref:`LawTester`, :ysrc:`scripts/test/law-test.py`
+:yref:`LawTester`, :ysrc:`scripts/checks-and-tests/law-test.py`
 
 New law
 -------
@@ -27,6 +27,6 @@ Visualization
 See the example :ref:`3d-postprocessing`
 
 * :yref:`VTKRecorder` & `Paraview <http://www.paraview.org>`__
-* :yref:`yade.qt.SnapshotEngine`
+* :yref:`SnapshotEngine`
 
 
