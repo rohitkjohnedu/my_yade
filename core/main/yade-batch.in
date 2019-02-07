@@ -374,8 +374,11 @@ args = opts.args
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
 
 if opts.impLibraries:
+	print "\n\n ------------------------ IMPORTING ---------------------------------------\n\n"
 	sys.path.append('.')
 	for lib in opts.impLibraries:
+		print "\n\n ------------------------ IMPORTING ---------------------------------------\n\n"
+		print lib
 		__import__(lib)
 
 if opts.version:

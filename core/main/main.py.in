@@ -63,9 +63,14 @@ opts=par.parse_args()
 args = opts.args
 
 if opts.impLibraries:
+	print "\n\n ------------------------ IMPORTING --------------------------------------\n\n"
 	sys.path.append('.')
 	for lib in opts.impLibraries:
-		__import__(lib)
+		print "\n\n ------------------------ IMPORTING --------------------------------------\n\n"
+		print lib
+		import importlib
+		importlib.import_module(str(lib))
+		#__import__(lib)
 
 if opts.version:
 	print 'Yade version: %s%s'%(version,debugbuild)
