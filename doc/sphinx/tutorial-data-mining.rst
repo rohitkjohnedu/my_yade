@@ -131,6 +131,15 @@ Writing complicated code inside *command* is awkward; in such case, we define a 
 		PyRunner(command='myFunction()',iterPeriod=100) # call myFunction every 100 steps
 	]
 
+
+.. warning::
+	If a function was declared inside a *live* yade session (`ipython <http://ipython.scipy.org>`_) then an error ``NameError: name 'myFunction' is not defined`` will occur unless python globals() are updated with command
+
+	.. code-block:: python
+
+		globals().update(locals())
+
+
 .. rubric:: Exercises
 
 #. Run the gravity deposition simulation, but change it such that:
