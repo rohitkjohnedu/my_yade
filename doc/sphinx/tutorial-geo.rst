@@ -54,7 +54,7 @@ Finally, the simulation is run using the special batch command::
 
 .. rubric:: Exercises
 
-#. Run the gravity deposition script in batch mode, varying :yref:`damping<NewtonIntegrator.damping>` to take values of ``.2``, ``.4``, ``.6``. See the http://localhost:9080 overview page while the batch is running.
+#. Run the :ref:`gravity-deposition` script in batch mode, varying :yref:`damping<NewtonIntegrator.damping>` to take values of ``.2``, ``.4``, ``.6``. See the http://localhost:9080 overview page while the batch is running.
 
 
 Boundary

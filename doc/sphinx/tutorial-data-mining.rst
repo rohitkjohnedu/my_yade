@@ -76,7 +76,7 @@ Labels
 
    	max([b.state.vel.norm() for b in O.bodies])
 
-#. Run the gravity deposition script, pause after a few seconds of simulation. Write expressions that compute
+#. Run the :ref:`gravity-deposition` script, pause after a few seconds of simulation. Write expressions that compute
 
    #. kinetic energy $\sum \frac{1}{2} m_i |v_i| ^2$
    #. average mass (hint: use `numpy.average <http://docs.scipy.org/doc/numpy/reference/generated/numpy.average.html>`__)
@@ -152,7 +152,7 @@ or, in general, like that::
 
 .. rubric:: Exercises
 
-#. Run the gravity deposition simulation, but change it such that:
+#. Run the :ref:`gravity-deposition` simulation, but change it such that:
 
    #. :yref:`yade._utils.unbalancedForce` is printed every 2 seconds.
    #. check every 1000 steps the value of unbalanced force
@@ -243,10 +243,10 @@ Press F8 to show plot window and F11 to show 3D view, then press ▶ to start si
 .. rubric:: Exercises
 
 #. Calculate average momentum in y direction.
-#. Run the gravity deposition script, plotting unbalanced force and kinetic energy.
+#. Run the :ref:`gravity-deposition` script, plotting unbalanced force and kinetic energy.
 #. While the script is running, try changing the :yref:`NewtonIntegrator.damping` parameter (do it from both *Inspector* and from the command-line). What influence does it have on the evolution of unbalanced force and kinetic energy?
 #. Think about and write down all energy sources (input); write down also all energy sinks (dissipation).
-#. Simulate gravity deposition and plot all energies as they evolve during the simulation.
+#. Simulate :ref:`gravity-deposition` and plot all energies as they evolve during the simulation.
 
 .. seealso::
 	
