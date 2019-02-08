@@ -90,7 +90,7 @@ The following creates periodic cloud of spheres and compresses to achieve $\sigm
 	
 	Yade [1]: sp=pack.SpherePack()
 
-	Yade [1]: sp.makeCloud((1,1,1),(2,2,2),rMean=.1,periodic=True)
+	Yade [1]: sp.makeCloud((1,1,1),(2,2,2),rMean=.16,periodic=True)
 
 	Yade [1]: sp.toSimulation()             # implicitly sets O.periodic=True, and O.cell.refSize to the packing period size
 
