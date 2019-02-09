@@ -1,7 +1,7 @@
 .. _examples:
 
-Examples
-=========
+Examples with tutorial
+======================
 
 .. _bouncing-sphere:
 

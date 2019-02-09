@@ -22,3 +22,5 @@ A few minor bugs were discovered during the course. They were all fixed in rev. 
   tutorial-advanced.rst
   
   tutorial-examples.rst
+  
+  tutorial-more-examples.rst
