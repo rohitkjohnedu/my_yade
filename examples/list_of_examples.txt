@@ -99,7 +99,7 @@ OK │OK │YES│   └── simulation.py                      https://yout
    │   │   ├── baraban
 OK │x  │YES│   ├── BicyclePedalEngine.py              https://youtu.be/tF9Qe9ayklo
 OK │x  │YES│   ├── baraban.py                         https://youtu.be/OCcjDf1rluw
-ok │x  │zo │   └── rotating-cylinder.py               https://youtu.be/Hh6nGzIU1vU                                  a little too slow
+ok │x  │YES│   └── rotating-cylinder.py               https://youtu.be/Hh6nGzIU1vU                                  a little too slow
    │   │   ├── bulldozer
 OK │ok │YES│   ├── bulldozer.py                       https://youtu.be/6cTyE-KfgcQ
 OK │ok │no │   └── bulldozerVTK.py
@@ -253,7 +253,7 @@ ok?│x  │YES│   ├── pack-inConvexPolyhedron.py         https://yout
 x  │x  │x  │   ├── pack-predicates.py                 nothing happens, scene is empty
    │   │   │   ├── paraview-spheres-solid-section
 OK │ok │no │   │   ├── export_text.py
-OK │ok │yes│   │   └── pv_section.py                  https://youtu.be/bFiUfoEXFMQ         NOTE: apt install paraview-python
+OK │ok │YES│   │   └── pv_section.py                  https://youtu.be/bFiUfoEXFMQ         NOTE: apt install paraview-python
    │   │   │   ├── performance
 ok?│x  │no │   │   └── checkPerf.py                   note: no visuals
 OK │ok?│YES│   ├── periodic-geom-compare.py           https://youtu.be/SiobftG7Lqw
