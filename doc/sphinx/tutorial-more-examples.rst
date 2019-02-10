@@ -3,7 +3,7 @@
 More examples
 =============
 
-A full list of examples is in file :ysrs:`examples/list_of_examples.txt`. Some of thoose examples are shown below.
+A full list of examples is in file :ysrc:`examples/list_of_examples.txt`. Some of thoose examples are shown below.
 
 .. comment:  # with overline, for parts
 .. comment:  * with overline, for chapters
@@ -27,7 +27,7 @@ A full list of examples is in file :ysrs:`examples/list_of_examples.txt`. Some o
 buoyancy
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./FluidCouplingLBM/buoyancy.py`.
+Following example is in file :ysrc:`examples/FluidCouplingLBM/buoyancy.py`.
 
 .. youtube:: bohwFU328NA
 
@@ -36,7 +36,7 @@ Following example is in file :ysrc:`./FluidCouplingLBM/buoyancy.py`.
 oedometer
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./FluidCouplingPFV/oedometer.py`.
+Following example is in file :ysrc:`examples/FluidCouplingPFV/oedometer.py`.
 
 .. youtube:: Oq4KyNDkMYA
 
@@ -45,7 +45,7 @@ Following example is in file :ysrc:`./FluidCouplingPFV/oedometer.py`.
 buoyantParticles
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./HydroForceEngine/oneWayCoupling/buoyantParticles.py`.
+Following example is in file :ysrc:`examples/HydroForceEngine/oneWayCoupling/buoyantParticles.py`.
 
 .. youtube:: AjFtdbaorE4
 
@@ -54,7 +54,7 @@ Following example is in file :ysrc:`./HydroForceEngine/oneWayCoupling/buoyantPar
 fluidizedBed
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./HydroForceEngine/oneWayCoupling/fluidizedBed.py`.
+Following example is in file :ysrc:`examples/HydroForceEngine/oneWayCoupling/fluidizedBed.py`.
 
 .. youtube:: _sFdHmc2kf8
 
@@ -63,7 +63,7 @@ Following example is in file :ysrc:`./HydroForceEngine/oneWayCoupling/fluidizedB
 sedimentTransportExample
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./HydroForceEngine/oneWayCoupling/sedimentTransportExample.py`.
+Following example is in file :ysrc:`examples/HydroForceEngine/oneWayCoupling/sedimentTransportExample.py`.
 
 .. youtube:: W6h-k7gGwTo
 
@@ -72,7 +72,7 @@ Following example is in file :ysrc:`./HydroForceEngine/oneWayCoupling/sedimentTr
 laminarShearFlow
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./HydroForceEngine/twoWayCoupling/laminarShearFlow.py`.
+Following example is in file :ysrc:`examples/HydroForceEngine/twoWayCoupling/laminarShearFlow.py`.
 
 .. youtube:: E2IOd9k47KM
 
@@ -81,7 +81,7 @@ Following example is in file :ysrc:`./HydroForceEngine/twoWayCoupling/laminarShe
 postProcessValidMaurin2015
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./HydroForceEngine/validations/DEMCoupling/Maurinetal2015/postProcessValidMaurin2015.py`.
+Following example is in file :ysrc:`examples/HydroForceEngine/validations/DEMCoupling/Maurinetal2015/postProcessValidMaurin2015.py`.
 
 .. youtube:: H_6CcrA3dSE
 
@@ -90,7 +90,7 @@ Following example is in file :ysrc:`./HydroForceEngine/validations/DEMCoupling/M
 validMaurin2015
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./HydroForceEngine/validations/DEMCoupling/Maurinetal2015/validMaurin2015.py`.
+Following example is in file :ysrc:`examples/HydroForceEngine/validations/DEMCoupling/Maurinetal2015/validMaurin2015.py`.
 
 .. youtube:: __8jcD7It0w
 
@@ -99,7 +99,7 @@ Following example is in file :ysrc:`./HydroForceEngine/validations/DEMCoupling/M
 cellFlipping
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/cellFlipping.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/cellFlipping.py`.
 
 .. youtube:: MOwatO13pgI
 
@@ -108,7 +108,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/cellFlipping.py`.
 peri3dController_example1
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/peri3dController_example1.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/peri3dController_example1.py`.
 
 .. youtube:: PWbri2_SR4w
 
@@ -117,7 +117,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/peri3dController_exampl
 peri3dController_shear
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/peri3dController_shear.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/peri3dController_shear.py`.
 
 .. youtube:: jMqqEF5LWTY
 
@@ -126,7 +126,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/peri3dController_shear.
 peri3dController_triaxialCompression
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/peri3dController_triaxialCompression.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/peri3dController_triaxialCompression.py`.
 
 .. youtube:: Jlq0V2jaQx0
 
@@ -135,7 +135,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/peri3dController_triaxi
 periodic-compress
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodic-compress.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodic-compress.py`.
 
 .. youtube:: 1_6Umjgia2k
 
@@ -144,7 +144,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodic-compress.py`.
 periodic-shear
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodic-shear.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodic-shear.py`.
 
 .. youtube:: XY_CwJcrsTE
 
@@ -153,7 +153,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodic-shear.py`.
 periodic-simple-shear
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodic-simple-shear.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodic-simple-shear.py`.
 
 .. youtube:: JXK9FwuU0WM
 
@@ -162,7 +162,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodic-simple-shear.p
 periodic-simple
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodic-simple.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodic-simple.py`.
 
 .. youtube:: q1yYLxZZU-Y
 
@@ -171,7 +171,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodic-simple.py`.
 periodic-triax-settingHsize
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodic-triax-settingHsize.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodic-triax-settingHsize.py`.
 
 .. youtube:: 8b_lJm4GhYs
 
@@ -180,7 +180,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodic-triax-settingH
 periodic-triax
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodic-triax.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodic-triax.py`.
 
 .. youtube:: Hp1W8WhmQZU
 
@@ -189,7 +189,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodic-triax.py`.
 periodicSandPile
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PeriodicBoundaries/periodicSandPile.py`.
+Following example is in file :ysrc:`examples/PeriodicBoundaries/periodicSandPile.py`.
 
 .. youtube:: _SeA5KDzxpg
 
@@ -198,7 +198,7 @@ Following example is in file :ysrc:`./PeriodicBoundaries/periodicSandPile.py`.
 WedgeYADE
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PotentialBlocks/WedgeYADE.py`.
+Following example is in file :ysrc:`examples/PotentialBlocks/WedgeYADE.py`.
 
 .. youtube:: GYrFkhFV-0E
 
@@ -207,7 +207,7 @@ Following example is in file :ysrc:`./PotentialBlocks/WedgeYADE.py`.
 cubePBscaled
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PotentialBlocks/cubePBscaled.py`.
+Following example is in file :ysrc:`examples/PotentialBlocks/cubePBscaled.py`.
 
 .. youtube:: Slnj-KeG-0w
 
@@ -216,7 +216,7 @@ Following example is in file :ysrc:`./PotentialBlocks/cubePBscaled.py`.
 cubePPscaled
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./PotentialParticles/cubePPscaled.py`.
+Following example is in file :ysrc:`examples/PotentialParticles/cubePPscaled.py`.
 
 .. youtube:: gOgjwMavjuk
 
@@ -225,7 +225,7 @@ Following example is in file :ysrc:`./PotentialParticles/cubePPscaled.py`.
 wirecontacttest
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./WireMatPM/wirecontacttest.py`.
+Following example is in file :ysrc:`examples/WireMatPM/wirecontacttest.py`.
 
 .. youtube:: Kc0R6ZaSIa0
 
@@ -234,7 +234,7 @@ Following example is in file :ysrc:`./WireMatPM/wirecontacttest.py`.
 wirepackings
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./WireMatPM/wirepackings.py`.
+Following example is in file :ysrc:`examples/WireMatPM/wirepackings.py`.
 
 .. youtube:: VaW6gDdyiIc
 
@@ -243,7 +243,7 @@ Following example is in file :ysrc:`./WireMatPM/wirepackings.py`.
 wiretensiltest
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./WireMatPM/wiretensiltest.py`.
+Following example is in file :ysrc:`examples/WireMatPM/wiretensiltest.py`.
 
 .. youtube:: mC2Rj-MK2TE
 
@@ -252,7 +252,7 @@ Following example is in file :ysrc:`./WireMatPM/wiretensiltest.py`.
 simple-scene-plot-NewtonIntegrator
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./adaptiveintegrator/simple-scene-plot-NewtonIntegrator.py`.
+Following example is in file :ysrc:`examples/adaptiveintegrator/simple-scene-plot-NewtonIntegrator.py`.
 
 .. youtube:: gRkKQKhwl5w
 
@@ -261,7 +261,7 @@ Following example is in file :ysrc:`./adaptiveintegrator/simple-scene-plot-Newto
 simple-scene-plot-RungeKuttaCashKarp54
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./adaptiveintegrator/simple-scene-plot-RungeKuttaCashKarp54.py`.
+Following example is in file :ysrc:`examples/adaptiveintegrator/simple-scene-plot-RungeKuttaCashKarp54.py`.
 
 .. youtube:: 57LmSgbSFZI
 
@@ -270,7 +270,7 @@ Following example is in file :ysrc:`./adaptiveintegrator/simple-scene-plot-Runge
 compress
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./agglomerate/compress.py`.
+Following example is in file :ysrc:`examples/agglomerate/compress.py`.
 
 .. youtube:: u_Wua_JnYE4
 
@@ -279,7 +279,7 @@ Following example is in file :ysrc:`./agglomerate/compress.py`.
 simulation
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./agglomerate/simulation.py`.
+Following example is in file :ysrc:`examples/agglomerate/simulation.py`.
 
 .. youtube:: QOhpCAJ5ypw
 
@@ -288,7 +288,7 @@ Following example is in file :ysrc:`./agglomerate/simulation.py`.
 BicyclePedalEngine
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./baraban/BicyclePedalEngine.py`.
+Following example is in file :ysrc:`examples/baraban/BicyclePedalEngine.py`.
 
 .. youtube:: tF9Qe9ayklo
 
@@ -297,7 +297,7 @@ Following example is in file :ysrc:`./baraban/BicyclePedalEngine.py`.
 baraban
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./baraban/baraban.py`.
+Following example is in file :ysrc:`examples/baraban/baraban.py`.
 
 .. youtube:: OCcjDf1rluw
 
@@ -306,7 +306,7 @@ Following example is in file :ysrc:`./baraban/baraban.py`.
 bulldozer
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./bulldozer/bulldozer.py`.
+Following example is in file :ysrc:`examples/bulldozer/bulldozer.py`.
 
 .. youtube:: 6cTyE-KfgcQ
 
@@ -315,7 +315,7 @@ Following example is in file :ysrc:`./bulldozer/bulldozer.py`.
 capillar
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./capillary/capillar.py`.
+Following example is in file :ysrc:`examples/capillary/capillar.py`.
 
 .. youtube:: gtpNKGJZpyc
 
@@ -324,7 +324,7 @@ Following example is in file :ysrc:`./capillary/capillar.py`.
 CapillaryPhys-example
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./capillaryLaplaceYoung/CapillaryPhys-example.py`.
+Following example is in file :ysrc:`examples/capillaryLaplaceYoung/CapillaryPhys-example.py`.
 
 .. youtube:: H0bPKX-jwu8
 
@@ -333,7 +333,7 @@ Following example is in file :ysrc:`./capillaryLaplaceYoung/CapillaryPhys-exampl
 capillaryBridge
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./capillaryLaplaceYoung/capillaryBridge.py`.
+Following example is in file :ysrc:`examples/capillaryLaplaceYoung/capillaryBridge.py`.
 
 .. youtube:: ds6zXTxaIY0
 
@@ -342,7 +342,7 @@ Following example is in file :ysrc:`./capillaryLaplaceYoung/capillaryBridge.py`.
 CohesiveCylinderSphere
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./chained-cylinders/CohesiveCylinderSphere.py`.
+Following example is in file :ysrc:`examples/chained-cylinders/CohesiveCylinderSphere.py`.
 
 .. youtube:: F2eStgTSgp0
 
@@ -351,7 +351,7 @@ Following example is in file :ysrc:`./chained-cylinders/CohesiveCylinderSphere.p
 chained-cylinder-roots
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./chained-cylinders/chained-cylinder-roots.py`.
+Following example is in file :ysrc:`examples/chained-cylinders/chained-cylinder-roots.py`.
 
 .. youtube:: wwkUIpVBL8k
 
@@ -360,7 +360,7 @@ Following example is in file :ysrc:`./chained-cylinders/chained-cylinder-roots.p
 chained-cylinder-spring
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./chained-cylinders/chained-cylinder-spring.py`.
+Following example is in file :ysrc:`examples/chained-cylinders/chained-cylinder-spring.py`.
 
 .. youtube:: wYp0XA_Q3ds
 
@@ -369,7 +369,7 @@ Following example is in file :ysrc:`./chained-cylinders/chained-cylinder-spring.
 addToClump-example
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/addToClump-example.py`.
+Following example is in file :ysrc:`examples/clumps/addToClump-example.py`.
 
 .. youtube:: uP19j2yZltg
 
@@ -378,7 +378,7 @@ Following example is in file :ysrc:`./clumps/addToClump-example.py`.
 apply-buoyancy-clumps
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/apply-buoyancy-clumps.py`.
+Following example is in file :ysrc:`examples/clumps/apply-buoyancy-clumps.py`.
 
 .. youtube:: fwsx_c1ibkM
 
@@ -387,7 +387,7 @@ Following example is in file :ysrc:`./clumps/apply-buoyancy-clumps.py`.
 clump-hopper-test
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/clump-hopper-test.py`.
+Following example is in file :ysrc:`examples/clumps/clump-hopper-test.py`.
 
 .. youtube:: ESzQ3t7RHeM
 
@@ -396,7 +396,7 @@ Following example is in file :ysrc:`./clumps/clump-hopper-test.py`.
 clump-hopper-viscoelastic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/clump-hopper-viscoelastic.py`.
+Following example is in file :ysrc:`examples/clumps/clump-hopper-viscoelastic.py`.
 
 .. youtube:: cX7Ewoz9wy8
 
@@ -405,7 +405,7 @@ Following example is in file :ysrc:`./clumps/clump-hopper-viscoelastic.py`.
 clump-inbox-viscoelastic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/clump-inbox-viscoelastic.py`.
+Following example is in file :ysrc:`examples/clumps/clump-inbox-viscoelastic.py`.
 
 .. youtube:: rpOYcwoDihE
 
@@ -414,7 +414,7 @@ Following example is in file :ysrc:`./clumps/clump-inbox-viscoelastic.py`.
 clump-viscoelastic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/clump-viscoelastic.py`.
+Following example is in file :ysrc:`examples/clumps/clump-viscoelastic.py`.
 
 .. youtube:: VSovZDU8Kb8
 
@@ -423,7 +423,7 @@ Following example is in file :ysrc:`./clumps/clump-viscoelastic.py`.
 releaseFromClump-example
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/releaseFromClump-example.py`.
+Following example is in file :ysrc:`examples/clumps/releaseFromClump-example.py`.
 
 .. youtube:: inER1NuyM-0
 
@@ -432,7 +432,7 @@ Following example is in file :ysrc:`./clumps/releaseFromClump-example.py`.
 replaceByClumps-example
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/replaceByClumps-example.py`.
+Following example is in file :ysrc:`examples/clumps/replaceByClumps-example.py`.
 
 .. youtube:: zjeN-OUj18A
 
@@ -441,7 +441,7 @@ Following example is in file :ysrc:`./clumps/replaceByClumps-example.py`.
 triax-basic-with-clumps
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./clumps/triax-basic-with-clumps.py`.
+Following example is in file :ysrc:`examples/clumps/triax-basic-with-clumps.py`.
 
 .. youtube:: kqisX2LfwIg
 
@@ -450,7 +450,7 @@ Following example is in file :ysrc:`./clumps/triax-basic-with-clumps.py`.
 brazilian
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./concrete/brazilian.py`.
+Following example is in file :ysrc:`examples/concrete/brazilian.py`.
 
 .. youtube:: KCq336lbw7w
 
@@ -459,7 +459,7 @@ Following example is in file :ysrc:`./concrete/brazilian.py`.
 interaction-histogram
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./concrete/interaction-histogram.py`.
+Following example is in file :ysrc:`examples/concrete/interaction-histogram.py`.
 
 .. youtube:: 59f8gSLu6DA
 
@@ -468,7 +468,7 @@ Following example is in file :ysrc:`./concrete/interaction-histogram.py`.
 periodic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./concrete/periodic.py`.
+Following example is in file :ysrc:`examples/concrete/periodic.py`.
 
 .. youtube:: DOptBIIp73U
 
@@ -477,7 +477,7 @@ Following example is in file :ysrc:`./concrete/periodic.py`.
 triax
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./concrete/triax.py`.
+Following example is in file :ysrc:`examples/concrete/triax.py`.
 
 .. youtube:: BEB88z1EztA
 
@@ -486,7 +486,7 @@ Following example is in file :ysrc:`./concrete/triax.py`.
 uniax-post
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./concrete/uniax-post.py`.
+Following example is in file :ysrc:`examples/concrete/uniax-post.py`.
 
 .. youtube:: iXYD9kMB9kA
 
@@ -495,7 +495,7 @@ Following example is in file :ysrc:`./concrete/uniax-post.py`.
 uniax
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./concrete/uniax.py`.
+Following example is in file :ysrc:`examples/concrete/uniax.py`.
 
 .. youtube:: Z1VQ14m0riM
 
@@ -504,7 +504,7 @@ Following example is in file :ysrc:`./concrete/uniax.py`.
 conveyor
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./conveyor/conveyor.py`.
+Following example is in file :ysrc:`examples/conveyor/conveyor.py`.
 
 .. youtube:: bLULZ2a_thk
 
@@ -513,7 +513,7 @@ Following example is in file :ysrc:`./conveyor/conveyor.py`.
 bendingbeams
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./cylinders/bendingbeams.py`.
+Following example is in file :ysrc:`examples/cylinders/bendingbeams.py`.
 
 .. youtube:: DO_ab64sUJc
 
@@ -522,7 +522,7 @@ Following example is in file :ysrc:`./cylinders/bendingbeams.py`.
 cylinder-cylinder
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./cylinders/cylinder-cylinder.py`.
+Following example is in file :ysrc:`examples/cylinders/cylinder-cylinder.py`.
 
 .. youtube:: IEzbwudIwGA
 
@@ -531,7 +531,7 @@ Following example is in file :ysrc:`./cylinders/cylinder-cylinder.py`.
 cylinderconnection-roots
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./cylinders/cylinderconnection-roots.py`.
+Following example is in file :ysrc:`examples/cylinders/cylinderconnection-roots.py`.
 
 .. youtube:: h-6z79VXWA8
 
@@ -540,7 +540,7 @@ Following example is in file :ysrc:`./cylinders/cylinderconnection-roots.py`.
 mikado
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./cylinders/mikado.py`.
+Following example is in file :ysrc:`examples/cylinders/mikado.py`.
 
 .. youtube:: j2aNyUSaWps
 
@@ -549,7 +549,7 @@ Following example is in file :ysrc:`./cylinders/mikado.py`.
 MinimalTensileTest
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./deformableelem/MinimalTensileTest.py`.
+Following example is in file :ysrc:`examples/deformableelem/MinimalTensileTest.py`.
 
 .. youtube:: sa0yVUKytN0
 
@@ -558,7 +558,7 @@ Following example is in file :ysrc:`./deformableelem/MinimalTensileTest.py`.
 testDeformableBodies
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./deformableelem/testDeformableBodies.py`.
+Following example is in file :ysrc:`examples/deformableelem/testDeformableBodies.py`.
 
 .. youtube:: L0q-1QMmw8Q
 
@@ -567,7 +567,7 @@ Following example is in file :ysrc:`./deformableelem/testDeformableBodies.py`.
 testDeformableBodies_pressure
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./deformableelem/testDeformableBodies_pressure.py`.
+Following example is in file :ysrc:`examples/deformableelem/testDeformableBodies_pressure.py`.
 
 .. youtube:: QPAtlnptjvk
 
@@ -576,7 +576,7 @@ Following example is in file :ysrc:`./deformableelem/testDeformableBodies_pressu
 CohesiveGridConnectionSphere
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./grids/CohesiveGridConnectionSphere.py`.
+Following example is in file :ysrc:`examples/grids/CohesiveGridConnectionSphere.py`.
 
 .. youtube:: H8VCdsW6wVA
 
@@ -585,7 +585,7 @@ Following example is in file :ysrc:`./grids/CohesiveGridConnectionSphere.py`.
 GridConnection_Spring
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./grids/GridConnection_Spring.py`.
+Following example is in file :ysrc:`examples/grids/GridConnection_Spring.py`.
 
 .. youtube:: NQL5y7bz9XU
 
@@ -594,7 +594,7 @@ Following example is in file :ysrc:`./grids/GridConnection_Spring.py`.
 Simple_GridConnection_Falling
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./grids/Simple_GridConnection_Falling.py`.
+Following example is in file :ysrc:`examples/grids/Simple_GridConnection_Falling.py`.
 
 .. youtube:: ede8_SQkkeM
 
@@ -603,7 +603,7 @@ Following example is in file :ysrc:`./grids/Simple_GridConnection_Falling.py`.
 Simple_Grid_Falling
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./grids/Simple_Grid_Falling.py`.
+Following example is in file :ysrc:`examples/grids/Simple_Grid_Falling.py`.
 
 .. youtube:: g8HVsbJB4fU
 
@@ -612,7 +612,7 @@ Following example is in file :ysrc:`./grids/Simple_Grid_Falling.py`.
 gts-horse
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./gts-horse/gts-horse.py`.
+Following example is in file :ysrc:`examples/gts-horse/gts-horse.py`.
 
 .. youtube:: xteVeQlMrYM
 
@@ -621,7 +621,7 @@ Following example is in file :ysrc:`./gts-horse/gts-horse.py`.
 gts-operators
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./gts-horse/gts-operators.py`.
+Following example is in file :ysrc:`examples/gts-horse/gts-operators.py`.
 
 .. youtube:: eZ9jBEiKUnk
 
@@ -630,7 +630,7 @@ Following example is in file :ysrc:`./gts-horse/gts-operators.py`.
 gts-random-pack-obb
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./gts-horse/gts-random-pack-obb.py`.
+Following example is in file :ysrc:`examples/gts-horse/gts-random-pack-obb.py`.
 
 .. youtube:: L04jwnz5Ujg
 
@@ -639,7 +639,7 @@ Following example is in file :ysrc:`./gts-horse/gts-random-pack-obb.py`.
 gts-random-pack
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./gts-horse/gts-random-pack.py`.
+Following example is in file :ysrc:`examples/gts-horse/gts-random-pack.py`.
 
 .. youtube:: 1dMVlf2u0zM
 
@@ -648,7 +648,7 @@ Following example is in file :ysrc:`./gts-horse/gts-random-pack.py`.
 hourglass
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./hourglass/hourglass.py`.
+Following example is in file :ysrc:`examples/hourglass/hourglass.py`.
 
 .. youtube:: wS_x4UPROOE
 
@@ -657,7 +657,7 @@ Following example is in file :ysrc:`./hourglass/hourglass.py`.
 packs
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./packs/packs.py`.
+Following example is in file :ysrc:`examples/packs/packs.py`.
 
 .. youtube:: luGIch9gSdg
 
@@ -666,7 +666,7 @@ Following example is in file :ysrc:`./packs/packs.py`.
 gts-pfacet
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./pfacet/gts-pfacet.py`.
+Following example is in file :ysrc:`examples/pfacet/gts-pfacet.py`.
 
 .. youtube:: AA2rCfdBX1w
 
@@ -675,7 +675,7 @@ Following example is in file :ysrc:`./pfacet/gts-pfacet.py`.
 mesh-pfacet
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./pfacet/mesh-pfacet.py`.
+Following example is in file :ysrc:`examples/pfacet/mesh-pfacet.py`.
 
 .. youtube:: HZ3aAOaebbo
 
@@ -684,7 +684,7 @@ Following example is in file :ysrc:`./pfacet/mesh-pfacet.py`.
 pFacets_grids_spheres_interacting
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./pfacet/pFacets_grids_spheres_interacting.py`.
+Following example is in file :ysrc:`examples/pfacet/pFacets_grids_spheres_interacting.py`.
 
 .. youtube:: 3e09Zi_LPU0
 
@@ -693,7 +693,7 @@ Following example is in file :ysrc:`./pfacet/pFacets_grids_spheres_interacting.p
 pfacetcreators
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./pfacet/pfacetcreators.py`.
+Following example is in file :ysrc:`examples/pfacet/pfacetcreators.py`.
 
 .. youtube:: 5PMYeadRRvA
 
@@ -702,7 +702,7 @@ Following example is in file :ysrc:`./pfacet/pfacetcreators.py`.
 ball
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/ball.py`.
+Following example is in file :ysrc:`examples/polyhedra/ball.py`.
 
 .. youtube:: pH6kbVcTRg4
 
@@ -711,7 +711,7 @@ Following example is in file :ysrc:`./polyhedra/ball.py`.
 horse
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/horse.py`.
+Following example is in file :ysrc:`examples/polyhedra/horse.py`.
 
 .. youtube:: I9bpX85B8f8
 
@@ -720,7 +720,7 @@ Following example is in file :ysrc:`./polyhedra/horse.py`.
 irregular
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/irregular.py`.
+Following example is in file :ysrc:`examples/polyhedra/irregular.py`.
 
 .. youtube:: 9XbkYXukdjI
 
@@ -729,7 +729,7 @@ Following example is in file :ysrc:`./polyhedra/irregular.py`.
 sphere-interaction
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/sphere-interaction.py`.
+Following example is in file :ysrc:`examples/polyhedra/sphere-interaction.py`.
 
 .. youtube:: 2ZlWJBQ4ELY
 
@@ -738,7 +738,7 @@ Following example is in file :ysrc:`./polyhedra/sphere-interaction.py`.
 splitter
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/splitter.py`.
+Following example is in file :ysrc:`examples/polyhedra/splitter.py`.
 
 .. youtube:: IjXvPLU92xQ
 
@@ -747,7 +747,7 @@ Following example is in file :ysrc:`./polyhedra/splitter.py`.
 interactinDetectionFactor
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/tests/interactinDetectionFactor.py`.
+Following example is in file :ysrc:`examples/polyhedra/tests/interactinDetectionFactor.py`.
 
 .. youtube:: mPj7YfFObdg
 
@@ -756,7 +756,7 @@ Following example is in file :ysrc:`./polyhedra/tests/interactinDetectionFactor.
 scGeom
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/tests/scGeom.py`.
+Following example is in file :ysrc:`examples/polyhedra/tests/scGeom.py`.
 
 .. youtube:: xdpFnwy_mB8
 
@@ -765,7 +765,7 @@ Following example is in file :ysrc:`./polyhedra/tests/scGeom.py`.
 textExport
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedra/textExport.py`.
+Following example is in file :ysrc:`examples/polyhedra/textExport.py`.
 
 .. youtube:: Js52jLduYYM
 
@@ -774,7 +774,7 @@ Following example is in file :ysrc:`./polyhedra/textExport.py`.
 uniaxial_compression
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./polyhedraBreak/uniaxial_compression.py`.
+Following example is in file :ysrc:`examples/polyhedraBreak/uniaxial_compression.py`.
 
 .. youtube:: r77l-A8O8ug
 
@@ -783,7 +783,7 @@ Following example is in file :ysrc:`./polyhedraBreak/uniaxial_compression.py`.
 ringCundallDamping
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./ring2d/ringCundallDamping.py`.
+Following example is in file :ysrc:`examples/ring2d/ringCundallDamping.py`.
 
 .. youtube:: jm_snDXShaE
 
@@ -792,7 +792,7 @@ Following example is in file :ysrc:`./ring2d/ringCundallDamping.py`.
 ringSimpleViscoelastic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./ring2d/ringSimpleViscoelastic.py`.
+Following example is in file :ysrc:`examples/ring2d/ringSimpleViscoelastic.py`.
 
 .. youtube:: 1-StKzb7XV4
 
@@ -801,7 +801,7 @@ Following example is in file :ysrc:`./ring2d/ringSimpleViscoelastic.py`.
 model
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./rod-penetration/model.py`.
+Following example is in file :ysrc:`examples/rod-penetration/model.py`.
 
 .. youtube:: b_yLp0onOzg
 
@@ -810,7 +810,7 @@ Following example is in file :ysrc:`./rod-penetration/model.py`.
 2SpheresNormVisc
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./simple-scene/2SpheresNormVisc.py`.
+Following example is in file :ysrc:`examples/simple-scene/2SpheresNormVisc.py`.
 
 .. youtube:: kiWMTyNGMv4
 
@@ -819,7 +819,7 @@ Following example is in file :ysrc:`./simple-scene/2SpheresNormVisc.py`.
 save-then-reload
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./simple-scene/save-then-reload.py`.
+Following example is in file :ysrc:`examples/simple-scene/save-then-reload.py`.
 
 .. youtube:: -_xUAgGMz2E
 
@@ -828,7 +828,7 @@ Following example is in file :ysrc:`./simple-scene/save-then-reload.py`.
 simple-scene-default-engines
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./simple-scene/simple-scene-default-engines.py`.
+Following example is in file :ysrc:`examples/simple-scene/simple-scene-default-engines.py`.
 
 .. youtube:: i8Vl3tx1-JM
 
@@ -837,7 +837,7 @@ Following example is in file :ysrc:`./simple-scene/simple-scene-default-engines.
 simple-scene-energy-tracking
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./simple-scene/simple-scene-energy-tracking.py`.
+Following example is in file :ysrc:`examples/simple-scene/simple-scene-energy-tracking.py`.
 
 .. youtube:: D3XrbW3lvsU
 
@@ -846,7 +846,7 @@ Following example is in file :ysrc:`./simple-scene/simple-scene-energy-tracking.
 simple-scene-plot
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./simple-scene/simple-scene-plot.py`.
+Following example is in file :ysrc:`examples/simple-scene/simple-scene-plot.py`.
 
 .. youtube:: 3bUCL4VmvGM
 
@@ -855,7 +855,7 @@ Following example is in file :ysrc:`./simple-scene/simple-scene-plot.py`.
 simple-scene
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./simple-scene/simple-scene.py`.
+Following example is in file :ysrc:`examples/simple-scene/simple-scene.py`.
 
 .. youtube:: a6j6v6zByFk
 
@@ -864,7 +864,7 @@ Following example is in file :ysrc:`./simple-scene/simple-scene.py`.
 gts-stl
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./stl-gts/gts-stl.py`.
+Following example is in file :ysrc:`examples/stl-gts/gts-stl.py`.
 
 .. youtube:: MvxHr7mCR0A
 
@@ -873,7 +873,7 @@ Following example is in file :ysrc:`./stl-gts/gts-stl.py`.
 tesselationWrapper
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./tesselationwrapper/tesselationWrapper.py`.
+Following example is in file :ysrc:`examples/tesselationwrapper/tesselationWrapper.py`.
 
 .. youtube:: 2o3Y4znBmh8
 
@@ -882,7 +882,7 @@ Following example is in file :ysrc:`./tesselationwrapper/tesselationWrapper.py`.
 net-2part-displ-unloading
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/WireMatPM/net-2part-displ-unloading.py`.
+Following example is in file :ysrc:`examples/test/WireMatPM/net-2part-displ-unloading.py`.
 
 .. youtube:: 588FJ80bf4I
 
@@ -891,7 +891,7 @@ Following example is in file :ysrc:`./test/WireMatPM/net-2part-displ-unloading.p
 net-2part-displ
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/WireMatPM/net-2part-displ.py`.
+Following example is in file :ysrc:`examples/test/WireMatPM/net-2part-displ.py`.
 
 .. youtube:: dcU3xQghpEc
 
@@ -900,7 +900,7 @@ Following example is in file :ysrc:`./test/WireMatPM/net-2part-displ.py`.
 beam-l6geom
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/beam-l6geom.py`.
+Following example is in file :ysrc:`examples/test/beam-l6geom.py`.
 
 .. youtube:: CFWi3YGXSKQ
 
@@ -909,7 +909,7 @@ Following example is in file :ysrc:`./test/beam-l6geom.py`.
 clump-facet
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/clump-facet.py`.
+Following example is in file :ysrc:`examples/test/clump-facet.py`.
 
 .. youtube:: kGRgeom2isI
 
@@ -918,7 +918,7 @@ Following example is in file :ysrc:`./test/clump-facet.py`.
 clumpPack
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/clumpPack.py`.
+Following example is in file :ysrc:`examples/test/clumpPack.py`.
 
 .. youtube:: qq17u0gXAfU
 
@@ -927,7 +927,7 @@ Following example is in file :ysrc:`./test/clumpPack.py`.
 collider-stride-triax
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/collider-stride-triax.py`.
+Following example is in file :ysrc:`examples/test/collider-stride-triax.py`.
 
 .. youtube:: jHXXuu7WeBk
 
@@ -936,7 +936,7 @@ Following example is in file :ysrc:`./test/collider-stride-triax.py`.
 collider-stride
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/collider-stride.py`.
+Following example is in file :ysrc:`examples/test/collider-stride.py`.
 
 .. youtube:: 0UIC-HhGDBY
 
@@ -945,7 +945,7 @@ Following example is in file :ysrc:`./test/collider-stride.py`.
 combined-kinematic-engine
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/combined-kinematic-engine.py`.
+Following example is in file :ysrc:`examples/test/combined-kinematic-engine.py`.
 
 .. youtube:: 6lN9N1YAmvM
 
@@ -954,7 +954,7 @@ Following example is in file :ysrc:`./test/combined-kinematic-engine.py`.
 energy
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/energy.py`.
+Following example is in file :ysrc:`examples/test/energy.py`.
 
 .. youtube:: 8v6ln8by5fo
 
@@ -963,7 +963,7 @@ Following example is in file :ysrc:`./test/energy.py`.
 facet-box
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/facet-box.py`.
+Following example is in file :ysrc:`examples/test/facet-box.py`.
 
 .. youtube:: 9h-5MLa5s0o
 
@@ -972,7 +972,7 @@ Following example is in file :ysrc:`./test/facet-box.py`.
 facet-sphere-ViscElBasic-peri
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/facet-sphere-ViscElBasic-peri.py`.
+Following example is in file :ysrc:`examples/test/facet-sphere-ViscElBasic-peri.py`.
 
 .. youtube:: NKzzupEVO8A
 
@@ -981,7 +981,7 @@ Following example is in file :ysrc:`./test/facet-sphere-ViscElBasic-peri.py`.
 facet-sphere-ViscElBasic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/facet-sphere-ViscElBasic.py`.
+Following example is in file :ysrc:`examples/test/facet-sphere-ViscElBasic.py`.
 
 .. youtube:: cggR3UG7a6o
 
@@ -990,7 +990,7 @@ Following example is in file :ysrc:`./test/facet-sphere-ViscElBasic.py`.
 facet-sphere
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/facet-sphere.py`.
+Following example is in file :ysrc:`examples/test/facet-sphere.py`.
 
 .. youtube:: 7aJ2jHK2zv8
 
@@ -999,7 +999,7 @@ Following example is in file :ysrc:`./test/facet-sphere.py`.
 helix
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/helix.py`.
+Following example is in file :ysrc:`examples/test/helix.py`.
 
 .. youtube:: EvpwMBdyG4s
 
@@ -1008,7 +1008,7 @@ Following example is in file :ysrc:`./test/helix.py`.
 interpolating-force
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/interpolating-force.py`.
+Following example is in file :ysrc:`examples/test/interpolating-force.py`.
 
 .. youtube:: 3RNc1J9YCds
 
@@ -1017,7 +1017,7 @@ Following example is in file :ysrc:`./test/interpolating-force.py`.
 kinematic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/kinematic.py`.
+Following example is in file :ysrc:`examples/test/kinematic.py`.
 
 .. youtube:: J10jxnWuhFc
 
@@ -1026,7 +1026,7 @@ Following example is in file :ysrc:`./test/kinematic.py`.
 mindlin
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/mindlin.py`.
+Following example is in file :ysrc:`examples/test/mindlin.py`.
 
 .. youtube:: kqr39aXEMCk
 
@@ -1035,7 +1035,7 @@ Following example is in file :ysrc:`./test/mindlin.py`.
 multi
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/multi/multi.py`.
+Following example is in file :ysrc:`examples/test/multi/multi.py`.
 
 .. youtube:: -DQrAVyXEzw
 
@@ -1044,7 +1044,7 @@ Following example is in file :ysrc:`./test/multi/multi.py`.
 pack-cloud
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/pack-cloud.py`.
+Following example is in file :ysrc:`examples/test/pack-cloud.py`.
 
 .. youtube:: bcPS894Qp_g
 
@@ -1053,7 +1053,7 @@ Following example is in file :ysrc:`./test/pack-cloud.py`.
 pack-inConvexPolyhedron
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/pack-inConvexPolyhedron.py`.
+Following example is in file :ysrc:`examples/test/pack-inConvexPolyhedron.py`.
 
 .. youtube:: fBJT5iFQ4ak
 
@@ -1062,7 +1062,7 @@ Following example is in file :ysrc:`./test/pack-inConvexPolyhedron.py`.
 pv_section
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/paraview-spheres-solid-section/pv_section.py`.
+Following example is in file :ysrc:`examples/test/paraview-spheres-solid-section/pv_section.py`.
 
 .. youtube:: bFiUfoEXFMQ
 
@@ -1071,7 +1071,7 @@ Following example is in file :ysrc:`./test/paraview-spheres-solid-section/pv_sec
 periodic-geom-compare
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/periodic-geom-compare.py`.
+Following example is in file :ysrc:`examples/test/periodic-geom-compare.py`.
 
 .. youtube:: SiobftG7Lqw
 
@@ -1080,7 +1080,7 @@ Following example is in file :ysrc:`./test/periodic-geom-compare.py`.
 psd
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/psd.py`.
+Following example is in file :ysrc:`examples/test/psd.py`.
 
 .. youtube:: HVs7qGg4AE0
 
@@ -1089,7 +1089,7 @@ Following example is in file :ysrc:`./test/psd.py`.
 sphere-sphere-ViscElBasic-peri
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/sphere-sphere-ViscElBasic-peri.py`.
+Following example is in file :ysrc:`examples/test/sphere-sphere-ViscElBasic-peri.py`.
 
 .. youtube:: ar4JDS6vjs0
 
@@ -1098,7 +1098,7 @@ Following example is in file :ysrc:`./test/sphere-sphere-ViscElBasic-peri.py`.
 subdomain-balancer
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/subdomain-balancer.py`.
+Following example is in file :ysrc:`examples/test/subdomain-balancer.py`.
 
 .. youtube:: i4_LOzGk3m8
 
@@ -1107,7 +1107,7 @@ Following example is in file :ysrc:`./test/subdomain-balancer.py`.
 test-sphere-facet-corner
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/test-sphere-facet-corner.py`.
+Following example is in file :ysrc:`examples/test/test-sphere-facet-corner.py`.
 
 .. youtube:: NaELYGF9tKg
 
@@ -1116,7 +1116,7 @@ Following example is in file :ysrc:`./test/test-sphere-facet-corner.py`.
 test-sphere-facet
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/test-sphere-facet.py`.
+Following example is in file :ysrc:`examples/test/test-sphere-facet.py`.
 
 .. youtube:: J7i86WHK3QA
 
@@ -1125,7 +1125,7 @@ Following example is in file :ysrc:`./test/test-sphere-facet.py`.
 triax-basic
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/triax-basic.py`.
+Following example is in file :ysrc:`examples/test/triax-basic.py`.
 
 .. youtube:: B2DIXJJvpwM
 
@@ -1134,7 +1134,7 @@ Following example is in file :ysrc:`./test/triax-basic.py`.
 unvRead
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./test/unv-read/unvRead.py`.
+Following example is in file :ysrc:`examples/test/unv-read/unvRead.py`.
 
 .. youtube:: IkDE36LAwr8
 
@@ -1143,7 +1143,7 @@ Following example is in file :ysrc:`./test/unv-read/unvRead.py`.
 oneTetra
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./tetra/oneTetra.py`.
+Following example is in file :ysrc:`examples/tetra/oneTetra.py`.
 
 .. youtube:: bv8PxbiG500
 
@@ -1152,7 +1152,7 @@ Following example is in file :ysrc:`./tetra/oneTetra.py`.
 oneTetraPoly
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./tetra/oneTetraPoly.py`.
+Following example is in file :ysrc:`examples/tetra/oneTetraPoly.py`.
 
 .. youtube:: vzOJte9HzgI
 
@@ -1161,7 +1161,7 @@ Following example is in file :ysrc:`./tetra/oneTetraPoly.py`.
 twoTetras
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./tetra/twoTetras.py`.
+Following example is in file :ysrc:`examples/tetra/twoTetras.py`.
 
 .. youtube:: U9edvfJWspk
 
@@ -1170,7 +1170,7 @@ Following example is in file :ysrc:`./tetra/twoTetras.py`.
 twoTetrasPoly
 """"""""""""""""""""""""
 
-Following example is in file :ysrc:`./tetra/twoTetrasPoly.py`.
+Following example is in file :ysrc:`examples/tetra/twoTetrasPoly.py`.
 
 .. youtube:: nAIBxWQ32-o
 

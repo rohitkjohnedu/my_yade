@@ -15,13 +15,13 @@ for example in $the_examples; do
 		YOUTUBEURL=`grep -E " ${example}\>" list_of_examples.txt | sed -e "s/.* ${example}\>.*https:\/\/youtu.be\/\([^ ]\+\).*/\1/"`
 		# make sure that .rst references do not contain illegal characters
 		SANITIZE=`echo ${BASENAME} | sed -e "s/[^A-Za-z0-9]/_/g"`
-		echo ".. _${SANITIZE}:\n"                                          >> ../doc/sphinx/tutorial-more-examples.rst
-		echo "${BASENAME}"                                                >> ../doc/sphinx/tutorial-more-examples.rst
-		echo '""""""""""""""""""""""""'                                   >> ../doc/sphinx/tutorial-more-examples.rst
-		echo ""                                                           >> ../doc/sphinx/tutorial-more-examples.rst
-		echo 'Following example is in file :ysrc:`'${file_location}'`'.   >> ../doc/sphinx/tutorial-more-examples.rst
-		echo ""                                                           >> ../doc/sphinx/tutorial-more-examples.rst
-		echo ".. youtube:: ${YOUTUBEURL}\n"                               >> ../doc/sphinx/tutorial-more-examples.rst
+		echo ".. _${SANITIZE}:\n"                                                  >> ../doc/sphinx/tutorial-more-examples.rst
+		echo "${BASENAME}"                                                         >> ../doc/sphinx/tutorial-more-examples.rst
+		echo '""""""""""""""""""""""""'                                            >> ../doc/sphinx/tutorial-more-examples.rst
+		echo ""                                                                    >> ../doc/sphinx/tutorial-more-examples.rst
+		echo 'Following example is in file :ysrc:`examples/'${file_location}'`'.   >> ../doc/sphinx/tutorial-more-examples.rst
+		echo ""                                                                    >> ../doc/sphinx/tutorial-more-examples.rst
+		echo ".. youtube:: ${YOUTUBEURL}\n"                                        >> ../doc/sphinx/tutorial-more-examples.rst
 	else
 		echo "Cannot find file ${example} in LOCATION: ${file_location}"
 		sleep 1
