@@ -23,4 +23,6 @@ A few minor bugs were discovered during the course. They were all fixed in rev. 
   
   tutorial-examples.rst
   
-  tutorial-more-examples.rst
+  tutorial-more-examples-fast.rst
+  
+.. comment:  tutorial-more-examples.rst

@@ -5,7 +5,7 @@ More examples
 
 A full list of examples is in file :ysrc:`examples/list_of_examples.txt`. Videos of some of those examples are listed below.
 
-To see the same :ref:`list with embedded videos<moreExamplesSlow>`, slow connections not recommended
+:ref:`The same list with embedded videos<moreExamplesSlow>` is available, but not recommended for viewing on slow internet connection.
 
 .. comment -----------X the rest of this file was copied from doc/sphinx/tutorial-more-examples.rst X----------
 .. comment ----X and vim command `  :%s/^\.\. youtube.*//gc               `  was used to remove youtube   X----
