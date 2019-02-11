@@ -1222,6 +1222,15 @@ __ https://youtu.be/B2DIXJJvpwM
 .. youtube:: B2DIXJJvpwM
 
 
+.. _refTriax-basic-without-plots:
+
+* refTriax-basic-without-plots_, :ysrc:`source file<examples/test/triax-basic-without-plots.py>`, `video`__.
+
+__ https://youtu.be/sY75c3E3FeY
+
+.. youtube:: sY75c3E3FeY
+
+
 .. _refUnvRead:
 
 * refUnvRead_, :ysrc:`source file<examples/test/unv-read/unvRead.py>`, `video`__.

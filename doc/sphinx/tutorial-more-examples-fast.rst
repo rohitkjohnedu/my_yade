@@ -1224,6 +1224,14 @@ __ https://youtu.be/B2DIXJJvpwM
 
 
 
+.. _refFastTriax-basic-without-plots:
+
+* refFastTriax-basic-without-plots_, :ysrc:`source file<examples/test/triax-basic-without-plots.py>`, `video`__.
+
+__ https://youtu.be/sY75c3E3FeY
+
+
+
 
 .. _refFastUnvRead:
 
