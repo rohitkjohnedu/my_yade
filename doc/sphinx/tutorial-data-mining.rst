@@ -223,7 +223,7 @@ Plotting all energy contributions would be difficult, since names of all energie
 Energy plot example
 """""""""""""""""""
 
-Plotting energies inside a *live* yade session, for example by launching ``examples/test/triax-basic-without-plots.py`` would look following::
+Plotting energies inside a *live* yade session, for example by launching :ysrc:`examples/test/triax-basic-without-plots.py` would look following::
 
 	from yade import plot
 	O.trackEnergy=True
@@ -250,7 +250,7 @@ It is also possible to make several separate plots, for example like this::
 .. warning::
 	There cannot be duplicate variable names declared in separate plots. This is why different variables ``t_`` and ``t__`` were used above.
 
-With the caveat above, a following example inside a *live* yade session launched on ``examples/test/triax-basic-without-plots.py`` would look following::
+With the caveat above, a following example inside a *live* yade session launched on :ysrc:`examples/test/triax-basic-without-plots.py` would look following::
 
 	from yade import plot
 	O.trackEnergy=True
@@ -268,8 +268,11 @@ With the caveat above, a following example inside a *live* yade session launched
 
 	plot.plot(subPlots=True)          # same as pressing F8: close current plot windows and reopen a single new one
 
+Press F8 to show plot window and F11 to show 3D view, then press ▶ to start simulation, see `video`__ below:
 
+__ https://youtu.be/sY75c3E3FeY
 
+.. youtube:: sY75c3E3FeY
 
 
 .. rubric:: Exercises
