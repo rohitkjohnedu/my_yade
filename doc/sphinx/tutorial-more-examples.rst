@@ -1,4 +1,4 @@
-.. _moreExamples:
+.. _moreExamplesSlow:
 
 More examples
 =============
