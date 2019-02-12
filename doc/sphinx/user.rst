@@ -32,7 +32,7 @@ Creating Body objects
 Defining materials
 ------------------
 
-The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined shared materials for bodies. It only supports addition, and will typically hold only a few instance (though there is no limit).
+The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined shared materials for bodies. It only supports addition, and will typically hold only a few instances (though there is no limit).
 
 ``label`` given to each material is optional, but can be passed to :yref:`sphere<yade.utils.sphere>` and other functions for constructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`sphere<yade.utils.sphere>` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
 
@@ -87,7 +87,7 @@ As shown above, bodies are added one by one or several at the same time using th
 
 	Yade [3]: O.bodies.append([
 	   ...:   sphere((0,0,0),1),
-	   ...:   sphere((0,0,2),1)
+	   ...:   sphere((1,1,3),1)
 	   ...: ])
 
 Many functions introduced in next sections return list of bodies which can be readily added to the simulation, including
@@ -96,7 +96,7 @@ Many functions introduced in next sections return list of bodies which can be re
 * surface function :yref:`yade.pack.gtsSurface2Facets`
 * import functions :yref:`yade.ymport.gmsh`, :yref:`yade.ymport.stl`, …
 
-As those functions use :yref:`sphere<yade.utils.sphere>` and :yref:`facet<yade.utils.facet>` internally, they accept additional argument passed to those function. In particular, material for each body is selected following the rules above (last one if not specified, by label, by index, etc.).
+As those functions use :yref:`sphere<yade.utils.sphere>` and :yref:`facet<yade.utils.facet>` internally, they accept additional arguments passed to those functions. In particular, material for each body is selected following the rules above (last one if not specified, by label, by index, etc.).
 
 
 Clumping particles together
@@ -158,9 +158,9 @@ This is done by a function called :yref:`replaceByClumps()<BodyContainer.replace
 
 -> :yref:`replaceByClumps()<yade.wrapper.BodyContainer.replaceByClumps>` returns a list of tuples: ``[(clumpId1,[memberId1,memberId2,...]),(clumpId2,[memberId1,memberId2,...]),...]``
 
-It is also possible to :yref:`add<BodyContainer.addToClump>` bodies to a clump and :yref:`release<BodyContainer.releaseFromClump>` bodies from a clump. Also you can :yref:`erase<BodyContainer.erase>` the clump (clump members will get standalone spheres).
+It is also possible to :yref:`add<BodyContainer.addToClump>` bodies to a clump and :yref:`release<BodyContainer.releaseFromClump>` bodies from a clump. Also you can :yref:`erase<BodyContainer.erase>` the clump (clump members will become standalone).
 
-Additionally YADE supports to achieve the :yref:`roundness<BodyContainer.getRoundness>` of a clump or roundness coefficient of a packing. Parts of the packing can be excluded from roundness measurement via exclude list.
+Additionally YADE allows to achieve the :yref:`roundness<BodyContainer.getRoundness>` of a clump or roundness coefficient of a packing. Parts of the packing can be excluded from roundness measurement via exclude list.
 
 .. ipython::
 
@@ -187,7 +187,7 @@ Additionally YADE supports to achieve the :yref:`roundness<BodyContainer.getRoun
 Sphere packings
 ===============
 
-Representing a solid of an arbitrary shape by arrangement of spheres presents the problem of sphere packing, i.e. spatial arrangement of sphere such that given solid is approximately filled with them. For the purposes of DEM simulation, there can be several requirements.
+Representing a solid of an arbitrary shape by arrangement of spheres presents the problem of sphere packing, i.e. spatial arrangement of spheres such that a given solid is approximately filled with them. For the purposes of DEM simulation, there can be several requirements.
 
 #. Distribution of spheres' radii. Arbitrary volume can be filled completely with spheres provided there are no restrictions on their radius; in such case, number of spheres can be infinite and their radii approach zero. Since both number of particles and minimum sphere radius (via critical timestep) determine computation cost, radius distribution has to be given mandatorily. The most typical distribution is uniform: mean±dispersion; if dispersion is zero, all spheres will have the same radius.
 #. Smooth boundary. Some algorithms treat boundaries in such way that spheres are aligned on them, making them smoother as surface.
