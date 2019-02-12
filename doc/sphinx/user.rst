@@ -459,11 +459,12 @@ Some material models (such as the :yref:`concrete model<Law2_ScGeom_CpmPhys_Cpm>
 
 #. Reset interaction radius in both ``Bo1`` and ``Ig2`` functors to their default value again.
 
-#. Continue the simulation; interactions that are already established will not be deleted (the ``Law2`` functor in usepermitting).
+#. Continue the simulation; interactions that are already established will not be deleted (the ``Law2`` functor in use permitting).
 
 In code, such scenario might look similar to this one (labeling is explained in :ref:`labelingthings`)::
 
 	intRadius=1.5
+	damping=0.05
 
 	O.engines=[
 	   ForceResetter(),
