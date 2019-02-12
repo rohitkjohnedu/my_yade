@@ -1228,7 +1228,7 @@ __ https://youtu.be/B2DIXJJvpwM
 
 * refFastTriax-basic-without-plots_, :ysrc:`source file<examples/test/triax-basic-without-plots.py>`, `video`__.
 
-__ https://youtu.be/sY75c3E3FeY
+__ https://youtu.be/AALiZ7G7yNM
 
 
 

@@ -268,7 +268,7 @@ OK │x  │YES│   ├── test-sphere-facet-corner.py        https://yout
 OK?│OK │YES│   ├── test-sphere-facet.py               https://youtu.be/J7i86WHK3QA
 x  │x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1475844 (NOTE not reproduced in 2018.02b, needs further investigation, NOTE2: happens also in 2018.02b on a different computer so it is random)
 OK │ok │YES│   ├── triax-basic.py                     https://youtu.be/B2DIXJJvpwM
-OK │ok │no │   ├── triax-basic-without-plots.py       https://youtu.be/sY75c3E3FeY
+OK │ok │no │   ├── triax-basic-without-plots.py       https://youtu.be/AALiZ7G7yNM
 OK │ok │no │   ├── triax-cohesive.py
    │   │   │   ├── unv-read
 OK │ok │YES│   │   ├── unvRead.py                     https://youtu.be/IkDE36LAwr8
