@@ -240,41 +240,6 @@ Plotting energies inside a *live* yade session, for example by launching :ysrc:`
 
 Press F8 to show plot window and F11 to show 3D view, then press ▶ to start simulation.
 
-Using multiple plots
-""""""""""""""""""""
-
-It is also possible to make several separate plots, for example like this::
-
-	plot.plots={ 't':('total','kinetic') , 't ':['elastPotential','gravWork'] , 't  ':('nonviscDamp') }
-
-.. warning::
-	There cannot be duplicate names declared in separate plots. This is why spaces were used above to indicate the same variable ``t``.
-
-With the caveat above, a following example inside a *live* yade session launched on :ysrc:`examples/test/triax-basic-without-plots.py` would look following::
-
-	from yade import plot
-	O.trackEnergy=True
-	plot.plots={ 't':('total','kinetic') , 't ':['elastPotential','gravWork'] , 't  ':('nonviscDamp') }
-
-	def addPlotData():
-		# assign value to all three: 't', 't ' and 't  ' with single t=... assignment
-		plot.addData( t=O.time , total=O.energy.total() , **O.energy )
-
-	O.engines+=[PyRunner(command='addPlotData()',iterPeriod=20)]
-
-	globals().update(locals())        # do this only because this is an example of a live yade session
-
-	plot.plot(subPlots=False)         # show plots in separate windows
-
-	plot.plot(subPlots=True)          # same as pressing F8: close current plot windows and reopen a single new one
-
-Press F8 to show plot window and F11 to show 3D view, then press ▶ to start simulation, see `video`__ below:
-
-__ https://youtu.be/AALiZ7G7yNM
-
-.. youtube:: AALiZ7G7yNM
-
-
 .. rubric:: Exercises
 
 #. Calculate average momentum in y direction.
