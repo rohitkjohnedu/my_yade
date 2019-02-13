@@ -27,7 +27,7 @@ The :yref:`BodyContainer` holds :yref:`Body` objects in the simulation; it is ac
 Creating Body objects
 ----------------------
 
-:yref:`Body` objects are only rarely constructed by hand by their components (:yref:`Shape`, :yref:`Bound`, :yref:`State`, :yref:`Material`); instead, convenience functions :yref:`sphere<yade.utils.sphere>`, :yref:`facet<yade.utils.facet>` and :yref:`wall<yade.utils.wall>` are used to create them. Using these functions also ensures better future compatibility, if internals of :yref:`Body` change in some way. These functions receive geometry of the particle and several other characteristics. See their documentation for details. If the same :yref:`Material` is used for several (or many) bodies, it can be shared by adding it in ``O.materials``, as explained below.
+:yref:`Body` objects are only rarely constructed by hand by their components (:ref:`Shape<inheritanceGraphShape>`, :ref:`Bound<inheritanceGraphBound>`, :ref:`State<inheritanceGraphState>`, :ref:`Material<inheritanceGraphMaterial>`); instead, convenience functions :yref:`sphere<yade.utils.sphere>`, :yref:`facet<yade.utils.facet>` and :yref:`wall<yade.utils.wall>` are used to create them. Using these functions also ensures better future compatibility, if internals of :yref:`Body` change in some way. These functions receive geometry of the particle and several other characteristics. See their documentation for details. If the same :ref:`Material<inheritanceGraphMaterial>` is used for several (or many) bodies, it can be shared by adding it in ``O.materials``, as explained below.
 
 Defining materials
 ------------------
@@ -36,7 +36,7 @@ The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined s
 
 ``label`` given to each material is optional, but can be passed to :yref:`sphere<yade.utils.sphere>` and other functions for constructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`sphere<yade.utils.sphere>` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
 
-If no :yref:`Material` is specified when calling :yref:`sphere<yade.utils.sphere>`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created: FrictMat(density=2e3,young=30e9,poisson=.3,frictionAngle=.5236). This should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
+If no :ref:`Material<inheritanceGraphMaterial>` is specified when calling :yref:`sphere<yade.utils.sphere>`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created: FrictMat(density=2e3,young=30e9,poisson=.3,frictionAngle=.5236). This should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
 
 .. ipython::
 
@@ -252,7 +252,7 @@ For example, we can construct a simple funnel (:ysrc:`examples/funnel.py`, shown
 
 	# create surface
 	surf=pack.sweptPolylines2gtsSurface(
-		meridians+
+		meridians
 		+[[Vector3(5*sin(-th),-10+5*cos(-th),30) for th in thetas]]  # add funnel top
 	)
 
@@ -278,6 +278,8 @@ The :ysrc:`examples/gts-horse/gts-horse.py` (img. img-horse_) shows both possibi
 That surface object is used as predicate for packing::
 
 	pred=pack.inGtsSurface(surf)
+	aabb=pred.aabb()
+	radius=(aabb[1][0]-aabb[0][0])/40
 	O.bodies.append(pack.regularHexa(pred,radius=radius,gap=radius/4.))
 
 and then, after being translated, as base for triangulated surface in the simulation itself::
@@ -305,7 +307,8 @@ Boolean operations on pair of predicates (noted ``A`` and ``B``) are defined:
 Composed predicates also properly define their bounding box. For example, we can take box and remove cylinder from inside, using the ``A - B`` operation (img. img-predicate-difference_)::
 
 	pred=pack.inAlignedBox((-2,-2,-2),(2,2,2))-pack.inCylinder((0,-2,0),(0,2,0),1)
-	spheres=pack.randomDensePack(pred,spheresInCell=2000,radius=.1,rRelFuzz=.4)
+	spheres=pack.randomDensePack(pred,spheresInCell=2000,radius=.1,rRelFuzz=.4,returnSpherePack=True)
+	spheres.toSimulation()
 
 .. _img-predicate-difference:
 .. figure:: fig/predicate-difference.png
