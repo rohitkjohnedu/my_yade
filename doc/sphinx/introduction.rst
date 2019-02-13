@@ -570,7 +570,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 
 :yref:`IPhysDispatcher` which uses :ref:`IPhysFunctor<inheritanceGraphIPhysFunctor>`
-	dispatches to the second set of functors based on combination of ``2`` :yref:`Materials<Material>`; these functors return return :yref:`IPhys` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
+	dispatches to the second set of functors based on combination of ``2`` :ref:`Materials<inheritanceGraphMaterial>`; these functors return return :yref:`IPhys` instance (the ``Ip`` prefix). In our case, there is only 1 functor used, :yref:`Ip2_FrictMat_FrictMat_FrictPhys`, which create :yref:`FrictPhys` from 2 :yref:`FrictMat's<FrictMat>`.
 	
 	``Ip2`` functors are derived from :ref:`IPhysFunctor<inheritanceGraphIPhysFunctor>`.
 
