@@ -143,7 +143,7 @@ or, in general, like that::
 ..          https://github.com/sphinx-doc/sphinx/issues/2640
 
 .. warning::
-	If a function was declared inside a *live* yade session (`ipython <http://ipython.scipy.org>`_) then an error ``NameError: name 'myFunction' is not defined`` will occur unless python globals() are updated with command
+	If a function was declared inside a *live* yade session (`ipython <http://ipython.org>`_) then an error ``NameError: name 'myFunction' is not defined`` will occur unless python globals() are updated with command
 
 	.. code-block:: python
 
