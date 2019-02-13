@@ -1466,7 +1466,7 @@ Parameter table:
 	Simple text file, each line representing one parameter set. This file is read by :yref:`readParamsFromTable<yade.utils.readParamsFromTable>` (using :yref:`TableParamReader<yade.utils.TableParamReader>` class), called from simulation script, as explained above. For better reading of the text file you can make use of tabulators, these will be ignored by :yref:`readParamsFromTable<yade.utils.readParamsFromTable>`. Parameters are not restricted to numerical values. You can also make use of strings by ``"quoting"`` them (``'  '`` may also be used instead of ``"  "``). This can be useful for nominal parameters.
 	
 Job script:
-	Bash script, which calls yade on computing nodes. This script eventually creates temp folders, save data to storage server etc. The script must be formatted as a template where some tags will be replaced by specific values at the execution time::
+	Bash script, which calls yade on computing nodes. This script eventually creates temp folders, save data to storage server etc. The script must be formatted as a template where some tags will be replaced by specific values at the execution time:
 
 * ``__YADE_COMMAND__`` will be replaced by the actual yade run command
 * ``__YADE_LOGFILE__`` will be replaced by the log file path (output to stdout)
@@ -1742,7 +1742,9 @@ Getting help
 Questions and answers
 ---------------------
 
-Please use Launchpad interface at https://answers.launchpad.net/yade/ for asking questions about Yade. In case you're not familiar with computer oriented discussion lists, please read `this wiki page <https://www.yade-dem.org/wiki/Howtoask>`_ (a Yade-oriented and shortened version of `How To Ask Questions The Smart Way <http://catb.org/~esr/faqs/smart-questions.html>`_) before posting, in order to increase your chances getting help. Do not forget to state what *version* of Yade you use (shown when you start Yade), whether you installed it from source code or a package, what operating system (such as Ubuntu 18.04), and if you have done any local modifications to source code in case of compiled version.
+.. Hint:: Please use Launchpad interface at https://answers.launchpad.net/yade/ for `asking questions <http://www.yade-dem.org/wiki/Howtoask>`_ about Yade.
+
+In case you're not familiar with computer oriented discussion lists, please read `this wiki page <https://www.yade-dem.org/wiki/Howtoask>`_ (a Yade-oriented and shortened version of `How To Ask Questions The Smart Way <http://catb.org/~esr/faqs/smart-questions.html>`_) before posting, in order to increase your chances getting help. Do not forget to state what *version* of Yade you use (shown when you start Yade), whether you installed it from source code or a package, what operating system (such as Ubuntu 18.04), and if you have done any local modifications to source code in case of compiled version.
 
 Mailing lists
 --------------
@@ -1750,9 +1752,16 @@ Mailing lists
 In addition to the Q&A Launchpad interface, Yade has two mailing-lists. Both are hosted at http://www.launchpad.net and before posting, you must register to Launchpad and subscribe to the list by adding yourself to "team" of the same name running the list.
 
 yade-users@lists.launchpad.net
-	is a general discussion list for all Yade users. Add yourself to `yade-users team <https://launchpad.net/~yade-users>`_ so that you can post messages. `List archive <http://www.mail-archive.com/yade-users@lists.launchpad.net/>`_ is available.
+	is a general discussion list for all Yade users. Add yourself to `yade-users team <https://launchpad.net/~yade-users>`_ so that you can post messages. List archives:
+
+* https://lists.launchpad.net/yade-users/
+* http://www.mail-archive.com/yade-users@lists.launchpad.net/
+
 yade-dev@lists.launchpad.net
-	is for discussions about Yade development; you must be member of `yade-dev team <https://launchpad.net/~yade-dev>`_ to post. This list is `archived <http://www.mail-archive.com/yade-dev@lists.launchpad.net/>`_ as well.
+	is for discussions about Yade development; you must be member of `yade-dev team <https://launchpad.net/~yade-dev>`_ to post. This list is archived in two places:
+
+* https://lists.launchpad.net/yade-dev/
+* http://www.mail-archive.com/yade-dev@lists.launchpad.net/
 
 Wiki
 -----
