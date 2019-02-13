@@ -330,7 +330,7 @@ Taking the example of pierced box::
 	pred=pack.inAlignedBox((-2,-2,-2),(2,2,2))-pack.inCylinder((0,-2,0),(0,2,0),1)
 	spheres=pack.randomDensePack(pred,spheresInCell=2000,radius=.1,rRelFuzz=.4,wire=True,color=(0,0,1),material=1,returnSpherePack=True)
 
-Keyword arguments ``wire``, ``color`` and ``material`` are not declared in :yref:`yade.pack.randomDensePack`, therefore will be passed to :yref:`sphere<yade.utils.sphere>`, where they are also documented. ``spheres`` is now a :yref:`packSpheres.SpherePack` object.::
+Keyword arguments ``wire``, ``color`` and ``material`` are not declared in :yref:`yade.pack.randomDensePack`, therefore will be passed to :yref:`sphere<yade.utils.sphere>`, where they are also documented. ``spheres`` is now a :yref:`SpherePack<yade._packSpheres.SpherePack>` object.::
 
 	spheres.toSimulation()
 
@@ -407,7 +407,7 @@ GTS surfaces are geometrical objects, which can be inserted into simulation as s
 
 Facet particles are created by default as non-:yref:`Body.dynamic` (they have zero inertial mass). That means that  they are fixed in space and will not move if subject to forces. You can however
 
-* prescribe arbitrary movement to facets using a :yref:`PartialEngine` (such as :yref:`TranslationEngine` or :yref:`RotationEngine`);
+* prescribe arbitrary movement to facets using a :ref:`PartialEngine<inheritanceGraphPartialEngine>` (such as :yref:`TranslationEngine` or :yref:`RotationEngine`);
 * assign explicitly :yref:`mass<State.mass>` and :yref:`inertia<State.inertia>` to that particle;
 * make that particle part of a clump and assign :yref:`mass<State.mass>` and :yref:`inertia<State.inertia>` of the clump itself (described below).
 
@@ -451,7 +451,7 @@ Another examples can be found in :ysrc:`examples/mill.py` (fully parametrized) o
 Creating interactions
 ======================
 
-In typical cases, interactions are created during simulations as particles collide. This is done by a :yref:`Collider` detecting approximate contact between particles and then an :ref:`IGeomFunctor<inheritanceGraphIGeomFunctor>` detecting exact collision.
+In typical cases, interactions are created during simulations as particles collide. This is done by a :ref:`Collider<inheritanceGraphCollider>` detecting approximate contact between particles and then an :ref:`IGeomFunctor<inheritanceGraphIGeomFunctor>` detecting exact collision.
 
 Some material models (such as the :yref:`concrete model<Law2_ScGeom_CpmPhys_Cpm>`) rely on initial interaction network which is denser than geometrical contact of spheres: sphere's radii as "enlarged" by a dimensionless factor called *interaction radius* (or *interaction ratio*) to create this initial network. This is done typically in this way (see :ysrc:`examples/concrete/uniax.py` for an example):
 
@@ -533,7 +533,7 @@ It is possible to create an interaction between a pair of particles independentl
 	# created by functors in InteractionLoop
 	Yade [2]: i.geom, i.phys
 
-This method will be rather slow if many interaction are to be created (the functor lookup will be repeated for each of them). In such case, ask on yade-dev@lists.launchpad.net to have the :yref:`createInteraction<yade._utils.createInteraction>` function accept list of pairs id's as well.
+This method will be rather slow if many interactions are to be created (the functor lookup will be repeated for each of them). In such case, ask on yade-dev@lists.launchpad.net to have the :yref:`createInteraction<yade._utils.createInteraction>` function accept list of pairs id's as well.
 
 Base engines
 =============
@@ -635,7 +635,7 @@ Law2 functor(s)
 
 ``Law2`` functor was the ultimate criterion for the choice of ``Ig2`` and ``Ip2`` functors; there are no restrictions on its choice in itself, as it only applies forces without creating new objects.
 
-In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :ref:`IGeom<inheritanceGraphIGeom>` and :ref:`IPhys<inheritanceGraphIPhys>` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :yref:`Shapes<Shape>` and :ref:`Materials<inheritanceGraphMaterial>`).
+In most simulations, only one ``Law2`` functor will be in use; it is possible, though, to have several of them, dispatched based on combination of :ref:`IGeom<inheritanceGraphIGeom>` and :ref:`IPhys<inheritanceGraphIPhys>` produced previously by ``Ig2`` and ``Ip2`` functors respectively (in turn based on combination of :ref:`Shapes<inheritanceGraphShape>` and :ref:`Materials<inheritanceGraphMaterial>`).
 
 .. note:: As in the case of ``Ip2`` functors, receiving a combination of :ref:`IGeom<inheritanceGraphIGeom>` and :ref:`IPhys<inheritanceGraphIPhys>` which is not handled by any ``Law2`` functor is an error.
 
@@ -803,7 +803,7 @@ Engines deriving from :ref:`BoundaryController<inheritanceGraphBoundaryControlle
 Field appliers
 ---------------
 
-Engines deriving from :ref:`FieldApplier<inheritanceGraphFieldApplier>` acting on all particles. The one most used is :yref:`GravityEngine` applying uniform acceleration field (:yref:`GravityEngine` is deprecated, use :yref:`NewtonIntegrator.gravity` instead!).
+Engines deriving from :ref:`FieldApplier<inheritanceGraphFieldApplier>` are acting on all particles. The one most used is :yref:`GravityEngine` applying uniform acceleration field (:yref:`GravityEngine` is deprecated, use :yref:`NewtonIntegrator.gravity` instead).
 
 Partial engines
 ---------------
@@ -814,7 +814,7 @@ Engines deriving from :ref:`PartialEngine<inheritanceGraphPartialEngine>` define
 * :yref:`ForceEngine` and :yref:`TorqueEngine` applying given values of force/torque on subscribed bodies at every step.
 * :yref:`StepDisplacer` for applying generalized displacement delta at every timestep; designed for precise control of motion when testing constitutive laws on 2 particles.
 
-The real value of partial engines is when you need to prescribe a complex type of force or displacement field. For moving a body at constant velocity or for imposing a single force, the methods explained in `Imposing motion and forces`_ are much simpler. There are several interpolating engines (:yref:`InterpolatingDirectedForceEngine` for applying force with varying magnitude, :yref:`InterpolatingHelixEngine` for applying spiral displacement with varying angular velocity in :ysrc:`examples/test/helix.py` and possibly others); writing a new interpolating engine is rather simple using examples of those that already exist.
+The real value of partial engines is when you need to prescribe a complex type of force or displacement field. For moving a body at constant velocity or for imposing a single force, the methods explained in `Imposing motion and forces`_ are much simpler. There are several interpolating engines (:yref:`InterpolatingDirectedForceEngine` for applying force with varying magnitude, :yref:`InterpolatingHelixEngine` for applying spiral displacement with varying angular velocity; see :ysrc:`examples/test/helix.py` and possibly others); writing a new interpolating engine is rather simple using examples of those that already exist.
 
 
 Convenience features
@@ -930,7 +930,7 @@ Running python code
 
 A special engine :yref:`PyRunner` can be used to periodically call python code, specified via the ``command`` parameter. Periodicity can be controlled by specifying computation time (``realPeriod``), virutal time (``virtPeriod``) or iteration number (``iterPeriod``).
 
-For instance, to print kinetic energy (using :yref:`kineticEnergy<yade.utils.kineticEnergy>`) every 5 seconds, the following engine will be put to ``O.engines``::
+For instance, to print kinetic energy (using :yref:`kineticEnergy<yade._utils.kineticEnergy>`) every 5 seconds, the following engine will be put to ``O.engines``::
 
 	PyRunner(command="print 'kinetic energy',kineticEnergy()",realPeriod=5)
 
@@ -1454,7 +1454,7 @@ While job is running, the batch system presents progress via simple HTTP server 
 Batch execution on Job-based clusters (OAR)
 ===========================================
 
-On computation clusters, where there is already a scheduling system, the following script might be usefull. Exactly like yade-batch, it handles assignemnt of parameters value to python variables in simulation script from a parameter table, and job submission. This script is written for `oar-based <http://oar.imag.fr>`_ system , and may be extended to others ones. On those system, usually, a job can't run forever and has a specific duration allocation.
+On High Performance Computation clusters with a scheduling system, the following script might be useful. Exactly like yade-batch, it handles assignemnt of parameters value to python variables in simulation script from a parameter table, and job submission. This script is written for `oar-based <http://oar.imag.fr>`_ system , and may be extended to others ones. On those system, usually, a job can't run forever and has a specific duration allocation.
 The whole job submission consists of 3 files:
 
 Simulation script:
@@ -1496,9 +1496,9 @@ Postprocessing
 
 There are multiple ways to produce a video of simulation:
 
-#. Capture screen output (the 3d rendering window) during the simulation − there are tools available for that (such as `Istanbul <http://live.gnome.org/Istanbul>`_ or `RecordMyDesktop <http://recordmydesktop.sourceforge.net/about.php>`_, which are also packaged for most Linux distributions).  The output is "what you see is what you get", with all the advantages and disadvantages.
+#. Capture screen output (the 3d rendering window) during the simulation − there are tools available for that (such as `Istanbul <http://www.linuceum.com/Desktop/istanbul.php>`_ or `RecordMyDesktop <http://recordmydesktop.sourceforge.net/about.php>`_, which are also packaged for most Linux distributions).  The output is "what you see is what you get", with all the advantages and disadvantages.
 
-#. Periodic frame snapshot using :yref:`SnapshotEngine` (see :ysrc:`examples/test/force-network-video.py`, :ysrc:`examples/bulldozer/bulldozer.py`, :ysrc:`examples/test/beam-l6geom.py` for a full example)::
+#. Periodic frame snapshot using :yref:`SnapshotEngine` (see :ysrc:`examples/test/force-network-video.py`, :ysrc:`examples/bulldozer/bulldozer.py` or :ysrc:`examples/test/beam-l6geom.py` for a complete example)::
    
       O.engines=[
       	#...
@@ -1623,7 +1623,7 @@ Below is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` functio
 
 Micro-stress
 ------------
-Stress fields can be generated by combining the volume returned by TesselationWrapper to per-particle stress given by :yref:`bodyStressTensors<yade.utils.bodyStressTensors>`. Since the stress $\sigma$ from bodyStressTensor implies a division by the volume $V_b$ of the solid particle, one has to re-normalize it in order to obtain the micro-stress as defined in [Catalano2014a]_ (equation 39 therein), i.e. $\overline{\sigma}^k = \sigma^k \times V_b^k / V_{\sigma}^k$ where $V_{\sigma}^k$ is the volume assigned to particle $k$ in the tesselation. For instance:
+Stress fields can be generated by combining the volume returned by TesselationWrapper to per-particle stress given by :yref:`bodyStressTensors<yade._utils.bodyStressTensors>`. Since the stress $\sigma$ from bodyStressTensor implies a division by the volume $V_b$ of the solid particle, one has to re-normalize it in order to obtain the micro-stress as defined in [Catalano2014a]_ (equation 39 therein), i.e. $\overline{\sigma}^k = \sigma^k \times V_b^k / V_{\sigma}^k$ where $V_{\sigma}^k$ is the volume assigned to particle $k$ in the tesselation. For instance:
 
 .. code-block:: python
 
