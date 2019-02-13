@@ -1,5 +1,5 @@
 #!/usr/bin/zsh
-# This script automatically adds links to youtube videos of examples. First it greps list_of_examples for pattern "...│...│YES│"
+# This script automatically adds links to youtube videos of examples. First it greps ../examples/list_of_examples for pattern "...│...│YES│"
 # to identify examples which have a video uploaded.
 # Then it runs a loop over all those examples and appends them to the file.
 
@@ -8,7 +8,7 @@
 # http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#anonymous-hyperlinks
 # https://stackoverflow.com/questions/30822880/python-sphinx-anchor-on-arbitrary-line
 # section levels: #, *, =, -, ^, ",
-the_examples=("${(@f)$(grep -E "...│...│YES│" list_of_examples.txt | sed -e "s/.* \([A-Za-z_0-9-]\+\>\.py\>\).*/\1/")}")
+the_examples=("${(@f)$(grep -E "...│...│YES│" ../examples/list_of_examples.txt | sed -e "s/.* \([A-Za-z_0-9-]\+\>\.py\>\).*/\1/")}")
 
 PREV_SECTION=""
 NEW_SECTION=""
@@ -22,7 +22,7 @@ for example in $the_examples; do
 		TMP2_SECTION=`echo "$TMP_SECTION" | cut -d "/" -f1`
 		# capitalize first letter in section name
 		NEW_SECTION="$(tr '[:lower:]' '[:upper:]' <<< ${TMP2_SECTION:0:1})${TMP2_SECTION:1}"
-		YOUTUBEURL=`grep -E " ${example}\>" list_of_examples.txt | sed -e "s/.* ${example}\>.*https:\/\/youtu.be\/\([^ ]\+\).*/\1/"`
+		YOUTUBEURL=`grep -E " ${example}\>" ../examples/list_of_examples.txt | sed -e "s/.* ${example}\>.*https:\/\/youtu.be\/\([^ ]\+\).*/\1/"`
 		# make sure that .rst references do not contain illegal characters
 		SANITIZE=`echo ${BASENAME} | sed -e "s/[^A-Za-z0-9]/-/g"`
 		Sanitize="$(tr '[:lower:]' '[:upper:]' <<< ${SANITIZE:0:1})${SANITIZE:1}"

@@ -7,12 +7,12 @@
 
 
 # this command I used to verify that I got a correct regexp for finding the examples.
-#grep -E "...│...│no │" list_of_examples.txt | grep -E "\<[A-Za-z_0-9-]+\>\.py\>" --color
+#grep -E "...│...│no │" ../examples/list_of_examples.txt | grep -E "\<[A-Za-z_0-9-]+\>\.py\>" --color
 
 # get a list of all examples which have "no" uploaded video
-#grep -E "...│...│no │" list_of_examples.txt | sed -e "s/.*\(\<[A-Za-z_0-9-]\+\>\.py\>\).*/\1/"
+#grep -E "...│...│no │" ../examples/list_of_examples.txt | sed -e "s/.*\(\<[A-Za-z_0-9-]\+\>\.py\>\).*/\1/"
 
-the_examples=("${(@f)$(grep -E "...│...│no │" list_of_examples.txt | sed -e "s/.* \([A-Za-z_0-9-]\+\>\.py\>\).*/\1/")}")
+the_examples=("${(@f)$(grep -E "...│...│no │" ../examples/list_of_examples.txt | sed -e "s/.* \([A-Za-z_0-9-]\+\>\.py\>\).*/\1/")}")
 
 mkdir -p /tmp/video
 mkdir -p /tmp/run
