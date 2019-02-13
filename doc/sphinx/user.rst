@@ -323,18 +323,18 @@ Algorithms presented below operate on geometric spheres, defined by their center
 
 #. Sphere positions and radii are computed (some functions use volume predicate for this, some do not)
 #. :yref:`sphere<yade.utils.sphere>` is called for each position and radius computed; it receives extra `keyword arguments <http://docs.python.org/glossary.html#term-keyword-argument>`_ of the packing function (i.e. arguments that the packing function doesn't specify in its definition; they are noted ``**kw``). Each :yref:`sphere<yade.utils.sphere>` call creates actual :yref:`Body` objects with :yref:`Sphere` :yref:`shape<Shape>`. List of :yref:`Body` objects is returned.
-#. List returned from the packing function can be added to simulation using ``O.bodies.append``.
+#. List returned from the packing function can be added to simulation using :yref:`toSimulation()<yade._packSpheres.SpherePack.toSimulation>`. Legacy code used a call to :yref:`O.bodies.append<BodyContainer::append>`.
 
 Taking the example of pierced box::
 
 	pred=pack.inAlignedBox((-2,-2,-2),(2,2,2))-pack.inCylinder((0,-2,0),(0,2,0),1)
-	spheres=pack.randomDensePack(pred,spheresInCell=2000,radius=.1,rRelFuzz=.4,wire=True,color=(0,0,1),material=1)
+	spheres=pack.randomDensePack(pred,spheresInCell=2000,radius=.1,rRelFuzz=.4,wire=True,color=(0,0,1),material=1,returnSpherePack=True)
 
-Keyword arguments ``wire``, ``color`` and ``material`` are not declared in :yref:`yade.pack.randomDensePack`, therefore will be passed to :yref:`sphere<yade.utils.sphere>`, where they are also documented. ``spheres`` is now list of :yref:`Body` objects, which we add to the simulation::
+Keyword arguments ``wire``, ``color`` and ``material`` are not declared in :yref:`yade.pack.randomDensePack`, therefore will be passed to :yref:`sphere<yade.utils.sphere>`, where they are also documented. ``spheres`` is now a :yref:`packSpheres.SpherePack` object.::
 
-	O.bodies.append(spheres)
+	spheres.toSimulation()
 
-Packing algorithms described below produce dense packings. If one needs loose packing, :yref:`yade._packSpheres.SpherePack` class provides functions for generating loose packing, via its :yref:`yade._packSpheres.SpherePack.makeCloud` method. It is used internally for generating initial configuration in dynamic algorithms. For instance::
+Packing algorithms described below produce dense packings. If one needs loose packing, :yref:`SpherePack<yade._packSpheres.SpherePack>` class provides functions for generating loose packing, via its :yref:`makeCloud<yade._packSpheres.SpherePack.makeCloud>` method. It is used internally for generating initial configuration in dynamic algorithms. For instance::
 
 	from yade import pack
 	sp=pack.SpherePack()
@@ -342,11 +342,13 @@ Packing algorithms described below produce dense packings. If one needs loose pa
 
 will fill given box with spheres, until no more spheres can be placed. The object can be used to add spheres to simulation::
 
-	for c,r in sp: O.bodies.append(sphere(c,r))
+	sp.toSimulation()
 
-or, in a more pythonic way, with one single ``O.bodies.append`` call::
+.. comment: this is old version:  	for c,r in sp: O.bodies.append(sphere(c,r))
 
-	O.bodies.append([sphere(c,r) for c,r in sp])
+.. comment: this is old version:  or, in a more pythonic way, with one single ``O.bodies.append`` call::
+
+.. comment: this is old version:  	O.bodies.append([sphere(c,r) for c,r in sp])
 
 
 Geometric
