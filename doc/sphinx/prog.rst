@@ -41,12 +41,12 @@ style of inclusion rather than ``#include "Class.hpp`` even if you are in the sa
 The following table gives a few examples:
 
 ============================================================= =========================
-Original header location											     Included as     
+Original header location                                      Included as     
 ============================================================= =========================
-``core/Scene.hpp``														  ``#include <core/Scene.hpp>``
-``lib/base/Logging.hpp``												  ``#include <lib/base/Logging.hpp>``
-``lib/serialization/Serializable.hpp``								  ``#include <lib/serialization/Serializable.hpp>``
-``pkg/dem/SpherePack.hpp``					``#include <pkg/dem/SpherePack.hpp>``
+``core/Scene.hpp``                                            ``#include <core/Scene.hpp>``
+``lib/base/Logging.hpp``                                      ``#include <lib/base/Logging.hpp>``
+``lib/serialization/Serializable.hpp``                        ``#include <lib/serialization/Serializable.hpp>``
+``pkg/dem/SpherePack.hpp``                                    ``#include <pkg/dem/SpherePack.hpp>``
 ============================================================= =========================
 
 
