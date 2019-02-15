@@ -24,36 +24,35 @@ we shall call each top-level component *module*::
 	extra/        ## miscillanea
 	gui/          ## user interfaces
 	   qt4/          ## graphical user interface based on qt3 and OpenGL
-	   py/           ## python console interface (phased out)
+	   qt5/          ## same, but for qt5
 	lib/          ## support libraries, not specific to simulations
 	pkg/          ## simulation-specific files
 	   common/       ## generally useful classes
 	   dem/          ## classes for Discrete Element Method
 	py/           ## python modules
 
+.. FIXME: what about /pkg/lbm i /pkg/pvf - put them here?
+
 
 Header installation
 ^^^^^^^^^^^^^^^^^^^^
-To allow flexibility in source layout, CMAKE will copy (symlink) all headers into 
-flattened structure within the build directory. First 2 components of the original 
-directory are joind by dash, deeper levels are discarded (in case of ``core`` and 
-``extra``, only 1 level is used). The following table makes gives a few examples:
+CMAKE uses the original source layout and it is advised to use ``#include <module/Class.hpp>``
+style of inclusion rather than ``#include "Class.hpp`` even if you are in the same directory.
+The following table gives a few examples:
 
 ============================================================= =========================
 Original header location											     Included as     
 ============================================================= =========================
-``core/Scene.hpp``														  ``<core/Scene.hpp>``
-``lib/base/Logging.hpp``												  ``<lib-base/Logging.hpp>``
-``lib/serialization/Serializable.hpp``								  ``<lib-serialization/Serializable.hpp>``
-``pkg/dem/DataClass/SpherePack.hpp``                          ``<pkg-dem/SpherePack.hpp>``
-``gui/qt3/QtGUI.hpp``                                         ``<gui-qt3/QtGUI.hpp>``
+``core/Scene.hpp``														  ``#include <core/Scene.hpp>``
+``lib/base/Logging.hpp``												  ``#include <lib/base/Logging.hpp>``
+``lib/serialization/Serializable.hpp``								  ``#include <lib/serialization/Serializable.hpp>``
+``pkg/dem/SpherePack.hpp``					``#include <pkg/dem/SpherePack.hpp>``
 ============================================================= =========================
-
-It is advised to use ``#include<module/Class.hpp>`` style of inclusion rather than ``#include"Class.hpp`` even if you are in the same directory.
 
 
 Automatic compilation
 """"""""""""""""""""""
+
 In the ``pkg/`` directory, situation is different. In order to maximally ease 
 addition of modules to yade, all ``*.cpp`` files are *automatically scanned* by 
 CMAKE and considered for compilation. Each file may contain multiple lines that 
