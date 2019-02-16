@@ -173,25 +173,25 @@ A check test should never need more than a few seconds to run. If your typical s
 Conventions
 ============
 
-The following rules that should be respected; documentation is treated separately.
+The following coding rules should be respected; documentation is treated separately.
 
 * general
 
   * C++ source files have ``.hpp`` and ``.cpp`` extensions (for headers and implementation, respectively).
   * All header files should have the ``#pragma once`` multiple-inclusion guard.
   * Try to avoid ``using namespace …`` in header files.
-  * Use tabs for indentation. While this is merely visual in ``c++``, it has semantic meaning in python; inadverently mixing tabs and spaces can result in syntax errors.
+  * Use tabs for indentation. While this is merely visual in ``C++``, it has semantic meaning in python; inadvertently mixing tabs and spaces can result in syntax errors.
 
 * capitalization style
 
-  * Types should be always capitalized. Use CamelCase for composed names (``GlobalEngine``). Underscores should be used only in special cases, such as functor names.
-  * Class data members and methods must not be capitalized, composed names should use use lowercased camelCase (``glutSlices``). The same applies for functions in python modules.
+  * Types should be always capitalized. Use CamelCase for composed class and typenames (``GlobalEngine``). Underscores should be used only in special cases, such as functor names.
+  * Class data members and methods must not be capitalized, composed names should use lowercase camelCase (``glutSlices``). The same applies for functions in python modules.
   * Preprocessor macros are uppercase, separated by underscores; those that are used outside the core take (with exceptions) the form ``YADE_*``, such as :ref:`YADE_CLASS_BASE_DOC`.
 
 * programming style
 
   * Be defensive, if it has no significant performance impact. Use assertions abundantly: they don't affect performance (in the optimized build) and make spotting error conditions much easier.
-  * Use ``YADE_CAST`` and ``YADE_PTR_CAST`` where you want type-check during debug builds, but fast casting in optimized build. 
+  * Use ``YADE_CAST`` and ``YADE_PTR_CAST`` where you want type-check during debug builds, but fast casting in optimized build.
   * Initialize all class variables in the default constructor. This avoids bugs that may manifest randomly and are difficult to fix. Initializing with NaN's will help you find otherwise unitialized variable. (This is taken care of by :ref:`YADE_CLASS_BASE_DOC` macros for user classes)
 
 
