@@ -5,19 +5,19 @@ Programmer's manual
 Build system
 =============
 
-Yade uses `cmake <http://www.cmake.org/>`__ the cross-platform, open-source build 
-system for managing the build process. It takes care of configuration, compilation 
-and installation. CMake is used to control the software compilation process using 
-simple platform and compiler independent configuration files. CMake generates 
-native makefiles and workspaces that can be used in the compiler environment of 
+Yade uses `cmake <http://www.cmake.org/>`__ the cross-platform, open-source build
+system for managing the build process. It takes care of configuration, compilation
+and installation. CMake is used to control the software compilation process using
+simple platform and compiler independent configuration files. CMake generates
+native makefiles and workspaces that can be used in the compiler environment of
 your choice.
 
 
 Building
 -------------
 
-Yade source tree has the following structure (omiting, ``doc``, 
-``examples`` and ``scripts`` which don't participate in the build process); 
+Yade source tree has the following structure (omitting, ``doc``,
+``examples`` and ``scripts`` which don't participate in the build process);
 we shall call each top-level component *module*::
 
 	core/         ## core simulation building blocks
@@ -55,7 +55,11 @@ Automatic compilation
 
 In the ``pkg/`` directory, situation is different. In order to maximally ease 
 addition of modules to yade, all ``*.cpp`` files are *automatically scanned* by 
-CMAKE and considered for compilation. Each file may contain multiple lines that 
+CMAKE and considered for compilation.
+
+.. FIXME: replace this with info about cmake -DENABLE_Something for #ifdef. Or something ilke that.
+
+Each file may contain multiple lines that 
 declare features that are necessary for this file to be compiled::
 
 	YADE_REQUIRE_FEATURE(vtk);
@@ -101,14 +105,23 @@ these tools in the `development section <https://yade-dem.org/wiki/Yade#Developm
 
 Hosting and versioning
 ----------------------
-The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__, 
-which is used for source code, bug tracking, planning, package downloads and more. 
+The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__
+and `GitLab <https://gitlab.com/yade-dev/>`__:
+
+.. comment Old Version:   which is used for source code, bug tracking, planning, package downloads and more. 
+
+* `source code on gitlab <https://gitlab.com/yade-dev/trunk>`__
+* `issue and bug tracking on gitlab <https://gitlab.com/yade-dev/trunk/issues>`__
+* `package downloads on launchpad <https://launchpad.net/yade/+download>`__
+* `yade-dev mailing list on launchpad <https://launchpad.net/~yade-dev>`__: yade-users@lists.launchpad.net
+* `yade-users mailing list on launchpad <https://launchpad.net/~yade-users>`__: yade-users@lists.launchpad.net
+* `questions and answers on launchpad <https://answers.launchpad.net/yade/>`__
 
 The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
 tutorial can be found in :ref:`yade-github-label`. 
 GIT is a distributed revision control system. It is available packaged for all major linux distributions.
 
-The source code is hosted on `GitHub <https://gitlab.com/yade-dev/>`__ , which is periodically
+The `suorce code <https://gitlab.com/yade-dev/>`__ is periodically
 imported to Launchpad for building PPA-packages.
 The repository `can be http-browsed <https://gitlab.com/yade-dev/trunk>`__.
 
