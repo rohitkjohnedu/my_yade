@@ -105,7 +105,7 @@ these tools in the `development section <https://yade-dem.org/wiki/Yade#Developm
 
 Hosting and versioning
 ----------------------
-The Yade project is kindly hosted at `launchpad <https://launchpad.net/yade/>`__
+The Yade project is kindly hosted at `Launchpad <https://launchpad.net/yade/>`__
 and `GitLab <https://gitlab.com/yade-dev/>`__:
 
 .. comment Old Version:   which is used for source code, bug tracking, planning, package downloads and more. 
@@ -127,21 +127,24 @@ The repository `can be http-browsed <https://gitlab.com/yade-dev/trunk>`__.
 
 Build robot
 -----------
-A build robot hosted at `3SR lab. <http://www.3s-r.hmg.inpg.fr/3sr/?lang=en>`__ 
-is tracking souce code changes.
-Each time a change in the source code is commited to the main development branch via GIT, 
+A build robot hosted at `UMS Gricad <https://gricad-gitlab.univ-grenoble-alpes.fr/>`__
+is tracking source code changes via `gitlab pipeline mechanism <https://gitlab.com/yade-dev/trunk/pipelines>`__.
+Each time a change in the source code is committed to the main development branch via GIT,
+or a `Merge Request (MR) <https://gitlab.com/yade-dev/trunk/merge_requests>`__ is submitted
 the "buildbot" downloads and compiles the new version, and start a series of tests.
 
-If a compilation error has been introduced, it will be notified to the yade-dev 
-mailing list and to the commiter, thus helping to fix problems quickly.
-If the compilation is successfull, the buildbot starts unit regression tests and 
-"check tests" (see below) and report the results. If all tests are passed, a new 
-version of the documentation is generated and uploaded to the website in 
-`html <https://www.yade-dem.org/doc/>`__ and `pdf <https://yade-dem.org/doc/Yade.pdf>`__ 
-formats. As a consequence, those two links always point to the documentation 
-(the one you are reading now) of the last successfull build, and the delay between 
+If a compilation error has been introduced, it will be notified to the yade-dev
+mailing list and to the committer, thus helping to fix problems quickly.
+If the compilation is successful, the buildbot starts unit regression tests and
+"check tests" (see below) and report the results. If all tests are passed, a new
+version of the documentation is generated and uploaded to the website in
+`html <https://www.yade-dem.org/doc/>`__ and `pdf <https://yade-dem.org/doc/Yade.pdf>`__
+formats. As a consequence, those two links always point to the documentation
+(the one you are reading now) of the last successful build, and the delay between
 commits and documentation updates are very short (minutes).
-The buildbot activity and logs can be `browsed online <https://yade-dem.org/buildbot/>`__.
+The buildbot activity and logs can be `browsed online <https://gitlab.com/yade-dev/trunk/-/jobs>`__.
+The output of each particular build is directly accessible by clicking the green *Passed* button,
+and then clicking *Browse* in the *Job Artifacts* on the right.
 
 Regression tests
 ----------------
