@@ -24,7 +24,7 @@ bool GeneralIntegratorInsertionSortCollider::isActivated(){
 		if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
 		fastestBodyMaxDist=integrator->maxVelocitySq;
 		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) return true;
-		if((size_t)BB[0].size()!=2*scene->bodies->size()) return true;
+		if(BB[0].size()!=2*scene->bodies->size()) return true;
 		if(scene->interactions->dirty) return true;
 		if(scene->doSort) { scene->doSort=false; return true; }
 		return false;
@@ -68,7 +68,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			}
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
-		assert((size_t)BB[0].size()==2*scene->bodies->size());
+		assert(BB[0].size() == 2*scene->bodies->size());
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);

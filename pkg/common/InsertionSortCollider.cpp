@@ -173,7 +173,7 @@ vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 		if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
 		fastestBodyMaxDist=newton->maxVelocitySq;
 		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) return true;
-		if((size_t)BB[0].size()!=2*scene->bodies->size()) return true;
+		if(BB[0].size() != 2*scene->bodies->size()) return true;
 		if(scene->interactions->dirty) return true;
 		if(scene->doSort) { scene->doSort=false; return true; }
 		return false;
@@ -204,9 +204,9 @@ void InsertionSortCollider::action(){
 			doInitSort=true;
 			doSort=false;
 		}
-		if(size_t(BB[0].size()) != 2*nBodies){
+		if(BB[0].size() != 2*nBodies){
 			// store previous size
-			size_t BBsize = size_t(BB[0].size());
+			size_t BBsize = BB[0].size();
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
@@ -222,7 +222,7 @@ void InsertionSortCollider::action(){
 			}
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
-		assert((size_t)BB[0].size()==2*scene->bodies->size());
+		assert( BB[0].size() == 2*scene->bodies->size());
 		
 		//Increase the size of force container.
 		scene->forces.addMaxId(2*scene->bodies->size());
