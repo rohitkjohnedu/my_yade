@@ -24,7 +24,7 @@ bool GeneralIntegratorInsertionSortCollider::isActivated(){
 		if(fastestBodyMaxDist<0){fastestBodyMaxDist=0; return true;}
 		fastestBodyMaxDist=integrator->maxVelocitySq;
 		if(fastestBodyMaxDist>=1 || fastestBodyMaxDist==0) return true;
-		if((size_t)BB[0].size!=2*scene->bodies->size()) return true;
+		if((size_t)BB[0].size()!=2*scene->bodies->size()) return true;
 		if(scene->interactions->dirty) return true;
 		if(scene->doSort) { scene->doSort=false; return true; }
 		return false;
@@ -35,7 +35,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 		timingDeltas->start();
 	#endif
 
-	long nBodies=(long)scene->bodies->size();
+	const size_t nBodies = scene->bodies->size();
 	InteractionContainer* interactions=scene->interactions.get();
 	scene->interactions->iterColliderLastRun=-1;
 
@@ -51,8 +51,8 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			doInitSort=true;
 			doSort=false;
 		}
-		if(BB[0].size!=2*nBodies){
-			long BBsize=BB[0].size;
+		if(BB[0].size() != 2*nBodies){
+			size_t BBsize=BB[0].size();
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
@@ -64,12 +64,11 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			for(int i=0; i<3; i++){
 				BB[i].vec.reserve(2*nBodies);
 				// add lower and upper bounds; coord is not important, will be updated from bb shortly
-				for(long id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bounds(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bounds(0,id,/*isMin=*/false)); }
-				BB[i].size=BB[i].vec.size();
+				for(size_t id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bounds(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bounds(0,id,/*isMin=*/false)); }
 			}
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
-		assert((size_t)BB[0].size==2*scene->bodies->size());
+		assert((size_t)BB[0].size()==2*scene->bodies->size());
 
 		// update periodicity
 		assert(BB[0].axis==0); assert(BB[1].axis==1); assert(BB[2].axis==2);
@@ -128,7 +127,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 	ISC_CHECKPOINT("bound");
 
 	// copy bounds along given axis into our arrays
-		for(long i=0; i<2*nBodies; i++){
+		for(size_t i=0; i<2*nBodies; i++){
 			for(int j=0; j<3; j++){
 				VecBounds& BBj=BB[j];
 				const Body::id_t id=BBj[i].id;
@@ -149,7 +148,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 		}
 	// for each body, copy its minima and maxima, for quick checks of overlaps later
 	BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
-	for(Body::id_t id=0; id<nBodies; id++){
+	for(size_t id=0; id<nBodies; id++){
 		const shared_ptr<Body>& b=Body::byId(id,scene);
 		if(b){
 			const shared_ptr<Bound>& bv=b->bound;
@@ -189,13 +188,13 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			VecBounds& V=BB[sortAxis];
 			// go through potential aabb collisions, create interactions as necessary
 			if(!periodic){
-				for(long i=0; i<2*nBodies; i++){
+				for(size_t i=0; i<2*nBodies; i++){
 					// start from the lower bound (i.e. skipping upper bounds)
 					// skip bodies without bbox, because they don't collide
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					// go up until we meet the upper bound
-					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
+					for(size_t j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
 						const Body::id_t& jid=V[j].id;
 						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
 						if(!V[j].flags.isMin) continue;
@@ -205,7 +204,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 					}
 				}
 			} else { // periodic case: see comments above
-				for(long i=0; i<2*nBodies; i++){
+				for(size_t i=0; i<2*nBodies; i++){
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					long cnt=0;
