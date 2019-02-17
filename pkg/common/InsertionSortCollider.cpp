@@ -184,7 +184,7 @@ void InsertionSortCollider::action(){
 		timingDeltas->start();
 	#endif
 
-	long nBodies=(long)scene->bodies->size();
+	const size_t nBodies = scene->bodies->size();
 	InteractionContainer* interactions=scene->interactions.get();
 	scene->interactions->iterColliderLastRun=-1;
 	#ifdef YADE_OPENMP
@@ -202,8 +202,9 @@ void InsertionSortCollider::action(){
 			doInitSort=true;
 			doSort=false;
 		}
-		if(BB[0].size!=2*nBodies){
-			long BBsize=BB[0].size;
+		if(size_t(BB[0].size) != 2*nBodies){
+			// store previous size
+			size_t BBsize = size_t(BB[0].size);
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
@@ -215,7 +216,7 @@ void InsertionSortCollider::action(){
 			for(int i=0; i<3; i++){
 				BB[i].vec.reserve(2*nBodies);
 				// add lower and upper bounds; coord is not important, will be updated from bb shortly
-				for(long id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bounds(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bounds(0,id,/*isMin=*/false)); }
+				for(size_t id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bounds(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bounds(0,id,/*isMin=*/false)); }
 				BB[i].size=BB[i].vec.size();
 			}
 		}
@@ -280,7 +281,7 @@ void InsertionSortCollider::action(){
 
 	// copy bounds along given axis into our arrays 
 	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
-	for(long i=0; i<2*nBodies; i++){
+	for(size_t i=0; i<2*nBodies; i++){
 // 		const long cacheIter = scene->iter;
 		for(int j=0; j<3; j++){
 				VecBounds& BBj=BB[j];
@@ -347,13 +348,13 @@ void InsertionSortCollider::action(){
 				for (int kk=0;  kk<ompThreads; kk++) newInts[kk].reserve(unsigned(10*nBodies/ompThreads));
 				#pragma omp parallel for schedule(guided,200) num_threads(ompThreads)
 			#endif
-				for(long i=0; i<2*nBodies; i++){
+				for(size_t i=0; i<2*nBodies; i++){
 					// start from the lower bound (i.e. skipping upper bounds)
 					// skip bodies without bbox, because they don't collide
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					// go up until we meet the upper bound
-					for(long j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
+					for(size_t j=i+1; /* handle case 2. of swapped min/max */ j<2*nBodies && V[j].id!=iid; j++){
 						const Body::id_t& jid=V[j].id;
 						// take 2 of the same condition (only handle collision [min_i..max_i]+min_j, not [min_i..max_i]+min_i (symmetric)
 						if(!(V[j].flags.isMin && V[j].flags.hasBB)) continue;
@@ -375,7 +376,7 @@ void InsertionSortCollider::action(){
 						interactions->insert(shared_ptr<Interaction>(new Interaction(newInts[n][k].first,newInts[n][k].second)));
 				#endif
 			} else { // periodic case: see comments above
-				for(long i=0; i<2*nBodies; i++){
+				for(size_t i=0; i<2*nBodies; i++){
 					if(!(V[i].flags.isMin && V[i].flags.hasBB)) continue;
 					const Body::id_t& iid=V[i].id;
 					// we might wrap over the periodic boundary here; that's why the condition is different from the aperiodic case
