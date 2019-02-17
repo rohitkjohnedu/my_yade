@@ -198,10 +198,10 @@ The following coding rules should be respected; documentation is treated separat
 Class naming
 -------------
 
-Although for historial reasons the naming scheme is not completely consistent, these rules should be obeyed especially when adding a new class.
+Although for historical reasons the naming scheme is not completely consistent, these rules should be obeyed especially when adding a new class.
 
-GlobalEngines and PartialEngines
-	GlobalEngines should be named in a way suggesting that it is a performer of certain action (like :yref:`ForceResetter`, :yref:`InsertionSortCollider`, :yref:`Recorder`); if this is not appropriate, append the ``Engine`` to the characteristics (:yref:`GravityEngine`). :yref:`PartialEngines<PartialEngine>` have no special naming convention different from :yref:`GlobalEngines<GlobalEngine>`.
+:ref:`GlobalEngines<inheritanceGraphGlobalEngine>` and :ref:`PartialEngines<inheritanceGraphPartialEngine>`
+	GlobalEngines should be named in a way suggesting that it is a performer of certain action (like :yref:`ForceResetter`, :yref:`InsertionSortCollider`, :yref:`Recorder`); if this is not appropriate, append the ``Engine`` to the characteristics name (e.g. :yref:`GravityEngine`). :ref:`PartialEngines<inheritanceGraphPartialEngine>` have no special naming convention different from :ref:`GlobalEngines<inheritanceGraphGlobalEngine>`.
 
 Dispatchers
 	Names of all dispatchers end in ``Dispatcher``. The name is composed of type it creates or, in case it doesn't create any objects, its main characteristics. Currently, the following dispatchers [#opengldispatchers]_ are defined:
