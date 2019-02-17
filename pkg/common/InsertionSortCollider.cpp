@@ -192,7 +192,10 @@ void InsertionSortCollider::action(){
 	#endif
 	// periodicity changed, force reinit
 	if(scene->isPeriodic != periodic){
-		for(int i=0; i<3; i++) BB[i].vec.clear();
+		for(int i=0; i<3; i++) {
+			BB[i].vec.clear();
+			BB[i].size=0;
+		}
 		periodic=scene->isPeriodic;
 	}
 	// pre-conditions
