@@ -28,7 +28,7 @@ void InsertionSortCollider::handleBoundInversion(Body::id_t id1, Body::id_t id2,
 
 void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 	assert(!periodic);
-	assert(v.size()==v.vec.size());
+	//assert(v.size()==v.vec.size());
 	for(size_t i=1; i<v.size(); i++){
 		const Bounds viInit=v[i]; long j=i-1; /* cache hasBB; otherwise 1% overall performance hit */ const bool viInitBB=viInit.flags.hasBB;
 		const bool isMin=viInit.flags.isMin; 
@@ -54,7 +54,7 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 #ifdef YADE_OPENMP
 	assert(!periodic);	
-	assert(v.size()==v.vec.size());
+	//assert(v.size()==v.vec.size());
 	if (ompThreads<=1) return insertionSort(v,interactions, scene, doCollide);
 	
 	Real chunksVerlet = 4*verletDist;//is 2* the theoretical requirement?
