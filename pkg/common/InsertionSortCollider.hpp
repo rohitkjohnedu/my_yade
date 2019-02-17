@@ -111,6 +111,9 @@ class InsertionSortCollider: public Collider{
 		std::vector<Bounds> vec;
 		Real cellDim;
 		// cache vector size(), update at every step in action()
+		// FIXME - this caching slows down everything, because it means extra copying of BB[i].vec.size() which anyways is internally cached by std::vector
+		//         also it can introduce bugs in case when BB[i].vec.size() changed, and someone forgot to update the cached size.
+		//         also, if it must stay here, it should become size_t type.
 		long size;
 		// index of the lowest coordinate element, before which the container wraps
 		long loIdx;
