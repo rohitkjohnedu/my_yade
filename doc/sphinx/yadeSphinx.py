@@ -100,7 +100,7 @@ def inheritanceDiagram(klass):
         global writer
         # useless, doesn't work in LaTeX anyway...
         return ('#yade.wrapper.%s'%c if writer=='html' else '%%yade.wrapper#yade.wrapper.%s'%c) # HTML/LaTeX
-    def mkNode(c,style='solid',fillcolor=None): return '\t\t"%s" [shape="box",fontsize=%i,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#yade.wrapper.%s"];\n'%(c,8 if writer=='html' else 20,style,'fillcolor=%s,'%fillcolor if fillcolor else '',c)
+    def mkNode(c,style='solid',fillcolor=None,isElsewhere=False): return '\t\t"%s" [shape="box",fontsize=%i,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#%s"];\n'%(c,8 if writer=='html' else 20,style,'fillcolor=%s,'%fillcolor if fillcolor else '', "inheritancegraph"+c.lower() if isElsewhere else "yade.wrapper."+c)
     childs=yade.system.childClasses(klass)
     maxDepth=1
     def countUp(c , klass):
@@ -119,7 +119,8 @@ def inheritanceDiagram(klass):
     pageWidth=6.3
     pageFraction=4
     fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
-    ret=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
+    ret=""
+    extraCaption="."
     if len(childs)==0: return ''
     for c in childs:
         try:
@@ -128,12 +129,14 @@ def inheritanceDiagram(klass):
                 continue # skip classes deriving from classes that are already documented
             if c not in docClasses: ret+=mkNode(c)
             else: # classes of which childs are documented elsewhere are marked specially
-                ret+=mkNode(c,style='filled,dashed',fillcolor='grey')
+                ret+=mkNode(c,style='filled,dashed',fillcolor='grey',isElsewhere=True)
+                extraCaption = ", complete graph of gray dashed classes is shown in their own section."
             ret+='\t\t"%s" -> "%s" [arrowsize=0.5,style="setlinewidth(0.5)"];\n'%(c,base)
         except NameError:
             pass
             #print 'WARN: unable to find class object for',c
-    return ret+'\t}\n\n'
+    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
+    return head+ret+'\t}\n\n'
 
 
 def sect(title,text,tops,reverse=False):
