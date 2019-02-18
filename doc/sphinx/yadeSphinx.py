@@ -77,20 +77,20 @@ def autodocClass(klass):
     global docClasses
     docClasses.add(klass)
     return ".. autoclass:: %s\n\t:members:\n\t:undoc-members:\n\t:inherited-members:\n\n"%(klass) # \t:inherited-members:\n # \n\t:show-inheritance:
-def autodocDerived(klass,doSections=True):
+def autodocDerived(klass,doSections=True,willBeLater=set()):
     global docClasses
     ret=''
     if doSections: ret+='%s\n'%klass+'^'*100+'\n\n'
     #the hyperlinks to those graphs work like: :ref:`inheritanceGraphBoundFunctor`  or  :ref:`BoundFunctor<inheritanceGraphBoundFunctor>`
     ret+=".. _inheritanceGraph%s:\n\n"%klass
-    ret+=inheritanceDiagram(klass)
+    ret+=inheritanceDiagram(klass,willBeLater)
     ret+=autodocClass(klass)
     childs=list(yade.system.childClasses(klass));
     childs.sort();
     for k in childs:
-        if not k in docClasses: ret+=autodocClass(k)
+        if not k in (docClasses|willBeLater): ret+=autodocClass(k)
     return ret
-def inheritanceDiagram(klass):
+def inheritanceDiagram(klass,willBeLater):
     """Generate simple inheritance graph for given classname *klass* using dot (http://www.graphviz.org) syntax.
     Classes in the docClasses set (already documented) are framed differently and the inheritance tree stops there.
     """
@@ -111,7 +111,8 @@ def inheritanceDiagram(klass):
         return ret
     for c in childs:
         try:
-            maxDepth=max(maxDepth,countUp(c,klass))
+            if c not in (docClasses|willBeLater):
+                maxDepth=max(maxDepth,countUp(c,klass))
         except NameError:
             pass
     # https://www.graphviz.org/doc/info/attrs.html , http://www.sphinx-doc.org/en/master/usage/extensions/graphviz.html , http://www.markusz.io/posts/drafts/graphviz-sphinx/
@@ -120,30 +121,42 @@ def inheritanceDiagram(klass):
     pageFraction=4
     fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
     ret=""
-    extraCaption="."
+    extraCaption=["",0]
     if len(childs)==0: return ''
     for c in childs:
         try:
             base=eval(c).__bases__[0].__name__
-            if base!=klass and base in docClasses:
+            if base!=klass and base in (docClasses|willBeLater):
                 continue # skip classes deriving from classes that are already documented
-            if c not in docClasses: ret+=mkNode(c)
+            if c not in (docClasses|willBeLater): ret+=mkNode(c)
             else: # classes of which childs are documented elsewhere are marked specially
                 ret+=mkNode(c,style='filled,dashed',fillcolor='grey',isElsewhere=True)
-                extraCaption = ", complete graph of gray dashed classes is shown in their own section."
+                extraCaption[0] += " :yref:`"+c+"`,"
+                extraCaption[1] += 1
             ret+='\t\t"%s" -> "%s" [arrowsize=0.5,style="setlinewidth(0.5)"];\n'%(c,base)
         except NameError:
             pass
             #print 'WARN: unable to find class object for',c
-    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
+    if(extraCaption[1] == 0):  extraCaption[0] = "."
+    # the [:-1] is to cut off the last comma after the last :yref:
+    if(extraCaption[1] == 1):  extraCaption[0] = ", the gray dashed class is discussed in a separate section: " + extraCaption[0][:-1] + "."
+    if(extraCaption[1] >= 2):  extraCaption[0] = ", gray dashed classes are discussed in their own sections: "  + extraCaption[0][:-1] + "."
+    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
     return head+ret+'\t}\n\n'
 
 
-def sect(title,text,tops,reverse=False):
-    subsects=[autodocDerived(top,doSections=(len(tops)>1)) for top in tops]
+def sect(title,text,tops,reverse=False,willBeLater=set()):
+    subsects=[autodocDerived(top,doSections=(len(tops)>1),willBeLater=willBeLater) for top in tops]
     if reverse: subsects.reverse()
     return title+'\n'+100*'-'+'\n\n'+text+'\n\n'+'\n\n'.join(subsects)+'\n'
 
+def childSet(klasses):
+    ret=set()
+    for klass in klasses:
+        ret.add(klass)
+        for child in yade.system.childClasses(klass):
+            ret.add(child)
+    return ret
 
 def genWrapperRst():
     global docClasses
