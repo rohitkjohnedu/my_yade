@@ -104,11 +104,16 @@ def inheritanceDiagram(klass,willBeLater):
     """
     global docClasses
     global writer
+    def linkGraphOrClass(klassToLink):
+        if(len(childSet([klassToLink]))==1):
+            return ":yref:`"+klassToLink+"`"
+        else:
+            return ":ref:`"+klassToLink+"<inheritanceGraph"+klassToLink+">"+"`"
     def mkUrl(c):
         global writer
         # useless, doesn't work in LaTeX anyway...
         return ('#yade.wrapper.%s'%c if writer=='html' else '%%yade.wrapper#yade.wrapper.%s'%c) # HTML/LaTeX
-    def mkNode(c,style='solid',fillcolor=None,isElsewhere=False): return '\t\t"%s" [shape="box",fontsize=%i,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#%s"];\n'%(c,8 if writer=='html' else 20,style,'fillcolor=%s,'%fillcolor if fillcolor else '', "inheritancegraph"+c.lower() if isElsewhere else "yade.wrapper."+c)
+    def mkNode(c,style='solid',fillcolor=None,isElsewhere=False): return '\t\t"%s" [shape="box",fontsize=%i,style="setlinewidth(0.5),%s",%sheight=0.2,URL="yade.wrapper.html#%s"];\n'%(c,8 if writer=='html' else 20,style,'fillcolor=%s,'%fillcolor if fillcolor else '', "inheritancegraph"+c.lower() if (isElsewhere and len(childSet([c])) != 1) else "yade.wrapper."+c)
     childs=yade.system.childClasses(klass)
     maxDepth=1
     def countUp(c , klass):
@@ -139,7 +144,7 @@ def inheritanceDiagram(klass,willBeLater):
             if c not in (docClasses|willBeLater): ret+=mkNode(c)
             else: # classes of which childs are documented elsewhere are marked specially
                 ret+=mkNode(c,style='filled,dashed',fillcolor='grey',isElsewhere=True)
-                extraCaption[0] += " :yref:`"+c+"`,"
+                extraCaption[0] += " "+linkGraphOrClass(c)+","
                 extraCaption[1] += 1
             ret+='\t\t"%s" -> "%s" [arrowsize=0.5,style="setlinewidth(0.5)"];\n'%(c,base)
         except NameError:
