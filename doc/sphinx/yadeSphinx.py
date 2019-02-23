@@ -183,10 +183,13 @@ Class reference (yade.wrapper module)
     sect('Interactions','',['Interaction','IGeom','IPhys'])+
     sect('Global engines','',['FieldApplier','Collider','BoundaryController','GlobalEngine'],reverse=True)+
     sect('Partial engines','',['PartialEngine'])+
+    sect('Dispatchers','',['Dispatcher'],willBeLater=childSet(['BoundDispatcher', 'IGeomDispatcher', 'IPhysDispatcher', 'LawDispatcher', 'InternalForceDispatcher']))+
+    sect('Functors','',['Functor'],willBeLater=childSet(['IPhysFunctor', 'GlStateFunctor', 'GlIGeomFunctor', 'IGeomFunctor', 'LawFunctor', 'GlBoundFunctor', 'GlIPhysFunctor', 'GlShapeFunctor', 'BoundFunctor', 'InternalForceFunctor']))+
     sect('Bounding volume creation','',['BoundFunctor','BoundDispatcher'])+
     sect('Interaction Geometry creation','',['IGeomFunctor','IGeomDispatcher'])+
     sect('Interaction Physics creation','',['IPhysFunctor','IPhysDispatcher'])+
     sect('Constitutive laws','',['LawFunctor','LawDispatcher'])+
+    sect('Internal forces','',['InternalForceFunctor', 'InternalForceDispatcher'])+
     sect('Callbacks','',[#'BodyCallback',
         'IntrCallback'])+
     sect('Preprocessors','',['FileGenerator'])+
