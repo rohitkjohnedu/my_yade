@@ -14,7 +14,14 @@
 #include <vtkPolyData.h>
 
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkTriangle.h>
+
+// https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcomment"
+// Code that generates this warning, FIXME: we should rather send a bugfix to the library authors. Note: we cannot do this trick for yade code. If we have a warning in yade, we must to fix it!
+#include<vtkTriangle.h>
+#pragma GCC diagnostic pop
+
 #include <vtkSmartPointer.h>
 #include <vtkFloatArray.h>
 #include <vtkCellArray.h>

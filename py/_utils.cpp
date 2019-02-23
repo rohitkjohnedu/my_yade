@@ -1,5 +1,10 @@
 #include <py/_utils.hpp>
+// https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+// Code that generates this warning, FIXME: we should rather send a bugfix to the library authors. Note: we cannot do this trick for yade code. If we have a warning in yade, we must to fix it!
 #include <numpy/arrayobject.h>
+#pragma GCC diagnostic pop
 
 py::tuple negPosExtremeIds(int axis, Real distFactor){
 	py::tuple extrema=Shop::aabbExtrema();
