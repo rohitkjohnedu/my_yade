@@ -73,6 +73,14 @@ with open('modules.rst','w') as f:
 # classes already documented
 docClasses=set()
 
+def childSet(klasses):
+    ret=set()
+    for klass in klasses:
+        ret.add(klass)
+        for child in yade.system.childClasses(klass):
+            ret.add(child)
+    return ret
+
 def autodocClass(klass):
     global docClasses
     docClasses.add(klass)
@@ -149,14 +157,6 @@ def sect(title,text,tops,reverse=False,willBeLater=set()):
     subsects=[autodocDerived(top,doSections=(len(tops)>1),willBeLater=willBeLater) for top in tops]
     if reverse: subsects.reverse()
     return title+'\n'+100*'-'+'\n\n'+text+'\n\n'+'\n\n'.join(subsects)+'\n'
-
-def childSet(klasses):
-    ret=set()
-    for klass in klasses:
-        ret.add(klass)
-        for child in yade.system.childClasses(klass):
-            ret.add(child)
-    return ret
 
 def genWrapperRst():
     global docClasses
