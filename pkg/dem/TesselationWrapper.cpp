@@ -17,6 +17,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 // Code that generates this warning, FIXME: we should rather send a bugfix to the library authors. Note: we cannot do this trick for yade code. If we have a warning in yade, we must to fix it!
+// This method will work once g++ bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431#c34 is fixed.
 #include <lib/pyutil/numpy_boost.hpp>
 #pragma GCC diagnostic pop
 
