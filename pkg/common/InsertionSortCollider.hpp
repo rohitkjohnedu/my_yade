@@ -109,22 +109,22 @@ class InsertionSortCollider: public Collider{
 		// axis set in the ctor
 		int axis;
 		Real cellDim;
-		// cache vector size(), update at every step in action()
-		// FIXME - this caching slows down everything, because it means extra copying of BB[i].vec.size() which anyways is internally cached by std::vector
-		//         also it can introduce bugs in case when BB[i].vec.size() changed, and someone forgot to update the cached size.
-		//         also, if it must stay here, it should become size_t type.
-//		long size;
-		size_t size() const { return vec.size(); };
 		// index of the lowest coordinate element, before which the container wraps
 		size_t loIdx;
+
 		Bounds& operator[](long idx){ assert(idx<long(size()) && idx>=0); return vec[idx]; }
 		const Bounds& operator[](long idx) const { assert(idx<long(size()) && idx>=0); return vec[idx]; }
+
 		// update number of bodies, periodic properties and size from Scene
 		void updatePeriodicity(Scene* );
 		// normalize given index to the right range (wraps around)
 		size_t norm(long i) const { if(i<0) i+=size(); assert(i>=0); size_t ret=i%size(); assert(ret<size()); return ret;}
 		VecBounds(): axis(-1), loIdx(0){}
 		void dump(ostream& os){ string ret; for(size_t i=0; i<vec.size(); i++) os<<(i==loIdx?"@@ ":"")<<vec[i].coord<<"(id="<<vec[i].id<<","<<(vec[i].flags.isMin?"min":"max")<<",p"<<vec[i].period<<") "; os<<endl;}
+
+//		long size;
+		size_t size() const { return vec.size(); };
+
 		void clear() { vec.clear(); }
 		void reserve(size_t n) { vec.reserve(n); }
 		void push_back(const Bounds&  bb) { vec.push_back(bb); }
