@@ -126,9 +126,9 @@ class InsertionSortCollider: public Collider{
 		size_t cachedSize{0};
 		void incCache()     { ++cachedSize; };
 		void zeroCache()    { cachedSize=0; };
-		size_t size() const { return cachedSize; };
+		size_t size() const { return cachedSize; }; // adding an assert(vec.size() == cachedSize); here might make some sense. But will defeat the purpose, sort of ;) Because it will call vec.size();
 #else
-		// Note, everything inside struct definition is inline. Empty functions expand to nothing.
+		// Note: everything inside struct definition is inline. Empty functions expand to nothing.
 		void incCache() {};
 		void zeroCache() {};
 		size_t size() const { return vec.size(); };
@@ -137,6 +137,7 @@ class InsertionSortCollider: public Collider{
 		void clear()                      { vec.clear();      zeroCache(); }
 		void reserve(size_t n)            { vec.reserve(n);                }
 		void push_back(const Bounds&  bb) { vec.push_back(bb); incCache(); }
+		// if the line below does not compile on older ubuntu 14.04, then I should add #ifdef guards to check compiler version. This line will make push_back faster when a newer compiler supports it.
 		void push_back(      Bounds&& bb) { vec.push_back(bb); incCache(); }
 		void sort()                       { std::sort(vec.begin(),vec.end()); }
 		std::vector<Bounds>::const_iterator cbegin() const { return vec.cbegin();}
