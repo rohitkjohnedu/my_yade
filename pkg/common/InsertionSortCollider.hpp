@@ -122,6 +122,7 @@ class InsertionSortCollider: public Collider{
 		VecBounds(): axis(-1), loIdx(0){}
 		void dump(ostream& os){ string ret; for(size_t i=0; i<vec.size(); i++) os<<(i==loIdx?"@@ ":"")<<vec[i].coord<<"(id="<<vec[i].id<<","<<(vec[i].flags.isMin?"min":"max")<<",p"<<vec[i].period<<") "; os<<endl;}
 
+#define VEC_BOUND_CACHING
 #ifdef VEC_BOUND_CACHING
 		size_t cachedSize{0};
 		void incCache()     { ++cachedSize; };
