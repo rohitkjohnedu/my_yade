@@ -108,7 +108,6 @@ class InsertionSortCollider: public Collider{
 	struct VecBounds{
 		// axis set in the ctor
 		int axis;
-		std::vector<Bounds> vec;
 		Real cellDim;
 		// cache vector size(), update at every step in action()
 		// FIXME - this caching slows down everything, because it means extra copying of BB[i].vec.size() which anyways is internally cached by std::vector
@@ -126,6 +125,16 @@ class InsertionSortCollider: public Collider{
 		size_t norm(long i) const { if(i<0) i+=size(); assert(i>=0); size_t ret=i%size(); assert(ret<size()); return ret;}
 		VecBounds(): axis(-1), loIdx(0){}
 		void dump(ostream& os){ string ret; for(size_t i=0; i<vec.size(); i++) os<<(i==loIdx?"@@ ":"")<<vec[i].coord<<"(id="<<vec[i].id<<","<<(vec[i].flags.isMin?"min":"max")<<",p"<<vec[i].period<<") "; os<<endl;}
+		void clear() { vec.clear(); }
+		void reserve(size_t n) { vec.reserve(n); }
+		void push_back(const Bounds&  bb) { vec.push_back(bb); }
+		void push_back(      Bounds&& bb) { vec.push_back(bb); }
+		void sort() { std::sort(vec.begin(),vec.end()); }
+		std::vector<Bounds>::const_iterator cbegin() const { return vec.cbegin();}
+		std::vector<Bounds>::const_iterator cend  () const { return vec.cend  ();}
+
+		private:
+			std::vector<Bounds> vec;
 	};
 	private:
 	//! storage for bounds
@@ -172,7 +181,7 @@ class InsertionSortCollider: public Collider{
 	virtual bool isActivated();
 
 	// force reinitialization at next run
-	virtual void invalidatePersistentData(){ for(int i=0; i<3; i++){ BB[i].vec.clear(); }}
+	virtual void invalidatePersistentData(){ for(int i=0; i<3; i++){ BB[i].clear(); }}
 
 	vector<Body::id_t> probeBoundingVolume(const Bound&);
 

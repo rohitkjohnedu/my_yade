@@ -41,7 +41,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 
 	// periodicity changed, force reinit
 	if(scene->isPeriodic != periodic){
-		for(int i=0; i<3; i++) BB[i].vec.clear();
+		for(int i=0; i<3; i++) BB[i].clear();
 		periodic=scene->isPeriodic;
 	}
 	// pre-conditions
@@ -56,15 +56,15 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
-			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].vec.clear(); }
+			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].clear(); }
 			// more than 100 bodies was added, do initial sort again
 			// maybe: should rather depend on ratio of added bodies to those already present...?
 			if(2*nBodies-BBsize>200 || BBsize==0) doInitSort=true;
 			assert((BBsize%2)==0);
 			for(int i=0; i<3; i++){
-				BB[i].vec.reserve(2*nBodies);
+				BB[i].reserve(2*nBodies);
 				// add lower and upper bounds; coord is not important, will be updated from bb shortly
-				for(size_t id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bounds(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bounds(0,id,/*isMin=*/false)); }
+				for(size_t id=BBsize/2; id<nBodies; id++){ BB[i].push_back(Bounds(0,id,/*isMin=*/true)); BB[i].push_back(Bounds(0,id,/*isMin=*/false)); }
 			}
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
@@ -177,7 +177,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 			if(doInitSort){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel; it seems that there is no time gain running in parallel, though
 				// important to reset loInx for periodic simulation (!!)
-				for(int i=0; i<3; i++) { BB[i].loIdx=0; std::sort(BB[i].vec.begin(),BB[i].vec.end()); }
+				for(int i=0; i<3; i++) { BB[i].loIdx=0; BB[i].sort(); }
 				numReinit++;
 			} else { // sortThenCollide
 				if(!periodic) for(int i=0; i<3; i++) insertionSort(BB[i],interactions,scene,false);

@@ -142,8 +142,8 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
 	if(periodic){ throw invalid_argument("InsertionSortCollider::probeBoundingVolume: handling periodic boundary not implemented."); }
 	vector<Body::id_t> ret;
-	for( vector<Bounds>::iterator 
-			it=BB[0].vec.begin(),et=BB[0].vec.end(); it < et; ++it)
+	for( vector<Bounds>::const_iterator
+			it=BB[0].cbegin(),et=BB[0].cend(); it < et; ++it)
 	{		
 		if (it->coord > bv.max[0]) break;
 		if (!it->flags.isMin || !it->flags.hasBB) continue;
@@ -193,7 +193,7 @@ void InsertionSortCollider::action(){
 	// periodicity changed, force reinit
 	if(scene->isPeriodic != periodic){
 		for(int i=0; i<3; i++) {
-			BB[i].vec.clear();
+			BB[i].clear();
 		}
 		periodic=scene->isPeriodic;
 	}
@@ -210,15 +210,15 @@ void InsertionSortCollider::action(){
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
-			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].vec.clear(); }
+			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].clear(); }
 			// more than 100 bodies was added, do initial sort again
 			// maybe: should rather depend on ratio of added bodies to those already present...?
 			if(2*nBodies-BBsize>200 || BBsize==0) doInitSort=true;
 			assert((BBsize%2)==0);
 			for(int i=0; i<3; i++){
-				BB[i].vec.reserve(2*nBodies);
+				BB[i].reserve(2*nBodies);
 				// add lower and upper bounds; coord is not important, will be updated from bb shortly
-				for(size_t id=BBsize/2; id<nBodies; id++){ BB[i].vec.push_back(Bounds(0,id,/*isMin=*/true)); BB[i].vec.push_back(Bounds(0,id,/*isMin=*/false)); }
+				for(size_t id=BBsize/2; id<nBodies; id++){ BB[i].push_back(Bounds(0,id,/*isMin=*/true)); BB[i].push_back(Bounds(0,id,/*isMin=*/false)); }
 			}
 		}
 		if(minima.size()!=(size_t)3*nBodies){ minima.resize(3*nBodies); maxima.resize(3*nBodies); }
@@ -332,7 +332,7 @@ void InsertionSortCollider::action(){
 				// the initial sort is in independent in 3 dimensions, may be run in parallel; it seems that there is no time gain running in parallel, though
 				// important to reset loInx for periodic simulation (!!)
 // 				#pragma omp parallel for schedule(dynamic,1) num_threads(min(ompThreads,3))
-				for(int i=0; i<3; i++) { BB[i].loIdx=0; std::sort(BB[i].vec.begin(),BB[i].vec.end()); }
+				for(int i=0; i<3; i++) { BB[i].loIdx=0; BB[i].sort(); }
 				numReinit++;
 			} else { // sortThenCollide
 				if(!periodic) for(int i=0; i<3; i++) insertionSort(BB[i],interactions,scene,false);
