@@ -37,7 +37,7 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 			v[j+1]=v[j];
 			// no collisions without bounding boxes
 			// also, do not collide body with itself; it sometimes happens for facets aligned perpendicular to an axis, for reasons that are not very clear
-			// see https://bugs.launchpad.net/yade/+bug/669095
+			// see (old site, fixed bug) https://bugs.launchpad.net/yade/+bug/669095
 			// skip bounds with same isMin flags, since inversion doesn't imply anything in that case  
 			if(isMin && !v[j].flags.isMin && doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id)) {
 				/*if (isMin)*/ handleBoundInversion(viInit.id,v[j].id,interactions,scene);

@@ -1,7 +1,7 @@
 #pragma once
 #include<core/Shape.hpp>
 
-// HACK to work around https://bugs.launchpad.net/yade/+bug/528509
+// HACK to work around (old site, fixed bug) https://bugs.launchpad.net/yade/+bug/528509
 // see comments there for explanation
 namespace yade{
 

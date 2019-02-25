@@ -1,6 +1,6 @@
 #pragma once
 #include<lib/serialization/Serializable.hpp>
-// keep those two here, template instantiation & boost::python gets broken otherwise, e.g. https://bugs.launchpad.net/bugs/618766
+// keep those two here, template instantiation & boost::python gets broken otherwise, e.g. (old site, fixed bug) https://bugs.launchpad.net/bugs/618766
 #include<core/IGeom.hpp> 
 #include<core/IPhys.hpp>
 #include<core/Body.hpp>

@@ -307,7 +307,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if(!blockHook.empty()){ LOG_INFO("Running blockHook: "<<blockHook); pyRunString(blockHook); }
         flow.computePermeability();
 
-	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (https://bugs.launchpad.net/yade/+bug/1687355)
+	if (multithread && fluidBulkModulus>0) initializeVolumes(flow);  // needed for multithreaded compressible flow (old site, fixed bug https://bugs.launchpad.net/yade/+bug/1687355)
 	trickPermeability(&flow); //This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 

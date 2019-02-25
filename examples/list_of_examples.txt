@@ -83,7 +83,7 @@ OK │OK │YES│   └── periodicSandPile.py                https://yout
 OK │ok │YES│   ├── WedgeYADE.py                       https://youtu.be/GYrFkhFV-0E
 OK │ok │YES│   └── cubePBscaled.py                    https://youtu.be/Slnj-KeG-0w
    │   │   ├── PotentialParticles
-OK │x  │YES│   └── cubePPscaled.py                    https://youtu.be/gOgjwMavjuk     Note: clicking GUI→Display→intrAllWire will cause crash see: https://bugs.launchpad.net/yade/+bug/1813222
+OK │x  │YES│   └── cubePPscaled.py                    https://youtu.be/gOgjwMavjuk     Note: clicking GUI→Display→intrAllWire will cause crash see: https://gitlab.com/yade-dev/trunk/issues/48 https://gitlab.com/yade-dev/trunk/merge_requests/36 , old site: https://bugs.launchpad.net/yade/+bug/1813222
    │   │   ├── WireMatPM
 ok │x  │YES│   ├── wirecontacttest.py                 https://youtu.be/Kc0R6ZaSIa0
 ok │ok │YES│   ├── wirepackings.py                    https://youtu.be/VaW6gDdyiIc
@@ -266,7 +266,7 @@ OK │ok │YES│   ├── sphere-sphere-ViscElBasic-peri.py  https://yout
 OK │x  │YES│   ├── subdomain-balancer.py              https://youtu.be/i4_LOzGk3m8
 OK │x  │YES│   ├── test-sphere-facet-corner.py        https://youtu.be/NaELYGF9tKg
 OK?│OK │YES│   ├── test-sphere-facet.py               https://youtu.be/J7i86WHK3QA
-x  │x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb, see: https://bugs.launchpad.net/yade/+bug/1475844 (NOTE not reproduced in 2018.02b, needs further investigation, NOTE2: happens also in 2018.02b on a different computer so it is random)
+x  │x  │x  │   ├── test_Ip2_FrictMat_CpmMat_FrictPhys.py   After collision there is error: InteractionLoop::action(): Assertion `!swap' failed. SIGSEGV/SIGABRT handler called; gdb, see: https://gitlab.com/yade-dev/trunk/issues/10 , previous bug address with more discussion: https://bugs.launchpad.net/yade/+bug/1475844 (NOTE not reproduced in 2018.02b, needs further investigation, NOTE2: happens also in 2018.02b on a different computer so it is random)
 OK │ok │YES│   ├── triax-basic.py                     https://youtu.be/B2DIXJJvpwM
 OK │ok │no │   ├── triax-basic-without-plots.py       https://youtu.be/AALiZ7G7yNM
 OK │ok │no │   ├── triax-cohesive.py
