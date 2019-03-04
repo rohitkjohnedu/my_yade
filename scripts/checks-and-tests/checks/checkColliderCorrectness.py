@@ -14,7 +14,6 @@ if((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.
 	print inspect.currentframe().f_lineno
 	failCollider=True
 
-
 from yade import pack
 
 results={True:[None,None],False:[None,None]}
@@ -67,21 +66,10 @@ for usePeriod in [True,False]:
 
 
 #### these text files have too high precision, and get too big. I think that 8 decimal places should be good to avoid any numerical errors arising on different architectures.
-
-# textFile1=open("Output1___n.txt", "w");textFile1.write(str(results[False][0]));textFile1.close()
-# textFile2=open("Output2___n.txt", "w");textFile2.write(str(results[False][1]));textFile2.close()
-# textFile3=open("Output3___n.txt", "w");textFile3.write(str(results[False][2]));textFile3.close()
-#
-# textFile1=open("Output1___p.txt", "w");textFile1.write(str(results[True][0]));textFile1.close()
-# textFile2=open("Output2___p.txt", "w");textFile2.write(str(results[True][1]));textFile2.close()
-# textFile3=open("Output3___p.txt", "w");textFile3.write(str(results[True][2]));textFile3.close()
-#
 # textFile=open("Output123___n.txt", "w");textFile.write(str([results[False][0],results[False][1],results[False][2]]));textFile.close()
 # textFile=open("Output123___p.txt", "w");textFile.write(str([results[True ][0],results[True ][1],results[True ][2]]));textFile.close()
 
-# import pickle
-# pickle.dump( results , open( checksPath+'/data/checkColider.dat', "wb" ) )
-
+# I used this loop to save the reference results in git revision 2bc5ac90b
 resultFile=open( checksPath+'/data/checkColider.txt', "wb" )
 for per in results:
 	for result in results[per]:
