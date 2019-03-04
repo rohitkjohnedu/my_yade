@@ -14,74 +14,87 @@ if((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.
 	print inspect.currentframe().f_lineno
 	failCollider=True
 
-# print inspect.currentframe().f_lineno
-# typedEngine("NewtonIntegrator").gravity=(0,0,-9.81)
-# print inspect.currentframe().f_lineno
-# typedEngine("NewtonIntegrator").damping=0.1
-# print inspect.currentframe().f_lineno
-# testedCollider=typedEngine("InsertionSortCollider")
-# print inspect.currentframe().f_lineno
-
-#### This is unnecessary now. But if we wanted to test different colliders later that might be useful.
-# if(testedCollider.__class__.__name__ not in yade.system.childClasses("Collider")):
-#	print "testedCollider is not derived from collider class?"
-#	failCollider=True
-
 
 from yade import pack
-from pylab import rand
-from yade import qt
 
-O.periodic=True
-length=1.0
-height=1.0
-width=1.0
-thickness=0.1
-
-O.cell.hSize=Matrix3(length, 0, 0,
-		     0 ,3.*height, 0,
-		    0, 0, width)
-
-O.materials.append(FrictMat(density=1,young=1e5,poisson=0.3,frictionAngle=radians(30),label='boxMat'))
-lowBox = box( center=(length/2.0,thickness*0.6,width/2.0), extents=(length*2.0,thickness/2.0,width*2.0) ,fixed=True,wire=False)
-O.bodies.append(lowBox)
-
-radius=0.01
-O.materials.append(FrictMat(density=1000,young=1e4,poisson=0.3,frictionAngle=radians(30),label='sphereMat'))
-sp=pack.SpherePack()
-sp.makeCloud((0.*length,height+1.2*radius,0.25*width),(0.5*length,2*height-1.2*radius,0.75*width),-1,.2,2000,periodic=True)
+results={True:[None,None],False:[None,None]}
 checksPath="."
-sp.load(checksPath+'/data/100spheres')
-O.bodies.append([sphere(s[0]+Vector3(0.0,0.2,0.0),s[1],color=(0.6+0.15*rand(),0.5+0.15*rand(),0.15+0.15*rand())) for s in sp])
-O.bodies.append([sphere(s[0]+Vector3(0.1,0.3,0.0),s[1],color=(0.6+0.15*rand(),0.5+0.15*rand(),0.15+0.15*rand())) for s in sp])
 
-O.dt=1e-5
-O.usesTimeStepper=False
-newton=NewtonIntegrator(damping=0.6,gravity=(0,-10,0))
+for usePeriod in [True,False]:
+	O.periodic=usePeriod
+	length=1.0
+	height=1.0
+	width=1.0
+	thickness=0.1
+	
+	if(usePeriod):
+		O.cell.hSize=Matrix3(length, 0, 0, 0 ,3.*height, 0, 0, 0, width)
+	
+	O.materials.append(FrictMat(density=1,young=1e5,poisson=0.3,frictionAngle=radians(30),label='boxMat'))
+	lowBox = box( center=(length/2.0,thickness*0.6,width/2.0), extents=(length*2.0,thickness/2.0,width*2.0) ,fixed=True,wire=False)
+	O.bodies.append(lowBox)
+	
+	radius=0.01
+	O.materials.append(FrictMat(density=1000,young=1e4,poisson=0.3,frictionAngle=radians(30),label='sphereMat'))
+	sp=pack.SpherePack()
+	sp.makeCloud((0.*length,height+1.2*radius,0.25*width),(0.5*length,2*height-1.2*radius,0.75*width),-1,.2,2000,periodic=True)
+	sp.load(checksPath+'/data/100spheres')
+	O.bodies.append([sphere(s[0]+Vector3(0.0,0.2,0.0),s[1]) for s in sp])
+	O.bodies.append([sphere(s[0]+Vector3(0.1,0.3,0.0),s[1]) for s in sp])
+	
+	O.dt=5e-4
+	O.usesTimeStepper=False
+	newton=NewtonIntegrator(damping=0.6,gravity=(0,-10,0))
+	
+	O.engines=[
+		ForceResetter(),
+		#(1) This is where we allow big bodies, else it would crash due to the very large bottom box:
+		InsertionSortCollider([Bo1_Box_Aabb(),Bo1_Sphere_Aabb()],allowBiggerThanPeriod=True),
+		InteractionLoop(
+			[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
+			[Ip2_FrictMat_FrictMat_FrictPhys()],
+			[Law2_ScGeom_FrictPhys_CundallStrack()]
+		),
+		newton
+	]
+	
+	testedCollider=typedEngine("InsertionSortCollider")
+	
+	O.run( 500, True); results[usePeriod][0]=testedCollider.dumpBounds()
+	O.run(1000, True); results[usePeriod][1]=testedCollider.dumpBounds()
+	#O.run( 500, True); results[usePeriod][2]=testedCollider.dumpBounds()
+	O.reset()
 
-O.engines=[
-	ForceResetter(),
-	#(1) This is where we allow big bodies, else it would crash due to the very large bottom box:
-	InsertionSortCollider([Bo1_Box_Aabb(),Bo1_Sphere_Aabb()],allowBiggerThanPeriod=True),
-	InteractionLoop(
-		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
-		[Ip2_FrictMat_FrictMat_FrictPhys()],
-		[Law2_ScGeom_FrictPhys_CundallStrack()]
-	),
-	newton
-]
 
-Gl1_Sphere.stripes=1
+#### these text files have too high precision, and get too big. I think that 8 decimal places should be good to avoid any numerical errors arising on different architectures.
 
-from yade import qt
-qt.View()
-print('Press PLAY button')
+# textFile1=open("Output1___n.txt", "w");textFile1.write(str(results[False][0]));textFile1.close()
+# textFile2=open("Output2___n.txt", "w");textFile2.write(str(results[False][1]));textFile2.close()
+# textFile3=open("Output3___n.txt", "w");textFile3.write(str(results[False][2]));textFile3.close()
+#
+# textFile1=open("Output1___p.txt", "w");textFile1.write(str(results[True][0]));textFile1.close()
+# textFile2=open("Output2___p.txt", "w");textFile2.write(str(results[True][1]));textFile2.close()
+# textFile3=open("Output3___p.txt", "w");textFile3.write(str(results[True][2]));textFile3.close()
+#
+# textFile=open("Output123___n.txt", "w");textFile.write(str([results[False][0],results[False][1],results[False][2]]));textFile.close()
+# textFile=open("Output123___p.txt", "w");textFile.write(str([results[True ][0],results[True ][1],results[True ][2]]));textFile.close()
 
+# import pickle
+# pickle.dump( results , open( checksPath+'/data/checkColider.dat', "wb" ) )
 
-
-
-
+resultFile=open( checksPath+'/data/checkColider.txt', "wb" )
+for per in results:
+	for result in results[per]:
+		for record in result:
+			for tupl in record:
+				for number in tupl:
+					if(type(number) is int):
+						resultFile.write(str(number)+'\n')
+					else:
+						resultFile.write("%.8f"%number+'\n')
 
 if failCollider: #put a condition on the result here, is it the expected result? else:
 	print "InsertionSortCollider failed."
 	resultStatus+=1
+
+
