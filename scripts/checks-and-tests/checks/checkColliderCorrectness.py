@@ -93,7 +93,7 @@ for per in results:
 						tmp = float(line)
 						if(abs(tmp - number) > 1e-8):
 							failCollider=True
-							print "InsertionSortCollider check failed in line: %d"%lineCount
+							print "InsertionSortCollider check failed in file scripts/checks-and-tests/checks/data/checkColider.txt line: %d"%lineCount
 					else:
 						if(type(number) is int):
 							resultFile.write(str(number)+'\n')

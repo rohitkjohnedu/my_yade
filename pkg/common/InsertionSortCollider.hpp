@@ -122,24 +122,13 @@ class InsertionSortCollider: public Collider{
 		VecBounds(): axis(-1), loIdx(0){}
 		void dump(ostream& os){ string ret; for(size_t i=0; i<vec.size(); i++) os<<(i==loIdx?"@@ ":"")<<vec[i].coord<<"(id="<<vec[i].id<<","<<(vec[i].flags.isMin?"min":"max")<<",p"<<vec[i].period<<") "; os<<endl;}
 
-#define VEC_BOUND_CACHING
-#ifdef VEC_BOUND_CACHING
-		size_t cachedSize{0};
-		void incCache()     { ++cachedSize; };
-		void zeroCache()    { cachedSize=0; };
-		size_t size() const { return cachedSize; }; // adding an assert(vec.size() == cachedSize); here might make some sense. But will defeat the purpose, sort of ;) Because it will call vec.size();
-#else
-		// Note: everything inside struct definition is inline. Empty functions expand to nothing.
-		void incCache() {};
-		void zeroCache() {};
 		size_t size() const { return vec.size(); };
-#endif
 
-		void clear()                      { vec.clear();      zeroCache(); }
+		void clear()                      { vec.clear();                   }
 		void reserve(size_t n)            { vec.reserve(n);                }
-		void push_back(const Bounds&  bb) { vec.push_back(bb); incCache(); }
+		void push_back(const Bounds&  bb) { vec.push_back(bb);             }
 		// if the line below does not compile on older ubuntu 14.04, then I should add #ifdef guards to check compiler version. This line will make push_back faster when a newer compiler supports it.
-		void push_back(      Bounds&& bb) { vec.push_back(bb); incCache(); }
+		void push_back(      Bounds&& bb) { vec.push_back(bb);             }
 		void sort()                       { std::sort(vec.begin(),vec.end()); }
 		std::vector<Bounds>::const_iterator cbegin() const { return vec.cbegin();}
 		std::vector<Bounds>::const_iterator cend  () const { return vec.cend  ();}
