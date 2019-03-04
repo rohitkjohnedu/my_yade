@@ -5,7 +5,7 @@ print 'checkColliderCorrectness for InsertionSortCollider'
 
 failCollider=False
 
-#### This is useful for printing the linenumber innn the script
+#### This is useful for printing the linenumber in the script
 # import inspect
 # print inspect.currentframe().f_lineno
 
@@ -16,8 +16,11 @@ if((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.
 
 from yade import pack
 
+# I had a third O.run( 500, True); and so there was
+# [None,None,None] below, but I decided that it is too much testing.
 results={True:[None,None],False:[None,None]}
-checksPath="."
+
+#checksPath="." # this line was used for working on this script locally.
 
 for usePeriod in [True,False]:
 	O.periodic=usePeriod
@@ -36,8 +39,9 @@ for usePeriod in [True,False]:
 	radius=0.01
 	O.materials.append(FrictMat(density=1000,young=1e4,poisson=0.3,frictionAngle=radians(30),label='sphereMat'))
 	sp=pack.SpherePack()
-	sp.makeCloud((0.*length,height+1.2*radius,0.25*width),(0.5*length,2*height-1.2*radius,0.75*width),-1,.2,2000,periodic=True)
+	#sp.makeCloud((0.*length,height+1.2*radius,0.25*width),(0.5*length,2*height-1.2*radius,0.75*width),-1,.2,2000,periodic=True)
 	sp.load(checksPath+'/data/100spheres')
+	# 100 was not enough to have reasonable number of collisions, so I put 200 spheres.
 	O.bodies.append([sphere(s[0]+Vector3(0.0,0.2,0.0),s[1]) for s in sp])
 	O.bodies.append([sphere(s[0]+Vector3(0.1,0.3,0.0),s[1]) for s in sp])
 	
@@ -69,17 +73,32 @@ for usePeriod in [True,False]:
 # textFile=open("Output123___n.txt", "w");textFile.write(str([results[False][0],results[False][1],results[False][2]]));textFile.close()
 # textFile=open("Output123___p.txt", "w");textFile.write(str([results[True ][0],results[True ][1],results[True ][2]]));textFile.close()
 
-# I used this loop to save the reference results in git revision 2bc5ac90b
-resultFile=open( checksPath+'/data/checkColider.txt', "wb" )
+resultFile=None
+# careful, I used this loop to save the reference results in git revision 2bc5ac90b. When doing tests it must be readonly, and loading=True
+loading=True
+if(loading):
+	resultFile=open( checksPath+'/data/checkColider.txt', "r" )
+else:
+	resultFile=open( checksPath+'/data/checkColider.txt', "w" )
+lineCount=0
 for per in results:
 	for result in results[per]:
 		for record in result:
 			for tupl in record:
+				# contents of this tuple is explained in file InsertionSortCollider.cpp line 518, function boost::python::tuple InsertionSortCollider::dumpBounds();
 				for number in tupl:
-					if(type(number) is int):
-						resultFile.write(str(number)+'\n')
+					lineCount+=1
+					if(loading):
+						line = resultFile.readline()
+						tmp = float(line)
+						if(abs(tmp - number) > 1e-8):
+							failCollider=True
+							print "InsertionSortCollider check failed in line: %d"%lineCount
 					else:
-						resultFile.write("%.8f"%number+'\n')
+						if(type(number) is int):
+							resultFile.write(str(number)+'\n')
+						else:
+							resultFile.write("%.8f"%number+'\n')
 
 if failCollider: #put a condition on the result here, is it the expected result? else:
 	print "InsertionSortCollider failed."
