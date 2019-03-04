@@ -63,11 +63,11 @@ opts=par.parse_args()
 args = opts.args
 
 if opts.impLibraries:
-	print "\n\n ------------------------ IMPORTING --------------------------------------\n\n"
 	sys.path.append('.')
 	for lib in opts.impLibraries:
-		print "\n\n ------------------------ IMPORTING --------------------------------------\n\n"
-		print lib
+		print "\n------------------------ IMPORTING ------------------------"
+		# see also https://gitlab.com/yade-dev/trunk/issues/18
+		print "library:", lib, "\n"
 		import importlib
 		importlib.import_module(str(lib))
 		#__import__(lib)
