@@ -84,9 +84,9 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	                        is 0 if all tests pass, 1 if a test fails and 2 for an
 	                        unspecified exception.
 	  --check               Run a series of user-defined check tests as described
-	                        in /build/buildd/yade-
-	                        daily-1+3021+27~lucid1/scripts/test/checks/README
-	  --performance         Starts a test to measure the productivity
+	                        in :ysrc:`scripts/test/checks/README` and :ref:`regression-tests`
+	  --performance
+	                        Starts a test to measure the productivity
 	  --no-gdb              Do not show backtrace when yade crashes (only
 	                        effective with \-\-debug) [#fdbg]_.
 
