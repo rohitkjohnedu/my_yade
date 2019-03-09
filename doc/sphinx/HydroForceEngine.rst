@@ -101,7 +101,7 @@ where the solid variables have been denoted with a superscript $n-1$ as they are
 
 .. _fig-scheme:
 .. figure:: fig/schemeNumResolVANS.*
-	:scale: 80 %
+	:width: 14cm
 	:align: center
 
 	Schematical picture of the numerical fluid resolution and variables definition with a regular mesh. All the definitions still holds for a mesh with variable spatial step. 

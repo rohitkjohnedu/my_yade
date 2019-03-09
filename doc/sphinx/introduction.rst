@@ -84,11 +84,13 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	                        is 0 if all tests pass, 1 if a test fails and 2 for an
 	                        unspecified exception.
 	  --check               Run a series of user-defined check tests as described
-	                        in :ysrc:`scripts/test/checks/README` and :ref:`regression-tests`
+	                        in :ysrc:`scripts/checks-and-tests/checks/README` and :ref:`regression-tests`
 	  --performance
 	                        Starts a test to measure the productivity
 	  --no-gdb              Do not show backtrace when yade crashes (only
 	                        effective with \-\-debug) [#fdbg]_.
+
+.. comment: NOTE: I can't find a way to link to sphinx generated anchors. I feel that I've found it once, but now I added by hand the :ref:`regression-tests` label in prog.rst
 
 .. rubric:: Footnotes
 
@@ -248,7 +250,7 @@ Yade can be optionally compiled with `QT <http://qt.io>`_ based graphical interf
 .. _imgQtGui:
 .. image:: fig/qt-gui.png
 
-The control window on the left (fig. imgQtGui_) is called ``Controller`` (can be invoked by ``yade.qt.Controller()`` from python):
+The control window on the left (fig. imgQtGui_) is called ``Controller`` (can be invoked by ``yade.qt.Controller()`` from python or by pressing ``F12`` key in terminal):
 
 #. The *Simulation* tab is mostly self-explanatory, and permits basic simulation control.
 #. The *Display* tab has various rendering-related options, which apply to all opened views (they can be zero or more, new one is opened by the *New 3D* button).
@@ -323,7 +325,7 @@ Each :yref:`Body` comprises the following:
 	Examples of concrete classes that might be used to describe a :yref:`Body`: :ref:`State<inheritanceGraphState>`, :yref:`CpmState`, :yref:`ChainedState`, :ref:`Material<inheritanceGraphMaterial>`, :yref:`ElastMat`, :yref:`FrictMat`, :yref:`FrictViscoMat`, :ref:`Shape<inheritanceGraphShape>`, :yref:`Polyhedra`, :yref:`PFacet`, :yref:`GridConnection`, :ref:`Bound<inheritanceGraphBound>`, :yref:`Aabb`.
 
 
-All these four properties can be of different types, derived from their respective base types. Yade frequently makes decisions about computation based on those types: :yref:`Sphere` + :yref:`Sphere` collision has to be treated differently than :yref:`Facet` + :yref:`Sphere` collision. Objects making those decisions are called :yref:`Dispatcher`'s and are essential to understand Yade's functioning; they are discussed below. 
+All these four properties can be of different types, derived from their respective base types. Yade frequently makes decisions about computation based on those types: :yref:`Sphere` + :yref:`Sphere` collision has to be treated differently than :yref:`Facet` + :yref:`Sphere` collision. Objects making those decisions are called :ref:`Dispatchers<inheritanceGraphDispatcher>` and are essential to understand Yade's functioning; they are discussed below.
 
 Explicitly assigning all 4 properties to each particle by hand would be not practical; there are utility functions defined to create them with all necessary ingredients. For example, we can create sphere particle using :yref:`yade.utils.sphere`:
 
@@ -387,7 +389,7 @@ Interactions
 :ref:`IGeom<inheritanceGraphIGeom>`
 	holding geometrical configuration of the two particles in collision; it is updated automatically as the particles in question move and can be queried for various geometrical characteristics, such as penetration distance or shear strain.
 	
-	Based on combination of types of :yref:`Shapes<Shape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<ScGeom>`, :yref:`Cylinder+Sphere<CylScGeom>` etc. Note, however, that it is possible to represent many type of contacts with the basic sphere-sphere geometry (for instance in :yref:`Ig2_Wall_Sphere_ScGeom`).
+	Based on combination of types of :ref:`Shapes<inheritanceGraphShape>` of the particles, there might be different storage requirements; for that reason, a number of derived classes exists, e.g. for representing geometry of contact between :yref:`Sphere+Sphere<ScGeom>`, :yref:`Cylinder+Sphere<CylScGeom>` etc. Note, however, that it is possible to represent many type of contacts with the basic sphere-sphere geometry (for instance in :yref:`Ig2_Wall_Sphere_ScGeom`).
 
 :ref:`IPhys<inheritanceGraphIPhys>`
 	representing non-geometrical features of the interaction; some are computed from :yref:`Materials<Material>` of the particles in contact using some averaging algorithm (such as contact stiffness from Young's moduli of particles), others might be internal variables like damage.
@@ -511,7 +513,7 @@ There are 3 fundamental types of Engines:
 :ref:`PartialEngine<inheritanceGraphPartialEngine>`
 	operating only on some pre-selected bodies (e.g. :yref:`ForceEngine` applying constant force to some :yref:`selected<ForceEngine::ids>` bodies)
 
-:yref:`Dispatchers<Dispatcher>`
+:ref:`Dispatchers<inheritanceGraphDispatcher>`
 	do not perform any computation themselves; they merely call other functions, represented by function objects, :yref:`Functors<Functor>`. Each functor is specialized, able to handle certain object types, and will be dispatched if such obejct is treated by the dispatcher. 
 
 .. _dispatchers-and-functors:
@@ -549,7 +551,7 @@ The next part, reading
 hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all operate on interactions and are, for performance reasons, put together:
 
 :yref:`IGeomDispatcher` which uses :ref:`IGeomFunctor<inheritanceGraphIGeomFunctor>`
-	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :yref:`Shapes<Shape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, but the shapes did not). In that case the attribute :yref:`<Interaction::isReal>` is set to false and interaction is scheduled for removal.
+	uses the first set of functors (``Ig2``), which are dispatched based on combination of ``2`` :ref:`Shapes<inheritanceGraphShape>` objects. Dispatched functor resolves exact collision configuration and creates an Interaction Geometry :yref:`IGeom<Interaction::geom>` (whence ``Ig`` in the name) associated with the interaction, if there is collision. The functor might as well determine that there is no real collision even if they did overlap in the approximate collision detection (e.g. the :yref:`Aabb` did overlap, but the shapes did not). In that case the attribute :yref:`<Interaction::isReal>` is set to false and interaction is scheduled for removal.
 
 	#. The first functor, :yref:`Ig2_Sphere_Sphere_ScGeom`, is called on interaction of 2 :yref:`Spheres<Sphere>` and creates :yref:`ScGeom` instance, if appropriate.
 
@@ -584,7 +586,7 @@ hides 3 internal dispatchers within the :yref:`InteractionLoop` engine; they all
 
 
 :yref:`LawDispatcher` which uses :ref:`LawFunctor<inheritanceGraphLawFunctor>`
-	dispatches to the third set of functors, based on combinations of :yref:`IGeom` and :yref:`IPhys` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent constitutive law; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
+	dispatches to the third set of functors, based on combinations of :ref:`IGeom<inheritanceGraphIGeom>` and :ref:`IPhys<inheritanceGraphIPhys>` (wherefore ``2`` in their name again) of each particular interaction, created by preceding functors. The ``Law2`` functors represent constitutive law; they resolve the interaction by computing forces on the interacting bodies (repulsion, attraction, shear forces, …) or otherwise update interaction state variables.
 
 	``Law2`` functors all inherit from :ref:`LawFunctor<inheritanceGraphLawFunctor>`.
 
