@@ -135,7 +135,7 @@ def inheritanceDiagram(klass,willBeLater):
     fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
     ret=""
     extraCaption=["",0]
-    extraPdfCaption=["",0]
+    extraPdfCaptionSet=set()
     if len(childs)==0: return ''
     for c in childs:
         try:
@@ -144,8 +144,7 @@ def inheritanceDiagram(klass,willBeLater):
                 continue # skip classes deriving from classes that are already documented
             if c not in (docClasses|willBeLater):
                 ret+=mkNode(c)
-                extraPdfCaption[0] += " "+linkGraphOrClass(c,True)+","
-                extraPdfCaption[1] += 1
+                extraPdfCaptionSet.add(c) # I use set() to make sure they are sorted alphabetically
             else: # classes of which childs are documented elsewhere are marked specially
                 ret+=mkNode(c,style='filled,dashed',fillcolor='grey',isElsewhere=True)
                 extraCaption[0] += " "+linkGraphOrClass(c)+","
@@ -162,6 +161,8 @@ def inheritanceDiagram(klass,willBeLater):
     # sphinx+graphviz does not support URL directive inside the graph. The bug is in sphinx, because it can generate only .png and .svg. And from sphinx the .png goes to latex,
     # while graphviz suppports URLs directives in latex via .ps format which is not supported by sphinx. So I will add the URLs in the caption.
     # https://www.graphviz.org/pdf/dotguide.pdf
+    extraPdfCaption=["",len(extraPdfCaptionSet)]
+    for c in sorted(extraPdfCaptionSet): extraPdfCaption[0] += " "+linkGraphOrClass(c,True)+","
     if(extraPdfCaption[1] == 0):  extraPdfCaption[0] = ""
     if(extraPdfCaption[1] == 1):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
     if(extraPdfCaption[1] >= 2):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
@@ -194,7 +195,7 @@ Class reference (yade.wrapper module)
 """+
     sect('Bodies','',['Body','Shape','State','Material','Bound'])+
     sect('Interactions','',['Interaction','IGeom','IPhys'])+
-    sect('Global engines','',['FieldApplier','Collider','BoundaryController','GlobalEngine'],reverse=True)+
+    sect('Global engines','',['FieldApplier','Collider','BoundaryController','PeriodicEngine','GlobalEngine'],reverse=True)+
     sect('Partial engines','',['PartialEngine'])+
     sect('Dispatchers','',['Dispatcher'],willBeLater=childSet(['BoundDispatcher', 'IGeomDispatcher', 'IPhysDispatcher', 'LawDispatcher', 'InternalForceDispatcher']))+
     sect('Functors','',['Functor'],willBeLater=childSet(['IPhysFunctor', 'GlStateFunctor', 'GlIGeomFunctor', 'IGeomFunctor', 'LawFunctor', 'GlBoundFunctor', 'GlIPhysFunctor', 'GlShapeFunctor', 'BoundFunctor', 'InternalForceFunctor']))+
