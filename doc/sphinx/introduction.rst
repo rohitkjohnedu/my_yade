@@ -19,6 +19,8 @@ Before you start moving around in Yade, you should have some prior knowledge.
 
 You are advised to try all commands described yourself. Don't be afraid to experiment.
 
+.. hint::
+	Sometimes reading `this documentation in a .pdf format <https://yade-dem.org/doc/Yade.pdf>`_ can be more comfortable. For example in `okular pdf viewer <https://okular.kde.org/>`_ clicking links is faster than a page refresh in the web browser and to go back press the shortcut ``Alt Shift ←``. To try it have a look at the inheritance graph of :ref:`PartialEngine<inheritanceGraphPartialEngine>` then go back.
 
 Starting yade
 -------------
@@ -37,7 +39,7 @@ These initial lines give you some information about
 * some information for :ref:`remoteaccess`, which you are unlikely to need now;
 * basic help for the command-line that just appeared (``Yade [1]:``).
 
-Type ``quit()``, ``exit()`` or simply press ``^D`` to quit Yade. 
+Type ``quit()``, ``exit()`` or simply press ``^D`` (``^`` is a commonly used written shortcut for pressing the ``Ctrl`` key, so here ``^D`` means ``Ctrl D``) to quit Yade.
 
 The command-line is `ipython <http://ipython.scipy.org>`_, python shell with enhanced interactive capabilities; it features persistent history (remembers commands from your last sessions), searching and so on. See ipython's documentation for more details.
 
