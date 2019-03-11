@@ -3,6 +3,8 @@
 Examples with tutorial
 ======================
 
+The `online version <https://yade-dem.org/doc/tutorial-examples.html>`_ of this tutorial contains embedded videos.
+
 .. _bouncing-sphere:
 
 Bouncing sphere

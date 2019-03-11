@@ -3,9 +3,9 @@
 More examples
 =============
 
-A full list of examples is in file :ysrc:`examples/list_of_examples.txt`. Videos of some of those examples are listed below.
+:ref:`The same list with embedded videos<moreExamplesSlow>` is available `online <https://yade-dem.org/doc/tutorial-more-examples.html>`_, but not recommended for viewing on slow internet connection.
 
-:ref:`The same list with embedded videos<moreExamplesSlow>` is available, but not recommended for viewing on slow internet connection.
+A full list of examples is in file :ysrc:`examples/list_of_examples.txt`. Videos of some of those examples are listed below.
 
 .. comment -----------X the rest of this file was copied from doc/sphinx/tutorial-more-examples.rst X----------
 .. comment ----X and vim command `  :%s/^\.\. youtube.*//gc               `  was used to remove youtube   X----
