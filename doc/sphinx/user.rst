@@ -1624,6 +1624,7 @@ Below is an output of the :yref:`defToVtk<TesselationWrapper::defToVtk>` functio
 
 
 .. figure:: fig/localstrain.*
+	:width: 10cm
 
 Micro-stress
 ------------
