@@ -560,6 +560,8 @@ In Yade (class :yref:`Clump`), clump members behave as stand-alone particles dur
 
 Motion of the clump is then integrated, using aspherical rotation integration. Afterwards, clump members are displaced in global space, to keep their initial positions and orientations in the clump's local coordinate system. In such a way, relative positions of clump members are always the same, resulting in the behavior of a rigid aggregate.
 
+.. _NumericalDamping:
+
 Numerical damping
 -----------------
 In simulations of quasi-static phenomena, it it desirable to dissipate kinetic energy of particles. Since most constitutive laws (including :yref:`Law_ScGeom_FrictPhys_Basic` shown above, :ref:`sect-formulation-stress-cundall`) do not include velocity-based damping (such as one in [Addetta2001]_), it is possible to use artificial numerical damping. The formulation is described in [Pfc3dManual30]_, although our version is slightly adapted. The basic idea is to decrease forces which increase the particle velocities and vice versa by $(\Delta F)_d$, comparing the current acceleration sense and particle velocity sense. This is done by component, which makes the damping scheme clearly non-physical, as it is not invariant with respect to coordinate system rotation; on the other hand, it is very easy to compute. Cundall proposed the form (we omit particle indices $i$ since it applies to all of them separately):
@@ -650,6 +652,8 @@ This equation can be used for all 6 degrees of freedom (DOF) in translation and 
 
 
 				
+.. _DEMSimulations:
+
 DEM simulations
 """"""""""""""""
 In DEM simulations, per-particle stiffness $\vec{K}_{ij}$ is determined from the stiffnesses of contacts in which it participates.  Suppose each contact has normal stiffness $K_{Nk}$, shear stiffness $K_{Tk}=\xi K_{Nk}$ and is oriented by normal $\vec{n}_{k}$. A translational stiffness matrix $\vec{K}_{ij}$ can be defined as the sum of contributions of all contacts in which it participates (indices $k$), as [Chareyre2005]_.

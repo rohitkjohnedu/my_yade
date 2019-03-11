@@ -594,7 +594,7 @@ At this moment (January 2019), the most common choice is :yref:`InsertionSortCol
 
 Using more functors than necessary (such as :yref:`Bo1_Facet_Aabb` if there are no :yref:`facets<Facet>` in the simulation) has no performance penalty. On the other hand, missing functors for existing :yref:`shapes<Shape>` will cause those bodies to not collider with other bodies (they will freely interpenetrate).
 
-There are other colliders as well, though their usage is only experimental:
+There are other :ref:`colliders<inheritanceGraphCollider>` as well, though their usage is only experimental:
 
 * :yref:`SpatialQuickSortCollider` is correctness-reference collider operating on :yref:`Aabb`; it is significantly slower than :yref:`InsertionSortCollider`.
 * :yref:`PersistentTriangulationCollider` only works on spheres; it does not use a :yref:`BoundDispatcher`, as it operates on spheres directly.
@@ -1593,6 +1593,8 @@ If you want to make facet objects transparent, select ``p1-facets.*`` in the Pip
 Animation
 """"""""""
 You can move between frames (snapshots that were saved) via the "Animation" menu. After setting the view angle, zoom etc to your satisfaction, the animation can be saved with *File/Save animation*.
+
+.. _MicroStressAndMicroStrain:
 
 Micro-stress and micro-strain
 =============================
