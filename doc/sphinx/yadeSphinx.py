@@ -104,8 +104,8 @@ def inheritanceDiagram(klass,willBeLater):
     """
     global docClasses
     global writer
-    def linkGraphOrClass(klassToLink):
-        if(len(childSet([klassToLink]))==1):
+    def linkGraphOrClass(klassToLink, forceYrefClassOnly=False):
+        if(forceYrefClassOnly or len(childSet([klassToLink]))==1):
             return ":yref:`"+klassToLink+"`"
         else:
             return ":ref:`"+klassToLink+"<inheritanceGraph"+klassToLink+">"+"`"
@@ -135,13 +135,17 @@ def inheritanceDiagram(klass,willBeLater):
     fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
     ret=""
     extraCaption=["",0]
+    extraPdfCaption=["",0]
     if len(childs)==0: return ''
     for c in childs:
         try:
             base=eval(c).__bases__[0].__name__
             if base!=klass and base in (docClasses|willBeLater):
                 continue # skip classes deriving from classes that are already documented
-            if c not in (docClasses|willBeLater): ret+=mkNode(c)
+            if c not in (docClasses|willBeLater):
+                ret+=mkNode(c)
+                extraPdfCaption[0] += " "+linkGraphOrClass(c,True)+","
+                extraPdfCaption[1] += 1
             else: # classes of which childs are documented elsewhere are marked specially
                 ret+=mkNode(c,style='filled,dashed',fillcolor='grey',isElsewhere=True)
                 extraCaption[0] += " "+linkGraphOrClass(c)+","
@@ -154,7 +158,16 @@ def inheritanceDiagram(klass,willBeLater):
     # the [:-1] is to cut off the last comma after the last :yref:
     if(extraCaption[1] == 1):  extraCaption[0] = ", the gray dashed class is discussed in a separate section: " + extraCaption[0][:-1] + "."
     if(extraCaption[1] >= 2):  extraCaption[0] = ", gray dashed classes are discussed in their own sections: "  + extraCaption[0][:-1] + "."
-    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
+
+    # sphinx+graphviz does not support URL directive inside the graph. The bug is in sphinx, because it can generate only .png and .svg. And from sphinx the .png goes to latex,
+    # while graphviz suppports URLs directives in latex via .ps format which is not supported by sphinx. So I will add the URLs in the caption.
+    # https://www.graphviz.org/pdf/dotguide.pdf
+    if(extraPdfCaption[1] == 0):  extraPdfCaption[0] = ""
+    if(extraPdfCaption[1] == 1):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
+    if(extraPdfCaption[1] >= 2):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
+    if(writer=='html'): extraPdfCaption[0] = ""
+
+    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
     return head+ret+'\t}\n\n'
 
 
