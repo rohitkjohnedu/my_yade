@@ -107,7 +107,7 @@ Performance increase
 [Catalano2012]_ demonstrated the performance of DEM+PFV coupling and highlighted its strengths and weaknesses. A significant strength of the DEM+PFV coupling is the asymptotic nature of triangulation costs, volume calculation costs, and force calculation costs ( [Catalano2012]_, Figure 5.4). In other words, increasing the number of particles beyond ~200k results in negligible additional computational costs. The main weakness of the DEM+PFV coupling is the exponential increase of computational cost of factoring and solving increasingly larger systems of linear equations ( [Catalano2012]_, Figure 5.7). As shown in Fig. `fig-cpuvsgpu`_, the employment of Tesla K20 GPU decreases the time cost of factorization by up to 75% for 2.1 million DOFs and 356k particles.
 
 .. _fig-cpuvsgpu:
-.. figure:: fig/particleVsFactortime.png
+.. figure:: fig/particleVsFactortime.*
 	:width: 17 cm
 	:align: center
 
