@@ -6,7 +6,7 @@ The yadeFoamCoupling engines provides a framework for Euler-Lagrange fluid-parti
 simulation with the open source finite volume solver OpenFOAM. The coupling
 relies on the Message Passing Interface library (MPI), as OpenFOAM is
 a parallel solver, furthermore communication between the solvers are realised by MPI messages. 
-Yade sends the partilce information (particle position, velocity, etc. ) to all the OpenFOAM processes. Each OpenFOAM process searches the particle in the local mesh, 
+Yade sends the particle information (particle position, velocity, etc. ) to all the OpenFOAM processes. Each OpenFOAM process searches the particle in the local mesh, 
 if the particle is found, the hydrodynamic drag force and torque are calculated using the fluid velocity at the particle position (two interpolation methods are available) and the particle velocity.
 The hydroynamic force is sent to the Yade process and it is added  to the force container.  The negative of the particle hydrodynamic force is set as source term in the Navier-Stokes equations. 
 The OpenFOAM solver can be found at: https://github.com/dpkn31/Yade-OpenFOAM-coupling. The coupling methodology can be found in [Kunhappan2017_] and [Kunhappan2018_].
@@ -35,12 +35,12 @@ Along with the continuity equation:
 
 .. math:: \frac{\partial \epsilon}{\partial t} + \nabla \cdot (\epsilon \vec{U}) = 0  
 
-where $\epsilon$ is the fluid volume fraction$
+where $\epsilon$ is the fluid volume fraction
 
 
 Usage
 =====
-The example in examples/openfoam/scriptYade.py demonstrates the coupling.
+The example in :ysrc:`examples/openfoam/scriptYade.py` demonstrates the coupling.
 A symbolic link to Yade is created and it is imported in the script. The MPI environment
 is initialized by the initMPI() function ::
 
