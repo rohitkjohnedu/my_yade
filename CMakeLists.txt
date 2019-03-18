@@ -83,7 +83,7 @@ ELSE()
   ENDIF()
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11 -lpthread")
 
 IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
@@ -150,7 +150,7 @@ OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" OFF)
 OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" OFF)
-
+OPTION(ENABLE_FOAMCOUPLING "Enable Yade OpenFOAM coupling " OFF)
 #===========================================================
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
@@ -371,7 +371,23 @@ ELSE(ENABLE_LINSOLV)
          SET(ENABLE_TWOPHASEFLOW OFF)
       ENDIF(ENABLE_TWOPHASEFLOW)
 ENDIF(ENABLE_LINSOLV)
-
+#===============================================
+IF(ENABLE_FOAMCOUPLING)
+  FIND_PACKAGE(MPI)
+  IF (MPI_FOUND)
+    INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DYADE_FOAM")
+    SET (LINKLIBS "${LINKLIBS};${MPI_C_LIBRARIES};${MPI_CXX_LIBRARIES};")
+    MESSAGE(STATUS "MPI found")
+    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} FOAMCOUPLING")
+  ELSE(MPI_FOUND)
+    MESSAGE(STATUS "MPI NOT FOUND, YADE-OpenFOAM coupling disabled")
+    SET (DISABLED_FEATS "${DISABLED_FEATS} FOAMCOUPLING")
+  ENDIF(MPI_FOUND)
+ELSE(ENABLE_FOAMCOUPLING)
+    SET (DISABLED_FEATS "${DISABLED_FEATS} FOAMCOUPLING") 
+ENDIF(ENABLE_FOAMCOUPLING)
+#===============================================
 IF(ENABLE_TWOPHASEFLOW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTWOPHASEFLOW")
 	SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} TWOPHASEFLOW")
