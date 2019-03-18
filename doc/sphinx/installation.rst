@@ -126,6 +126,7 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `SuiteSparse <http://www.cise.ufl.edu/research/sparse/SuiteSparse/>`_ sparse algebra library (fluid coupling, optional, requires eigen>=3.1)
 * `OpenBLAS <http://www.openblas.net/>`_ optimized and parallelized alternative to the standard blas+lapack (fluid coupling, optional)
 * `Metis <http://glaros.dtc.umn.edu/gkhome/metis/metis/overview/>`_ matrix preconditioning (fluid coupling, optional)
+* `OpenMPI <https://www.open-mpi.org/software/>` _ library for parallel distributed computing (OpenFOAM coupling, optional)
 
 Most of the list above is very likely already packaged for your distribution. In case you are confronted
 with some errors concerning not available packages (e.g., package libmetis-dev is not available) it may be necessary 
@@ -146,7 +147,8 @@ need root privileges.
 		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
 		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
+		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen	\
+		libopenmpi-dev libopenmpi1.10 openmpi-bin openmpi-common openmpi-doc
 		
 * For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``, ``python-imaging`` is to be replaced by ``python-pil``, and the additional package "qt5-default" is required
 		

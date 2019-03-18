@@ -9,7 +9,7 @@ a parallel solver, furthermore communication between the solvers are realised by
 Yade sends the particle information (particle position, velocity, etc. ) to all the OpenFOAM processes. Each OpenFOAM process searches the particle in the local mesh, 
 if the particle is found, the hydrodynamic drag force and torque are calculated using the fluid velocity at the particle position (two interpolation methods are available) and the particle velocity.
 The hydroynamic force is sent to the Yade process and it is added  to the force container.  The negative of the particle hydrodynamic force is set as source term in the Navier-Stokes equations. 
-The OpenFOAM solver can be found at: https://github.com/dpkn31/Yade-OpenFOAM-coupling. The coupling methodology can be found in [Kunhappan2017_] and [Kunhappan2018_].
+The OpenFOAM solver can be found at: https://github.com/dpkn31/Yade-OpenFOAM-coupling. The coupling methodology can be found in [Kunhappan2017] and [Kunhappan2018].
 
 Simulation Types
 ================
