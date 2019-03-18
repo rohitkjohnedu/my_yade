@@ -174,6 +174,8 @@ Real FoamCoupling::getViscousTimeScale() {
   
 }
 
+
+
 void FoamCoupling::runCoupling() {
 
     castParticle(); 
@@ -190,4 +192,3 @@ void FoamCoupling::killMPI() {
 }
 
 #endif
-
