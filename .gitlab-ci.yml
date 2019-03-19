@@ -74,9 +74,9 @@ pages:
   only:
     - master
   script:
-    - mv ../install/share/doc/yade-ci/html ../public
-    - mv ../install/share/doc/yade-ci/Yade.pdf ../public
-    - mv ../install/share/doc/yade-ci/Yade.epub ../public
+    - mv install/share/doc/yade-ci/html public
+    - mv install/share/doc/yade-ci/Yade.pdf public
+    - mv install/share/doc/yade-ci/Yade.epub public
   dependencies:
     - doc
   artifacts:
