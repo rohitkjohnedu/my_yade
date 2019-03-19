@@ -8,22 +8,12 @@
 CREATE_LOGGER(FoamCoupling); 
 YADE_PLUGIN((FoamCoupling)); 
 
-void FoamCoupling::initMPI() { //Maybe move the  MPI init function to utils or something? 
-
-  //modify for YADE-MPI, 
+void FoamCoupling::getRank() {
   
-  int threads; 
-  MPI_Init_thread(0,0,MPI_THREAD_SINGLE,&threads); 
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  std::cout  << "myrank = " << rank << std::endl;  
   MPI_Comm_size(MPI_COMM_WORLD, &commSize);
-  std::cout << "commSize = " << commSize << endl;  
-  int color = 2; //Foam uses 1  
-  MPI_Comm yadeComm; // dummy communicator; 
-  MPI_Comm_split(MPI_COMM_WORLD,color,rank,&yadeComm);
 
 }
-
 
 void FoamCoupling::setNumParticles(int np){
   
