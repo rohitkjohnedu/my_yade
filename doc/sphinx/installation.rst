@@ -148,7 +148,7 @@ need root privileges.
 		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen	\
-		libopenmpi-dev libopenmpi1.10 openmpi-bin openmpi-common openmpi-doc
+		libopenmpi-dev openmpi-bin openmpi-common
 		
 * For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``, ``python-imaging`` is to be replaced by ``python-pil``, and the additional package "qt5-default" is required
 		
