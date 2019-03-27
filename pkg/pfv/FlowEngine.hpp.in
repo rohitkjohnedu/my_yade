@@ -188,6 +188,14 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 				cons.append(csd[k].second[3]);
 				pycsd.append(cons);}
 			return pycsd;}
+		boost::python::list getNeighbors(unsigned int id){ // Temporary function to allow for simulations in Python, can be easily accessed in c++
+		        boost::python::list ids;
+		        const RTriangulation& Tri = solver->tesselation().Triangulation();
+		        if (id>=solver->tesselation().cellHandles.size()) {LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size()); return ids;}
+		        for (unsigned int i=0;i<4;i++) {
+			        const CellHandle& neighbourCell = solver->tesselation().cellHandles[id]->neighbor(i);
+			        if (!Tri.is_infinite(neighbourCell)) ids.append(neighbourCell->info().id);}
+		        return ids;}
 		
 		template<class Cellhandle>
 		Real volumeCellSingleFictious (Cellhandle cell);
@@ -426,6 +434,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("nCells",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::nCells,"get the total number of finite cells in the triangulation.")
 		.def("blockCell",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::blockCell,(boost::python::arg("id"),boost::python::arg("blockPressure")),"block cell 'id'. The cell will be excluded from the fluid flow problem and the conductivity of all incident facets will be null. If blockPressure=False, deformation is reflected in the pressure, else it is constantly 0.")
 		.def("getVertices",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getVertices,(boost::python::arg("id")),"get the vertices of a cell")
+		.def("getNeighbors",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getNeighbors,"get 4 neigboring cells")
 		.def("getDiffusionCoeff",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getDiffusionCoeff,(boost::python::arg("cellId"),boost::python::arg("throat")),"get the ratio of throat cross-sectional area and distance between two cells")
 		#ifdef LINSOLV
 		.def("exportMatrix",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::exportMatrix,(boost::python::arg("filename")="matrix"),"Export system matrix to a file with all entries (even zeros will displayed).")
