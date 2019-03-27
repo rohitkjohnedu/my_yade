@@ -1,47 +1,18 @@
-===================================
-YADE - Yet Another Dynamic Engine
-===================================
+===================================================
+YADE - Yet Another Dynamic Engine - Python 3 branch
+===================================================
 
-Extensible open-source framework for discrete numerical models, focused on 
-Discrete Element Method. The computation parts are written in c++ using flexible
-object model, allowing independent implementation of new algorithms and interfaces. 
-Python is used for rapid and concise scene construction, simulation control, 
-postprocessing and debugging.
+This branch is used to migrate yade to python version 3. **It is under development, currently not working**.
 
-**Documentation:**
+**Installation**
 
-- https://www.yade-dem.org/doc/ (includes c++ and python reference)
-- https://yade-dem.org/doc/Yade.pdf (PDF-file with documentation)
-- https://yade-dem.org/doc/Yade.epub (EPUB-file with documentation)
- 
-**Downloads:**
+The packages needed are the python3-versions of all packages listed in the official Yade doc. So the installation command becomes:
 
-- Packages for Ubuntu and Debian:
-  
-  - https://yade-dem.org/doc/installation.html#packages
-  - External packages: https://launchpad.net/~yade-users/+archive/external
+.. code::
 
-- Tarballs of different versions: 
+sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot dpkg-dev build-essential g++ python3-dev ipython python3-matplotlib libsqlite3-dev python3-numpy python3-tk gnuplot libgts-dev python3-pygraphviz libvtk6-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools python3-pyqt5.qtwebkit gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 python3-pil libjs-jquery python3-sphinx python3-git libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python3-minieigen libopenblas-dev libsuitesparse-dev libmetis-dev
 
-  - https://gitlab.com/yade-dev/trunk/tags
-  - Repository on gitlab.com: https://gitlab.com/yade-dev/trunk/-/archive/master/trunk-master.tar.gz
-  - Repository on git.debian.org: http://git.debian.org/?p=debian-science/packages/yade.git
+**Known bugs**
 
-**Teams involved:**
-
-- General users: https://launchpad.net/~yade-users
-- Developers and advanced users: https://launchpad.net/~yade-dev
-- Developers for distributed memory parallelization of Yade: https://launchpad.net/~yade-mpi
-- Infrastructure maintainers: https://launchpad.net/~yade-pkg
-
-**Miscellaneous:**
-
-- `Wiki <https://yade-dem.org/wiki/>`_
-- `Screenshots <https://www.yade-dem.org/wiki/Screenshots_and_videos>`_
-- `Tutorial <https://yade-dem.org/doc/tutorial-examples.html>`_
-- `Videos <https://yade-dem.org/doc/tutorial-more-examples-fast.html>`_
-- `Yade page on Open Hub <http://www.openhub.net/p/yade/>`_
-- `Yade on Debian PTS <http://packages.qa.debian.org/y/yade.html>`_
-- `Yade on Debian salsa <https://salsa.debian.org/science-team/yade/commits/master>`_
-- `Yade in Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_
-- `Launchpad page <http://www.launchpad.net/yade>`_
+- pygts may not compile
+- python3-bibtex package doesn't exist, and underlying _bibtex python module will not be found. As a result, the doc will not compile. We may use another python bibtex parser or use sphinxcontrib-bibtex: https://sphinxcontrib-bibtex.readthedocs.io/en/latest/usage.html
