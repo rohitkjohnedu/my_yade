@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 ################################################################################
 #
 # Triaxial test. Axial strain rate is prescribed and transverse prestress.
@@ -150,12 +152,12 @@ def stopIfDamaged(maxEps=5e-3):
 	if O.iter < 1000 or s > .5*extremum and e < maxEps:
 		return
 	f = os.path.join(exportDir,fileName)
-	print 'gnuplot',plot.saveGnuplot(f,term='png')
+	print('gnuplot',plot.saveGnuplot(f,term='png'))
 	if runGnuplot:
 		import subprocess
 		os.chdir(exportDir)
 		subprocess.Popen(['gnuplot',f+'.gnuplot']).wait()
-	print 'Simulation finished'
+	print('Simulation finished')
 	O.pause()
 	#sys.exit(0) # results in some threading exception
 

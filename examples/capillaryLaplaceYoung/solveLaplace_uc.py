@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # J. Duriez (jerome.duriez@irstea.fr)
 
 # to import with yade/python/ipython solveLaplace_uc.py, or with execfile('solveLaplace_uc.py',globals()) once inside a yade/python/ipython session

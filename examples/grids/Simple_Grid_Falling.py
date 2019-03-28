@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+from __future__ import unicode_literals
 from yade import pack,geom,qt
 from yade.gridpfacet import *
 from pylab import *

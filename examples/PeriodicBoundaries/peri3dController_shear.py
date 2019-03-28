@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # peri3dController_shear.py
 # script, that explains funcionality and input parameters of Peri3dController on the example of
 # shear test with rotated periodic cell (that enables strain localization).

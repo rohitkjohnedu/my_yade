@@ -6,6 +6,7 @@
 #
 # The force evolution is sine wave, but it could really be any data
 
+from __future__ import unicode_literals
 from numpy import arange
 
 nPulses=4 # run for total of 4 pulses

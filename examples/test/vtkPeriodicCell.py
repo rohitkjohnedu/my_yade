@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 ######################################################################
 # Simple script to test VTK export of periodic cell
 ######################################################################

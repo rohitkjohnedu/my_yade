@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # pygts - python package for the manipulation of triangulated surfaces
 #
 #   Copyright (C) 2009 Thomas J. Duck

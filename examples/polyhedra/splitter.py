@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # This script demonstrates polyhedra splitting/crushing under compression.
 from yade import polyhedra_utils
 

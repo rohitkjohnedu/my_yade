@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 #!/usr/local/bin/yade-trunk -x
 # -*- coding: utf-8 -*-
 #Author : Kneib François, francois.kneib@gmail.com

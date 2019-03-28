@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 maxCorner = (10,10,10)
 center = (5,5,5)
 normal = (1,1,1)

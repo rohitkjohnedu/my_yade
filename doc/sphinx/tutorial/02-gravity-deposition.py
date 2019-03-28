@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # gravity deposition in box, showing how to plot and save history of data,
 # and how to control the simulation while it is running by calling
 # python functions from within the simulation loop

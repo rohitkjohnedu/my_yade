@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 
 #Simulates a 5mm Diameter bubble in water rising and colliding with another bubble of the same diameter
 

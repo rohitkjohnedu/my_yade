@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import print_function
+from __future__ import unicode_literals
 import argparse, os, git, shutil, sys, time
 
 parser = argparse.ArgumentParser(description='Process some integers.')

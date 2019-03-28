@@ -58,6 +58,7 @@ This example can be found in examples/concrete/uniax-post.py ::
  pylab.show()
 
 """
+from __future__ import unicode_literals
 from yade.wrapper import *
 from minieigen import *
 

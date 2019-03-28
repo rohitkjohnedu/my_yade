@@ -2,6 +2,8 @@
 # 2012 ©Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 # This variant of triax-basic.py shows the usage of cohesive contact laws and moments at contacts
 
+from __future__ import print_function
+from __future__ import unicode_literals
 from yade import pack
 
 sp=pack.SpherePack()
@@ -69,7 +71,7 @@ def history():
 plot.plots={'i':(('e11',"bo"),('e22',"ro"),('e33',"go"),None,('s11',"bx"),('s22',"rx"),('s33',"gx"))}
 plot.plot()
 
-print "computing, be patient..."
+print("computing, be patient...")
 #First run without moment and without cohesion
 O.run(7000,True)
 

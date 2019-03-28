@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from yade import qt
 from yade.gridpfacet import *
 import gts, os.path, locale

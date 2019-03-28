@@ -1,5 +1,6 @@
 # encoding: utf-8
 "An example showing various bending beams."
+from __future__ import unicode_literals
 
 from yade.gridpfacet import *
 

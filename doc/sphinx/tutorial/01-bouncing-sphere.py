@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # basic simulation showing sphere falling ball gravity,
 # bouncing against another sphere representing the support
 

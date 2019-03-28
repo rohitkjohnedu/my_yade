@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from yade import export,polyhedra_utils
 
 mat = PolyhedraMat()

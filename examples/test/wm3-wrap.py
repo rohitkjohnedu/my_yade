@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # constructors, constants as static objects
 x,y,z,one=Vector3.UnitX,Vector3.UnitY,Vector3.UnitZ,Vector3(1,1,1)
 x2=Vector3(x)

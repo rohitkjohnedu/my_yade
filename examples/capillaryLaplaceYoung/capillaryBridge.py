@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # capillary bridge example between 2 spheres
 
 

@@ -1,6 +1,7 @@
 """
 Show basic wall functionality (infinite axis-aligned planes).
 """
+from __future__ import unicode_literals
 
 O.materials.append(FrictMat(young=30e9,density=1000,poisson=.2,frictionAngle=.5))
 O.bodies.append([

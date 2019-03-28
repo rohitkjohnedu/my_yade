@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # gravity deposition, continuing with oedometric test after stabilization
 # shows also how to run parametric studies with yade-batch
 

@@ -4,6 +4,7 @@
 """
 Auxiliary functions for polyhedra
 """
+from __future__ import unicode_literals
 
 
 import math,random,doctest,geom,numpy

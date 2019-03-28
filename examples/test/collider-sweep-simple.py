@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 O.bodies.append(sphere([0,0,10],.5))
 #O.bodies.append(sphere([0,0,0],.5,fixed=True))
 

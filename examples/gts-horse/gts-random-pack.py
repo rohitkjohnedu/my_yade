@@ -2,6 +2,7 @@
 """ CAUTION:
 Running this script can take very long!
 """
+from __future__ import unicode_literals
 
 from numpy import arange
 from yade import pack

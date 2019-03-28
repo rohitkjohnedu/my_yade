@@ -3,6 +3,7 @@
 # © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 # © 2013 Anton Gladky <gladk@debian.org>
 
+from __future__ import unicode_literals
 from yade import pack
 import gts, os.path, locale
 

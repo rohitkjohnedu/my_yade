@@ -21,6 +21,8 @@
 ##
 ## http://docutils.sourceforge.net/docs/howto/rst-roles.html
 
+from __future__ import print_function
+from __future__ import unicode_literals
 import sys, os, re
 from docutils import nodes
 from sphinx import addnodes
@@ -79,7 +81,7 @@ moduleMap={
 class YadeXRefRole(XRefRole):
 	#def process_link
 	def process_link(self, env, refnode, has_explicit_title, title, target):
-		print 'TARGET:','yade.wrapper.'+target
+		print('TARGET:','yade.wrapper.'+target)
 		return '[['+title+']]','yade.wrapper.'+target
 
 def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
@@ -231,11 +233,11 @@ def boostFuncSignature(name,obj,removeSelf=False):
 		strippedDoc[i],n=re.subn(r'([a-zA-Z_][a-zA-Z0-9_]*\() \(object\)arg1(, |)',r'\1',strippedDoc[i].replace('->','→'))
 	# inspect dosctring after mangling
 	if 'getViscoelasticFromSpheresInteraction' in name and False:
-		print name
-		print strippedDoc
-		print '======================'
-		for l in strippedDoc: print l
-		print '======================'
+		print(name)
+		print(strippedDoc)
+		print('======================')
+		for l in strippedDoc: print(l)
+		print('======================')
 	sig=doc1.split('(',1)[1]
 	if removeSelf:
 		# remove up to the first comma; if no comma present, then the method takes no arguments
@@ -305,7 +307,7 @@ from sphinx import addnodes
 def parse_ystaticattr(env,attr,attrnode):
 	m=re.match(r'([a-zA-Z0-9_]+)\.(.*)\(=(.*)\)',attr)
 	if not m:
-		print 100*'@'+' Static attribute %s not matched'%attr
+		print(100*'@'+' Static attribute %s not matched'%attr)
 		attrnode+=addnodes.desc_name(attr,attr)
 	klass,name,default=m.groups()
 	#attrnode+=addnodes.desc_type('static','static')

@@ -13,6 +13,7 @@ The result is:
 http://www.access.edu.au/lsmgengeo_python_doc/current/pythonapi/html/GenGeo-module.html
 https://svn.esscc.uq.edu.au/svn/esys3/lsm/contrib/LSMGenGeo/
 """
+from __future__ import unicode_literals
 from yade import pack,ymport
 
 try:

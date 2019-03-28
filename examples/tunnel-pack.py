@@ -10,6 +10,7 @@ The tunnel hole is oriented along +y, the face is in the xz plane.
 The first you run this scipt, a few minutes is neede to generate the packing. It is
 saved in /tmp/triaxPackCache.sqlite and at next time it will be only loaded (fast).
 """
+from __future__ import unicode_literals
 # set some geometry parameters: domain box size, tunnel radius, radius of particles
 boxSize=Vector3(5,8,5)
 tunnelRad=2

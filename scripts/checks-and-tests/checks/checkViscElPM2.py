@@ -12,6 +12,7 @@
 # checkViscElPM.py and checkViscElEng.py
 #
 
+from __future__ import unicode_literals
 from yade import plot,ymport
 import math
 

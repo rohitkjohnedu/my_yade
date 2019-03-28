@@ -2,6 +2,7 @@
 """
 Same example as CohesiveCylinderSphere.py but using gridConnections instead of chainedCylinder.
 """
+from __future__ import unicode_literals
 from yade import qt
 from yade.gridpfacet import *
 from numpy import linspace

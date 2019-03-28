@@ -4,6 +4,7 @@
 # This script plots the viscous and normal forces of the contact
 # of 2 spheres
 
+from __future__ import unicode_literals
 from yade import utils, plot, qt
 o = Omega()
 

@@ -3,6 +3,7 @@
 #
 # demonstration of the yade.post2d module (see its documentation for details)
 #
+from __future__ import unicode_literals
 import pylab # the matlab-like interface of matplotlib
 pylab.ioff()
 import numpy

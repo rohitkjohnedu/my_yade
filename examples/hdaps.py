@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 
 # With Thinkpad laptops, control the sphere's motion by tilting the
 # laptop.

@@ -7,6 +7,7 @@
 #****** The application is consisted of a free-fixed 1 meter rod having a miliseconds sinusoidal pressure applied on the one side.
 
 #****** The propagation of the wave is investigated.
+from __future__ import unicode_literals
 from yade.deformableelementsutils import *;
 
 O=Omega()

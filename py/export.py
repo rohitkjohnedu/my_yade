@@ -2,6 +2,8 @@
 """
 Export (not only) geometry to various formats.
 """
+from __future__ import print_function
+from __future__ import unicode_literals
 
 from yade.wrapper import *
 from yade import utils,Matrix3,Vector3
@@ -30,7 +32,7 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1,attrs=[]):
 	# TODO use output=[] instrad of ''???
 	output = ''
 	outputVel=''
-	if (format<>'liggghts_in'):
+	if (format!='liggghts_in'):
 		output = '#format ' + format + '\n'
 		if (comment):
 			if format=='x_y_z_r_attrs':
@@ -109,7 +111,7 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1,attrs=[]):
 			elif isinstance(val,(int,float)):
 				d.append(val)
 			else:
-				print "WARNING: export.text: wrong 'what' parameter, output might be corrupted"
+				print("WARNING: export.text: wrong 'what' parameter, output might be corrupted")
 				return 0
 		data.append(d)
 	dataw = [' '.join('%e'%v for v in d) for d in data]
@@ -372,9 +374,9 @@ class VTKExporter:
 
 	# auxiliary functions
 	def _warn(self,msg):
-		print "Warning (yade.export.VTKExporter): " + msg
+		print("Warning (yade.export.VTKExporter): " + msg)
 	def _error(self,msg):
-		print "ERROR (yade.export.VTKExporter): " + msg
+		print("ERROR (yade.export.VTKExporter): " + msg)
 	def _getBodies(self,ids,type):
 		allIds = False
 		if isinstance(ids,str) and ids.lower()=='all':

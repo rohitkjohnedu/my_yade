@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 #
 # Demonstrate L6Geom class with suspended hook-shaped beam fixed at one side, subject to gravity
 #

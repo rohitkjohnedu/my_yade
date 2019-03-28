@@ -4,6 +4,7 @@
 # A facet is rotated around Z axis.  Test pass, if a sphere at (0,0) position is not moving (because in this case no transfer moment from the facet to the sphere), but a sphere at facet's edge moves with the facet (for this sphere blocked the rotation DOFs in order to remove rolling).
 
 ## PhysicalParameters 
+from __future__ import unicode_literals
 Density=2400
 frictionAngle=radians(35)
 tc = 0.001

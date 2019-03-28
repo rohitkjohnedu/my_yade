@@ -11,6 +11,7 @@ How to run this script:
     /path/to/yade ./footing.py
 Please amend these instructions if you find that they do not work.
 """
+from __future__ import unicode_literals
 from esys.escript import *
 from esys.finley import ReadGmsh
 from esys.weipa import saveVTK

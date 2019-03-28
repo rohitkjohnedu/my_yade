@@ -24,6 +24,7 @@
 #    the constitutive law.
 #
 
+from __future__ import unicode_literals
 from yade import plot,ymport
 import math
 

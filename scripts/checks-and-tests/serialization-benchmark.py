@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 import time
 # change this line to load your reference simulation
 O.load2('ref.boost.bin.gz')
@@ -14,7 +16,7 @@ def io(ext,load,noBoost=False):
 	t0=time.time()
 	f=base+('.yade.' if noBoost else '.boost.')+ext
 	((O.load if noBoost else O.load2) if load else (O.save if noBoost else O.save2))(f)
-	print ('Loaded' if load else 'Saved '),('yade ' if noBoost else 'boost'),'%-7s '%ext,'%7s'%sizeof_fmt(os.path.getsize(f)),'%.1fs'%(time.time()-t0)
+	print(('Loaded' if load else 'Saved '),('yade ' if noBoost else 'boost'),'%-7s '%ext,'%7s'%sizeof_fmt(os.path.getsize(f)),'%.1fs'%(time.time()-t0))
 for ext in ['xml','xml.bz2']:
 	io(ext,False,True)
 	io(ext,True,True)

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 06/11/2018
@@ -49,7 +51,7 @@ fluidHeight = 2*Nlayer*diameterPart	#Height of the flow from the bottom of the s
 waterDepth = Nlayer*diameterPart
 Rep =  densFluidPY*diameterPart*uTop/dynamicVisco
 Re = densFluidPY*waterDepth*uTop/dynamicVisco
-print "\nDimensionless numbers of the simulation: Re =",Re, ",   Rep =",Rep,",  rhop/rhof=",densPart/densFluidPY, ",   Shields =", Shields,"\n"
+print("\nDimensionless numbers of the simulation: Re =",Re, ",   Rep =",Rep,",  rhop/rhof=",densPart/densFluidPY, ",   Shields =", Shields,"\n")
 #Fit the gravity in order to obtain the wanted Shields number while keeping the Reynolds number and particle Reynolds number to the same values. 
 gammaDot = uTop/(Nlayer*diameterPart)#Approximate Shear rate
 gra = dynamicVisco*gammaDot/((densPart-densFluidPY)*Shields*diameterPart)
@@ -227,7 +229,7 @@ def measure():
 	#Evaluate the dimensionless sediment transport rate for information
 	qsMean = sum(phiPartPY*vxPartPY)*dz/sqrt((densPart/densFluidPY - 1)*abs(gravityVector[2])*pow(diameterPart,3))
 	plot.addData(SedimentRate = qsMean, time = O.time)	#Plot it during the simulation
-	print qsMean
+	print(qsMean)
 
 	#Condition to stop the simulation after endTime seconds
 	if O.time>=endTime:
@@ -259,7 +261,7 @@ if saveData==1:	#If saveData option is activated, requires a folder data
 	if os.path.exists(scriptPath +'/data/')==False:
 		os.mkdir(scriptPath +'/data/')
 	else:
-		print '\n!! Save data: overwrite the files contains in the folder data/ !!\n'
+		print('\n!! Save data: overwrite the files contains in the folder data/ !!\n')
 #Function to save global variables in a python file which can be re-executed for post-processing
 def Save(filePathName, globalVariables):
 	f = open(filePathName,'w')

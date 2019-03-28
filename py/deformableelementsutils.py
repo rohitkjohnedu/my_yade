@@ -5,6 +5,7 @@
 # burak er buraker88@yandex.com
 
 
+from __future__ import unicode_literals
 import math,random,doctest,geom,numpy
 from yade import *
 from yade.wrapper import *
@@ -192,7 +193,7 @@ def mshreader(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quat
 	interactionList=[]	
 	findVerticesString=0
 	
-	while (lines[findVerticesString].split()[0]<>'$Nodes'): #Find the string with the number of Vertices
+	while (lines[findVerticesString].split()[0]!='$Nodes'): #Find the string with the number of Vertices
 		findVerticesString+=1
 	findVerticesString+=1
 	numNodes = int(lines[findVerticesString].split()[0])
@@ -202,7 +203,7 @@ def mshreader(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Quat
 		nodelistVector3.append(orientation*Vector3(float(data[1])*scale,float(data[2])*scale,float(data[3])*scale)+shift)
 	
 	findElementString=findVerticesString+numNodes
-	while (lines[findElementString].split()[0]<>'$Elements'): #Find the string with the number of Elements
+	while (lines[findElementString].split()[0]!='$Elements'): #Find the string with the number of Elements
 		findElementString+=1
 	findElementString+=1
 	numElements = int(lines[findElementString].split()[0])

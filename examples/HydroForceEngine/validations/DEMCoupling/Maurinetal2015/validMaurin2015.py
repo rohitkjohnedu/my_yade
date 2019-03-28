@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 24/11/2017
@@ -61,7 +63,7 @@ elif sim20==1:
 	Nlayer = 7.30	#nb of layer of particle, in diameter
 	nbSim=20
 else:
-	print '\n At least one of the option sim6, sim14 or sim20 should be equal to 1 !! Exit !\n'
+	print('\n At least one of the option sim6, sim14 or sim20 should be equal to 1 !! Exit !\n')
 	exit()
 
 saveData = 1	#If put to 1, at each execution of function measure() save the sediment transport rate, fluid velocity, solid volume fraction and velocity profiles for post-processing
@@ -228,7 +230,7 @@ def fluidModel():
 def turbulentFluctuationPY():
 	#For stability requirement at the initialization stage
 	if O.time<depoTime+0.5:
-		print 'No turbulent fluctuation in the initialization process for stability reasons!'
+		print('No turbulent fluctuation in the initialization process for stability reasons!')
 		turbFluct.virtPeriod = 0.5
 	else:
 		# Evaluate nBed, the position of the bed which is assumed to be located around the first maximum of concentration when considering decreasing z.
@@ -282,7 +284,7 @@ def measure():
 
 	#Evaluate the Shields number from the maximum of the Reynolds stresses evaluated in the fluid resolution
 	shieldsNumber = max(hydroEngine.ReynoldStresses)/((densPart-densFluidPY)*diameterPart*abs(gravityVector[2]))	
-	print 'Shields number', shieldsNumber
+	print('Shields number', shieldsNumber)
 
 	if saveData==1:	#Save data for postprocessing
 		global fileNumber
@@ -311,7 +313,7 @@ if saveData==1:	#If saveData option is activated, requires a folder data
 	if os.path.exists(scriptPath + '/sim'+ str(nbSim) +'/data/')==False:
 		os.makedirs(scriptPath + '/sim'+ str(nbSim) +'/data/')
 	else:
-		print '\n!! Save data: overwrite the files contains in the folder data/ !!\n'
+		print('\n!! Save data: overwrite the files contains in the folder data/ !!\n')
 #Function to save global variables in a python file which can be re-executed for post-processing
 def Save(filePathName, globalVariables):
 	f = open(filePathName,'w')

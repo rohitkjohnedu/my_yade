@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from yade import *
 from yade import plot,qt
 import sys

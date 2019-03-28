@@ -114,5 +114,7 @@ It is also possible to read in GTS data files and plot surfaces to
 the screen.  See the example programs packaged with PyGTS for
 more information.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-from pygts import *
+from .pygts import *

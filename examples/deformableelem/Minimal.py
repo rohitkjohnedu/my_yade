@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Created by Burak ER
+from __future__ import unicode_literals
 from yade.deformableelementsutils import *;
 
 O=Omega()

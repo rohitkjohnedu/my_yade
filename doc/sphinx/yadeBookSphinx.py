@@ -3,6 +3,7 @@
 #
 # module documentation
 #
+from __future__ import unicode_literals
 import sys,os,os.path
 
 outDir=sys.argv[2] if len(sys.argv)>2 else 'book/_build/'
@@ -248,7 +249,7 @@ for vol in volumes:
 				
 				out=[]
 				for i in range(0,len(lines)):
-					if (i<>len(lines) and
+					if (i!=len(lines) and
 							lines[i].strip()=="\\begin{Verbatim}[commandchars=\\\\\{\\}]" and
 							lines[i+1].strip()=="\\end{Verbatim}"):
 							lines[i]=''; lines[i+1]=''

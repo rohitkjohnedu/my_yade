@@ -1,5 +1,7 @@
 # -*- coding: utf-8
 
+from __future__ import print_function
+from __future__ import unicode_literals
 from yade import pack,export,qt,geom
 import itertools
 from numpy import *
@@ -65,9 +67,9 @@ def addBodies():
 
 def state():
 	global numSphereGen
-	print "Iter %d: Total number of generated spheres %d, removed particles %d, current particles %d, kinEnergy %g"%(O.iter, numSphereGen, domLim.nDeleted, numSphereGen-domLim.nDeleted, utils.kineticEnergy())
+	print("Iter %d: Total number of generated spheres %d, removed particles %d, current particles %d, kinEnergy %g"%(O.iter, numSphereGen, domLim.nDeleted, numSphereGen-domLim.nDeleted, utils.kineticEnergy()))
 	if (utils.kineticEnergy() > kinEnergyMax):
-		print "Kinetic energy is over a threshold value! Error!"
+		print("Kinetic energy is over a threshold value! Error!")
 
 addBodies()
 

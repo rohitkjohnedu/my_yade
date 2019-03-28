@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 O.periodic=True
 O.cell.setBox(.55,.55,.55)
 O.bodies.append(facet([[.4,.0001,.3],[.2,.0001,.3],[.3,.2,.2]]))

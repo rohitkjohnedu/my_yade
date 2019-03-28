@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 
+from __future__ import unicode_literals
 from yade import pack,export,qt
 import gts,os
 
