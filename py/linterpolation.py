@@ -62,7 +62,7 @@ def xFractionalFromIntegral(integral,x,y):
 		if sum+diff>integral:
 			return revIntegrateLinear(integral-sum,x[i-1],y[i-1],x[i],y[i])
 		else: sum+=diff
-	raise "Integral not reached within the interpolation range!"
+	raise ValueError("Integral not reached within the interpolation range!")
 
 
 def xFromIntegral(integralValue,x,y):

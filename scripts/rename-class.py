@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os,re,sys,os.path
 
-if not os.path.exists('SConstruct'): raise 'Must be run from the top-level source directory'
+if not os.path.exists('SConstruct'): raise AssertionError('Must be run from the top-level source directory')
 oldClass,newClass=sys.argv[1],sys.argv[2]
 replCnt,moveCnt,moveDirCnt=0,0,0
 
