@@ -389,4 +389,3 @@ instDirTargets={} # hash indexed by (env,targetDir)->str_target_spec
 installDirs={'shlib':join('$PREFIX','lib','yade$POSTFIX',string.split(scriptDir,os.sep)[-1]),'staticlib':join('$PREFIX','lib','yade$POSTFIX'),'program':join('$PREFIX','bin')}
 
 print masterScriptGen(allVars,scriptDir)
-

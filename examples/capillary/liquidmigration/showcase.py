@@ -94,7 +94,7 @@ def showData():
     print "Interaction[3, 5].Vb=%s"%(O.interactions[id3,id5].phys.Vb)
   except:
     pass
-  print 
+  print
 
 
 showData()

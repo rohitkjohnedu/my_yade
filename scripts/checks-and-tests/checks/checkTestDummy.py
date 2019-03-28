@@ -10,5 +10,5 @@ print 'checkTest mechanism'
 #do something and get a result...
 
 if 0: #put a condition on the result here, is it the expected result? else:
-	print "Dummy failed (we know it will not happen here, you get the idea)." 
+	print "Dummy failed (we know it will not happen here, you get the idea)."
 	resultStatus+=1

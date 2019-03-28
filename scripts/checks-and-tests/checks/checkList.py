@@ -11,7 +11,7 @@ skipScripts = ['checkList.py']
 for script in scriptsToRun:
 	if (script[len(script)-3:]==".py" and script not in skipScripts):
 		try:
-	 		print "###################################"
+			print "###################################"
 			print "running: ",script
 			execfile(checksPath+"/"+script)
 			if (resultStatus>nFailed):

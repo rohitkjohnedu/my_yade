@@ -149,7 +149,7 @@ for l in data:
 	fid.write("%d %f %f\n"%(l[0],l[1],l[2]))
 fid.close()
 print "Summary saved to "+filename
-print 
+print
 print "SCORE: " + str(scoreIterVel)
 print "Number of threads: ", os.environ['OMP_NUM_THREADS']
 print "___________________________________________________"

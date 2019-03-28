@@ -25,11 +25,11 @@ sp=pack.SpherePack()
 #O.materials.append(CohFrictMat(young=1.0e5,poisson=0.03,density=2.60e2,frictionAngle=frictionAngle,label='spheremat'))
 
 if os.path.exists("cloud4cylinders"+`Ns`):
- 	print "loading spheres from file"
+	print "loading spheres from file"
 	sp.load("cloud4cylinders"+`Ns`)
 else:
- 	print "generating spheres"
- 	Ns=sp.makeCloud(Vector3(-0.3,0.2,-1.0),Vector3(+0.3,+0.5,+1.0),-1,.2,Ns,False,0.8)
+	print "generating spheres"
+	Ns=sp.makeCloud(Vector3(-0.3,0.2,-1.0),Vector3(+0.3,+0.5,+1.0),-1,.2,Ns,False,0.8)
 	sp.save("cloud4cylinders"+`Ns`)
 
 O.bodies.append([sphere(center,rad,material='spheremat') for center,rad in sp])

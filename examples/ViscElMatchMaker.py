@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# encoding: utf-8
 
 # This example shows, how matchmaker can be used to
 # set the parameters of ViscoElastic model.

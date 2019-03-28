@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# encoding: utf-8
 
 # The model checks liquid migration model if it is enabled during compilation
 from yade import utils, plot
@@ -71,7 +71,7 @@ if ('LIQMIGRATION' in features):
       print "Interaction[%d, %d].Vb=%s"%(id0, id2, O.interactions[id0,id2].phys.Vb)
     except:
       pass
-    print 
+    print
   
   def switchVel():
     O.bodies[id1].state.vel=-O.bodies[id1].state.vel

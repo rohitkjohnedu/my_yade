@@ -55,7 +55,7 @@ def formatRest(db):
 		elif type=='inproceedings':
 			line+='%s (%s), **%s**. In *%s*.'%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
 		elif type=='incollection':
-		 	line+='%s (%s), **%s**. In *%s* '%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
+			line+='%s (%s), **%s**. In *%s* '%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
 			if i.has_key('editor'): line+='( %s'%i['editor']+', ed.),'
 			if i.has_key('publisher'): line+=' %s'%i['publisher']+' ,'
 			if i.has_key('edition'): line+=' %s ed.'%i['edition']
@@ -78,7 +78,7 @@ def formatRest(db):
 		# add doi and url to everything, if present
 		## ReST uses <..> to delimit URL, therefore < and > must be encoded in the URL (http://www.blooberry.com/indexdot/html/topics/urlencoding.htm)
 		def escapeUrl(url): return url.replace('<','%3c').replace('>','%3e')
-		if i.has_key('doi'): line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi'])) 
+		if i.has_key('doi'): line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi']))
 		if i.has_key('url'): line+=' `(fulltext) <%s>`__'%escapeUrl(i['url'])
 		if (i.has_key('note') and type<>'mastersthesis'): line+=' (%s)'%i['note']
 		ret.append(line)
