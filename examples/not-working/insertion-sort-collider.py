@@ -2,6 +2,7 @@
 """ NOTE
 Needs yade compiled with CGAL feature
 """
+from __future__ import print_function
 
 O.engines=[
 	ForceResetter(),
@@ -39,6 +40,6 @@ if 1:
 else:
 	#O.run(100,True)
 	O.step()
-	print len(O.interactions)
+	print(len(O.interactions))
 	#O.bodies[2].phys['se3']=[-.6,0,.6,1,0,0,0]
 	#O.step()

@@ -25,7 +25,7 @@ def spheresPackDimensions(idSpheres=[],mask=-1):
 		ifSpherMask=[]
 		if (mask>-1):   #The case, when only the mask was given, without list of ids
 			for i in O.bodies:
-				if ((i.mask&mask)<>0):
+				if ((i.mask&mask)!=0):
 					ifSpherMask.append(i.id)
 			if (len(ifSpherMask)<2):
 				raise RuntimeWarning("Not enough bodies to analyze with given mask")
@@ -106,7 +106,7 @@ def facetsDimensions(idFacets=[],mask=-1):
 		ifFacetMask=[]
 		if (mask>-1):   #The case, when only the mask was given, without list of ids
 			for i in O.bodies:
-				if ((i.mask&mask)<>0):
+				if ((i.mask&mask)!=0):
 					ifFacetMask.append(i.id)
 			if (len(ifFacetMask)<2):
 				raise RuntimeWarning("Not enough bodies to analyze with given mask")
@@ -185,7 +185,7 @@ def spheresModify(idSpheres=[],mask=-1,shift=Vector3.Zero,scale=1.0,orientation=
 		ifSpherMask=[]
 		if (mask>-1):   #The case, when only the mask was given, without list of ids
 			for i in O.bodies:
-				if ((i.mask&mask)<>0):
+				if ((i.mask&mask)!=0):
 					ifSpherMask.append(i.id)
 			if (len(ifSpherMask)==0):
 				raise RuntimeWarning("No bodies to modify with given mask")

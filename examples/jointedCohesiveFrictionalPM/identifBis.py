@@ -7,6 +7,7 @@
 
 ### engines definition, according to our only goal that is to detect spheres concerned by joint surfaces
 
+from __future__ import print_function
 O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],verletDist=0), #verletDist=0 to avoid introducing NewtonIntegrator in engines list
 	InteractionLoop(
@@ -128,7 +129,7 @@ for b in O.bodies:
 O.resetTime()
 O.interactions.clear()
 
-print '\nIdentificationSpheresOnJoint executed ! Spheres onJoint (and so on...) detected, facets deleted, simulation may go on.\n\n'
+print('\nIdentificationSpheresOnJoint executed ! Spheres onJoint (and so on...) detected, facets deleted, simulation may go on.\n\n')
 
 
 

@@ -8,6 +8,7 @@
 
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
+from __future__ import print_function
 
 import math,random,doctest,geom,numpy
 from yade import *
@@ -297,7 +298,7 @@ def tetra(vertices,strictCheck=True,dynamic=True,fixed=False,wire=True,color=Non
 	volume = TetrahedronSignedVolume(vertices)
 	if volume < 0:
 		if strictCheck:
-			raise RuntimeError, "tetra: wrong order of vertices"
+			raise RuntimeError("tetra: wrong order of vertices")
 		temp = vertices[3]
 		vertices[3] = vertices[2]
 		vertices[2] = temp
@@ -508,11 +509,11 @@ def makeVideo(frameSpec,out,renameNotOverwrite=True,fps=24,kbps=6000,bps=None):
 	if renameNotOverwrite and os.path.exists(out):
 		i=0
 		while(os.path.exists(out+"~%d"%i)): i+=1
-		os.rename(out,out+"~%d"%i); print "Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i)
+		os.rename(out,out+"~%d"%i); print("Output file `%s' already existed, old file renamed to `%s'"%(out,out+"~%d"%i))
 	if isinstance(frameSpec,list) or isinstance(frameSpec,tuple): frameSpec=','.join(frameSpec)
 	for passNo in (1,2):
 		cmd=['mencoder','mf://%s'%frameSpec,'-mf','fps=%d'%int(fps),'-ovc','lavc','-lavcopts','vbitrate=%d:vpass=%d:threads=%d:%s'%(int(kbps),passNo,O.numThreads,'turbo' if passNo==1 else ''),'-o',('/dev/null' if passNo==1 else out)]
-		print 'Pass %d:'%passNo,' '.join(cmd)
+		print('Pass %d:'%passNo,' '.join(cmd))
 		ret=subprocess.call(cmd)
 		if ret!=0: raise RuntimeError("Error when running mencoder.")
 
@@ -730,7 +731,7 @@ This class is used by :yref:`yade.utils.readParamsFromTable`.
 				if values[l][j]=='=':
 					try:
 						values[l][j]=values[lines[i-1]][j]
-					except IndexError,KeyError:
+					except IndexError as KeyError:
 						raise RuntimeError("The = specifier on line %d refers to nonexistent value on previous line?"%l)
 		#import pprint; pprint.pprint(headings); pprint.pprint(values)
 		# add descriptions, but if they repeat, append line number as well
@@ -811,7 +812,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 		env=tableFileLine.split(':')
 		tableFile,tableLine=env[0],int(env[1])
 		allTab=TableParamReader(tableFile).paramDict()
-		if not allTab.has_key(tableLine): raise RuntimeError("Table %s doesn't contain valid line number %d"%(tableFile,tableLine))
+		if tableLine not in allTab: raise RuntimeError("Table %s doesn't contain valid line number %d"%(tableFile,tableLine))
 		vv=allTab[tableLine]
 		O.tags['line']='l%d'%tableLine
 		O.tags['description']=vv['description']
@@ -854,12 +855,12 @@ def psd(bins=5, mass=True, mask=-1):
 	minD = 0.0
 	
 	for b in O.bodies:
-		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)<>0))):
+		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)!=0))):
 			if ((2*b.shape.radius)	> maxD) : maxD = 2*b.shape.radius
 			if (((2*b.shape.radius)	< minD) or (minD==0.0)): minD = 2*b.shape.radius
 
 	if (minD==maxD):
-		print 'Monodisperse packing with diameter =', minD,'. Not computing psd'
+		print('Monodisperse packing with diameter =', minD,'. Not computing psd')
 		return False       #All particles are having the same size
   
 	binsSizes = numpy.linspace(minD, maxD, bins+1)
@@ -869,7 +870,7 @@ def psd(bins=5, mass=True, mask=-1):
 	binsNumbers = numpy.zeros(bins)
 	
 	for b in O.bodies:
-		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)<>0))):
+		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)!=0))):
 			d=2*b.shape.radius
 			
 			basketId = int(math.floor( (d-minD) / deltaBinD ) )

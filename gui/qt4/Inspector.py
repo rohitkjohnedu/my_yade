@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+from __future__ import print_function
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from yade import *
@@ -63,7 +64,7 @@ def getBodyIdFromLabel(label):
 	try:
 		return int(unicode(label).split()[0])
 	except ValueError:
-		print 'Error with label:',unicode(label)
+		print('Error with label:',unicode(label))
 		return -1
 
 class BodyInspector(QWidget):
@@ -173,7 +174,7 @@ class BodyInspector(QWidget):
 			#except IndexError: pass
 		v=yade.qt.views()
 		if len(v)>0 and v[0].selection!=self.bodyId:
-			print v[0].selection,self.bodyId,self.idGlSync
+			print(v[0].selection,self.bodyId,self.idGlSync)
 			if self.idGlSync==self.bodyId: # changed in the viewer, reset ourselves
 				self.bodyId=self.idGlSync=v[0].selection; self.changeIdSlot(self.bodyId)
 				return

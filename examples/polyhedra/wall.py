@@ -1,3 +1,4 @@
+from __future__ import print_function
 from yade import qt
 import numpy as np
 import random

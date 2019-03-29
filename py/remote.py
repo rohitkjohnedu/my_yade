@@ -5,6 +5,7 @@ Remote connections to yade: authenticated python command-line over telnet and an
 
 These classes are used internally in gui/py/PythonUI_rc.py and are not intended for direct use.
 """
+from __future__ import print_function
 
 import SocketServer,xmlrpclib,socket
 import sys,time,os,math
@@ -26,7 +27,7 @@ bgThreads=[] # needed to keep background threads alive
 
 class InfoProvider:
 	def basicInfo(self):
-		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,speed=O.speed,realtime=O.realtime,time=O.time,id=O.tags['id'] if O.tags.has_key('id') else None,threads=os.environ['OMP_NUM_THREADS'] if os.environ.has_key('OMP_NUM_THREADS') else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
+		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,speed=O.speed,realtime=O.realtime,time=O.time,id=O.tags['id'] if 'id' in O.tags else None,threads=os.environ['OMP_NUM_THREADS'] if 'OMP_NUM_THREADS' in os.environ else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
 		sys.stdout.flush(); sys.stderr.flush()
 		return ret
 	def plot(self):
@@ -42,7 +43,7 @@ class InfoProvider:
 			#print 'returning '+plotImgFormat
 			return xmlrpclib.Binary(data)
 		except:
-			print 'Error updating plots:'
+			print('Error updating plots:')
 			import traceback
 			traceback.print_exc()
 			return None
@@ -58,9 +59,9 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 	"""
 	def setup(self):
 		if not self.client_address[0].startswith('127.0.0'):
-			print "TCP Connection from non-127.0.0.* address %s rejected"%self.client_address[0]
+			print("TCP Connection from non-127.0.0.* address %s rejected"%self.client_address[0])
 			return
-		print self.client_address, 'connected!'
+		print(self.client_address, 'connected!')
 		self.request.send('Enter auth cookie: ')
 	def tryLogin(self):
 		if self.request.recv(1024).rstrip()==self.server.cookie:
@@ -77,7 +78,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 		else:
 			import time
 			time.sleep(5)
-			print "invalid cookie"
+			print("invalid cookie")
 			return False
 	def displayhook(self,s):
 		import pprint
@@ -100,7 +101,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 				if comp:
 					sys.displayhook=self.displayhook
 					sys.stdout=sio
-					exec comp
+					exec(comp)
 					self.request.send(sio.getvalue())
 					buf=[]
 				else:
@@ -112,7 +113,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 				sys.displayhook,sys.stdout=orig_displayhook,orig_stdout
 				if not continuation: self.request.send('\n>>> ')
 	def finish(self):
-		print self.client_address, 'disconnected!'
+		print(self.client_address, 'disconnected!')
 		self.request.send('\nBye ' + str(self.client_address) + '\n')
 
 
@@ -186,7 +187,7 @@ def runServers():
 	#prov=InfoProvider()
 	#for m in prov.exposedMethods(): info.register_function(m)
 	_runInBackground(info.serve_forever)
-	print 'XMLRPC info provider on http://localhost:%d'%port
+	print('XMLRPC info provider on http://localhost:%d'%port)
 	sys.stdout.flush()
 
 

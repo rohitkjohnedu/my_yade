@@ -1,3 +1,4 @@
+from __future__ import print_function
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"
@@ -32,7 +33,7 @@ def get_pool(mpi=False,threads=1):
       from multiprocessing import Pool
       pool = Pool(processes=threads)
    else:
-      raise RuntimeError,"Wrong arguments: either mpi=True or threads>1."
+      raise RuntimeError("Wrong arguments: either mpi=True or threads>1.")
    return pool
 
 class MultiScale(object):
@@ -68,9 +69,9 @@ class MultiScale(object):
             self.__pde.getSolverOptions().setSolverMethod(SolverOptions.DIRECT)
       except:
             #import time
-            print "======================================================================="
-            print "For better performance compile python-escript with direct solver method"
-            print "======================================================================="
+            print("=======================================================================")
+            print("For better performance compile python-escript with direct solver method")
+            print("=======================================================================")
             raw_input("Press Enter to continue...")
             #time.sleep(5)
       self.__pde.setSymmetryOn()
@@ -214,7 +215,7 @@ class MultiScale(object):
       converged=(err<rtol)
       while (not converged) and (iterate<iter_max):
          if self.__verbose:
-            print "Not converged after %d iteration(s)! Relative error: %e"%(iterate,err)
+            print("Not converged after %d iteration(s)! Relative error: %e"%(iterate,err))
          iterate+=1
          self.__domain.setX(x_safe+u)
          self.__pde.setValue(A=update_s,X=-update_stress,r=escript.Data())
@@ -241,7 +242,7 @@ class MultiScale(object):
       self.__strain+=D
       self.__scenes=update_scenes
       if self.__verbose:
-         print "Convergence reached after %d iteration(s)! Relative error: %e"%(iterate,err)
+         print("Convergence reached after %d iteration(s)! Relative error: %e"%(iterate,err))
       return u
       
    """

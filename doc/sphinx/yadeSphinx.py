@@ -311,7 +311,7 @@ for writer in ['html','latex','epub']:
 
         out=[]
         for i in range(0,len(lines)):
-            if (i<>len(lines) and
+            if (i!=len(lines) and
                     lines[i].strip()=="\\begin{Verbatim}[commandchars=\\\\\{\\}]" and
                     lines[i+1].strip()=="\\end{Verbatim}"):
                     lines[i]=''; lines[i+1]=''

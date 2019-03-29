@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # encoding: utf-8
+from __future__ import print_function
 try:
 	import _bibtex as bib
 	import _recode as bibRecode
@@ -27,7 +28,7 @@ def readBib(filename):
 
 def dumpBib(db):
 	for k in db.keys():
-		print k,db[k]
+		print(k,db[k])
 
 def formatRest(db):
 	ret=[]
@@ -35,52 +36,52 @@ def formatRest(db):
 	for key in keys:
 		i=db[key]; type=i['type']
 		line=r'.. [%s] \ '%key ## ← HACK: explicit space to prevent docutils from using abbreviated first name (e.g. "F.") as enumeration item; it works!!
-		if i.has_key('author'): author=i['author'].replace(' and ',', ') # the module does not handle this..?
+		if 'author' in i: author=i['author'].replace(' and ',', ') # the module does not handle this..?
 
 		# required fields from http://en.wikipedia.org/wiki/Bibtex
 		# in some cases, they are not present, anyway
 		if type=='article':
-			if i.has_key('author'): line+='%s '%author
-			if i.has_key('year'): line+='(%s), '%i['year']
+			if 'author' in i: line+='%s '%author
+			if 'year' in i: line+='(%s), '%i['year']
 			line+='**%s**. *%s*'%(i['title'],i['journal'])
-			if i.has_key('issue'): line+=' %s'%i['issue']
-			if i.has_key('volume'): line+=' (%s)'%i['volume']
-			if i.has_key('pages'): line+=', pages %s'%i['pages']
+			if 'issue' in i: line+=' %s'%i['issue']
+			if 'volume' in i: line+=' (%s)'%i['volume']
+			if 'pages' in i: line+=', pages %s'%i['pages']
 			line+='.'
 		elif type=='book':
-			if i.has_key('author'): line+='%s '%author
-			if i.has_key('year'): line+='(%s), '%i['year']
+			if 'author' in i: line+='%s '%author
+			if 'year' in i: line+='(%s), '%i['year']
 			line+='**%s**.'%i['title']
-			if i.has_key('publisher'): line+=' %s.'%i['publisher']
+			if 'publisher' in i: line+=' %s.'%i['publisher']
 		elif type=='inproceedings':
-			line+='%s (%s), **%s**. In *%s*.'%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
+			line+='%s (%s), **%s**. In *%s*.'%(author,i['year'],i['title'],i['booktitle'] if 'booktitle' in i else i['journal'])
 		elif type=='incollection':
-			line+='%s (%s), **%s**. In *%s* '%(author,i['year'],i['title'],i['booktitle'] if i.has_key('booktitle') else i['journal'])
-			if i.has_key('editor'): line+='( %s'%i['editor']+', ed.),'
-			if i.has_key('publisher'): line+=' %s'%i['publisher']+' ,'
-			if i.has_key('edition'): line+=' %s ed.'%i['edition']
+			line+='%s (%s), **%s**. In *%s* '%(author,i['year'],i['title'],i['booktitle'] if 'booktitle' in i else i['journal'])
+			if 'editor' in i: line+='( %s'%i['editor']+', ed.),'
+			if 'publisher' in i: line+=' %s'%i['publisher']+' ,'
+			if 'edition' in i: line+=' %s ed.'%i['edition']
 		elif type=='phdthesis':
 			line+='%s (%s), **%s**. PhD thesis at *%s*.'%(author,i['year'],i['title'],i['school'])
 		elif type=='mastersthesis':
 			typeThesis = 'Master thesis'
-			if i.has_key('note'):
+			if 'note' in i:
 				typeThesis = i['note']
 			line+='%s (%s), **%s**. %s at *%s*.'%(author,i['year'],i['title'],typeThesis,i['school'])
 		elif type=='proceedings':
-			if i.has_key('editor'): line+='%s (ed.), '%i['editor']
+			if 'editor' in i: line+='%s (ed.), '%i['editor']
 			line+='**%s** (%s).'%(i['title'],i['year'])
-			if i.has_key('organization'): line+=' *%s*.'%i['organization']
-			if i.has_key('publisher'): line+=' %s'%i['publisher']
+			if 'organization' in i: line+=' *%s*.'%i['organization']
+			if 'publisher' in i: line+=' %s'%i['publisher']
 		elif type=='misc':
-			if i.has_key('author'): line+=author
-			if i.has_key('year'): line+=' %s'%i['year']
-			if i.has_key('title'): line+=' **%s**'%i['title']
+			if 'author' in i: line+=author
+			if 'year' in i: line+=' %s'%i['year']
+			if 'title' in i: line+=' **%s**'%i['title']
 		# add doi and url to everything, if present
 		## ReST uses <..> to delimit URL, therefore < and > must be encoded in the URL (http://www.blooberry.com/indexdot/html/topics/urlencoding.htm)
 		def escapeUrl(url): return url.replace('<','%3c').replace('>','%3e')
-		if i.has_key('doi'): line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi']))
-		if i.has_key('url'): line+=' `(fulltext) <%s>`__'%escapeUrl(i['url'])
-		if (i.has_key('note') and type<>'mastersthesis'): line+=' (%s)'%i['note']
+		if 'doi' in i: line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi']))
+		if 'url' in i: line+=' `(fulltext) <%s>`__'%escapeUrl(i['url'])
+		if ('note' in i and type!='mastersthesis'): line+=' (%s)'%i['note']
 		ret.append(line)
 	return [l.replace('@tilde@','~') for l in ret]
 
@@ -95,4 +96,4 @@ def bib2rst(filename):
 	return '\n\n'.join(formatRest(db))
 if __name__=='__main__':
 	import sys
-	print bib2rst(sys.argv[1])
+	print(bib2rst(sys.argv[1]))

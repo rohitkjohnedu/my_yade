@@ -1,3 +1,4 @@
+from __future__ import print_function
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 24/11/2017
@@ -232,7 +233,7 @@ if saveData==1:	#If saveData option is activated, requires a folder data
 	if os.path.exists(scriptPath +'/data/')==False:
 		os.mkdir(scriptPath +'/data/')
 	else:
-		print '\n!! Save data: overwrite the files contains in the folder data/ !!\n'
+		print('\n!! Save data: overwrite the files contains in the folder data/ !!\n')
 #Function to save global variables in a python file which can be re-executed for post-processing
 def Save(filePathName, globalVariables):
 	f = open(filePathName,'w')
@@ -431,6 +432,6 @@ vxFluidPY = np.array([ 0.        ,  0.06156562,  0.08728988,  0.10283756,  0.110
         2.6963033 ,  2.69634954,  2.69637016,  2.69633447,  2.69633447])
 
 if ndimz!=len(vxFluidPY):
-	print '\n Bug: ndimz should necessarily be equal to the length of the imposed fluid profile vxFluidPY !\n'
+	print('\n Bug: ndimz should necessarily be equal to the length of the imposed fluid profile vxFluidPY !\n')
 	exit()
 

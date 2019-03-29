@@ -743,7 +743,7 @@ class SeqFundamentalEditor(QFrame):
 		field=self.form.itemAt(index,QFormLayout.LabelRole).widget() if index>=0 else None
 		menu=QMenu(self)
 		actNew,actKill,actUp,actDown=[menu.addAction(name) for name in (u'☘ New',u'☠ Remove',u'↑ Up',u'↓ Down')]
-		if index<0: [a.setEnabled(False) for a in actKill,actUp,actDown]
+		if index<0: [a.setEnabled(False) for a in (actKill,actUp,actDown)]
 		if index==len(seq)-1: actDown.setEnabled(False)
 		if index==0: actUp.setEnabled(False)
 		if field: field.setStyleSheet('QWidget { background: green }')

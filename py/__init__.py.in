@@ -11,6 +11,7 @@ It loads yade plugins and injects c++ class constructors to the __builtins__
 (that might change in the future, though) namespace, making them available
 everywhere.
 """
+from __future__ import print_function
 
 import ctypes,sys
 try:
@@ -58,8 +59,8 @@ for root,dirs,files in os.walk(config.libDir):
 		plugin=os.path.join(config.libDir,root,f)
 		plugins.append(plugin)
 if 'YADE_DEBUG' in os.environ:
-	print 'The following plugins will be loaded:'
-	for p in plugins: print '\t'+p
+	print('The following plugins will be loaded:')
+	for p in plugins: print('\t'+p)
 
 # c++ initialization code
 import boot

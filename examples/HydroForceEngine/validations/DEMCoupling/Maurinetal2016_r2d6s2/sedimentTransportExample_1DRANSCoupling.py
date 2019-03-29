@@ -1,3 +1,4 @@
+from __future__ import print_function
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 24/11/2017
@@ -223,7 +224,7 @@ def measure():
 
 	#Evaluate the Shields number from the maximum of the Reynolds stresses evaluated in the fluid resolution
 	shieldsNumber = max(hydroEngine.ReynoldStresses)/((densPart-densFluidPY)*diameterPart*abs(gravityVector[2]))	
-	print 'Shields number', shieldsNumber
+	print('Shields number', shieldsNumber)
 
 	if saveData==1:	#Save data for postprocessing
 		global fileNumber
@@ -248,7 +249,7 @@ if saveData==1:	#If saveData option is activated, requires a folder data
 	if os.path.exists(scriptPath +'/data/')==False:
 		os.mkdir(scriptPath +'/data/')
 	else:
-		print '\n!! Save data: overwrite the files contains in the folder data/ !!\n'
+		print('\n!! Save data: overwrite the files contains in the folder data/ !!\n')
 #Function to save global variables in a python file which can be re-executed for post-processing
 def Save(filePathName, globalVariables):
 	f = open(filePathName,'w')

@@ -419,7 +419,7 @@ def gmshPFacet(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Qua
 	nodelistVector3=[]
 	findVerticesString=0
 	
-	while (lines[findVerticesString].split()[0]<>'Vertices'): # find the string with the number of Vertices
+	while (lines[findVerticesString].split()[0]!='Vertices'): # find the string with the number of Vertices
 		findVerticesString+=1
 	findVerticesString+=1
 	numNodes = int(lines[findVerticesString].split()[0])
@@ -434,7 +434,7 @@ def gmshPFacet(meshfile="file.mesh",shift=Vector3.Zero,scale=1.0,orientation=Qua
 		id += 1
 	
 	findTriangleString=findVerticesString+numNodes
-	while (lines[findTriangleString].split()[0]<>'Triangles'): # find the string with the number of Triangles
+	while (lines[findTriangleString].split()[0]!='Triangles'): # find the string with the number of Triangles
 		findTriangleString+=1
 	findTriangleString+=1
 	numTriangles = int(lines[findTriangleString].split()[0])
