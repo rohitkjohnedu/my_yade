@@ -12,7 +12,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import math,random,doctest,geom,numpy
-from yade import *
+
+#from . import yade 
 from yade.wrapper import *
 try: # use psyco if available
 	import psyco
@@ -60,7 +61,7 @@ def loadVars(mark=None):
 		import yade.params
 		if mark:
 			if mark in yade.params.__dict__: warnings.warn('Overwriting yade.params.%s which already exists.'%mark)
-			modName='yade.params.'+mark
+			modName=b'yade.params.'+mark
 			mod=types.ModuleType(modName)
 			mod.__dict__.update(d)
 			mod.__all__=list(d.keys()) # otherwise params starting with underscore would not be imported
