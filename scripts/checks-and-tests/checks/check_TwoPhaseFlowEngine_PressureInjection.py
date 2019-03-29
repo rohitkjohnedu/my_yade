@@ -128,7 +128,7 @@ while (iniok==0):
          celleini0[c0.getInterfaces()[ii][1]]=c0.getInterfaces()[ii][0]
   for ii in range(nvoids):
     if celleini1[ii]!=nvoids+1:
-        flow.clusterOutvadePore(celleini0[ii],ii)
+        flow.clusterOutvadePore(celleini0[ii],ii,celleini1[ii])
   no=0
   for ii in range(nvoids):
      if bar[ii]<initiallevel:
@@ -177,7 +177,7 @@ def pressureImbibition():
    delta=[0.0] * (nvoids)   
    for ii in range(nvoids):
         if flow.getCellLabel(ii)==0:
-            totalflux[ii]+=-1.*flow.getCellFluxFromId(ii)*O.dt   
+            totalflux[ii]+=-1.*flow.getCellFluxFromId(ii)*O.dt
             if (totalflux[ii])>=initialvol[ii]:
                 col1[ii]=1
             if (totalflux[ii])>initialvol[ii]:
