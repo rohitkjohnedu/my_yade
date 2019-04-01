@@ -25,7 +25,7 @@
 # 5.  Once compilation is done, you can run the solver from any dir. Return to this example file directory.
 #
 # 6.  Create a symbolic link to Yade Install
-#       ln -s /path/to/yade/install/bin/yade-exec yimport.py
+#       ln -s /path/to/yade/install/bin/yade-exec yadeimport.py
 #
 # 7.  Yade side :
 #
