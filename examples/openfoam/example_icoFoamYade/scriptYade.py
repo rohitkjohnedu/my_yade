@@ -31,7 +31,7 @@
 #
 #    a) In the Yade side, create the scene/simulation similar to this script :
 #       (typical yade script but recast in classes. See : https://yade-dev.gitlab.io/trunk/user.html#importing-yade-in-other-python-applications)
-#        At present only spheres are supported.  The coupling module is called as "FoamCoupling", see lines 40-42 on how to
+#        At present only spheres are supported.  The coupling module is called as "FoamCoupling", see lines 127-130 on how to
 #       initialize this.
 #
 #    b) Set the ids of spheres involved in hydrodynamic interaction:
