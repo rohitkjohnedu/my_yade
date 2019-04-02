@@ -8,7 +8,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 ## all exported names
-__all__=[b'data',b'plots',b'labels',b'live',b'liveInterval',b'autozoom',b'plot',b'reset',b'resetData',b'splitData',b'reverseData',b'addData',b'addAutoData',b'saveGnuplot',b'saveDataTxt',b'savePlotSequence']
+__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
 # safe to import even if Tk will not be used

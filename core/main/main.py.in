@@ -1,9 +1,8 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 #!${pyExecutable}
 # encoding: utf-8
 # syntax:python
-
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import sys,os,os.path,time
 try:

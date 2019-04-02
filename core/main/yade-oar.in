@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import unicode_literals
 #!${pyExecutable}
 # encoding: utf-8
 #
@@ -6,9 +8,6 @@
 #  © 2017 William Chèvremont <william.chevremont@univ-grenoble-alpes.fr>
 # This script is to be used with OAR task scheduler. May be an example to use use with other task scheduler for clusters
 # Adapted from yade-batch
-
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, random
 

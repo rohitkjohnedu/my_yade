@@ -15,7 +15,7 @@ O=wrapper.Omega()
 
 def childClasses(base,recurse=True,includeBase=False):
 	"""Enumerate classes deriving from given base (as string), recursively by default. Returns set."""
-	ret=set(O.childClassesNonrecursive(base.encode("utf8"))); ret2=set();
+	ret=set(O.childClassesNonrecursive(base)); ret2=set();
 	if includeBase: ret|=set([base])
 	if not recurse: return ret
 	for bb in ret:
