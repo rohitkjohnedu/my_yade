@@ -56,8 +56,8 @@ try:
 except ImportError: pass; noPredicate = True
 
 # import SpherePack
-from _packSpheres import *
-from _packObb import *
+from yade._packSpheres import *
+from yade._packObb import *
 
 ##
 # extend _packSphere.SpherePack c++ class by this method

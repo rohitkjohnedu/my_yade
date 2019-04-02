@@ -101,7 +101,7 @@ ENDIF (DEBUG)
 IF ( NOT LocalBoost )
   SET(LocalBoost "1.47.0") # Minimal required Boost version
 ENDIF ( NOT LocalBoost )
-FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system date_time REQUIRED)
+FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python3 thread filesystem iostreams regex serialization system date_time REQUIRED)
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
 MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
@@ -121,7 +121,7 @@ FIND_PACKAGE(Eigen3 REQUIRED)
 FIND_PACKAGE(BZip2 REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
 
-SET(Python_ADDITIONAL_VERSIONS 2.7)
+#SET(Python_ADDITIONAL_VERSIONS 2.7)
 FIND_PACKAGE(PythonLibs REQUIRED)
 INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 #===========================================================

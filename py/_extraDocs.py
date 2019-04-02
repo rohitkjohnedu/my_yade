@@ -17,7 +17,7 @@
 #
 #    to the c++ documentation.
 
-import wrapper
+from . import wrapper
 
 # Update docstring of your class/function like this:
 #
@@ -27,7 +27,6 @@ import wrapper
 #		.. note::
 #			The c++ documentation will be overwritten by this string.
 #	"""
-
 
 wrapper.TriaxialTest.__doc__='''
 Create a scene for triaxal test.

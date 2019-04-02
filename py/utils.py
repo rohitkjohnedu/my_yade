@@ -9,7 +9,6 @@
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
 from __future__ import print_function
-import math,random,doctest,geom,numpy
 from __future__ import division
 
 from future import standard_library
@@ -18,6 +17,7 @@ from builtins import str
 from builtins import range
 from builtins import object
 from past.utils import old_div
+import math,random,doctest,yade.geom,numpy
 from yade import *
 from yade.wrapper import *
 try: # use psyco if available

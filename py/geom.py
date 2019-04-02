@@ -8,7 +8,8 @@ from __future__ import division
 from builtins import range
 from past.utils import old_div
 from yade.wrapper import *
-import utils,math,numpy
+import math,numpy
+from yade import utils
 
 from minieigen import *
 

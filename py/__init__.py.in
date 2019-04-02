@@ -12,24 +12,14 @@ It loads yade plugins and injects c++ class constructors to the __builtins__
 everywhere.
 """
 from __future__ import print_function
-
-import ctypes,sys
-try:
-	import dl
-except ImportError:
-	import DLFCN as dl
-if True: # not eval('${mono}'):
-	# see file:///usr/share/doc/python2.6/html/library/sys.html#sys.setdlopenflags
-	# and various web posts on the topic, e.g.
-	# * http://gcc.gnu.org/faq.html#dso
-	# * http://www.code-muse.com/blog/?p=58
-	# * http://wiki.python.org/moin/boost.python/CrossExtensionModuleDependencies
-	sys.setdlopenflags(dl.RTLD_NOW | dl.RTLD_GLOBAL)
-else: sys.setdlopenflags(dl.RTLD_NOW)
 from __future__ import absolute_import
 
 from future import standard_library
 standard_library.install_aliases()
+import ctypes,sys,os
+print("Using python version:",sys.version)
+
+sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
 
 # important: initialize c++ by importing libstdc++ directly
 # see http://www.abclinuxu.cz/poradna/programovani/show/286322
@@ -49,7 +39,7 @@ except: pass
 
 # find plugin directory
 import os,os.path
-import config
+import yade.config
 # find plugins recursively
 plugins=[]
 # might add followlinks=True to os.walk, for python>=2.6
@@ -66,10 +56,12 @@ if 'YADE_DEBUG' in os.environ:
 	print('The following plugins will be loaded:')
 	for p in plugins: print('\t'+p)
 
+
+	
 # c++ initialization code
-import boot
+import yade.boot
 boot.initialize(plugins,config.confDir)
-import system
+import yade.system
 
 # create proxies for deprecated classes
 deprecatedTypes=system.cxxCtorsDict()
@@ -80,14 +72,14 @@ __all__=list(deprecatedTypes.keys())+['O']
 
 from minieigen import *
 
-from wrapper import *
+from yade.wrapper import *
 # import to separate namespace to be able to call dir(miniEigen) and dir(wrapper) below
-import wrapper 
+import yade.wrapper 
 
 # out-of-class docstrings for some classes
-import _extraDocs
+import yade._extraDocs
 # import a few "important" modules along with *
-import utils # some others?
+import yade.utils # some others?
 __all__+=['utils',]+dir(wrapper)
 
 

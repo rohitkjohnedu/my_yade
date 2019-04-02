@@ -69,7 +69,7 @@ class PythonConsoleSocketEmulator(socketserver.BaseRequestHandler):
 		self.request.send('Enter auth cookie: ')
 	def tryLogin(self):
 		if self.request.recv(1024).rstrip()==self.server.cookie:
-	  		self.server.authenticated+=[self.client_address]
+			self.server.authenticated+=[self.client_address]
 			self.request.send("""__   __    ____                 __  _____ ____ ____  
 \ \ / /_ _|  _ \  ___    ___   / / |_   _/ ___|  _ \ 
  \ V / _` | | | |/ _ \  / _ \ / /    | || |   | |_) |
@@ -78,7 +78,7 @@ class PythonConsoleSocketEmulator(socketserver.BaseRequestHandler):
 
 (connected from %s:%d)
 >>> """%(str(self.client_address[0]),self.client_address[1]))
-  			return True
+			return True
 		else:
 			import time
 			time.sleep(5)
