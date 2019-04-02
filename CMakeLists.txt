@@ -35,7 +35,7 @@ cmake_minimum_required(VERSION 2.8.11)
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
 
-set(Python_ADDITIONAL_VERSIONS 2)
+set(Python_ADDITIONAL_VERSIONS 3)
 INCLUDE(FindPythonInterp)
 INCLUDE(FindOpenMP)
 INCLUDE(FindQt4)
@@ -597,7 +597,7 @@ ENDIF (CHUNKSIZE)
 #===========================================================
 find_python_module(minieigen REQUIRED)
 
-find_python_module(Tkinter REQUIRED)
+find_python_module(tkinter REQUIRED)
 #===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
