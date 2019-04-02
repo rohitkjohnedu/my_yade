@@ -103,7 +103,7 @@ def myAddPlotData():
 	E_kin_rotation    = 0
 	E_pot		  = 0
 	E_plastic	  = 0
-	E_tracker	  = dict(O.energy.items())
+	E_tracker	  = dict(list(O.energy.items()))
 
 	if(two_spheres):## for more bodies we better use the energy tracker, because it's tracking all bodies
 		E_kin_translation = E_tracker['kinTrans']

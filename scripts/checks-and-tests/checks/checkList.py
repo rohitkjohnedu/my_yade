@@ -1,6 +1,7 @@
 # encoding: utf-8
 # 2011 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 from __future__ import print_function
+from past.builtins import execfile
 import yade,math,os,sys
 
 scriptsToRun=os.listdir(checksPath)

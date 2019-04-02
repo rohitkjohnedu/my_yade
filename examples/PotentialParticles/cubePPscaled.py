@@ -1,7 +1,9 @@
+from __future__ import division
 #!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 # CWBoon 2015
 
+from past.utils import old_div
 from yade import pack
 import math
 
@@ -288,4 +290,4 @@ def removeLid():
 	if (O.bodies[lidID]):
 		O.bodies.erase(lidID)	
 
-O.dt = 0.2*sqrt(O.bodies[0].state.mass*0.33333333/1.0e8)
+O.dt = 0.2*sqrt(old_div(O.bodies[0].state.mass*0.33333333,1.0e8))

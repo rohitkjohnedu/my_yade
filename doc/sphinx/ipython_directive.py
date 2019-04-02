@@ -58,7 +58,12 @@ from __future__ import print_function
 #-----------------------------------------------------------------------------
 
 # Stdlib
-import cStringIO
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+import io
 import imp
 import os
 import re
@@ -93,7 +98,7 @@ sphinx_version = sphinx.__version__.split(".")
 sphinx_version = tuple([int(re.split('[a-z]', x)[0])
                         for x in sphinx_version[:2]])
 
-COMMENT, INPUT, OUTPUT =  range(3)
+COMMENT, INPUT, OUTPUT =  list(range(3))
 rc_override = {}
 rgxin = re.compile('In \[(\d+)\]:\s?(.*)\s*')
 rgxcont = re.compile('   \.+:\s?(.*)\s*')
@@ -206,7 +211,7 @@ class EmbeddedSphinxShell(object):
 
     def __init__(self):
 
-        self.cout = cStringIO.StringIO()
+        self.cout = io.StringIO()
 
         IPython.Shell.Term.cout = self.cout
         IPython.Shell.Term.cerr = self.cout

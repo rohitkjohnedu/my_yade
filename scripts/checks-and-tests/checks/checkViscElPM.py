@@ -24,6 +24,8 @@
 #    the constitutive law.
 #
 
+from __future__ import division
+from past.utils import old_div
 from yade import plot,ymport
 import math
 
@@ -88,16 +90,16 @@ m = 4./3. * math.pi * r**3 * rho # [kg] mass of the sphere
 
 
 # Normal stiffness and damping coefficients according to [Pournin2001]
-meff = m/2
+meff = old_div(m,2)
 kn   = 2.0 * meff/tc**2 * (math.pi**2 + math.log(en)**2)
-cn   = -4.0 * meff/tc * math.log(en)
+cn   = old_div(-4.0 * meff,tc * math.log(en))
 
 
 # Analytical solution of a linear spring damper system
-omega0      = math.sqrt(kn/m)
-zeta        = cn / (2 * math.sqrt(kn * m))
+omega0      = math.sqrt(old_div(kn,m))
+zeta        = old_div(cn, (2 * math.sqrt(kn * m)))
 omegad      = omega0 * math.sqrt(1 - zeta**2)
-xAnalytical = v/omegad * math.exp(-zeta*omega0*O.time) * math.sin(omegad*O.time)
+xAnalytical = old_div(v,omegad * math.exp(-zeta*omega0*O.time) * math.sin(omegad*O.time))
 
 
 # Comparison (if ok, resultStatus is not incremented)
@@ -105,6 +107,6 @@ tolerance = 0.0001
 
 xNumerical = O.bodies[b2].state.pos[0]
 
-if ((abs(xNumerical-xAnalytical)/xAnalytical)>tolerance):
+if ((old_div(abs(xNumerical-xAnalytical),xAnalytical))>tolerance):
   resultStatus += 1
 

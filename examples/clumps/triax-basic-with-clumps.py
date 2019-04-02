@@ -4,6 +4,8 @@
 
 # This script shows how to run a triaxial test on clumps.
 
+from __future__ import division
+from past.utils import old_div
 from yade import pack
 from numpy import arange
 import itertools
@@ -21,7 +23,7 @@ d=8
 
 # clumps
 for xyz in itertools.product(arange(0,d),arange(0,d),arange(0,d)):
-	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((mn[0]+xyz[0]*(mx[0]-mn[0])/d,mn[0]+xyz[1]*(mx[1]-mn[1])/d,mn[2]+xyz[2]*(mx[2]-mn[2])/d),(0.45+random.random()*0.1,0.45+random.random()*0.1,0.45+random.random()*0.1)),radius=0.15+random.random()*0.05,gap=0,color=[random.random(),random.random(),random.random()]))
+	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((mn[0]+old_div(xyz[0]*(mx[0]-mn[0]),d),mn[0]+old_div(xyz[1]*(mx[1]-mn[1]),d),mn[2]+old_div(xyz[2]*(mx[2]-mn[2]),d)),(0.45+random.random()*0.1,0.45+random.random()*0.1,0.45+random.random()*0.1)),radius=0.15+random.random()*0.05,gap=0,color=[random.random(),random.random(),random.random()]))
 
 ## create walls around the packing
 walls=aabbWalls(material='frictionless')

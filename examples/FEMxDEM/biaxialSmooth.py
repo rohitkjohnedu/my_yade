@@ -11,6 +11,9 @@ How to run this script:
     /path/to/yade ./biaxialSmooth.py
 Please amend these instructions if you find that they do not work.
 """
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 from esys.escript import *
 from esys.finley import Rectangle
 from esys.weipa import saveVTK
@@ -85,14 +88,14 @@ while t < 100: # apply 100 load steps
    tractTop = traction*topSurf
    forceTop = integrate(tractTop,where=FunctionOnBoundary(dom))
    lengthTop = integrate(topSurf,where=FunctionOnBoundary(dom))
-   fout.write(str(t*vel/ly)+' '+str(forceTop[1])+' '+str(lengthTop)+'\n')
+   fout.write(str(old_div(t*vel,ly))+' '+str(forceTop[1])+' '+str(lengthTop)+'\n')
       
    vR=prob.getLocalVoidRatio()
    fabric=prob.getLocalFabric()
    strain = prob.getCurrentStrain()
    saveGauss2D(name='./result/gauss/time_'+str(t)+'.dat',strain=strain,stress=stress,fabric=fabric)
    volume_strain = trace(strain)
-   dev_strain = symmetric(strain) - volume_strain*k/dim
+   dev_strain = symmetric(strain) - old_div(volume_strain*k,dim)
    shear = sqrt(2*inner(dev_strain,dev_strain))
    saveVTK("./result/vtk/biaxialSmooth_%d.vtu"%t,disp=disp,shear=shear,e=vR)
 

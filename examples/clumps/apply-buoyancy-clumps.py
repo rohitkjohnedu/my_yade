@@ -17,8 +17,10 @@
 	Buoyancy is included with an additional force 
 	F_buo = -volumeOfDisplacedWater*fluidDensity*gravityAcceleration.'''
 from __future__ import print_function
+from __future__ import division
 
 #define material properties:
+from past.utils import old_div
 shearModulus			= 3.2e10
 poissonRatio			= 0.15
 youngModulus			= 2*shearModulus*(1+poissonRatio)
@@ -56,7 +58,7 @@ for b in O.bodies:
 		b.shape.color=clumpColor
 
 #create boundary:
-O.bodies.append(geom.facetBox((0,0,1), (boundaryMax-boundaryMin)/2, fixed=True, material=Mat, color=boxColor))
+O.bodies.append(geom.facetBox((0,0,1), old_div((boundaryMax-boundaryMin),2), fixed=True, material=Mat, color=boxColor))
 
 #define engines:
 O.engines=[
@@ -82,18 +84,18 @@ def applyBuoyancy():
 			zMin = b.state.pos[2] - rad
 			dh = min((waterLevel - zMin),2*rad)	#to get sure, that dh is not bigger than 2*radius
 		elif b.isClump:				#determine rad, zMin and zMax for clumps:
-			for ii in b.shape.members.keys():
+			for ii in list(b.shape.members.keys()):
 				pos = O.bodies[ii].state.pos
 				zMin = min(zMin,pos[2]-O.bodies[ii].shape.radius)
 				zMax = max(zMax,pos[2]+O.bodies[ii].shape.radius)
 			#get equivalent radius from clump mass:
-			rad = ( 3*b.state.mass/(4*pi*O.bodies[b.shape.members.keys()[0]].mat.density) )**(1./3.)		
+			rad = ( old_div(3*b.state.mass,(4*pi*O.bodies[list(b.shape.members.keys())[0]].mat.density)) )**(1./3.)		
 			#get dh relative to equivalent sphere, but acting when waterLevel is between clumps z-dimensions zMin and zMax:
-			dh = min((waterLevel - zMin)*2*rad/(zMax - zMin),2*rad)		
+			dh = min(old_div((waterLevel - zMin)*2*rad,(zMax - zMin)),2*rad)		
 		else:
 			continue
 		if dh > 0:
-			F_buo = -1*(pi/3)*dh*dh*(3*rad - dh)*rho_f*integrator.gravity										# = -V*rho*g
+			F_buo = -1*(old_div(pi,3))*dh*dh*(3*rad - dh)*rho_f*integrator.gravity										# = -V*rho*g
 			O.forces.setPermF(b.id,F_buo)
 
 #STEP1: reduce overlaps from replaceByClumps() method:

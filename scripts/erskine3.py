@@ -9,6 +9,9 @@ Erskine is Watt's colleague in the house of Mr. Nutting.
 """
 from __future__ import print_function
 
+from builtins import filter
+from builtins import map
+from builtins import range
 import sys,pprint,string,os
 from logging import *
 from os.path import *
@@ -38,7 +41,7 @@ defaultEnv='env'
 currentPro='[none]'
 
 allEnvs=[defaultEnv]
-for t in targetEnv.keys():
+for t in list(targetEnv.keys()):
 	if not targetEnv[t] in allEnvs: allEnvs.append(targetEnv[t])
 allSystemLibs=['glut','boost_date_time','boost_filesystem','boost_thread']
 
@@ -231,7 +234,7 @@ def scriptGen(v,dir):
 	###################
 	### LIBRARIES
 	
-	def prependDirFile(d,f): return map(lambda x: join(d,x),f)
+	def prependDirFile(d,f): return [join(d,x) for x in f]
 	def listLibs(ll):
 		ret=[]
 		for l in ll:
@@ -255,7 +258,7 @@ def scriptGen(v,dir):
 		def prepIf(ff):
 			if not isabs(ff) and ff[0]!='$': return join(d,ff)
 			return ff
-		return map(prepIf,f)
+		return list(map(prepIf,f))
 	includePath=prependDirFileIfRelative(relPath,includePath)
 	# filter out non-existent paths; without warning, it could be a short lambda...
 	def DelAndWarnNonexistentPath(x):
@@ -263,10 +266,10 @@ def scriptGen(v,dir):
 			warning2("Include path `%s' is invalid, removed!"%(normpath(join(dirAbsPath,x))))
 			return False
 		return True
-	includePath=filter(DelAndWarnNonexistentPath,includePath)
+	includePath=list(filter(DelAndWarnNonexistentPath,includePath))
 	includePath=[normpath(p) for p in includePath]
 	# remove duplicates... http://stinkpot.afraid.org:8080/tricks/index.php/2006/05/find-all-the-unique-elements-in-a-python-list/
-	includePath=dict([(i,1) for i in includePath]).keys()
+	includePath=list(dict([(i,1) for i in includePath]).keys())
 
 
 
@@ -347,7 +350,7 @@ def masterScriptGen(V,dir):
 	if buildEngine=='scons':
 		s+="Import('*')\n"
 		processVars(V,dir) # return value of processVars discarded, results passed in instDirTarget instead
-		for env,dir in instDirTargets.keys():
+		for env,dir in list(instDirTargets.keys()):
 			idt=instDirTargets[(env,dir)]
 			#binary targets are handles specially: they install under _filename_ postfixed
 			if match('.*/bin$',dir): ## warhing: this is OS-specific to tell binary target!

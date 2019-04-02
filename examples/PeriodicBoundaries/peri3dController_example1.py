@@ -1,6 +1,8 @@
+from __future__ import division
 # peri3dController_example1.py
 # script, that explains funcionality and input parameters of Peri3dController
 
+from past.utils import old_div
 from yade import pack, plot
 
 # create some material
@@ -26,7 +28,7 @@ def plotAddData():
 # in how many time steps should be the goal state reached
 nSteps=4000
 
-O.dt=PWaveTimeStep()/2
+O.dt=old_div(PWaveTimeStep(),2)
 EnlargeFactor=1.5
 EnlargeFactor=1.0
 O.engines=[

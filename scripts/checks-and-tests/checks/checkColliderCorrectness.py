@@ -1,5 +1,6 @@
 # encoding: utf-8
 from __future__ import print_function
+from builtins import str
 from yade import pack,utils,export,plot
 import math,os,sys
 print('checkColliderCorrectness for InsertionSortCollider')

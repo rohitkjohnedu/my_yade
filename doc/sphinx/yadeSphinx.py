@@ -3,6 +3,10 @@
 #
 # module documentation
 #
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import sys,os,os.path
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -54,7 +58,7 @@ mods={
     }
 #
 # generate documentation, in alphabetical order
-mm=mods.keys(); mm.sort()
+mm=list(mods.keys()); mm.sort()
 for m in mm: moduleDoc(m,mods[m])
 
 with open('modules.rst','w') as f:
@@ -132,7 +136,7 @@ def inheritanceDiagram(klass,willBeLater):
     # margin size is in inches. The text area on page in .pdf is 6.3in by 9.8in. I'll use a default that each class uses one fourth of page width. If maxDepth>=5 then the image just gets smaller.
     pageWidth=6.3
     pageFraction=4
-    fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
+    fixPdfMargin=(old_div(pageWidth,pageFraction))*max(0,pageFraction-maxDepth)
     ret=""
     extraCaption=["",0]
     extraPdfCaptionSet=set()

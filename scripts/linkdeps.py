@@ -73,7 +73,7 @@ cache=shelve.open('linkdeps.cache')
 cache['pluginLinks'],cache['pluginFeats'],cache['pluginSrcs']=pluginLinks,pluginFeats,pluginSrcs
 pluginLinks,pluginFeats,pluginSrcs=cache['pluginLinks'],cache['pluginFeats'],cache['pluginSrcs']
 pluginObjs={}
-for p in pluginLinks.keys(): pluginObjs[p]='packages'
+for p in list(pluginLinks.keys()): pluginObjs[p]='packages'
 cache.close()
 
 def getPluginLibs(plugin):
@@ -87,8 +87,8 @@ def getPluginLibs(plugin):
 			print('WARNING: plugin %s, missing lib %s'%(plugin,lib))
 	return libs
 allLibs=set();
-for p in pluginSrcs.keys(): allLibs.update(getPluginLibs(p))
-print("\tenv.SharedLibrary('packages',Split('"+' '.join(pluginSrcs.values())+"'),LIBS=env['LIBS']+Split('"+' '.join(allLibs)+"'),CXXFLAGS=env['CXXFLAGS']+['--combine'])")
+for p in list(pluginSrcs.keys()): allLibs.update(getPluginLibs(p))
+print("\tenv.SharedLibrary('packages',Split('"+' '.join(list(pluginSrcs.values()))+"'),LIBS=env['LIBS']+Split('"+' '.join(allLibs)+"'),CXXFLAGS=env['CXXFLAGS']+['--combine'])")
 #print plugin,' '.join(feats)
 #print f ,' '.join(feats)
 

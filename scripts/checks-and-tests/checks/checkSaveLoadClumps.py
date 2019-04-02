@@ -8,6 +8,7 @@
 # minimal test script.
 
 from __future__ import print_function
+from builtins import str
 from yade import pack
 import tempfile, shutil
 import time

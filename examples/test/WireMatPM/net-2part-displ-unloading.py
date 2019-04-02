@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # encoding: utf-8
 from __future__ import print_function
+from __future__ import division
+from builtins import input
+from past.utils import old_div
 from yade import  ymport, qt, plot
 
 ## definition of some colors for colored text output in terminal
@@ -19,7 +22,7 @@ by unsing the '''+RED+'''StepDisplacer'''+BLUE+''' with loading and unloading.
 #### define parameters for the net
 # mesh opening size
 mos = 80./1000.
-a = mos/sqrt(3)
+a = old_div(mos,sqrt(3))
 # wire diameter
 d = 2.7/1000.
 # particle radius
@@ -29,8 +32,8 @@ strainStressValues=[(0.0019230769,2.5e8),(0.0192,3.2195e8),(0.05,3.8292e8),(0.15
 # elastic material properties
 particleVolume = 4./3.*pow(radius,3)*pi
 particleMass = 3.9/1000.
-density = particleMass/particleVolume
-young = strainStressValues[0][1] / strainStressValues[0][0]
+density = old_div(particleMass,particleVolume)
+young = old_div(strainStressValues[0][1], strainStressValues[0][0])
 poisson = 0.3
 
 
@@ -98,21 +101,21 @@ Ig2ssGeom.interactionDetectionFactor=-1.
 O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines
 
 print('Loading (press enter)')
-raw_input()
+input()
 O.run(100,True)
 
 #### define simulation unloading
 O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,-1.3e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
 
 print('Unloading (press enter)')
-raw_input()
+input()
 O.run(50,True)
 
 #### define simulation reloading
 O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1.6e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
 
 print('Reloading (press enter)')
-raw_input()
+input()
 O.run(500,True)
 
 
@@ -120,7 +123,7 @@ O.run(500,True)
 O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,-1.45e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
 
 print('Reunloading (press enter)')
-raw_input()
+input()
 O.run(10,True)
 
 
@@ -128,7 +131,7 @@ O.run(10,True)
 O.engines = [StepDisplacer( ids=[1],mov=Vector3(0,+1.6e-5,0),rot=Quaternion().Identity,setVelocities=False )] + O.engines[1:]
 
 print('Reloading (press enter)')
-raw_input()
+input()
 O.run(500,True)
 
 

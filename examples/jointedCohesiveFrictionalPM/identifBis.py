@@ -8,6 +8,8 @@
 ### engines definition, according to our only goal that is to detect spheres concerned by joint surfaces
 
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 O.engines=[
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],verletDist=0), #verletDist=0 to avoid introducing NewtonIntegrator in engines list
 	InteractionLoop(
@@ -38,7 +40,7 @@ for i in O.interactions:
     if isinstance(O.bodies[i.id1].shape,Facet) and isinstance(O.bodies[i.id2].shape,Sphere): 
 	vertices=O.bodies[i.id1].shape.vertices
 	normalRef=vertices[0].cross(vertices[1]) # defines the normal to the facet normalRef
-	nRef=normalRef/(normalRef.norm()) ## normalizes normalRef
+	nRef=old_div(normalRef,(normalRef.norm())) ## normalizes normalRef
 	normalFacetSphere=i.geom.normal # geom.normal is oriented from id1 to id2 -> normalFacetSphere from facet (i.id1) to sphere (i.id2)
 
 	if O.bodies[i.id2].state.onJoint==False : ## particles has not yet been identified as belonging to a joint plane
@@ -75,7 +77,7 @@ for j in O.interactions:
     if isinstance(O.bodies[j.id1].shape,Facet) and isinstance(O.bodies[j.id2].shape,Sphere): 
 	vertices=O.bodies[j.id1].shape.vertices
 	normalRef=vertices[0].cross(vertices[1]) # defines the normal to the facet normalRef
-	nRef=normalRef/(normalRef.norm()) ## normalizes normalRef
+	nRef=old_div(normalRef,(normalRef.norm())) ## normalizes normalRef
 	if ((O.bodies[j.id2].state.jointNormal1.cross(nRef)).norm()<0.05) :
 	    jointNormalRef=O.bodies[j.id2].state.jointNormal1
 	elif ((O.bodies[j.id2].state.jointNormal2.cross(nRef)).norm()<0.05) :

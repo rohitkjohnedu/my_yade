@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 #CW BOON 2018
 # Use the following algorithms:
 # CW Boon, GT Houlsby, S Utili (2012).  A new algorithm for contact detection between convex polygonal and polyhedral particles in the discrete element method.  Computers and Geotechnics 44, 73-82. 
@@ -18,6 +19,7 @@ from __future__ import print_function
 #coinor-libclp1, 
 #coinor-libosi1v5
 
+from past.utils import old_div
 import os
 import errno
 try:
@@ -149,10 +151,10 @@ dPP = [p.boundarySizeXmax , p.boundarySizeXmax ,p.boundarySizeYmax,p.boundarySiz
 minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
 bBottom.shape=PotentialBlock(k=kPP, r=rPP , R=RPP,a=aPP, b=bPP, c=cPP, d=dPP,id=count,isBoundary=True,color=color ,wire=wire,highlight=highlight,AabbMinMax=True,minAabb=minmaxAabb ,maxAabb=minmaxAabb,minAabbRotated=minmaxAabb ,maxAabbRotated=minmaxAabb,fixedNormal=True,boundaryNormal=Vector3(0,0,-1))	
 V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert = 1/12*(p.boundarySizeYmax)*(length**3)
-geomInertX = 1/12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertY = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertZ = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
+geomInert = old_div(1,12*(p.boundarySizeYmax)*(length**3))
+geomInertX = old_div(1,12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertY = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertZ = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2)) 
 utils._commonBodySetup(bBottom,V,Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless',pos= [0.0,0.0,p.boundarySizeZmax+rPP+thickness+rPP], dynamic=True, fixed=True) 
 bBottom.state.pos = [0.0,0.0,p.boundarySizeZmax+rPP+thickness+rPP]
 bBottom.shape.isBoundary=True
@@ -178,10 +180,10 @@ dPP = [p.boundarySizeXmax , p.boundarySizeXmax ,thickness,thickness,0.5*p.bounda
 minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
 bSideA.shape=PotentialBlock(k=kPP, r=rPP , R=RPP,a=aPP, b=bPP, c=cPP, d=dPP,id=count,isBoundary=True,color=color ,wire=wire,highlight=highlight,AabbMinMax=True,minAabb=minmaxAabb ,maxAabb=minmaxAabb,minAabbRotated=minmaxAabb ,maxAabbRotated=minmaxAabb,fixedNormal=True,boundaryNormal=Vector3(0,-1.0,0))	
 V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert = 1/12*(p.boundarySizeYmax)*(length**3)
-geomInertX = 1/12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertY = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertZ = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
+geomInert = old_div(1,12*(p.boundarySizeYmax)*(length**3))
+geomInertX = old_div(1,12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertY = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertZ = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2)) 
 utils._commonBodySetup(bSideA,V,Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless',pos= [0.0,0.0,p.boundarySizeZmax+rPP+thickness+rPP], dynamic=True, fixed=True) 
 bSideA.state.pos = [0.0,p.boundarySizeYmax+rPP+thickness+rPP,0.5*p.boundarySizeZmax]
 bSideA.shape.isBoundary=True
@@ -207,10 +209,10 @@ dPP = [p.boundarySizeXmax , p.boundarySizeXmax ,thickness,thickness,0.5*p.bounda
 minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
 bSideB.shape=PotentialBlock(k=kPP, r=rPP , R=RPP,a=aPP, b=bPP, c=cPP, d=dPP,id=count,isBoundary=True,color=color ,wire=wire,highlight=highlight,AabbMinMax=True,minAabb=minmaxAabb ,maxAabb=minmaxAabb,minAabbRotated=minmaxAabb ,maxAabbRotated=minmaxAabb,fixedNormal=True,boundaryNormal=Vector3(0,1.0,0.0))	
 V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert = 1/12*(p.boundarySizeYmax)*(length**3)
-geomInertX = 1/12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertY = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertZ = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
+geomInert = old_div(1,12*(p.boundarySizeYmax)*(length**3))
+geomInertX = old_div(1,12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertY = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertZ = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2)) 
 utils._commonBodySetup(bSideB,V,Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless',pos= [0.0,0.0,p.boundarySizeZmax+rPP+thickness+rPP], dynamic=True, fixed=True) 
 bSideB.state.pos = [0.0,-p.boundarySizeYmax-rPP-thickness-rPP,0.5*p.boundarySizeZmax]
 bSideB.shape.isBoundary=True
@@ -236,10 +238,10 @@ dPP = [thickness , thickness ,p.boundarySizeYmax,p.boundarySizeYmax,0.5*p.bounda
 minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
 bSideC.shape=PotentialBlock(k=kPP, r=rPP , R=RPP,a=aPP, b=bPP, c=cPP, d=dPP,id=count,isBoundary=True,color=color ,wire=wire,highlight=highlight,AabbMinMax=True,minAabb=minmaxAabb ,maxAabb=minmaxAabb,minAabbRotated=minmaxAabb ,maxAabbRotated=minmaxAabb,fixedNormal=True,boundaryNormal=Vector3(1.0,0,0.0))	
 V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert = 1/12*(p.boundarySizeYmax)*(length**3)
-geomInertX = 1/12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertY = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertZ = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
+geomInert = old_div(1,12*(p.boundarySizeYmax)*(length**3))
+geomInertX = old_div(1,12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertY = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertZ = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2)) 
 utils._commonBodySetup(bSideC,V,Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless',pos= [0.0,0.0,p.boundarySizeZmax+rPP+thickness+rPP], dynamic=True, fixed=True) 
 bSideC.state.pos = [-p.boundarySizeXmax-rPP-thickness-rPP,0.0,0.5*p.boundarySizeZmax]
 bSideC.shape.isBoundary=True
@@ -265,10 +267,10 @@ dPP = [thickness , thickness ,p.boundarySizeYmax,p.boundarySizeYmax,0.5*p.bounda
 minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
 bSideD.shape=PotentialBlock(k=kPP, r=rPP , R=RPP,a=aPP, b=bPP, c=cPP, d=dPP,id=count,isBoundary=True,color=color ,wire=wire,highlight=highlight,AabbMinMax=True,minAabb=minmaxAabb ,maxAabb=minmaxAabb,minAabbRotated=minmaxAabb ,maxAabbRotated=minmaxAabb,fixedNormal=True,boundaryNormal=Vector3(-1.0,0,0.0))	
 V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert = 1/12*(p.boundarySizeYmax)*(length**3)
-geomInertX = 1/12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertY = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInertZ = 1/12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
+geomInert = old_div(1,12*(p.boundarySizeYmax)*(length**3))
+geomInertX = old_div(1,12*V*p.density*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertY = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 )) 
+geomInertZ = old_div(1,12*V*p.density*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2)) 
 utils._commonBodySetup(bSideD,V,Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless',pos= [0.0,0.0,p.boundarySizeZmax+rPP+thickness+rPP], dynamic=True, fixed=True) 
 bSideD.state.pos = [p.boundarySizeXmax+rPP+thickness+rPP,0.0,0.5*p.boundarySizeZmax]
 bSideD.shape.isBoundary=True
@@ -287,8 +289,8 @@ def calTimeStep():
 	minMass = 1.0e15
 	for i in O.interactions:
 		if i.isReal==True:
-			dt1 = O.bodies[i.id1].state.mass/i.phys.Knormal_area
-			dt2 = O.bodies[i.id2].state.mass/i.phys.Knormal_area
+			dt1 = old_div(O.bodies[i.id1].state.mass,i.phys.Knormal_area)
+			dt2 = old_div(O.bodies[i.id2].state.mass,i.phys.Knormal_area)
 			if dt1 < dt2:
 				presentDt = 0.15*sqrt(dt1)
 				if minTimeStep > presentDt:
@@ -398,9 +400,9 @@ def SouthWall(x,y,z):
 	b = sin(dipdirRad)*cos(dipRad)
 	c = sin(dipRad)
 	l = sqrt(a*a + b*b +c*c)
-	a = a/l
-	b = b/l
-	c = c/l
+	a = old_div(a,l)
+	b = old_div(b,l)
+	c = old_div(c,l)
 	d = a*Xcentre1 + b*Ycentre1 + c*Zcentre1
 	plane = a*x+ b*y +c*z - d
 	if plane < 0.0:
@@ -425,9 +427,9 @@ def NorthWall(x,y,z):
 	b = sin(dipdirRad)*cos(dipRad)
 	c = sin(dipRad)
 	l = sqrt(a*a + b*b +c*c)
-	a = -a/l
-	b = -b/l
-	c = -c/l
+	a = old_div(-a,l)
+	b = old_div(-b,l)
+	c = old_div(-c,l)
 	d = a*Xcentre1 + b*Ycentre1 + c*Zcentre1
 	plane = a*x+ b*y +c*z - d
 	if plane < 0.0:

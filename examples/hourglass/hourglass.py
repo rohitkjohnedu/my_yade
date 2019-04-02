@@ -7,6 +7,9 @@
 # in line 62 not to revolute the hourglass before particles are
 # settled down at the bottom.
 
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 from yade import ymport
 import time
 
@@ -33,7 +36,7 @@ os.mkdir(folderNameBase)
 o = Omega()
 o.dt = 0.05*tcIn
 rotPeriod = 0.01
-rotPeriodIter = int(rotPeriod/o.dt)
+rotPeriodIter = int(old_div(rotPeriod,o.dt))
 
 mat1 = O.materials.append(ViscElMat(frictionAngle=frIn, density=rhoIn,tc=tcIn, en=enIn, et=etIn,))
 id_HourGl = O.bodies.append(ymport.gmsh("hourglass.mesh",scale=1.0, material=mat1,color=(0,0,1),mask=5))
@@ -55,7 +58,7 @@ o.engines = [
     vMin=0.1,vMax=0.1,vAngle=0,massFlowRate=0.01,
     normal=(0.0,0.0,-1.0),label='factorySpheres',mask=3,materialId=mat1,
     stopIfFailed=False),
-  RotationEngine(ids=id_HourGl, angularVelocity = math.pi/rotPeriod,
+  RotationEngine(ids=id_HourGl, angularVelocity = old_div(math.pi,rotPeriod),
     rotateAroundZero=True, rotationAxis=Vector3(1,0,0),
     zeroPoint=Vector3(0.,0.,0.), label='rotEng', dead=True),
   VTKRecorder(iterPeriod=dumpVTKIn,fileName=folderName+'/spheres-',mask=2,

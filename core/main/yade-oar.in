@@ -1,4 +1,3 @@
-from __future__ import print_function
 #!${pyExecutable}
 # encoding: utf-8
 #
@@ -8,7 +7,14 @@ from __future__ import print_function
 # This script is to be used with OAR task scheduler. May be an example to use use with other task scheduler for clusters
 # Adapted from yade-batch
 
-import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, random
+from __future__ import print_function
+
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+import os, sys, _thread, time, logging, pipes, socket, xmlrpc.client, re, shutil, random
 
 # Add search path for yade Python-modules
 # It allows to use both Yade-versions (packaged and self-compiled one).
@@ -45,7 +51,7 @@ except ImportError: # argparse not present, print error message
 	raise RuntimeError("\n\nPlease install 'python-argparse' package.\n")
 
 
-class JobInfo():
+class JobInfo(object):
 	def __init__(self,num,id,command,log,nCores,script,table,lineNo,affinity,oarprop):
 		self.started,self.finished,self.duration,self.durationSec,self.exitStatus=None,None,None,None,None # duration is a string, durationSec is a number
 		self.command=command; self.num=num; self.log=log; self.id=id; self.nCores=nCores; self.cores=set(); self.infoSocket=None
@@ -127,7 +133,7 @@ print("Will run simulation(s) %s using `%s', nice value %d"%(scripts,executable,
 if table:
 	reader=yade.utils.TableParamReader(table)
 	params=reader.paramDict()
-	availableLines=params.keys()
+	availableLines=list(params.keys())
 
 	print("Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.')
 
@@ -136,7 +142,7 @@ if table:
 		def numRange2List(s):
 			ret=[]
 			for l in s.split(','):
-				if "-" in l: ret+=range(*[int(s) for s in l.split('-')]); ret+=[ret[-1]+1]
+				if "-" in l: ret+=list(range(*[int(s) for s in l.split('-')])); ret+=[ret[-1]+1]
 				else: ret+=[int(l)]
 			return ret
 		useLines0=numRange2List(lineList)
@@ -170,7 +176,7 @@ for i,l in enumerate(useLines):
 	jobCount=opts.timing
 	walltime = opts.oar_t
 	oarprops = opts.oar_prop
-	for col in params[l].keys():
+	for col in list(params[l].keys()):
 		if col[0]!='!': continue
 		val=params[l][col]
 		if col=='!OMP_NUM_THREADS' or col=='!THREADS': nCores=int(val)
@@ -203,7 +209,7 @@ for i,l in enumerate(useLines):
 		if table: env+='%s:%d'%(os.path.abspath(table),l) # keep YADE_BATCH empty (but still defined) if running a single simulation
 		cmd=' %s%s -j %i -x %s 2>&1'%(jobExecutable,' --nice=%s'%nice if nice!=None else '',nCores,os.path.abspath(script))
 		desc=params[l]['description']
-		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
+		if '!SCRIPT' in list(params[l].keys()): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
 		jobs.append(JobInfo(jobNum,desc,env+cmd,os.path.abspath('tmp/'+str(os.getpid())+'/'+logFile2),nCores,script=os.path.abspath(script),table=table,lineNo=l,affinity=jobAffinity,oarprop=oarprops))
 

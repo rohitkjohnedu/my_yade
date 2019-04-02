@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 # gravity deposition, continuing with oedometric test after stabilization
 # shows also how to run parametric studies with yade-batch
 
@@ -12,13 +13,14 @@ from __future__ import print_function
 
 
 # create box with free top, and ceate loose packing inside the box
+from past.utils import old_div
 from yade import plot, polyhedra_utils
 from yade import qt
 
 m = PolyhedraMat()
 m.density = 2600 #kg/m^3 
 m.young = 1E6 #Pa
-m.poisson = 20000/1E6
+m.poisson = old_div(20000,1E6)
 m.frictionAngle = 0.6 #rad
 
 O.bodies.append(utils.wall(0,axis=2,sense=1, material = m))

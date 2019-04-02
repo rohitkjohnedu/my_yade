@@ -16,7 +16,14 @@ For examples, see
 * :ysrc:`examples/WireMatPM/wirepackings.py`
 """
 from __future__ import print_function
+from __future__ import division
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import itertools,warnings
 from numpy import arange
 from math import sqrt
@@ -32,7 +39,7 @@ from minieigen import *
 if 'product' not in dir(itertools):
 	def product(*args, **kwds):
 		"http://docs.python.org/library/itertools.html#itertools.product"
-		pools = map(tuple, args) * kwds.get('repeat', 1); result = [[]]
+		pools = list(map(tuple, args)) * kwds.get('repeat', 1); result = [[]]
 		for pool in pools: result = [x+[y] for x in result for y in pool]
 		for prod in result: yield tuple(prod)
 	itertools.product=product
@@ -188,7 +195,7 @@ if not (noPredicate):
       inf=float('inf')
       min = Vector3(-inf,-inf,-inf)
       max = Vector3(+inf,+inf,+inf)
-      for i in xrange(3):
+      for i in range(3):
         j = (i+1)%3
         k = (i+2)%3
         if d[i]==0 and d[j]==0:
@@ -219,7 +226,7 @@ if not (noPredicate):
         A.append(tuple(-h._dir))
         b.append(h._d)
       inf = float('inf')
-      for i in xrange(3):
+      for i in range(3):
         c = Vector3.Zero
         #
         c[i] = 1
@@ -271,7 +278,7 @@ If threshold is given (>0), then
 	import gts # will raise an exception in gts-less builds
 	if not len(set([len(pts1) for pts1 in pts]))==1: raise RuntimeError("Polylines must be all of the same length!")
 	vtxs=[[gts.Vertex(x,y,z) for x,y,z in pts1] for pts1 in pts]
-	sectEdges=[[gts.Edge(vtx[i],vtx[i+1]) for i in xrange(0,len(vtx)-1)] for vtx in vtxs]
+	sectEdges=[[gts.Edge(vtx[i],vtx[i+1]) for i in range(0,len(vtx)-1)] for vtx in vtxs]
 	interSectEdges=[[] for i in range(0,len(vtxs)-1)]
 	for i in range(0,len(vtxs)-1):
 		for j in range(0,len(vtxs[i])):
@@ -348,7 +355,7 @@ def regularHexa(predicate,radius,gap,**kw):
 	mn,mx=predicate.aabb()
 	dim=[mx[i]-mn[i] for i in (0,1,2)]
 	if(max(dim)==float('inf')): raise ValueError("Aabb of the predicate must not be infinite (didn't you use union | instead of intersection & for unbounded predicate such as notInNotch?");
-	ii,jj,kk=[range(0,int(dim[0]/a)+1),range(0,int(dim[1]/hy)+1),range(0,int(dim[2]/hz)+1)]
+	ii,jj,kk=[list(range(0,int(old_div(dim[0],a))+1)),list(range(0,int(old_div(dim[1],hy))+1)),list(range(0,int(old_div(dim[2],hz))+1))]
 	for i,j,k in itertools.product(ii,jj,kk):
 		#Simple HCP-lattice packing
 		#http://en.wikipedia.org/wiki/Close-packing_of_equal_spheres#Simple_hcp_lattice
@@ -387,7 +394,7 @@ def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
 
 def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim,noPrint=False):
 	if not memoizeDb: return
-	import cPickle,sqlite3,time,os
+	import pickle,sqlite3,time,os
 	if os.path.exists(memoizeDb):
 		conn=sqlite3.connect(memoizeDb)
 	else:
@@ -395,7 +402,7 @@ def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim,noPrint=False)
 		c=conn.cursor()
 		c.execute('create table packings (radius real, rRelFuzz real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)')
 	c=conn.cursor()
-	packBlob=buffer(cPickle.dumps(sp.toList(),cPickle.HIGHEST_PROTOCOL))
+	packBlob=buffer(pickle.dumps(sp.toList(),pickle.HIGHEST_PROTOCOL))
 	packDim=sp.cellSize if wantPeri else fullDim
 	c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,rRelFuzz,packDim[0],packDim[1],packDim[2],len(sp),time.time(),wantPeri,packBlob,))
 	c.close()
@@ -408,7 +415,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 		:param fillPeriodic: whether to fill fullDim by repeating periodic packing
 		:param wantPeri: only consider periodic packings
 	"""
-	import os,os.path,sqlite3,time,cPickle,sys
+	import os,os.path,sqlite3,time,pickle,sys
 	if memoDbg and not noPrint:
 		def memoDbgMsg(s): print(s)
 	else:
@@ -423,21 +430,21 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 	except sqlite3.OperationalError:
 		raise RuntimeError("ERROR: database `"+memoizeDb+"' not compatible with randomDensePack (corrupt, deprecated format or not a db created by randomDensePack)")
 	for row in c:
-		R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=radius/R
+		R,rDev,X,Y,Z,NN,timestamp,isPeri=row[0:8]; scale=old_div(radius,R)
 		rDev*=scale; X*=scale; Y*=scale; Z*=scale
 		memoDbgMsg("Considering packing (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(R,.5*rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp))))
 		if not isPeri and wantPeri: memoDbgMsg("REJECT: is not periodic, which is requested."); continue
-		if wantPeri and (X/x1>0.9 or X/x1<0.6):  memoDbgMsg("REJECT: initSize differs too much from scaled packing size."); continue
-		if (rRelFuzz==0 and rDev!=0) or (rRelFuzz!=0 and rDev==0) or (rRelFuzz!=0 and abs((rDev-rRelFuzz)/rRelFuzz)>1e-2): memoDbgMsg("REJECT: radius fuzz differs too much (%g, %g desired)"%(rDev,rRelFuzz)); continue # radius fuzz differs too much
+		if wantPeri and (old_div(X,x1)>0.9 or old_div(X,x1)<0.6):  memoDbgMsg("REJECT: initSize differs too much from scaled packing size."); continue
+		if (rRelFuzz==0 and rDev!=0) or (rRelFuzz!=0 and rDev==0) or (rRelFuzz!=0 and abs(old_div((rDev-rRelFuzz),rRelFuzz))>1e-2): memoDbgMsg("REJECT: radius fuzz differs too much (%g, %g desired)"%(rDev,rRelFuzz)); continue # radius fuzz differs too much
 		if isPeri and wantPeri:
 			if spheresInCell>NN and spheresInCell>0: memoDbgMsg("REJECT: Number of spheres in the packing too small"); continue
-			if abs((y1/x1)/(Y/X)-1)>0.3 or abs((z1/x1)/(Z/X)-1)>0.3: memoDbgMsg("REJECT: proportions (y/x=%g, z/x=%g) differ too much from what is desired (%g, %g)."%(Y/X,Z/X,y1/x1,z1/x1)); continue
+			if abs(old_div((old_div(y1,x1)),(old_div(Y,X)))-1)>0.3 or abs(old_div((old_div(z1,x1)),(old_div(Z,X)))-1)>0.3: memoDbgMsg("REJECT: proportions (y/x=%g, z/x=%g) differ too much from what is desired (%g, %g)."%(old_div(Y,X),old_div(Z,X),old_div(y1,x1),old_div(z1,x1))); continue
 		else:
 			if (X<fullDim[0] or Y<fullDim[1] or Z<fullDim[2]): memoDbgMsg("REJECT: not large enough"); continue # not large enough
 		memoDbgMsg("ACCEPTED");
 		if not noPrint: print("Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp))))
 		c.execute('select pack from packings where timestamp=?',(timestamp,))
-		sp=SpherePack(cPickle.loads(str(c.fetchone()[0])))
+		sp=SpherePack(pickle.loads(str(c.fetchone()[0])))
 		sp.scale(scale);
 		if isPeri and wantPeri:
 			sp.isPeriodic = True
@@ -480,7 +487,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 
 	:return: SpherePack object with spheres, filtered by the predicate.
 	"""
-	import sqlite3, os.path, cPickle, time, sys, _packPredicates, numpy
+	import sqlite3, os.path, pickle, time, sys, _packPredicates, numpy
 	from math import pi
 	wantPeri=(spheresInCell>0)
 	if 'inGtsSurface' in dir(_packPredicates) and type(predicate)==inGtsSurface and useOBB:
@@ -498,13 +505,13 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		# they have to be adjusted to not make the cell to small WRT particle radius
 		fullDim=dim
 		cloudPorosity=0.25 # assume this number for the initial cloud (can be underestimated)
-		beta,gamma=fullDim[1]/fullDim[0],fullDim[2]/fullDim[0] # ratios β=y₀/x₀, γ=z₀/x₀
-		N100=spheresInCell/cloudPorosity # number of spheres for cell being filled by spheres without porosity
-		x1=radius*(1/(beta*gamma)*N100*(4/3.)*pi)**(1/3.)
+		beta,gamma=old_div(fullDim[1],fullDim[0]),old_div(fullDim[2],fullDim[0]) # ratios β=y₀/x₀, γ=z₀/x₀
+		N100=old_div(spheresInCell,cloudPorosity) # number of spheres for cell being filled by spheres without porosity
+		x1=radius*(old_div(1,(beta*gamma)*N100*(4/3.)*pi))**(1/3.)
 		y1,z1=beta*x1,gamma*x1; vol0=x1*y1*z1
 		maxR=radius*(1+rRelFuzz)
 		x1=max(x1,8*maxR); y1=max(y1,8*maxR); z1=max(z1,8*maxR); vol1=x1*y1*z1
-		N100*=vol1/vol0 # volume might have been increased, increase number of spheres to keep porosity the same
+		N100*=old_div(vol1,vol0) # volume might have been increased, increase number of spheres to keep porosity the same
 		sp=_getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fillPeriodic=True,spheresInCell=spheresInCell,memoDbg=False)
 		if sp:
 			if orientation:
@@ -534,7 +541,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		# repetition to the required cell size will be done below, after memoizing the result
 	else:
 		assumedFinalDensity=0.6
-		V=(4.0/3.0)*pi*radius**3.0; N=assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2]/V;
+		V=(4.0/3.0)*pi*radius**3.0; N=old_div(assumedFinalDensity*fullDim[0]*fullDim[1]*fullDim[2],V);
 		TriaxialTest(
 			numberOfGrains=int(N),radiusMean=radius,radiusStdDev=rRelFuzz,
 			# upperCorner is just size ratio, if radiusMean is specified
@@ -610,17 +617,17 @@ def hexaNet( radius, cornerCoord=[0,0,0], xLength=1., yLength=0.5, mos=0.08, a=0
 	z = cornerCoord[2]
 	ab = a+b
 	# number of double twisted sections in y-direction and real length ly
-	ny = int( (yLength-a)/ab ) + 1
+	ny = int( old_div((yLength-a),ab) ) + 1
 	ly = ny*a+(ny-1)*b
 	jump=0
 	# number of sections in x-direction and real length lx
 	if isSymmetric:
-		nx = int( xLength/mos ) + 1
+		nx = int( old_div(xLength,mos) ) + 1
 		lx = (nx-1)*mos
 		if not startAtCorner:
 			nx+=-1
 	else:
-		nx = int( (xLength-0.5*mos)/mos ) + 1
+		nx = int( old_div((xLength-0.5*mos),mos) ) + 1
 		lx = (nx-1)*mos+0.5*mos
 	net = []
 	# generate corner particles

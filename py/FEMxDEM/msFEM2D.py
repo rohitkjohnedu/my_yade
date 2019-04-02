@@ -1,4 +1,10 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import input
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"
@@ -72,7 +78,7 @@ class MultiScale(object):
             print("=======================================================================")
             print("For better performance compile python-escript with direct solver method")
             print("=======================================================================")
-            raw_input("Press Enter to continue...")
+            input("Press Enter to continue...")
             #time.sleep(5)
       self.__pde.setSymmetryOn()
       #self.__pde.getSolverOptions().setTolerance(rtol**2)
@@ -83,20 +89,20 @@ class MultiScale(object):
       self.__pert=pert
       self.__verbose=verbose
       self.__pool=get_pool(mpi=useMPI,threads=np)
-      self.__scenes=self.__pool.map(initLoad,range(ng))
+      self.__scenes=self.__pool.map(initLoad,list(range(ng)))
       self.__strain=escript.Tensor(0,escript.Function(self.__domain))
       self.__stress=escript.Tensor(0,escript.Function(self.__domain))
       self.__S=escript.Tensor4(0,escript.Function(self.__domain))
       
       if self.__usepert:
          s = self.__pool.map(getStressTensor,self.__scenes)
-         t = self.__pool.map(getTangentOperator,zip(self.__scenes,repeat(pert)))
-         for i in xrange(ng):
+         t = self.__pool.map(getTangentOperator,list(zip(self.__scenes,repeat(pert))))
+         for i in range(ng):
             self.__stress.setValueOfDataPoint(i,s[i])
             self.__S.setValueOfDataPoint(i,t[i])
       else:
          st = self.__pool.map(getStressAndTangent2D,self.__scenes)
-         for i in xrange(ng):
+         for i in range(ng):
             self.__stress.setValueOfDataPoint(i,st[i][0])
             self.__S.setValueOfDataPoint(i,st[i][1])
                      
@@ -126,30 +132,30 @@ class MultiScale(object):
    def getCurrentPacking(self,pos=(),time=0,prefix=''):
       if len(pos) == 0:
          # output all Gauss points packings
-         self.__pool.map(outputPack,zip(self.__scenes,repeat(time),repeat(prefix)))
+         self.__pool.map(outputPack,list(zip(self.__scenes,repeat(time),repeat(prefix))))
       else:
          # output selected Gauss points packings
          scene = [self.__scenes[i] for i in pos]
-         self.__pool.map(outputPack,zip(scene,repeat(time),repeat(prefix)))
+         self.__pool.map(outputPack,list(zip(scene,repeat(time),repeat(prefix))))
    
    def getLocalVoidRatio(self):
       void=escript.Scalar(0,escript.Function(self.__domain))
       e = self.__pool.map(getVoidRatio2D,self.__scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          void.setValueOfDataPoint(i,e[i])
       return void
    
    def getLocalAvgRotation(self):
       rot=escript.Scalar(0,escript.Function(self.__domain))
       r = self.__pool.map(avgRotation2D,self.__scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          rot.setValueOfDataPoint(i,r[i])
       return rot
    
    def getLocalFabric(self):
       fabric=escript.Tensor(0,escript.Function(self.__domain))
       f = self.__pool.map(getFabric2D,self.__scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          fabric.setValueOfDataPoint(i,f[i])
       return fabric
    
@@ -223,7 +229,7 @@ class MultiScale(object):
          du=self.__pde.getSolution()
          u+=du
          l,d=util.L2(u),util.L2(du)
-         err=d/l # displacement error, alternatively using force error 'residual'
+         err=old_div(d,l) # displacement error, alternatively using force error 'residual'
          converged=(err<rtol)
          if err>rtol*0.001: # only update DEM parts when error is large enough
             self.__domain.setX(x_safe)
@@ -254,16 +260,16 @@ class MultiScale(object):
       st = numpy.array(st).reshape(-1,4)
       stress = escript.Tensor(0,escript.Function(self.__domain))
       S = escript.Tensor4(0,escript.Function(self.__domain))
-      scenes = self.__pool.map(shear2D,zip(self.__scenes,st))
+      scenes = self.__pool.map(shear2D,list(zip(self.__scenes,st)))
       if self.__usepert:
          s = self.__pool.map(getStressTensor,scenes)
-         t = self.__pool.map(getTangentOperator,zip(scenes,repeat(self.__pert)))
-         for i in xrange(self.__numGaussPoints):
+         t = self.__pool.map(getTangentOperator,list(zip(scenes,repeat(self.__pert))))
+         for i in range(self.__numGaussPoints):
             stress.setValueOfDataPoint(i,s[i])
             S.setValueOfDataPoint(i,t[i])
       else:
          ST = self.__pool.map(getStressAndTangent2D,scenes)
-         for i in xrange(self.__numGaussPoints):
+         for i in range(self.__numGaussPoints):
             stress.setValueOfDataPoint(i,ST[i][0])
             S.setValueOfDataPoint(i,ST[i][1])
       return stress,S,scenes

@@ -1,4 +1,6 @@
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 from yade import plot, polyhedra_utils, ymport, export
 
 frictionIn = 0.0
@@ -18,7 +20,7 @@ def printSuccess ():
    print ("Checkpoint: force values and number of bodies are OK! Iteration %d"%(O.iter))
 
 def checkForcesBodies(fR, bodNum):
-   if (abs(f[2] - fR)/f[2] >  tolerance or len(O.bodies) != bodNum):
+   if (old_div(abs(f[2] - fR),f[2]) >  tolerance or len(O.bodies) != bodNum):
       printWarning (fR, f[2], 4, len(O.bodies))
       global resultStatus
       resultStatus += 1
@@ -30,7 +32,7 @@ O.bodies.append(utils.wall(0,axis=2,sense=1, material = mat1))
 
 vertices = [[0,0,0],[sizeB,0,0],[sizeB,sizeB,0],[sizeB,sizeB,sizeB],[0,sizeB,0],[0,sizeB,sizeB],[0,0,sizeB],[sizeB,0,sizeB]]
 t = polyhedra_utils.polyhedra(mat1,v=vertices)
-t.state.pos = (0,0,sizeB/2)
+t.state.pos = (0,0,old_div(sizeB,2))
 O.bodies.append(t)
 
 topmesh=O.bodies.append(geom.facetBox((0.,0.,startPos),(sizeB,sizeB,0.), material=mat1))

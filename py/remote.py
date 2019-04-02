@@ -7,7 +7,11 @@ These classes are used internally in gui/py/PythonUI_rc.py and are not intended 
 """
 from __future__ import print_function
 
-import SocketServer,xmlrpclib,socket
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+import socketserver,xmlrpc.client,socket
 import sys,time,os,math
 
 from yade import *
@@ -25,7 +29,7 @@ b64favicon='AAABAAEAEBAAAAAAAABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAQAEAAAAAAAAA
 
 bgThreads=[] # needed to keep background threads alive
 
-class InfoProvider:
+class InfoProvider(object):
 	def basicInfo(self):
 		ret=dict(iter=O.iter,dt=O.dt,stopAtIter=O.stopAtIter,speed=O.speed,realtime=O.realtime,time=O.time,id=O.tags['id'] if 'id' in O.tags else None,threads=os.environ['OMP_NUM_THREADS'] if 'OMP_NUM_THREADS' in os.environ else '0',numBodies=len(O.bodies),numIntrs=len(O.interactions))
 		sys.stdout.flush(); sys.stderr.flush()
@@ -41,7 +45,7 @@ class InfoProvider:
 			fig.savefig(img)
 			f=open(img,'rb'); data=f.read(); f.close(); os.remove(img)
 			#print 'returning '+plotImgFormat
-			return xmlrpclib.Binary(data)
+			return xmlrpc.client.Binary(data)
 		except:
 			print('Error updating plots:')
 			import traceback
@@ -51,7 +55,7 @@ class InfoProvider:
 		O.pause()
 		return True
 
-class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
+class PythonConsoleSocketEmulator(socketserver.BaseRequestHandler):
 	"""Class emulating python command-line over a socket connection.
 
 	The connection is authenticated by requiring a cookie.
@@ -85,7 +89,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 		self.request.send(pprint.pformat(s))
 	def handle(self):
 		if self.client_address not in self.server.authenticated and not self.tryLogin(): return
-		import code,cStringIO,traceback
+		import code,io,traceback
 		buf=[]
 		while True:
 			data = self.request.recv(1024).rstrip()
@@ -93,7 +97,7 @@ class PythonConsoleSocketEmulator(SocketServer.BaseRequestHandler):
 				return
 			buf.append(data)
 			orig_displayhook,orig_stdout=sys.displayhook,sys.stdout
-			sio=cStringIO.StringIO()
+			sio=io.StringIO()
 			continuation=False
 			#print "buffer:",buf
 			try:
@@ -131,10 +135,10 @@ def _runInBackground(func):
 		wt.start()
 		global bgThreads; bgThreads.append(wt)
 	else:
-		import thread; thread.start_new_thread(func,())
+		import _thread; _thread.start_new_thread(func,())
 
 
-class GenericTCPServer:
+class GenericTCPServer(object):
 	"Base class for socket server, handling port allocation, initial logging and thead backgrounding."
 	def __init__(self,handler,title,cookie=True,minPort=9000,host='',maxPort=65536,background=True):
 		import socket, random, sys
@@ -144,7 +148,7 @@ class GenericTCPServer:
 		if maxPort==None: maxPort=minPort
 		while self.port==-1 and tryPort<=maxPort:
 			try:
-				self.server=SocketServer.ThreadingTCPServer((host,tryPort),handler)
+				self.server=socketserver.ThreadingTCPServer((host,tryPort),handler)
 				self.port=tryPort
 				if cookie:
 					self.server.cookie=''.join([i for i in random.sample('yadesucks',6)])
@@ -175,7 +179,7 @@ def runServers():
 	#info=GenericTCPServer(handler=yade.remote.InfoSocketProvider,title='TCP info provider',cookie=False,minPort=21000)
 	## XMPRPC server for general information:
 	
-	from SimpleXMLRPCServer import SimpleXMLRPCServer
+	from xmlrpc.server import SimpleXMLRPCServer
 	port,maxPort=21000,65535 # minimum port number
 	while port<maxPort:
 		try:

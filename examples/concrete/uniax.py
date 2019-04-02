@@ -3,6 +3,8 @@
 from __future__ import division
 from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
 from yade import plot,pack,timing
 import time, sys, os, copy
 
@@ -67,7 +69,7 @@ readParamsFromTable(noTableOk=True, # unknownOk=True,
 
 from yade.params.table import *
 
-if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description']
+if 'description' in list(O.tags.keys()): O.tags['id']=O.tags['id']+O.tags['description']
 
 
 # make geom; the dimensions are hard-coded here; could be in param table if desired
@@ -153,7 +155,7 @@ def stopIfDamaged():
 			# important! initTest must be launched in a separate thread;
 			# otherwise O.load would wait for the iteration to finish,
 			# but it would wait for initTest to return and deadlock would result
-			import thread; thread.start_new_thread(initTest,())
+			import _thread; _thread.start_new_thread(initTest,())
 			return
 		else:
 			print("Damaged, stopping.")
@@ -164,7 +166,7 @@ def stopIfDamaged():
 				print('Compressive strength fc=%g'%(abs(fc)))
 			if doModes==1:
 				print('Tensile strength ft=%g'%(abs(ft)))
-			title=O.tags['description'] if 'description' in O.tags.keys() else O.tags['params']
+			title=O.tags['description'] if 'description' in list(O.tags.keys()) else O.tags['params']
 			print('gnuplot',plot.saveGnuplot(O.tags['id'],title=title))
 			print('Bye.')
 			O.pause()

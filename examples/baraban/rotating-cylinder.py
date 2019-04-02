@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 cylHt,cylRd=1,.2
 nSpheres=2e4
 
@@ -29,13 +31,13 @@ def unitCylinder(nDiv=24):
 
 from yade import pack,timing
 cyl=unitCylinder(); sq=unitSquare(); sq.translate(0,0,-1); cyl.copy(sq)
-cyl.scale(cylRd,cylRd,.5*cylHt); cyl.rotate(1,0,0,-pi/4) # 45° anti-colckwise in the yz plane
+cyl.scale(cylRd,cylRd,.5*cylHt); cyl.rotate(1,0,0,old_div(-pi,4)) # 45° anti-colckwise in the yz plane
 # calling gtsSurface2Facets with just "cyl" (without constructing the faces tuple) ignores 2 faces that were copy'd before; bug in pygts?
 cylIds=O.bodies.append(pack.gtsSurface2Facets(cyl))
 sp=pack.SpherePack(); wd=cylRd*sqrt(2); rMean=(.2*wd*wd*cylHt/(nSpheres*(4/3.)*pi))**(1/3.)
 print('Generating cloud…')
-sp.makeCloud((-wd/2,-wd/2,-.5*cylHt),(wd/2,wd/2,.5*cylHt),rMean,0,int(nSpheres),False)
-sp.rotate((1,0,0),-pi/4)
+sp.makeCloud((old_div(-wd,2),old_div(-wd,2),-.5*cylHt),(old_div(wd,2),old_div(wd,2),.5*cylHt),rMean,0,int(nSpheres),False)
+sp.rotate((1,0,0),old_div(-pi,4))
 O.bodies.append([sphere(s[0],s[1]) for s in sp])
 
 O.engines=[
@@ -46,11 +48,11 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()],
 	),
-	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(0,1,1),angularVelocity=30*(2*pi/60),ids=cylIds,label='rotor'),
+	RotationEngine(rotateAroundZero=True,zeroPoint=(0,0,0),rotationAxis=(0,1,1),angularVelocity=30*(old_div(2*pi,60)),ids=cylIds,label='rotor'),
 	NewtonIntegrator(damping=.3,gravity=(0,0,-1e3)), # gravity artificially high, to make it faster going ;-)
 ]
 O.dt=PWaveTimeStep()
-O.stopAtIter=int(2*pi/(rotor.angularVelocity*O.dt))
+O.stopAtIter=int(old_div(2*pi,(rotor.angularVelocity*O.dt)))
 O.timingEnabled=True; timing.reset()
 
 from yade import qt

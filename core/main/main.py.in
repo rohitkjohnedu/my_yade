@@ -1,8 +1,11 @@
-from __future__ import print_function
 #!${pyExecutable}
 # encoding: utf-8
 # syntax:python
 
+from __future__ import print_function
+
+from past.builtins import execfile
+from builtins import str
 import sys,os,os.path,time
 try:
 	import _io

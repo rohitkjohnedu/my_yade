@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 from __future__ import print_function
+from builtins import str
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from yade import *
@@ -51,7 +52,7 @@ class CellInspector(QWidget):
 	
 
 def makeBodyLabel(b):
-	ret=unicode(b.id)+u' '
+	ret=str(b.id)+u' '
 	if not b.shape: ret+=u'⬚'
 	else:
 		typeMap={'Sphere':u'⚫','Facet':u'△','Wall':u'┃','Box':u'⎕','Cylinder':u'⌭','ChainedCylinder':u'☡','Clump':u'☍'}
@@ -62,9 +63,9 @@ def makeBodyLabel(b):
 
 def getBodyIdFromLabel(label):
 	try:
-		return int(unicode(label).split()[0])
+		return int(str(label).split()[0])
 	except ValueError:
-		print('Error with label:',unicode(label))
+		print('Error with label:',str(label))
 		return -1
 
 class BodyInspector(QWidget):

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation
+from __future__ import division
+from past.utils import old_div
 from numpy import linspace
 from numpy import arange
 import gts
@@ -16,13 +18,13 @@ buldozerHeight=1.2
 radiusSph = 0.05
 numBoxes = Vector3(15,5,2)
 gapBetweenBoxes = 0.05
-sizeBox = (lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes)/numBoxes[1]
+sizeBox = old_div((lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes),numBoxes[1])
 
 
 ### Creating the Buldozer Knife
 ### from facets, using GTS
 Knife=[]
-for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
+for i in linspace(pi, old_div(pi*3,2), num=numKnifeParts, endpoint=True):
 	Knife.append(Vector3(radiusKnife*cos(i),0,radiusKnife*sin(i)))
 
 	
@@ -32,12 +34,12 @@ KnifeIDs=[]
 KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False))
 
 
-KnifeIDs+=O.bodies.append(geom.facetBox((-lengthKnife/2-radiusKnife,lengthKnife/2,-radiusKnife+buldozerHeight/2),(lengthKnife/2,lengthKnife/2,buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
+KnifeIDs+=O.bodies.append(geom.facetBox((old_div(-lengthKnife,2)-radiusKnife,old_div(lengthKnife,2),-radiusKnife+old_div(buldozerHeight,2)),(old_div(lengthKnife,2),old_div(lengthKnife,2),buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
 
-KnifeIDs+=O.bodies.append(geom.facetBox((-lengthKnife/2-radiusKnife-lengthKnife/4.,lengthKnife/2,-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
+KnifeIDs+=O.bodies.append(geom.facetBox((old_div(-lengthKnife,2)-radiusKnife-lengthKnife/4.,old_div(lengthKnife,2),-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
 
 
-O.bodies.append(geom.facetBox((0,lengthKnife/2,radiusKnife),(lengthKnife*4,lengthKnife*4,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
+O.bodies.append(geom.facetBox((0,old_div(lengthKnife,2),radiusKnife),(lengthKnife*4,lengthKnife*4,lengthKnife),wallMask=16,color=(1,1,1),wire=False))
 
 
 
@@ -50,7 +52,7 @@ colorsph1.normalize();
 colorsph2.normalize();
 colorSph=colorsph1
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
-	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph))
+	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(old_div(sizeBox,2),old_div(sizeBox,2),old_div(sizeBox,2))),radius=radiusSph,gap=0,color=colorSph))
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:

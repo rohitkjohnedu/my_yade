@@ -3,6 +3,7 @@
 "Beam-like behaviour with cylinderConnections for roots interaction with spheres."
 from __future__ import print_function
 
+from builtins import range
 from yade import pack
 from yade.gridpfacet import *
 

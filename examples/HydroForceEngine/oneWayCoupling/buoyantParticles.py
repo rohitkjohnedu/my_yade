@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 07/07/2016
@@ -11,6 +12,7 @@ from __future__ import print_function
 ############################################################################################################################################################################
 
 #Import libraries
+from past.utils import old_div
 from yade import pack, plot
 import math
 import random as rand
@@ -39,7 +41,7 @@ gravityVector = Vector3(0,0.0,-9.81) #Gravity vector
 
 #Particles contact law/material parameters
 normalStiffness = 1e4
-youngMod = normalStiffness/diameterPart	#Young modulus of the particles from the stiffness wanted.
+youngMod = old_div(normalStiffness,diameterPart)	#Young modulus of the particles from the stiffness wanted.
 poissonRatio = 0.5	#poisson's ratio of the particles. Classical values, does not have much influence
 
 #Material of particle 1, 2, and 3, with different density densPart1, densPart2 and densPart3 defined above (1500, 1000 and 500kg/m3 by default) 
@@ -83,7 +85,7 @@ O.engines = [
    	[Law2_ScGeom_ViscElPhys_Basic()]
 	,label = 'interactionLoop'),				
 	#Apply an hydrodynamic force to the particles
-	HydroForceEngine(densFluid = densFluidPY,viscoDyn = kinematicViscoFluid*densFluidPY,zRef = groundPosition,gravity = gravityVector,deltaZ = fluidHeight/ndimz,expoRZ = 0.,lift = False,nCell = ndimz,vCell = 1.,vxFluid = np.zeros(ndimz),phiPart = np.zeros(ndimz),vxPart = np.zeros(ndimz),vFluctX = np.zeros(len(O.bodies)),vFluctY = np.zeros(len(O.bodies)),vFluctZ = np.zeros(len(O.bodies)),ids = idApplyForce, label = 'hydroEngine'),
+	HydroForceEngine(densFluid = densFluidPY,viscoDyn = kinematicViscoFluid*densFluidPY,zRef = groundPosition,gravity = gravityVector,deltaZ = old_div(fluidHeight,ndimz),expoRZ = 0.,lift = False,nCell = ndimz,vCell = 1.,vxFluid = np.zeros(ndimz),phiPart = np.zeros(ndimz),vxPart = np.zeros(ndimz),vFluctX = np.zeros(len(O.bodies)),vFluctY = np.zeros(len(O.bodies)),vFluctZ = np.zeros(len(O.bodies)),ids = idApplyForce, label = 'hydroEngine'),
 	#To plot the wall normal position of the spheres with time
 	PyRunner(command = 'plotPos()', virtPeriod = 0.01, label = 'plot'),
 	# Integrate the equation and calculate the new position/velocities...
@@ -96,7 +98,7 @@ O.dt = 5e-7 #Low no purpose, in order to observe the sedimentation
 
 #Plot the wall normal position of the spheres with time
 def plotPos():
-	plot.addData(z1 = O.bodies[2].state.pos[2]/fluidHeight,z2 = O.bodies[3].state.pos[2]/fluidHeight,z3 = O.bodies[4].state.pos[2]/fluidHeight, time = O.time)
+	plot.addData(z1 = old_div(O.bodies[2].state.pos[2],fluidHeight),z2 = old_div(O.bodies[3].state.pos[2],fluidHeight),z3 = old_div(O.bodies[4].state.pos[2],fluidHeight), time = O.time)
 	if O.time>endTime:
 		print('\nEnd of the simulation, {0}s simulated as asked!\n'.format(endTime))
 		O.pause()

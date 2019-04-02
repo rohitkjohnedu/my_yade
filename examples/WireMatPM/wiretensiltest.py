@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 from yade import plot
 
 #### short description of script
@@ -15,8 +17,8 @@ strainStressValues=[(0.0019230769,2.5e8),(0.0192,3.2195e8),(0.05,3.8292e8),(0.15
 # elastic material properties
 particleVolume = 4./3.*pow(radius,3)*pi
 particleMass = 3.9/1000.
-density = particleMass/particleVolume
-young = strainStressValues[0][1] / strainStressValues[0][0]
+density = old_div(particleMass,particleVolume)
+young = old_div(strainStressValues[0][1], strainStressValues[0][0])
 poisson = 0.3
 
 
@@ -127,13 +129,13 @@ def addPlotData():
 	un = O.bodies[O.bodies[posIds[0]].id].state.pos[1] - O.bodies[O.bodies[posIds[0]].id].state.refPos[1]
 	if un > 0.10:
 		O.pause()
-	plot.addData( un=un*1000, Fn=Fn/1000 )
+	plot.addData( un=un*1000, Fn=old_div(Fn,1000) )
 
 
 #### time step definition for simulation
 ## critical time step proposed by Bertrand
 kn = 16115042 # stiffness of single wire from code
-O.dt = 0.2*sqrt(particleMass/(2.*kn))
+O.dt = 0.2*sqrt(old_div(particleMass,(2.*kn)))
 
 
 #### to see it

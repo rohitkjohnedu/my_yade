@@ -5,8 +5,15 @@ Module containing utility functions for plotting inside yade. See :ysrc:`example
 
 """
 from __future__ import print_function
+from __future__ import division
 
 ## all exported names
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 __all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
@@ -109,9 +116,9 @@ def reverseData():
 
 def addDataColumns(dd):
 	'''Add new columns with NaN data, without adding anything to other columns. Does nothing for columns that already exist'''
-	numSamples=len(data[data.keys()[0]]) if len(data)>0 else 0
+	numSamples=len(data[list(data.keys())[0]]) if len(data)>0 else 0
 	for d in dd:
-		if d in data.keys(): continue
+		if d in list(data.keys()): continue
 		data[d]=[nan for i in range(numSamples)]
 
 def addAutoData():
@@ -240,14 +247,14 @@ def addData(*d_in,**kw):
 
 	"""
 	import numpy
-	if len(data)>0: numSamples=len(data[data.keys()[0]])
+	if len(data)>0: numSamples=len(data[list(data.keys())[0]])
 	else: numSamples=0
 	# align with imgData, if there is more of them than data
-	if len(imgData)>0 and numSamples==0: numSamples=max(numSamples,len(imgData[imgData.keys()[0]]))
+	if len(imgData)>0 and numSamples==0: numSamples=max(numSamples,len(imgData[list(imgData.keys())[0]]))
 	d=(d_in[0] if len(d_in)>0 else {})
 	d.update(**kw)
 	# handle types composed of multiple values (vectors, matrices)
-	dNames=d.keys()[:] # make copy, since dict cannot change size if iterated over directly
+	dNames=list(d.keys())[:] # make copy, since dict cannot change size if iterated over directly
 	for name in dNames:
 		if type(d[name]) in componentSuffixes:
 			val=d[name]
@@ -257,7 +264,7 @@ def addData(*d_in,**kw):
 		elif hasattr(d[name],'__len__'):
 			raise ValueError('plot.addData given unhandled sequence type (is a '+type(d[name]).__name__+', must be number or '+'/'.join([k.__name__ for k in componentSuffixes])+')')
 	for name in d:
-		if not name in data.keys(): data[name]=[]
+		if not name in list(data.keys()): data[name]=[]
 	for name in data:
 		data[name]+=(numSamples-len(data[name]))*[nan]
 		data[name].append(d[name] if name in d else nan)
@@ -269,26 +276,26 @@ def addImgData(**kw):
 	for k in kw:
 		if k not in imgData: imgData[k]=[]
 	# align imgData with data
-	if len(data.keys())>0 and len(imgData.keys())>0:
-		nData,nImgData=len(data[data.keys()[0]]),len(imgData[imgData.keys()[0]])
+	if len(list(data.keys()))>0 and len(list(imgData.keys()))>0:
+		nData,nImgData=len(data[list(data.keys())[0]]),len(imgData[list(imgData.keys())[0]])
 		#if nImgData>nData-1: raise RuntimeError("imgData is already the same length as data?")
 		if nImgData<nData-1: # repeat last value
-			for k in imgData.keys():
+			for k in list(imgData.keys()):
 				lastValue=imgData[k][-1] if len(imgData[k])>0 else None
 				imgData[k]+=(nData-len(imgData[k])-1)*[lastValue]
 		elif nData<nImgData:
-			for k in data.keys():
+			for k in list(data.keys()):
 				lastValue=data[k][-1] if len(data[k])>0 else nan
 				data[k]+=(nImgData-nData)*[lastValue]   # add one more, because we will append to imgData below
 	# add values from kw
-	newLen=(len(imgData[imgData.keys()[0]]) if imgData else 0)+1 # current length plus 1
+	newLen=(len(imgData[list(imgData.keys())[0]]) if imgData else 0)+1 # current length plus 1
 	for k in kw:
 		if k in imgData and len(imgData[k])>0: imgData[k]+=(newLen-len(imgData[k])-1)*[imgData[k][-1]]+[kw[k]] # repeat last element as necessary
 		else: imgData[k]=(newLen-1)*[None]+[kw[k]]  # repeat None if no previous value
 	# align values which were not in kw by repeating the last value
 	for k in imgData:
 		if len(imgData[k])<newLen: imgData[k]+=(newLen-len(imgData[k]))*[imgData[k][-1]]
-	assert(len(set([len(i) for i in imgData.values()]))<=1)  # no data or all having the same value
+	assert(len(set([len(i) for i in list(imgData.values())]))<=1)  # no data or all having the same value
 
 
 
@@ -306,10 +313,10 @@ def tuplifyYAxis(pp):
 def xlateLabel(l):
 	"Return translated label; return l itself if not in the labels dict."
 	global labels
-	if l in labels.keys(): return labels[l]
+	if l in list(labels.keys()): return labels[l]
 	else: return l
 
-class LineRef:
+class LineRef(object):
 	"""Holds reference to plot line and to original data arrays (which change during the simulation),
 	and updates the actual line using those data upon request."""
 	def __init__(self,line,scatter,line2,xdata,ydata,dataName=None):
@@ -357,8 +364,8 @@ class LineRef:
 						# there must be an easier way to find on-screen derivative angle, ask on the matplotlib mailing list
 						axes=self.line.axes()
 						p=axes.patch; xx,yy=p.get_verts()[:,0],p.get_verts()[:,1]; size=max(xx)-min(xx),max(yy)-min(yy)
-						aspect=(size[1]/size[0])*(1./axes.get_data_ratio())
-						angle=math.atan(aspect*dy/dx)
+						aspect=(old_div(size[1],size[0]))*(1./axes.get_data_ratio())
+						angle=math.atan(old_div(aspect*dy,dx))
 						if dx<0: angle-=math.pi
 						self.scatter.set_transform(matplotlib.transforms.Affine2D().rotate(angle))
 					except IndexError: pass
@@ -376,14 +383,14 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 	if len(plots)==0: return # nothing to plot
 	if subPlots:
 		# compute number of rows and colums for plots we have
-		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
+		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(old_div(len(plots)*1.,subCols)))
 		if wider: subRows,subCols=subCols,subRows
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip().split('=',1)[0]
 		if not subPlots: pylab.figure()
 		else: pylab.subplot(subRows,subCols,nPlot+1)
 		if plots[p]==None: # image plot
-			if not pStrip in imgData.keys(): imgData[pStrip]=[]
+			if not pStrip in list(imgData.keys()): imgData[pStrip]=[]
 			# fake (empty) image if no data yet
 			if len(imgData[pStrip])==0 or imgData[pStrip][-1]==None: img=Image.new('RGBA',(1,1),(0,0,0,0))
 			else: img=Image.open(imgData[pStrip][-1])
@@ -394,15 +401,15 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 		plots_p=[addPointTypeSpecifier(o) for o in tuplifyYAxis(plots[p])]
 		plots_p_y1,plots_p_y2=[],[]; y1=True
 		missing=set() # missing data columns
-		if pStrip not in data.keys(): missing.add(pStrip)
+		if pStrip not in list(data.keys()): missing.add(pStrip)
 		for d in plots_p:
 			if d[0]==None:
 				y1=False; continue
 			if y1: plots_p_y1.append(d)
 			else: plots_p_y2.append(d)
-			if d[0] not in data.keys() and not callable(d[0]) and not hasattr(d[0],'keys'): missing.add(d[0])
+			if d[0] not in list(data.keys()) and not callable(d[0]) and not hasattr(d[0],'keys'): missing.add(d[0])
 		if missing:
-			if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
+			if len(list(data.keys()))==0 or len(data[list(data.keys())[0]])==0: # no data at all yet, do not add garbage NaNs
 				for m in missing: data[m]=[]
 			else:
 				print('Missing columns in plot.data, adding NaN: ',','.join(list(missing)))
@@ -420,7 +427,7 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 			for ys in ySpecs:
 				# ys[0]() must return list of strings, which are added to ySpecs2; line specifier is synthesized by tuplifyYAxis and cannot be specified by the user
 				if callable(ys[0]): ySpecs2+=[(ret,ys[1]) for ret in ys[0]()]
-				elif hasattr(ys[0],'keys'): ySpecs2+=[(yy,'') for yy in ys[0].keys()]
+				elif hasattr(ys[0],'keys'): ySpecs2+=[(yy,'') for yy in list(ys[0].keys())]
 				else: ySpecs2.append(ys)
 			if len(ySpecs2)==0:
 				print('yade.plot: creating fake plot, since there are no y-data yet')
@@ -462,7 +469,7 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 		if len(plots_p_y2)>0:
 			pylab.twinx() # create the y2 axis
 			createLines(pStrip,plots_p_y2,isY1=False,y2Exists=True)
-		if 'title' in O.tags.keys(): pylab.title(O.tags['title'])
+		if 'title' in list(O.tags.keys()): pylab.title(O.tags['title'])
 
 
 
@@ -483,16 +490,16 @@ def liveUpdate(timestamp):
 			yy=set();
 			for f in ax.yadeYFuncs:
 				if callable(f): yy.update(f())
-				elif hasattr(f,'keys'): yy.update(f.keys())
+				elif hasattr(f,'keys'): yy.update(list(f.keys()))
 				else: raise ValueError("Internal error: ax.yadeYFuncs items must be callables or dictionary-like objects and nothing else.")
 			#print 'callables y names:',yy
 			news=yy-ax.yadeYNames
 			if not news: continue
 			for new in news:
 				ax.yadeYNames.add(new)
-				if new in data.keys() and id(data[new]) in linesData: continue # do not add when reloaded and the old lines are already there
+				if new in list(data.keys()) and id(data[new]) in linesData: continue # do not add when reloaded and the old lines are already there
 				print('yade.plot: creating new line for',new)
-				if not new in data.keys(): data[new]=len(data[ax.yadeXName])*[nan] # create data entry if necessary
+				if not new in list(data.keys()): data[new]=len(data[ax.yadeXName])*[nan] # create data entry if necessary
 				#print 'data',len(data[ax.yadeXName]),len(data[new]),data[ax.yadeXName],data[new]
 				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
 				line2,=ax.plot([],[],color=line.get_color(),alpha=afterCurrentAlpha)
@@ -528,11 +535,11 @@ def savePlotSequence(fileBase,stride=1,imgRatio=(5,7),title=None,titleFrames=20,
 	sqrtFigs=math.sqrt(len(plots))
 	pylab.gcf().set_size_inches(8*sqrtFigs,5*sqrtFigs) # better readable
 	pylab.subplots_adjust(left=.05,right=.95,bottom=.05,top=.95) # make it more compact
-	if len(plots)==1 and plots[plots.keys()[0]]==None: # only pure snapshot is there
+	if len(plots)==1 and plots[list(plots.keys())[0]]==None: # only pure snapshot is there
 		pylab.gcf().set_size_inches(5,5)
 		pylab.subplots_adjust(left=0,right=1,bottom=0,top=1)
 	#if not data.keys(): raise ValueError("plot.data is empty.")
-	pltLen=max(len(data[data.keys()[0]]) if data else 0,len(imgData[imgData.keys()[0]]) if imgData else 0)
+	pltLen=max(len(data[list(data.keys())[0]]) if data else 0,len(imgData[list(imgData.keys())[0]]) if imgData else 0)
 	if pltLen==0: raise ValueError("Both plot.data and plot.imgData are empty.")
 	global current, currLineRefs
 	ret=[]
@@ -564,10 +571,10 @@ def createTitleFrame(out,size,title):
 		rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=fontsize,dpi=fig.get_dpi(),color='blue')
 		textsize=rgba.shape[1],rgba.shape[0]
 		if textsize[0]>size[0]:
-			rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=fontsize*size[0]/textsize[0],dpi=fig.get_dpi(),color='blue')
+			rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=old_div(fontsize*size[0],textsize[0]),dpi=fig.get_dpi(),color='blue')
 			textsize=rgba.shape[1],rgba.shape[0]
 		fig.figimage(rgba.astype(float)/255.,xo=(size[0]-textsize[0])/2.,yo=vertPos-depth)
-	ht=size[1]; y0=ht-2*fontSizes[0]; yStep=(ht-2.5*fontSizes[0])/len(lines)
+	ht=size[1]; y0=ht-2*fontSizes[0]; yStep=old_div((ht-2.5*fontSizes[0]),len(lines))
 	for i,(l,isTitle) in enumerate(lines):
 		writeLine(l,y0-i*yStep,fontSizes[0 if isTitle else 1])
 	fig.savefig(out)
@@ -602,8 +609,8 @@ def plot(noShow=False,subPlots=True):
 	if not noShow:
 		if not yade.runtime.hasDisplay: return # would error out with some backends, such as Agg used in batches
 		if live:
-			import thread
-			thread.start_new_thread(liveUpdate,(time.time(),))
+			import _thread
+			_thread.start_new_thread(liveUpdate,(time.time(),))
 		# pylab.show() # this blocks for some reason; call show on figures directly
 		for f in figs:
 			f.show()
@@ -636,13 +643,13 @@ def saveDataTxt(fileName,vars=None, headers=None):
 	"""
 	import bz2,gzip
 	if not vars:
-		vars=data.keys(); vars.sort()
+		vars=list(data.keys()); vars.sort()
 	if fileName.endswith('.bz2'): f=bz2.BZ2File(fileName,'w')
 	elif fileName.endswith('.gz'): f=gzip.GzipFile(fileName,'w')
 	else: f=open(fileName,'w')
 	
 	if headers:
-		k = headers.keys();
+		k = list(headers.keys());
 		for i in range(len(k)):
 			f.write("# "+k[i]+"=\t"+str(headers[k[i]])+"\n");
 	
@@ -655,7 +662,7 @@ def saveDataTxt(fileName,vars=None, headers=None):
 def savePylab(baseName,timestamp=False,title=None):
 	'''This function is not finished, do not use it.'''
 	import time
-	if len(data.keys())==0: raise RuntimeError("No data for plotting were saved.")
+	if len(list(data.keys()))==0: raise RuntimeError("No data for plotting were saved.")
 	if timestamp: baseName+=_mkTimestamp()
 	baseNameNoPath=baseName.split('/')[-1]
 	saveDataTxt(fileName=baseName+'.data.bz2')
@@ -663,7 +670,7 @@ def savePylab(baseName,timestamp=False,title=None):
 	py=file(baseName+'.py','w')
 	py.write('#!/usr/bin/env python\n# encoding: utf-8\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\nimport pylab, numpy\n')
 	py.write("data=numpy.genfromtxt('%s.data.bz2',dtype=None,names=True)\n"%baseName)
-	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
+	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(old_div(len(plots)*1.,subCols)))
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip().split('=',1)[0]
 		if plots[p]==None: continue # image plots, which is not exported
@@ -686,10 +693,10 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 
 :return: name of the gnuplot file created.
 	"""
-	if len(data.keys())==0: raise RuntimeError("No data for plotting were saved.")
+	if len(list(data.keys()))==0: raise RuntimeError("No data for plotting were saved.")
 	if timestamp: baseName+=_mkTimestamp()
 	baseNameNoPath=baseName.split('/')[-1]
-	vars=data.keys(); vars.sort()
+	vars=list(data.keys()); vars.sort()
 	saveDataTxt(fileName=baseName+'.data.bz2',vars=vars)
 	fPlot=file(baseName+".gnuplot",'w')
 	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\n')
@@ -713,8 +720,8 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 		# replace callable/dict-like data specifiers by the results, it that particular data exists
 		plots_p2=[]
 		for pp in plots_p:
-			if callable(pp[0]): plots_p2+=[(ppp,'') for ppp in pp[0]() if ppp in data.keys()]
-			elif hasattr(pp[0],'keys'): plots_p2+=[(name,val) for name,val in pp[0].items() if name in data.keys()]
+			if callable(pp[0]): plots_p2+=[(ppp,'') for ppp in pp[0]() if ppp in list(data.keys())]
+			elif hasattr(pp[0],'keys'): plots_p2+=[(name,val) for name,val in list(pp[0].items()) if name in list(data.keys())]
 			else: plots_p2.append((pp[0],pp[1]))
 		plots_p=plots_p2
 		#plots_p=sum([([(pp,'') for pp in p[0]() if pp in data.keys()] if callable(p[0]) else [(p[0],p[1])] ) for p in plots_p],[])

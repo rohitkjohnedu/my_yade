@@ -1,5 +1,9 @@
 # encoding: utf-8
 
+from __future__ import division
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 from yade import pack,geom,qt
 from yade.gridpfacet import *
 from pylab import *
@@ -29,7 +33,7 @@ color=[255./255.,102./255.,0./255.]
 ### Create all nodes first
 nodeIds=[]
 for i in range(0,n):
-  nodeIds.append( O.bodies.append( gridNode([i*L/n,0,0],r,wire=False,fixed=False,material='mat',color=color) ) )
+  nodeIds.append( O.bodies.append( gridNode([old_div(i*L,n),0,0],r,wire=False,fixed=False,material='mat',color=color) ) )
 
 ### Create connections between the nodes
 connectionIds=[]

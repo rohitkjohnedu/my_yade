@@ -1,6 +1,9 @@
 # -*- coding: utf-8
 
 from __future__ import print_function
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 from yade import pack,export,qt
 import gts,os,random,itertools
 from numpy import *
@@ -29,7 +32,7 @@ plnSurf1 = pack.sweptPolylines2gtsSurface([[Vector3(-.5,-.5,-.5),Vector3(.5,-.5,
 plnIds1=O.bodies.append(pack.gtsSurface2Facets(plnSurf1,material=facetMat,color=(0,1,0)))
 
 # Create clumps
-clpId,sphId=O.bodies.appendClumped([sphere(Vector3(0,Rs*2*i,Rs*2),Rs,material=dfltSpheresMat) for i in xrange(4)])
+clpId,sphId=O.bodies.appendClumped([sphere(Vector3(0,Rs*2*i,Rs*2),Rs,material=dfltSpheresMat) for i in range(4)])
 
 # Create engines
 O.engines=[
@@ -75,7 +78,7 @@ mass = sum( [ s.state.mass for s in spheres ] )
 xm_ = [ s.state.pos[0]*s.state.mass for s in spheres ]
 ym_ = [ s.state.pos[1]*s.state.mass for s in spheres ]
 zm_ = [ s.state.pos[2]*s.state.mass for s in spheres ]
-centroid  = Vector3( sum(xm_)/mass, sum(ym_)/mass, sum(zm_)/mass )
+centroid  = Vector3( old_div(sum(xm_),mass), old_div(sum(ym_),mass), old_div(sum(zm_),mass) )
 
 def sphereInertiaTensor(p, m, r, c):
 	''' Inertia tensor sphere with position p, mass m and radus r relative point c '''

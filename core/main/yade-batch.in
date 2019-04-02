@@ -1,11 +1,19 @@
-from __future__ import print_function
 #!${pyExecutable}
 # encoding: utf-8
 #
 # vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, random
+from __future__ import print_function
+from __future__ import division
+
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
+import os, sys, _thread, time, logging, pipes, socket, xmlrpc.client, re, shutil, random
 
 # Add search path for yade Python-modules
 # It allows to use both Yade-versions (packaged and self-compiled one).
@@ -33,7 +41,7 @@ executable=os.path.join(prefix,'bin','yade'+suffix)
 import yade, yade.utils, yade.config, yade.remote
 
 
-class JobInfo():
+class JobInfo(object):
 	def __init__(self,num,id,command,hrefCommand,log,nCores,script,table,lineNo,affinity):
 		self.started,self.finished,self.duration,self.durationSec,self.exitStatus=None,None,None,None,None # duration is a string, durationSec is a number
 		self.command=command; self.hrefCommand=hrefCommand; self.num=num; self.log=log; self.id=id; self.nCores=nCores; self.cores=set(); self.infoSocket=None
@@ -73,7 +81,7 @@ finished: %s
 		for l in open(self.log,'r'):
 			if not l.startswith('XMLRPC info provider on'): continue
 			url=l[:-1].split()[4]
-			self.xmlrpcConn=xmlrpclib.ServerProxy(url,allow_none=True)
+			self.xmlrpcConn=xmlrpc.client.ServerProxy(url,allow_none=True)
 			self.hasXmlrpc=True
 			return True
 		if not self.hasXmlrpc: return False # catches the case where the magic line is not in the log yet
@@ -107,8 +115,8 @@ finished: %s
 		if info:
 			ret+='<td>'
 			if info['stopAtIter']>0:
-				ret+='<nobr>%2.2f%% done</nobr><br/><nobr>step %d/%d</nobr>'%(info['iter']*100./info['stopAtIter'],info['iter'],info['stopAtIter'])
-				finishTime = str(time.ctime(time.time()+int((round(info['stopAtIter'] - info['iter'])/info['speed']))))
+				ret+='<nobr>%2.2f%% done</nobr><br/><nobr>step %d/%d</nobr>'%(old_div(info['iter']*100.,info['stopAtIter']),info['iter'],info['stopAtIter'])
+				finishTime = str(time.ctime(time.time()+int((old_div(round(info['stopAtIter'] - info['iter']),info['speed'])))))
 				ret+='<br/><font size="1"><nobr>%s finishes</nobr></font><br/>'%finishTime
 			else: ret+='<nobr>step %d</nobr>'%(info['iter'])
 			if info['realtime']!=0: ret+='<br/><nobr>speed %g/sec</nobr>'%(info['speed'])
@@ -164,7 +172,7 @@ def globalHtmlStats():
 	ret+='<p><b>%d</b> total, <b>%d</b> <span style="background-color:yellow">running</span>, <b>%d</b> <span style="background-color:lime">done</span>%s</p>'%(len(jobs),len([j for j in jobs if j.status=='RUNNING']), len([j for j in jobs if j.status=='DONE']),' (<b>%d <span style="background-color:red"><b>failed</b></span>)'%nFailed if nFailed>0 else '')
 	return ret
 
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import socket,re
 class HttpStatsServer(BaseHTTPRequestHandler):
 	favicon=None # binary favicon, created when first requested
@@ -259,7 +267,7 @@ def runHttpStatsServer():
 	while port<maxPort:
 		try:
 			server=HTTPServer(('',port),HttpStatsServer)
-			import thread; thread.start_new_thread(server.serve_forever,())
+			import _thread; _thread.start_new_thread(server.serve_forever,())
 			print("http://localhost:%d shows batch summary"%port)
 			break
 		except socket.error:
@@ -317,7 +325,7 @@ def runJobs(jobs,numCores):
 					# only set cores if CPU affinity is desired; otherwise, just numer of cores is used
 					if j.affinity: j.cores=list(freeCores)[0:j.nCores] # take required number of free cores
 				# if overloaded, do not assign cores directly
-				thread.start_new_thread(runJob,(j,))
+				_thread.start_new_thread(runJob,(j,))
 				break
 		time.sleep(.5)
 		sys.stdout.flush()
@@ -420,7 +428,7 @@ print("Will run simulation(s) %s using `%s', nice value %d, using max %d cores."
 if table:
 	reader=yade.utils.TableParamReader(table)
 	params=reader.paramDict()
-	availableLines=params.keys()
+	availableLines=list(params.keys())
 
 	print("Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.')
 
@@ -429,7 +437,7 @@ if table:
 		def numRange2List(s):
 			ret=[]
 			for l in s.split(','):
-				if "-" in l: ret+=range(*[int(s) for s in l.split('-')]); ret+=[ret[-1]+1]
+				if "-" in l: ret+=list(range(*[int(s) for s in l.split('-')])); ret+=[ret[-1]+1]
 				else: ret+=[int(l)]
 			return ret
 		useLines0=numRange2List(lineList)
@@ -461,7 +469,7 @@ for i,l in enumerate(useLines):
 	jobExecutable=executable
 	jobAffinity=opts.affinity
 	jobCount=opts.timing
-	for col in params[l].keys():
+	for col in list(params[l].keys()):
 		if col[0]!='!': continue
 		val=params[l][col]
 		if col=='!OMP_NUM_THREADS' or col=='!THREADS': nCores=int(val)
@@ -504,7 +512,7 @@ for i,l in enumerate(useLines):
 		hrefCmd=env+cmd+log
 		fullCmd=re.sub('(<a href="[^">]+">|</a>)','',hrefCmd)
 		desc=params[l]['description']
-		if '!SCRIPT' in params[l].keys(): desc=script+'.'+desc # prepend filename if script is specified explicitly
+		if '!SCRIPT' in list(params[l].keys()): desc=script+'.'+desc # prepend filename if script is specified explicitly
 		if opts.timing>0: desc+='[%d]'%j
 		jobs.append(JobInfo(jobNum,desc,fullCmd,hrefCmd,logFile2,nCores,script=script,table=table,lineNo=l,affinity=jobAffinity))
 
@@ -523,7 +531,7 @@ if opts.plotAlwaysUpdateTime>0:
 	def updateAllPlots():
 		time.sleep(opts.plotAlwaysUpdateTime)
 		for job in jobs: job.updatePlots()
-	thread.start_new_thread(updateAllPlots,())
+	_thread.start_new_thread(updateAllPlots,())
 
 # OK, go now
 if not dryRun: runJobs(jobs,maxJobs)
@@ -553,15 +561,15 @@ if opts.timing>0:
 		out=sys.stdout
 	# write header
 	out.write('## timing data, written '+time.asctime()+' with arguments\n##    '+' '.join(sys.argv)+'\n##\n')
-	paramNames=params[params.keys()[0]].keys(); paramNames.sort()
+	paramNames=list(params[list(params.keys())[0]].keys()); paramNames.sort()
 	out.write('## line\tcount\tavg\tdev\trelDev\tmin\tmax\t|\t'+'\t'.join(paramNames)+'\n')
 	import math
 	for i,l in enumerate(useLines):
 		jobTimes=[j.durationSec for j in jobs if j.lineNo==l and j.durationSec!=None]
-		tSum=sum(jobTimes); tAvg=tSum/len(jobTimes)
+		tSum=sum(jobTimes); tAvg=old_div(tSum,len(jobTimes))
 		tMin,tMax=min(jobTimes),max(jobTimes)
-		tDev=math.sqrt(sum((t-tAvg)**2 for t in jobTimes)/len(jobTimes))
-		tRelDev=tDev/tAvg
+		tDev=math.sqrt(old_div(sum((t-tAvg)**2 for t in jobTimes),len(jobTimes)))
+		tRelDev=old_div(tDev,tAvg)
 		out.write('%d\t%d\t%.2f\t%.2f\t%.3g\t%.2f\t%.2f\t|\t'%(l,len(jobTimes),tAvg,tDev,tRelDev,tMin,tMax)+'\t'.join([params[l][p] for p in paramNames])+'\n')
 
 if not gnuplotOut:

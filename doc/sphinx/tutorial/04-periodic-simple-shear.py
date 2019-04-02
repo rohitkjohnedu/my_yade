@@ -14,6 +14,8 @@
 
 # setup the periodic boundary
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 O.periodic=True
 O.cell.refSize=(2,2,2)
 
@@ -109,7 +111,7 @@ def addData():
 	# get the stress tensor (as 3x3 matrix)
 	stress=sum(normalShearStressTensors(),Matrix3.Zero)
 	# give names to values we are interested in and save them
-	plot.addData(exz=O.cell.trsf[0,2],szz=stress[2,2],sxz=stress[0,2],tanPhi=stress[0,2]/stress[2,2],i=O.iter)
+	plot.addData(exz=O.cell.trsf[0,2],szz=stress[2,2],sxz=stress[0,2],tanPhi=old_div(stress[0,2],stress[2,2]),i=O.iter)
 	# color particles based on rotation amount
 	for b in O.bodies:
 		# rot() gives rotation vector between reference and current position

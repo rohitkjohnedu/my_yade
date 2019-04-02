@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 22/11/2017
@@ -12,6 +13,8 @@ from __future__ import print_function
 # The obtained 1D fluid velocity profile (vxFluid) is compared to the analytical solution in the figure "figPoiseuille.png"
 #
 #########################################################################################################################################################################
+from builtins import range
+from past.utils import old_div
 import numpy as np
 
 ################################
@@ -27,7 +30,7 @@ tfin = 1e7		#Total simulated time, in s
 dtFluid = 1e4		#Resolution time step, in s
 #Mesh
 ndimz = 101   #Number of grid cells in the height
-dz =  fluidHeight/(1.0*(ndimz-1))	#spatial step between two mesh nodes
+dz =  old_div(fluidHeight,(1.0*(ndimz-1)))	#spatial step between two mesh nodes
 
 # Initialization of the fluid velocity
 vxFluid =np.zeros(ndimz)

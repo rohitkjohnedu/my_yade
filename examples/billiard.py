@@ -4,13 +4,16 @@
 # The script was implemented to check the following task
 # http://math.stackexchange.com/questions/658871/perfectly-centered-break-of-a-perfectly-aligned-pool-ball-rack/659318#659318
 
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 massBall   = 1.0
 radiusBall = 1.0
 rowsN = 5
 velBall = 10.0
 
 vBall = 4.0/3.0 * math.pi * math.pow(radiusBall, 3.0)
-rhoBall = massBall/vBall
+rhoBall = old_div(massBall,vBall)
 
 
 ## PhysicalParameters 

@@ -24,7 +24,10 @@ fast for sequential reads).
 TODO: Interpolating from within python is not (yet) supported.
 """
 from __future__ import print_function
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 def revIntegrateLinear(I,x0,y0,x1,y1):
 	"""Helper function, returns value of integral variable x for
 	linear function f passing through (x0,y0),(x1,y1) such that
@@ -36,10 +39,10 @@ def revIntegrateLinear(I,x0,y0,x1,y1):
 	from math import sqrt
 	dx,dy=x1-x0,y1-y0
 	if dy==0: # special case, degenerates to linear equation
-		return (x0*y0+I)/y0
-	a=dy/dx; b=2*(y0-x0*dy/dx); c=x0**2*dy/dx-2*x0*y0-2*I
+		return old_div((x0*y0+I),y0)
+	a=old_div(dy,dx); b=2*(y0-old_div(x0*dy,dx)); c=old_div(x0**2*dy,dx)-2*x0*y0-2*I
 	det=b**2-4*a*c; assert(det>0)
-	p,q=(-b+sqrt(det))/(2*a),(-b-sqrt(det))/(2*a)
+	p,q=old_div((-b+sqrt(det)),(2*a)),old_div((-b-sqrt(det)),(2*a))
 	pOK,qOK=x0<=p<=x1,x0<=q<=x1
 	if pOK and qOK: raise ValueError("Both radices within interval!?")
 	if not pOK and not qOK: raise ValueError("No radix in given interval!")
@@ -72,7 +75,7 @@ def xFromIntegral(integralValue,x,y):
 	from math import floor
 	period=x[-1]-x[0]
 	periodIntegral=integral(x,y)
-	numPeriods=floor(integralValue/periodIntegral)
+	numPeriods=floor(old_div(integralValue,periodIntegral))
 	xFrac=xFractionalFromIntegral(integralValue-numPeriods*periodIntegral,x,y)
 	#print '### wanted _%g; period=%g; periodIntegral=_%g (numPeriods=%g); rests _%g (xFrac=%g)'%(integralValue,period,periodIntegral,numPeriods,integralValue-numPeriods*periodIntegral,xFrac)
 	#print '### returning %g*%g+%g=%g'%(period,numPeriods,xFrac,period*numPeriods+xFrac)

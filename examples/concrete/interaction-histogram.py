@@ -3,6 +3,8 @@
 #
 # demonstration of the yade.post2d module (see its documentation for details)
 #
+from __future__ import division
+from past.utils import old_div
 import pylab # the matlab-like interface of matplotlib
 pylab.ioff()
 import numpy
@@ -20,7 +22,7 @@ angles,forces=[],[]
 for i in O.interactions:
 	if not i.isReal: continue
 	norm=i.geom.normal
-	angle=atan(norm[ax2]/norm[ax1])
+	angle=atan(old_div(norm[ax2],norm[ax1]))
 	force=i.phys.normalForce.norm()
 	angles.append(angle)
 	forces.append(force)

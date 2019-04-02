@@ -1,7 +1,11 @@
 """
 Import geometry from various formats ('import' is python keyword, hence the name 'ymport').
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from yade.wrapper import *
 from yade import utils
 
@@ -312,7 +316,7 @@ def unv(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 	
 	Example: :ysrc:`examples/test/unv-read/unvRead.py`."""
 
-	class UNVReader:
+	class UNVReader(object):
 		# class used in ymport.unv function
 		# reads and evaluate given unv file and extracts all triangles
 		# can be extended to read tetrahedrons as well
@@ -401,7 +405,7 @@ def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 			nodes.append(v)
 		if line.startswith('136,'): # read elements
 			ls = line.split(',')
-			i1,i2,i3 = int(ls[3])/2, int(ls[4])/2, int(ls[5])/2 # the numbering of nodes is 1,3,5,7,..., hence this int(ls[*])/2
+			i1,i2,i3 = old_div(int(ls[3]),2), old_div(int(ls[4]),2), old_div(int(ls[5]),2) # the numbering of nodes is 1,3,5,7,..., hence this int(ls[*])/2
 			elems.append( (i1,i2,i3) )
 	facets = [utils.facet( ( nodes[e[0]], nodes[e[1]], nodes[e[2]] ), **kw) for e in elems]
 	if returnConnectivityTable:
@@ -426,9 +430,9 @@ def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
 	nVertices = int(ls[0])
 	if int(ls[1])!=3:
 		raise RuntimeError("wrong .node file, number of dimensions should be 3")
-	vertices = [None for i in xrange(nVertices)]
+	vertices = [None for i in range(nVertices)]
 	shift = Vector3(shift)
-	for i in xrange(nVertices):
+	for i in range(nVertices):
 		line = f.readline()
 		while line.startswith('#'):
 			line = f.readline()
@@ -447,8 +451,8 @@ def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
 	if int(ls[1])!=4:
 		raise RuntimeError("wrong .ele file, unsupported tetrahedra's number of nodes")
 	nTetras = int(ls[0])
-	tetras = [None for i in xrange(nTetras)]
-	for i in xrange(nTetras):
+	tetras = [None for i in range(nTetras)]
+	for i in range(nTetras):
 		ls = f.readline().split()
 		tetras[int(ls[0])-1] = utils.polyhedron([vertices[int(ls[j])-1] for j in (1,2,3,4)],**kw)
 	f.close()

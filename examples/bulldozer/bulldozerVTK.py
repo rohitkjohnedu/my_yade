@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation with VTK recorder
 ### vtk-files are saved in /tmp directory with names buldozer-*.vtk
+from __future__ import division
+from past.utils import old_div
 from numpy import linspace
 from numpy import arange
 import gts
@@ -17,7 +19,7 @@ buldozerHeight=1.2
 radiusSph = 0.05
 numBoxes = Vector3(8,5,2)
 gapBetweenBoxes = 0.05
-sizeBox = (lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes)/numBoxes[1]
+sizeBox = old_div((lengthKnife-(numBoxes[1]-1)*gapBetweenBoxes),numBoxes[1])
 
 ## PhysicalParameters 
 Density=2400
@@ -33,16 +35,16 @@ sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAng
 ### Creating the Buldozer Knife
 ### from facets, using GTS
 Knife=[]
-for i in linspace(pi, pi*3/2, num=numKnifeParts, endpoint=True):
+for i in linspace(pi, old_div(pi*3,2), num=numKnifeParts, endpoint=True):
 	Knife.append(Vector3(radiusKnife*cos(i),0,radiusKnife*sin(i)))
 	
 KnifeP=[Knife,[p+Vector3(0,lengthKnife,0) for p in Knife]]
 KnifePoly=pack.sweptPolylines2gtsSurface(KnifeP,threshold=1e-4)
 KnifeIDs=O.bodies.append(pack.gtsSurface2Facets(KnifePoly,color=(1,0,0),wire=False,material=facetMat))
 
-KnifeIDs+=O.bodies.append(geom.facetBox((-lengthKnife/2-radiusKnife,lengthKnife/2,-radiusKnife+buldozerHeight/2),(lengthKnife/2,lengthKnife/2,buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
+KnifeIDs+=O.bodies.append(geom.facetBox((old_div(-lengthKnife,2)-radiusKnife,old_div(lengthKnife,2),-radiusKnife+old_div(buldozerHeight,2)),(old_div(lengthKnife,2),old_div(lengthKnife,2),buldozerHeight/2.),wallMask=47,color=(0,1,0),wire=False))
 
-KnifeIDs+=O.bodies.append(geom.facetBox((-lengthKnife/2-radiusKnife-lengthKnife/4.,lengthKnife/2,-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
+KnifeIDs+=O.bodies.append(geom.facetBox((old_div(-lengthKnife,2)-radiusKnife-lengthKnife/4.,old_div(lengthKnife,2),-radiusKnife+buldozerHeight*3./2.-buldozerHeight/4.),(lengthKnife/4.,lengthKnife/3.,buldozerHeight/4.),wallMask=47,color=(0,0,1),wire=False))
 
 O.bodies.append(geom.facetBox((0,0,radiusKnife),(lengthKnife*3,lengthKnife*3,lengthKnife),wallMask=16,color=(1,1,1),wire=False,material=facetMat))
 
@@ -55,7 +57,7 @@ colorsph1.normalize();
 colorsph2.normalize();
 colorSph=colorsph1
 for xyz in itertools.product(arange(0,numBoxes[0]),arange(0,numBoxes[1]),arange(0,numBoxes[2])):
-	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(sizeBox/2,sizeBox/2,sizeBox/2)),radius=radiusSph,gap=0,color=colorSph,material=sphereMat))
+	ids_spheres=O.bodies.appendClumped(pack.regularHexa(pack.inEllipsoid((xyz[0]*(sizeBox+gapBetweenBoxes),xyz[1]*(sizeBox+gapBetweenBoxes)+sizeBox*0.5,xyz[2]*(sizeBox+gapBetweenBoxes)-radiusKnife+sizeBox*0.6),(old_div(sizeBox,2),old_div(sizeBox,2),old_div(sizeBox,2))),radius=radiusSph,gap=0,color=colorSph,material=sphereMat))
 	if (colorSph==colorsph1):
 		colorSph=colorsph2
 	else:

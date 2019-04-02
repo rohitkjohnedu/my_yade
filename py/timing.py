@@ -6,7 +6,10 @@ See :ref:`timing` section of the programmer's manual, `wiki page <http://yade-de
 
 """
 from __future__ import print_function
+from __future__ import division
 
+from builtins import str
+from past.utils import old_div
 from yade.wrapper import *
 
 
@@ -31,8 +34,8 @@ def _formatLine(label,time,count,totalTime,level):
 	raw=[]
 	raw.append(label)
 	raw.append(str(count) if count>=0 else '')
-	raw.append((str(time/1000)+u'us') if time>=0 else '')
-	raw.append(('%6.2f%%'%(time*100./totalTime)) if totalTime>0 else '')
+	raw.append((str(old_div(time,1000))+u'us') if time>=0 else '')
+	raw.append(('%6.2f%%'%(old_div(time*100.,totalTime))) if totalTime>0 else '')
 	return u' '.join([
 		(sp+raw[0]).ljust(_statCols['label']),
 		(raw[1]+negSp).rjust(_statCols['count']),

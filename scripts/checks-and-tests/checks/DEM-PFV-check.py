@@ -4,6 +4,8 @@
 
 
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 if ('PFVFLOW' in features):
 	errors=0
 	toleranceWarning =0.01
@@ -28,8 +30,8 @@ if ('PFVFLOW' in features):
 	sp.toSimulation(material='spheres')
 
 	triax=TriaxialStressController(
-		maxMultiplier=1.+2e4/young, # spheres growing factor (fast growth)
-		finalMaxMultiplier=1.+2e3/young, # spheres growing factor (slow growth)
+		maxMultiplier=1.+old_div(2e4,young), # spheres growing factor (fast growth)
+		finalMaxMultiplier=1.+old_div(2e3,young), # spheres growing factor (slow growth)
 		thickness = 0,
 		stressMask = 7,
 		max_vel = 0.005,
@@ -57,7 +59,7 @@ if ('PFVFLOW' in features):
 	while 1:
 		O.run(200, True)
 		unb=unbalancedForce()
-		if unb<0.01 and abs(-10000-triax.meanStress)/10000<0.01: break
+		if unb<0.01 and old_div(abs(-10000-triax.meanStress),10000)<0.01: break
 
 	setContactFriction(radians(finalFricDegree))
 
@@ -79,9 +81,9 @@ if ('PFVFLOW' in features):
 	modulus = 1000./abs(e22)
 
 	target=252759.905803
-	if abs((modulus-target)/target)>toleranceWarning:
+	if abs(old_div((modulus-target),target))>toleranceWarning:
 		print("DEM-PFV: difference in bulk modulus:", modulus, "vs. target ",target)
-		if (abs((modulus-target)/target)>toleranceCritical):
+		if (abs(old_div((modulus-target),target))>toleranceCritical):
 			errors+=1
 			print("The difference is more, than the critical tolerance!")
 
@@ -100,16 +102,16 @@ if ('PFVFLOW' in features):
 	O.run(1,1)
 	Qin = flow.getBoundaryFlux(2)
 	Qout = flow.getBoundaryFlux(3)
-	permeability = abs(Qin)/1.e-4 #size is one, we compute K=V/∇H
+	permeability = old_div(abs(Qin),1.e-4) #size is one, we compute K=V/∇H
 
 	if abs(Qin+Qout)>1e-10 :
 		print("DEM-PFV: unbalanced Qin vs. Qout (",Qin," vs. ",Qout,")")
 		errors+=1
 
 	target=0.040399916554
-	if abs((permeability-target)/target)>toleranceWarning:
+	if abs(old_div((permeability-target),target))>toleranceWarning:
 		print("DEM-PFV: difference in permeability:",permeability," vs. target ",target)
-		if (abs((permeability-target)/target)>toleranceCritical):
+		if (abs(old_div((permeability-target),target))>toleranceCritical):
 			errors+=1
 			print("The difference is more, than the critical tolerance!")
 
@@ -127,16 +129,16 @@ if ('PFVFLOW' in features):
 	O.run(3000,1)
 
 	target=628.314160434
-	if abs((flow.getPorePressure((0.5,0.1,0.5))-target)/target)>toleranceWarning:
+	if abs(old_div((flow.getPorePressure((0.5,0.1,0.5))-target),target))>toleranceWarning:
 		print("DEM-PFV: difference in final pressure:",flow.getPorePressure((0.5,0.1,0.5))," vs. target ",target)
-		if (abs((flow.getPorePressure((0.5,0.1,0.5))-target)/target)>toleranceCritical):
+		if (abs(old_div((flow.getPorePressure((0.5,0.1,0.5))-target),target))>toleranceCritical):
 			errors+=1
 			print("The difference is more, than the critical tolerance!")
 
 	target=-0.00258113045083
-	if abs((triax.strain[1]-zeroe22-target)/target)>toleranceWarning:
+	if abs(old_div((triax.strain[1]-zeroe22-target),target))>toleranceWarning:
 		print("DEM-PFV: difference in final deformation",triax.strain[1]-zeroe22," vs. target ",target)
-		if (abs((triax.strain[1]-zeroe22-target)/target)>toleranceCritical):
+		if (abs(old_div((triax.strain[1]-zeroe22-target),target))>toleranceCritical):
 			errors+=1
 			print("The difference is more, than the critical tolerance!")
 

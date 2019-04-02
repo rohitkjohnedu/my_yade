@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 from yade import plot, qt
 
 #### define parameters for the net
@@ -12,8 +15,8 @@ strainStressValues=[(0.0019230769,2.5e8),(0.0192,3.2195e8),(0.05,3.8292e8),(0.15
 # elastic material properties
 particleVolume = 4./3.*pow(radius,3)*pi
 particleMass = 3.9/1000.
-density = particleMass/particleVolume
-young = strainStressValues[0][1] / strainStressValues[0][0]
+density = old_div(particleMass,particleVolume)
+young = old_div(strainStressValues[0][1], strainStressValues[0][0])
 poisson = 0.3
 
 
@@ -150,6 +153,6 @@ O.engines=[
 #### time step definition for simulation
 ## critical time step proposed by Bertrand
 kn = 16115042 # stiffness of single wire from code, has to be changed if you change the stress-strain curve for the wire
-O.dt = 0.2*sqrt(particleMass/(2.*kn))
+O.dt = 0.2*sqrt(old_div(particleMass,(2.*kn)))
 
 O.run(200000)

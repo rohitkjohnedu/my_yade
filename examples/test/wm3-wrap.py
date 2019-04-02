@@ -1,4 +1,6 @@
+from __future__ import division
 # constructors, constants as static objects
+from past.utils import old_div
 x,y,z,one=Vector3.UnitX,Vector3.UnitY,Vector3.UnitZ,Vector3(1,1,1)
 x2=Vector3(x)
 # conversions to sequence types
@@ -13,8 +15,8 @@ one.norm()
 
 # quaternions
 # construction (implicit conversion of 3-tuple or list of length 3 to Vector3)
-q1=Quaternion((0,0,1),pi/2)
-q2=Quaternion(Vector3(0,0,1),pi/2)
+q1=Quaternion((0,0,1),old_div(pi,2))
+q2=Quaternion(Vector3(0,0,1),old_div(pi,2))
 q1==q2
 # rotating vector
 q1*x==y # almost, due to rounding 

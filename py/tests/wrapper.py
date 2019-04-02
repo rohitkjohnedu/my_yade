@@ -5,7 +5,11 @@
 This test module covers python/c++ transitions, for both classes deriving from Serializable,
 but also for other classes that we wrap (like miniEigen).
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import unittest
 from yade.wrapper import *
 from yade._customConverters import *
@@ -120,15 +124,15 @@ class TestEigenWrapper(unittest.TestCase):
 	def testQuaternion(self):
 		"Math: Quaternion operations"
 		# construction
-		q1=Quaternion((0,0,1),pi/2)
-		q2=Quaternion(Vector3(0,0,1),pi/2)
+		q1=Quaternion((0,0,1),old_div(pi,2))
+		q2=Quaternion(Vector3(0,0,1),old_div(pi,2))
 		q1==q2
 		x,y,z,one=Vector3().UnitX,Vector3().UnitY,Vector3().UnitZ,Vector3().Ones
 		self.assertSeqAlmostEqual(q1*x,y)
 		self.assertSeqAlmostEqual(q1*q1*x,-x)
 		self.assertSeqAlmostEqual(q1*q1.conjugate(),Quaternion().Identity)
 		self.assertSeqAlmostEqual(q1.toAxisAngle()[0],(0,0,1))
-		self.assertAlmostEqual(q1.toAxisAngle()[1],pi/2)
+		self.assertAlmostEqual(q1.toAxisAngle()[1],old_div(pi,2))
 	def testMatrix3(self):
 		"Math: Matrix3 operations"
 		#construction
@@ -136,7 +140,7 @@ class TestEigenWrapper(unittest.TestCase):
 		# comparison
 		self.assert_(m1==Matrix3().Identity)
 		# rotation matrix from quaternion
-		m1=Quaternion(Vector3(0,0,1),pi/2).toRotationMatrix()
+		m1=Quaternion(Vector3(0,0,1),old_div(pi,2)).toRotationMatrix()
 		# multiplication with vectors
 		self.assertSeqAlmostEqual(m1*Vector3().UnitX,Vector3().UnitY)
 		# determinant

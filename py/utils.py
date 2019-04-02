@@ -9,8 +9,15 @@
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
 from __future__ import print_function
-
 import math,random,doctest,geom,numpy
+from __future__ import division
+
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 from yade import *
 from yade.wrapper import *
 try: # use psyco if available
@@ -38,14 +45,14 @@ def saveVars(mark='',loadNow=True,**kw):
 	``loadVars('something')`` and they will be defined in the yade.params.\ *mark* module. The *loadNow* parameter calls :yref:`yade.utils.loadVars`
 	after saving automatically. If 'something' already exists, given variables will be inserted.
 	"""
-	import cPickle
+	import pickle
 	try: 
-		d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])	#load dictionary d
-		for key in kw.keys():
+		d=pickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])	#load dictionary d
+		for key in list(kw.keys()):
 			d[key]=kw[key]							#insert new variables into d
 	except KeyError: 
 		d = kw
-	Omega().tags['pickledPythonVariablesDictionary'+mark]=cPickle.dumps(d)
+	Omega().tags['pickledPythonVariablesDictionary'+mark]=pickle.dumps(d)
 	if loadNow: loadVars(mark)
 
 
@@ -53,7 +60,7 @@ def loadVars(mark=None):
 	"""Load variables from :yref:`yade.utils.saveVars`, which are saved inside the simulation.
 	If ``mark==None``, all save variables are loaded. Otherwise only those with
 	the mark passed."""
-	import cPickle, types, sys, warnings
+	import pickle, types, sys, warnings
 	def loadOne(d,mark=None):
 		"""Load given dictionary into a synthesized module yade.params.name (or yade.params if *name* is not given). Update yade.params.__all__ as well."""
 		import yade.params
@@ -70,10 +77,10 @@ def loadVars(mark=None):
 			yade.params.__all__+=list(d.keys())
 			yade.params.__dict__.update(d)
 	if mark!=None:
-		d=cPickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])
+		d=pickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])
 		loadOne(d,mark)
 	else: # load everything one by one
-		for m in Omega().tags.keys():
+		for m in list(Omega().tags.keys()):
 			if m.startswith('pickledPythonVariablesDictionary'):
 				loadVars(m[len('pickledPythonVariableDictionary')+1:])
 
@@ -86,7 +93,7 @@ def SpherePWaveTimeStep(radius,density,young):
 	2.8284271247461903e-07
 	"""
 	from math import sqrt
-	return radius/sqrt(young/density)
+	return old_div(radius,sqrt(old_div(young,density)))
 
 def randomColor():
 	"""Return random Vector3 with each component in interval 0…1 (uniform distribution)"""
@@ -239,7 +246,7 @@ def wall(position,axis,sense=0,color=None,material=-1,mask=1):
 	See :yref:`yade.utils.sphere`'s documentation for meaning of other parameters."""
 	b=Body()
 	b.shape=Wall(sense=sense,axis=axis,color=color if color else randomColor())
-	if isinstance(position,(int,long,float)):
+	if isinstance(position,(int,int,float)):
 		pos2=Vector3(0,0,0); pos2[axis]=position
 	else: pos2=position
 	_commonBodySetup(b,0,Vector3(0,0,0),material,pos=pos2,fixed=True)
@@ -435,17 +442,17 @@ def avgNumInteractions(cutoff=0.,skipFree=False,considerClumps=False):
 	:param considerClumps: also consider clumps if cutoff=0 and skipFree=False; for further explanation see above.
 	
 """
-	if cutoff==0 and not skipFree and not considerClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
+	if cutoff==0 and not skipFree and not considerClumps: return old_div(2*O.interactions.countReal()*1.,len(O.bodies))
 	else:
 		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 		## CC is 2*C
 		CC=sum([nums[i]*counts[i] for i in range(len(nums))]); N=sum(counts)
-		if not skipFree: return CC*1./N if N>0 else float('nan')
+		if not skipFree: return old_div(CC*1.,N) if N>0 else float('nan')
 		## find bins with 0 and 1 spheres
 		N0=0 if (0 not in nums) else counts[nums.index(0)]
 		N1=0 if (1 not in nums) else counts[nums.index(1)]
 		NN=N-N0-N1
-		return (CC-N1)*1./NN if NN>0 else float('nan')
+		return old_div((CC-N1)*1.,NN) if NN>0 else float('nan')
 
 def plotNumInteractionsHistogram(cutoff=0.):
 	"Plot histogram with number of interactions per body, optionally cutting away *cutoff* relative axis-aligned box from specimen margin."
@@ -471,13 +478,13 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False,sphSph=False
 		fc=[0,0,0]; fc[axis]=1.
 		subp=pylab.subplot(220+axis+1,polar=True);
 		# 1.1 makes small gaps between values (but the column is a bit decentered)
-		pylab.bar(d[0],d[1],width=math.pi/(1.1*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
+		pylab.bar(d[0],d[1],width=old_div(math.pi,(1.1*bins)),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
 		#pylab.title(['yz','xz','xy'][axis]+' plane')
 		pylab.text(.5,.25,['yz','xz','xy'][axis],horizontalalignment='center',verticalalignment='center',transform=subp.transAxes,fontsize='xx-large')
 	if numHist:
 		pylab.subplot(224,polar=False)
 		nums,counts=utils.bodyNumInteractionsHistogram(aabb if len(aabb)>0 else utils.aabbExtrema())
-		avg=sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
+		avg=old_div(sum([nums[i]*counts[i] for i in range(len(nums))]),(1.*sum(counts)))
 		pylab.bar(nums,counts,fc=[1,1,0],alpha=.7,align='center')
 		pylab.xlabel('Interactions per body (avg. %g)'%avg)
 		pylab.axvline(x=avg,linewidth=3,color='r')
@@ -638,13 +645,13 @@ def trackPerfomance(updateTime=5):
 				plot.plots.update({'Iteration':('Perfomance',None,'Bodies','Interactions')})
 				continue
 			curTime=time.time();curIter=O.iter
-			perf=(curIter-lastIter)/(curTime-lastTime)
+			perf=old_div((curIter-lastIter),(curTime-lastTime))
 			out=subprocess.Popen(['top','-bH','-n1', ''.join(['-p',str(pid)])],stdout=subprocess.PIPE).communicate()[0].splitlines()
 			for s in out[7:-1]:
 				w=s.split()
 				threadsCpu[w[0]]=float(w[8])
 			plot.addData(Iteration=curIter,Iter=curIter,Perfomance=perf,Bodies=len(O.bodies),Interactions=len(O.interactions),**threadsCpu)
-			plot.plots.update({'Iter':threadsCpu.keys()})
+			plot.plots.update({'Iter':list(threadsCpu.keys())})
 			lastTime=time.time();lastIter=O.iter
 
 	thread.start_new_thread(__track_perfomance,(updateTime))
@@ -660,7 +667,7 @@ def NormalRestitution2DampingRate(en):
 	if en == 1.0: return 0.0
 	from math import sqrt,log,pi
 	ln_en = math.log(en)
-	return (-ln_en/math.sqrt((math.pow(ln_en,2) + math.pi*math.pi)))
+	return (old_div(-ln_en,math.sqrt((math.pow(ln_en,2) + math.pi*math.pi))))
 
 def xMirror(half):
 	"""Mirror a sequence of 2d points around the x axis (changing sign on the y coord).
@@ -686,7 +693,7 @@ def _deprecatedUtilsFunction(old,new):
 #		return yade.ymport.stl(*args,**kw)
 
 
-class TableParamReader():
+class TableParamReader(object):
 	"""Class for reading simulation parameters from text file.
 
 Each parameter is represented by one column, each parameter set by one line. Colums are separated by blanks (no quoting).
@@ -724,10 +731,10 @@ This class is used by :yref:`yade.utils.readParamsFromTable`.
 			for i in range(len(headings)):
 				val[headings[i]]=ll[l].split()[i]
 			values[l]=val
-		lines=values.keys(); lines.sort()
+		lines=list(values.keys()); lines.sort()
 		# replace '=' by previous value of the parameter
 		for i,l in enumerate(lines):
-			for j in values[l].keys():
+			for j in list(values[l].keys()):
 				if values[l][j]=='=':
 					try:
 						values[l][j]=values[lines[i-1]][j]
@@ -803,7 +810,7 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 	tagsParams=[]
 	# dictParams is what eventually ends up in yade.params.table (default+specified values)
 	dictDefaults,dictParams,dictAssign={},{},{}
-	import os, __builtin__,re,math
+	import os, builtins,re,math
 	if not tableFileLine and ('YADE_BATCH' not in os.environ or os.environ['YADE_BATCH']==''):
 		if not noTableOk: raise EnvironmentError("YADE_BATCH is not defined in the environment")
 		O.tags['line']='l!'
@@ -819,17 +826,17 @@ def readParamsFromTable(tableFileLine=None,noTableOk=True,unknownOk=False,**kw):
 		O.tags['id.d']=O.tags['id']+'.'+O.tags['description']; O.tags['d.id']=O.tags['description']+'.'+O.tags['id']
 		# assign values specified in the table to python vars
 		# !something cols are skipped, those are env vars we don't treat at all (they are contained in description, though)
-		for col in vv.keys():
+		for col in list(vv.keys()):
 			if col=='description' or col[0]=='!': continue
-			if col not in kw.keys() and (not unknownOk): raise NameError("Parameter `%s' has no default value assigned"%col)
+			if col not in list(kw.keys()) and (not unknownOk): raise NameError("Parameter `%s' has no default value assigned"%col)
 			if vv[col]=='*': vv[col]=kw[col] # use default value for * in the table
-			elif col in kw.keys(): kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
+			elif col in list(kw.keys()): kw.pop(col) # remove the var from kw, so that it contains only those that were default at the end of this loop
 			#print 'ASSIGN',col,vv[col]
 			tagsParams+=['%s=%s'%(col,vv[col])];
 			dictParams[col]=eval(vv[col],math.__dict__)
 	# assign remaining (default) keys to python vars
 	defaults=[]
-	for k in kw.keys():
+	for k in list(kw.keys()):
 		dictDefaults[k]=kw[k]
 		defaults+=["%s=%s"%(k,kw[k])];
 	O.tags['defaultParams']=",".join(defaults)
@@ -865,7 +872,7 @@ def psd(bins=5, mass=True, mask=-1):
   
 	binsSizes = numpy.linspace(minD, maxD, bins+1)
 	
-	deltaBinD = (maxD-minD)/bins
+	deltaBinD = old_div((maxD-minD),bins)
 	binsMass = numpy.zeros(bins)
 	binsNumbers = numpy.zeros(bins)
 	
@@ -873,7 +880,7 @@ def psd(bins=5, mass=True, mask=-1):
 		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)!=0))):
 			d=2*b.shape.radius
 			
-			basketId = int(math.floor( (d-minD) / deltaBinD ) )
+			basketId = int(math.floor( old_div((d-minD), deltaBinD) ) )
 			if (d == maxD): basketId = bins-1												 #If the diameter equals the maximal diameter, put the particle into the last bin
 			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses into the bin 
 			binsNumbers[basketId] = binsNumbers[basketId] + 1					#Put numbers into the bin 
@@ -890,11 +897,11 @@ def psd(bins=5, mass=True, mask=-1):
 	if (binsSumCum[len(binsSumCum)-1] > 0):
 		i=0
 		for l in binsSumCum:
-			binsProc[i] = binsSumCum[i]/binsSumCum[len(binsSumCum)-1]
+			binsProc[i] = old_div(binsSumCum[i],binsSumCum[len(binsSumCum)-1])
 			i+=1
 	return binsSizes, binsProc, binsSumCum
 
-class clumpTemplate:
+class clumpTemplate(object):
 	"""Create a clump template by a list of relative radii and a list of relative positions. Both lists must have the same length.
 	
 	:param [float,float,...] relRadii: list of relative radii (minimum length = 2)

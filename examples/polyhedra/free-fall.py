@@ -1,11 +1,13 @@
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 from yade import plot, polyhedra_utils
 
 
 gravel = PolyhedraMat()
 gravel.density = 2600 #kg/m^3 
 gravel.young = 1E7 #Pa
-gravel.poisson = 20000/1E7
+gravel.poisson = old_div(20000,1E7)
 gravel.frictionAngle = 0.5 #rad
 
 steel = PolyhedraMat()
@@ -16,7 +18,7 @@ steel.frictionAngle = 0.4 #rad
 
 rubber = PolyhedraMat()
 rubber.density = 1000 #kg/m^3 
-rubber.young = gravel.young/10
+rubber.young = old_div(gravel.young,10)
 rubber.poisson = gravel.poisson
 rubber.frictionAngle = 0.7 #rad
 

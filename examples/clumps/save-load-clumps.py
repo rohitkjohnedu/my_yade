@@ -4,6 +4,7 @@
 '''This example shows usage of save and load clumps.'''
 from __future__ import print_function
 
+from builtins import range
 from yade import pack,export,qt,ymport
 
 #define material for all bodies:
@@ -48,7 +49,7 @@ def getClumpInfo():
 	for b in O.bodies:
 		if b.isClump:
 			print('Clump ',b.id,' has following members:')
-			keys = b.shape.members.keys()
+			keys = list(b.shape.members.keys())
 			for ii in range(0,len(keys)):
 				print('- Body ',keys[ii])
 			print('inertia:',b.state.inertia)

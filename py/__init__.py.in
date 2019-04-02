@@ -26,6 +26,10 @@ if True: # not eval('${mono}'):
 	# * http://wiki.python.org/moin/boost.python/CrossExtensionModuleDependencies
 	sys.setdlopenflags(dl.RTLD_NOW | dl.RTLD_GLOBAL)
 else: sys.setdlopenflags(dl.RTLD_NOW)
+from __future__ import absolute_import
+
+from future import standard_library
+standard_library.install_aliases()
 
 # important: initialize c++ by importing libstdc++ directly
 # see http://www.abclinuxu.cz/poradna/programovani/show/286322
@@ -72,7 +76,7 @@ deprecatedTypes=system.cxxCtorsDict()
 # insert those in the module namespace
 globals().update(deprecatedTypes)
 # declare what should be imported for "from yade import *"
-__all__=deprecatedTypes.keys()+['O']
+__all__=list(deprecatedTypes.keys())+['O']
 
 from minieigen import *
 
@@ -88,9 +92,9 @@ __all__+=['utils',]+dir(wrapper)
 
 
 # make O and wrapper.Omega part of __builtin__ (equvialent to global)
-import __builtin__
-__builtin__.__dict__['O'] = O
-__builtin__.__dict__['Omega'] = wrapper.Omega
+import builtins
+builtins.__dict__['O'] = O
+builtins.__dict__['Omega'] = wrapper.Omega
 # define a default list of engine
 O.engines=[
 		ForceResetter(),

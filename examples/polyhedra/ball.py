@@ -1,11 +1,13 @@
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 from yade import plot, polyhedra_utils
 from yade import qt
 
 m = PolyhedraMat()
 m.density = 2600 #kg/m^3 
 m.young = 1E6 #Pa
-m.poisson = 20000/1E6
+m.poisson = old_div(20000,1E6)
 m.frictionAngle = 0.6 #rad
 
 maxLoad = 3E6

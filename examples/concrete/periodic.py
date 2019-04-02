@@ -3,6 +3,8 @@
 from __future__ import division
 from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
 from yade import plot,pack
 import time, sys, os, copy
 
@@ -57,7 +59,7 @@ readParamsFromTable(noTableOk=True, # unknownOk=True,
 
 from yade.params.table import *
 
-if 'description' in O.tags.keys(): O.tags['id']=O.tags['id']+O.tags['description']
+if 'description' in list(O.tags.keys()): O.tags['id']=O.tags['id']+O.tags['description']
 
 packingFile='periCube.pickle'
 # got periodic packing? Memoization not (yet) supported, so just generate it if there is not the right file
@@ -65,12 +67,12 @@ packingFile='periCube.pickle'
 if not os.path.exists(packingFile):
 	sp=pack.randomPeriPack(radius=.05e-3,rRelFuzz=0.,initSize=Vector3(1.5e-3,1.5e-3,1.5e-3))
 	dd=dict(cell=(sp.cellSize[0],sp.cellSize[1],sp.cellSize[2]),spheres=sp.toList())
-	import cPickle as pickle
+	import pickle as pickle
 	pickle.dump(dd,open(packingFile,'w'))
 #
 # load the packing (again);
 #
-import cPickle as pickle
+import pickle as pickle
 concreteId=O.materials.append(CpmMat(young=young, frictionAngle=frictionAngle, density=4800, sigmaT=sigmaT, relDuctility=relDuctility, epsCrackOnset=epsCrackOnset, poisson=poisson, isoPrestress=isoPrestress))
 sphDict=pickle.load(open(packingFile))
 from yade import pack
@@ -171,13 +173,13 @@ def stopIfDamaged():
 			# important! initTest must be launched in a separate thread;
 			# otherwise O.load would wait for the iteration to finish,
 			# but it would wait for initTest to return and deadlock would result
-			import thread; thread.start_new_thread(initTest,())
+			import _thread; _thread.start_new_thread(initTest,())
 			return
 		else:
 			print("Damaged, stopping.")
 			ft,fc=max(sigma),min(sigma)
 			print('Strengths fc=%g, ft=%g, |fc/ft|=%g'%(fc,ft,abs(fc/ft)))
-			title=O.tags['description'] if 'description' in O.tags.keys() else O.tags['params']
+			title=O.tags['description'] if 'description' in list(O.tags.keys()) else O.tags['params']
 			print('gnuplot',plot.saveGnuplot(O.tags['id'],title=title))
 			print('Bye.')
 			# O.pause()

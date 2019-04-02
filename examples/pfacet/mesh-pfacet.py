@@ -1,4 +1,6 @@
 # -*- coding: utf-8
+from __future__ import division
+from past.utils import old_div
 from yade import qt,plot
 from yade.gridpfacet import *
 
@@ -84,7 +86,7 @@ def history():
     ksum=0
     for i in nodesIds:
       ksum+=O.bodies[i].state.pos[k]
-    xyz.append(ksum/len(nodesIds))  # take average value as reference
+    xyz.append(old_div(ksum,len(nodesIds)))  # take average value as reference
   plot.addData(i=O.iter,t=O.time,x=xyz[0],y=xyz[1],z=xyz[2])
 plot.plots={'x':'y'}
 plot.plot()

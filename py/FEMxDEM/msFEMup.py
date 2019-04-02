@@ -1,4 +1,10 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import input
+from builtins import zip
+from builtins import range
+from builtins import object
+from past.utils import old_div
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"
@@ -89,7 +95,7 @@ class MultiScale(object):
             print("=======================================================================")
             print("For better performance compile python-escript with direct solver method")
             print("=======================================================================")
-            raw_input("Press Enter to continue...")
+            input("Press Enter to continue...")
             #time.sleep(5)
       self.__upde.setSymmetryOn()
       self.__ppde.setSymmetryOn()
@@ -101,9 +107,9 @@ class MultiScale(object):
       self.__stress=escript.Tensor(0,escript.Function(domain))
       self.__S=escript.Tensor4(0,escript.Function(domain))
       self.__pool=get_pool(mpi=useMPI,threads=np)
-      self.__scenes=self.__pool.map(initLoad,range(ng))
+      self.__scenes=self.__pool.map(initLoad,list(range(ng)))
       st = self.__pool.map(getStressAndTangent2D,self.__scenes)
-      for i in xrange(ng):
+      for i in range(ng):
          self.__stress.setValueOfDataPoint(i,st[i][0])
          self.__S.setValueOfDataPoint(i,st[i][1])
       self.__strain=escript.Tensor(0,escript.Function(domain))
@@ -136,29 +142,29 @@ class MultiScale(object):
 
    def getCurrentPacking(self,pos=(),time=0,prefix=''):
       if len(pos) == 0: # output all Gauss points packings
-         self.__pool.map(outputPack,zip(self.__scenes,repeat(time),repeat(prefix)))
+         self.__pool.map(outputPack,list(zip(self.__scenes,repeat(time),repeat(prefix))))
       else: # output selected Gauss points packings
          scene = [self.__scenes[i] for i in pos]
-         self.__pool.map(outputPack,zip(scene,repeat(time),repeat(prefix)))
+         self.__pool.map(outputPack,list(zip(scene,repeat(time),repeat(prefix))))
    
    def getEquivalentPorosity(self):
       porosity=escript.Scalar(0,escript.Function(self.__domain))
       p = self.__pool.map(getEquivalentPorosity,self.__scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          porosity.setValueOfDataPoint(i,p[i])
       return porosity
    
    def getLocalAvgRotation(self):
       rot=escript.Scalar(0,escript.Function(self.__domain))
       r = self.__pool.map(avgRotation2D,self.__scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          rot.setValueOfDataPoint(i,r[i])
       return rot
    
    def getLocalFabric(self):
       fabric=escript.Tensor(0,escript.Function(self.__domain))
       f = self.__pool.map(getFabric2D,self.__scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          fabric.setValueOfDataPoint(i,f[i])
       return fabric
    
@@ -196,7 +202,7 @@ class MultiScale(object):
       type: Vector on FunctionSpace
       """
       n=self.getEquivalentPorosity()
-      perm=self.__permeability*n**3/(1.-n)**2
+      perm=old_div(self.__permeability*n**3,(1.-n)**2)
       flux=-perm*util.grad(self.__pore)
       return flux
    
@@ -233,7 +239,7 @@ class MultiScale(object):
          du=self.__upde.getSolution()
          u+=du
          l,d=util.L2(u),util.L2(du)
-         err=d/l # displacement error, alternatively using force error 'residual'
+         err=old_div(d,l) # displacement error, alternatively using force error 'residual'
          converged=(err<rtol)
          if err>rtol**3: # only update DEM parts when error is large enough
             self.__domain.setX(x_safe)
@@ -253,10 +259,10 @@ class MultiScale(object):
       k=util.kronecker(self.__domain)
       kdr=util.inner(k,util.tensor_mult(self.__S,k))/4.
       n=self.getEquivalentPorosity()
-      perm=self.__permeability*n**3/(1.-n)**2*k
+      perm=old_div(self.__permeability*n**3,(1.-n)**2*k)
       kf=self.__bulkFluid
       dt=self.__dt
-      self.__ppde.setValue(A=perm,D=(n/kf+1./kdr)/dt,Y=(n/kf+1./kdr)/dt*self.__pgauss-self.__meanStressRate/kdr)
+      self.__ppde.setValue(A=perm,D=old_div((old_div(n,kf)+1./kdr),dt),Y=old_div((old_div(n,kf)+1./kdr),dt*self.__pgauss)-old_div(self.__meanStressRate,kdr))
       p_iter_old=self.__ppde.getSolution()
       p_iter_gauss=util.interpolate(p_iter_old,escript.Function(self.__domain))
       u_old,D,sig,s,scene=self.solveSolid(p_iter_gauss=p_iter_gauss,iter_max=solidIter)
@@ -264,16 +270,16 @@ class MultiScale(object):
       iterate=0
       while (not converge) and (iterate<globalIter):
          iterate += 1
-         self.__ppde.setValue(Y=n/kf/dt*self.__pgauss+1./kdr/dt*p_iter_gauss-util.trace(D)/dt)
+         self.__ppde.setValue(Y=old_div(n,kf/dt*self.__pgauss)+1./kdr/dt*p_iter_gauss-old_div(util.trace(D),dt))
          p_iter=self.__ppde.getSolution()
-         p_err=util.L2(p_iter-p_iter_old)/util.L2(p_iter)
+         p_err=old_div(util.L2(p_iter-p_iter_old),util.L2(p_iter))
          p_iter_old=p_iter
          p_iter_gauss=util.interpolate(p_iter,escript.Function(self.__domain))
          u,D,sig,s,scene=self.solveSolid(p_iter_gauss=p_iter_gauss,iter_max=solidIter)
-         u_err=util.L2(u-u_old)/util.L2(u)
+         u_err=old_div(util.L2(u-u_old),util.L2(u))
          u_old=u
          converge=(u_err<=rtol and p_err <= rtol*.1)
-      self.__meanStressRate=(util.trace(sig-self.__stress)/2.-p_iter_gauss+self.__pgauss)/dt
+      self.__meanStressRate=old_div((util.trace(sig-self.__stress)/2.-p_iter_gauss+self.__pgauss),dt)
       self.__pore=p_iter_old
       self.__pgauss=p_iter_gauss
       self.__domain.setX(x_safe+u_old)
@@ -292,9 +298,9 @@ class MultiScale(object):
       st = numpy.array(st).reshape(-1,4)
       stress = escript.Tensor(0,escript.Function(self.__domain))
       S = escript.Tensor4(0,escript.Function(self.__domain))
-      scenes = self.__pool.map(shear2D,zip(self.__scenes,st))
+      scenes = self.__pool.map(shear2D,list(zip(self.__scenes,st)))
       ST = self.__pool.map(getStressAndTangent2D,scenes)
-      for i in xrange(self.__numGaussPoints):
+      for i in range(self.__numGaussPoints):
          stress.setValueOfDataPoint(i,ST[i][0])
          S.setValueOfDataPoint(i,ST[i][1])
       return stress,S,scenes

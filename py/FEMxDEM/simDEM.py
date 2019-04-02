@@ -1,4 +1,7 @@
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"
@@ -52,7 +55,7 @@ def shear2D(param):
    Omega().stringToScene(param[0])
    ns=int(max(1e5*numpy.max(numpy.abs(param[1])),2))
    dstrain = utils.Matrix3(param[1][0],param[1][1],0, param[1][2],param[1][3],0, 0,0,0)
-   Omega().cell.velGrad=dstrain/(ns*Omega().dt)
+   Omega().cell.velGrad=old_div(dstrain,(ns*Omega().dt))
    Omega().run(ns,True)
    Omega().cell.velGrad=utils.Matrix3.Zero
    return Omega().sceneToString()
@@ -64,7 +67,7 @@ def shear3D(param):
    Omega().stringToScene(param[0])
    ns=int(max(1e5*numpy.max(numpy.abs(param[1])),2))
    dstrain = utils.Matrix3(param[1][0],param[1][1],param[1][2], param[1][3],param[1][4],param[1][5], param[1][6],param[1][7],param[1][8])
-   Omega().cell.velGrad=dstrain/(ns*Omega().dt)
+   Omega().cell.velGrad=old_div(dstrain,(ns*Omega().dt))
    Omega().run(ns,True)
    Omega().cell.velGrad=utils.Matrix3.Zero
    return Omega().sceneToString()
@@ -179,12 +182,12 @@ def getEquivalentPorosity(scene):
    Omega().stringToScene(scene)
    zSize = Omega().cell.hSize[2,2]
    e = utils.voidratio2D(zlen=zSize)
-   return e/(1.+e)
+   return old_div(e,(1.+e))
    
 def getVoidRatio3D(scene):
    Omega().stringToScene(scene)
    p = utils.porosity()
-   return p/(1.0-p)
+   return old_div(p,(1.0-p))
 
 # get average rotation of the particles within a packing
 def avgRotation2D(scene):

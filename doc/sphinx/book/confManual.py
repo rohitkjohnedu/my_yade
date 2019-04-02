@@ -22,6 +22,10 @@
 ## http://docutils.sourceforge.net/docs/howto/rst-roles.html
 
 from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import sys, os, re
 from docutils import nodes
 from sphinx import addnodes
@@ -37,10 +41,10 @@ import docutils
 # xrefs: http://groups.google.com/group/sphinx-dev/browse_thread/thread/d719d19307654548
 #
 #
-import __builtin__
-if 'latex' in sys.argv: __builtin__.writer='latex'
-elif 'html' in sys.argv: __builtin__.writer='html'
-elif 'epub' in sys.argv: __builtin__.writer='epub'
+import builtins
+if 'latex' in sys.argv: builtins.writer='latex'
+elif 'html' in sys.argv: builtins.writer='html'
+elif 'epub' in sys.argv: builtins.writer='epub'
 else: raise RuntimeError("Must have either 'latex' or 'html' on the command line (hack for reference styles)")
 
 sys.path.append(os.path.abspath('./..'))
@@ -85,11 +89,11 @@ def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 	
 	Other targets are supposed to live in yade.wrapper (such as c++ classes)."""
 
-	writer=__builtin__.writer # to make sure not shadowed by a local var
+	writer=builtins.writer # to make sure not shadowed by a local var
 	import string
 	if target.startswith('yade.'):
 		module='.'.join(target.split('.')[0:2])
-		module2=(module if module not in moduleMap.keys() else moduleMap[module])
+		module2=(module if module not in list(moduleMap.keys()) else moduleMap[module])
 		if target==module: target='' # to reference the module itself
 		uri=('%%%s#%s'%(module2,target) if writer=='latex' else '%s.html#%s'%(module2,target))
 		if not explicitText and module!=module2:
@@ -252,7 +256,7 @@ def boostFuncSignature(name,obj,removeSelf=False):
 def fixSignature(app, what, name, obj, options, signature, return_annotation):
 	#print what,name,obj,signature#,dir(obj)
 	if what=='attribute':
-		doc=unicode(obj.__doc__)
+		doc=str(obj.__doc__)
 		ret=''
 		m=re.match('.*:ydefault:`(.*?)`.*',doc)
 		if m:

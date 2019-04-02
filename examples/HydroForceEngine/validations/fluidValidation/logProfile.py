@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 22/11/2017
@@ -16,6 +17,8 @@ from __future__ import print_function
 # as the analytical solution does not account for its presence. 
 # 
 #########################################################################################################################################################################
+from builtins import range
+from past.utils import old_div
 import numpy as np
 
 
@@ -32,7 +35,7 @@ tfin = 1e3		#Total simulated time, in s
 dtFluid = 2e-1		#Resolution time step, in s
 #Mesh
 ndimz = 50000   #Number of grid cells in the height. Needs to be high in order to solve accurately the viscous sublayer
-dz =  fluidHeight/(1.0*(ndimz-1))	#spatial step between two mesh nodes
+dz =  old_div(fluidHeight,(1.0*(ndimz-1)))	#spatial step between two mesh nodes
 
 # Initialization of the fluid velocity
 vxFluid =np.zeros(ndimz)
@@ -61,17 +64,17 @@ vxFluid = np.array(a.vxFluid)
 kappa=0.41    # Von Karman constant
 ustar=sqrt(abs(gravityVector[0])*fluidHeight)	# Shear velocity
 dz_ap=.1*kinematicViscoFluid/ustar		# Dimensionless vertical scale unit
-nz=int(round(fluidHeight/dz_ap))		# Number of unit over the fluid depth
+nz=int(round(old_div(fluidHeight,dz_ap)))		# Number of unit over the fluid depth
 ztrans=11.3	#Vertical position of the transition from the viscous sublayer to the log law, in dimensionless unit z+. Take it classically as 11.3, similarly to the fluid resolution
 utrans=ztrans*ustar	#Fluid velocity transition from the viscous sublayer to the log law, in dimensionless unit z+
 z_analytic=np.linspace(0,1e0,nz)*fluidHeight	#Re-create the vertical scale
-zplus=z_analytic*ustar/kinematicViscoFluid	#Dimensionless vertical scale
+zplus=old_div(z_analytic*ustar,kinematicViscoFluid)	#Dimensionless vertical scale
 vxFluid_analytic =np.zeros(nz)	#Initialization
 for i in range(nz):
 	if (zplus[i]<=ztrans): 
 		vxFluid_analytic[i]=ustar*zplus[i]	#Linear fluid profile in the viscous sub layer
 	else:
-		vxFluid_analytic[i]=ustar/kappa*np.log(zplus[i]/ztrans)+utrans;	#Logarythmic fluid profile above
+		vxFluid_analytic[i]=old_div(ustar,kappa*np.log(old_div(zplus[i],ztrans)))+utrans;	#Logarythmic fluid profile above
 
 ##############################
 #### PLOT AND COMPARISON

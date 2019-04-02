@@ -12,6 +12,8 @@
 # checkViscElPM.py and checkViscElEng.py
 #
 
+from __future__ import division
+from past.utils import old_div
 from yade import plot,ymport
 import math
 
@@ -65,9 +67,9 @@ O.engines=[
 def check():
 	global resultStatus
 	# Compare imposed restitution coefficient and obtained one
-	enMeasured = (O.bodies[1].state.vel[2]-O.bodies[0].state.vel[2])/(2*v)
+	enMeasured = old_div((O.bodies[1].state.vel[2]-O.bodies[0].state.vel[2]),(2*v))
 	tolerance = 1e-2
-	if (abs(enMeasured -en)/en)>tolerance:
+	if (old_div(abs(enMeasured -en),en))>tolerance:
 		resultStatus+=1
 ################################################################################
 # RUN

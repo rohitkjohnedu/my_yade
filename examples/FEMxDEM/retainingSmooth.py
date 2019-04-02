@@ -11,6 +11,10 @@ How to run this script:
     /path/to/yade ./retainingSmooth.py
 Please amend these instructions if you find that they do not work.
 """
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
 from esys.escript import *
 from esys.finley import Rectangle
 from esys.weipa import saveVTK
@@ -38,7 +42,7 @@ mydomain = Rectangle(l0=B,l1=H,n0=nx,n1=ny,order=2,integrationOrder=2)
 dim = mydomain.getDim()
 k = kronecker(mydomain)
 numg = 4*nx*ny; nump = 16;
-packNo=range(0,numg,16)
+packNo=list(range(0,numg,16))
 
 disp = Vector(0.,Solution(mydomain))
 
@@ -99,7 +103,7 @@ while t < 100:
    strain = prob.getCurrentStrain()
    saveGauss2D(name='./result/gauss/time_'+str(t)+'.dat',strain=strain,stress=stress,fabric=fabric)
    volume_strain = trace(strain)
-   dev_strain = symmetric(strain) - volume_strain*k/dim
+   dev_strain = symmetric(strain) - old_div(volume_strain*k,dim)
    shear = sqrt(2*inner(dev_strain,dev_strain))
    saveVTK("./result/vtk/retainingSmooth_%d.vtu"%t,disp=disp,stress=stress,shear=shear,e=vR,rot=rotation)
 

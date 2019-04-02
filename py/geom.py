@@ -3,7 +3,10 @@
 Creates geometry objects from facets.
 """
 from __future__ import print_function
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 from yade.wrapper import *
 import utils,math,numpy
 
@@ -60,7 +63,7 @@ def facetParallelepiped(center,extents,height,orientation=Quaternion((0,1,0),0.0
 	#inclination angle
 	beta = 0; dx = 0
 	if (height>0):
-		beta = math.asin(height/extents[2])
+		beta = math.asin(old_div(height,extents[2]))
 		dx = math.cos(beta)*extents[2]
 	
 	mn,mx=[-extents[i] for i in (0,1,2)],[extents[i] for i in (0,1,2)]
@@ -138,21 +141,21 @@ def facetSphere(center,radius,thetaResolution=8,phiResolution=8,returnElementMap
 	
 	r,c0,c1,c2 = radius,center[0],center[1],center[2]
 	nodes = [Vector3(c0,c1,c2+radius)]
-	phis   = numpy.linspace(math.pi/(phiResolution-1),math.pi,phiResolution-2,endpoint=False)
+	phis   = numpy.linspace(old_div(math.pi,(phiResolution-1)),math.pi,phiResolution-2,endpoint=False)
 	thetas = numpy.linspace(0,2*math.pi,thetaResolution,endpoint=False)
 	nodes.extend((Vector3(c0+r*math.cos(theta)*math.sin(phi),c1+r*math.sin(theta)*math.sin(phi),c2+r*math.cos(phi)) for phi in phis for theta in thetas))
 	nodes.append(Vector3(c0,c1,c2-radius))
 	n = len(nodes)-1
 	
-	elements = [(0,i+1,i+2) for i in xrange(thetaResolution-1)]
+	elements = [(0,i+1,i+2) for i in range(thetaResolution-1)]
 	elements.append((0,1,thetaResolution))
-	for j in xrange(0,phiResolution-3):
+	for j in range(0,phiResolution-3):
 		k = j*thetaResolution + 1
-		elements.extend((k+i,k+i+1,k+i+thetaResolution) for i in xrange(thetaResolution-1))
+		elements.extend((k+i,k+i+1,k+i+thetaResolution) for i in range(thetaResolution-1))
 		elements.append((k,k+thetaResolution-1,k+2*thetaResolution-1))
-		elements.extend((k+i+thetaResolution,k+i+1+thetaResolution,k+i+1) for i in xrange(thetaResolution-1))
+		elements.extend((k+i+thetaResolution,k+i+1+thetaResolution,k+i+1) for i in range(thetaResolution-1))
 		elements.append((k+2*thetaResolution-1,k+thetaResolution,k))
-	elements.extend((n,n-i-1,n-i-2) for i in xrange(thetaResolution-1))
+	elements.extend((n,n-i-1,n-i-2) for i in range(thetaResolution-1))
 	elements.append((n,n-1,n-thetaResolution))
 	
 	facets = [utils.facet(tuple(nodes[node] for node in elem),**kw) for elem in elements]
@@ -307,7 +310,7 @@ def facetPolygonHelixGenerator(center,radiusOuter,pitch=0,orientation=Quaternion
 	if angleRange==None: angleRange=(0,2*math.pi)
 	
 	anglesInRad = numpy.linspace(angleRange[0], angleRange[1], segmentsNumber+1, endpoint=True)
-	heightsInRad = numpy.linspace(0, pitch*(abs(angleRange[1]-angleRange[0])/(2.0*math.pi)), segmentsNumber+1, endpoint=True)
+	heightsInRad = numpy.linspace(0, pitch*(old_div(abs(angleRange[1]-angleRange[0]),(2.0*math.pi))), segmentsNumber+1, endpoint=True)
 	
 	POuter=[];
 	PInner=[];
@@ -373,24 +376,24 @@ def facetCylinderConeGenerator(center,radiusTop,height,orientation=Quaternion((0
 		
 	anglesInRad = numpy.linspace(angleRange[0], angleRange[1], segmentsNumber+1, endpoint=True)
 	
-	PTop=[]; PTop.append(Vector3(0,0,+height/2))
-	PTopIn=[]; PTopIn.append(Vector3(0,0,+height/2))
+	PTop=[]; PTop.append(Vector3(0,0,old_div(+height,2)))
+	PTopIn=[]; PTopIn.append(Vector3(0,0,old_div(+height,2)))
 	
-	PBottom=[]; PBottom.append(Vector3(0,0,-height/2))
-	PBottomIn=[]; PBottomIn.append(Vector3(0,0,-height/2))
+	PBottom=[]; PBottom.append(Vector3(0,0,old_div(-height,2)))
+	PBottomIn=[]; PBottomIn.append(Vector3(0,0,old_div(-height,2)))
 	
 	for i in anglesInRad:
 		XTop=radiusTop*math.cos(i); YTop=radiusTop*math.sin(i); 
-		PTop.append(Vector3(XTop,YTop,+height/2))
+		PTop.append(Vector3(XTop,YTop,old_div(+height,2)))
 		if (radiusTopInner > 0):
 			XTopIn=radiusTopInner*math.cos(i); YTopIn=radiusTopInner*math.sin(i); 
-			PTopIn.append(Vector3(XTopIn,YTopIn,+height/2))
+			PTopIn.append(Vector3(XTopIn,YTopIn,old_div(+height,2)))
 		
 		XBottom=radiusBottom*math.cos(i); YBottom=radiusBottom*math.sin(i); 
-		PBottom.append(Vector3(XBottom,YBottom,-height/2))
+		PBottom.append(Vector3(XBottom,YBottom,old_div(-height,2)))
 		if (radiusBottomInner > 0):
 			XBottomIn=radiusBottomInner*math.cos(i); YBottomIn=radiusBottomInner*math.sin(i);
-			PBottomIn.append(Vector3(XBottomIn,YBottomIn,-height/2))
+			PBottomIn.append(Vector3(XBottomIn,YBottomIn,old_div(-height,2)))
 		
 	for i in range(0,len(PTop)):
 		PTop[i]=orientation*PTop[i]+center

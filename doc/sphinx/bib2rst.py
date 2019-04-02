@@ -18,7 +18,7 @@ def readBib(filename):
 		if entry is None: break
 		key,type,dta=entry[0],entry[1],entry[4]
 		item={'type':type}
-		for field in dta.keys():
+		for field in list(dta.keys()):
 			expanded=bib.expand(bibfile,dta[field],-1)
 			#conv=bibRecode.recode(rq,expanded[2])
 			item[field]=expanded[2].strip()
@@ -27,12 +27,12 @@ def readBib(filename):
 	return db
 
 def dumpBib(db):
-	for k in db.keys():
+	for k in list(db.keys()):
 		print(k,db[k])
 
 def formatRest(db):
 	ret=[]
-	keys=db.keys(); keys.sort()
+	keys=list(db.keys()); keys.sort()
 	for key in keys:
 		i=db[key]; type=i['type']
 		line=r'.. [%s] \ '%key ## ← HACK: explicit space to prevent docutils from using abbreviated first name (e.g. "F.") as enumeration item; it works!!

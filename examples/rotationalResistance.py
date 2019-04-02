@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
+from __future__ import division
+from past.utils import old_div
 from yade import utils, plot
 o = Omega()
 fr = 0.5;rho=2000
@@ -10,7 +12,7 @@ r = 0.002
 mat1 = O.materials.append(ViscElMat(frictionAngle=fr,mR = 0.05, mRtype = 1, density=rho,tc=tc,en=en,et=et))
 mat2 = O.materials.append(ViscElMat(frictionAngle=fr,mR = 0.05, mRtype = 2, density=rho,tc=tc,en=en,et=et))
 
-oriBody = Quaternion(Vector3(1,0,0),(pi/28))
+oriBody = Quaternion(Vector3(1,0,0),(old_div(pi,28)))
 
 id1 = O.bodies.append(sphere(center=[0,0,2*r],radius=r,material=mat1))
 id2 = O.bodies.append(geom.facetBox(center=(0,-16.0*r,-2*r),orientation=oriBody,extents=(r,17.0*r,0), material=mat1,color=(0,0,1)))

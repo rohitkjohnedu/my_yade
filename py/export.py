@@ -3,7 +3,13 @@
 Export (not only) geometry to various formats.
 """
 from __future__ import print_function
+from __future__ import division
 
+from builtins import zip
+from builtins import str
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from yade.wrapper import *
 from yade import utils,Matrix3,Vector3
 
@@ -60,9 +66,9 @@ def textExt(filename, format='x_y_z_r', comment='',mask=-1,attrs=[]):
 						if isinstance(v,(int,float)):
 							output+='\t%g'%v
 						elif isinstance(v,Vector3):
-							output+='\t%g\t%g\t%g'%tuple(v[i] for i in xrange(3))
+							output+='\t%g\t%g\t%g'%tuple(v[i] for i in range(3))
 						elif isinstance(v,Matrix3):
-							output+='\t%g'%tuple(v[i] for i in xrange(9))
+							output+='\t%g'%tuple(v[i] for i in range(9))
 					output += '\n'
 				elif (format=='id_x_y_z_r_matId'):
 					output+=('%d\t%g\t%g\t%g\t%g\t%d\n'%(b.id,b.state.pos[0],b.state.pos[1],b.state.pos[2],b.shape.radius,b.material.id))
@@ -149,7 +155,7 @@ def textClumps(filename, format='x_y_z_r_clumpId', comment='',mask=-1):
 	
 	for bC in O.bodies:
 		if bC.isClump:
-			keys = bC.shape.members.keys()
+			keys = list(bC.shape.members.keys())
 			countClumps+=1
 			for ii in keys:
 				try:
@@ -207,9 +213,9 @@ def textPolyhedra(fileName, comment='',mask=-1, explanationComment=True,attrs=[]
 				if isinstance(v,(int,float)):
 					strAttrs+=' %g'%v
 				elif isinstance(v,Vector3):
-					strAttrs+=' %g %g %g'%tuple(v[i] for i in xrange(3))
+					strAttrs+=' %g %g %g'%tuple(v[i] for i in range(3))
 				elif isinstance(v,Matrix3):
-					strAttrs+=' %g'%tuple(v[i] for i in xrange(9))
+					strAttrs+=' %g'%tuple(v[i] for i in range(9))
 		f.write('%d %d %d%s\n'%(b.id,len(vertices),len(surfaces),strAttrs))
 		f.writelines('%.8e %.8e %.8e\n'%(v[0],v[1],v[2]) for v in vertices)
 		f.writelines(' '.join(str(i) for i in surface)+'\n' for surface in surfaces)
@@ -217,7 +223,7 @@ def textPolyhedra(fileName, comment='',mask=-1, explanationComment=True,attrs=[]
 	return count
 
 #VTKWriter===============================================================
-class VTKWriter:
+class VTKWriter(object):
 	"""
 	USAGE:
 	create object vtk_writer = VTKWriter('base_file_name'),
@@ -349,7 +355,7 @@ def text(filename,mask=-1):
 
 #VTKExporter===============================================================
 
-class VTKExporter:
+class VTKExporter(object):
 	"""Class for exporting data to VTK Simple Legacy File (for example if, for some reason, you are not able to use VTKRecorder). Export of spheres, facets, interactions and polyhedra is supported.
 	
 	USAGE:
@@ -379,7 +385,7 @@ class VTKExporter:
 	def _getBodies(self,ids,type):
 		allIds = False
 		if isinstance(ids,str) and ids.lower()=='all':
-			ids=xrange(len(O.bodies))
+			ids=range(len(O.bodies))
 			allIds = True
 		bodies = []
 		for i in ids:
@@ -531,7 +537,7 @@ class VTKExporter:
 			self._error("length of 'connectivityTable' does not match length of 'ids', no export")
 			return
 		# nodes
-		nodes = [Vector3.Zero for i in xrange(max(max(e) for e in connectivityTable)+1)]
+		nodes = [Vector3.Zero for i in range(max(max(e) for e in connectivityTable)+1)]
 		for id,e in zip(ids,connectivityTable):
 			b = bodies[id]
 			p = b.state.pos
@@ -706,8 +712,8 @@ class VTKExporter:
 		"""
 		# get list of interactions to export
 		if useRef:
-			useRef = dict(((i.id1,i.id2),v) for i,v in useRef.iteritems())
-			intrs = useRef.keys()
+			useRef = dict(((i.id1,i.id2),v) for i,v in useRef.items())
+			intrs = list(useRef.keys())
 		else:
 			intrs = self._getInteractions(ids) 
 		if not intrs:
@@ -816,7 +822,7 @@ class VTKExporter:
 		for b in bodies:
 			ff = []
 			f = b.shape.GetSurfaceTriangulation()
-			for i in xrange(len(f)/3):
+			for i in range(old_div(len(f),3)):
 				ff.append([f[3*i+j] for j in (0,1,2)])
 			bodyFaces.append(ff)
 		# output file
@@ -1045,7 +1051,7 @@ def text2vtkSection(inFileName,outFileName,point,normal=(1,0,0)):
 	"""
 	from math import sqrt
 	norm = sqrt(pow(normal[0],2)+pow(normal[1],2)+pow(normal[2],2))
-	normal = (normal[0]/norm,normal[1]/norm,normal[2]/norm)
+	normal = (old_div(normal[0],norm),old_div(normal[1],norm),old_div(normal[2],norm))
 	#
 	def computeD(point,normal):
 		# from point and normal computes parameter d in plane equation ax+by+cz+d=0
@@ -1061,7 +1067,7 @@ def text2vtkSection(inFileName,outFileName,point,normal=(1,0,0)):
 			d = computeD(point,normal)
 		nx,ny,nz = normal[0],normal[1],normal[2]
 		cx,cy,cz = dat[0],dat[1],dat[2]
-		t = (-d-nx*cx-ny*cy-nz*cz) / (nx*nx+ny*ny+nz*nz)
+		t = old_div((-d-nx*cx-ny*cy-nz*cz), (nx*nx+ny*ny+nz*nz))
 		x,y,z = cx+t*nx, cy+t*ny, cz+t*nz
 		return x,y,z
 	#

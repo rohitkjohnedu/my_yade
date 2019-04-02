@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 08/07/2016
@@ -21,6 +22,7 @@ from __future__ import print_function
 
 
 #Import libraries
+from past.utils import old_div
 from yade import pack, plot
 import math
 import random as rand
@@ -56,7 +58,7 @@ endTime = 10	#Time simulated (in seconds)
 
 expoDrag_PY = 3.1	# Richardson Zaki exponent for the hindrance function of the drag force applied to the particles
 ndimz = 20	#Number of cells in the height
-dz =  widthCell*diameterPart/ndimz	# Fluid discretization step in the wall-normal direction	
+dz =  old_div(widthCell*diameterPart,ndimz)	# Fluid discretization step in the wall-normal direction	
 
 # Initialization of the main vectors
 vxFluidPY = np.ones(ndimz)*18.5	# Vertical fluid velocity profile: u^f = u_x^f(z) e_x, with x the streamwise direction and z the wall-normal
@@ -73,7 +75,7 @@ gravityVector = Vector3(-9.81,0.0,0.) #Gravity vector. Inclined along x to have 
 #Particles contact law/material parameters
 maxPressure = (densPart-densFluidPY)*phiPartMax*Nlayer*diameterPart*9.81#Estimated max particle pressure from the static load
 normalStiffness = maxPressure*diameterPart*1e4 #Evaluate the minimal normal stiffness to be in the rigid particle limit (cf Roux and Combe 2002)
-youngMod = normalStiffness/diameterPart	#Young modulus of the particles from the stiffness wanted.
+youngMod = old_div(normalStiffness,diameterPart)	#Young modulus of the particles from the stiffness wanted.
 poissonRatio = 0.5	#poisson's ratio of the particles. Classical values, does not have much influence
 O.materials.append(ViscElMat(en=restitCoef, et=0., young=youngMod, poisson=poissonRatio, density=densPart, frictionAngle=partFrictAngle, label='Mat'))  
 
@@ -93,7 +95,7 @@ O.bodies.append([lowPlane,sidePlane1,sidePlane2,sidePlane3,sidePlane4])
 #Create a loose cloud of particle inside the cell
 partCloud = pack.SpherePack()
 partVolume = pi/6.*pow(diameterPart,3) #Volume of a particle
-partNumber = int(Nlayer*phiPartMax*diameterPart*width*width/partVolume) #Volume of beads to obtain Nlayer layers of particles
+partNumber = int(old_div(Nlayer*phiPartMax*diameterPart*width*width,partVolume)) #Volume of beads to obtain Nlayer layers of particles
 partCloud.makeCloud(minCorner=(0,0.,0),maxCorner=(length,width,width),rRelFuzz=0., rMean=diameterPart/2.0, num = partNumber)
 partCloud.toSimulation(material='Mat') #Send this packing to simulation with material Mat
 #Evaluate the deposition time considering the free-fall time of the highest particle to the ground

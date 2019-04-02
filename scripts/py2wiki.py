@@ -29,8 +29,11 @@ Usasge 2: generate SimpleScene.cpp formatted for wiki with comments from simple-
 """
 from __future__ import print_function
 
+from builtins import str
+from builtins import range
+from builtins import object
 import sys,re
-class Text:
+class Text(object):
 	def __init__(self,txt):
 		self.text=[txt]
 class Code(Text): pass
@@ -68,7 +71,7 @@ for i in range(len(pg[0])):
 		for l in ll.text: print(l)
 	if ll.__class__==Code('').__class__:
 		if table: print('<table><tr>')
-		for j in (range(len(pg)) if table else [showCode]):
+		for j in (list(range(len(pg))) if table else [showCode]):
 			print('%s<source lang="%s">'%('<td>' if table else '',codeLangs[j]))
 			#if pg[j][i].text[0][0]==' ': print ' ',
 			for l in pg[j][i].text: print(l)

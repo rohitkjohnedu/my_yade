@@ -1,4 +1,6 @@
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 from yade import plot,pack
 """
 A simple script of a Brazilian splitting test.
@@ -77,7 +79,7 @@ def stopIfDamaged():
 		return
 	fMax = max(plot.data["f"])
 	f = plot.data["f"][-1]
-	if f/fMax < .6:
+	if old_div(f,fMax) < .6:
 		print("Damaged, stopping.")
 		print("ft = ",max(plot.data["stress"]))
 		O.pause()
@@ -93,7 +95,7 @@ def addPlotData():
 	wall = O.bodies[wallIDs[0]]
 	dspl = 2*wall.state.displ()[2]
 	# stress (according to standard brazilian test evaluation formula)
-	stress = f/(pi*specimenRadius*specimenLength)
+	stress = old_div(f,(pi*specimenRadius*specimenLength))
 	# store values
 	yade.plot.addData(
 		t = O.time,

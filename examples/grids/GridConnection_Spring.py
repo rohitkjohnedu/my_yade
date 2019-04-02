@@ -5,6 +5,8 @@ from __future__ import print_function
 
 # Experiment beam-like behaviour with chained cylinders + CohFrict connexions
 
+from builtins import zip
+from builtins import range
 from yade.gridpfacet import *
 
 young=1.0e10

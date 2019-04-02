@@ -3,6 +3,7 @@
 
 # The script implements the show case in this article [Mani2013]
 from __future__ import print_function
+from builtins import range
 from yade import utils, plot
 o = Omega()
 fr = 0.5;rho=2000

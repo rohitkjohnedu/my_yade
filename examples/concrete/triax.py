@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 ################################################################################
 #
 # Triaxial test. Axial strain rate is prescribed and transverse prestress.
@@ -6,6 +7,8 @@ from __future__ import print_function
 # An independent c++ engine may be created from this script in the future.
 #
 ################################################################################
+from builtins import range
+from past.utils import old_div
 from yade import pack, plot
 import os
 
@@ -78,8 +81,8 @@ for s in top:
 facets = []
 if testType == 'cyl':
 	rCyl2 = .5*width / cos(pi/float(nw))
-	for r in xrange(nw):
-		for h in xrange(nh):
+	for r in range(nw):
+		for h in range(nh):
 			v1 = Vector3( rCyl2*cos(2*pi*(r+0)/float(nw)), rCyl2*sin(2*pi*(r+0)/float(nw)), height*(h+0)/float(nh) )
 			v2 = Vector3( rCyl2*cos(2*pi*(r+1)/float(nw)), rCyl2*sin(2*pi*(r+1)/float(nw)), height*(h+0)/float(nh) )
 			v3 = Vector3( rCyl2*cos(2*pi*(r+1)/float(nw)), rCyl2*sin(2*pi*(r+1)/float(nw)), height*(h+1)/float(nh) )
@@ -88,31 +91,31 @@ if testType == 'cyl':
 			f2 = facet((v1,v3,v4),color=(0,0,1),material=frictMat)
 			facets.extend((f1,f2))
 elif testType == 'cube':
-	nw2 = nw/4
-	for r in xrange(nw2):
-		for h in xrange(nh):
-			v11 = Vector3( -.5*width + (r+0)*width/nw2, -.5*width, height*(h+0)/float(nh) )
-			v12 = Vector3( -.5*width + (r+1)*width/nw2, -.5*width, height*(h+0)/float(nh) )
-			v13 = Vector3( -.5*width + (r+1)*width/nw2, -.5*width, height*(h+1)/float(nh) )
-			v14 = Vector3( -.5*width + (r+0)*width/nw2, -.5*width, height*(h+1)/float(nh) )
+	nw2 = old_div(nw,4)
+	for r in range(nw2):
+		for h in range(nh):
+			v11 = Vector3( -.5*width + old_div((r+0)*width,nw2), -.5*width, height*(h+0)/float(nh) )
+			v12 = Vector3( -.5*width + old_div((r+1)*width,nw2), -.5*width, height*(h+0)/float(nh) )
+			v13 = Vector3( -.5*width + old_div((r+1)*width,nw2), -.5*width, height*(h+1)/float(nh) )
+			v14 = Vector3( -.5*width + old_div((r+0)*width,nw2), -.5*width, height*(h+1)/float(nh) )
 			f11 = facet((v11,v12,v13),color=(0,0,1),material=frictMat)
 			f12 = facet((v11,v13,v14),color=(0,0,1),material=frictMat)
-			v21 = Vector3( +.5*width, -.5*width + (r+0)*width/nw2, height*(h+0)/float(nh) )
-			v22 = Vector3( +.5*width, -.5*width + (r+1)*width/nw2, height*(h+0)/float(nh) )
-			v23 = Vector3( +.5*width, -.5*width + (r+1)*width/nw2, height*(h+1)/float(nh) )
-			v24 = Vector3( +.5*width, -.5*width + (r+0)*width/nw2, height*(h+1)/float(nh) )
+			v21 = Vector3( +.5*width, -.5*width + old_div((r+0)*width,nw2), height*(h+0)/float(nh) )
+			v22 = Vector3( +.5*width, -.5*width + old_div((r+1)*width,nw2), height*(h+0)/float(nh) )
+			v23 = Vector3( +.5*width, -.5*width + old_div((r+1)*width,nw2), height*(h+1)/float(nh) )
+			v24 = Vector3( +.5*width, -.5*width + old_div((r+0)*width,nw2), height*(h+1)/float(nh) )
 			f21 = facet((v21,v22,v23),color=(0,0,1),material=frictMat)
 			f22 = facet((v21,v23,v24),color=(0,0,1),material=frictMat)
-			v31 = Vector3( +.5*width - (r+0)*width/nw2, +.5*width, height*(h+0)/float(nh) )
-			v32 = Vector3( +.5*width - (r+1)*width/nw2, +.5*width, height*(h+0)/float(nh) )
-			v33 = Vector3( +.5*width - (r+1)*width/nw2, +.5*width, height*(h+1)/float(nh) )
-			v34 = Vector3( +.5*width - (r+0)*width/nw2, +.5*width, height*(h+1)/float(nh) )
+			v31 = Vector3( +.5*width - old_div((r+0)*width,nw2), +.5*width, height*(h+0)/float(nh) )
+			v32 = Vector3( +.5*width - old_div((r+1)*width,nw2), +.5*width, height*(h+0)/float(nh) )
+			v33 = Vector3( +.5*width - old_div((r+1)*width,nw2), +.5*width, height*(h+1)/float(nh) )
+			v34 = Vector3( +.5*width - old_div((r+0)*width,nw2), +.5*width, height*(h+1)/float(nh) )
 			f31 = facet((v31,v32,v33),color=(0,0,1),material=frictMat)
 			f32 = facet((v31,v33,v34),color=(0,0,1),material=frictMat)
-			v41 = Vector3( -.5*width, +.5*width - (r+0)*width/nw2, height*(h+0)/float(nh) )
-			v42 = Vector3( -.5*width, +.5*width - (r+1)*width/nw2, height*(h+0)/float(nh) )
-			v43 = Vector3( -.5*width, +.5*width - (r+1)*width/nw2, height*(h+1)/float(nh) )
-			v44 = Vector3( -.5*width, +.5*width - (r+0)*width/nw2, height*(h+1)/float(nh) )
+			v41 = Vector3( -.5*width, +.5*width - old_div((r+0)*width,nw2), height*(h+0)/float(nh) )
+			v42 = Vector3( -.5*width, +.5*width - old_div((r+1)*width,nw2), height*(h+0)/float(nh) )
+			v43 = Vector3( -.5*width, +.5*width - old_div((r+1)*width,nw2), height*(h+1)/float(nh) )
+			v44 = Vector3( -.5*width, +.5*width - old_div((r+0)*width,nw2), height*(h+1)/float(nh) )
 			f41 = facet((v41,v42,v43),color=(0,0,1),material=frictMat)
 			f42 = facet((v41,v43,v44),color=(0,0,1),material=frictMat)
 			facets.extend((f11,f12,f21,f22,f31,f32,f41,f42))
@@ -128,8 +131,8 @@ def plotAddData():
 	f1 = sum(O.forces.f(b.id)[2] for b in top)
 	f2 = sum(O.forces.f(b.id)[2] for b in bot)
 	f = .5*(f2-f1)
-	s = f/(pi*.25*width*width) if testType=='cyl' else f/(width*width) if testType=='cube' else None
-	e = (top[0].state.displ()[2] - bot[0].state.displ()[2]) / (height-rParticle*2*bcCoeff)
+	s = old_div(f,(pi*.25*width*width)) if testType=='cyl' else old_div(f,(width*width)) if testType=='cube' else None
+	e = old_div((top[0].state.displ()[2] - bot[0].state.displ()[2]), (height-rParticle*2*bcCoeff))
 	plot.addData(
 		i = O.iter,
 		s = s,

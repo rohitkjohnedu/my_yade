@@ -4,7 +4,10 @@
 '''
 Various computations affected by the periodic boundary conditions.
 '''
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 import unittest
 import random,math
 from yade.wrapper import *
@@ -74,7 +77,7 @@ class TestPBC(unittest.TestCase):
 		O.engines=[ForceResetter(),InteractionLoop([Ig2_Sphere_Sphere_L3Geom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_L3Geom_FrictPhys_ElPerfPl(noBreak=True)]),NewtonIntegrator()]
 		i=utils.createInteraction(0,1) 
 		O.dt=1e-10; O.step() # tiny timestep, to not move the normal too much
-		self.assertAlmostEqual(self.initVel.norm(),(i.geom.u/O.dt).norm())
+		self.assertAlmostEqual(self.initVel.norm(),(old_div(i.geom.u,O.dt)).norm())
 	def testKineticEnergy(self):
 		"PBC: utils.kineticEnergy considers only fluctuation velocity, not the velocity gradient"
 		O.step() # updates velocity with homotheticCellResize

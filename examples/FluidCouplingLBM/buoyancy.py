@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 ##############################################################################################################################
 #Authors: Luc Sibille  luc.sibille@3sr-grenoble.fr
 #         Franck Lomine  franck.lomine@insa-rennes.fr
@@ -9,6 +10,7 @@ from __future__ import print_function
 ##############################################################################################################################
 
 
+from past.utils import old_div
 from yade import pack,timing,utils
 
 
@@ -89,34 +91,34 @@ O.materials.append(FrictMat(young=50e6,poisson=.5,frictionAngle=0.0,density=3000
 wallOversizeFactor=1.001
 thickness=0.00001;
 #bottom box
-center= ((lowerCornerW[0]+upperCornerW[0])/2,lowerCornerW[1]-thickness/2.0,(lowerCornerW[2]+upperCornerW[2])/2)
-halfSize= (wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0])/2+thickness,thickness/2.0,wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2])/2+thickness)
+center= (old_div((lowerCornerW[0]+upperCornerW[0]),2),lowerCornerW[1]-thickness/2.0,old_div((lowerCornerW[2]+upperCornerW[2]),2))
+halfSize= (old_div(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0]),2)+thickness,thickness/2.0,old_div(wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2]),2)+thickness)
 b1=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b1)
 #--
 #Top box
-center=((lowerCornerW[0]+upperCornerW[0])/2,upperCornerW[1]+thickness/2.0,(lowerCornerW[2]+upperCornerW[2])/2)
-halfSize =(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0])/2+thickness,thickness/2.0,wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2])/2+thickness)
+center=(old_div((lowerCornerW[0]+upperCornerW[0]),2),upperCornerW[1]+thickness/2.0,old_div((lowerCornerW[2]+upperCornerW[2]),2))
+halfSize =(old_div(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0]),2)+thickness,thickness/2.0,old_div(wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2]),2)+thickness)
 b2=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b2)
 #--
-center=(lowerCornerW[0]-thickness/2.0,(lowerCornerW[1]+upperCornerW[1])/2,(lowerCornerW[2]+upperCornerW[2])/2)
-halfSize=(thickness/2.0,wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1])/2+thickness,wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2])/2+thickness)
+center=(lowerCornerW[0]-thickness/2.0,old_div((lowerCornerW[1]+upperCornerW[1]),2),old_div((lowerCornerW[2]+upperCornerW[2]),2))
+halfSize=(thickness/2.0,old_div(wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1]),2)+thickness,old_div(wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2]),2)+thickness)
 b3=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b3)
 #--
-center=(upperCornerW[0]+thickness/2.0,(lowerCornerW[1]+upperCornerW[1])/2,(lowerCornerW[2]+upperCornerW[2])/2)
-halfSize=(thickness/2.0,wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1])/2+thickness,wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2])/2+thickness)
+center=(upperCornerW[0]+thickness/2.0,old_div((lowerCornerW[1]+upperCornerW[1]),2),old_div((lowerCornerW[2]+upperCornerW[2]),2))
+halfSize=(thickness/2.0,old_div(wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1]),2)+thickness,old_div(wallOversizeFactor*fabs(lowerCornerW[2]-upperCornerW[2]),2)+thickness)
 b4=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b4)
 #--
-center=((lowerCornerW[0]+upperCornerW[0])/2,(lowerCornerW[1]+upperCornerW[1])/2,lowerCornerW[2]-thickness/2.0)
-halfSize=(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0])/2+thickness,wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1])/2+thickness,thickness/2.0)
+center=(old_div((lowerCornerW[0]+upperCornerW[0]),2),old_div((lowerCornerW[1]+upperCornerW[1]),2),lowerCornerW[2]-thickness/2.0)
+halfSize=(old_div(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0]),2)+thickness,old_div(wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1]),2)+thickness,thickness/2.0)
 b5=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b5)
 #--
-center=((lowerCornerW[0]+upperCornerW[0])/2,(lowerCornerW[1]+upperCornerW[1])/2,upperCornerW[2]+thickness/2.0)
-halfSize=(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0])/2+thickness,wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1])/2+thickness,thickness/2.0);	 	
+center=(old_div((lowerCornerW[0]+upperCornerW[0]),2),old_div((lowerCornerW[1]+upperCornerW[1]),2),upperCornerW[2]+thickness/2.0)
+halfSize=(old_div(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0]),2)+thickness,old_div(wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1]),2)+thickness,thickness/2.0);	 	
 b6=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b6)
 
@@ -125,7 +127,7 @@ O.bodies.append(b6)
 # Creation of the assembly of particles
 
 # defintiion of the material for particles
-O.materials.append(FrictMat(young=50e6,poisson=.5,frictionAngle=35*3.1415926535/180,density=3000,label='spheres'))
+O.materials.append(FrictMat(young=50e6,poisson=.5,frictionAngle=old_div(35*3.1415926535,180),density=3000,label='spheres'))
 ## use a SpherePack object to generate a random loose particles packing
 sp=pack.SpherePack()
 sp.makeCloud(lowerCornerS,upperCornerS,-1,0.33,nbSpheres,False, 0.5,seed=1) #"seed" make the "random" generation always the same

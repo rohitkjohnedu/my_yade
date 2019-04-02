@@ -7,6 +7,8 @@
 # This check-simulation checks the correctness of ViscoElasticEngine
 
 from __future__ import print_function
+from __future__ import division
+from past.utils import old_div
 from yade import utils, plot
 o = Omega()
 fr = 0.5;rho=2000
@@ -45,7 +47,7 @@ def addPlotData():
   v = O.bodies[id2].state.vel[2]
 
   if v0<=0 and v>0:
-    en=-v/v0
+    en=old_div(-v,v0)
     print ("Precalculated en value %.12f" % 0.736356797441)
     print ("Obtained en value %.12f" % en)
     O.pause()
@@ -54,5 +56,5 @@ def addPlotData():
 O.run(1000000)
 O.wait()
 
-if ((abs(0.736356797441-en)/en)>tolerance):
+if ((old_div(abs(0.736356797441-en),en))>tolerance):
   resultStatus += 1

@@ -54,9 +54,13 @@ Author: Allen B. Taylor, a.b.taylor@gmail.com
 '''
 from __future__ import print_function
 
-from Tkinter import *
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+from tkinter import *
 import threading
-import Queue
+import queue
 
 class _Tk(object):
     """
@@ -67,7 +71,7 @@ class _Tk(object):
         self._tk = tk
 
         # Create the incoming event queue.
-        self._eventQueue = Queue.Queue(1)
+        self._eventQueue = queue.Queue(1)
 
         # Identify the thread from which this object is being created so we can
         # tell later whether an event is coming from another thread.
@@ -110,7 +114,7 @@ class _TkAttr(object):
         else:
             # We're in a different thread than the creation thread; enqueue
             # the event, and then wait for the response.
-            responseQueue = Queue.Queue(1)
+            responseQueue = queue.Queue(1)
             if self._tk._debug >= 1:
                 print('Marshalling event:', self._attr.__name__, args, kwargs)
             self._tk._eventQueue.put((self._attr, args, kwargs, responseQueue))
@@ -130,7 +134,7 @@ def _Tk__init__(self, *args, **kwargs):
     # doesn't expect, so separate those out before doing anything else.
     new_kwnames = ('mtCheckPeriod', 'mtDebug')
     new_kwargs = {}
-    for name, value in kwargs.items():
+    for name, value in list(kwargs.items()):
         if name in new_kwnames:
             new_kwargs[name] = value
             del kwargs[name]
@@ -194,7 +198,7 @@ def _testThread(root):
     text = "This is Tcl/Tk version %s" % TclVersion
     if TclVersion >= 8.1:
         try:
-            text = text + unicode("\nThis should be a cedilla: \347",
+            text = text + str("\nThis should be a cedilla: \347",
                                   "iso-8859-1")
         except NameError:
             pass # no unicode support

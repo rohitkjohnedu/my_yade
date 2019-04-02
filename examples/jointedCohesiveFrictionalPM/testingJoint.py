@@ -7,6 +7,7 @@
 
 # Mechanical properties of rock matrix and rock joint :
 from __future__ import print_function
+from past.builtins import execfile
 def mat(): return JCFpmMat(type=1,young=15.e9,frictionAngle=radians(35),density=3000,poisson=0.35,tensileStrength=4.5e6,cohesion=45.e6,jointNormalStiffness=5.e7,jointShearStiffness=2.5e7,jointCohesion=0.,jointTensileStrength=0.,jointFrictionAngle=radians(35.),jointDilationAngle=0.0)
 
 

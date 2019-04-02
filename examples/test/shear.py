@@ -1,9 +1,11 @@
 from __future__ import print_function
+from __future__ import division
 #
 # script for testing ScGeom shear computation
 # Runs the same 2-sphere setup for useShear=False and for useShear=True
 #
 
+from past.utils import old_div
 O.bodies.append([
 	sphere([0,0,0],.5000001,fixed=True,color=(1,0,0)),
 	sphere([0,0,1],.5000001,fixed=False,color=(0,0,1))
@@ -30,7 +32,7 @@ def interInfo():
 		r1,r2=O.bodies[0].shape.radius,O.bodies[1].shape.radius
 		theta=[e['angularVelocity'] for e in O.engines if e.name=='RotationEngine'][0]
 		f=.5*(r1+r2)*theta*O.time*i.phys['ks']
-		print(O.time,i.phys.shearForce,f,i.phys.shearForce[0]/f)
+		print(O.time,i.phys.shearForce,f,old_div(i.phys.shearForce[0],f))
 
 
 print('=========== no shear ============')

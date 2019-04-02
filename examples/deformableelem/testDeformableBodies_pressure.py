@@ -7,6 +7,8 @@
 #****** The application is consisted of a free-fixed 1 meter rod having a miliseconds sinusoidal pressure applied on the one side.
 
 #****** The propagation of the wave is investigated.
+from __future__ import division
+from past.utils import old_div
 from yade.deformableelementsutils import *;
 
 O=Omega()
@@ -51,9 +53,9 @@ pressure=Vector3(1.5e8,0,0);
 
 period=(3e-4)
 
-omega=2*pi/period;
+omega=old_div(2*pi,period);
 
-applicationperiod=period/2;
+applicationperiod=old_div(period,2);
 
 # Displacement Properties(Displacement Application)
 
@@ -143,12 +145,12 @@ def applyforcetoelements():
 
 		for node in forcebodies[deformablebody]:
 			if(O.time<applicationperiod):
-				O.forces.addF(node.id,(T/3)*sin(omega*O.time));
+				O.forces.addF(node.id,(old_div(T,3))*sin(omega*O.time));
 #		fixboundaryelements();
 
 def addplot():
-	forcenode=forcebodies[forcebodies.keys()[0]][0].id;
-	boundarynode=boundarybodies[boundarybodies.keys()[0]][0].id;
+	forcenode=forcebodies[list(forcebodies.keys())[0]][0].id;
+	boundarynode=boundarybodies[list(boundarybodies.keys())[0]][0].id;
 	plot.addData(force=O.forces.f(forcenode)[0],pos=(O.bodies[forcenode].state.pos[0]-initialpositions[forcenode][0]),vel=O.bodies[forcenode].state.vel[0],postail=(O.bodies[boundarynode].state.pos[0]-initialpositions[boundarynode][0]),t=O.time,time=O.time,tm=O.time,tt=O.time)
 
 		

@@ -2,7 +2,9 @@
 """ CAUTION:
 Running this script can take very long!
 """
+from __future__ import division
 
+from past.utils import old_div
 from numpy import arange
 from yade import pack
 import pylab
@@ -11,7 +13,7 @@ poly=((1e-2,5e-2),(5e-2,2e-2),(7e-2,-2e-2),(1e-2,-5e-2),(1e-2,5e-2))
 # show us the meridian shape
 #pylab.plot(*zip(*poly)); pylab.xlim(xmin=0); pylab.grid(); pylab.title('Meridian of the revolution surface\n(close to continue)'); pylab.gca().set_aspect(aspect='equal',adjustable='box'); pylab.show()
 # angles at which we want this polygon to appear
-thetas=arange(0,pi/2,pi/24)
+thetas=arange(0,old_div(pi,2),old_div(pi,24))
 # create 3d points from the 2d ones, turning the 2d meridian around the +y axis
 # for each angle, put the poly a little bit higher (+2e-3*theta);
 # this is just to demonstrate that you can do whatever here as long as the resulting
@@ -22,7 +24,7 @@ thetas=arange(0,pi/2,pi/24)
 # without these transformation, it would look a little simpler:
 # 	pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+2e-3*theta) for pt in poly] for theta in thetas],thetas
 #
-pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+1e-2*theta) for pt in poly] for theta in thetas],thetas,origin=Vector3(0,-.05,.1),orientation=Quaternion((1,1,0),pi/4))
+pts=pack.revolutionSurfaceMeridians([[(pt[0],pt[1]+1e-2*theta) for pt in poly] for theta in thetas],thetas,origin=Vector3(0,-.05,.1),orientation=Quaternion((1,1,0),old_div(pi,4)))
 # connect meridians to make surfaces
 # caps will close it at the beginning and the end
 # threshold will merge points closer than 1e-4; this is important: we want it to be closed for filling

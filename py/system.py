@@ -5,6 +5,7 @@
 Functions for accessing yade's internals; only used internally.
 """
 from __future__ import print_function
+from builtins import object
 import sys
 from yade import wrapper
 from yade._customConverters import *
@@ -93,7 +94,7 @@ def updateScripts(scripts):
 		"An all-in-one multiple string substitution class; adapted to match only whole words"
 		def _make_regex(self): 
 			"Build a regular expression object based on the keys of the current dictionary"
-			return re.compile(r"(\b%s\b)" % "|".join(self.keys()))  ## adapted here 
+			return re.compile(r"(\b%s\b)" % "|".join(list(self.keys())))  ## adapted here 
 		def __call__(self, mo): 
 			"This handler will be invoked for each regex match"
 			# Count substitutions
@@ -137,8 +138,8 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 		except KeyError: pass # not registered properly
 
 	# deprecated names
-	for oldName in _deprecated.keys():
-		class warnWrap:
+	for oldName in list(_deprecated.keys()):
+		class warnWrap(object):
 			def __init__(self,_old,_new):
 				# assert(proxyNamespace.has_key(_new))
 				self.old,self.new=_old,_new

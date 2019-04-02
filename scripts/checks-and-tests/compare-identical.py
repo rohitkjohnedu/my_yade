@@ -9,8 +9,11 @@ in the container (although they are the same). You can use OMP_NUM_THREADS=2 to 
 what happens if the simulations get different.
 """
 from __future__ import print_function
+from __future__ import division
 # this is to provide some default simulation to test on
 # comment it out and provide your own simulation XML in init
+from builtins import range
+from past.utils import old_div
 TriaxialTest().generate('/tmp/TriaxialTest.xml')
 #
 
@@ -32,7 +35,7 @@ for scene in 0,1:
 	O.load(initFile); O.interactions.serializeSorted=True; O.switchScene();
 from hashlib import md5; import difflib,sys
 print("Identical at steps ", end=' ')
-for i in xrange(0,stopIter/nSteps):
+for i in range(0,old_div(stopIter,nSteps)):
 	sys.stdout.flush()
 	for scene in 'A','B':
 		O.run(nSteps,True); O.saveTmp(scene); O.switchScene()

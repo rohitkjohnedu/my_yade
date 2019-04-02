@@ -3,6 +3,8 @@
 #
 # module documentation
 #
+from builtins import str
+from builtins import range
 import sys,os,os.path
 
 outDir=sys.argv[2] if len(sys.argv)>2 else 'book/_build/'
