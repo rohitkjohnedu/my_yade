@@ -276,7 +276,7 @@ def fluxtest():
    QinOk=-Qin-deltabubble
    error=QinOk-total
    if error>toleranceWarning:
-      print "Warning: difference between total flux through bottom wall and water loss due to air bubble generations",QinOk," vs. total influx in dry or partially saturated cells",total
+      print "Warning: difference between total water volume flowing through bottom wall and water loss due to air bubble generations",QinOk," vs. total water volume flowing inside dry or partially saturated cells",total
    if error>toleranceCritical:
       print "The difference is more, than the critical tolerance!"
       errors+=1
@@ -290,7 +290,7 @@ def fluxtest():
          imbtime=O.time-iterini
          print imbtime,voidvol,total,QinOk
          if voidvol-total>toleranceWarning:
-           print "Warning: initial volume of dry voids",voidvol," vs. total influx in dry or partially saturated cells",total
+           print "Warning: initial volume of dry voids",voidvol," vs. total water volume flowing inside dry or partially saturated cells",total
          if voidvol-total>toleranceCritical:
            print "The difference is more, than the critical tolerance!"
            errors+=1
