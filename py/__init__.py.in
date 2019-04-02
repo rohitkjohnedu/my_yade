@@ -76,6 +76,12 @@ from yade.wrapper import *
 # import to separate namespace to be able to call dir(miniEigen) and dir(wrapper) below
 import yade.wrapper 
 
+# bindings for python2 retro-compatibility:
+yade.wrapper.BodyIterator.next=yade.wrapper.BodyIterator.__next__
+yade.wrapper.InteractionIterator.next=yade.wrapper.InteractionIterator.__next__
+from yade import pack
+pack.SpherePackIterator.next=pack.SpherePackIterator.__next__
+
 # out-of-class docstrings for some classes
 import yade._extraDocs
 # import a few "important" modules along with *
