@@ -25,54 +25,24 @@
  *   Boston, MA 02111-1307, USA.
  */
 
-#ifndef __PYGTS_H__
-#define __PYGTS_H__
+#ifndef __PYGTS_FACE_H__
+#define __PYGTS_FACE_H__
 
-#ifndef PYGTS_DEBUG
-#define PYGTS_DEBUG 1
-#endif /* PYGTS_DEBUG */
-
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include <Python.h>
-#include <structmember.h>
-
-/* Defined for arrayobject.h which is only included where needed */
-#define PY_ARRAY_UNIQUE_SYMBOL PYGTS
-
-#include <glib.h>
-#include <gts.h>
-
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-
-#include "object.h"
-#include "point.h"
-#include "vertex.h"
-#include "segment.h"
-#include "edge.h"
-#include "triangle.h"
-#include "face.h"
-#include "surface.h"
-
-#include "cleanup.h"
-
-// used in several cpp files without having any good header for it
-// defined in pygts.cpp
-FILE* FILE_from_py_file__raises(PyObject *f_, const char* mode);
-
-// helpers for py3k compatibility
-#if PY_MAJOR_VERSION < 3
-	#ifndef PyLong_AsLong
-	   #define PyLong_AsLong PyInt_AsLong
-	#endif
+#ifndef gts_face_is_unattached
+#define gts_face_is_unattached(f) ((f)->surfaces == NULL ? TRUE : FALSE)
 #endif
 
+typedef struct _PygtsObject PygtsFace;
 
+#define PYGTS_FACE(obj) ((PygtsFace*)obj)
 
+#define PYGTS_FACE_AS_GTS_FACE(o) (GTS_FACE(PYGTS_OBJECT(o)->gtsobj))
 
-#endif /* __PYGTS_H__ */
+extern PyTypeObject PygtsFaceType;
+
+gboolean pygts_face_check(PyObject* o);
+gboolean pygts_face_is_ok(PygtsFace *f);
+
+PygtsFace* pygts_face_new(GtsFace *f);
+
+#endif /* __PYGTS_FACE_H__ */

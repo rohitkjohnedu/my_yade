@@ -32,11 +32,11 @@
 #define PYGTS_DEBUG 1
 #endif /* PYGTS_DEBUG */
 
+#include <Python.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include <Python.h>
 #include <structmember.h>
 
 /* Defined for arrayobject.h which is only included where needed */
@@ -44,11 +44,6 @@
 
 #include <glib.h>
 #include <gts.h>
-
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 #include "object.h"
 #include "point.h"
@@ -60,19 +55,5 @@
 #include "surface.h"
 
 #include "cleanup.h"
-
-// used in several cpp files without having any good header for it
-// defined in pygts.cpp
-FILE* FILE_from_py_file__raises(PyObject *f_, const char* mode);
-
-// helpers for py3k compatibility
-#if PY_MAJOR_VERSION < 3
-	#ifndef PyLong_AsLong
-	   #define PyLong_AsLong PyInt_AsLong
-	#endif
-#endif
-
-
-
 
 #endif /* __PYGTS_H__ */

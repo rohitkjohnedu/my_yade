@@ -1,4 +1,3 @@
-from builtins import zip
 # pygts - python package for the manipulation of triangulated surfaces
 #
 #   Copyright (C) 2009 Thomas J. Duck
@@ -26,15 +25,15 @@ from builtins import zip
 #   Boston, MA 02111-1307, USA.
 
 
-# added by eudoxos 29.1.2011, fixes https://bugs.launchpad.net/woo/+bug/668329
+# added by eudoxos 29.1.2011, fixes https://bugs.launchpad.net/yade/+bug/668329
 ## force decimal separator to be always . (decimal point), not , (decimal comma) -- unless LC_ALL is set, then we are stuck
 ## this was reason for bogus gts imports
-## adding to woo main does not solve the problem for some reason
+## adding to yade main does not solve the problem for some reason
+from builtins import zip
 import locale
 locale.setlocale(locale.LC_NUMERIC,'C')
 
-## PY3K compatibility
-from ._gts import *
+from _gts import *
 
 def get_coords_and_face_indices(s,unzip=False):
     """Returns the coordinates and face indices of Surface s.

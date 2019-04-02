@@ -25,54 +25,20 @@
  *   Boston, MA 02111-1307, USA.
  */
 
-#ifndef __PYGTS_H__
-#define __PYGTS_H__
 
-#ifndef PYGTS_DEBUG
-#define PYGTS_DEBUG 1
-#endif /* PYGTS_DEBUG */
+/*
+ *  Below are functions for cleaning up duplicated edges and faces on
+ *  a surface.  This file was adapted from the example file of the same
+ *  name in the GTS distribution.
+ */
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#ifndef __PYGTS_CLEANUP_H__
+#define __PYGTS_CLEANUP_H__
 
-#include <Python.h>
-#include <structmember.h>
+GList* pygts_vertices_merge(GList* vertices, gdouble epsilon,
+			    gboolean (* check) (GtsVertex *, GtsVertex *));
+void pygts_vertex_cleanup(GtsSurface *s, gdouble threhold);
+void pygts_edge_cleanup(GtsSurface * s);
+void pygts_face_cleanup(GtsSurface * s);
 
-/* Defined for arrayobject.h which is only included where needed */
-#define PY_ARRAY_UNIQUE_SYMBOL PYGTS
-
-#include <glib.h>
-#include <gts.h>
-
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-
-#include "object.h"
-#include "point.h"
-#include "vertex.h"
-#include "segment.h"
-#include "edge.h"
-#include "triangle.h"
-#include "face.h"
-#include "surface.h"
-
-#include "cleanup.h"
-
-// used in several cpp files without having any good header for it
-// defined in pygts.cpp
-FILE* FILE_from_py_file__raises(PyObject *f_, const char* mode);
-
-// helpers for py3k compatibility
-#if PY_MAJOR_VERSION < 3
-	#ifndef PyLong_AsLong
-	   #define PyLong_AsLong PyInt_AsLong
-	#endif
-#endif
-
-
-
-
-#endif /* __PYGTS_H__ */
+#endif /* __PYGTS_CLEANUP_H__ */

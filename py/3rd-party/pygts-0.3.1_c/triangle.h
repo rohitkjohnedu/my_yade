@@ -25,54 +25,34 @@
  *   Boston, MA 02111-1307, USA.
  */
 
-#ifndef __PYGTS_H__
-#define __PYGTS_H__
+#ifndef __PYGTS_TRIANGLE_H__
+#define __PYGTS_TRIANGLE_H__
 
-#ifndef PYGTS_DEBUG
-#define PYGTS_DEBUG 1
-#endif /* PYGTS_DEBUG */
+typedef struct _PygtsObject PygtsTriangle;
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#define PYGTS_TRIANGLE(obj) ((PygtsTriangle*)obj)
 
-#include <Python.h>
-#include <structmember.h>
+#define PYGTS_TRIANGLE_AS_GTS_TRIANGLE(o) \
+  (GTS_TRIANGLE(PYGTS_OBJECT(o)->gtsobj))
 
-/* Defined for arrayobject.h which is only included where needed */
-#define PY_ARRAY_UNIQUE_SYMBOL PYGTS
+extern PyTypeObject PygtsTriangleType;
 
-#include <glib.h>
-#include <gts.h>
+gboolean pygts_triangle_check(PyObject* o);
+gboolean pygts_triangle_is_ok(PygtsTriangle *t);
 
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+PygtsTriangle* pygts_triangle_new(GtsTriangle *t);
 
-#include "object.h"
-#include "point.h"
-#include "vertex.h"
-#include "segment.h"
-#include "edge.h"
-#include "triangle.h"
-#include "face.h"
-#include "surface.h"
-
-#include "cleanup.h"
-
-// used in several cpp files without having any good header for it
-// defined in pygts.cpp
-FILE* FILE_from_py_file__raises(PyObject *f_, const char* mode);
-
-// helpers for py3k compatibility
-#if PY_MAJOR_VERSION < 3
-	#ifndef PyLong_AsLong
-	   #define PyLong_AsLong PyInt_AsLong
-	#endif
-#endif
+int pygts_triangle_compare(GtsTriangle* t1,GtsTriangle* t2);
 
 
 
+/* Replacement for gts_triangle_is_ok().  The problem is that sometimes the 
+ * "reserved" variable is set in a face by gts, and so this function fails.  
+ * e.g., The error occurs when gts_triangle_is_ok() is called during 
+ * iteration over faces in a surface.  This function ignores that check so
+ * that there is no failure when PYGTS_DEBUG is set.  A bug report should be 
+ * submitted.
+ */
+gboolean pygts_gts_triangle_is_ok(GtsTriangle *t);
 
-#endif /* __PYGTS_H__ */
+#endif /* __PYGTS_TRIANGLE_H__ */

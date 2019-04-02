@@ -25,54 +25,22 @@
  *   Boston, MA 02111-1307, USA.
  */
 
-#ifndef __PYGTS_H__
-#define __PYGTS_H__
+#ifndef __PYGTS_SEGMENT_H__
+#define __PYGTS_SEGMENT_H__
 
-#ifndef PYGTS_DEBUG
-#define PYGTS_DEBUG 1
-#endif /* PYGTS_DEBUG */
+typedef struct _PygtsObject PygtsSegment;
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#define PYGTS_SEGMENT(obj) ((PygtsSegment*)obj)
 
-#include <Python.h>
-#include <structmember.h>
+#define PYGTS_SEGMENT_AS_GTS_SEGMENT(o) (GTS_SEGMENT(PYGTS_OBJECT(o)->gtsobj))
 
-/* Defined for arrayobject.h which is only included where needed */
-#define PY_ARRAY_UNIQUE_SYMBOL PYGTS
+extern PyTypeObject PygtsSegmentType;
 
-#include <glib.h>
-#include <gts.h>
+gboolean pygts_segment_check(PyObject* o);
+gboolean pygts_segment_is_ok(PygtsSegment *t);
 
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+PygtsSegment* pygts_segment_new(GtsSegment *f);
 
-#include "object.h"
-#include "point.h"
-#include "vertex.h"
-#include "segment.h"
-#include "edge.h"
-#include "triangle.h"
-#include "face.h"
-#include "surface.h"
+int pygts_segment_compare(GtsSegment* s1,GtsSegment* s2);
 
-#include "cleanup.h"
-
-// used in several cpp files without having any good header for it
-// defined in pygts.cpp
-FILE* FILE_from_py_file__raises(PyObject *f_, const char* mode);
-
-// helpers for py3k compatibility
-#if PY_MAJOR_VERSION < 3
-	#ifndef PyLong_AsLong
-	   #define PyLong_AsLong PyInt_AsLong
-	#endif
-#endif
-
-
-
-
-#endif /* __PYGTS_H__ */
+#endif /* __PYGTS_SEGMENT_H__ */

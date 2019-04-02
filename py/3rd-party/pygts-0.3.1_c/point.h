@@ -25,54 +25,27 @@
  *   Boston, MA 02111-1307, USA.
  */
 
-#ifndef __PYGTS_H__
-#define __PYGTS_H__
+#ifndef __PYGTS_POINT_H__
+#define __PYGTS_POINT_H__
 
-#ifndef PYGTS_DEBUG
-#define PYGTS_DEBUG 1
-#endif /* PYGTS_DEBUG */
+typedef struct _PygtsObject PygtsPoint;
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#define PYGTS_POINT(o) ( PyObject_TypeCheck((PyObject*)o, &PygtsPointType) ? \
+			 (PygtsPoint*)o :				\
+			 pygts_point_from_sequence((PyObject*)o) )
 
-#include <Python.h>
-#include <structmember.h>
+#define PYGTS_POINT_AS_GTS_POINT(o) (GTS_POINT(PYGTS_OBJECT(o)->gtsobj))
 
-/* Defined for arrayobject.h which is only included where needed */
-#define PY_ARRAY_UNIQUE_SYMBOL PYGTS
+extern PyTypeObject PygtsPointType;
 
-#include <glib.h>
-#include <gts.h>
+gboolean pygts_point_check(PyObject* o);
+gboolean pygts_point_is_ok(PygtsPoint *o);
 
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
-#pragma GCC diagnostic ignored "-Wwrite-strings"
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+PygtsPoint* pygts_point_from_sequence(PyObject *tuple);
+int pygts_point_compare(GtsPoint* p1,GtsPoint* p2);
 
-#include "object.h"
-#include "point.h"
-#include "vertex.h"
-#include "segment.h"
-#include "edge.h"
-#include "triangle.h"
-#include "face.h"
-#include "surface.h"
+gint pygts_point_rotate(GtsPoint* p,gdouble dx,gdouble dy,gdouble dz,gdouble a);
+gint pygts_point_scale(GtsPoint* p, gdouble dx, gdouble dy, gdouble dz);
+gint pygts_point_translate(GtsPoint* p, gdouble dx, gdouble dy, gdouble dz);
 
-#include "cleanup.h"
-
-// used in several cpp files without having any good header for it
-// defined in pygts.cpp
-FILE* FILE_from_py_file__raises(PyObject *f_, const char* mode);
-
-// helpers for py3k compatibility
-#if PY_MAJOR_VERSION < 3
-	#ifndef PyLong_AsLong
-	   #define PyLong_AsLong PyInt_AsLong
-	#endif
-#endif
-
-
-
-
-#endif /* __PYGTS_H__ */
+#endif /* __PYGTS_POINT_H__ */
