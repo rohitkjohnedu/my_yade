@@ -23,3 +23,4 @@ sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot d
 - (FIXED by Vaclav) pygts may not compile
 - python3-bibtex package doesn't exist, and underlying _bibtex python module will not be found. As a result, the doc will not compile. We may use another python bibtex parser or use sphinxcontrib-bibtex: https://sphinxcontrib-bibtex.readthedocs.io/en/latest/usage.html
 - fix checks/tests
+- try/fix python2 retro-compatibility
