@@ -124,7 +124,7 @@ class _TkAttr(object):
             # an exception.
             if isException:
                 exType, exValue, exTb = response
-                raise exType, exValue, exTb
+                raise RuntimeError(exType, exValue, exTb)
             else:
                 return response
 
