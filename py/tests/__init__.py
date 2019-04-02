@@ -1,7 +1,6 @@
 # encoding: utf-8
 # 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 """All defined functionality tests for yade."""
-from __future__ import unicode_literals
 import unittest,inspect,sys
 
 # add any new test suites to the list here, so that they are picked up by testAll

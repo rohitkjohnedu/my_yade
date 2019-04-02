@@ -17,7 +17,6 @@
 #
 #    to the c++ documentation.
 
-from __future__ import unicode_literals
 import wrapper
 
 # Update docstring of your class/function like this:

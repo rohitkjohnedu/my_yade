@@ -11,7 +11,6 @@
 # with conveyor
 
 ## PhysicalParameters 
-from __future__ import unicode_literals
 Density=1000
 frictionAngle=0.4
 tc = 0.001

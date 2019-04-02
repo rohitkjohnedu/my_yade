@@ -5,7 +5,6 @@
 ## Note that it is no longer necessary to define O.dt
 ## See simple-scene.py for the complete version with explicit engines definition 
 
-from __future__ import unicode_literals
 typedEngine("NewtonIntegrator").gravity=(0,0,-9.81)
 typedEngine("NewtonIntegrator").damping=0.1
 O.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],color=[0,0,1],fixed=True))

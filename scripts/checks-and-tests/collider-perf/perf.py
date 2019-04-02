@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 
 utils.readParamsFromTable(nSpheres=8000,collider='InsertionSortCollider',noTableOk=True)
 # name of file containing sphere packing with given number of spheres
@@ -9,13 +7,13 @@ fast='@stride' in collider
 
 import os
 if not os.path.exists(spheresFile):
-	print("Generating packing")
+	print "Generating packing"
 	p=TriaxialTest(numberOfGrains=nSpheres,radiusMean=1e-3,lowerCorner=[0,0,0],upperCorner=[1,1,1],noFiles=True)
 	p.load()
 	utils.spheresToFile(spheresFile)
 	O.reset()
-	print("Packing %s done"%spheresFile)
-else: print("Packing found (%s), using it."%spheresFile)
+	print "Packing %s done"%spheresFile
+else: print "Packing found (%s), using it."%spheresFile
 
 from yade import timing
 O.timingEnabled=True

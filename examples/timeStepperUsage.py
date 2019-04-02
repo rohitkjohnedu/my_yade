@@ -1,8 +1,6 @@
 # coding: utf-8
 # 2012 © Bruno Chareyre <bruno.chareyre_A_hmg.inpg.fr>
 "Test and demonstrate the use of timestepper and density scaling."
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from yade import pack,qt,timing
 O.periodic=True
@@ -48,9 +46,9 @@ timing.reset()
 O.dt=0.8*PWaveTimeStep() #for fair comparison, we use the same safety factor as in GS timestepper, allthough many scripts use 0.5 or even 0.1*PWaveTimeStep()
 ts.active=False
 O.run(100000,True);#it will actually stop before 100k iterations as soon as the packing is stable
-print("--------------------------------")
-print("Fixed dt = 0.8 * PWave timestep:")
-print("--------------------------------")
+print "--------------------------------"
+print "Fixed dt = 0.8 * PWave timestep:"
+print "--------------------------------"
 timing.stats()
 
 #======   Now we use the timestepper to adjust dt dynamicaly =========#
@@ -59,9 +57,9 @@ timing.reset()
 O.dt=100000000 #or whatever
 ts.active=True
 O.run(100000,True);
-print("--------------------------------------------------")
-print("dt dynamicaly set with GlobalStiffness timesteper:")
-print("--------------------------------------------------")
+print "--------------------------------------------------"
+print "dt dynamicaly set with GlobalStiffness timesteper:"
+print "--------------------------------------------------"
 timing.stats()
 
 #======  And finaly, the timestepper with density scaling =========#
@@ -74,9 +72,9 @@ newton.densityScaling=True
 triax.mass /= (0.8*PWaveTimeStep())**2
 triax.maxStrainRate *= 0.8*PWaveTimeStep()
 O.run(1000000,True);
-print("--------------------------------------------------------------------")
-print("dt dynamicaly set with GlobalStiffness timesteper + density scaling:")
-print("--------------------------------------------------------------------")
+print "--------------------------------------------------------------------"
+print "dt dynamicaly set with GlobalStiffness timesteper + density scaling:"
+print "--------------------------------------------------------------------"
 timing.stats()
 
 

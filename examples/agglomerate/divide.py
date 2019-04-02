@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 ######################################################################
 # A script for subdivision of macro perticles into a dense packing of
 # smaller particles
@@ -12,7 +10,7 @@ import random
 random.seed(1) # to make colors always the same
 
 # load macroparticles
-print("\nPlease see README if you have errors when running this example.\n")
+print "\nPlease see README if you have errors when running this example.\n"
 sp = ymport.text('/tmp/cloud.txt')
 colors = [randomColor() for s in sp]
 # each macroparticle is filled randomDensePack

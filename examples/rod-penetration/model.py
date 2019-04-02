@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import unicode_literals
 import random
 from yade import ymport
 
@@ -19,7 +17,7 @@ rod = O.bodies.append(ymport.stl('rod-'+mesh+'.stl',wire=True))
 # Spheres
 sphereRadius = 0.01
 nbSpheres = (32,11,32) 
-print("Creating %d spheres..."%(nbSpheres[0]*nbSpheres[1]*nbSpheres[2]), end=' ')
+print "Creating %d spheres..."%(nbSpheres[0]*nbSpheres[1]*nbSpheres[2]),
 for i in xrange(nbSpheres[0]):
     for j in xrange(nbSpheres[1]):
 		for k in xrange(nbSpheres[2]):
@@ -33,7 +31,7 @@ for i in xrange(nbSpheres[0]):
 				fixed = True
 				color=[0.21,0.22,0.1]
 			O.bodies.append(sphere([x,y,z],r,color=color,fixed=fixed))
-print("done\n")
+print "done\n"
 
 ## Estimate time step
 #O.dt=PWaveTimeStep()
@@ -67,7 +65,7 @@ O.engines=[
 
 import sys,time
 
-print("Start simulation: " + mesh)
+print "Start simulation: " + mesh
 nbIter=10000
 
 from yade import qt

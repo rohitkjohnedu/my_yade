@@ -5,8 +5,6 @@
 
 #O.bodyContainer="BodyVector"
 
-from __future__ import print_function
-from __future__ import unicode_literals
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()],nBins=5,sweepLength=5e-3),
@@ -45,8 +43,8 @@ if 1:
 		if random.choice([True,False]):
 			idOld=random.randint(2,len(O.bodies)-1)
 			O.bodies.erase(idOld)
-			print("-%d"%idOld, end=' ')
+			print "-%d"%idOld,
 		else:
 			idNew=addRandomSphere()
-			print("+%d"%idNew, end=' ')
+			print "+%d"%idNew,
 		sys.stdout.flush()

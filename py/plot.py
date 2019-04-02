@@ -4,8 +4,6 @@
 Module containing utility functions for plotting inside yade. See :ysrc:`examples/simple-scene/simple-scene-plot.py` or :ysrc:`examples/concrete/uniax.py` for example of usage.
 
 """
-from __future__ import print_function
-from __future__ import unicode_literals
 
 ## all exported names
 __all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
@@ -185,7 +183,7 @@ def addAutoData():
 			val=eval(expr)
 			dic.update({name:val})
 		except:
-			print('WARN: ignoring exception raised while evaluating auto-column `'+expr+"'%s."%('' if name==expr else ' ('+name+')'))
+			print 'WARN: ignoring exception raised while evaluating auto-column `'+expr+"'%s."%('' if name==expr else ' ('+name+')')
 	cols={}
 	for p in plots:
 		pp=plots[p]
@@ -406,7 +404,7 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 			if len(data.keys())==0 or len(data[data.keys()[0]])==0: # no data at all yet, do not add garbage NaNs
 				for m in missing: data[m]=[]
 			else:
-				print('Missing columns in plot.data, adding NaN: ',','.join(list(missing)))
+				print 'Missing columns in plot.data, adding NaN: ',','.join(list(missing))
 				addDataColumns(missing)
 		def createLines(pStrip,ySpecs,isY1=True,y2Exists=False):
 			'''Create data lines from specifications; this code is common for y1 and y2 axes;
@@ -424,12 +422,12 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 				elif hasattr(ys[0],'keys'): ySpecs2+=[(yy,'') for yy in ys[0].keys()]
 				else: ySpecs2.append(ys)
 			if len(ySpecs2)==0:
-				print('yade.plot: creating fake plot, since there are no y-data yet')
+				print 'yade.plot: creating fake plot, since there are no y-data yet'
 				line,=pylab.plot([nan],[nan])
 				line2,=pylab.plot([nan],[nan])
 				currLineRefs.append(LineRef(line,None,line2,[nan],[nan]))
 			# set different color series for y1 and y2 so that they are recognizable
-			if 'axes.color_cycle' in pylab.rcParams: pylab.rcParams['axes.color_cycle']='b,g,r,c,m,y,k' if not isY1 else 'm,y,k,b,g,r,c'
+			if pylab.rcParams.has_key('axes.color_cycle'): pylab.rcParams['axes.color_cycle']='b,g,r,c,m,y,k' if not isY1 else 'm,y,k,b,g,r,c'
 			for d in ySpecs2:
 				yNames.add(d)
 				line,=pylab.plot(data[pStrip],data[d[0]],d[1],label=xlateLabel(d[0]))
@@ -492,7 +490,7 @@ def liveUpdate(timestamp):
 			for new in news:
 				ax.yadeYNames.add(new)
 				if new in data.keys() and id(data[new]) in linesData: continue # do not add when reloaded and the old lines are already there
-				print('yade.plot: creating new line for',new)
+				print 'yade.plot: creating new line for',new
 				if not new in data.keys(): data[new]=len(data[ax.yadeXName])*[nan] # create data entry if necessary
 				#print 'data',len(data[ax.yadeXName]),len(data[new]),data[ax.yadeXName],data[new]
 				line,=ax.plot(data[ax.yadeXName],data[new],label=xlateLabel(new)) # no line specifier
@@ -537,7 +535,7 @@ def savePlotSequence(fileBase,stride=1,imgRatio=(5,7),title=None,titleFrames=20,
 	if pltLen==0: raise ValueError("Both plot.data and plot.imgData are empty.")
 	global current, currLineRefs
 	ret=[]
-	print('Saving %d plot frames, it can take a while...'%(pltLen))
+	print 'Saving %d plot frames, it can take a while...'%(pltLen)
 	for i,n in enumerate(range(0,pltLen,stride)):
 		current=n
 		for l in currLineRefs: l.update()

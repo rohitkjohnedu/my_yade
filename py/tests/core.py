@@ -4,7 +4,6 @@
 """
 Core functionality (Scene in c++), such as accessing bodies, materials, interactions. Specific functionality tests should go to engines.py or elsewhere, not here.
 """
-from __future__ import unicode_literals
 import unittest
 import random
 from yade.wrapper import *

@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 25/10/2018
@@ -34,8 +32,8 @@ k = 0
 for nbSim in folder:
 	scriptPath = os.path.abspath(os.path.dirname(sys.argv[-1])) #Path where the script is stored
 	if os.path.exists(scriptPath + '/sim'+ str(nbSim) +'/data/')==False:	#If the data folder does not exist, no data to extract, exit. 
-		print('\n There is no data to extract in this folder ! Please first run validMaurin2015.py !\n')
-		print('The experiment expData'+str(nbSim)+' was not calculated, there will be missing data on the plot. To calculate it choose this experiment in validMaurin2015.py')
+		print '\n There is no data to extract in this folder ! Please first run validMaurin2015.py !\n'
+		print 'The experiment expData'+str(nbSim)+' was not calculated, there will be missing data on the plot. To calculate it choose this experiment in validMaurin2015.py'
 		#exit()
 	else:	#Else, extract the first file in order to get the size of the vectors, ndimz
 		execfile(scriptPath + '/sim'+ str(nbSim) + '/data/0.py')

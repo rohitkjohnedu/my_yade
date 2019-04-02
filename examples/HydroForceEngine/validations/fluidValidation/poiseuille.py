@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 22/11/2017
@@ -40,12 +38,12 @@ a = HydroForceEngine(densFluid=densFluid,viscoDyn=kinematicViscoFluid*densFluid,
 ################################
 # FLUID RESOLUTION
 a.fluidResolution(tfin,dtFluid)# Call the fluid resolution associated with the defined HydroForceEngine. Use the parameters defined just above. 
-print("\nFluid Resolution finished !  ","max(vxFluid)=",np.max(a.vxFluid),"\n")
+print "\nFluid Resolution finished !  ","max(vxFluid)=",np.max(a.vxFluid),"\n"
 
 
 ################################
 # COMPARISON TO THE ANALYTICAL SOLUTION
-print("Comparison to the analytical solution\n")
+print "Comparison to the analytical solution\n"
 vxFluid = np.array(a.vxFluid)
 
 # Re-create the fluid resolution mesh: regular spacing, with differences at the bottom (0) and at the top (ndimz-1). 
@@ -74,5 +72,5 @@ ylabel('z (m)')
 legend(loc=1)
 savefig('figPoiseuille.png')
 show()
-print("finished! exit\n")
+print "finished! exit\n"
 exit()	#Leave the simulation at the end 

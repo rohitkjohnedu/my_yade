@@ -23,8 +23,6 @@ fast for sequential reads).
 
 TODO: Interpolating from within python is not (yet) supported.
 """
-from __future__ import print_function
-from __future__ import unicode_literals
 
 def revIntegrateLinear(I,x0,y0,x1,y1):
 	"""Helper function, returns value of integral variable x for
@@ -93,9 +91,9 @@ def sanitizeInterpolation(x,y,x0,x1):
 
 if __name__=="main":
 	xx,yy=sanitizeInterpolation([1,2,3],[1,1,2],0,4)
-	print(xx,yy)
-	print(integral(xx,yy)) # 5.5
-	print(revIntegrateLinear(.625,1,1,2,2)) # 1.5
-	print(xFractionalFromIntegral(1.625,xx,yy)) # 1.625
-	print(xFractionalFromIntegral(2.625,xx,yy)) # 2.5
+	print xx,yy
+	print integral(xx,yy) # 5.5
+	print revIntegrateLinear(.625,1,1,2,2) # 1.5
+	print xFractionalFromIntegral(1.625,xx,yy) # 1.625
+	print xFractionalFromIntegral(2.625,xx,yy) # 2.5
 

@@ -22,8 +22,6 @@
 ## See triax-tutorial/script-session1.py for more detailed explanations of the packing generation procedure.
 
 ## ______________   First section, similar to triax-tutorial/script-session1.py  _________________
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import pack
 
 num_spheres=1000# number of spheres
@@ -114,7 +112,7 @@ O.run(1,1)
 Qin = flow.getBoundaryFlux(2)
 Qout = flow.getBoundaryFlux(3)
 permeability = abs(Qin)/1.e-4 #size is one, we compute K=V/∇H
-print("Qin=",Qin," Qout=",Qout," permeability=",permeability)
+print "Qin=",Qin," Qout=",Qout," permeability=",permeability
 
 #C. now the oedometer test, drained at the top, impermeable at the bottom plate
 flow.bndCondIsPressure=[0,0,0,1,0,0]
@@ -161,10 +159,10 @@ plot.plot()
 O.saveTmp()
 O.timingEnabled=1
 from yade import timing
-print("starting oedometer simulation")
+print "starting oedometer simulation"
 O.run(200,1)
 timing.stats()
 
-print("\nPress ▶ (the start button) to see graph.\n")
+print "\nPress ▶ (the start button) to see graph.\n"
 
 ## Make more steps to see the convergence to the stationnary solution

@@ -3,7 +3,6 @@
 # The script was used to generate the result and supplementary material (video) of [1]. The only difference is the problem size (40k particles in the paper vs. 1k (default) in this version)
 # [1] Yuan, C., & Chareyre, B. (2017). A pore-scale method for hydromechanical coupling in deformable granular media. Computer Methods in Applied Mechanics and Engineering, 318, 1066-1079. (http://www.sciencedirect.com/science/article/pii/S0045782516307216)
 
-from __future__ import unicode_literals
 import matplotlib; matplotlib.rc('axes',grid=True)
 from yade import pack
 import pylab

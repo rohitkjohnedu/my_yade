@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # Deomonstrate composition of KinematicEngine's with +:
 # The first engine is composed (from translation and 2 independent rotations, one global and one local)
 # The second engine does the same on body #1 as the first one does on #0 (the local rotation is not present)

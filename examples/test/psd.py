@@ -3,7 +3,6 @@
 # demonstrate how to generate sphere packing based on arbitrary PSD (particle size distribution)
 # show the difference between size-based and mass-based (≡ volume-based in our case) PSD
 #
-from __future__ import unicode_literals
 import matplotlib; matplotlib.rc('axes',grid=True)
 from yade import pack
 import pylab

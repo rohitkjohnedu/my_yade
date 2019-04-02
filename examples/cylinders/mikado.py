@@ -1,6 +1,5 @@
 # encoding: utf-8
 "An example showing how two create cylinders with random length."
-from __future__ import unicode_literals
 
 from yade.gridpfacet import *
 

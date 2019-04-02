@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import pack,plot
 sp=pack.SpherePack()
 rMean=.05
@@ -16,7 +14,7 @@ O.engines=[
 O.dt=.5*utils.PWaveTimeStep()
 O.trackEnergy=True
 def goalReached():
-	print('Goal reached, strain',triax.strain,' stress',triax.stress)
+	print 'Goal reached, strain',triax.strain,' stress',triax.stress
 	O.pause()
 def addPlotData():
 	plot.addData(sx=triax.stress[0],sy=triax.stress[1],sz=triax.stress[2],ex=triax.strain[0],ey=triax.strain[1],ez=triax.strain[2],

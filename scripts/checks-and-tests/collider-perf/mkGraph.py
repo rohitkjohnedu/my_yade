@@ -1,10 +1,8 @@
 #encoding: utf-8
-from __future__ import print_function
-from __future__ import unicode_literals
 dta={'QS':{},'IS':{},'ISS':{}}
 import sys
 for f in sys.argv[1:]:
-	print(f,'', end=' ')
+	print f,'',
 	N=f.split('.')[1];
 	assert(N[-1]=='k'); N=1000*int(N[:-1])
 	if '.q.' in f: collider='QS'
@@ -14,9 +12,9 @@ for f in sys.argv[1:]:
 	for l in open(f):
 		if 'Collider' in l:
 			t=l.split()[2]; assert(t[-2:]=='us'); t=float(t[:-2])/1e6
-			if N not in dta[collider]: dta[collider][N]=[t]
+			if not dta[collider].has_key(N): dta[collider][N]=[t]
 			else: dta[collider][N]+=[t*0.01] # the second time is per 100 iterations
-print()
+print
 
 ISS_N=dta['ISS'].keys(); ISS_N.sort()
 QS_N=dta['QS'].keys(); QS_N.sort()

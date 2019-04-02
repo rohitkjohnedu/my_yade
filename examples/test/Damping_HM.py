@@ -7,7 +7,6 @@
 
 #__________________________________________________________________
 # Geometry sphere and box
-from __future__ import unicode_literals
 r2=1e-2 # radii [m]
 p2=[r2,0,0] # center positions [m]
 center=[-r2/2.,0,0] # center [m]

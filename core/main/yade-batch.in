@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 #!${pyExecutable}
 # encoding: utf-8
 #
@@ -18,7 +16,7 @@ sys.path.insert(1,'${runtimePREFIX}/${LIBRARY_OUTPUT_PATH}/yade${SUFFIX}/py')
 #socket.setdefaulttimeout(10) 
 
 ## replaced by scons automatically
-prefix,suffix='${runtimePREFIX}' if 'YADE_PREFIX' not in os.environ else os.environ['YADE_PREFIX'],'${SUFFIX}'
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 
 libPATH='${LIBRARY_OUTPUT_PATH}'
 if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
@@ -261,18 +259,18 @@ def runHttpStatsServer():
 		try:
 			server=HTTPServer(('',port),HttpStatsServer)
 			import thread; thread.start_new_thread(server.serve_forever,())
-			print("http://localhost:%d shows batch summary"%port)
+			print "http://localhost:%d shows batch summary"%port
 			break
 		except socket.error:
 			port+=1
 	if port==maxPort:
-		print("WARN: No free port in range 9080-11000, not starting HTTP stats server!")
+		print "WARN: No free port in range 9080-11000, not starting HTTP stats server!"
 
 
 def runJob(job):
 	job.status='RUNNING'
 	job.started=time.time();
-	print('#%d (%s%s%s) started on %s'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores,(' ['+','.join([str(c) for c in job.cores])+']') if job.cores else '',time.asctime()))
+	print '#%d (%s%s%s) started on %s'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores,(' ['+','.join([str(c) for c in job.cores])+']') if job.cores else '',time.asctime())
 	#print '#%d cores',%(job.num,job.cores)
 	if job.cores:
 		def coresReplace(s): return s.replace('[threadspec]','--cores=%s'%(','.join(str(c) for c in job.cores)))
@@ -294,7 +292,7 @@ def runJob(job):
 		shutil.copy(job.plotsFile,f)
 		job.plotsFile=f
 		havePlot=True
-	print("#%d (%s%s) %s (exit status %d), duration %s, log %s%s"%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores,strStatus,job.exitStatus,job.duration,job.log,(', plot %s'%(job.plotsFile) if havePlot else '')))
+	print "#%d (%s%s) %s (exit status %d), duration %s, log %s%s"%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores,strStatus,job.exitStatus,job.duration,job.log,(', plot %s'%(job.plotsFile) if havePlot else ''))
 	job.saveInfo()
 	
 def runJobs(jobs,numCores):
@@ -335,10 +333,10 @@ def getNumCores():
 	try:
 		nCpu=len([l for l in open('/proc/cpuinfo','r') if l.find('processor')==0])
 	except:
-		print('WARNING: No cpuinfo available! Setting the maximal number of processors 1')
+		print 'WARNING: No cpuinfo available! Setting the maximal number of processors 1'
 		pass
 		
-	if "OMP_NUM_THREADS" in os.environ: return min(int(os.environ['OMP_NUM_THREADS']),nCpu)
+	if os.environ.has_key("OMP_NUM_THREADS"): return min(int(os.environ['OMP_NUM_THREADS']),nCpu)
 	return nCpu
 numCores=getNumCores()
 maxOmpThreads=numCores if 'OpenMP' in yade.config.features else 1
@@ -376,19 +374,19 @@ args = opts.args
 logFormat,lineList,maxJobs,nice,executable,gnuplotOut,dryRun,httpWait,globalLog=opts.logFormat,opts.lineList,opts.maxJobs,opts.nice,opts.executable,opts.gnuplotOut,opts.dryRun,opts.httpWait,opts.globalLog
 
 if opts.impLibraries:
-	print("\n\n ------------------------ IMPORTING ---------------------------------------\n\n")
+	print "\n\n ------------------------ IMPORTING ---------------------------------------\n\n"
 	sys.path.append('.')
 	for lib in opts.impLibraries:
-		print("\n\n ------------------------ IMPORTING ---------------------------------------\n\n")
-		print(lib)
+		print "\n\n ------------------------ IMPORTING ---------------------------------------\n\n"
+		print lib
 		__import__(lib)
 
 if opts.version:
-	print('Yade version: %s, features: %s'%(version,','.join(features)))
+	print 'Yade version: %s, features: %s'%(version,','.join(features))
 	sys.exit(0)
 
 if globalLog:
-	print('Redirecting all output to',globalLog)
+	print 'Redirecting all output to',globalLog
 	sys.stderr=open(globalLog,"w")
 	sys.stdout=sys.stderr
 
@@ -416,14 +414,14 @@ if not opts.disablePynotify:
 	except Exception:
 		pynotifyAvailable = False
 
-print("Will run simulation(s) %s using `%s', nice value %d, using max %d cores."%(scripts,executable,nice,maxJobs))
+print "Will run simulation(s) %s using `%s', nice value %d, using max %d cores."%(scripts,executable,nice,maxJobs)
 
 if table:
 	reader=yade.utils.TableParamReader(table)
 	params=reader.paramDict()
 	availableLines=params.keys()
 
-	print("Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.')
+	print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
 
 	if lineList:
 		useLines=[]
@@ -438,9 +436,9 @@ if table:
 			if l not in availableLines: logging.warn('Skipping unavailable line %d that was requested from the command line.'%l)
 			else: useLines+=[l]
 	else: useLines=availableLines
-	print("Will use lines ",', '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.')
+	print "Will use lines ",', '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.'
 else:
-	print("Running %d stand-alone simulation(s) in batch mode."%(len(scripts)))
+	print "Running %d stand-alone simulation(s) in batch mode."%(len(scripts))
 	useLines=[]
 	params={}
 	for i,s in enumerate(scripts):
@@ -509,11 +507,11 @@ for i,l in enumerate(useLines):
 		if opts.timing>0: desc+='[%d]'%j
 		jobs.append(JobInfo(jobNum,desc,fullCmd,hrefCmd,logFile2,nCores,script=script,table=table,lineNo=l,affinity=jobAffinity))
 
-print("Master process pid",os.getpid())
+print "Master process pid",os.getpid()
 
-print("Job summary:")
+print "Job summary:"
 for job in jobs:
-	print('   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command)
+	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command
 sys.stdout.flush()
 
 
@@ -529,28 +527,28 @@ if opts.plotAlwaysUpdateTime>0:
 # OK, go now
 if not dryRun: runJobs(jobs,maxJobs)
 
-print('All jobs finished, total time ',t2hhmmss(totalRunningTime()))
+print 'All jobs finished, total time ',t2hhmmss(totalRunningTime())
 
 plots=[]
 for j in jobs:
 	if not os.path.exists(j.plotsFile): continue
 	plots.append(j.plotsFile)
-if plots: print('Plot files:',' '.join(plots))
+if plots: print 'Plot files:',' '.join(plots)
 
 # for easy grepping in logfiles:
-print('Log files:',' '.join([j.log for j in jobs]))
+print 'Log files:',' '.join([j.log for j in jobs])
 
 # write timing table
 if opts.timing>0:
 	if opts.timingOut:
-		print('Writing gathered timing information to',opts.timingOut)
+		print 'Writing gathered timing information to',opts.timingOut
 		try:
 			out=open(opts.timingOut,'w')
 		except IOError:
 			logging.warn('Unable to open file %s for timing output, writing to stdout.'%opts.timingOut)
 			out=sys.stdout
 	else:
-		print('Gathered timing information:')
+		print 'Gathered timing information:'
 		out=sys.stdout
 	# write header
 	out.write('## timing data, written '+time.asctime()+' with arguments\n##    '+' '.join(sys.argv)+'\n##\n')
@@ -566,9 +564,9 @@ if opts.timing>0:
 		out.write('%d\t%d\t%.2f\t%.2f\t%.3g\t%.2f\t%.2f\t|\t'%(l,len(jobTimes),tAvg,tDev,tRelDev,tMin,tMax)+'\t'.join([params[l][p] for p in paramNames])+'\n')
 
 if not gnuplotOut:
-	print('Bye.')
+	print 'Bye.'
 else:
-	print('Assembling gnuplot files…')
+	print 'Assembling gnuplot files…'
 	for job in jobs:
 		for l in file(job.log):
 			if l.startswith('gnuplot '):
@@ -577,7 +575,7 @@ else:
 	preamble,plots='',[]
 	for job in jobs:
 		if not 'plot' in job.__dict__:
-			print("WARN: No plot found for job "+job.id)
+			print "WARN: No plot found for job "+job.id
 			continue
 		for l in file(job.plot):
 			if l.startswith('plot'):
@@ -594,10 +592,10 @@ else:
 	gp=file(gnuplotOut,'w')
 	gp.write(preamble)
 	gp.write('plot '+','.join(plots))
-	print("gnuplot",gnuplotOut)
-	print("Plot written, bye.")
+	print "gnuplot",gnuplotOut
+	print "Plot written, bye."
 if httpWait and time.time()-httpLastServe<30:
-	print("(continue serving http until no longer requested  as per --http-wait)")
+	print "(continue serving http until no longer requested  as per --http-wait)"
 	while time.time()-httpLastServe<30:
 		time.sleep(1)
 

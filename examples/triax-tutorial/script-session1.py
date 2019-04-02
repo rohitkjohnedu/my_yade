@@ -19,7 +19,6 @@
 ## If you want to know more on micro-macro relations evaluated by triaxial simulations
 ## AND if you can read some french, it is here: http://tel.archives-ouvertes.fr/docs/00/48/68/07/PDF/Thesis.pdf
 
-from __future__ import unicode_literals
 from yade import pack
 
 ############################################

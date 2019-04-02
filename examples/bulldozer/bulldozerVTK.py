@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation with VTK recorder
 ### vtk-files are saved in /tmp directory with names buldozer-*.vtk
-from __future__ import unicode_literals
 from numpy import linspace
 from numpy import arange
 import gts

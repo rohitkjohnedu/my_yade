@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 #!${pyExecutable}
 # encoding: utf-8
 #
@@ -22,7 +20,7 @@ import os, sys, thread, time, logging, pipes, socket, xmlrpclib, re, shutil, ran
 # Setup executable
 
 ## replaced by scons automatically
-prefix,suffix='${runtimePREFIX}' if 'YADE_PREFIX' not in os.environ else os.environ['YADE_PREFIX'],'${SUFFIX}'
+prefix,suffix='${runtimePREFIX}' if not os.environ.has_key('YADE_PREFIX') else os.environ['YADE_PREFIX'],'${SUFFIX}'
 
 libPATH='${LIBRARY_OUTPUT_PATH}'
 if (libPATH[1:] == '{LIBRARY_OUTPUT_PATH}'): libPATH='lib'
@@ -90,11 +88,11 @@ args = opts.args
 logFormat,lineList,nice,executable,dryRun,globalLog,project, walltime=opts.logFormat,opts.lineList,opts.nice,opts.executable,opts.dryRun,opts.globalLog,opts.oar_p,opts.oar_t
 
 if opts.version:
-	print('Yade version: %s, features: %s'%(version,','.join(features)))
+	print 'Yade version: %s, features: %s'%(version,','.join(features))
 	sys.exit(0)
 
 if globalLog:
-	print('Redirecting all output to',globalLog)
+	print 'Redirecting all output to',globalLog
 	sys.stderr=open(globalLog,"w")
 	sys.stdout=sys.stderr
 
@@ -110,7 +108,7 @@ else:
 	sys.exit(1)
 	
 if opts.oar_script == '' :
-        print('--oar_script is mandatory');
+        print '--oar_script is mandatory';
         sys.exit(1);
 
 pynotifyAvailable = False
@@ -123,14 +121,14 @@ if not opts.disablePynotify:
 	except ImportError:
 		pynotifyAvailable = False
 
-print("Will run simulation(s) %s using `%s', nice value %d"%(scripts,executable,nice))
+print "Will run simulation(s) %s using `%s', nice value %d"%(scripts,executable,nice)
 
 if table:
 	reader=yade.utils.TableParamReader(table)
 	params=reader.paramDict()
 	availableLines=params.keys()
 
-	print("Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.')
+	print "Will use table `%s', with available lines"%(table),', '.join([str(i) for i in availableLines])+'.'
 
 	if lineList:
 		useLines=[]
@@ -145,9 +143,9 @@ if table:
 			if l not in availableLines: logging.warn('Skipping unavailable line %d that was requested from the command line.'%l)
 			else: useLines+=[l]
 	else: useLines=availableLines
-	print("Will use lines ",',\n '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.')
+	print "Will use lines ",',\n '.join([str(i)+' (%s)'%params[i]['description'] for i in useLines])+'.'
 else:
-	print("Running %d stand-alone simulation(s) in batch mode."%(len(scripts)))
+	print "Running %d stand-alone simulation(s) in batch mode."%(len(scripts))
 	useLines=[]
 	params={}
 	for i,s in enumerate(scripts):
@@ -211,10 +209,10 @@ for i,l in enumerate(useLines):
 if not os.path.exists('tmp/'+str(os.getpid())):
     os.makedirs('tmp/'+str(os.getpid()));
 
-print("Job summary:")
+print "Job summary:"
 i = 0
 for job in jobs:
-	print('   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command)
+	print '   #%d (%s%s):'%(job.num,job.id,'' if job.nCores==1 else '/%d'%job.nCores),job.command
 	if not dryRun:
 		# Create script file from model
 		scriptname = 'tmp/'+str(os.getpid())+'/'+opts.oar_script.split('/')[-1]+'.'+str(i)
@@ -238,7 +236,7 @@ for job in jobs:
 			prop+=' -t besteffort'
 
 
-		os.chmod(scriptname,0o744);
+		os.chmod(scriptname,0744);
 		#os.system('%s'%(scriptname));
 		os.system('oarsub --project=%s %s -l/cpu=1/core=%i,walltime=%s -O %s -E %s.err %s\n'%(project, prop, job.nCores, walltime, job.log,job.log,scriptname));
 

@@ -2,7 +2,6 @@
 '''
 Various computations affected by the periodic boundary conditions.
 '''
-from __future__ import unicode_literals
 
 import unittest
 import random

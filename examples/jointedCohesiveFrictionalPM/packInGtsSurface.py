@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import pack, export, ymport
 import gts, os.path, locale
 
@@ -13,7 +11,7 @@ sizeRatio=10. # defines discretisation (sizeRatio=meshLength/particleDiameter)
 locale.setlocale(locale.LC_ALL,'en_US.UTF-8')   #gts is locale-dependend.  If, for example, german locale is used, gts.read()-function does not import floats normally
 surface=gts.read(open(mesh+'.gts'))
 
-print('closed? ', surface.is_closed())
+print 'closed? ', surface.is_closed()
 
 #### generate packing
 if surface.is_closed():
@@ -25,7 +23,7 @@ if surface.is_closed():
 	minDim=min(dim[0],dim[1],dim[2])
 	# define discretisation
 	radius=minDim/(2*sizeRatio)
-	print(center, dim, ' | minDim=', minDim, ' | diameter=', 2*radius)
+	print center, dim, ' | minDim=', minDim, ' | diameter=', 2*radius
 	### regular packing
 	#O.bodies.append(pack.regularHexa(pred,radius=radius,gap=0.,color=(0.9,0.8,0.6)))
 	#O.bodies.append(pack.regularOrtho(pred,radius=radius,gap=0.,color=(0.9,0.8,0.6)))

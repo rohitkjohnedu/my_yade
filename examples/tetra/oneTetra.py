@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 ################################################################################
 # 
 # Script to test tetra gl functions and prescribed motion

@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 #!/usr/local/bin/yade-trunk -x
 # -*- encoding=utf-8 -*-
 # CWBoon 2015

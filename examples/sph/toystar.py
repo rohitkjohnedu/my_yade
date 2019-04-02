@@ -4,8 +4,6 @@
 # This script demonstrates SPH-engine in Yade
 # !!! Very experimental at the moment!!!
 
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import utils, plot, qt
 o = Omega()
 
@@ -50,7 +48,7 @@ o.engines = [
 
 
 enlargeF = h/Rad*1.1
-print("enlargeF = %g"%enlargeF)
+print "enlargeF = %g"%enlargeF
 is2aabb.aabbEnlargeFactor = enlargeF
 ss2sc.interactionDetectionFactor = enlargeF
 

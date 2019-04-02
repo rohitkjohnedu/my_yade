@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import pack
 import random
 random.seed(1)
@@ -47,9 +45,9 @@ try: # should be ValueError, since the 3 planes does not form closed polyhedron 
 		((0,0,0), ( 0, 0,+1)),
 	))
 except ValueError:
-	print('ValueError successfully detected')
+	print 'ValueError successfully detected'
 else:
-	raise RuntimeError("ValueError should have been detected...")
+	raise RuntimeError, "ValueError should have been detected..."
 
 r = .05
 for p in (pred1,pred2,pred3):

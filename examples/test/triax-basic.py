@@ -1,6 +1,5 @@
 # encoding: utf-8
 # the script demonstrates a simple case of triaxial simulation using TriaxialCompressionEngine. More elaborated examples can be found in the triax-tutorial folder
-from __future__ import unicode_literals
 from yade import pack
 
 sp=pack.SpherePack()

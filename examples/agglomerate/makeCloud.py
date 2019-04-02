@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 ######################################################################
 # A script for prepare loose packing of macro particles
 ######################################################################

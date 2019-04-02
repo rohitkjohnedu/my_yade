@@ -9,8 +9,6 @@ $ yade-trunk dispatcher-torture.py > /tmp/aa.html
 $ firefox /tmp/aa.html
 
 """
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import collections
 Dispatch=collections.namedtuple('Dispatch',['basename','types'])
@@ -31,7 +29,7 @@ sys.path.append('.')
 try:
 	import HTML
 except:
-	print("\nERROR: This script needs an unpackaged python import from https://www.decalage.info/en/python/html a file HTML.py\n")
+	print "\nERROR: This script needs an unpackaged python import from https://www.decalage.info/en/python/html a file HTML.py\n"
 	sys.exit(1)
 outStr=''
 for D in dispatches:
@@ -69,5 +67,5 @@ for D in dispatches:
 	else: raise ValueError("Dispatcher must be 1D or 2D, not %dD"%len(D.types))
 	outStr+='\n<h1>%sDispatcher</h1>'%D.basename
 	outStr+=str(table)
-print(outStr)
+print outStr
 quit()

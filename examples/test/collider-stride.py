@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 #
 # check visually whether swept bounding boxes work as expected
 #

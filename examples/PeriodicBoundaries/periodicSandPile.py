@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # © 2012 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 """Script showing how large bodies can be combined with periodic boundary conditions using InsertioSortCollider::allowBiggerThanPeriod=True (1)."""
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from yade import pack
 from pylab import rand

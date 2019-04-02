@@ -1,6 +1,5 @@
 # -*- coding: utf-8
 
-from __future__ import unicode_literals
 from yade import pack,export,qt,geom
 import gts,os,random,itertools
 from numpy import *

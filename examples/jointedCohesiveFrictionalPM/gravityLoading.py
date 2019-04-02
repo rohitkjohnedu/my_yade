@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import unicode_literals
 O=Omega()
 from yade import plot, pack,utils,ymport
 
@@ -15,7 +13,7 @@ maxIter=10000
 
 #### Import of the sphere assembly
 def sphereMat(): return JCFpmMat(type=1,young=1e8,frictionAngle=radians(30),density=3000,poisson=0.3,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1e7,jointShearStiffness=1e7,jointCohesion=1e6,jointFrictionAngle=jointFrict,jointDilationAngle=jointDil) ## Rq: density needs to be adapted as porosity of real rock is different to granular assembly due to difference in porosity (utils.sumForces(baseBodies,(0,1,0))/(Z*X) should be equal to Gamma*g*h with h=Y, g=9.82 and Gamma=2700 kg/m3
-print("\n  In case of errors please look at README about generating parallellepiped_10_persistentPlane30Deg.spheres file\n")
+print "\n  In case of errors please look at README about generating parallellepiped_10_persistentPlane30Deg.spheres file\n"
 O.bodies.append(ymport.text(packing+'.spheres',scale=1.,shift=Vector3(0,0,0),material=sphereMat))
 
 ## preprocessing to get dimensions of the packing
@@ -122,7 +120,7 @@ degrade=True
 def jointStrengthDegradation():
     global degrade
     if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[1])<stableVel :
-	print('!joint cohesion total degradation!', ' | iteration=', O.iter)
+	print '!joint cohesion total degradation!', ' | iteration=', O.iter
 	degrade=False
 	for i in O.interactions:
 	    if i.phys.isOnJoint : 

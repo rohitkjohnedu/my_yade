@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 ### Simpificated buldozer simulation
-from __future__ import unicode_literals
 from numpy import linspace
 from numpy import arange
 import gts

@@ -1,5 +1,4 @@
 # -*- coding: utf-8
-from __future__ import unicode_literals
 from yade import qt,plot
 from yade.gridpfacet import *
 

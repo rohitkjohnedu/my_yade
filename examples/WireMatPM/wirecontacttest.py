@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from yade import plot, qt
 
 #### define parameters for the net

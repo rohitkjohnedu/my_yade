@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # demonstrate 3d postprocessing with yade
 #
 # 1. qt.SnapshotEngine saves images of the 3d view as it appears on the screen periodically

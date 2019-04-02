@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # install pyqglviewer from https://launchpad.net/~nakednous/+ppa-packages
 from PyQGLViewer import *
 

@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import plot, polyhedra_utils, ymport, export
 import os.path
 

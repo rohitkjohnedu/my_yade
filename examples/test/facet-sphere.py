@@ -2,7 +2,6 @@
 # © Václav Šmilauer <eudoxos@arcig.cz>
 #
 # Test case for sphere-facet interaction.
-from __future__ import unicode_literals
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),

@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from yade import pack,ymport,export,geom,bodiesHandling
 
 """ This script demonstrates how to use 2 components of creating packings:

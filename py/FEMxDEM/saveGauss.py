@@ -2,7 +2,6 @@
 2D/3D Function to output Gauss point tensorial quantities, e.g. stress, strain, fabric.
 Author: Ning Guo <ceguo@connect.ust.hk>
 """
-from __future__ import unicode_literals
 def saveGauss2D(name='',pos=(),**kwargs):
    fout = file(name,'w')
    for key in kwargs:

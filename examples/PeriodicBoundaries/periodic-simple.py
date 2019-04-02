@@ -2,7 +2,6 @@
 A few spheres falling down in gravity field and one moving accross.
 Includes a clump.
 """
-from __future__ import unicode_literals
 
 from yade import timing
 

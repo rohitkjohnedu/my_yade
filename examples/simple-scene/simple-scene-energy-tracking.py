@@ -6,8 +6,6 @@
 ############################################
 # Cundall non-viscous damping
 # try zero damping and watch total energy...
-from __future__ import print_function
-from __future__ import unicode_literals
 damping = 0.2
 # initial angular velocity
 angVel = 3.0
@@ -143,7 +141,7 @@ def myAddPlotData():
 		total_plus_damp	  = total_plus_damp	 ,
 	)
 
-print("Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live.")
+print "Now calling plot.plot() to show the figures. The timestep is artificially low so that you can watch graphs being updated live."
 plot.liveInterval=2
 plot.plot(subPlots=False)
 #from yade import qt

@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 24/11/2017
@@ -24,7 +22,7 @@ endFile = 400		# File where the post-processing ends
 
 scriptPath = os.path.abspath(os.path.dirname(sys.argv[-1])) #Path where the script is stored
 if os.path.exists(scriptPath +'/data/')==False:	#If the data folder does not exist, no data to extract, exit. 
-	print('\n There is no data to extract in this folder ! Please first run sedimentTransportExample_1DRANSCoupling.py !\n')
+	print '\n There is no data to extract in this folder ! Please first run sedimentTransportExample_1DRANSCoupling.py !\n'
 	exit()
 else:	#Else, extract the first file in order to get the size of the vectors, ndimz
 	execfile(scriptPath +'/data/0.py')

@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-from __future__ import print_function
-from __future__ import unicode_literals
 from sys import *
 import os,re
 from string import *
@@ -52,7 +50,7 @@ def grepCpp(path,f,level=0):
 		if m:
 			inc=m.group(1); incBaseName=m.group(1).split('.')[0]
 			if not os.path.exists(path+sep+m.group(1)):
-				print("WARNING: file %s included from %s doesn't exist"%(m.group(1),fullF))
+				print "WARNING: file %s included from %s doesn't exist"%(m.group(1),fullF)
 				pass
 			else:
 				if m.group(1).split('.')[0] not in plugins or incBaseName==baseName:
@@ -85,11 +83,11 @@ def getPluginLibs(plugin):
 		try:
 			libs.add(pluginObjs[lib])
 		except KeyError:
-			print('WARNING: plugin %s, missing lib %s'%(plugin,lib))
+			print 'WARNING: plugin %s, missing lib %s'%(plugin,lib)
 	return libs
 allLibs=set();
 for p in pluginSrcs.keys(): allLibs.update(getPluginLibs(p))
-print("\tenv.SharedLibrary('packages',Split('"+' '.join(pluginSrcs.values())+"'),LIBS=env['LIBS']+Split('"+' '.join(allLibs)+"'),CXXFLAGS=env['CXXFLAGS']+['--combine'])")
+print "\tenv.SharedLibrary('packages',Split('"+' '.join(pluginSrcs.values())+"'),LIBS=env['LIBS']+Split('"+' '.join(allLibs)+"'),CXXFLAGS=env['CXXFLAGS']+['--combine'])"
 #print plugin,' '.join(feats)
 #print f ,' '.join(feats)
 

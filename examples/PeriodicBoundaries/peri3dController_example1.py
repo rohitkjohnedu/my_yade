@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # peri3dController_example1.py
 # script, that explains funcionality and input parameters of Peri3dController
 

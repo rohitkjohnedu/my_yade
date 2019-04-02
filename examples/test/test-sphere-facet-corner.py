@@ -3,7 +3,6 @@
 
 
 ## PhysicalParameters 
-from __future__ import unicode_literals
 Young = 7e6
 Poisson = 0.2
 Density=2700

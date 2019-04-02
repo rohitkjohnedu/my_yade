@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 07/07/2016

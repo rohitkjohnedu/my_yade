@@ -5,7 +5,6 @@
 This test module covers python/c++ transitions, for both classes deriving from Serializable,
 but also for other classes that we wrap (like miniEigen).
 """
-from __future__ import unicode_literals
 
 import unittest
 from yade.wrapper import *

@@ -15,7 +15,6 @@
 # Capillary forces between surfaces with nanoscale roughness (Yakov I. Rabinovich ...)
 # http://diyhpl.us/~bryan/papers2/Capillary%20forces%20between%20surfaces%20with%20nanoscale%20roughness.pdf
 
-from __future__ import unicode_literals
 from yade import utils, plot
 o = Omega()
 fr = 0.5;rho=2000

@@ -1,6 +1,5 @@
 # -*- encoding=utf-8 -*-
 
-from __future__ import unicode_literals
 O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Box_Aabb()]),

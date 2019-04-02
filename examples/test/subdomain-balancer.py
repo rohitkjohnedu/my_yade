@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from yade import pack,timing
 readParamsFromTable(noTableOk=True,num=12000)
 import yade.params.table

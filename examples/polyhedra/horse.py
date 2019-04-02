@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # modified script yade/examples/gts-horse/horse.py
 from yade import pack,ymport
 import gts

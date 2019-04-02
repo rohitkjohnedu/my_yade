@@ -1,7 +1,6 @@
 '''
 This example shows compression of a packing with a periodic cell.
 '''
-from __future__ import unicode_literals
 
 O.periodic=True
 O.cell.setBox(20,20,10)

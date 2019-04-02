@@ -5,8 +5,6 @@
 # Checks the correctness of NewtonIntegrator and GravityEngine
 
 ## Omega
-from __future__ import print_function
-from __future__ import unicode_literals
 o=Omega() 
 
 ## PhysicalParameters 
@@ -72,12 +70,12 @@ def getCurrentVel(inVel=0):
   return inVel + g*t
 
 def warningMessagePos(inVel, y_pos, y_pos_need):
-  print("The body with the initial velocity %.3f, has an y-position %.3f, but it should be %.3f" % (inVel, y_pos, y_pos_need))
+  print "The body with the initial velocity %.3f, has an y-position %.3f, but it should be %.3f" % (inVel, y_pos, y_pos_need)
   global resultStatus
   resultStatus+=1
   
 def warningMessageVel(inVel, y_vel, y_pos_vel):
-  print("The body with the initial velocity %.3f, has an y-velocity %.3f, but it should be %.3f" % (inVel, y_vel, y_pos_vel))
+  print "The body with the initial velocity %.3f, has an y-velocity %.3f, but it should be %.3f" % (inVel, y_vel, y_pos_vel)
   global resultStatus
   resultStatus+=1
 

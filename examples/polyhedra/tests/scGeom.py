@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 from yade import plot, polyhedra_utils
 from yade import qt
 

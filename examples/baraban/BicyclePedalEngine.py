@@ -3,7 +3,6 @@
 """
 Engine applying the linear motion of bicycle pedal e.g. moving points around the axis without rotation
 """
-from __future__ import unicode_literals
 
 import time
 

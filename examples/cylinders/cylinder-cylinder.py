@@ -1,6 +1,5 @@
 # encoding: utf-8
 "An example showing how to create two cylinders which are interacting."
-from __future__ import unicode_literals
 
 from yade.gridpfacet import *
 

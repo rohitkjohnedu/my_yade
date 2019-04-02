@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import unicode_literals
 # Performance test for running
 #
 #  1. Regular TriaxialTest with 3 independent dispatchers (geom, phys, constitutive law)
@@ -22,5 +20,5 @@ O.timingEnabled=True
 O.run(200,True)
 from yade import timing
 timing.stats()
-print('ForceContainer synced %d times'%(O.bexSyncCount))
+print 'ForceContainer synced %d times'%(O.bexSyncCount)
 

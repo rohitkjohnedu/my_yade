@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # Example of ymport.unv function and also export.VTKExporter.exportFacetsAsMesh
 # Reads facets from shell.unv and saves them as one mesh to vtk file
 

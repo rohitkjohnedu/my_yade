@@ -3,8 +3,6 @@
 # Several spheres falling down into the box.
 # Their weight is measured and compares with real mass particles
 
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import utils,pack,export,geom
 
 tc=0.001

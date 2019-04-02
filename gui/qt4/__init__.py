@@ -1,6 +1,4 @@
 # encoding: utf-8
-from __future__ import print_function
-from __future__ import unicode_literals
 import yade.runtime
 if not yade.runtime.hasDisplay:
 	msg = "Connecting to DISPLAY at Yade startup failed, unable to activate the qt4 interface."
@@ -110,7 +108,7 @@ class ControllerClass(QWidget,Ui_Controller):
 	def pythonComboSlot(self,cmd):
 		try:
 			code=compile(str(cmd),'<UI entry>','exec')
-			exec(code, globals())
+			exec code in globals()
 		except:
 			import traceback
 			traceback.print_exc()
@@ -118,7 +116,7 @@ class ControllerClass(QWidget,Ui_Controller):
 		filename=str(self.generatorFilenameEdit.text())
 		if self.generatorMemoryCheck.isChecked():
 			filename=':memory:'+filename
-			print('BUG: Saving to memory slots freezes Yade (cause unknown). Cross fingers.')
+			print 'BUG: Saving to memory slots freezes Yade (cause unknown). Cross fingers.'
 		#print 'Will save to ',filename
 		self.generator.generate(filename)
 		if self.generatorAutoCheck:

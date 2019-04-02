@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import pack, utils, ymport, export
 
 packing='parallellepiped_10'
@@ -12,7 +10,7 @@ facetMat = O.materials.append(JCFpmMat(type=0,young=1,frictionAngle=radians(1),p
 def sphereMat(): return JCFpmMat(type=1,young=1,frictionAngle=radians(1),density=1,poisson=1,tensileStrength=1e6,cohesion=1e6,jointNormalStiffness=1,jointShearStiffness=1,jointTensileStrength=1e6,jointCohesion=1e6,jointFrictionAngle=1)
 
 ############################ Import of the sphere assembly
-print("\n  In case of errors please look at README about generating parallellepiped_10.spheres file\n")
+print "\n  In case of errors please look at README about generating parallellepiped_10.spheres file\n"
 O.bodies.append(ymport.text(packing+'.spheres',scale=1,shift=Vector3(0,0,0),material=sphereMat)) #(-3,-4,-8)
 
 #### some preprocessing (not mandatory)
@@ -38,7 +36,7 @@ for o in O.bodies:
    o.shape.color=(0,0,0)
 Rmean=R/numSpheres
 
-print('number of spheres=', numSpheres, ' | Rmean=', Rmean, ' | dim=', dim)
+print 'number of spheres=', numSpheres, ' | Rmean=', Rmean, ' | dim=', dim
 
 ############################ import stl file
 O.bodies.append(ymport.stl(DFN+'.stl',color=(0.9,0.9,0.9),wire=False,material=facetMat)) 

@@ -4,7 +4,6 @@
 
 # This script shows how to run a triaxial test on clumps.
 
-from __future__ import unicode_literals
 from yade import pack
 from numpy import arange
 import itertools

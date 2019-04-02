@@ -3,7 +3,6 @@
 
 """Simple script which shows how to create an inlet.
 """
-from __future__ import unicode_literals
 
 shotsId,steelId=O.materials.append([
 	FrictMat(young=50e9,density=6000,poisson=.2,label='shots'),

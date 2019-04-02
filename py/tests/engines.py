@@ -1,5 +1,4 @@
 'test functionality of individual engines'
-from __future__ import unicode_literals
 
 import unittest
 import random

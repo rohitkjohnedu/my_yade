@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-from __future__ import unicode_literals
 from yade import pack
 
 num_spheres=500
@@ -85,12 +83,12 @@ while 1:
   #average stress
   #note: triax.stress(k) returns a stress vector, so we need to keep only the normal component
   meanS=(triax.stress(triax.wall_right_id)[0]+triax.stress(triax.wall_top_id)[1]+triax.stress(triax.wall_front_id)[2])/3
-  print('unbalanced force:',unb,' mean stress: ',meanS)
+  print 'unbalanced force:',unb,' mean stress: ',meanS
   if unb<stabilityThreshold and abs(meanS+10000)/10000<0.001:
     break
 
 O.save('compressedState'+key+'.xml')
-print("###      Isotropic state saved      ###")
+print "###      Isotropic state saved      ###"
 
 #let us turn internal compaction off...
 triax.internalCompaction=False
