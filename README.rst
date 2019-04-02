@@ -14,10 +14,12 @@ sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot d
 
 **Implementation status**
 
-- cmake and yade compilation ok with default cmake options
+- cmake and yade compilation ok with python3
+- yade launch ok with python3, generating/launching triax ok
 
 **Known bugs/todos**
 
 - update CMakeLists.txt to make python3 and python2 optional (and one of them at least is necessary)
-- pygts may not compile
+- (FIXED by Vaclav) pygts may not compile
 - python3-bibtex package doesn't exist, and underlying _bibtex python module will not be found. As a result, the doc will not compile. We may use another python bibtex parser or use sphinxcontrib-bibtex: https://sphinxcontrib-bibtex.readthedocs.io/en/latest/usage.html
+- fix checks/tests
