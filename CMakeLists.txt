@@ -28,8 +28,7 @@
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 #  USE_QT5: use QT5 for GUI (ON by default)
 #  CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
-#  ENABLE_FOAMCOUPLING : enable the Yade-OpenFOAM coupling engine to realize coupled CFD-DEM simulations (two-way coupling between fluid and particles), requires
-#  MPI library (preferably OpenMPI).
+#  ENABLE_MPI : Enable MPI communications in Yade. Used for Yade-OpenFOAM coupling.
 
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8.11)
@@ -152,7 +151,7 @@ OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" OFF)
 OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" OFF)
-OPTION(ENABLE_FOAMCOUPLING "Enable Yade OpenFOAM coupling " OFF)
+OPTION(ENABLE_MPI "Enable MPI environement and communications, required for coupling Yade with OpenFOAM  " OFF)
 #===========================================================
 # Use Eigen3 by default
 IF (EIGEN3_FOUND)
@@ -374,21 +373,21 @@ ELSE(ENABLE_LINSOLV)
       ENDIF(ENABLE_TWOPHASEFLOW)
 ENDIF(ENABLE_LINSOLV)
 #===============================================
-IF(ENABLE_FOAMCOUPLING)
+IF(ENABLE_MPI)
   FIND_PACKAGE(MPI)
   IF (MPI_FOUND)
     INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DYADE_FOAM")
     SET (LINKLIBS "${LINKLIBS};${MPI_CXX_LIBRARIES};")
     MESSAGE(STATUS "MPI found")
-    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} FOAMCOUPLING")
+    SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} MPI")
   ELSE(MPI_FOUND)
     MESSAGE(STATUS "MPI NOT FOUND, YADE-OpenFOAM coupling disabled")
-    SET (DISABLED_FEATS "${DISABLED_FEATS} FOAMCOUPLING")
+    SET (DISABLED_FEATS "${DISABLED_FEATS} MPI")
   ENDIF(MPI_FOUND)
 ELSE(ENABLE_FOAMCOUPLING)
-    SET (DISABLED_FEATS "${DISABLED_FEATS} FOAMCOUPLING")
-ENDIF(ENABLE_FOAMCOUPLING)
+    SET (DISABLED_FEATS "${DISABLED_FEATS} MPI")
+ENDIF(ENABLE_MPI)
 #===============================================
 IF(ENABLE_TWOPHASEFLOW)
 	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTWOPHASEFLOW")
