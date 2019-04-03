@@ -2,7 +2,7 @@
 YADE - Yet Another Dynamic Engine - Python 3 branch
 ===================================================
 
-This branch is used to migrate yade to python version 3. **It is under development, currently not working**.
+This branch is used to migrate yade to python version 3. **It is under development**.
 
 **Installation**
 
@@ -16,11 +16,13 @@ sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot d
 
 - cmake and yade compilation ok with python3
 - yade launch ok with python3, generating/launching triax ok
+- yade --test all ok
 
 **Known bugs/todos**
 
 - update CMakeLists.txt to make python3 and python2 optional (and one of them at least is necessary)
 - (FIXED by Vaclav) pygts may not compile
 - python3-bibtex package doesn't exist, and underlying _bibtex python module will not be found. As a result, the doc will not compile. We may use another python bibtex parser or use sphinxcontrib-bibtex: https://sphinxcontrib-bibtex.readthedocs.io/en/latest/usage.html
-- fix checks/tests
+- (PARTIALLY FIXED) fix checks/tests (checks neither work in the master branch)
 - try/fix python2 retro-compatibility
+- try/fix examples
