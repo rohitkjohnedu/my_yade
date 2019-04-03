@@ -2,9 +2,7 @@
 # author: Marcus Guadagnin Moravia <marcus.moravia@3sr-grenoble.fr>
 # example showing how to handle interactions involving spheres, gridConnections, and PFacets
 # running the script there will be contacts between: sphere-sphere, sphere-gridConnection, sphere-PFacet, griConnection-gridConnection, gridConnection-PFacet, and PFacet-PFacet
-from __future__ import division
 from builtins import range
-from past.utils import old_div
 from yade import qt,plot
 from yade.gridpfacet import *
 
@@ -65,12 +63,12 @@ nodesBG=[]
 #node
 for i in range(0,nbL):
   for j in range(0,nbl):
-    nodesTG.append( O.bodies.append(gridNode([old_div(i*L,nbL),-0.1,old_div(j*l,nbl)],r,wire=False,fixed=False,material='cohfrictMat',color=colorTG)) )
+    nodesTG.append( O.bodies.append(gridNode([i*L/nbL,-0.1,j*l/nbl],r,wire=False,fixed=False,material='cohfrictMat',color=colorTG)) )
 #connection
 for i in range(0,len(nodesTG)):
   for j in range(i+1,len(nodesTG)):
     dist=(O.bodies[nodesTG[i]].state.pos - O.bodies[nodesTG[j]].state.pos).norm()
-    if(dist<=old_div(L,nbL*1.01)):
+    if(dist<=L/nbL*1.01):
       O.bodies.append( gridConnection(nodesTG[i],nodesTG[j],r,material='frictMat',color=colorTG) )
 #PFacet connection
 O.bodies.append( gridConnection(nodesTG[21],nodesTG[27],r,material='frictMat',color=colorTG) )
@@ -86,12 +84,12 @@ for i in range(nodesTG[0],nodesTG[5]):
 #node
 for i in range(0,nbL):
   for j in range(0,nbl):
-    nodesBG.append( O.bodies.append(gridNode([(old_div(i*L,nbL))+0.005,-0.11,old_div(j*l,nbl)],r,wire=False,fixed=False,material='cohfrictMat',color=colorBG)) )
+    nodesBG.append( O.bodies.append(gridNode([(i*L/nbL)+0.005,-0.11,j*l/nbl],r,wire=False,fixed=False,material='cohfrictMat',color=colorBG)) )
 #connection
 for i in range(0,len(nodesBG)):
   for j in range(i+1,len(nodesBG)):
     dist=(O.bodies[nodesBG[i]].state.pos - O.bodies[nodesBG[j]].state.pos).norm()
-    if(dist<=old_div(L,nbL*1.01)):
+    if(dist<=L/nbL*1.01):
       O.bodies.append( gridConnection(nodesBG[i],nodesBG[j],r,material='frictMat',color=colorBG) )
 #PFacet connection
 O.bodies.append( gridConnection(nodesBG[21],nodesBG[27],r,material='frictMat',color=colorBG) )

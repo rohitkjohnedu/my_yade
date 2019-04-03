@@ -1,8 +1,6 @@
 # encoding: utf-8
 "An example showing how to create two cylinders which are interacting."
-from __future__ import division
 
-from past.utils import old_div
 from yade.gridpfacet import *
 
 #### Parameter ####
@@ -42,15 +40,15 @@ nodesIds=[]
 cylIds=[]
 cylinder((0,0,0),(L,0,0),radius=r,nodesIds=nodesIds,cylIds=cylIds,
 				 fixed=True,color=[1,0,0],intMaterial='cMat',extMaterial='fMat')
-cylinder((old_div(L,4),old_div(2*L,3),L),(old_div(L,4),old_div(-L,3),L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
+cylinder((L/4,2*L/3,L),(L/4,-L/3,L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
 				 fixed=False,color=[0,1,0],intMaterial='cMat',extMaterial='fMat')
-cylinder((0,old_div(2*L,3),L),(0,old_div(-L,3),L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
+cylinder((0,2*L/3,L),(0,-L/3,L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
 				 fixed=False,color=[0,1,0],intMaterial='cMat',extMaterial='fMat')
-cylinder((old_div(L,2),old_div(L,2),L),(old_div(L,2),old_div(-L,2),L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
+cylinder((L/2,L/2,L),(L/2,-L/2,L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
 				 fixed=False,color=[0,1,1],intMaterial='cMat',extMaterial='fMat')
-cylinder((old_div(3*L,4),old_div(L,3),L),(old_div(3*L,4),old_div(-2*L,3),L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
+cylinder((3*L/4,L/3,L),(3*L/4,-2*L/3,L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
 				 fixed=False,color=[0,0,1],intMaterial='cMat',extMaterial='fMat')
-cylinder((L,old_div(L,3),L),(L,old_div(-2*L,3),L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
+cylinder((L,L/3,L),(L,-2*L/3,L),radius=r,nodesIds=nodesIds,cylIds=cylIds,
 				 fixed=False,color=[0,0,1],intMaterial='cMat',extMaterial='fMat')
 
 #### For viewing ####

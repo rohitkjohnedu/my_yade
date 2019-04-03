@@ -5,8 +5,6 @@
 # !!! Very experimental at the moment!!!
 
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 from yade import utils, plot, qt
 o = Omega()
 
@@ -51,7 +49,7 @@ o.engines = [
   SPHEngine(mask=3, k=k, rho0 = rho, h=h, KernFunctionDensity= 1),
 ]
 
-enlargeF = old_div(h,Rad*1.1)
+enlargeF = h/Rad*1.1
 print("enlargeF = %g"%enlargeF)
 is2aabb.aabbEnlargeFactor = enlargeF
 ss2sc.interactionDetectionFactor = enlargeF

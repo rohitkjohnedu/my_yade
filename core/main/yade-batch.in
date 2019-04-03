@@ -1,18 +1,15 @@
+from __future__ import print_function
 #!${pyExecutable}
 # encoding: utf-8
 #
 # vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
-from __future__ import print_function
-from __future__ import division
-
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 import os, sys, _thread, time, logging, pipes, socket, xmlrpc.client, re, shutil, random
 
 # Add search path for yade Python-modules
@@ -115,8 +112,8 @@ finished: %s
 		if info:
 			ret+='<td>'
 			if info['stopAtIter']>0:
-				ret+='<nobr>%2.2f%% done</nobr><br/><nobr>step %d/%d</nobr>'%(old_div(info['iter']*100.,info['stopAtIter']),info['iter'],info['stopAtIter'])
-				finishTime = str(time.ctime(time.time()+int((old_div(round(info['stopAtIter'] - info['iter']),info['speed'])))))
+				ret+='<nobr>%2.2f%% done</nobr><br/><nobr>step %d/%d</nobr>'%(info['iter']*100./info['stopAtIter'],info['iter'],info['stopAtIter'])
+				finishTime = str(time.ctime(time.time()+int((round(info['stopAtIter'] - info['iter'])/info['speed']))))
 				ret+='<br/><font size="1"><nobr>%s finishes</nobr></font><br/>'%finishTime
 			else: ret+='<nobr>step %d</nobr>'%(info['iter'])
 			if info['realtime']!=0: ret+='<br/><nobr>speed %g/sec</nobr>'%(info['speed'])
@@ -566,10 +563,10 @@ if opts.timing>0:
 	import math
 	for i,l in enumerate(useLines):
 		jobTimes=[j.durationSec for j in jobs if j.lineNo==l and j.durationSec!=None]
-		tSum=sum(jobTimes); tAvg=old_div(tSum,len(jobTimes))
+		tSum=sum(jobTimes); tAvg=tSum/len(jobTimes)
 		tMin,tMax=min(jobTimes),max(jobTimes)
-		tDev=math.sqrt(old_div(sum((t-tAvg)**2 for t in jobTimes),len(jobTimes)))
-		tRelDev=old_div(tDev,tAvg)
+		tDev=math.sqrt(sum((t-tAvg)**2 for t in jobTimes)/len(jobTimes))
+		tRelDev=tDev/tAvg
 		out.write('%d\t%d\t%.2f\t%.2f\t%.3g\t%.2f\t%.2f\t|\t'%(l,len(jobTimes),tAvg,tDev,tRelDev,tMin,tMax)+'\t'.join([params[l][p] for p in paramNames])+'\n')
 
 if not gnuplotOut:

@@ -3,12 +3,10 @@
 Export (not only) geometry to various formats.
 """
 from __future__ import print_function
-from __future__ import division
 
 from builtins import zip
 from builtins import str
 from builtins import range
-from past.utils import old_div
 from builtins import object
 from yade.wrapper import *
 from yade import utils,Matrix3,Vector3
@@ -822,7 +820,7 @@ class VTKExporter(object):
 		for b in bodies:
 			ff = []
 			f = b.shape.GetSurfaceTriangulation()
-			for i in range(old_div(len(f),3)):
+			for i in range(len(f)/3):
 				ff.append([f[3*i+j] for j in (0,1,2)])
 			bodyFaces.append(ff)
 		# output file
@@ -1051,7 +1049,7 @@ def text2vtkSection(inFileName,outFileName,point,normal=(1,0,0)):
 	"""
 	from math import sqrt
 	norm = sqrt(pow(normal[0],2)+pow(normal[1],2)+pow(normal[2],2))
-	normal = (old_div(normal[0],norm),old_div(normal[1],norm),old_div(normal[2],norm))
+	normal = (normal[0]/norm,normal[1]/norm,normal[2]/norm)
 	#
 	def computeD(point,normal):
 		# from point and normal computes parameter d in plane equation ax+by+cz+d=0
@@ -1067,7 +1065,7 @@ def text2vtkSection(inFileName,outFileName,point,normal=(1,0,0)):
 			d = computeD(point,normal)
 		nx,ny,nz = normal[0],normal[1],normal[2]
 		cx,cy,cz = dat[0],dat[1],dat[2]
-		t = old_div((-d-nx*cx-ny*cy-nz*cz), (nx*nx+ny*ny+nz*nz))
+		t = (-d-nx*cx-ny*cy-nz*cz) / (nx*nx+ny*ny+nz*nz)
 		x,y,z = cx+t*nx, cy+t*ny, cz+t*nz
 		return x,y,z
 	#

@@ -11,10 +11,8 @@ How to run this script:
     /path/to/yade ./triaxialRough.py
 Please amend these instructions if you find that they do not work.
 """
-from __future__ import division
 from builtins import str
 from builtins import range
-from past.utils import old_div
 from esys.escript import *
 from esys.finley import Brick
 from esys.weipa import saveVTK
@@ -87,7 +85,7 @@ while t < 100:
    tractTop = traction*topSurf
    forceTop = integrate(tractTop,where=FunctionOnBoundary(dom))
    areaTop = integrate(topSurf,where=FunctionOnBoundary(dom))
-   fout.write(str(old_div(t*vel,lz))+' '+str(forceTop[2])+' '+str(areaTop)+'\n')
+   fout.write(str(t*vel/lz)+' '+str(forceTop[2])+' '+str(areaTop)+'\n')
       
    vR=prob.getLocalVoidRatio()
    rotation=prob.getLocalAvgRotation()
@@ -95,7 +93,7 @@ while t < 100:
    strain = prob.getCurrentStrain()
    saveGauss3D(name='./result/gauss/time_'+str(t)+'.dat',strain=strain,stress=stress,fabric=fabric)
    volume_strain = trace(strain)
-   dev_strain = symmetric(strain) - old_div(volume_strain*k,dim)
+   dev_strain = symmetric(strain) - volume_strain*k/dim
    shear = sqrt(2./3.*inner(dev_strain,dev_strain))
    saveVTK("./result/vtk/triaxialRough_%d.vtu"%t,disp=disp,shear=shear,e=vR,rot=rotation)
    

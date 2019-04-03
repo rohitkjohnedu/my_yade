@@ -7,9 +7,7 @@
 # definition of a predicate for use of randomDensePack() function
 
 from __future__ import print_function
-from __future__ import division
 from past.builtins import execfile
-from past.utils import old_div
 from yade import pack
 dimModele = 10.0
 pred = pack.inAlignedBox((0,0,0),(dimModele,dimModele,dimModele))
@@ -79,7 +77,7 @@ for o in O.bodies:
 	 o.shape.color=(1,1,1)
 
       ## to identify indicator on top
-      if o.state.pos[2]>(zsup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[1]>((yinf+ysup-e)/2.0) and o.state.pos[1]<(old_div((yinf+ysup+e),2)) : 
+      if o.state.pos[2]>(zsup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[1]>((yinf+ysup-e)/2.0) and o.state.pos[1]<((yinf+ysup+e)/2) : 
 	refPoint=o.id
 
 O.bodies[refPoint].shape.highlight=True

@@ -1,15 +1,13 @@
-from __future__ import division
 #
 # Demonstrate L6Geom class with suspended hook-shaped beam fixed at one side, subject to gravity
 #
-from past.utils import old_div
 import numpy
 # radius, number and distance of spheres
 rad,num=1,6; dist=1.9999*rad
 # one arm
 O.bodies.append([sphere((0,y,0),rad,wire=True) for y in numpy.arange(0,2*num-1,dist)])
 # the lateral arm
-O.bodies.append([sphere((x,(num-1)*2*rad,0),rad,wire=True) for x in numpy.arange(dist,1+old_div(num,2),dist)])
+O.bodies.append([sphere((x,(num-1)*2*rad,0),rad,wire=True) for x in numpy.arange(dist,1+num/2,dist)])
 # support sphere
 O.bodies[0].state.blockedDOFs='xyzXYZ'
 # small dt to see in realtime how it swings; real critical is higher, but much less than p-wave

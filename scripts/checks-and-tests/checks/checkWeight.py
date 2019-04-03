@@ -4,8 +4,6 @@
 # Their weight is measured and compares with real mass particles
 
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 from yade import utils,pack,export,geom
 
 tc=0.001
@@ -51,6 +49,6 @@ curForce = utils.sumForces(ids=floorId,direction=Vector3(0,0,1))*(-1)
 print ("Precalculated weight %f" % sphMass)
 print ("Obtained weight %f" % curForce)
 
-if ((old_div((sphMass-curForce),curForce))>tolerance):
+if (((sphMass-curForce)/curForce)>tolerance):
 	resultStatus += 1
 

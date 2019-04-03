@@ -3,9 +3,7 @@
 # The script was used to generate the result and supplementary material (video) of [1]. The only difference is the problem size (40k particles in the paper vs. 1k (default) in this version)
 # [1] Yuan, C., & Chareyre, B. (2017). A pore-scale method for hydromechanical coupling in deformable granular media. Computer Methods in Applied Mechanics and Engineering, 318, 1066-1079. (http://www.sciencedirect.com/science/article/pii/S0045782516307216)
 
-from __future__ import division
 from builtins import str
-from past.utils import old_div
 import matplotlib; matplotlib.rc('axes',grid=True)
 from yade import pack
 import pylab
@@ -62,7 +60,7 @@ O.engines=[
 while 1:
   O.run(1000,True)
   unb=unbalancedForce()
-  if unb<0.01 and old_div(abs(triax.goal1-triax.meanStress),abs(triax.goal1))<0.001:
+  if unb<0.01 and abs(triax.goal1-triax.meanStress)/abs(triax.goal1)<0.001:
     break
 
 #############################
@@ -78,7 +76,7 @@ setContactFriction(radians(finalFricDegree))
 while 1:
   O.run(1000,True)
   unb=unbalancedForce()
-  if unb<0.001 and old_div(abs(triax.goal1-triax.meanStress),abs(triax.goal1))<0.001:
+  if unb<0.001 and abs(triax.goal1-triax.meanStress)/abs(triax.goal1)<0.001:
     break  
 
 triax.depth0=triax.depth
@@ -132,7 +130,7 @@ unsat.surfaceTension = 10
 file=open('pcSwStrain.txt',"w")
 for pg in arange(1.0e-5,15.0,0.1):
   #increase gaz pressure at the top boundary
-  unsat.bndCondValue=[0,0,old_div((-1.0)*pg*unsat.surfaceTension,meanDiameter),0,0,0]
+  unsat.bndCondValue=[0,0,(-1.0)*pg*unsat.surfaceTension/meanDiameter,0,0,0]
   #compute the evolution of interfaces
   unsat.invasion()
   #save the phases distribution in vtk format, to be displayed by paraview

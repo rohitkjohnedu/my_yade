@@ -9,9 +9,7 @@ This script shows how to use Law2_ScGeom_CapillaryPhys_Capillarity. The user can
 linear model by setting "model_type"
 """
 from __future__ import print_function
-from __future__ import division
 
-from past.utils import old_div
 model_type		= 1	#1=Hertz model with capillary forces, else linear model with capillary model
 
 #some parameters:
@@ -36,7 +34,7 @@ sp.makeCloud(lowercorner,uppercorner,.0002,rRelFuzz=.3)
 O.bodies.append([sphere(c,r,material=SphereMat) for c,r in sp])
 
 #generate boundary:
-O.bodies.append(geom.facetBox(old_div(uppercorner,2),old_div(uppercorner,2),wire=True,fixed=True,material=SphereMat))
+O.bodies.append(geom.facetBox(uppercorner/2,uppercorner/2,wire=True,fixed=True,material=SphereMat))
 
 #define engines:
 if model_type == 1:#hertz model with capillary forces

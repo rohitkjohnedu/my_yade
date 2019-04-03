@@ -1,6 +1,4 @@
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 from yade import plot, polyhedra_utils, ymport, export
 import os.path
 
@@ -35,9 +33,9 @@ utils.readParamsFromTable(descriptionIn = 'noDescription',
 
 from yade.params.table import *
 
-youngIn = old_div(youngIn,factorR)
-sigmaCZ = old_div(sigmaCZ,factorR)
-sigmaCD = old_div(sigmaCD,factorR)
+youngIn = youngIn/factorR
+sigmaCZ = sigmaCZ/factorR
+sigmaCD = sigmaCD/factorR
 #odt     = odt*factorR
 
 mat1 = PolyhedraMat(density=densityIn, young=youngIn,poisson=poissonIn, frictionAngle=frictionIn,IsSplitable=True,
@@ -59,7 +57,7 @@ backmesh = O.bodies.append(geom.facetBox((sizeB/2.0,0.,sizeB/2.0),(0.,sizeB/2.0,
 
 vertices = [[0,0,0],[sizeB,0,0],[sizeB,sizeB,0],[sizeB,sizeB,sizeB],[0,sizeB,0],[0,sizeB,sizeB],[0,0,sizeB],[sizeB,0,sizeB]]
 t = polyhedra_utils.polyhedra(mat1,v=vertices, fixed=True)
-t.state.pos = (0,0,old_div(sizeB,2))
+t.state.pos = (0,0,sizeB/2)
 O.bodies.append(t)
 
 """
@@ -127,12 +125,12 @@ def addPlotData():
   if (fB.norm() > maxFB.norm()):
     maxFB = fB
   
-  SigmaT = old_div(fT[2],(sizeB*sizeB)*factorR); uT = startPos - O.bodies[topmesh[0]].state.pos[2]
-  SigmaL = old_div(fL[1],(sizeB*sizeB)*factorR); uL = sizeB - O.bodies[leftmesh[0]].state.pos[1]
-  SigmaB = old_div(fB[0],(sizeB*sizeB)*factorR); uB = sizeB - O.bodies[backmesh[0]].state.pos[0]
+  SigmaT = fT[2]/(sizeB*sizeB)*factorR; uT = startPos - O.bodies[topmesh[0]].state.pos[2]
+  SigmaL = fL[1]/(sizeB*sizeB)*factorR; uL = sizeB - O.bodies[leftmesh[0]].state.pos[1]
+  SigmaB = fB[0]/(sizeB*sizeB)*factorR; uB = sizeB - O.bodies[backmesh[0]].state.pos[0]
   SigmaLT = 0.
   if (SigmaT):
-    SigmaLT = old_div(SigmaL, SigmaT)
+    SigmaLT = SigmaL / SigmaT
   plot.addData(time=O.time, time2=O.time, 
     Energy=utils.kineticEnergy(),
     SigmaT = SigmaT, uT = uT,
@@ -148,7 +146,7 @@ def addPlotData():
 
 def breakControl():
   if (len(O.bodies) > 7):
-    sigmaResT = old_div(maxFT[2],(sizeB*sizeB)*factorR)
+    sigmaResT = maxFT[2]/(sizeB*sizeB)*factorR
     uT = startPos - O.bodies[topmesh[0]].state.pos[2]
     print ("STOP!!!!!!!!!!!!!!!!")
     print ('maxFT = %g;'%(sigmaResT))

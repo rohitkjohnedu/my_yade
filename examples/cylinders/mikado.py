@@ -1,9 +1,7 @@
 # encoding: utf-8
 "An example showing how two create cylinders with random length."
-from __future__ import division
 
 from builtins import range
-from past.utils import old_div
 from yade.gridpfacet import *
 
 #### Parameters ####
@@ -50,13 +48,13 @@ O.materials.append( FrictMat( young=E,poisson=0.3,density=1000,frictionAngle=rad
 nodesIds=[]
 cylIds=[]
 ext=12.
-dxy=old_div(ext,(n-1))
+dxy=ext/(n-1)
 dL=Lmax-Lmin
 random.seed( 10 )
 for i in range(0,n):
-	y=old_div(-ext,2)+i*dxy
+	y=-ext/2+i*dxy
 	for i in range(0,n):
-		x=old_div(-ext,2)+i*dxy
+		x=-ext/2+i*dxy
 		L=Lmin+dL*random.random()
 		color=[random.random(),random.random(),random.random()]
 		cylinder((x,y,2*r),(x,y,L+2*r),radius=r,nodesIds=nodesIds,cylIds=cylIds,

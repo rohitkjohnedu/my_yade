@@ -1,7 +1,5 @@
 from __future__ import print_function
-from __future__ import division
 from builtins import range
-from past.utils import old_div
 from yade import qt
 import numpy as np
 import random
@@ -10,7 +8,7 @@ from yade import polyhedra_utils
 m = PolyhedraMat()
 m.density = 1000  
 m.young = 5E8 
-m.poisson = old_div(5E6,5E8)
+m.poisson = 5E6/5E8
 m.frictionAngle = 0.7 
 
 size = 0.1;

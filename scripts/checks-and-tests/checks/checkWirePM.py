@@ -3,8 +3,6 @@
 # Check test version for WirePM tensile test
 
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 tolerance=0.01
 errors=0
 
@@ -18,8 +16,8 @@ strainStressValues=[(0.0019230769,2.5e8),(0.0192,3.2195e8),(0.05,3.8292e8),(0.15
 # elastic material properties
 particleVolume = 4./3.*pow(radius,3)*pi
 particleMass = 3.9/1000.
-density = old_div(particleMass,particleVolume)
-young = old_div(strainStressValues[0][1], strainStressValues[0][0])
+density = particleMass/particleVolume
+young = strainStressValues[0][1] / strainStressValues[0][0]
 poisson = 0.3
 
 
@@ -121,7 +119,7 @@ NewtonIntegrator(damping=0.5),
 #### time step definition for simulation
 ## critical time step proposed by Bertrand
 kn = 16115042 # stiffness of single wire from code
-O.dt = 0.2*sqrt(old_div(particleMass,(2.*kn)))
+O.dt = 0.2*sqrt(particleMass/(2.*kn))
 O.run(30000,True)
 
 Fn = 0.

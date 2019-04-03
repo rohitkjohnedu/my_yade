@@ -58,10 +58,8 @@ This example can be found in examples/concrete/uniax-post.py ::
  pylab.show()
 
 """
-from __future__ import division
 from builtins import zip
 from builtins import range
-from past.utils import old_div
 from builtins import object
 from yade.wrapper import *
 from minieigen import *
@@ -232,7 +230,7 @@ def data(extractor,flattener,intr=False,onlyDynamic=True,stDev=None,relThreshold
 	elif perArea==2:
 		def compAvg(gauss,coord,cellCoord):
 			s=gauss.cellSum(cellCoord);
-			return (old_div(s,gauss.cellArea)) if s>0 else float('nan')
+			return (s/gauss.cellArea) if s>0 else float('nan')
 	elif perArea==3:
 		def compAvg(gauss,coord,cellCoord):
 			s=gauss.cellSum(cellCoord);

@@ -1,9 +1,7 @@
 """ Playground for tuning collider strides depending on maximum velocity. """
 from __future__ import print_function
-from __future__ import division
 
 from builtins import range
-from past.utils import old_div
 from yade import timing
 import os.path
 loadFrom='/tmp/triax.xml'
@@ -32,5 +30,5 @@ for i in range(0,5):
 	print('=======================================================')
 	timing.reset()
 
-print('Total time: %g s'%(old_div(totalTime,1e9)))
+print('Total time: %g s'%(totalTime/1e9))
 #quit()

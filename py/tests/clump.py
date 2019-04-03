@@ -2,9 +2,7 @@
 '''
 Various computations affected by the periodic boundary conditions.
 '''
-from __future__ import division
 
-from past.utils import old_div
 import unittest
 import random
 from yade.wrapper import *
@@ -40,7 +38,7 @@ class TestSimpleClump(unittest.TestCase):
 		self.assertEqual(bC.state.mass,b1.state.mass+b2.state.mass)
 		# centroid
 		S=b1.state.mass*b1.state.pos+b2.state.mass*b2.state.pos
-		c=old_div(S,bC.state.mass)
+		c=S/bC.state.mass
 		self.assertAlmostEqual(bC.state.pos[0],c[0]);
 		self.assertAlmostEqual(bC.state.pos[1],c[1]);
 		self.assertAlmostEqual(bC.state.pos[2],c[2]);

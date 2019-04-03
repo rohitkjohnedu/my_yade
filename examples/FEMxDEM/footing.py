@@ -11,10 +11,8 @@ How to run this script:
     /path/to/yade ./footing.py
 Please amend these instructions if you find that they do not work.
 """
-from __future__ import division
 from builtins import str
 from builtins import range
-from past.utils import old_div
 from esys.escript import *
 from esys.finley import ReadGmsh
 from esys.weipa import saveVTK
@@ -96,7 +94,7 @@ while t < 58: # apply 58 loading step; further loading would abort the program d
    strain = prob.getCurrentStrain()
    saveGauss2D(name='./result/gauss/time_'+str(t)+'.dat',strain=strain,stress=stress,fabric=fabric)
    volume_strain = trace(strain)
-   dev_strain = symmetric(strain) - old_div(volume_strain*k,dim)
+   dev_strain = symmetric(strain) - volume_strain*k/dim
    shear = sqrt(2*inner(dev_strain,dev_strain))
    saveVTK("./result/vtk/footing_%d.vtu"%t,disp=disp,stress=stress,shear=shear,e=vR,rot=rotation)
 

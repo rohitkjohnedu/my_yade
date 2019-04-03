@@ -9,14 +9,12 @@
 Devs: please DO NOT ADD more functions here, it is getting too crowded!
 """
 from __future__ import print_function
-from __future__ import division
 
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 import math,random,doctest,yade.geom,numpy
 from yade import *
 from yade.wrapper import *
@@ -93,7 +91,7 @@ def SpherePWaveTimeStep(radius,density,young):
 	2.8284271247461903e-07
 	"""
 	from math import sqrt
-	return old_div(radius,sqrt(old_div(young,density)))
+	return radius/sqrt(young/density)
 
 def randomColor():
 	"""Return random Vector3 with each component in interval 0…1 (uniform distribution)"""
@@ -442,17 +440,17 @@ def avgNumInteractions(cutoff=0.,skipFree=False,considerClumps=False):
 	:param considerClumps: also consider clumps if cutoff=0 and skipFree=False; for further explanation see above.
 	
 """
-	if cutoff==0 and not skipFree and not considerClumps: return old_div(2*O.interactions.countReal()*1.,len(O.bodies))
+	if cutoff==0 and not skipFree and not considerClumps: return 2*O.interactions.countReal()*1./len(O.bodies)
 	else:
 		nums,counts=bodyNumInteractionsHistogram(aabbExtrema(cutoff))
 		## CC is 2*C
 		CC=sum([nums[i]*counts[i] for i in range(len(nums))]); N=sum(counts)
-		if not skipFree: return old_div(CC*1.,N) if N>0 else float('nan')
+		if not skipFree: return CC*1./N if N>0 else float('nan')
 		## find bins with 0 and 1 spheres
 		N0=0 if (0 not in nums) else counts[nums.index(0)]
 		N1=0 if (1 not in nums) else counts[nums.index(1)]
 		NN=N-N0-N1
-		return old_div((CC-N1)*1.,NN) if NN>0 else float('nan')
+		return (CC-N1)*1./NN if NN>0 else float('nan')
 
 def plotNumInteractionsHistogram(cutoff=0.):
 	"Plot histogram with number of interactions per body, optionally cutting away *cutoff* relative axis-aligned box from specimen margin."
@@ -478,13 +476,13 @@ def plotDirections(aabb=(),mask=0,bins=20,numHist=True,noShow=False,sphSph=False
 		fc=[0,0,0]; fc[axis]=1.
 		subp=pylab.subplot(220+axis+1,polar=True);
 		# 1.1 makes small gaps between values (but the column is a bit decentered)
-		pylab.bar(d[0],d[1],width=old_div(math.pi,(1.1*bins)),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
+		pylab.bar(d[0],d[1],width=math.pi/(1.1*bins),fc=fc,alpha=.7,label=['yz','xz','xy'][axis])
 		#pylab.title(['yz','xz','xy'][axis]+' plane')
 		pylab.text(.5,.25,['yz','xz','xy'][axis],horizontalalignment='center',verticalalignment='center',transform=subp.transAxes,fontsize='xx-large')
 	if numHist:
 		pylab.subplot(224,polar=False)
 		nums,counts=utils.bodyNumInteractionsHistogram(aabb if len(aabb)>0 else utils.aabbExtrema())
-		avg=old_div(sum([nums[i]*counts[i] for i in range(len(nums))]),(1.*sum(counts)))
+		avg=sum([nums[i]*counts[i] for i in range(len(nums))])/(1.*sum(counts))
 		pylab.bar(nums,counts,fc=[1,1,0],alpha=.7,align='center')
 		pylab.xlabel('Interactions per body (avg. %g)'%avg)
 		pylab.axvline(x=avg,linewidth=3,color='r')
@@ -645,7 +643,7 @@ def trackPerfomance(updateTime=5):
 				plot.plots.update({'Iteration':('Perfomance',None,'Bodies','Interactions')})
 				continue
 			curTime=time.time();curIter=O.iter
-			perf=old_div((curIter-lastIter),(curTime-lastTime))
+			perf=(curIter-lastIter)/(curTime-lastTime)
 			out=subprocess.Popen(['top','-bH','-n1', ''.join(['-p',str(pid)])],stdout=subprocess.PIPE).communicate()[0].splitlines()
 			for s in out[7:-1]:
 				w=s.split()
@@ -667,7 +665,7 @@ def NormalRestitution2DampingRate(en):
 	if en == 1.0: return 0.0
 	from math import sqrt,log,pi
 	ln_en = math.log(en)
-	return (old_div(-ln_en,math.sqrt((math.pow(ln_en,2) + math.pi*math.pi))))
+	return (-ln_en/math.sqrt((math.pow(ln_en,2) + math.pi*math.pi)))
 
 def xMirror(half):
 	"""Mirror a sequence of 2d points around the x axis (changing sign on the y coord).
@@ -872,7 +870,7 @@ def psd(bins=5, mass=True, mask=-1):
   
 	binsSizes = numpy.linspace(minD, maxD, bins+1)
 	
-	deltaBinD = old_div((maxD-minD),bins)
+	deltaBinD = (maxD-minD)/bins
 	binsMass = numpy.zeros(bins)
 	binsNumbers = numpy.zeros(bins)
 	
@@ -880,7 +878,7 @@ def psd(bins=5, mass=True, mask=-1):
 		if (isinstance(b.shape,Sphere) and ((mask<0) or ((b.mask&mask)!=0))):
 			d=2*b.shape.radius
 			
-			basketId = int(math.floor( old_div((d-minD), deltaBinD) ) )
+			basketId = int(math.floor( (d-minD) / deltaBinD ) )
 			if (d == maxD): basketId = bins-1												 #If the diameter equals the maximal diameter, put the particle into the last bin
 			binsMass[basketId] = binsMass[basketId] + b.state.mass		#Put masses into the bin 
 			binsNumbers[basketId] = binsNumbers[basketId] + 1					#Put numbers into the bin 
@@ -897,7 +895,7 @@ def psd(bins=5, mass=True, mask=-1):
 	if (binsSumCum[len(binsSumCum)-1] > 0):
 		i=0
 		for l in binsSumCum:
-			binsProc[i] = old_div(binsSumCum[i],binsSumCum[len(binsSumCum)-1])
+			binsProc[i] = binsSumCum[i]/binsSumCum[len(binsSumCum)-1]
 			i+=1
 	return binsSizes, binsProc, binsSumCum
 

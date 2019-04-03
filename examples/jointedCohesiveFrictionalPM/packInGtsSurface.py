@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from __future__ import division
 from builtins import str
-from past.utils import old_div
 from yade import pack, export, ymport
 import gts, os.path, locale
 
@@ -26,7 +24,7 @@ if surface.is_closed():
 	center=pred.center()
 	minDim=min(dim[0],dim[1],dim[2])
 	# define discretisation
-	radius=old_div(minDim,(2*sizeRatio))
+	radius=minDim/(2*sizeRatio)
 	print(center, dim, ' | minDim=', minDim, ' | diameter=', 2*radius)
 	### regular packing
 	#O.bodies.append(pack.regularHexa(pred,radius=radius,gap=0.,color=(0.9,0.8,0.6)))

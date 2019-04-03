@@ -6,8 +6,6 @@
 
 ## Omega
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 o=Omega() 
 
 ## PhysicalParameters 
@@ -51,22 +49,22 @@ o.engines=[
 ]
 
 def checkPos():
-  if (old_div((O.bodies[id_0].state.pos[1] - getCurrentPos(0)),O.bodies[id_0].state.pos[1]) > tolerance): 
+  if ((O.bodies[id_0].state.pos[1] - getCurrentPos(0))/O.bodies[id_0].state.pos[1] > tolerance): 
     warningMessagePos (0, O.bodies[id_0].state.pos[1], getCurrentPos(0))
-  if (old_div((O.bodies[id_down].state.pos[1] - getCurrentPos(v_down)),O.bodies[id_down].state.pos[1]) > tolerance): 
+  if ((O.bodies[id_down].state.pos[1] - getCurrentPos(v_down))/O.bodies[id_down].state.pos[1] > tolerance): 
     warningMessagePos (v_down, O.bodies[id_down].state.pos[1], getCurrentPos(0))
-  if (old_div((O.bodies[id_up].state.pos[1] - getCurrentPos(v_up)),O.bodies[id_up].state.pos[1]) > tolerance): 
+  if ((O.bodies[id_up].state.pos[1] - getCurrentPos(v_up))/O.bodies[id_up].state.pos[1] > tolerance): 
     warningMessagePos (v_up, O.bodies[id_up].state.pos[1], getCurrentPos(0))
-  if (old_div((O.bodies[id_0].state.vel[1] - getCurrentVel(0)),O.bodies[id_0].state.vel[1]) > tolerance): 
+  if ((O.bodies[id_0].state.vel[1] - getCurrentVel(0))/O.bodies[id_0].state.vel[1] > tolerance): 
     warningMessageVel (0, O.bodies[id_0].state.vel[1], getCurrentPos(0))
-  if (old_div((O.bodies[id_down].state.vel[1] - getCurrentVel(v_down)),O.bodies[id_down].state.vel[1]) > tolerance): 
+  if ((O.bodies[id_down].state.vel[1] - getCurrentVel(v_down))/O.bodies[id_down].state.vel[1] > tolerance): 
     warningMessageVel (v_down, O.bodies[id_down].state.vel[1], getCurrentPos(0))
-  if (old_div((O.bodies[id_up].state.vel[1] - getCurrentVel(v_up)),O.bodies[id_up].state.vel[1]) > tolerance): 
+  if ((O.bodies[id_up].state.vel[1] - getCurrentVel(v_up))/O.bodies[id_up].state.vel[1] > tolerance): 
     warningMessageVel (v_up, O.bodies[id_up].state.vel[1], getCurrentPos(0))
   
 def getCurrentPos(inVel=0):
   t = O.time+O.dt
-  return inVel*t + old_div(g*t*t,2)
+  return inVel*t + g*t*t/2
 
 def getCurrentVel(inVel=0):
   t = O.time+O.dt

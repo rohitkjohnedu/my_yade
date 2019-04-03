@@ -6,13 +6,11 @@
 #
 # The force evolution is sine wave, but it could really be any data
 
-from __future__ import division
-from past.utils import old_div
 from numpy import arange
 
 nPulses=4 # run for total of 4 pulses
 freq=10. # 5 pulses per second
-times=arange(0,old_div(1,freq),.01/freq) # generate 100 points equally distributed over the period (can be much more)
+times=arange(0,1/freq,.01/freq) # generate 100 points equally distributed over the period (can be much more)
 maxMag=1e5 # maximum magnitude of applied force
 magnitudes=[.5*maxMag*(sin(t*(freq*2*pi))+1) for t in times] # generate points on sine wave over 1 period, but shifted up to be ∈(0,2)
 
@@ -59,7 +57,7 @@ try:
 except ImportError: pass
 
 # run so many steps such that prescribed number of pulses is done
-O.run(int(old_div((old_div(nPulses,freq)),O.dt)),True)
+O.run(int((nPulses/freq)/O.dt),True)
 
 # plot the time-series of force magnitude
 import pylab

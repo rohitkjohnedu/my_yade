@@ -1,10 +1,8 @@
 from __future__ import print_function
-from __future__ import division
 from builtins import input
 from builtins import zip
 from builtins import range
 from builtins import object
-from past.utils import old_div
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"
@@ -229,7 +227,7 @@ class MultiScale(object):
          du=self.__pde.getSolution()
          u+=du
          l,d=util.L2(u),util.L2(du)
-         err=old_div(d,l) # displacement error, alternatively using force error 'residual'
+         err=d/l # displacement error, alternatively using force error 'residual'
          converged=(err<rtol)
          if err>rtol*0.001: # only update DEM parts when error is large enough
             self.__domain.setX(x_safe)

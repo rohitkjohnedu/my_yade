@@ -1,9 +1,7 @@
 # -*- coding: utf-8
 
 from __future__ import print_function
-from __future__ import division
 from builtins import range
-from past.utils import old_div
 from yade import pack,export,qt
 import gts,os,random,itertools
 from numpy import *
@@ -78,7 +76,7 @@ mass = sum( [ s.state.mass for s in spheres ] )
 xm_ = [ s.state.pos[0]*s.state.mass for s in spheres ]
 ym_ = [ s.state.pos[1]*s.state.mass for s in spheres ]
 zm_ = [ s.state.pos[2]*s.state.mass for s in spheres ]
-centroid  = Vector3( old_div(sum(xm_),mass), old_div(sum(ym_),mass), old_div(sum(zm_),mass) )
+centroid  = Vector3( sum(xm_)/mass, sum(ym_)/mass, sum(zm_)/mass )
 
 def sphereInertiaTensor(p, m, r, c):
 	''' Inertia tensor sphere with position p, mass m and radus r relative point c '''

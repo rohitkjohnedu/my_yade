@@ -9,17 +9,15 @@ You can take this file as instruction on how to build parametric surfaces,
 and how to make videos as well.
 """
 from __future__ import print_function
-from __future__ import division
 from builtins import range
-from past.utils import old_div
 from yade import pack
 from numpy import linspace
 # geometry parameters
 bumpNum=20
-bumpHt,bumpTipAngle=0.07,old_div(60*pi,180)
+bumpHt,bumpTipAngle=0.07,60*pi/180
 millRad,millDp=1,1 # radius and depth (cylinder length) of the mill
 sphRad,sphRadFuzz=0.03,.8 # mean radius and relative fuzz of the radius (random, uniformly distributed between sphRad*(1-.5*sphRadFuzz)…sphRad*(1+.5*sphRadFuzz))
-dTheta=old_div(pi,24) # circle division angle
+dTheta=pi/24 # circle division angle
 
 
 
@@ -27,8 +25,8 @@ dTheta=old_div(pi,24) # circle division angle
 ### mill geometry (parameteric)
 ###
 bumpPeri=2*bumpHt*tan(.5*bumpTipAngle) # length of a bump on the perimeter of the mill
-bumpAngle=old_div(bumpPeri,millRad) # angle of one bump from the axis of the mill
-interBumpAngle=old_div(2*pi,bumpNum)
+bumpAngle=bumpPeri/millRad # angle of one bump from the axis of the mill
+interBumpAngle=2*pi/bumpNum
 bumpRad=millRad-bumpHt
 pts=[]; thMin=0
 for i in range(0,bumpNum):
@@ -36,7 +34,7 @@ for i in range(0,bumpNum):
 	thMax=thMin+interBumpAngle-bumpAngle
 	thTip=thMax+.5*bumpAngle
 	# the circular parts spanning from thMin to thMax
-	for th0 in linspace(thMin,thMax,old_div(interBumpAngle,dTheta),endpoint=True):
+	for th0 in linspace(thMin,thMax,interBumpAngle/dTheta,endpoint=True):
 		pts.append(Vector3(-.5*millDp,millRad*cos(th0),millRad*sin(th0)))
 	# tip of the bump
 	pts.append(Vector3(-.5*millDp,bumpRad*cos(thTip),bumpRad*sin(thTip)))

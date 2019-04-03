@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 from yade import pack, utils, ymport, export
 
 packing='parallellepiped_10'
@@ -37,7 +35,7 @@ for o in O.bodies:
      Rmax=o.shape.radius
  else :
    o.shape.color=(0,0,0)
-Rmean=old_div(R,numSpheres)
+Rmean=R/numSpheres
 
 print('number of spheres=', numSpheres, ' | Rmean=', Rmean, ' | dim=', dim)
 
@@ -82,7 +80,7 @@ for i in O.interactions:
     if isinstance(O.bodies[i.id1].shape,Facet) and isinstance(O.bodies[i.id2].shape,Sphere): 
 	vertices=O.bodies[i.id1].shape.vertices
 	normalRef=vertices[0].cross(vertices[1]) # defines the normal to the facet normalRef
-	nRef=old_div(normalRef,(normalRef.norm())) ## normalizes normalRef
+	nRef=normalRef/(normalRef.norm()) ## normalizes normalRef
 	normalFacetSphere=i.geom.normal # geom.normal is oriented from id1 to id2 -> normalFacetSphere from facet (i.id1) to sphere (i.id2)
 
 	if O.bodies[i.id2].state.onJoint==False : ## particles has not yet been identified as belonging to a joint plane
@@ -118,7 +116,7 @@ for j in O.interactions:
     if isinstance(O.bodies[j.id1].shape,Facet) and isinstance(O.bodies[j.id2].shape,Sphere):
 	vertices=O.bodies[j.id1].shape.vertices
 	normalRef=vertices[0].cross(vertices[1]) # defines the normal to the facet normalRef
-	nRef=old_div(normalRef,(normalRef.norm())) ## normalizes normalRef
+	nRef=normalRef/(normalRef.norm()) ## normalizes normalRef
 	if ((O.bodies[j.id2].state.jointNormal1.cross(nRef)).norm()<0.05) :
 	    jointNormalRef=O.bodies[j.id2].state.jointNormal1
 	elif ((O.bodies[j.id2].state.jointNormal2.cross(nRef)).norm()<0.05) :

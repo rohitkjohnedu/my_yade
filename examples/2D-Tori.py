@@ -1,4 +1,3 @@
-from __future__ import division
 #!/usr/local/bin/yade-trunk -x
 # -*- coding: utf-8 -*-
 #Author : Kneib François, francois.kneib@gmail.com
@@ -6,7 +5,6 @@ from __future__ import division
 #/!\ this is just a DISPLAY FEATURE, computed particles still are SPHERICAL.
 
 from builtins import range
-from past.utils import old_div
 from yade import qt
 X=1
 Y=1
@@ -41,7 +39,7 @@ for i in O.bodies:
 	i.shape.color=(0.,0.,1.)
 
 #Fix some spheres to make the simulation "interesting".
-for i in range(0,int(old_div(len(O.bodies),10))):
+for i in range(0,int(len(O.bodies)/10)):
 	O.bodies[i].state.blockedDOFs="xyzXYZ"
 	O.bodies[i].shape.color=(1.,0.,0.)
 

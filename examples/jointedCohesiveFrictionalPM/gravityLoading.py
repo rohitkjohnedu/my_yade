@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 O=Omega()
 from yade import plot, pack,utils,ymport
 
@@ -42,7 +40,7 @@ for o in O.bodies:
    R+=o.shape.radius
    if o.shape.radius>Rmax:
      Rmax=o.shape.radius
-Rmean=old_div(R,numSpheres)
+Rmean=R/numSpheres
 
 #### Identification of the spheres on joint (some DIY here!) -> work to do on import function textExt to directly load material properties from the ascii file
 inFile=open(packing+'_jointedPM.spheres','r')
@@ -83,7 +81,7 @@ for o in O.bodies:
 	 o.shape.color=(1,1,1)
 
       ## to identify indicator on top
-      if o.state.pos[1]>(ysup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[2]>(zinf+old_div((Z-e),2)) and o.state.pos[2]<(zsup-old_div((Z-e),2)) : 
+      if o.state.pos[1]>(ysup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[2]>(zinf+(Z-e)/2) and o.state.pos[2]<(zsup-(Z-e)/2) : 
 	refPoint=o.id
 	p0=o.state.pos[1]
 

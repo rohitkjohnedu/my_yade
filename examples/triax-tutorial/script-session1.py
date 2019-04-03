@@ -19,8 +19,6 @@
 ## If you want to know more on micro-macro relations evaluated by triaxial simulations
 ## AND if you can read some french, it is here: http://tel.archives-ouvertes.fr/docs/00/48/68/07/PDF/Thesis.pdf
 
-from __future__ import division
-from past.utils import old_div
 from yade import pack
 
 ############################################
@@ -84,8 +82,8 @@ else:
 triax=TriaxialStressController(
 	## TriaxialStressController will be used to control stress and strain. It controls particles size and plates positions.
 	## this control of boundary conditions was used for instance in http://dx.doi.org/10.1016/j.ijengsci.2008.07.002
-	maxMultiplier=1.+old_div(2e4,young), # spheres growing factor (fast growth)
-	finalMaxMultiplier=1.+old_div(2e3,young), # spheres growing factor (slow growth)
+	maxMultiplier=1.+2e4/young, # spheres growing factor (fast growth)
+	finalMaxMultiplier=1.+2e3/young, # spheres growing factor (slow growth)
 	thickness = 0,
 	## switch stress/strain control using a bitmask. What is a bitmask, huh?!
 	## Say x=1 if stess is controlled on x, else x=0. Same for for y and z, which are 1 or 0.

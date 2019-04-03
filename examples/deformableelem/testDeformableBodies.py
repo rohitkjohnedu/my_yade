@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Created by Burak ER
-from __future__ import division
-from past.utils import old_div
 from yade.deformableelementsutils import *;
 
 O=Omega()
@@ -39,9 +37,9 @@ amplitude=1000;
 
 period=(1e-4)
 
-omega=old_div(2*pi,period);
+omega=2*pi/period;
 
-applicationperiod=old_div(period,2);
+applicationperiod=period/2;
 
 ## Define the fixed boundary
 

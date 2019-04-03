@@ -1,10 +1,8 @@
 """
 Import geometry from various formats ('import' is python keyword, hence the name 'ymport').
 """
-from __future__ import division
 
 from builtins import range
-from past.utils import old_div
 from builtins import object
 from yade.wrapper import *
 from yade import utils
@@ -405,7 +403,7 @@ def iges(fileName,shift=(0,0,0),scale=1.0,returnConnectivityTable=False,**kw):
 			nodes.append(v)
 		if line.startswith('136,'): # read elements
 			ls = line.split(',')
-			i1,i2,i3 = old_div(int(ls[3]),2), old_div(int(ls[4]),2), old_div(int(ls[5]),2) # the numbering of nodes is 1,3,5,7,..., hence this int(ls[*])/2
+			i1,i2,i3 = int(ls[3])/2, int(ls[4])/2, int(ls[5])/2 # the numbering of nodes is 1,3,5,7,..., hence this int(ls[*])/2
 			elems.append( (i1,i2,i3) )
 	facets = [utils.facet( ( nodes[e[0]], nodes[e[1]], nodes[e[2]] ), **kw) for e in elems]
 	if returnConnectivityTable:

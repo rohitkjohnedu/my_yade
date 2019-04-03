@@ -7,8 +7,6 @@
 
 
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 from yade import utils, plot, timing
 from yade import pack
 
@@ -31,9 +29,9 @@ o.dt = 1.0e-5
 
 particleMass = 4.0/3.0*math.pi*r1*r1*r1*rho
 
-Vi1 = math.sqrt(old_div(k1,particleMass))*DeltaPMax*Chi1
+Vi1 = math.sqrt(k1/particleMass)*DeltaPMax*Chi1
 
-PhiF1 = old_div(DeltaPMax*(kp-k1)*(r1+r2),(kp*2*r1*r2))
+PhiF1 = DeltaPMax*(kp-k1)*(r1+r2)/(kp*2*r1*r2)
 
 
 #*************************************

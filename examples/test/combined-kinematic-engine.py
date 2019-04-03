@@ -1,6 +1,4 @@
 from __future__ import print_function
-from __future__ import division
-from past.utils import old_div
 box = geom.facetBox(center=(0,0,0),extents=(1,2,3), color=(0,1,0))
 O.bodies.append(box)
 ids = [b.id for b in box]
@@ -8,13 +6,13 @@ ids = [b.id for b in box]
 # set this parameter according to your computer power to make the simulation vizualization slower of faster
 coeff = 5.0
 
-nIterPerOneCycle = int(old_div(50000,coeff))
+nIterPerOneCycle = int(50000/coeff)
 vel = 10000*coeff
 angVel = 8000*coeff
 
 # function for changing motion, sets transEngine.translationAxis, rotEngine.angularVelocity and rotEngine.zeroPoint
 def updateKinematicEngines():
-	part = (old_div(O.iter, nIterPerOneCycle)) % 4
+	part = (O.iter / nIterPerOneCycle) % 4
 	if   part == 0: # fist part
 		v = Vector3(1,0,0)
 		av = 0

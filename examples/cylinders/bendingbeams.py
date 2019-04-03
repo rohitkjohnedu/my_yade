@@ -1,9 +1,7 @@
 # encoding: utf-8
 "An example showing various bending beams."
-from __future__ import division
 
 from builtins import range
-from past.utils import old_div
 from yade.gridpfacet import *
 
 #### Parameter ####
@@ -35,10 +33,10 @@ vertices2=[]
 vertices3=[]
 vertices4=[]
 for i in range(0,n):
-  vertices1.append( [old_div(i*L,n),0,0] )
-  vertices2.append( [old_div(i*L,n),1,0] )
-  vertices3.append( [old_div(i*L,n),2,0] )
-  vertices4.append( [old_div(i*L,n),3,0] )
+  vertices1.append( [i*L/n,0,0] )
+  vertices2.append( [i*L/n,1,0] )
+  vertices3.append( [i*L/n,2,0] )
+  vertices4.append( [i*L/n,3,0] )
 
 #### Create cylinder connections ####
 nodesIds=[]

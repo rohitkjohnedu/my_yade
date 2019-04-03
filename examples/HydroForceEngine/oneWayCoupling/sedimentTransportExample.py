@@ -1,5 +1,4 @@
 from __future__ import print_function
-from __future__ import division
 #########################################################################################################################################################################
 # Author: Raphael Maurin, raphael.maurin@imft.fr
 # 24/11/2017
@@ -20,7 +19,6 @@ from __future__ import division
 #Import libraries
 from builtins import str
 from builtins import range
-from past.utils import old_div
 from yade import pack, plot
 import math
 import random as rand
@@ -63,7 +61,7 @@ expoDrag_PY = 3.1	# Richardson Zaki exponent for the hindrance function of the d
 
 #Discretization of the sample in ndimz wall-normal (z) steps of size dz, between the bottom of the channel and the position of the water free-surface. Should be equal to the length of the imposed fluid profile. Mesh used for HydroForceEngine.
 ndimz = 900	#Number of cells in the height
-dz =  old_div(fluidHeight,(1.0*(ndimz-1)))	# Fluid discretization step in the wall-normal direction	
+dz =  fluidHeight/(1.0*(ndimz-1))	# Fluid discretization step in the wall-normal direction	
 
 # Initialization of the main vectors
 vxFluidPY = np.zeros(ndimz)	# Vertical fluid velocity profile: u^f = u_x^f(z) e_x, with x the streamwise direction and z the wall-normal
@@ -80,7 +78,7 @@ gravityVector = Vector3(9.81*sin(slope),0.0,-9.81*cos(slope)) #Gravity vector to
 #Particles contact law/material parameters
 maxPressure = (densPart-densFluidPY)*phiPartMax*Nlayer*diameterPart*abs(gravityVector[2]) #Estimated max particle pressure from the static load
 normalStiffness = maxPressure*diameterPart*1e4 #Evaluate the minimal normal stiffness to be in the rigid particle limit (cf Roux and Combe 2002)
-youngMod = old_div(normalStiffness,diameterPart)	#Young modulus of the particles from the stiffness wanted.
+youngMod = normalStiffness/diameterPart	#Young modulus of the particles from the stiffness wanted.
 poissonRatio = 0.5	#poisson's ratio of the particles. Classical values, does not have much influence
 O.materials.append(ViscElMat(en=restitCoef, et=0., young=youngMod, poisson=poissonRatio, density=densPart, frictionAngle=partFrictAngle, label='Mat'))  
 
@@ -100,8 +98,8 @@ O.bodies.append([lowPlane,WaterSurface]) #add to simulation
 
 
 # Regular arrangement of spheres sticked at the bottom with random height
-L = list(range(0,int(old_div(length,(diameterPart))))) #The length is divided in particle diameter
-W = list(range(0,int(old_div(width,(diameterPart))))) #The width is divided in particle diameter
+L = list(range(0,int(length/(diameterPart)))) #The length is divided in particle diameter
+W = list(range(0,int(width/(diameterPart)))) #The width is divided in particle diameter
 
 for x in L: #loop creating a set of sphere sticked at the bottom with a (uniform) random altitude comprised between 0.5 (diameter/12) and 5.5mm (11diameter/12) with steps of 0.5mm. The repartition along z is made around groundPosition.
 	for y in W:
@@ -112,11 +110,11 @@ for x in L: #loop creating a set of sphere sticked at the bottom with a (uniform
 #Create a loose cloud of particle inside the cell
 partCloud = pack.SpherePack()
 partVolume = pi/6.*pow(diameterPart,3) #Volume of a particle
-partNumber = int(old_div(Nlayer*phiPartMax*diameterPart*length*width,partVolume)) #Volume of beads to obtain Nlayer layers of particles
+partNumber = int(Nlayer*phiPartMax*diameterPart*length*width/partVolume) #Volume of beads to obtain Nlayer layers of particles
 partCloud.makeCloud(minCorner=(0,0.,groundPosition+diameterPart),maxCorner=(length,width,groundPosition+fluidHeight),rRelFuzz=0., rMean=diameterPart/2.0, num = partNumber)
 partCloud.toSimulation(material='Mat') #Send this packing to simulation with material Mat
 #Evaluate the deposition time considering the free-fall time of the highest particle to the ground
-depoTime = sqrt(old_div(fluidHeight*2,abs(gravityVector[2])))
+depoTime = sqrt(fluidHeight*2/abs(gravityVector[2]))
 
 # Collect the ids of the spheres which are dynamic to add a fluid force through HydroForceEngines
 idApplyForce = []
@@ -193,7 +191,7 @@ def gravityDeposition(lim):
 qsMean = 0		#Mean dimensionless sediment transport rate
 zAxis = np.zeros(ndimz)	#z scale, in diameter
 for i in range(0,ndimz):#z scale used for the possible plot at the end
-	zAxis[i] = old_div(i*dz,diameterPart)
+	zAxis[i] = i*dz/diameterPart
 # Averaging/Save
 def measure():
 	global qsMean,vxPartPY,phiPartPY
@@ -208,7 +206,7 @@ def measure():
 	averageDragPY = np.array(hydroEngine.averageDrag)
 
 	#Evaluate the dimensionless sediment transport rate for information
-	qsMean = old_div(sum(phiPartPY*vxPartPY)*dz,sqrt((old_div(densPart,densFluidPY) - 1)*abs(gravityVector[2])*pow(diameterPart,3)))
+	qsMean = sum(phiPartPY*vxPartPY)*dz/sqrt((densPart/densFluidPY - 1)*abs(gravityVector[2])*pow(diameterPart,3))
 	plot.addData(SedimentRate = qsMean, time = O.time)	#Plot it during the simulation
 
 	#Condition to stop the simulation after endTime seconds
@@ -219,7 +217,7 @@ def measure():
 		#Z scale used for the possible plot at the end
 		global zAxis
 		for i in range(0,ndimz):
-			zAxis[i] = old_div(i*dz,diameterPart)
+			zAxis[i] = i*dz/diameterPart
 
 
 	if saveData==1:	#Save data for postprocessing

@@ -5,7 +5,6 @@ Module containing utility functions for plotting inside yade. See :ysrc:`example
 
 """
 from __future__ import print_function
-from __future__ import division
 
 ## all exported names
 from future import standard_library
@@ -13,7 +12,6 @@ standard_library.install_aliases()
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 __all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
@@ -364,8 +362,8 @@ class LineRef(object):
 						# there must be an easier way to find on-screen derivative angle, ask on the matplotlib mailing list
 						axes=self.line.axes()
 						p=axes.patch; xx,yy=p.get_verts()[:,0],p.get_verts()[:,1]; size=max(xx)-min(xx),max(yy)-min(yy)
-						aspect=(old_div(size[1],size[0]))*(1./axes.get_data_ratio())
-						angle=math.atan(old_div(aspect*dy,dx))
+						aspect=(size[1]/size[0])*(1./axes.get_data_ratio())
+						angle=math.atan(aspect*dy/dx)
 						if dx<0: angle-=math.pi
 						self.scatter.set_transform(matplotlib.transforms.Affine2D().rotate(angle))
 					except IndexError: pass
@@ -383,7 +381,7 @@ def createPlots(subPlots=True,scatterSize=60,wider=False):
 	if len(plots)==0: return # nothing to plot
 	if subPlots:
 		# compute number of rows and colums for plots we have
-		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(old_div(len(plots)*1.,subCols)))
+		subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
 		if wider: subRows,subCols=subCols,subRows
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip().split('=',1)[0]
@@ -571,10 +569,10 @@ def createTitleFrame(out,size,title):
 		rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=fontsize,dpi=fig.get_dpi(),color='blue')
 		textsize=rgba.shape[1],rgba.shape[0]
 		if textsize[0]>size[0]:
-			rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=old_div(fontsize*size[0],textsize[0]),dpi=fig.get_dpi(),color='blue')
+			rgba,depth=matplotlib.mathtext.MathTextParser('Bitmap').to_rgba(text,fontsize=fontsize*size[0]/textsize[0],dpi=fig.get_dpi(),color='blue')
 			textsize=rgba.shape[1],rgba.shape[0]
 		fig.figimage(rgba.astype(float)/255.,xo=(size[0]-textsize[0])/2.,yo=vertPos-depth)
-	ht=size[1]; y0=ht-2*fontSizes[0]; yStep=old_div((ht-2.5*fontSizes[0]),len(lines))
+	ht=size[1]; y0=ht-2*fontSizes[0]; yStep=(ht-2.5*fontSizes[0])/len(lines)
 	for i,(l,isTitle) in enumerate(lines):
 		writeLine(l,y0-i*yStep,fontSizes[0 if isTitle else 1])
 	fig.savefig(out)
@@ -670,7 +668,7 @@ def savePylab(baseName,timestamp=False,title=None):
 	py=file(baseName+'.py','w')
 	py.write('#!/usr/bin/env python\n# encoding: utf-8\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\nimport pylab, numpy\n')
 	py.write("data=numpy.genfromtxt('%s.data.bz2',dtype=None,names=True)\n"%baseName)
-	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(old_div(len(plots)*1.,subCols)))
+	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
 	for nPlot,p in enumerate(plots.keys()):
 		pStrip=p.strip().split('=',1)[0]
 		if plots[p]==None: continue # image plots, which is not exported

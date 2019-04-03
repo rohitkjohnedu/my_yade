@@ -23,9 +23,7 @@
 
 ## ______________   First section, similar to triax-tutorial/script-session1.py  _________________
 from __future__ import print_function
-from __future__ import division
 from builtins import range
-from past.utils import old_div
 from yade import pack
 
 num_spheres=1000# number of spheres
@@ -44,8 +42,8 @@ sp.makeCloud(mn,mx,-1,0.3333,num_spheres,False, 0.95,seed=1) #"seed" make the "r
 sp.toSimulation(material='spheres')
 
 triax=TriaxialStressController(
-	maxMultiplier=1.+old_div(2e4,young), # spheres growing factor (fast growth)
-	finalMaxMultiplier=1.+old_div(2e3,young), # spheres growing factor (slow growth)
+	maxMultiplier=1.+2e4/young, # spheres growing factor (fast growth)
+	finalMaxMultiplier=1.+2e3/young, # spheres growing factor (slow growth)
 	thickness = 0,
 	stressMask = 7,
 	max_vel = 0.005,
@@ -73,7 +71,7 @@ triax.goal1=triax.goal2=triax.goal3=-10000
 while 1:
   O.run(1000, True)
   unb=unbalancedForce()
-  if unb<0.001 and old_div(abs(-10000-triax.meanStress),10000)<0.001:
+  if unb<0.001 and abs(-10000-triax.meanStress)/10000<0.001:
     break
 
 setContactFriction(radians(finalFricDegree))
@@ -115,7 +113,7 @@ O.dynDt=False
 O.run(1,1)
 Qin = flow.getBoundaryFlux(2)
 Qout = flow.getBoundaryFlux(3)
-permeability = old_div(abs(Qin),1.e-4) #size is one, we compute K=V/∇H
+permeability = abs(Qin)/1.e-4 #size is one, we compute K=V/∇H
 print("Qin=",Qin," Qout=",Qout," permeability=",permeability)
 
 #C. now the oedometer test, drained at the top, impermeable at the bottom plate
@@ -128,18 +126,18 @@ newton.damping=0
 #keep in mind that we are not in an homogeneous material and the small strain
 #assumption is not verified => we don't expect perfect match
 #there can be also an overshoot of pressure in the very beginning due to dynamic effects
-Cv=old_div(permeability*modulus,1e4)
+Cv=permeability*modulus/1e4
 zeroTime=O.time
 zeroe22 = - triax.strain[1]
 dryFraction=0.05 #the top layer is affected by drainage on a certain depth, we account for it here
-drye22 = old_div(1000,modulus*dryFraction)
+drye22 = 1000/modulus*dryFraction
 wetHeight=1*(1-dryFraction)
 
 def consolidation(Tv): #see your soil mechanics handbook...
 	U=1
 	for k in range(50):
-		M=old_div(pi,2*(2*k+1))
-		U=U-old_div(2,M**2*exp(-M**2*Tv))
+		M=pi/2*(2*k+1)
+		U=U-2/M**2*exp(-M**2*Tv)
 	return U
 
 triax.goal2=-11000
@@ -150,7 +148,7 @@ from yade import plot
 
 ## a function saving variables
 def history():
-  	plot.addData(e22=-triax.strain[1]-zeroe22,e22_theory=drye22+old_div((1-dryFraction)*consolidation(old_div((O.time-zeroTime)*Cv,wetHeight**2))*1000.,modulus),t=O.time,p=flow.getPorePressure((0.5,0.1,0.5)),s22=-triax.stress(3)[1]-10000)
+  	plot.addData(e22=-triax.strain[1]-zeroe22,e22_theory=drye22+(1-dryFraction)*consolidation((O.time-zeroTime)*Cv/wetHeight**2)*1000./modulus,t=O.time,p=flow.getPorePressure((0.5,0.1,0.5)),s22=-triax.stress(3)[1]-10000)
   	#plot.addData(e22=-triax.strain[1],t=O.time,s22=-triax.stress(2)[1],p=flow.MeasurePorePressure((0.5,0.5,0.5)))
 
 O.engines=O.engines+[PyRunner(iterPeriod=200,command='history()',label='recorder')]

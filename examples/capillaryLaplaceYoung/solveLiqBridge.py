@@ -1,5 +1,4 @@
 from __future__ import print_function
-from __future__ import division
 # J. Duriez (jerome.duriez@irstea.fr)
 
 # to import with yade/python/ipython solveLiqBridge.py, or with execfile('solveLiqBridge.py',globals()) once inside a yade/python/ipython session
@@ -10,7 +9,6 @@ from __future__ import division
 # --- End of "ipython necessary imports" ---
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import scipy # for root finding function (see below), requires installing python-scipy package
 from scipy import optimize
 
@@ -54,7 +52,7 @@ def solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,plot3D,speak):
     step = 0
     # Boundary conditions on left contact line: see left (smallest) particle
     rho.append( 1./rRatio * sin(radians(delta1)) )
-    rhoPrime.append( old_div(- 1, tan(radians(delta1+theta))) )
+    rhoPrime.append( - 1 / tan(radians(delta1+theta)) )
     # Boundary condition on right contact line: see right (biggest) particle
     rhoRight = sin(radians(delta2));
 
@@ -93,14 +91,14 @@ def solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,plot3D,speak):
     # Dimensionless volume:
     # Cf (4) Soulie2006, (34) Appendix Scholtes2008, (8) Duriez2017 etc. :
     vol = pi*sum( rho[1:]**2 )*deltaZ
-    vol = vol - old_div(pi,3 * rRatio**(-3) * ( 1-cos(d1) )**2 * ( 2+cos(d1) ))
-    vol = vol - old_div(pi,3 * ( 1-cos(d2) )**2 * ( 2+cos(d2) ))
+    vol = vol - pi/3 * rRatio**(-3) * ( 1-cos(d1) )**2 * ( 2+cos(d1) )
+    vol = vol - pi/3 * ( 1-cos(d2) )**2 * ( 2+cos(d2) )
 
     # Capillary bridge dimensionless free energy:
     # (12) Duriez2017 rather than [35] Lian1993 (was for cst volume stability)
     dArea = rho * ( 1+rhoPrime**2)**0.5 # ~ infinitesimal liquid gas area
     eStar = 2*pi * sum(dArea[1:]) * deltaZ + uStar * vol #+/- uStar changes the values but not the shape
-    eStar = eStar - 2*pi*cos(radians(theta)) * ( old_div((1-cos(d1)),rRatio**2) + 1 - cos(d2) )
+    eStar = eStar - 2*pi*cos(radians(theta)) * ( (1-cos(d1))/rRatio**2 + 1 - cos(d2) )
 
     rhoRed,rhoPrRed = rho[1:len(rho)], rhoPrime[1:len(rho)]
 
@@ -108,14 +106,14 @@ def solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,plot3D,speak):
     surf = 2*pi * sum( rhoRed * (1 + rhoPrRed**2)**0.5 ) * deltaZ
 
     # Surface integral of dyadic product n*n (diagonal axisymmetric matrix):
-    nn11 = pi * sum( old_div(rhoRed, (1 + rhoPrRed**2)**0.5) ) * deltaZ # = n22
-    nn33 = 2*pi * sum( old_div(rhoRed * rhoPrRed**2, (1 + rhoPrRed**2)**0.5) ) * deltaZ
+    nn11 = pi * sum( rhoRed / (1 + rhoPrRed**2)**0.5 ) * deltaZ # = n22
+    nn33 = 2*pi * sum( rhoRed * rhoPrRed**2 / (1 + rhoPrRed**2)**0.5 ) * deltaZ
 
 
     # --------------- Miscellaneous checks and plots --------------------------
 
     # Check whether surf = tr(integral n*n)
-    if old_div((surf - (2*nn11 + nn33) ), surf) > 0.0025: # strict equality beyond reach
+    if (surf - (2*nn11 + nn33) ) / surf > 0.0025: # strict equality beyond reach
         print('surf =', surf)
         print('Vs 2*nn11 + nn33 =', 2*nn11 + nn33)
         startStr = 'r = ' + str(rRatio) + ';theta = '+ str(theta) + ';u* = ' + str(uStar)
@@ -136,11 +134,11 @@ def solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,plot3D,speak):
 
     # Check if the neck has been reached: (there is a risk because of divergence possibility)
     if uStar!= 0: # "y0" computation according to [10] Lian1993, (or (2.54) Soulie2005 - (11) Soulie2006)
-        rhoNeck = old_div(( -1 + sqrt(1+2*uStar*cstC) ), uStar)
+        rhoNeck = ( -1 + sqrt(1+2*uStar*cstC) ) / uStar
     else:
         rhoNeck = cstC
 
-    if old_div((min(rho) - rhoNeck), rhoNeck) > 0.002:
+    if (min(rho) - rhoNeck) / rhoNeck > 0.002:
         strU,strD1,strDz = str(uStar),str(delta1),str(deltaZ)
         if speak != 0:
             print('Profile with u*='+strU+', delta1='+strD1+' and deltaZ='+strDz+' has not reached its neck !')
@@ -156,7 +154,7 @@ def solveLiqBridge(rRatio,theta,uStar,delta1,deltaZ,plot,plot3D,speak):
 
 
 def radians(angle):
-    return old_div(angle * pi, 180)
+    return angle * pi / 180
 
 def func_delta2(delta2,cstC,theta,uStar): # from e.g. (2.52) Soulie2005
     return sin(radians(delta2)) * sin(radians(delta2+theta)) + 1./2. * uStar * sin(radians(delta2))**2 - cstC
@@ -165,11 +163,11 @@ def drho(rho,prevRho,deltaZ,rho2d):
     # returns rhoPrime at i+1, see (4) Duriez2017
 
     #drho = sqrt( ( rho/(cstK - 1./2.*uStar*rho**2) )**2 - 1 ) # [11] Lian1993 is always positiv, which is not true
-    return old_div((rho - prevRho), deltaZ) + 1./2.*deltaZ * rho2d; # NB: the rho2d term has a real influence
+    return (rho - prevRho) / deltaZ + 1./2.*deltaZ * rho2d; # NB: the rho2d term has a real influence
 
 def rhoSecond(rho,rhoP,uStar):
     # see e.g. (5) Duriez2017
-    return old_div((1+rhoP**2), rho) + uStar*(1+rhoP**2)**1.5
+    return (1+rhoP**2) / rho + uStar*(1+rhoP**2)**1.5
 
 
 def plotProfile(rho,deltaZ,rRatio,delta1,delta2,theta,cstC,uStar):
@@ -177,7 +175,7 @@ def plotProfile(rho,deltaZ,rRatio,delta1,delta2,theta,cstC,uStar):
     from matplotlib import pyplot # could not achieve calling pyplot.plot from here without putting this line directly here.
 
     if uStar != 0: # "y0" computation, see e.g. [10] Lian1993, (2.54) Soulie2005, (11) Soulie2006..
-        rhoNeck = old_div(( -1 + sqrt(1+2*uStar*cstC) ), uStar)
+        rhoNeck = ( -1 + sqrt(1+2*uStar*cstC) ) / uStar
     else:
         rhoNeck = cstC
 
@@ -188,9 +186,9 @@ def plotProfile(rho,deltaZ,rRatio,delta1,delta2,theta,cstC,uStar):
     if rRatio ==1:
         d1Rad,d2Rad,thRad = radians(delta1),radians(delta2),radians(theta)
         dist = lastZ - (1-cos(d1Rad)) - (1-cos(d2Rad))
-        rho1 = old_div(( dist/2. + 1 - cos(d1Rad) ),cos(d2Rad+thRad))
-        rho2 = sin(d2Rad) - old_div((1-sin(d2Rad+thRad)) * ( old_div(dist,2) + 1-cos(d2Rad) ), cos(d2Rad+thRad))
-        torProfile = rho1 + abs(rho2) - ( rho1**2 - (vecZ-old_div(lastZ,2))**2 )**0.5 # toroidal equation        
+        rho1 = ( dist/2. + 1 - cos(d1Rad) )/cos(d2Rad+thRad)
+        rho2 = sin(d2Rad) - (1-sin(d2Rad+thRad)) * ( dist/2 + 1-cos(d2Rad) ) / cos(d2Rad+thRad)
+        torProfile = rho1 + abs(rho2) - ( rho1**2 - (vecZ-lastZ/2)**2 )**0.5 # toroidal equation        
 
     pyplot.figure()
     pyplot.plot(vecZ,rho,label='Profile')
@@ -217,19 +215,19 @@ def plot3Dbridge(rho,deltaZ,rRatio):
     lastZ = deltaZ*(nRhoVal -1)
 
     # discretization of x axis of 3D figure
-    x = numpy.arange(-rhoMax,rhoMax,old_div(rhoMax,nPtsAlongAxis))
+    x = numpy.arange(-rhoMax,rhoMax,rhoMax/nPtsAlongAxis)
     if not rhoMax in x: # most often rhoMax won't be in x, as numpy.arange usually does not include the stop attribute
         x=numpy.append(x,rhoMax)
     # discretization of y axis of 3D figure (= z axis from Fig. 1 Duriez2017), nPtsAlongAxis values, from 0 to lastZ:
-    y = old_div(numpy.arange(nPtsAlongAxis)*lastZ,(nPtsAlongAxis-1))
+    y = numpy.arange(nPtsAlongAxis)*lastZ/(nPtsAlongAxis-1)
 
     # the matrix, with elevation data (MATLAB-like)
     alt = numpy.zeros((len(y),len(x)))
     for i in range(len(y)):
-        indRho = int( old_div((i-1)*(nRhoVal-1),(nPtsAlongAxis)) ) + 1
+        indRho = int( (i-1)*(nRhoVal-1)/(nPtsAlongAxis) ) + 1
         for j in range(len(x)):
             if rho[indRho]**2 - x[j]**2 >=0:
-                alt[i,j] = old_div(rho[indRho] * sqrt(rho[indRho]**2 - x[j]**2), rho[indRho])
+                alt[i,j] = rho[indRho] * sqrt(rho[indRho]**2 - x[j]**2) / rho[indRho]
 
     fig = pyplot.figure()
     ax = fig.gca(projection='3d')

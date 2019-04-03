@@ -1,4 +1,3 @@
-from __future__ import division
 # peri3dController_triaxialCompression.py
 # script, that explains funcionality and input parameters of Peri3dController on the example of
 # triaxial compression.
@@ -9,7 +8,6 @@ from __future__ import division
 # in this case there is almost no difference, but in script peri3dController_shear,
 # the cell rotation has significant effect)
 
-from past.utils import old_div
 from yade import pack,plot,qt
 
 # define material
@@ -34,7 +32,7 @@ def plotAddData():
 		eyz=p3d.strain[3],ezx=p3d.strain[4],exy=p3d.strain[5],
 	)
 
-O.dt=old_div(PWaveTimeStep(),2)
+O.dt=PWaveTimeStep()/2
 
 # define the first part of simulation, hydrostatic compression
 O.engines=[

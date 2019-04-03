@@ -4,11 +4,9 @@
 """
 Auxiliary functions for polyhedra
 """
-from __future__ import division
 
 
 from builtins import range
-from past.utils import old_div
 import math,random,doctest,geom,numpy
 from yade import Vector3
 from yade.wrapper import *
@@ -77,7 +75,7 @@ def polyhedralBall(radius, N, material, center,mask=1):
 		r = math.sqrt(1. - y*y)
 		phi = k * inc
 		pts.append([math.cos(phi)*r*radius, y*radius, math.sin(phi)*r*radius])
-
+ 	
 	ball = polyhedra(material,v=pts)
 	ball.state.pos = center
 	return ball
@@ -87,7 +85,7 @@ def polyhedraTruncIcosaHed(radius, material, centre,mask=1):
 	pts = []
 
 	p = (1.+math.sqrt(5.))/2.
-	f = old_div(radius,math.sqrt(9.*p + 1.))
+	f = radius/math.sqrt(9.*p + 1.)
 	A = [[0.,1.,3.*p],[2.,1.+2.*p,p],[1.,2.+p,2.*p]]
 	for a in A:
 		a = [a[0]*f,a[1]*f,a[2]*f]

@@ -94,8 +94,8 @@ def updateScripts(scripts):
 		"An all-in-one multiple string substitution class; adapted to match only whole words"
 		def _make_regex(self): 
 			"Build a regular expression object based on the keys of the current dictionary"
-			return re.compile(r"(\b%s\b)" % "|".join(list(self.keys())))  ## adapted here 
-		def __call__(self, mo): 
+			return re.compile(r"(\b%s\b)" % "|".join(list(self.keys())))  ## adapted here
+		def __call__(self, mo):
 			"This handler will be invoked for each regex match"
 			# Count substitutions
 			self.count += 1 # Look-up string

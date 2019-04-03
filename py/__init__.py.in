@@ -12,14 +12,11 @@ It loads yade plugins and injects c++ class constructors to the __builtins__
 everywhere.
 """
 from __future__ import print_function
-from __future__ import absolute_import
 
 from future import standard_library
 standard_library.install_aliases()
 import ctypes,sys,os
 print("Using python version:",sys.version)
-
-sys.path.insert(2,os.path.realpath(__file__).rsplit("/",1)[0])
 
 sys.setdlopenflags(os.RTLD_NOW | os.RTLD_GLOBAL)
 
@@ -41,7 +38,7 @@ except: pass
 
 # find plugin directory
 import os,os.path
-import yade.config
+from yade import config
 # find plugins recursively
 plugins=[]
 # might add followlinks=True to os.walk, for python>=2.6
@@ -54,16 +51,14 @@ for root,dirs,files in os.walk(config.libDir):
 		if not (f.startswith('lib') and f.endswith('.so')): continue
 		plugin=os.path.join(config.libDir,root,f)
 		plugins.append(plugin)
-if 'YADE_DEBUG' in os.environ:
+#if 'YADE_DEBUG' in os.environ:
 	print('The following plugins will be loaded:')
 	for p in plugins: print('\t'+p)
 
-
-	
 # c++ initialization code
-import yade.boot
+from yade import boot
 boot.initialize(plugins,config.confDir)
-import yade.system
+from yade import system
 
 # create proxies for deprecated classes
 deprecatedTypes=system.cxxCtorsDict()
@@ -76,18 +71,18 @@ from minieigen import *
 
 from yade.wrapper import *
 # import to separate namespace to be able to call dir(miniEigen) and dir(wrapper) below
-import yade.wrapper 
+from yade import wrapper 
 
 # bindings for python2 retro-compatibility:
-yade.wrapper.BodyIterator.next=yade.wrapper.BodyIterator.__next__
-yade.wrapper.InteractionIterator.next=yade.wrapper.InteractionIterator.__next__
+wrapper.BodyIterator.next=wrapper.BodyIterator.__next__
+wrapper.InteractionIterator.next=wrapper.InteractionIterator.__next__
 from yade import pack
 pack.SpherePackIterator.next=pack.SpherePackIterator.__next__
 
 # out-of-class docstrings for some classes
-import yade._extraDocs
+from yade import _extraDocs
 # import a few "important" modules along with *
-import yade.utils # some others?
+from yade import utils # some others?
 __all__+=['utils',]+dir(wrapper)
 
 
@@ -108,3 +103,6 @@ O.engines=[
 		GlobalStiffnessTimeStepper(timeStepUpdateInterval=10,label="timeStepper"),
 		NewtonIntegrator(label="newton")
 	]
+
+#this will allow in python3 direct use of yade modules with import module_name (normally forbidden)
+sys.path.insert(2,os.path.realpath(__file__).rsplit("/",1)[0])

@@ -10,9 +10,7 @@
 ## Comments on the simulation itself can be found in script-session1.py
 
 from __future__ import print_function
-from __future__ import division
 from builtins import str
-from past.utils import old_div
 nRead=readParamsFromTable(
 	num_spheres=1001,
 	compFricDegree = 30,
@@ -78,7 +76,7 @@ O.engines=[
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
 	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=100,timestepSafetyCoefficient=0.8),
-	TriaxialStressController(maxMultiplier=1.+old_div(2e4,young), finalMaxMultiplier=1.+old_div(2e3,young), thickness = 0, stressMask = 7, internalCompaction=True,label="triax"),
+	TriaxialStressController(maxMultiplier=1.+2e4/young, finalMaxMultiplier=1.+2e3/young, thickness = 0, stressMask = 7, internalCompaction=True,label="triax"),
 	PyRunner(iterPeriod=20,command='history()',label='recorder'),
 	NewtonIntegrator(damping=damp,label="newton")
 ]
@@ -92,7 +90,7 @@ if not savedState:
 		O.run(1000, True)
 		unb=unbalancedForce()
 		print('unbalanced force:',unb,' mean stress: ',triax.meanStress)
-		if unb<stabilityThreshold and old_div(abs(-10000-triax.meanStress),10000)<0.001:
+		if unb<stabilityThreshold and abs(-10000-triax.meanStress)/10000<0.001:
 			break
 	while triax.porosity>targetPorosity:
 		compFricDegree = 0.95*compFricDegree

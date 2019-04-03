@@ -11,9 +11,7 @@ How to run this script:
     /path/to/yade ./undrain.py
 Please amend these instructions if you find that they do not work.
 """
-from __future__ import division
 from builtins import str
-from past.utils import old_div
 from esys.escript import *
 from esys.finley import Rectangle
 from esys.weipa import saveVTK
@@ -36,7 +34,7 @@ except OSError as exc:
 
 
 confining = -2.e5; pore = 1.e5 # initial pore pressure
-perm = old_div(0.001**2,(180.*8.9e-4)); # unscaled permeability, using KC equation
+perm = 0.001**2/(180.*8.9e-4); # unscaled permeability, using KC equation
 kf = 2.2e9 # fluid bulk modulus
 dt = .1; vel = -0.0001 # time step and loading speed
 lx = 0.05; ly = 0.1 # sample dimension
@@ -79,10 +77,10 @@ while t < 400:
    stress = prob.getCurrentStress() # effective stress at GP
    strain = prob.getCurrentStrain() # disp. grad at GP
    volume_strain = trace(strain) # volumetric strain
-   dev_strain = symmetric(strain) - old_div(volume_strain*k,dim) # deviatoric strain
+   dev_strain = symmetric(strain) - volume_strain*k/dim # deviatoric strain
    shear = sqrt(2.*inner(dev_strain,dev_strain)) # shear strain
    fab = prob.getLocalFabric() # fabric tensor at GP
-   dev_fab = 4.*(fab-old_div(trace(fab),dim*k))
+   dev_fab = 4.*(fab-trace(fab)/dim*k)
    anis = sqrt(.5*inner(dev_fab,dev_fab))
    p = prob.getEquivalentPorosity() # porosity at GP
    rot = prob.getLocalAvgRotation() # average rotation at GP
@@ -101,7 +99,7 @@ while t < 400:
    tractTop = traction*topSurf
    forceTop = integrate(tractTop,where=FunctionOnBoundary(dom))
    lengthTop = integrate(topSurf,where=FunctionOnBoundary(dom))
-   fout.write(str(old_div(t*vel*dt,ly))+' '+str(forceTop[1])+' '+str(lengthTop)+'\n')
+   fout.write(str(t*vel*dt/ly)+' '+str(forceTop[1])+' '+str(lengthTop)+'\n')
 
 prob.getCurrentPacking(time=t,prefix='./result/packing/')
 time_elapse = time.time() - time_start

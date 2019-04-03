@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 # encoding: utf-8
 from __future__ import print_function
-from __future__ import division
 from builtins import input
-from past.utils import old_div
 from yade import  ymport, qt, plot
 
 ## definition of some colors for colored text output in terminal
@@ -22,7 +20,7 @@ by unsing the '''+RED+'''StepDisplacer'''+BLUE+''' with loading and unloading.
 #### define parameters for the net
 # mesh opening size
 mos = 80./1000.
-a = old_div(mos,sqrt(3))
+a = mos/sqrt(3)
 # wire diameter
 d = 2.7/1000.
 # particle radius
@@ -32,8 +30,8 @@ strainStressValues=[(0.0019230769,2.5e8),(0.0192,3.2195e8),(0.05,3.8292e8),(0.15
 # elastic material properties
 particleVolume = 4./3.*pow(radius,3)*pi
 particleMass = 3.9/1000.
-density = old_div(particleMass,particleVolume)
-young = old_div(strainStressValues[0][1], strainStressValues[0][0])
+density = particleMass/particleVolume
+young = strainStressValues[0][1] / strainStressValues[0][0]
 poisson = 0.3
 
 

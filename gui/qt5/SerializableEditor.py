@@ -1,9 +1,7 @@
 # encoding: utf-8
-from __future__ import division
 from builtins import zip
 from builtins import str
 from builtins import range
-from past.utils import old_div
 from builtins import object
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -762,7 +760,7 @@ class SeqFundamentalEditor(QFrame):
 		elif act==actDown: self.downSlot(index)
 	def localPositionToIndex(self,pos):
 		gp=self.mapToGlobal(pos)
-		for row in range(old_div(self.form.count(),2)):
+		for row in range(self.form.count()/2):
 			w,i=self.form.itemAt(row,QFormLayout.FieldRole),self.form.itemAt(row,QFormLayout.LabelRole)
 			for wi in w.widget(),i.widget():
 				x0,y0,x1,y1=wi.geometry().getCoords(); globG=QRect(self.mapToGlobal(QPoint(x0,y0)),self.mapToGlobal(QPoint(x1,y1)))
@@ -788,7 +786,7 @@ class SeqFundamentalEditor(QFrame):
 	def rebuild(self):
 		currSeq=self.getter()
 		# clear everything
-		rows=old_div(self.form.count(),2)
+		rows=self.form.count()/2
 		for row in range(rows):
 			logging.trace('counts',self.form.rowCount(),self.form.count())
 			for wi in self.form.itemAt(row,QFormLayout.FieldRole),self.form.itemAt(row,QFormLayout.LabelRole):
@@ -819,7 +817,7 @@ class SeqFundamentalEditor(QFrame):
 		self.refreshEvent(dontRebuild=True) # avoid infinite recursion it the length would change meanwhile
 	def refreshEvent(self,dontRebuild=False,forceIx=-1):
 		currSeq=self.getter()
-		if len(currSeq)!=old_div(self.form.count(),2): #rowCount():
+		if len(currSeq)!=self.form.count()/2: #rowCount():
 			if dontRebuild: return # length changed behind our back, just pretend nothing happened and update next time instead
 			self.rebuild()
 			currSeq=self.getter()

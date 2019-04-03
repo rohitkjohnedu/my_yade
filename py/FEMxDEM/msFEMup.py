@@ -1,10 +1,8 @@
 from __future__ import print_function
-from __future__ import division
 from builtins import input
 from builtins import zip
 from builtins import range
 from builtins import object
-from past.utils import old_div
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"
@@ -202,7 +200,7 @@ class MultiScale(object):
       type: Vector on FunctionSpace
       """
       n=self.getEquivalentPorosity()
-      perm=old_div(self.__permeability*n**3,(1.-n)**2)
+      perm=self.__permeability*n**3/(1.-n)**2
       flux=-perm*util.grad(self.__pore)
       return flux
    
@@ -239,7 +237,7 @@ class MultiScale(object):
          du=self.__upde.getSolution()
          u+=du
          l,d=util.L2(u),util.L2(du)
-         err=old_div(d,l) # displacement error, alternatively using force error 'residual'
+         err=d/l # displacement error, alternatively using force error 'residual'
          converged=(err<rtol)
          if err>rtol**3: # only update DEM parts when error is large enough
             self.__domain.setX(x_safe)
@@ -259,10 +257,10 @@ class MultiScale(object):
       k=util.kronecker(self.__domain)
       kdr=util.inner(k,util.tensor_mult(self.__S,k))/4.
       n=self.getEquivalentPorosity()
-      perm=old_div(self.__permeability*n**3,(1.-n)**2*k)
+      perm=self.__permeability*n**3/(1.-n)**2*k
       kf=self.__bulkFluid
       dt=self.__dt
-      self.__ppde.setValue(A=perm,D=old_div((old_div(n,kf)+1./kdr),dt),Y=old_div((old_div(n,kf)+1./kdr),dt*self.__pgauss)-old_div(self.__meanStressRate,kdr))
+      self.__ppde.setValue(A=perm,D=(n/kf+1./kdr)/dt,Y=(n/kf+1./kdr)/dt*self.__pgauss-self.__meanStressRate/kdr)
       p_iter_old=self.__ppde.getSolution()
       p_iter_gauss=util.interpolate(p_iter_old,escript.Function(self.__domain))
       u_old,D,sig,s,scene=self.solveSolid(p_iter_gauss=p_iter_gauss,iter_max=solidIter)
@@ -270,16 +268,16 @@ class MultiScale(object):
       iterate=0
       while (not converge) and (iterate<globalIter):
          iterate += 1
-         self.__ppde.setValue(Y=old_div(n,kf/dt*self.__pgauss)+1./kdr/dt*p_iter_gauss-old_div(util.trace(D),dt))
+         self.__ppde.setValue(Y=n/kf/dt*self.__pgauss+1./kdr/dt*p_iter_gauss-util.trace(D)/dt)
          p_iter=self.__ppde.getSolution()
-         p_err=old_div(util.L2(p_iter-p_iter_old),util.L2(p_iter))
+         p_err=util.L2(p_iter-p_iter_old)/util.L2(p_iter)
          p_iter_old=p_iter
          p_iter_gauss=util.interpolate(p_iter,escript.Function(self.__domain))
          u,D,sig,s,scene=self.solveSolid(p_iter_gauss=p_iter_gauss,iter_max=solidIter)
-         u_err=old_div(util.L2(u-u_old),util.L2(u))
+         u_err=util.L2(u-u_old)/util.L2(u)
          u_old=u
          converge=(u_err<=rtol and p_err <= rtol*.1)
-      self.__meanStressRate=old_div((util.trace(sig-self.__stress)/2.-p_iter_gauss+self.__pgauss),dt)
+      self.__meanStressRate=(util.trace(sig-self.__stress)/2.-p_iter_gauss+self.__pgauss)/dt
       self.__pore=p_iter_old
       self.__pgauss=p_iter_gauss
       self.__domain.setX(x_safe+u_old)

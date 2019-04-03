@@ -1,8 +1,6 @@
 # encoding: utf-8
 from __future__ import print_function
-from __future__ import division
 from builtins import str
-from past.utils import old_div
 import yade.runtime
 if not yade.runtime.hasDisplay:
 	msg = "Connecting to DISPLAY at Yade startup failed, unable to activate the qt4 interface."
@@ -242,7 +240,7 @@ class ControllerClass(QWidget,Ui_Controller):
 			if len(self.iterTimes)==1: self.iterTimes.append(self.iterTimes[0]); self.iterValues.append(self.iterValues[0]) # 2 values, first one is bogus
 			self.iterTimes[0]=self.iterTimes[1]; self.iterValues[0]=self.iterValues[1]
 			self.iterTimes[1]=rt; self.iterValues[1]=iter;
-			self.iterPerSec=old_div((self.iterValues[-1]-self.iterValues[-2]),(self.iterTimes[-1]-self.iterTimes[-2]))
+			self.iterPerSec=(self.iterValues[-1]-self.iterValues[-2])/(self.iterTimes[-1]-self.iterTimes[-2])
 		if not O.running: self.iterPerSec=0
 		stopAtIter=O.stopAtIter
 		subStepInfo=''

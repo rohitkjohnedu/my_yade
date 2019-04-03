@@ -1,10 +1,8 @@
 # -*- coding: utf-8
 
 from __future__ import print_function
-from __future__ import division
 from builtins import str
 from builtins import range
-from past.utils import old_div
 from yade import pack,export,geom,timing,bodiesHandling
 import time,numpy
 	
@@ -63,7 +61,7 @@ for z in range(numberTests):
 		tolerance = 0.0001
 		
 		SpheresID=[]
-		SpheresID+=O.bodies.append(pack.regularHexa(pack.inSphere((Vector3(0.0,0.0,0.0)),rad),radius=old_div(rad,rR),gap=old_div(rad,rR*0.5),material=defMat))
+		SpheresID+=O.bodies.append(pack.regularHexa(pack.inSphere((Vector3(0.0,0.0,0.0)),rad),radius=rad/rR,gap=rad/rR*0.5,material=defMat))
 		
 		geometryParameters = bodiesHandling.spheresPackDimensions(SpheresID)
 		print(len(SpheresID))
@@ -99,11 +97,11 @@ for z in range(numberTests):
 		tEnd=time.time()
 		print()
 		print('Elapsed ', tEnd-tStart, ' sec')
-		print('Performance ', old_div(nbIter,(tEnd-tStart)), ' iter/sec')
-		print('Extrapolation on 1e5 iters ', old_div((tEnd-tStart),nbIter*1e5/3600.), ' hours')
+		print('Performance ', nbIter/(tEnd-tStart), ' iter/sec')
+		print('Extrapolation on 1e5 iters ', (tEnd-tStart)/nbIter*1e5/3600., ' hours')
 		print("=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*")
 		timing.stats()
-		iterVel += [old_div(nbIter,(tEnd-tStart))]
+		iterVel += [nbIter/(tEnd-tStart)]
 		testTime += [tEnd-tStart]
 		particlesNumber += [len(O.bodies)]
 
@@ -125,13 +123,13 @@ for i in range(len(radRAD)):
 	for z in range(numberTests):
 		iterVelNumpy[z]=iterVel[z*len(radRAD)+i]
 	avgVel = numpy.average(iterVelNumpy)
-	dispVel = old_div(numpy.std(iterVelNumpy),numpy.average(iterVelNumpy)*100.0)
+	dispVel = numpy.std(iterVelNumpy)/numpy.average(iterVelNumpy)*100.0
 	if (dispVel>10.):
 		print("Calculation velocity is unstable, try to close all programs and start performance tests again")
 	
 	print(particlesNumber[i]," spheres, calculation velocity=",avgVel, "iter/sec +/-",dispVel,"%")
 	data+=[[particlesNumber[i],avgVel,avgVel*dispVel/100.]]
-	scoreIterVel+=old_div(avgVel,coefCor[i]*1000.0)
+	scoreIterVel+=avgVel/coefCor[i]*1000.0
 print()
 scoreIterVel = int(scoreIterVel)
 ## write output file for graph
