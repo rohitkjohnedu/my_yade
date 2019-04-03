@@ -649,11 +649,11 @@ def saveDataTxt(fileName,vars=None, headers=None):
 	if headers:
 		k = list(headers.keys());
 		for i in range(len(k)):
-			f.write("# "+k[i]+"=\t"+str(headers[k[i]])+"\n");
+			f.write(("# "+k[i]+"=\t"+str(headers[k[i]])+"\n").encode("ascii"));
 	
-	f.write("# "+"\t\t".join(vars)+"\n")
+	f.write(("# "+"\t\t".join(vars)+"\n").encode("ascii"))
 	for i in range(len(data[vars[0]])):
-		f.write("\t".join([str(data[var][i]) for var in vars])+"\n")
+		f.write(("\t".join([str(data[var][i]) for var in vars])+"\n").encode("ascii"))
 	f.close()
 
 

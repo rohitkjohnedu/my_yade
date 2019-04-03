@@ -45,12 +45,12 @@ def saveVars(mark='',loadNow=True,**kw):
 	"""
 	import pickle
 	try: 
-		d=pickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])	#load dictionary d
+		d=pickle.loads((Omega().tags['pickledPythonVariablesDictionary'+mark]).encode("ascii"))	#load dictionary d
 		for key in list(kw.keys()):
 			d[key]=kw[key]							#insert new variables into d
 	except KeyError: 
 		d = kw
-	Omega().tags['pickledPythonVariablesDictionary'+mark]=pickle.dumps(d)
+	Omega().tags['pickledPythonVariablesDictionary'+mark]=pickle.dumps(d,1)	#use protocol 1 (0 also works) as it allows storage in utf8 for python3 and ascii for python2 (boost requirement)
 	if loadNow: loadVars(mark)
 
 
@@ -75,7 +75,7 @@ def loadVars(mark=None):
 			yade.params.__all__+=list(d.keys())
 			yade.params.__dict__.update(d)
 	if mark!=None:
-		d=pickle.loads(Omega().tags['pickledPythonVariablesDictionary'+mark])
+		d=pickle.loads((Omega().tags['pickledPythonVariablesDictionary'+mark]).encode("ascii"))
 		loadOne(d,mark)
 	else: # load everything one by one
 		for m in list(Omega().tags.keys()):
