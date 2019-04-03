@@ -784,7 +784,7 @@ class SeqFundamentalEditor(QFrame):
 	def rebuild(self):
 		currSeq=self.getter()
 		# clear everything
-		rows=self.form.count()/2
+		rows=int(self.form.count()/2)
 		for row in range(rows):
 			logging.trace('counts',self.form.rowCount(),self.form.count())
 			for wi in self.form.itemAt(row,QFormLayout.FieldRole),self.form.itemAt(row,QFormLayout.LabelRole):
