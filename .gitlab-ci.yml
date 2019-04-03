@@ -1,4 +1,4 @@
-image: registry.gitlab.com/remche/docker-yade
+image: registry.gitlab.com/yade-dev/docker-yade
 stages:
   - cmake
   - build
