@@ -12,6 +12,7 @@ cmake:
     - master
     - merge_request
   script:
+    - apt-get install python3-numpy
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
   tags:
