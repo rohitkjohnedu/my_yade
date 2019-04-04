@@ -6,8 +6,7 @@ from __future__ import print_function
 
 from builtins import range
 from yade.wrapper import *
-import math,numpy
-from yade import utils
+import yade.utils,math,numpy
 
 from minieigen import *
 

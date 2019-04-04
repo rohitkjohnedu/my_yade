@@ -49,9 +49,9 @@ except ImportError: pass
 
 # make c++ predicates available in this module
 noPredicate = False
-#try:
-from yade._packPredicates import * ## imported in randomDensePack as well
-#except ImportError: pass; noPredicate = True
+try:
+	from _packPredicates import * ## imported in randomDensePack as well
+except ImportError: pass; noPredicate = True
 
 # import SpherePack
 from yade._packSpheres import *
@@ -485,9 +485,8 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 
 	:return: SpherePack object with spheres, filtered by the predicate.
 	"""
-	import sqlite3, os.path, pickle, time, sys, numpy
+	import sqlite3, os.path, pickle, time, sys, _packPredicates, numpy
 	from math import pi
-	from yade import _packPredicates
 	wantPeri=(spheresInCell>0)
 	if 'inGtsSurface' in dir(_packPredicates) and type(predicate)==inGtsSurface and useOBB:
 		center,dim,orientation=gtsSurfaceBestFitOBB(predicate.surf)
