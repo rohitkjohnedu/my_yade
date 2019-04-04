@@ -50,7 +50,7 @@ def saveVars(mark='',loadNow=True,**kw):
 			d[key]=kw[key]							#insert new variables into d
 	except KeyError: 
 		d = kw
-	Omega().tags['pickledPythonVariablesDictionary'+mark]=pickle.dumps(d,1)	#use protocol 1 (0 also works) as it allows storage in utf8 for python3 and ascii for python2 (boost requirement)
+	Omega().tags['pickledPythonVariablesDictionary'+mark]=pickle.dumps(d,0)	#use protocol 0 as it allows storage in utf8 for python3 and ascii for python2 (boost requirement)
 	if loadNow: loadVars(mark)
 
 
