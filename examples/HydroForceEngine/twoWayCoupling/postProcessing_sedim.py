@@ -11,7 +11,7 @@ from __future__ import print_function
 
 
 from past.builtins import execfile
-from builtins import str
+
 from builtins import range
 import numpy as np
 import os

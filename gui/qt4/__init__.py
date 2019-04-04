@@ -1,6 +1,6 @@
 # encoding: utf-8
 from __future__ import print_function
-from builtins import str
+
 import yade.runtime
 if not yade.runtime.hasDisplay:
 	msg = "Connecting to DISPLAY at Yade startup failed, unable to activate the qt4 interface."

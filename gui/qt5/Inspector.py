@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 from __future__ import print_function
-from builtins import str
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from yade import *

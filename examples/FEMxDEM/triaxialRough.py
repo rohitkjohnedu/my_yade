@@ -11,7 +11,7 @@ How to run this script:
     /path/to/yade ./triaxialRough.py
 Please amend these instructions if you find that they do not work.
 """
-from builtins import str
+
 from builtins import range
 from esys.escript import *
 from esys.finley import Brick

@@ -3,7 +3,7 @@
 #
 # module documentation
 #
-from builtins import str
+
 from builtins import range
 import sys,os,os.path
 

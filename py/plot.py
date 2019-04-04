@@ -9,7 +9,7 @@ from __future__ import print_function
 ## all exported names
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
+
 from builtins import range
 from builtins import object
 __all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']

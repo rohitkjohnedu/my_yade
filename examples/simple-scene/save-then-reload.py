@@ -10,7 +10,7 @@
 ## Comments on the simulation itself can be found in script-session1.py
 
 from __future__ import print_function
-from builtins import str
+
 nRead=readParamsFromTable(
 	num_spheres=1001,
 	compFricDegree = 30,

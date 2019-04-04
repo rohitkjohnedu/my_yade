@@ -7,7 +7,7 @@ See :ref:`timing` section of the programmer's manual, `wiki page <http://yade-de
 """
 from __future__ import print_function
 
-from builtins import str
+
 from yade.wrapper import *
 
 

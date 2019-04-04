@@ -3,7 +3,7 @@
 # to import with yade/python/ipython solveLaplace_uc.py, or with execfile('solveLaplace_uc.py',globals()) once inside a yade/python/ipython session
 
 from past.builtins import execfile
-from builtins import str
+
 from builtins import range
 execfile('solveLiqBridge.py',globals())
 

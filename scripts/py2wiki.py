@@ -29,7 +29,7 @@ Usasge 2: generate SimpleScene.cpp formatted for wiki with comments from simple-
 """
 from __future__ import print_function
 
-from builtins import str
+
 from builtins import range
 from builtins import object
 import sys,re

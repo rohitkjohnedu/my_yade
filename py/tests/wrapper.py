@@ -6,7 +6,7 @@ This test module covers python/c++ transitions, for both classes deriving from S
 but also for other classes that we wrap (like miniEigen).
 """
 
-from builtins import str
+
 from builtins import range
 import unittest
 from yade.wrapper import *

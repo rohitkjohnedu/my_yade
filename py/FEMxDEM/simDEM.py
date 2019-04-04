@@ -1,5 +1,5 @@
 from __future__ import print_function
-from builtins import str
+
 __author__="Ning Guo, ceguo@connect.ust.hk"
 __supervisor__="Jidong Zhao, jzhao@ust.hk"
 __institution__="The Hong Kong University of Science and Technology"

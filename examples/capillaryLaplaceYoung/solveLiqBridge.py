@@ -7,7 +7,7 @@ from __future__ import print_function
 # import numpy
 # from math import sin,pi,cos,sqrt,tan
 # --- End of "ipython necessary imports" ---
-from builtins import str
+
 from builtins import range
 import scipy # for root finding function (see below), requires installing python-scipy package
 from scipy import optimize

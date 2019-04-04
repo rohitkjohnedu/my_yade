@@ -1,6 +1,6 @@
 # encoding: utf-8
 from builtins import zip
-from builtins import str
+
 from builtins import range
 from builtins import object
 from PyQt5.QtCore import *
