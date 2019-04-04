@@ -113,10 +113,8 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			
 		boost::python::list getIncidentCells(unsigned vertexId) {
 			RTriangulation& Tri = solver->tesselation().Triangulation();
-        		FiniteCellsIterator cellEnd = Tri.finite_cells_end();
 			unsigned& id = vertexId;
 			if (vertexId >= solver->tesselation().vertexHandles.size()) LOG_ERROR("vertexId exceeds number of vertices");
-// 			vector<unsigned> incidentCells;
 			boost::python::list incidentCells;
 			vector<CellHandle> tmpCells;
 			tmpCells.resize(10000);
