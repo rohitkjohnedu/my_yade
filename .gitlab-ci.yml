@@ -13,7 +13,7 @@ cmake:
     - merge_request
   script:
     - apt-get update
-    - apt-get  -y  install python3-numpy python3-dev python3-matplotlib python3-numpy python3-tk python-vtk python3-pygraphviz python3-xlib python3-pyqt5 python3-pyqt5.qtwebkit python3-pyqt5.qtsvg python3-pil python3-sphinx python3-git python3-minieigen
+    - apt-get  -y  install python3-numpy python3-dev python3-matplotlib python3-numpy python3-tk python-vtk6 python3-pygraphviz python3-xlib python3-pyqt5 python3-pyqt5.qtwebkit python3-pyqt5.qtsvg python3-pil python3-sphinx python3-git python3-minieigen
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
   tags:
