@@ -15,7 +15,7 @@ standard_library.install_aliases()
 
 from builtins import range
 from builtins import object
-import math,random,doctest,numpy
+import math,random,doctest,yade.geom,numpy
 from yade import *
 from yade.wrapper import *
 try: # use psyco if available
