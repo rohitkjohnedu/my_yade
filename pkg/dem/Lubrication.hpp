@@ -110,7 +110,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			((bool,verbose,false,,"Write more debug informations"))
 			((int,maxSubSteps,4,,"max recursion depth of adaptative timestepping in the theta-method, the minimal time interval is thus :yref:`Omega::dt<O.dt>`$/2^{depth}$. If still not converged the integrator will switch to backward Euler."))
 			((Real,theta,0.55,,"parameter of the 'theta'-method, 1: backward Euler, 0.5: trapezoidal rule, 0: not used,  0.55: suggested optimum)"))
-			((int,resolution,2,,"Change normal component resolution method, 0: Iterative exact resolution with substepping (theta method, linear contact), 1: Newton-Rafson dimentionless resolution (theta method, linear contact), 2: (default) Dichotomy dimentionless resolution (theta method, linear contact), 3:Exact dimentionless solution with contact prediction (theta method, linear contact)"))
+			((int,resolution,3,,"Change normal component resolution method, 0: Iterative exact resolution with substepping (theta method, linear contact), 1: Newton-Rafson dimentionless resolution (theta method, linear contact), 2: Dichotomy dimentionless resolution (theta method, linear contact), 3: (default) Exact dimentionless solution with contact prediction (theta method, linear contact)"))
 			((Real, SolutionTol, 1.e-8,,"Tolerance for numerical resolution (Dichotomy and Newton-Rafson)"))
 			((int, MaxIter, 30,,"Maximum iterations for numerical resolution (Dichotomy and Newton-Rafson)"))
 			,// CTOR

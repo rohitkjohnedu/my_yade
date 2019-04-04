@@ -240,7 +240,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trpz_adim(LubricationPhys 
 
 // Dimentionless exact solution solver
 Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n, Real const& eps, Real const& dt, Real const& prev_u, Real & prevDotU) {
-	Real dtc((prev_u - eps)/(eps*(eps-u_n))); // Critical timestep
+	Real dtc((prev_u - eps)/(theta*(eps*(eps-u_n)) + (1.-theta)*prevDotU*prev_u)); // Critical timestep
 	Real u_(prev_u);
 	bool c(u_ < eps);
 	Real dt_(dt);
@@ -250,9 +250,9 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n
 	Real a((c) ? 1. : 0.);
 	
 	Real b(theta*(u_n + a*eps) - 1./dt_);
-	Real ac(4.*theta*(1.+a)*((1.-theta)*prevDotU - u_/dt_));
+	Real ac(4.*theta*(1.+a)*((1.-theta)*prevDotU*prev_u + u_/dt_));
 	
-	Real u = (b + std::sqrt(b*b-ac))/(2.*theta*(1.+a));
+	Real u = (b + std::sqrt(b*b+ac))/(2.*theta*(1.+a));
 	prevDotU = -(1.+a)*u + a*eps + u_n; // dotu/u
 	return u;
 }
