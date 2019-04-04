@@ -151,7 +151,7 @@ if opts.updateScripts:
 sys.argv=yade.runtime.argv=args
 yade.runtime.opts=opts
 
-from yade import utils, pack
+from yade import utils, pack, geom
 from yade.utils import *
 from yade.pack import *
 from math import *
