@@ -75,7 +75,7 @@ def polyhedralBall(radius, N, material, center,mask=1):
 		r = math.sqrt(1. - y*y)
 		phi = k * inc
 		pts.append([math.cos(phi)*r*radius, y*radius, math.sin(phi)*r*radius])
- 	
+
 	ball = polyhedra(material,v=pts)
 	ball.state.pos = center
 	return ball

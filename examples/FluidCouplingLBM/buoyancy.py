@@ -116,7 +116,7 @@ b5=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSiz
 O.bodies.append(b5)
 #--
 center=((lowerCornerW[0]+upperCornerW[0])/2,(lowerCornerW[1]+upperCornerW[1])/2,upperCornerW[2]+thickness/2.0)
-halfSize=(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0])/2+thickness,wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1])/2+thickness,thickness/2.0);	 	
+halfSize=(wallOversizeFactor*fabs(lowerCornerW[0]-upperCornerW[0])/2+thickness,wallOversizeFactor*fabs(lowerCornerW[1]-upperCornerW[1])/2+thickness,thickness/2.0);
 b6=utils.box(center=[center[0],center[1],center[2]],extents=[halfSize[0],halfSize[1],halfSize[2]],color=[0,1,0],fixed=True,wire=True,material='walls')
 O.bodies.append(b6)
 

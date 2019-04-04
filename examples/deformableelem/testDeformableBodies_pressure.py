@@ -177,14 +177,14 @@ O.dt=1e-3;
 
 O.engines=[
 #		integratoreng,
-	    ForceResetter(),
-#	    ## Apply internal force to the deformable elements and internal force of the interaction element
-	    FEInternalForceEngine([If2_Lin4NodeTetra_LinIsoRayleighDampElast(),If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat()]),
-	    PyRunner(iterPeriod=1,command='applyforcetoelements()'),
-	    NewtonIntegrator(damping=0,gravity=[0,0,0]),
-#	    ## Plotting data: adds plots after one step of the integrator engine
-	    PyRunner(iterPeriod=1,command='addplot()')
-	  ]
+		ForceResetter(),
+#		Apply internal force to the deformable elements and internal force of the interaction element
+		FEInternalForceEngine([If2_Lin4NodeTetra_LinIsoRayleighDampElast(),If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat()]),
+		PyRunner(iterPeriod=1,command='applyforcetoelements()'),
+		NewtonIntegrator(damping=0,gravity=[0,0,0]),
+#		Plotting data: adds plots after one step of the integrator engine
+		PyRunner(iterPeriod=1,command='addplot()')
+	]
 
 from yade import plot
 

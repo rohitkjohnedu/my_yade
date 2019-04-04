@@ -72,7 +72,7 @@ o.engines=[
 
 for b in O.bodies:
 	if isinstance(b.shape,Sphere):
-		 b.state.blockedDOFs='zXY'
+		b.state.blockedDOFs='zXY'
 
 O.dt=0.02*tc
 

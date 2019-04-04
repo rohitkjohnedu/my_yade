@@ -148,8 +148,8 @@ from yade import plot
 
 ## a function saving variables
 def history():
-  	plot.addData(e22=-triax.strain[1]-zeroe22,e22_theory=drye22+(1-dryFraction)*consolidation((O.time-zeroTime)*Cv/wetHeight**2)*1000./modulus,t=O.time,p=flow.getPorePressure((0.5,0.1,0.5)),s22=-triax.stress(3)[1]-10000)
-  	#plot.addData(e22=-triax.strain[1],t=O.time,s22=-triax.stress(2)[1],p=flow.MeasurePorePressure((0.5,0.5,0.5)))
+	plot.addData(e22=-triax.strain[1]-zeroe22,e22_theory=drye22+(1-dryFraction)*consolidation((O.time-zeroTime)*Cv/wetHeight**2)*1000./modulus,t=O.time,p=flow.getPorePressure((0.5,0.1,0.5)),s22=-triax.stress(3)[1]-10000)
+	#plot.addData(e22=-triax.strain[1],t=O.time,s22=-triax.stress(2)[1],p=flow.MeasurePorePressure((0.5,0.5,0.5)))
 
 O.engines=O.engines+[PyRunner(iterPeriod=200,command='history()',label='recorder')]
 ##make nice animations:

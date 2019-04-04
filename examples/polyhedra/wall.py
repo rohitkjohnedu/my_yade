@@ -56,7 +56,7 @@ O.engines=[
    ),
    #GravityEngine(gravity=(0,0,-9.81)),
    NewtonIntegrator(damping=0.5,gravity=(0,0,-9.81)),
-   PyRunner(command='checkUnbalanced()',realPeriod=3,label='checker')#, 	
+   PyRunner(command='checkUnbalanced()',realPeriod=3,label='checker')#,
    # wideo_recording
    #qt.SnapshotEngine(fileBase='W',iterPeriod=50,label='snapshot')
 ]

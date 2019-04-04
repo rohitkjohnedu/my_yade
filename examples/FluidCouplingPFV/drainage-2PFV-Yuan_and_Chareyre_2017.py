@@ -92,14 +92,14 @@ from yade import plot
 O.engines=O.engines+[PyRunner(iterPeriod=20,command='history()',dead=1,label='recorder')]
 
 def history():
-  	plot.addData(e11=-triax.strain[0]-ei0, e22=-triax.strain[1]-ei1, e33=-triax.strain[2]-ei2,
-		    s11=-triax.stress(0)[0]-si0,
-		    s22=-triax.stress(2)[1]-si1,
-		    s33=-triax.stress(4)[2]-si2,
-		    pc=-unsat.bndCondValue[2],
-		    sw=unsat.getSaturation(False),
-		    i=O.iter
-		    )
+	plot.addData(e11=-triax.strain[0]-ei0, e22=-triax.strain[1]-ei1, e33=-triax.strain[2]-ei2,
+		s11=-triax.stress(0)[0]-si0,
+		s22=-triax.stress(2)[1]-si1,
+		s33=-triax.stress(4)[2]-si2,
+		pc=-unsat.bndCondValue[2],
+		sw=unsat.getSaturation(False),
+		i=O.iter
+		)
 
 plot.plots={'pc':('sw',None,'e22')}
 plot.plot()

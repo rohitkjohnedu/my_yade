@@ -83,24 +83,24 @@ for inte in O.interactions:
        bod2 = O.bodies[inte.id2]
        if bod1.state.pos[2]<Lz/2.0:
           if not (bod1.id in lowerBlock):
-		  lowerBlock.append(bod1.id)
-		  bod1.shape.color=Vector3(1,0,0)
-	  if bod2.state.pos[2]>Lz/2.0:
+                  lowerBlock.append(bod1.id)
+                  bod1.shape.color=Vector3(1,0,0)
+          if bod2.state.pos[2]>Lz/2.0:
              print('\n **** ERROR !!!! ******* \n\n')
-	  else:
+          else:
              if not (bod2.id in lowerBlock):
-		     lowerBlock.append(bod2.id)
-		     bod2.shape.color=Vector3(1,0,0)
+                     lowerBlock.append(bod2.id)
+                     bod2.shape.color=Vector3(1,0,0)
        else:
           if not (bod1.id in upperBlock):
-		  upperBlock.append(bod1.id)
-		  bod1.shape.color=Vector3(0,0,1)
-	  if bod2.state.pos[2]<Lz/2.0:
+                  upperBlock.append(bod1.id)
+                  bod1.shape.color=Vector3(0,0,1)
+          if bod2.state.pos[2]<Lz/2.0:
              print('\n **** ERROR !!!! ******* \n\n')
-	  else:
-		  if not (bod2.id in upperBlock):
-			  upperBlock.append(bod2.id)
-			  bod2.shape.color=Vector3(0,0,1)
+          else:
+                  if not (bod2.id in upperBlock):
+                          upperBlock.append(bod2.id)
+                          bod2.shape.color=Vector3(0,0,1)
 print('\n Clumping upper block, be patient')
 idUpperClump=O.bodies.clump(upperBlock)
 print('Clumped !')

@@ -145,9 +145,9 @@ O.engines = [
 	InsertionSortCollider([Bo1_Sphere_Aabb(), Bo1_Wall_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()],label='contactDetection',allowBiggerThanPeriod = True),
 	# Calculate the different interactions
 	InteractionLoop(
-   	[Ig2_Sphere_Sphere_ScGeom(), Ig2_Box_Sphere_ScGeom()],
-   	[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
-   	[Law2_ScGeom_ViscElPhys_Basic()]
+	[Ig2_Sphere_Sphere_ScGeom(), Ig2_Box_Sphere_ScGeom()],
+	[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
+	[Law2_ScGeom_ViscElPhys_Basic()]
 	,label = 'interactionLoop'),				
 	#Apply an hydrodynamic force to the particles
 	HydroForceEngine(densFluid = densFluidPY,viscoDyn = dynamicVisco,zRef = groundPosition,gravity = gravityVector,deltaZ = dz,expoRZ = expoDrag_PY,lift = False,nCell = ndimz,vCell = length*width*dz,radiusPart=diameterPart/2.,vxFluid = initVxFluid,phiPart = phiPartPY,vxPart = vxPartPY,irheolf=0, iusl = 0, uTop = uTop,iturbu = 0,ids = idApplyForce, label = 'hydroEngine', dead = True),
@@ -181,7 +181,7 @@ def gravityDeposition(lim):
 	else :
 		print('\n Gravity deposition finished, apply fluid forces !\n')
 		newtonIntegr.damping = 0.0	# Set the artificial numerical damping to zero
-	   	gravDepo.dead = True		# Remove the present engine for the following
+		gravDepo.dead = True		# Remove the present engine for the following
 		hydroEngine.dead = False	# Activate the HydroForceEngine
 		hydroEngine.vxFluid = vxFluidPY # Send the fluid velocity vector used to apply the drag fluid force on particles in HydroForceEngine (see c++ code)
 		hydroEngine.ReynoldStresses = np.zeros(ndimz) # Send the simplified fluid Reynolds stresses Rxz/\rho^f used to account for the fluid velocity fluctuations in HydroForceEngine (see c++ code)

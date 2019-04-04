@@ -30,7 +30,6 @@ O.bodies.append(t)
 def checkUnbalanced():   
    # at the very start, unbalanced force can be low as there is only few contacts, but it does not mean the packing is stable
    print("unbalanced forces = %.5f, position %f, %f, %f"%(utils.unbalancedForce(), t.state.pos[0], t.state.pos[1], t.state.pos[2]))
-    	
    
 
 O.engines=[

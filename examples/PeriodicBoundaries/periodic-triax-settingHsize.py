@@ -6,8 +6,8 @@ from yade import pack,qt
 O.periodic=True
 
 O.cell.hSize=Matrix3(1.0, -0.15, -0.10,
-		     -0.2 ,1.5, 0.3,
-		    0.3, -0.3, 1.0)
+				-0.2 ,1.5, 0.3,
+				0.3, -0.3, 1.0)
 sp=pack.SpherePack()
 num=sp.makeCloud(hSize=O.cell.hSize, rMean=-0.01,rRelFuzz=.2, num=500,periodic=True, porosity=0.52,distributeMass=False)
 O.bodies.append([sphere(s[0],s[1]) for s in sp])

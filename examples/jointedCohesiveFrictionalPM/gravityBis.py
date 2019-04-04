@@ -73,12 +73,12 @@ for o in O.bodies:
       o.shape.color=(0.9,0.8,0.6)
       ## to fix boundary particles on ground
       if o.state.pos[2]<(zinf+2*e) :
-	 o.state.blockedDOFs+='xyz'
-	 o.shape.color=(1,1,1)
+         o.state.blockedDOFs+='xyz'
+         o.shape.color=(1,1,1)
 
       ## to identify indicator on top
       if o.state.pos[2]>(zsup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[1]>((yinf+ysup-e)/2.0) and o.state.pos[1]<((yinf+ysup+e)/2) : 
-	refPoint=o.id
+         refPoint=o.id
 
 O.bodies[refPoint].shape.highlight=True
 
@@ -112,16 +112,16 @@ stableIter=1000
 stableVel=0.001
 degrade=True
 def jointStrengthDegradation():
-    global degrade
-    if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[2])<stableVel :
+	global degrade
+	if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[2])<stableVel :
 	print('Equilibrium reached \nJoint cohesion canceled now !', ' | iteration=', O.iter)
 	degrade=False
 	for i in O.interactions:
-	    if i.phys.isOnJoint : 
+		if i.phys.isOnJoint : 
 		if i.phys.isCohesive:
-		  i.phys.isCohesive=False
-		  i.phys.FnMax=0.
-		  i.phys.FsMax=0.
+			i.phys.isCohesive=False
+			i.phys.FnMax=0.
+			i.phys.FsMax=0.
 
 print('Seeking after an initial equilibrium state')
 print('')

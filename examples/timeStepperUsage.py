@@ -7,8 +7,8 @@ from yade import pack,qt,timing
 O.periodic=True
 
 O.cell.hSize=Matrix3(0.1, 0, 0,
-		     0 ,0.1, 0,
-		    0, 0, 0.1)
+	0 ,0.1, 0,
+	0, 0, 0.1)
 
 n=1000
 

@@ -76,14 +76,14 @@ for o in O.bodies:
       o.shape.color=(0.9,0.8,0.6)
       ## to fix boundary particles on ground
       if o.state.pos[1]<(yinf+2*e) :
-	 o.state.blockedDOFs+='xyz'
-	 baseBodies.append(o.id)
-	 o.shape.color=(1,1,1)
+         o.state.blockedDOFs+='xyz'
+         baseBodies.append(o.id)
+         o.shape.color=(1,1,1)
 
       ## to identify indicator on top
       if o.state.pos[1]>(ysup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[2]>(zinf+(Z-e)/2) and o.state.pos[2]<(zsup-(Z-e)/2) : 
-	refPoint=o.id
-	p0=o.state.pos[1]
+         refPoint=o.id
+         p0=o.state.pos[1]
 
 baseBodies=tuple(baseBodies)
 O.bodies[refPoint].shape.color=(1,0,0)
@@ -124,12 +124,12 @@ def jointStrengthDegradation():
 	print('!joint cohesion total degradation!', ' | iteration=', O.iter)
 	degrade=False
 	for i in O.interactions:
-	    if i.phys.isOnJoint : 
+		if i.phys.isOnJoint : 
 		if i.phys.isCohesive:
-		  i.phys.isCohesive=False
-		  i.phys.FnMax=0.
-		  i.phys.FsMax=0.
-		
+			i.phys.isCohesive=False
+			i.phys.FnMax=0.
+			i.phys.FsMax=0.
+
 #### YADE windows
 from yade import qt
 v=qt.Controller()
