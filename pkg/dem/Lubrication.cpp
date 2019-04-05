@@ -61,6 +61,7 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
     phys->nun = M_PI*eta*3./2.*a*a;
     phys->eta = eta;
     phys->eps = eps;
+	phys->ladh = Fadh/Kn/a; // Compute adhesion length from force
 	
 	/* Integration sheme memory */
     phys->u = -1.;
@@ -226,23 +227,33 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trpz_adim(LubricationPhys 
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth; }
 	
-	phys->u = a*trapz_integrate_u_adim(-geom->penetrationDepth/a, phys->eps, scene->dt*a*phys->kn/phys->nun, phys->u/a, phys->prevDotU);
+	Real uprim = trapz_integrate_u_adim(-geom->penetrationDepth/a, 2.*phys->eps, scene->dt*a*phys->kn/phys->nun, phys->u/a, phys->ladh , phys->contact, phys->prevDotU);
+	
+	phys->u = a*uprim;
+	
+	//if(debug) LOG_DEBUG("uprim " << uprim << " u " << phys->u);
+	
+	if(phys->contact) { // We where in contact. Contact is maintained while u'-2*eps < ladh
+		phys->contact = uprim-2.*phys->eps < phys->ladh;
+	} else { // We where not in contact. We create contact if u' < 2*eps
+		phys->contact = uprim < 2.*phys->eps;
+	}
 	
 	phys->normalForce = phys->kn*(-geom->penetrationDepth-phys->u)*geom->normal;
-	phys->normalContactForce = (phys->nun > 0.) ? Vector3r(-phys->kn*(std::max(2.*a*phys->eps-phys->u,0.))*geom->normal) : phys->normalForce;
+	phys->normalContactForce = (phys->contact) ? Vector3r(-phys->kn*(2.*a*phys->eps-phys->u)*geom->normal) : Vector3r::Zero();
 	phys->normalLubricationForce = phys->kn*a*phys->prevDotU*geom->normal;
-	
-	phys->contact = phys->normalContactForce.norm() != 0;
+
 	phys->ue = -geom->penetrationDepth - phys->u;
 	
 	return phys->u;
 }
 
 // Dimentionless exact solution solver
-Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n, Real const& eps, Real const& dt, Real const& prev_u, Real & prevDotU) {
-	Real dtc((prev_u - eps)/(theta*(eps*(eps-u_n)) + (1.-theta)*prevDotU*prev_u)); // Critical timestep
+Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n, Real const& eps, Real const& dt, Real const& prev_u, Real const& ladh, bool const& inContact, Real & prevDotU) {
+	Real l((inContact) ? ladh : 0.);
+	Real dtc((prev_u - eps - l)/(theta*(eps+l)*(eps+2.*l-u_n) + (1.-theta)*prevDotU*prev_u)); // Critical timestep
 	Real u_(prev_u);
-	bool c(u_ < eps);
+	bool c(inContact);
 	Real dt_(dt);
 	
 	if(dtc > 0. && dt > dtc) { c = !c; u_ = eps; dt_ = dt - dtc; } // Contact transition will occur. Starting from intermediate solution.
@@ -253,6 +264,9 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n
 	Real ac(4.*theta*(1.+a)*((1.-theta)*prevDotU*prev_u + u_/dt_));
 	
 	Real u = (b + std::sqrt(b*b+ac))/(2.*theta*(1.+a));
+	
+	if(debug) LOG_DEBUG("b " << b << " ac " << ac);
+	
 	prevDotU = -(1.+a)*u + a*eps + u_n; // dotu/u
 	return u;
 }
@@ -521,7 +535,7 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(Lubricatio
 		C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
 		C2 = -(geom->radius2-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
 	} else {
-		LOG_WARN("Gap is negative or null with lubrication: inconsistant results: skip shear force and torques calculation");
+		LOG_WARN("Gap is negative or null with lubrication: inconsistant results: skip shear force and torques calculation"<<phys->u);
 	}
 }
 
