@@ -24,6 +24,7 @@ cmake -DCMAKE_INSTALL_PREFIX=/path/to/your/install/target -DUSE_PYTHON3=ON /path
 - yade launch ok with python3, generating/launching triax ok
 - yade --test all ok
 - yade --test all ok with python2 (-DUSE_PYTHON3=OFF)
+- yade --checks almost ok with python2 and python3 (but the only issue is not related to python version)
 
 **Known bugs/todos**
 
