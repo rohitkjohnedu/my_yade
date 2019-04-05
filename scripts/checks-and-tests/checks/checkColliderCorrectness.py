@@ -83,7 +83,7 @@ if(loading):
 else:
 	resultFile=open( checksPath+'/data/checkColider.txt', "w" )
 lineCount=0
-for per in results:
+for per in sorted(results):
 	for result in results[per]:
 		for record in result:
 			for tupl in record:
