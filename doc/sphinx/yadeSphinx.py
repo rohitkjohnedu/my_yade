@@ -6,10 +6,17 @@
 
 from builtins import range
 import sys,os,os.path
+try: #for python 3.4+s
+	from importlib import reload
+except:
+	pass
 reload(sys)
-sys.setdefaultencoding('utf8')
+try: #for python2
+	sys.setdefaultencoding('utf8')
+except:
+	pass
 
-outDir=sys.argv[2] if len(sys.argv)>2 else '_build'
+outDir=sys.argv[2] if len(sys.argv)>2 else os.getcwd()+'/_build'
 for d in (outDir,outDir+'/latex',outDir+'/html'):
     if not os.path.exists(d):
         os.mkdir(d)
@@ -182,7 +189,7 @@ def sect(title,text,tops,reverse=False,willBeLater=set()):
 def genWrapperRst():
     global docClasses
     docClasses=set() # reset globals
-    wrapper=file('yade.wrapper.rst','w')
+    wrapper=open('yade.wrapper.rst','w')
     wrapper.write(""".. _yade.wrapper::
 
 Yade wrapper class reference
@@ -279,9 +286,9 @@ def genReferences():
 import sphinx,sys,shutil
 sys.path.append('.') # for bib2rst
 
-genReferences()
-for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
-    shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
+#genReferences()
+#for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
+    #shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
 global writer
 writer=None
@@ -319,8 +326,8 @@ for writer in ['html','latex','epub']:
                     lines[i]=''; lines[i+1]=''
             else:
                 out.append(lines[i])
-        file(outDir+'/latex/Yade.tex','w').write('')
+        open(outDir+'/latex/Yade.tex','w').write('')
         for i in out:
-            file(outDir+'/latex/Yade.tex','a').write(i)
+            open(outDir+'/latex/Yade.tex','a').write(i)
     # HACK!!!!==========================================================================
 sys.exit()

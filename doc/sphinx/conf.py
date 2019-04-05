@@ -73,7 +73,7 @@ def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
 
 # map modules to their html (rst) filenames. Used for sub-modules, where e.g. SpherePack is yade._packSphere.SpherePack, but is documented from yade.pack.rst
 moduleMap={
-	  'yade._packPredicates'    :'yade.pack'
+	'yade._packPredicates'    :'yade.pack'
 	, 'yade._packSpheres'       :'yade.pack'
 	, 'yade._packObb'           :'yade.pack'
 	, 'yade._utils'             :'yade.utils'
@@ -101,7 +101,7 @@ def mkYrefNode(target,text,rawtext,role,explicitText,lineno,options={}):
 		uri=('%%%s#%s'%(module2,target) if writer=='latex' else '%s.html#%s'%(module2,target))
 		if not explicitText and module!=module2:
 			text=module2+'.'+'.'.join(target.split('.')[2:])
-		text=string.replace(text,'yade.','',1)
+		text=text.replace('yade.','',1)
 	elif target.startswith('external:'):
 		exttarget=target.split(':',1)[1]
 		if not explicitText: text=exttarget
@@ -180,7 +180,10 @@ def fixSrc(app,docname,source):
 	source[0]=replaceLaTeX(source[0])
 
 def fixDocstring(app,what,name,obj,options,lines):
-	for i in range(0,len(lines)): lines[i]=lines[i].decode('utf-8')
+	try: #for python2 (python3 will produce an error)
+		for i in range(0,len(lines)): lines[i]=lines[i].decode('utf-8')
+	except:
+		pass
 	# remove empty default roles, which is not properly interpreted by docutils parser
 	for i in range(0,len(lines)):
 		lines[i]=lines[i].replace(':ydefault:``','')
@@ -196,9 +199,9 @@ def fixDocstring(app,what,name,obj,options,lines):
 			lines[i]=l2[i] if i<len(l2) else ''
 	elif isBoostMethod(what,obj):
 		l2=boostFuncSignature(name,obj)[1]
-                if (l2):
-                    for i in range(0,len(lines)):
-                            lines[i]=l2[i] if i<len(l2) else ''
+		if (l2):
+			for i in range(0,len(lines)):
+				lines[i]=l2[i] if i<len(l2) else ''
 	# LaTeX: replace $...$ by :math:`...`
 	# must be done after calling boostFuncSignature which uses original docstring
 	for i in range(0,len(lines)): lines[i]=replaceLaTeX(lines[i])
@@ -406,11 +409,12 @@ extensions = [
 		'sphinx.ext.viewcode',
 		'sphinx.ext.inheritance_diagram',
 		'matplotlib.sphinxext.plot_directive',
-		'matplotlib.sphinxext.only_directives',
+		#'matplotlib.sphinxext.only_directives',	#FIXME : why did I removed this ?
 		#'matplotlib.sphinxext.mathmpl',
 		'ipython_console_highlighting',
 		'youtube',
 		'sphinx.ext.todo',
+		'IPython.sphinxext.ipython_directive',
 		]
 
 
@@ -423,7 +427,7 @@ else:
 		extensions.append('ipython_directive013')
 	elif 200<=yade.runtime.ipython_version<500:
 		extensions.append('ipython_directive200')
-	else:
+	elif yade.runtime.ipython_version<600:
 		extensions.append('ipython_directive500')
 
 # the sidebar extension
