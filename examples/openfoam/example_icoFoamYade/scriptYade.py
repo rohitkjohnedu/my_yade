@@ -111,11 +111,29 @@ class simulation():
     O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=radians(15),density=density,label='spheremat'))
     O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=0,density=0,label='wallmat'))
 
+    #wall coords, use facets for wall BC:
+    v0 = Vector3(0,0,0)
+    v1 = Vector3(0,0,1)
+    v2 = Vector3(1,0,0)
+    v3 = Vector3(1,0,1)
 
-    wall1 = wall(1e-08,1,0, material='wallmat'); O.bodies.append(wall1);
-    wall2 = wall(1-1e-08,1,0, material='wallmat'); O.bodies.append(wall2);
+    v4 = Vector3(0,1,0)
+    v5 = Vector3(0,1,1)
+    v6 = Vector3(1,1,0)
+    v7 = Vector3(1,1,1)
 
 
+    lf0 = facet([v0,v1,v2],material='wallmat')
+    O.bodies.append(lf0);
+    lf1 = facet([v1,v3,v2],material='wallmat')
+    O.bodies.append(lf1);
+
+    uf0 = facet([v4,v5,v6],material='wallmat')
+    O.bodies.append(uf0);
+    uf1 = facet([v5,v7,v6],material='wallmat')
+    O.bodies.append(uf1)
+
+    #spheres
     mn, mx= Vector3(2e-08,2e-08,2e-08), Vector3(1-2e-08,1-2e-08, 1-2e-08)
 
     sp = pack.SpherePack();
@@ -124,18 +142,21 @@ class simulation():
 
     sphereIDs = [b.id for b in O.bodies if type(b.shape)==Sphere]
 
+    #coupling engine settings
+
     fluidCoupling.setNumParticles(len(sphereIDs))
     fluidCoupling.setIdList(sphereIDs)
     fluidCoupling.isGaussianInterp=False;  #use pimpleFoamYade for gaussianInterp
 
+    # Integrator
     newton=NewtonIntegrator(damping=0.0, gravity = (0.0 ,0.0, 0.0))
-     # add small damping in case of stability issues.. ~ 0.1 max, also note : If using gravity,  make sure buoyancy force is switched on in the foam side, else the simulation will crash
+     # add small damping in case of stability issues.. ~ 0.1 max, also note : If gravity is needed, set it in constant/g dir.
 
     O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Wall_Aabb()]),
+	InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()], allowBiggerThanPeriod=True),
 	InteractionLoop(
-		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()],
+		[Ig2_Sphere_Sphere_ScGeom(),Ig2_Facet_Sphere_ScGeom()],
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
