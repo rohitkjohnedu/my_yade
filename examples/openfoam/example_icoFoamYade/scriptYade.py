@@ -166,7 +166,7 @@ class simulation():
         fluidCoupling, #to be called after timestepper
         PyRunner(command='sim.printMessage()', iterPeriod= 1000, label='outputMessage'),
 	newton,
-        VTKRecorder(fileName='yadep/3d-vtk-',recorders=['spheres'],iterPeriod=10000)
+        VTKRecorder(fileName='yadep/3d-vtk-',recorders=['spheres'],iterPeriod=1000)
     ]
 
   def printMessage(self):

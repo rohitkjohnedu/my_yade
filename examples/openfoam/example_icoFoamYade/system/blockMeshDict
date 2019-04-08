@@ -19,13 +19,13 @@ convertToMeters 1;
 vertices
 (
     (0 0 0)
-    (1 0 0)
-    (1 1 0)
-    (0 1 0)
-    (0 0 1)
-    (1 0 1)
-    (1 1 1)
-    (0 1 1)
+    (0.1 0 0)
+    (0.1 0.1 0)
+    (0 0.1 0)
+    (0 0 0.1)
+    (0.1 0 0.1)
+    (0.1 0.1 0.1)
+    (0 0.1 0.1)
 );
 
 blocks
@@ -63,44 +63,44 @@ boundary
     x0
     {
         type cyclic;
-        neighbourPatch x1; 
-        faces 
+        neighbourPatch x1;
+        faces
         (
             (4 7 3 0)
-        ); 
+        );
     }
 
 
     x1
     {
-        type cyclic; 
+        type cyclic;
         neighbourPatch x0;
-        faces 
+        faces
         (
             (5 1 2 6)
-        ); 
+        );
     }
 
 
     z0
     {
-        type cyclic; 
-        neighbourPatch z1; 
-        faces 
+        type cyclic;
+        neighbourPatch z1;
+        faces
         (
             (0 1 2 3)
-        ); 
+        );
     }
 
 
     z1
     {
-        type cyclic; 
-        neighbourPatch z0; 
-        faces 
+        type cyclic;
+        neighbourPatch z0;
+        faces
         (
             (4 5 6 7)
-        ); 
+        );
     }
 
 
