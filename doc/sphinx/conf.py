@@ -409,12 +409,11 @@ extensions = [
 		'sphinx.ext.viewcode',
 		'sphinx.ext.inheritance_diagram',
 		'matplotlib.sphinxext.plot_directive',
-		#'matplotlib.sphinxext.only_directives',	#FIXME : why did I removed this ?
+		#'matplotlib.sphinxext.only_directives', #removed this with python3, seems not used anymore by sphinx.
 		#'matplotlib.sphinxext.mathmpl',
 		'ipython_console_highlighting',
 		'youtube',
-		'sphinx.ext.todo',
-		'IPython.sphinxext.ipython_directive',
+		'sphinx.ext.todo'
 		]
 
 
@@ -429,6 +428,8 @@ else:
 		extensions.append('ipython_directive200')
 	elif yade.runtime.ipython_version<600:
 		extensions.append('ipython_directive500')
+	else:
+		extensions.append('IPython.sphinxext.ipython_directive')
 
 # the sidebar extension
 if False:
