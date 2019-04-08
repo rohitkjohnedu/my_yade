@@ -2,29 +2,15 @@
 # encoding: utf-8
 from __future__ import print_function
 try:
-	import _bibtex as bib
-	import _recode as bibRecode
+	import bibtexparser
 except ImportError:
-	raise ImportError("Unable to import _bibtex and/or _recode; install the python-bibtex package.")
+	raise ImportError("Unable to import bibtexparser; install the python3-bibtexparser package.")
 import sys
 
 def readBib(filename):
-	## _bibtex has horrible interface
-	bibfile=bib.open_file(filename,1) # 2nd argument: strict mode
-	db={}
-	#rq=bibRecode.request('latex..latin1')
-	while True:
-		entry=bib.next(bibfile)
-		if entry is None: break
-		key,type,dta=entry[0],entry[1],entry[4]
-		item={'type':type}
-		for field in list(dta.keys()):
-			expanded=bib.expand(bibfile,dta[field],-1)
-			#conv=bibRecode.recode(rq,expanded[2])
-			item[field]=expanded[2].strip()
-		db[key]=item
-	## now we don't need _bibtex anymore, everything is in our dicts
-	return db
+	with open(filename) as bibtex_file:
+		db = bibtexparser.load(bibtex_file)
+	return db.entries
 
 def dumpBib(db):
 	for k in list(db.keys()):
@@ -32,9 +18,11 @@ def dumpBib(db):
 
 def formatRest(db):
 	ret=[]
-	keys=list(db.keys()); keys.sort()
-	for key in keys:
-		i=db[key]; type=i['type']
+	for i in db:
+		print(i)
+		key=i["ID"]
+		type=i["ENTRYTYPE"]
+		#i=db[key]; type=i['type']
 		line=r'.. [%s] \ '%key ## ← HACK: explicit space to prevent docutils from using abbreviated first name (e.g. "F.") as enumeration item; it works!!
 		if 'author' in i: author=i['author'].replace(' and ',', ') # the module does not handle this..?
 
@@ -80,8 +68,11 @@ def formatRest(db):
 		## ReST uses <..> to delimit URL, therefore < and > must be encoded in the URL (http://www.blooberry.com/indexdot/html/topics/urlencoding.htm)
 		def escapeUrl(url): return url.replace('<','%3c').replace('>','%3e')
 		if 'doi' in i: line+=' DOI `%s <http://dx.doi.org/%s>`_'%(i['doi'],escapeUrl(i['doi']))
-		if 'url' in i: line+=' `(fulltext) <%s>`__'%escapeUrl(i['url'])
+		if 'link' in i: line+=' `(fulltext) <%s>`__'%escapeUrl(i['link'])
 		if ('note' in i and type!='mastersthesis'): line+=' (%s)'%i['note']
+		#remove brackets from the bibtex syntax
+		line=line.replace("{","")
+		line=line.replace("}","")
 		ret.append(line)
 	return [l.replace('@tilde@','~') for l in ret]
 
