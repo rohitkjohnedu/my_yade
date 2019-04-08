@@ -102,7 +102,7 @@ class simulation():
   def __init__(self):
 
     O.periodic = True;
-    O.cell.setBox(1,1,1);
+    O.cell.setBox(0.1,0.1,0.1);
 
 
     numspheres=1000;
@@ -111,16 +111,18 @@ class simulation():
     O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=radians(15),density=density,label='spheremat'))
     O.materials.append(FrictMat(young=young,poisson=0.5,frictionAngle=0,density=0,label='wallmat'))
 
+    minval = 1e-08;
+    maxval = 0.1-(1e-08)
     #wall coords, use facets for wall BC:
-    v0 = Vector3(0,0,0)
-    v1 = Vector3(0,0,1)
-    v2 = Vector3(1,0,0)
-    v3 = Vector3(1,0,1)
+    v0 = Vector3(minval, minval, minval)
+    v1 = Vector3(minval,minval,maxval)
+    v2 = Vector3(maxval,minval,minval)
+    v3 = Vector3(maxval,minval,maxval)
 
-    v4 = Vector3(0,1,0)
-    v5 = Vector3(0,1,1)
-    v6 = Vector3(1,1,0)
-    v7 = Vector3(1,1,1)
+    v4 = Vector3(minval,maxval,minval)
+    v5 = Vector3(minval,maxval,maxval)
+    v6 = Vector3(maxval,maxval,minval)
+    v7 = Vector3(maxval, maxval, maxval)
 
 
     lf0 = facet([v0,v1,v2],material='wallmat')
@@ -134,10 +136,10 @@ class simulation():
     O.bodies.append(uf1)
 
     #spheres
-    mn, mx= Vector3(2e-08,2e-08,2e-08), Vector3(1-2e-08,1-2e-08, 1-2e-08)
+    mn, mx= Vector3(2e-08, 2e-08, 2e-08), Vector3(0.099, 0.099, 0.099)
 
     sp = pack.SpherePack();
-    sp.makeCloud(mn,mx,rMean=0.0075,rRelFuzz=0.10, num=numspheres)
+    sp.makeCloud(mn,mx,rMean=0.00075,rRelFuzz=0.10, num=numspheres)
     O.bodies.append([sphere(center,rad,material='spheremat') for center,rad in sp])
 
     sphereIDs = [b.id for b in O.bodies if type(b.shape)==Sphere]
