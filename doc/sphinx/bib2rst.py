@@ -81,7 +81,7 @@ def bib2rst(filename):
 	import tempfile,shutil,os.path
 	d=tempfile.mkdtemp()
 	bib=d+'/'+os.path.basename(filename)
-	open(bib,'w').write(open(filename).read().replace('~','@tilde@'))
+	open(bib,'w',encoding="utf8").write(open(filename,'r',encoding="utf8").read().replace('~','@tilde@'))
 	db=readBib(bib)
 	shutil.rmtree(d)
 	return '\n\n'.join(formatRest(db))
