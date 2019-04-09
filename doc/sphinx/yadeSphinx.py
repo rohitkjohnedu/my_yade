@@ -6,7 +6,7 @@
 
 from builtins import range
 import sys,os,os.path
-try: #for python 3.4+s
+try: #for python 3.4+
 	from importlib import reload
 except:
 	pass
@@ -297,10 +297,10 @@ for writer in ['html','latex','epub']:
     genWrapperRst()
     # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
     sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
-    try:
-        sphinx.main(sys.argv)
-    except SystemExit:
-        pass
+    #try:
+    sphinx.main(sys.argv)
+    #except SystemExit:
+        #pass
     if writer=='html':
         makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
     elif writer=='latex':
