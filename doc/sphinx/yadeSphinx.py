@@ -295,13 +295,15 @@ writer=None
 
 for writer in ['html','latex','epub']:
     genWrapperRst()
+    import traceback
     # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
     sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
     print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
-    #try:
-    sphinx.main(sys.argv)
-    #except SystemExit:
-        #pass
+    try:
+        sphinx.main(sys.argv)
+    except SystemExit:
+        traceback.print_exc(file=sys.stdout)
+    print("***END SPHINX")
     if writer=='html':
         print("***writer==html")
         makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
