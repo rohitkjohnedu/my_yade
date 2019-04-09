@@ -297,13 +297,16 @@ for writer in ['html','latex','epub']:
     genWrapperRst()
     # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
     sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
+    print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
     #try:
     sphinx.main(sys.argv)
     #except SystemExit:
         #pass
     if writer=='html':
+        print("***writer==html")
         makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
     elif writer=='latex':
+        print("***writer==latex")
         makeBaseClassesClickable((outDir+'/latex/Yade.tex'),writer)
     if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
         os.system('rm '+ outDir+'/html/_static/jquery.js')
