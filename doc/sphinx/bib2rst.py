@@ -8,7 +8,7 @@ except ImportError:
 import sys
 
 def readBib(filename):
-	with open(filename) as bibtex_file:
+	with open(filename,encoding="utf8") as bibtex_file:
 		db = bibtexparser.load(bibtex_file)
 	return db.entries
 
