@@ -18,11 +18,6 @@ def dumpBib(db):
 def formatRest(db):
 	ret=[]
 	for i in db:
-		import locale
-		print(locale.getlocale(),locale.getpreferredencoding())
-		locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
-		print(locale.getlocale(),locale.getpreferredencoding())
-		print(i)
 		key=i["ID"]
 		type=i["ENTRYTYPE"]
 		#i=db[key]; type=i['type']
