@@ -274,8 +274,8 @@ def processTemplate(f1,f2):
     def doEval(match):
         import bib2rst
         return str(eval(match.group(1)))
-    ff2=open(f2,'w')
-    for l in open(f1):
+    ff2=open(f2,'w',encoding="utf8")
+    for l in open(f1,encoding="utf8"):
         ff2.write(re.sub(r'@([^@]*)@',doEval,l))
 
 def genReferences():
