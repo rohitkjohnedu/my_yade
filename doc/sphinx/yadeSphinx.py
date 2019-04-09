@@ -293,7 +293,7 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-
 global writer
 writer=None
 
-for writer in ['html','latex','epub']:
+for writer in ['latex','html','epub']:
     genWrapperRst()
     import traceback
     # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
