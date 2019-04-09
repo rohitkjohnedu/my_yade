@@ -391,6 +391,7 @@ def filterSpherePack(predicate,spherePack,returnSpherePack=None,**kw):
 		return ret
 
 def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim,noPrint=False):
+	import sys
 	if not memoizeDb: return
 	import pickle,sqlite3,time,os
 	if os.path.exists(memoizeDb):
@@ -400,7 +401,10 @@ def _memoizePacking(memoizeDb,sp,radius,rRelFuzz,wantPeri,fullDim,noPrint=False)
 		c=conn.cursor()
 		c.execute('create table packings (radius real, rRelFuzz real, dimx real, dimy real, dimz real, N integer, timestamp real, periodic integer, pack blob)')
 	c=conn.cursor()
-	packBlob=buffer(pickle.dumps(sp.toList(),pickle.HIGHEST_PROTOCOL))
+	if(sys.version_info[0]<3):
+		packBlob=buffer(pickle.dumps(sp.toList(),pickle.HIGHEST_PROTOCOL))
+	else:
+		packBlob=memoryview(pickle.dumps(sp.toList(),pickle.HIGHEST_PROTOCOL))
 	packDim=sp.cellSize if wantPeri else fullDim
 	c.execute('insert into packings values (?,?,?,?,?,?,?,?,?)',(radius,rRelFuzz,packDim[0],packDim[1],packDim[2],len(sp),time.time(),wantPeri,packBlob,))
 	c.close()
@@ -442,7 +446,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 		memoDbgMsg("ACCEPTED");
 		if not noPrint: print("Found suitable packing in %s (radius=%g±%g,N=%g,dim=%g×%g×%g,%s,scale=%g), created %s"%(memoizeDb,R,rDev,NN,X,Y,Z,"periodic" if isPeri else "non-periodic",scale,time.asctime(time.gmtime(timestamp))))
 		c.execute('select pack from packings where timestamp=?',(timestamp,))
-		sp=SpherePack(pickle.loads(str(c.fetchone()[0])))
+		sp=SpherePack(pickle.loads(c.fetchone()[0]))
 		sp.scale(scale);
 		if isPeri and wantPeri:
 			sp.isPeriodic = True
