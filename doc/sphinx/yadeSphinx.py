@@ -293,16 +293,16 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-
 global writer
 writer=None
 
+import threading
 for writer in ['latex','html','epub']:
     genWrapperRst()
-    import traceback
     # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
     sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
     print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
-    try:
-        sphinx.main(sys.argv)
-    except SystemExit:
-        traceback.print_exc(file=sys.stdout)
+    t=threading.Thread(target=sphinx.main,args=[sys.argv])
+    t.start()
+    t.join()
+    #sphinx.main(sys.argv)
     print("***END SPHINX")
     if writer=='html':
         print("***writer==html")
