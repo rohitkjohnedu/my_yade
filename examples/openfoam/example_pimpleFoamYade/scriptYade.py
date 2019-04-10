@@ -61,7 +61,7 @@
 #           mkdir yadep
 #
 #       d) run the example :
-#           mpiexec -n 1 python scriptYade.py : -n 2 icoFoamYade -parallel
+#           mpiexec -n 1 python scriptYade.py : -n 2 pimpleFoamYade -parallel
 #
 #9. Notes (OpenFOAM side):
 #     to configure the mesh, edit :  system/blockMeshDict
