@@ -90,8 +90,8 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			Real normalForce_AdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew, bool dichotomie);
 			Real NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot, int depth=0);
 
-			Real DichoAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot);
-			Real ObjF(Real const& un, Real const& eps, Real const& alpha, Real const& prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& d);
+			Real DichoAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& ladh);
+			Real ObjF(Real const& un, Real const& eps, Real const& alpha, Real const& prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& d, Real const& ladh);
 			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 			void shearForce_firstOrder_log(LubricationPhys *phys, ScGeom* geom);
