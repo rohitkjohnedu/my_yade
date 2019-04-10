@@ -16,6 +16,9 @@ try: #for python2
 except:
 	pass
 
+writer=sys.argv[1]
+print("***********"+writer)
+
 outDir=sys.argv[2] if len(sys.argv)>2 else os.getcwd()+'/_build'
 for d in (outDir,outDir+'/latex',outDir+'/html'):
     if not os.path.exists(d):
@@ -290,50 +293,49 @@ genReferences()
 for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
     shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
-global writer
-writer=None
+#global writer
+#writer=None
 
 
-import threading
-for writer in ['latex','html','epub']:
-    genWrapperRst()
-    # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
-    sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
-    print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
-    t=threading.Thread(target=sphinx.main,args=[sys.argv])
-    t.start()
-    t.join()
-    #sphinx.main(sys.argv)
-    print("***END SPHINX")
-    if writer=='html':
-        print("***writer==html")
-        makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
-    elif writer=='latex':
-        print("***writer==latex")
-        makeBaseClassesClickable((outDir+'/latex/Yade.tex'),writer)
-    if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
-        os.system('rm '+ outDir+'/html/_static/jquery.js')
-        os.system('cp /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')
+#for writer in ['latex','html','epub']:
+genWrapperRst()
+# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
+sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
+print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
+try:
+	sphinx.main(sys.argv)
+except ValueError:
+	pass
+print("***END SPHINX")
+if writer=='html':
+	print("***writer==html")
+	makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
+elif writer=='latex':
+	print("***writer==latex")
+	makeBaseClassesClickable((outDir+'/latex/Yade.tex'),writer)
+if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
+	os.system('rm '+ outDir+'/html/_static/jquery.js')
+	os.system('cp /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')
 
-    # HACK!!!!==========================================================================
-    # New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
-    # That is why xelatex crashes.
-    # The following "script" removes all empty environments. Needs to be fixed in python-sphinx.
-    if (writer=='latex'):
-        infile = open(outDir+'/latex/Yade.tex',"r")
-        lines = infile.readlines()
-        infile.close()
+# HACK!!!!==========================================================================
+# New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
+# That is why xelatex crashes.
+# The following "script" removes all empty environments. Needs to be fixed in python-sphinx.
+if (writer=='latex'):
+	infile = open(outDir+'/latex/Yade.tex',"r")
+	lines = infile.readlines()
+	infile.close()
 
-        out=[]
-        for i in range(0,len(lines)):
-            if (i!=len(lines) and
-                    lines[i].strip()=="\\begin{Verbatim}[commandchars=\\\\\{\\}]" and
-                    lines[i+1].strip()=="\\end{Verbatim}"):
-                    lines[i]=''; lines[i+1]=''
-            else:
-                out.append(lines[i])
-        open(outDir+'/latex/Yade.tex','w').write('')
-        for i in out:
-            open(outDir+'/latex/Yade.tex','a').write(i)
-    # HACK!!!!==========================================================================
+	out=[]
+	for i in range(0,len(lines)):
+		if (i!=len(lines) and
+				lines[i].strip()=="\\begin{Verbatim}[commandchars=\\\\\{\\}]" and
+				lines[i+1].strip()=="\\end{Verbatim}"):
+				lines[i]=''; lines[i+1]=''
+		else:
+			out.append(lines[i])
+	open(outDir+'/latex/Yade.tex','w').write('')
+	for i in out:
+		open(outDir+'/latex/Yade.tex','a').write(i)
+# HACK!!!!==========================================================================
 sys.exit()
