@@ -293,6 +293,7 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-
 global writer
 writer=None
 
+
 import threading
 for writer in ['latex','html','epub']:
     genWrapperRst()
