@@ -300,7 +300,7 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-
 #for writer in ['latex','html','epub']:
 genWrapperRst()
 # HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
-sys.argv=['sphinx-build','-a','-v','-v','-v','-T','-P','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
+sys.argv=['sphinx-build','-a','-v','-T','-P','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
 print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
 try:
 	sphinx.main(sys.argv)
