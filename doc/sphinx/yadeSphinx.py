@@ -310,12 +310,13 @@ print("***END SPHINX")
 if writer=='html':
 	print("***writer==html")
 	makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
+	if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
+	    os.system('rm '+ outDir+'/html/_static/jquery.js')
+	    os.system('cp /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')
 elif writer=='latex':
 	print("***writer==latex")
 	makeBaseClassesClickable((outDir+'/latex/Yade.tex'),writer)
-if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
-	os.system('rm '+ outDir+'/html/_static/jquery.js')
-	os.system('cp /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')
+
 
 # HACK!!!!==========================================================================
 # New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
