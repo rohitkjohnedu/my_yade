@@ -304,7 +304,7 @@ sys.argv=['sphinx-build','-a','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',
 print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
 try:
 	sphinx.main(sys.argv)
-except ValueError:
+except  Exception
 	pass
 print("***END SPHINX")
 if writer=='html':
