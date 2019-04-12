@@ -8,26 +8,42 @@
 # Usage :
 #
 # 1. Enable the OpenFOAM coupling engine : (Requires MPI installation)
-#       cmake -DCMAKE_INSTALL_PREFIX= /path/to/install  /path/to/sources -DDEBUG=0 -DCHUNKSIZE=1 -DENABLE_FOAMCOUPLING=ON
+#       cmake -DCMAKE_INSTALL_PREFIX= /path/to/install  /path/to/sources -DDEBUG=0 -DCHUNKSIZE=1 -DENABLE_MPI=ON
 #       make
 #       make install
 #
-# 2.  Complile or install OpenFOAM (get binary from here : https://openfoam.org/download/6-ubuntu ) (ubuntu and debian)
+# 2. Complile or install OpenFOAM (get binary from here : https://openfoam.org/download/6-ubuntu ) (ubuntu and debian)
+#    Example installation for ubuntu (careful, it may be different on your system!):
+#       apt install software-properties-common
+#       sudo sh -c "wget -O - http://dl.openfoam.org/gpg.key | apt-key add -"
+#       add-apt-repository http://dl.openfoam.org/ubuntu
+#       apt-get update
+#       apt-get install openfoam6
+#       . /opt/openfoam6/etc/bashrc
+#    Example installation from source (careful, it may be different on your system!):
+#       sudo apt install build-essential flex bison git-core cmake zlib1g-dev libboost-system-dev libboost-thread-dev libopenmpi-dev openmpi-bin gnuplot libreadline-dev libncurses-dev libxt-dev libptscotch-dev
+#       git clone https://github.com/OpenFOAM/OpenFOAM-6.git
+#       source OpenFOAM-6/etc/bashrc
+#       cd OpenFOAM-6
+#       # export WM_COMPILE_OPTION=Debug
+#       ./Allwmake -j 2
 #
-# 3.  Get the Yade-OpenFOAM solver at : https://github.com/dpkn31/Yade-OpenFOAM-coupling
+# 3. Get the Yade-OpenFOAM solver at : https://github.com/dpkn31/Yade-OpenFOAM-coupling
 #       git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
 #
-#
-# 4.  Enter the dir : Yade-OpenFOAM-coupling and compile the solvers and the libs
+# 4. Enter the dir : Yade-OpenFOAM-coupling
+#     Adapt the file icoFoamYade/icoFoamYade.C on how shear flow velocity (or other parameters) is initialized up to your linking.
+#     A commented out example is in icoFoamYade/icoFoamYade.C line 59
+#     Compile the solvers and the libs
 #       ./Allclean
 #       ./Allmake
 #
-# 5.  Once compilation is done, you can run the solver from any dir. Return to this example file directory.
+# 5. Once compilation is done, you can run the solver from any dir. Return to this example file directory.
 #
-# 6.  Create a symbolic link to Yade Install
+# 6. Create a symbolic link to Yade Install
 #       ln -s /path/to/yade/install/bin/yade-exec yadeimport.py
 #
-# 7.  Yade side :
+# 7. Yade side :
 #
 #    a) In the Yade side, create the scene/simulation similar to this script :
 #       (typical yade script but recast in classes. See : https://yade-dev.gitlab.io/trunk/user.html#importing-yade-in-other-python-applications)
@@ -43,7 +59,7 @@
 #      fluidCoupling.isGaussianInterp=False;
 #
 #
-#8.  OpenFOAM side :
+# 8. OpenFOAM side :
 #
 #      Set up the OpenFOAM in the usual way. (If you're an experienced OpenFOAM user, skip this)
 #      I will only highlight the steps to run this example. Note that you can use any type of mesh
@@ -63,7 +79,7 @@
 #       d) run the example :
 #           mpiexec -n 1 python scriptYade.py : -n 2 icoFoamYade -parallel
 #
-#9. Notes (OpenFOAM side):
+# 9. Notes (OpenFOAM side):
 #     to configure the mesh, edit :  system/blockMeshDict
 #     to change the number of subdomains, edit : system/decomposeParDict
 #     to change solver settings, edit:   system/controlDict
