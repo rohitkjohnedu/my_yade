@@ -12,12 +12,12 @@
 #include<lib/computational-geometry/Hull2d.hpp>
 #include<lib/pyutil/doc_opts.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
-#ifdef YADE_FOAM 
+#ifdef YADE_MPI
 	#include <mpi.h>
 #endif 
 
 
-#ifdef YADE_FOAM
+#ifdef YADE_MPI
 
   void initMPI() {
 

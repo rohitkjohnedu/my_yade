@@ -1,5 +1,5 @@
 // YADE-OpenFOAM coupling module, Deepak kn  deepak.kunhappan@3sr-grenoble.fr/deepak.kn1990@gmail.com
-#ifdef YADE_FOAM
+#ifdef YADE_MPI
 
 #pragma once 
 
