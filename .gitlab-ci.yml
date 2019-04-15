@@ -26,8 +26,10 @@ make:
     - master
     - merge_request
   script:
+    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in "y_4pak_64cpu_256RAM_4TB_docker") echo "64" ;; "c_4pak_64cpu_256RAM_4TB_docker") echo "64" ;; *) echo "12";; esac)
+    - echo $JOBSNUM
     - cd build
-    - make -j 12
+    - make -j $JOBSNUM
     - make install
     - make clean
   artifacts:
