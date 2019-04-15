@@ -148,7 +148,7 @@ need root privileges.
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen
 		
-* For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``
+* For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``, ``python-imaging`` is to be replaced by ``python-pil``, and the additional package "qt5-default" is required
 		
 
 Some of the packages (for example, cmake, eigen3) are mandatory, some of them
