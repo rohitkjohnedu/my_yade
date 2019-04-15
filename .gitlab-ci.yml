@@ -14,9 +14,7 @@ cmake:
     - merge_request
   script:
     - mkdir build && cd build
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-  tags:
-  - lightweight
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
   artifacts:
     paths:
       - build
@@ -46,8 +44,6 @@ test:
     - merge_request
   script:
     - install/bin/yade-ci --test
-  tags:
-  - lightweight
   dependencies:
     - make
 
@@ -58,8 +54,6 @@ check:
     - merge_request
   script:
     - install/bin/yade-ci --checks
-  tags:
-  - lightweight
   dependencies:
     - make
 
@@ -74,8 +68,6 @@ doc:
   dependencies:
     - cmake
     - make
-  tags:
-  - lightweight
   artifacts:
     paths:
       - install
@@ -90,8 +82,6 @@ pages:
     - mv install/share/doc/yade-ci/Yade.epub public
   dependencies:
     - doc
-  tags:
-  - lightweight
   artifacts:
     paths:
       - public
