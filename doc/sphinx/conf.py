@@ -448,6 +448,8 @@ inheritance_graph_attrs = { 'rankdir' : 'BT' }
 inheritance_node_attrs = { 'height' : 0.5, 'fontsize' : 12, 'shape' : 'oval' } 
 inheritance_edge_attrs = {} 
 
+graphviz_dot_args = ['-Gsize=1.5,1.5!']
+
 my_latex_preamble=r'''
 \usepackage{euler} % must be loaded before fontspec for the whole doc (below); this must be kept for pngmath, however
 \usepackage{hyperref}
