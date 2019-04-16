@@ -26,7 +26,7 @@ make:
     - master
     - merge_request
   script:
-    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in "y_4pak_64cpu_256RAM_4TB_docker") echo "24" ;; "c_4pak_64cpu_256RAM_4TB_docker") echo "24" ;; "yade-runner") echo "12" ;; "yade-runner-01") echo "1" ;; *) echo "5";; esac)
+    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in "y_4pak_64cpu_256RAM_4TB_docker") echo "30" ;; "c_4pak_64cpu_256RAM_4TB_docker") echo "30" ;; "yade-runner") echo "12" ;; "yade-runner-01") echo "1" ;; *) echo "5";; esac)
     - echo $JOBSNUM
     - cd build
     - make -j $JOBSNUM
