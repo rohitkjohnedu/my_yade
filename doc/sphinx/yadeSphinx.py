@@ -310,23 +310,13 @@ else:
 
 	#LATEX FIXES:
 	makeBaseClassesClickable((outDir+'/latex/Yade.tex'),"latex")
-	# HACK!!!!==========================================================================
-	# New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
-	# That is why xelatex crashes.
-	# The following "script" removes all empty environments. Needs to be fixed in python-sphinx.
-	infile = open(outDir+'/latex/Yade.tex',"r",encoding="utf8")
-	lines = infile.readlines()
-	infile.close()
-	out=[]
-	for i in range(0,len(lines)):
-		if (i!=len(lines) and
-				lines[i].strip()=="\\begin{Verbatim}[commandchars=\\\\\{\\}]" and
-				lines[i+1].strip()=="\\end{Verbatim}"):
-				lines[i]=''; lines[i+1]=''
-		else:
-			out.append(lines[i])
-	open(outDir+'/latex/Yade.tex','w',encoding="utf8").write('')
-	for i in out:
-		open(outDir+'/latex/Yade.tex','a',encoding="utf8").write(i)
-	# HACK!!!!==========================================================================
+	###HACK: sphinx sometimes produces lots of backslashes in tex source on ipython outs (with are '\PYGZbs{}' in the source) -> remove them all.
+	import re
+	find_tex_backslashes=re.compile(r'^(\\PYG{g\+go}{)(\\PYGZbs{})*')
+	with open(outDir+'/latex/Yade.tex','r',encoding="utf8") as f:
+		lines=f.readlines()
+	with open(outDir+'/latex/Yade.tex','w',encoding="utf8") as f:
+		for l in lines:
+			f.write(find_tex_backslashes.sub(r'\1',l))
+	###HACK
 sys.exit()
