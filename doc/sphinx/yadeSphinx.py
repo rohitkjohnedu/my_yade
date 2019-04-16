@@ -17,7 +17,7 @@ except:
 	pass
 
 writer=sys.argv[1]
-print("***********"+writer)
+print("Running yadeSphinx.py with writer ==",writer)
 
 outDir=sys.argv[2] if len(sys.argv)>2 else os.getcwd()+'/_build'
 for d in (outDir,outDir+'/latex',outDir+'/html'):
@@ -293,40 +293,30 @@ genReferences()
 for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
     shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
-#global writer
-#writer=None
-
-
-#for writer in ['latex','html','epub']:
-genWrapperRst()
-# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
-sys.argv=['sphinx-build','-a','-v','-T','-P','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
-print("***COMPILING DOC WITH SPHINX, sys.argv=",sys.argv)
-try:
-	sphinx.main(sys.argv)
-except  Exception:
-	pass
-print("***END SPHINX")
-if writer=='html':
-	print("***writer==html")
-	makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),writer)
+if(writer != "workarounds"):
+	genWrapperRst()
+	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
+	sys.argv=['sphinx-build','-a','-v','-T','-P','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
+	try:
+		sphinx.main(sys.argv)
+	except  Exception:
+		pass
+else:
+	#HTML FIXES:
+	makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),"html")
 	if (os.path.exists('/usr/share/javascript/jquery/jquery.js')): #Check, whether jquery.js installed in system
 	    os.system('rm '+ outDir+'/html/_static/jquery.js')
 	    os.system('cp /usr/share/javascript/jquery/jquery.js '+ outDir+'/html/_static/jquery.js')
-elif writer=='latex':
-	print("***writer==latex")
-	makeBaseClassesClickable((outDir+'/latex/Yade.tex'),writer)
 
-
-# HACK!!!!==========================================================================
-# New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
-# That is why xelatex crashes.
-# The following "script" removes all empty environments. Needs to be fixed in python-sphinx.
-if (writer=='latex'):
+	#LATEX FIXES:
+	makeBaseClassesClickable((outDir+'/latex/Yade.tex'),"latex")
+	# HACK!!!!==========================================================================
+	# New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
+	# That is why xelatex crashes.
+	# The following "script" removes all empty environments. Needs to be fixed in python-sphinx.
 	infile = open(outDir+'/latex/Yade.tex',"r")
 	lines = infile.readlines()
 	infile.close()
-
 	out=[]
 	for i in range(0,len(lines)):
 		if (i!=len(lines) and
@@ -338,5 +328,5 @@ if (writer=='latex'):
 	open(outDir+'/latex/Yade.tex','w').write('')
 	for i in out:
 		open(outDir+'/latex/Yade.tex','a').write(i)
-# HACK!!!!==========================================================================
+	# HACK!!!!==========================================================================
 sys.exit()

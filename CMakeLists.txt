@@ -722,6 +722,7 @@ ADD_CUSTOM_COMMAND(
                   COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py html
                   COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py latex
                   COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py epub
+                  COMMAND PYTHONPATH=${CMAKE_BINARY_DIR}/doc/sphinx ${YADE_EXEC_PATH}/yade${SUFFIX} -x yadeSphinx.py workarounds
                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/doc/sphinx
                   DEPENDS ${YADE_EXEC_PATH}/yade${SUFFIX}
                   )

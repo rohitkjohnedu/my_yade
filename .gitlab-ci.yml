@@ -70,7 +70,7 @@ doc:
     - merge_request
   script:
     - cd build
-    - xvfb-run -s "-screen 0 1600x1200x24" make -i doc
+    - xvfb-run -s "-screen 0 1600x1200x24" make doc
   dependencies:
     - cmake
     - make
