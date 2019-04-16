@@ -25,7 +25,7 @@ for d in (outDir,outDir+'/latex',outDir+'/html'):
         os.mkdir(d)
 
 def moduleDoc(module,submodules=[]):
-    f=open('yade.'+module+'.rst','w')
+    f=open('yade.'+module+'.rst','w',encoding="utf8")
     modFmt=""".. automodule:: yade.%s
     :members:
     :undoc-members:
@@ -69,7 +69,7 @@ mods={
 mm=list(mods.keys()); mm.sort()
 for m in mm: moduleDoc(m,mods[m])
 
-with open('modules.rst','w') as f:
+with open('modules.rst','w',encoding="utf8") as f:
     f.write("Yade modules reference\n=============\n\n.. toctree::\n\t:maxdepth: 2\n\n")
     for m in mm: f.write('\tyade.%s.rst\n\n'%m)
 
@@ -192,7 +192,7 @@ def sect(title,text,tops,reverse=False,willBeLater=set()):
 def genWrapperRst():
     global docClasses
     docClasses=set() # reset globals
-    wrapper=open('yade.wrapper.rst','w')
+    wrapper=open('yade.wrapper.rst','w',encoding="utf8")
     wrapper.write(""".. _yade.wrapper::
 
 Yade wrapper class reference
@@ -235,7 +235,7 @@ def makeBaseClassesClickable(f,writer):
     out=[]
     import re,shutil
     changed=False
-    for l in open(f):
+    for l in open(f,encoding="utf8"):
         if writer=='html':
             if not '(</big><em>inherits ' in l:
                 out.append(l)
@@ -266,7 +266,7 @@ def makeBaseClassesClickable(f,writer):
         changed=True
     if changed:
         shutil.move(f,f+'_')
-        ff=open(f,'w')
+        ff=open(f,'w',encoding="utf8")
         for l in out:
             ff.write(l)
         ff.close()
@@ -314,7 +314,7 @@ else:
 	# New sphinx-python versions (hopefully) are producing empty "verbatim"-environments.
 	# That is why xelatex crashes.
 	# The following "script" removes all empty environments. Needs to be fixed in python-sphinx.
-	infile = open(outDir+'/latex/Yade.tex',"r")
+	infile = open(outDir+'/latex/Yade.tex',"r",encoding="utf8")
 	lines = infile.readlines()
 	infile.close()
 	out=[]
@@ -325,8 +325,8 @@ else:
 				lines[i]=''; lines[i+1]=''
 		else:
 			out.append(lines[i])
-	open(outDir+'/latex/Yade.tex','w').write('')
+	open(outDir+'/latex/Yade.tex','w',encoding="utf8").write('')
 	for i in out:
-		open(outDir+'/latex/Yade.tex','a').write(i)
+		open(outDir+'/latex/Yade.tex','a',encoding="utf8").write(i)
 	# HACK!!!!==========================================================================
 sys.exit()
