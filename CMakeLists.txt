@@ -139,7 +139,18 @@ IF ( NOT LocalBoost )
   SET(LocalBoost "1.47.0") # Minimal required Boost version
 ENDIF ( NOT LocalBoost )
 
-FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time REQUIRED)
+IF ( ${PYTHON_VERSION_MAJOR} EQUAL 2 )
+  FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system date_time REQUIRED)
+ELSE() #python3
+  FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
+  IF(NOT Boost_FOUND)
+    FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
+      IF(NOT Boost_FOUND)
+        message( FATAL_ERROR "Can't find suitable libboost_python version." )
+      ENDIF()
+  ENDIF()
+ENDIF()
+
 
 INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 # for checking purpose
