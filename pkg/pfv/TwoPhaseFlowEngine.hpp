@@ -200,6 +200,10 @@ class PhaseCluster : public Serializable
 				( innerCell->info().p() + interfaces[nf].capillaryP - innerCell->neighbor(interfaces[nf].outerIndex)->info().p());
 		}
 		Real getCapVol(unsigned nf) {return interfaces[nf].volume;}
+		Real getConductivity(unsigned nf) {
+			const CellHandle& innerCell = interfaces[nf].innerCell;
+			return innerCell->info().kNorm()[interfaces[nf].outerIndex];
+		}
 
 		void setCapPressure(unsigned nf, Real pcap) {interfaces[nf].capillaryP=pcap;}
 		Real getCapPressure(unsigned nf) {return interfaces[nf].capillaryP;}
@@ -224,6 +228,7 @@ class PhaseCluster : public Serializable
 		.def("getCapPressure",&PhaseCluster::getCapPressure,(boost::python::arg("numf")),"get local capillary pressure")
 		.def("setCapVol",&PhaseCluster::setCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"set position of the meniscus - in terms of volume")
 		.def("getCapVol",&PhaseCluster::getCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"get position of the meniscus - in terms of volume")
+		.def("getConductivity",&PhaseCluster::getConductivity,(boost::python::arg("numf"),boost::python::arg("K")),"get conductivity")
 		.def("updateCapVol",&PhaseCluster::updateCapVol,(boost::python::arg("numf"),boost::python::arg("dt")),"increments throat's volume by flux*dt")
 		.def("solvePressure",&PhaseCluster::solvePressure,"Solve 1-phase flow in one single cluster defined by its id.")
 		)
