@@ -141,10 +141,10 @@ def inheritanceDiagram(klass,willBeLater):
         except NameError:
             pass
     # https://www.graphviz.org/doc/info/attrs.html , http://www.sphinx-doc.org/en/master/usage/extensions/graphviz.html , http://www.markusz.io/posts/drafts/graphviz-sphinx/
-    # margin size is in inches. The text area on page in .pdf is 6.3in by 9.8in. I'll use a default that each class uses one fourth of page width. If maxDepth>=5 then the image just gets smaller.
+    # margin size is in inches. The text area on page in .pdf is 6.3in by 9.8in. I'll use a default that each class uses one fifth of page width. If maxDepth>=6 then the image just gets smaller.
     pageWidth=6.3
-    pageFraction=4
-    fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)
+    pageFraction=5
+    fixPdfMargin=(pageWidth/pageFraction)*max(0,pageFraction-maxDepth)/2
     ret=""
     extraCaption=["",0]
     extraPdfCaptionSet=set()
@@ -180,7 +180,7 @@ def inheritanceDiagram(klass,willBeLater):
     if(extraPdfCaption[1] >= 2):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
     if(writer=='html'): extraPdfCaption[0] = ""
 
-    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=300;" if writer!='html' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+mkNode(klass)
+    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+('\t\tsize="'+str(pageWidth-2*fixPdfMargin)+',999!";\n' if writer!='html' else "")+mkNode(klass)
     return head+ret+'\t}\n\n'
 
 
