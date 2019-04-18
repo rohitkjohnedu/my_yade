@@ -29,6 +29,7 @@
 #  USE_QT5: use QT5 for GUI (ON by default)
 #  CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 #  ENABLE_PYTHON3: enable python 3 compilation instead of python2.7 (OFF by default)
+#  PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system. (-1 by default)
 
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8.11)
@@ -61,18 +62,20 @@ OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" OFF)
 OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" OFF)
-OPTION(USE_PYTHON3 "enable python 3 compilation instead of python2.7" ON)
+#Set -DPYTHON_VERSION numeric option below:
+set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defaults to -DPYTHON_VERSION=-1 which automatically uses the last python version on the system.")
 #===========================================================
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
 
-IF(USE_PYTHON3)
-	SET(PYTHON_MAJOR 3)
+
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
+message(***PYTHON_VERSION*** ${PYTHON_VERSION})
+IF(${PYTHON_VERSION} EQUAL -1)
+	set(Python_ADDITIONAL_VERSIONS 3 2)
 ELSE()
-	SET(PYTHON_MAJOR 2)
+	set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
 ENDIF()
 
-set(Python_ADDITIONAL_VERSIONS ${PYTHON_MAJOR})
 INCLUDE(FindPythonInterp)
 INCLUDE(FindOpenMP)
 INCLUDE(FindQt4)
@@ -616,12 +619,14 @@ ELSE (CHUNKSIZE)
   ADD_LIBRARY(yade SHARED ${SRC_CORE} ${SRC_PKG} ${SRC_LIB})
 ENDIF (CHUNKSIZE)
 #===========================================================
-find_python_module(minieigen REQUIRED)
 
-IF(USE_PYTHON3)
-find_python_module(tkinter REQUIRED)
+FOREACH(PYTHON_MODULE IPython matplotlib numpy pygraphviz Xlib minieigen future past)
+	find_python_module(${PYTHON_MODULE} REQUIRED)
+ENDFOREACH()
+IF(${PYTHON_VERSION_MAJOR} EQUAL 2)
+	find_python_module(Tkinter REQUIRED)
 ELSE()
-find_python_module(Tkinter REQUIRED)
+	find_python_module(tkinter REQUIRED)
 ENDIF()
 #===========================================================
 
