@@ -269,7 +269,7 @@ def pressureImbibition():
          if col1[ll]==1:
            if celleok[ll]==0:
               celleok[ll]=1
-              col0[ll]=c0.getInterfaces()[ii][0]         
+              col0[ll]=c0.getInterfaces()[ii][0]          
        for jj in range(nvoids):
           if col1[jj]==1:
               flow.clusterOutvadePore(col0[jj],jj)
