@@ -49,9 +49,9 @@ except ImportError: pass
 
 # make c++ predicates available in this module
 noPredicate = False
-#try:
-from yade._packPredicates import * ## imported in randomDensePack as well
-#except ImportError: pass; noPredicate = True
+try:
+	from yade._packPredicates import * ## imported in randomDensePack as well
+except ImportError: pass; noPredicate = True
 
 # import SpherePack
 from yade._packSpheres import *
