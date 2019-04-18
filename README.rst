@@ -20,14 +20,14 @@ Installing, running, testing, doc look now ok, on all current and future debian/
 
 .. code::
 
-cmake -DCMAKE_INSTALL_PREFIX=/path/to/your/install/target -DUSE_PYTHON3=ON /path/to/sources
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/your/install/target -DPYTHON_VERSION=3 /path/to/sources
 
 **Implementation status**
 
 - cmake and yade compilation ok with python3
 - yade launch ok with python3, generating/launching triax ok
-- yade --test all ok with python3 (-DUSE_PYTHON3=ON)
-- yade --test all ok with python2 (-DUSE_PYTHON3=OFF)
+- yade --test all ok with python3 (-DPYTHON_VERSION=3)
+- yade --test all ok with python2 (-DPYTHON_VERSION=2)
 - yade --checks almost ok with python2 and python3 (but the only issue is not related to python version)
 
 **Known bugs/todos**
