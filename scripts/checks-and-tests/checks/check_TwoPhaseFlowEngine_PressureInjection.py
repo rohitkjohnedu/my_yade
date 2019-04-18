@@ -154,7 +154,6 @@ Qin=0.0
 #Qout=0.0
 
 totalflux=[0] * (nvoids)
-#total=0.0
 #totalCellSat=0.0
 
 for ii in range(nvoids):
@@ -167,22 +166,20 @@ celleok=[0] * (nvoids)
 deltabubble=0
 col0=[0] * (nvoids)
 col=[0] * (nvoids)
-neighK=[0] * (nvoids)
+neighK=[0.0] * (nvoids)
 def pressureImbibition():
    global Qin,total2,dd,deltabubble,bubble
-  
-   for ii in range(len(c0.getInterfaces())):
-      c0.updateCapVol(ii,O.dt) 
-      #total+=c0.getFlux(ii)*O.dt
-      
-   Qin+=-1*(flow.getBoundaryFlux(flow.wallIds[flow.ymin]))*O.dt
-   #Qout+=(flow.getBoundaryFlux(flow.wallIds[flow.ymax]))*O.dt   
    
+   c0.updateCapVolList(O.dt)
+       
+   Qin+=flow.getBoundaryVolume(flow.wallIds[flow.ymin],O.dt)
+   #Qout+=(flow.getBoundaryFlux(flow.wallIds[flow.ymax]))*O.dt   
+       
    col1=[0] * (nvoids)
-   delta=[0] * (nvoids)
+   delta=[0.0] * (nvoids)   
    for ii in range(nvoids):
         if flow.getCellLabel(ii)==0:
-	    totalflux[ii]+=-1*flow.getCellFluxFromId(ii)*O.dt   
+	    totalflux[ii]+=flow.getCellInVolumeFromId(ii,O.dt)   
 	    if (totalflux[ii])>=initialvol[ii]:
 	       col1[ii]=1
 	    if (totalflux[ii])>initialvol[ii]:
@@ -191,11 +188,12 @@ def pressureImbibition():
 	      #dd+=delta[ii]
    	    	      
    for ii in range(len(c0.getInterfaces())):
-      if col1[c0.getInterfaces()[ii][1]]==1:
-	if celleok[c0.getInterfaces()[ii][1]]==0:
-	   celleok[c0.getInterfaces()[ii][1]]=1
-	   col0[c0.getInterfaces()[ii][1]]=c0.getInterfaces()[ii][0]
-	   col[c0.getInterfaces()[ii][1]]=ii
+      ll=c0.getInterfaces()[ii][1]
+      if col1[ll]==1:
+	if celleok[ll]==0:
+	   celleok[ll]=1
+	   col0[ll]=c0.getInterfaces()[ii][0]
+	   col[ll]=ii
            
    for jj in range(nvoids):
       if col1[jj]==1:
@@ -203,13 +201,14 @@ def pressureImbibition():
           #totalCellSat+=initialvol[jj]       
    
    for ii in range(len(c0.getInterfaces())):
-      if delta[c0.getInterfaces()[ii][0]]!=0:
-	 neighK[c0.getInterfaces()[ii][0]]+=c0.getConductivity(ii)	 
+      ll=c0.getInterfaces()[ii][0]
+      if delta[ll]!=0:
+	 neighK[ll]+=c0.getConductivity(ii)	 
    for ii in range(len(c0.getInterfaces())):
-      if delta[c0.getInterfaces()[ii][0]]!=0:
-         c0.setCapVol(ii,delta[c0.getInterfaces()[ii][0]]/neighK[c0.getInterfaces()[ii][0]]*c0.getConductivity(ii))
-         totalflux[c0.getInterfaces()[ii][1]]+=delta[c0.getInterfaces()[ii][0]]/neighK[c0.getInterfaces()[ii][0]]*c0.getConductivity(ii)
-   
+      ll=c0.getInterfaces()[ii][0]
+      if delta[ll]!=0:
+         c0.setCapVol(ii,delta[ll]/neighK[ll]*c0.getConductivity(ii))
+         totalflux[c0.getInterfaces()[ii][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii)   
    for ii in range(nvoids):
       if delta[ii]!=0:
 	  if neighK[ii]==0:
@@ -217,7 +216,7 @@ def pressureImbibition():
              bubble+=1
    
    col1=[0] * (nvoids)
-   delta=[0] * (nvoids)
+   delta=[0.0] * (nvoids)
    for ii in range(nvoids):
         if flow.getCellLabel(ii)==0:
 	    if (totalflux[ii])>=initialvol[ii]:
@@ -228,29 +227,32 @@ def pressureImbibition():
 	      #dd+=delta[ii]
    if col1!=[0] * (nvoids):	    	      
      for ii in range(len(c0.getInterfaces())):
-        if col1[c0.getInterfaces()[ii][1]]==1:
-	  if celleok[c0.getInterfaces()[ii][1]]==0:
-	     celleok[c0.getInterfaces()[ii][1]]=1
-	     col0[c0.getInterfaces()[ii][1]]=c0.getInterfaces()[ii][0]
-	     col[c0.getInterfaces()[ii][1]]=ii             
+        ll=c0.getInterfaces()[ii][1]
+        if col1[ll]==1:
+	  if celleok[ll]==0:
+	     celleok[ll]=1
+	     col0[ll]=c0.getInterfaces()[ii][0]
+	     col[ll]=ii             
      for jj in range(nvoids):
         if col1[jj]==1:
 	    flow.clusterOutvadePore(col0[jj],jj,col[jj])
             #totalCellSat+=initialvol[jj]          
      for ii in range(len(c0.getInterfaces())):
-        if delta[c0.getInterfaces()[ii][0]]!=0:
-	   neighK[c0.getInterfaces()[ii][0]]+=c0.getConductivity(ii)	 
+        ll=c0.getInterfaces()[ii][0]
+        if delta[ll]!=0:
+	   neighK[ll]+=c0.getConductivity(ii)	 
      for ii in range(len(c0.getInterfaces())):
-        if delta[c0.getInterfaces()[ii][0]]!=0:
-           c0.setCapVol(ii,delta[c0.getInterfaces()[ii][0]]/neighK[c0.getInterfaces()[ii][0]]*c0.getConductivity(ii))
-           totalflux[c0.getInterfaces()[ii][1]]+=delta[c0.getInterfaces()[ii][0]]/neighK[c0.getInterfaces()[ii][0]]*c0.getConductivity(ii)   
+        ll=c0.getInterfaces()[ii][0]
+        if delta[ll]!=0:
+           c0.setCapVol(ii,delta[ll]/neighK[ll]*c0.getConductivity(ii))
+           totalflux[c0.getInterfaces()[ii][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii)   
      for ii in range(nvoids):
         if delta[ii]!=0:
-	   if neighK[ii]==0:
+	    if neighK[ii]==0:
                deltabubble+=delta[ii]
                bubble+=1
      col1=[0] * (nvoids)
-     delta=[0] * (nvoids)
+     delta=[0.0] * (nvoids)
      for ii in range(nvoids):
         if flow.getCellLabel(ii)==0:
 	    if (totalflux[ii])>=initialvol[ii]:
@@ -262,11 +264,12 @@ def pressureImbibition():
 	      print O.iter,'waterloss',ii,delta[ii]
      if col1!=[0] * (nvoids):
        for ii in range(len(c0.getInterfaces())):
-          if col1[c0.getInterfaces()[ii][1]]==1:
-	    if celleok[c0.getInterfaces()[ii][1]]==0:
-	       celleok[c0.getInterfaces()[ii][1]]=1
-	       col0[c0.getInterfaces()[ii][1]]=c0.getInterfaces()[ii][0]
-	       col[c0.getInterfaces()[ii][1]]=ii             
+         ll=c0.getInterfaces()[ii][1]
+         if col1[ll]==1:
+	   if celleok[ll]==0:
+	      celleok[ll]=1
+	      col0[ll]=c0.getInterfaces()[ii][0]
+	      col[ll]=ii           
        for jj in range(nvoids):
           if col1[jj]==1:
 	      flow.clusterOutvadePore(col0[jj],jj,col[jj])
