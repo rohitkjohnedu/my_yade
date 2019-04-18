@@ -236,6 +236,7 @@ class PhaseCluster : public Serializable
 		.def("getCapVol",&PhaseCluster::getCapVol,(boost::python::arg("numf"),boost::python::arg("vCap")),"get position of the meniscus - in terms of volume")
 		.def("getConductivity",&PhaseCluster::getConductivity,(boost::python::arg("numf"),boost::python::arg("K")),"get conductivity")
 		.def("updateCapVol",&PhaseCluster::updateCapVol,(boost::python::arg("numf"),boost::python::arg("dt")),"increments throat's volume by flux*dt")
+		.def("updateCapVolList",&PhaseCluster::updateCapVolList,(boost::python::arg("dt")),"increments throat's volume of each interface by flux*dt")
 		.def("solvePressure",&PhaseCluster::solvePressure,"Solve 1-phase flow in one single cluster defined by its id.")
 		)
 };
