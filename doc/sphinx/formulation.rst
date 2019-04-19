@@ -1,7 +1,7 @@
 .. _chapter-formulation:
 
 ****************
-DEM Background
+DEM formulation
 ****************
 In this chapter, we mathematically describe general features of explicit DEM simulations, with some reference to Yade implementation of these algorithms. They are given roughly in the order as they appear in simulation; first, two particles might establish a new interaction, which consists in
 

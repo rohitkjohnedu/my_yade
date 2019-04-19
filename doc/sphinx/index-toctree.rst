@@ -13,34 +13,34 @@ Welcome to Yade's documentation!
   introduction.rst
 
   tutorial.rst
-  
-  formulation.rst
 
   user.rst
-  
+
   citing.rst
-  
-  yade.wrapper.rst
 
   prog.rst
+
+  yade.wrapper.rst
+
+  modules.rst
 
   installation.rst
 
   github.rst
 
-  modules.rst
-  
-  amazonEC2.rst
+  formulation.rst
 
-  GPUacceleration.rst
-
-  HydroForceEngine.rst
+  FoamCoupling.rst
 
   FEMxDEM.rst
 
   acousticemissions.rst
 
-  FoamCoupling.rst
+  HydroForceEngine.rst
+
+  amazonEC2.rst
+
+  GPUacceleration.rst
 
   publications.rst
 

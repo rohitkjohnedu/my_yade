@@ -58,7 +58,7 @@ mm=mods.keys(); mm.sort()
 for m in mm: moduleDoc(m,mods[m])
 
 with open('modules.rst','w') as f:
-    f.write("Yade modules\n=============\n\n.. toctree::\n\t:maxdepth: 2\n\n")
+    f.write("Yade modules reference\n=============\n\n.. toctree::\n\t:maxdepth: 2\n\n")
     for m in mm: f.write('\tyade.%s.rst\n\n'%m)
 
 
@@ -183,8 +183,8 @@ def genWrapperRst():
     wrapper=file('yade.wrapper.rst','w')
     wrapper.write(""".. _yade.wrapper::
 
-Class reference (yade.wrapper module)
-=======================================
+Yade wrapper class reference
+============================
 
 .. toctree::
   :maxdepth: 2

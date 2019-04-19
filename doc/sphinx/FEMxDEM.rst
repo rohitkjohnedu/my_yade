@@ -1,8 +1,8 @@
 .. _FEMxDEM:
 
-##############################################################################################################################
-Parallel hierarchical multiscale modeling of granular media by coupling FEM and DEM with open-source codes Escript and YADE
-##############################################################################################################################
+############################
+FEM-DEM multiscale coupling
+############################
 Authors: Ning Guo and Jidong Zhao
 
 Institution: Hong Kong University of Science and Technology
