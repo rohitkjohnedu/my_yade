@@ -18,7 +18,7 @@ cmake:
   artifacts:
     paths:
       - build
-      
+
 make:
   stage: build
   only:
@@ -34,8 +34,10 @@ make:
   artifacts:
     paths:
       - install
-  dependencies: 
-    - cmake      
+  tags:
+    - fast
+  dependencies:
+    - cmake
 
 test:
   stage: test
@@ -71,7 +73,7 @@ doc:
   artifacts:
     paths:
       - install
-      
+
 pages:
   stage: pages
   only:
