@@ -8,45 +8,19 @@ Welcome to Yade's documentation!
 ================================
 
 .. toctree::
-  :maxdepth: 2
+  :maxdepth: 3
 
-  introduction.rst
+  guided-tour.rst
 
-  tutorial.rst
-  
-  formulation.rst
+  for-all-users.rst
 
-  user.rst
-  
-  yade.wrapper.rst
-  
-  modules.rst
-  
-  citing.rst
-  
-  installation.rst
+  for-developers-only.rst
 
-  prog.rst
+  physical-laws.rst
 
-  github.rst
-  
-  amazonEC2.rst
+  miscellaneous.rst
 
-  GPUacceleration.rst
-
-  HydroForceEngine.rst
-
-  FEMxDEM.rst
-
-  acousticemissions.rst
-
-  FoamCoupling.rst
-
-  publications.rst
-
-  yadeTechArchive.rst
-
-  references.rst
+  literature.rst
 
 Indices and tables
 ==================
