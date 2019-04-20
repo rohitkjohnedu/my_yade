@@ -148,6 +148,7 @@ need root privileges.
 		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
 		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen	\
+		libopenblas-dev libsuitesparse-dev libmetis-dev  \
 		libopenmpi-dev openmpi-bin openmpi-common
 		
 * For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``, ``python-imaging`` is to be replaced by ``python-pil``, and the additional package ``qt5-default`` is required
@@ -161,11 +162,6 @@ some of Yade features will be disabled (see the messages at the end of the confi
 Additional packages, which can become mandatory later::
 
 		sudo apt-get install python-gts
-
-For effective usage of direct solvers in the PFV-type fluid coupling, the following libraries are recommended: ``openblas``, ``suitesparse``, and ``metis``.
-All three of them are available in many different versions in each distribution. Different combinations are possible and not all of them will work. The following was found to be effective on recent debian-based systems. ::
-
-		sudo apt-get install libopenblas-dev libsuitesparse-dev libmetis-dev
 
 Some packages listed here are relatively new and they can be absent
 in your distribution (for example, libmetis-dev or python-gts). They can be
