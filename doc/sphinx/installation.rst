@@ -139,20 +139,24 @@ The following commands have to be executed in the command line of your correspon
 distribution. Just copy&paste to the terminal. Note, to execute these commands you
 need root privileges.
 
-* **Ubuntu**, **Debian** and their derivatives::
+* **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives::
 
-		sudo apt-get install cmake git freeglut3-dev libloki-dev \
+		sudo apt install cmake git freeglut3-dev libloki-dev \
 		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
 		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
 		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
-		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
-		libqglviewer-dev python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen	\
-		libopenblas-dev libsuitesparse-dev libmetis-dev  \
+		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit \
+		gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg qt5-default \
+		libqglviewer-dev-qt5 python-pil libjs-jquery python-sphinx python-git python-bibtex \
+		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen \
+		libopenblas-dev libsuitesparse-dev libmetis-dev \
 		libopenmpi-dev openmpi-bin openmpi-common
+
+
 		
-* For **Ubuntu 18.04** ``libqglviewer-dev`` is to be replaced by ``libqglviewer-dev-qt5``, ``python-imaging`` is to be replaced by ``python-pil``, and the additional package ``qt5-default`` is required
-		
+* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``, and the package ``qt5-default`` is not required.
+
+* For building documentation (a ``make doc`` invocation explained below) additional package ``texlive-xetex`` is required.
 
 Some of the packages (for example, cmake, eigen3) are mandatory, some of them
 are optional. Watch for notes and warnings/errors, which are shown
