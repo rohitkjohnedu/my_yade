@@ -10,11 +10,11 @@ Physical laws
 
   FoamCoupling.rst
 
-  HydroForceEngine.rst
-
   FEMxDEM.rst
 
   acousticemissions.rst
+
+  HydroForceEngine.rst
 
 .. comment:
    https://en.wikipedia.org/wiki/Physical_law#Laws_as_approximations
