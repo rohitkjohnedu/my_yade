@@ -1740,6 +1740,8 @@ Bugs are general name for defects (functionality shortcomings, misdocumentation,
 
 When reporting a new bug, be as specific as possible; state version of yade you use, system version and so on, as explained in the above section on crashes.
 
+.. _getting-help:
+
 Getting help
 =============
 
