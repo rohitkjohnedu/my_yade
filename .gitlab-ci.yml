@@ -14,7 +14,7 @@ cmake:
     - merge_request
   script:
     - mkdir build && cd build
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
   artifacts:
     paths:
       - build
