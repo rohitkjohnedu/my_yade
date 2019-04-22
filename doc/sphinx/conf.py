@@ -519,6 +519,10 @@ my_latex_preamble=r'''
 \def\sortlines#1{\xymatrix@=3pt{#1}}
 \def\crossBound{||\mkern-18mu<}
 
+% restore previous tocdepth in .pdf after introducing new sections in .html
+
+\setcounter{tocdepth}{2}
+
 '''
 
 pngmath_latex_preamble=r'\usepackage[active]{preview}'+my_latex_preamble
