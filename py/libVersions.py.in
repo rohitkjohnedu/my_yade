@@ -1,0 +1,16 @@
+# encoding: utf-8
+"""
+Documentation description will go here. (Template file is processed by cmake to create the actual version information at build-time.)
+All functions written here also should have docstrings.
+"""
+
+# all C++ functions are accessible now:
+from yade._libVersions import *
+
+def cmakeVer():
+	"""
+	Return cmake version with which yade was compiled, as detected from ``CMAKE_VERSION``.
+
+	"""
+	return '${CMAKE_VERSION}'
+
