@@ -15,7 +15,7 @@ cmake:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
   tags:
-  - lightweight
+    - fast
   artifacts:
     paths:
       - build
@@ -35,6 +35,8 @@ make:
   artifacts:
     paths:
       - install
+  tags:
+    - fast
   dependencies: 
     - cmake      
 
@@ -46,7 +48,7 @@ test:
   script:
     - install/bin/yade-ci --test
   tags:
-  - lightweight
+    - fast
   dependencies:
     - make
 
@@ -58,7 +60,7 @@ check:
   script:
     - install/bin/yade-ci --checks
   tags:
-  - lightweight
+    - fast
   dependencies:
     - make
 
@@ -74,7 +76,7 @@ doc:
     - cmake
     - make
   tags:
-  - lightweight
+    - fast
   artifacts:
     paths:
       - install
@@ -90,7 +92,7 @@ pages:
   dependencies:
     - doc
   tags:
-  - lightweight
+    - fast
   artifacts:
     paths:
       - public
