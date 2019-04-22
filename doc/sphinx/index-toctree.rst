@@ -9,23 +9,6 @@
 Welcome to Yade's documentation!
 ################################
 
-.. comment: .. toctree::
-.. comment:   :maxdepth: 3
-.. comment: 
-.. comment:   guided-tour.rst
-.. comment: 
-.. comment:   for-all-users.rst
-.. comment: 
-.. comment:   for-developers-only.rst
-.. comment: 
-.. comment:   physical-laws.rst
-.. comment: 
-.. comment:   miscellaneous.rst
-.. comment: 
-.. comment:   literature.rst
-
-
-
 ################################
 Guided tour
 ################################
