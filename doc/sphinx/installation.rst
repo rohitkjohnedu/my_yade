@@ -254,7 +254,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_.
 
-.. warning:: To provide Qt4->Qt5 migration one needs to provide an additional option USE_QT5.
+.. warning:: To provide Qt4→Qt5 migration one needs to provide an additional option USE_QT5.
  This option is ON by default but should be set according to the Qt version which was used
  to compile libQGLViewer. On Debian/Ubuntu operating systems libQGLViewer
  of version 2.6.3 and higher are compiled against Qt5 (for other operating systems
@@ -290,6 +290,8 @@ the new built can be started by navigating to /path/to/installfolder/bin and cal
 
     cd /path/to/installfolder/bin
     ./yade-2014-02-20.git-a7048f4
+
+.. comment: is it possible to invoke python yade.config.revision and put it above as a text in the doc?
 
 For building the documentation you should at first execute the command ``make install``
 and then ``make doc`` to build it. The generated files will be stored in your current
