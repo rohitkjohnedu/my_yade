@@ -21,7 +21,7 @@ Guided tour
   tutorial.rst
 
 ################################
-Yade for Users
+Yade for users
 ################################
 
 .. toctree::
@@ -40,7 +40,7 @@ Yade for Users
   citing.rst
 
 ################################
-Yade for Programmers
+Yade for programmers
 ################################
 
 .. toctree::
@@ -51,7 +51,7 @@ Yade for Programmers
   github.rst
 
 ################################
-Physical laws
+Theoretical background
 ################################
 
 .. toctree::
@@ -68,15 +68,15 @@ Physical laws
   HydroForceEngine.rst
 
 ################################
-Miscellaneous
+Performance enhancements
 ################################
 
 .. toctree::
   :maxdepth: 2
 
-  amazonEC2.rst
-
   GPUacceleration.rst
+
+  amazonEC2.rst
 
 ################################
 Literature
