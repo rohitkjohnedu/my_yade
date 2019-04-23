@@ -7,10 +7,24 @@ stages:
   - doc
   - pages
 
+# https://docs.gitlab.com/ee/ci/yaml/#onlyexcept-basic
+# I create two "stage: cmake" instructions.
+# only: master        will use -DCHUNKSIZE=1, to avoid future compilation errors caused by DCHUNKSIZE other than 1
+# only: merge_request will use -DCHUNKSIZE=4, to make compilation faster by 3 minutes
 cmake:
   stage: cmake
   only:
     - master
+  script:
+    - mkdir build && cd build
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DDISABLE_SAVE_TEMPS=1 ..
+  artifacts:
+    paths:
+      - build
+
+cmake:
+  stage: cmake
+  only:
     - merge_request
   script:
     - mkdir build && cd build
