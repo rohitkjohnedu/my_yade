@@ -140,6 +140,8 @@ import yade.config
 import yade.wrapper
 import yade.system
 import yade.runtime
+# import to have quick access to function printAllVersions()
+from yade.libVersions import printAllVersions
 
 # continue option processing
 
