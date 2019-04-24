@@ -127,7 +127,7 @@ BOOST_PYTHON_MODULE(_libVersions){
 */
 
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
-// The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This delimeter decides what will be the termination delimeter.
+// The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
 
 	py::def("allVersionsCpp", allVersionsCpp, R"""(
 This function returns library versions as discovered by C++ during compilation from all the ``#include`` headers. This can be useful in debugging to detect some library ``.so`` conflicts.

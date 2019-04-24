@@ -60,7 +60,7 @@ def printAllVersions(rstFormat=False):
 		longest[0] = max(longest[0],len(key))
 		if(len(val)==2):
 			namesSet.add(key)
-			longest[1] = max(longest[1],len(val[1]))
+			longest[2] = max(longest[2],len(val[1]))
 
 	for i in range(3): longest[i]+=2
 
