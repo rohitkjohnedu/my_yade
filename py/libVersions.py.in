@@ -1,7 +1,10 @@
 # encoding: utf-8
 """
-Documentation description will go here. (Template file is processed by cmake to create the actual version information at build-time.)
+XXXXXXXXX FIXME XXXXXXXXX Documentation description will go here. (Template file is processed by cmake to create the actual version information at build-time.)
 All functions written here also should have docstrings.
+
+I used the list in https://yade-dem.org/doc/installation.html#prerequisites
+If we need a version of some library not listed in doc/sphinx/installation.rst, then it must also be added to that list!
 """
 
 # all C++ functions are accessible now:
@@ -14,25 +17,16 @@ def allVersionsCmake():
 
 	:return: dictionary in folowing format: ``{ "libName" : [ (major,minor,patch) , "versionString" ] }``
 
-	.. note:: Please add here more libraries as yade starts using them or as you discover how to extract from cmake a version which I didn't add here.
+	.. note:: Please add here detection of other libraries when yade starts using them or if you discover how to extract from cmake a version which I didn't add here.
 
 	"""
 
 	return {
-		  "cmake" : [ (${CMAKE_MAJOR_VERSION},${CMAKE_MINOR_VERSION},${CMAKE_PATCH_VERSION}) , '${CMAKE_VERSION}' ]
-		, "vtk"   : [ (${VTK_MAJOR_VERSION},${VTK_MINOR_VERSION},${VTK_PATCH_VERSION})       , '${VTK_VERSION}'   ]
+		  "cmake" : [ (${CMAKE_MAJOR_VERSION}, ${CMAKE_MINOR_VERSION}, ${CMAKE_PATCH_VERSION})   , '${CMAKE_VERSION}' ]
+		, "vtk"   : [ (${VTK_MAJOR_VERSION}  , ${VTK_MINOR_VERSION}  , ${VTK_PATCH_VERSION})     , '${VTK_VERSION}'   ]
 # uncomment when this bug is fixed in upstream: https://github.com/CGAL/cgal/issues/2820
-		, "cgal"  : [ (${CGAL_MAJOR_VERSION},${CGAL_MINOR_VERSION},${CGAL_BUGFIX_VERSION})   , '${CGAL_VERSION}'  ]
+#		, "cgal"  : [ (${CGAL_MAJOR_VERSION},${CGAL_MINOR_VERSION},${CGAL_BUGFIX_VERSION})   , '${CGAL_VERSION}'  ]
 		}
-
-def allVersions():
-	"""
-	This function returns a dictionary of yade version and all library versions with which yade was compiled. This information is collected during compilation by both cmake and C++.
-
-	:return: dictionary in folowing format: ``{ "libName" : [ (major,minor,patch) , "versionString" , float ] }``
-	"""
-	return 0
-
 
 def printAllVersions(rstFormat=False):
 	"""
