@@ -68,7 +68,7 @@ Theoretical background and extensions
   HydroForceEngine.rst
 
 ######################################
-Computation and performance
+Performance enhancements
 ######################################
 
 .. toctree::
