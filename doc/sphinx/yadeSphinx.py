@@ -293,6 +293,8 @@ genReferences()
 for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
     shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
+# NOTE: for some unexplained reason, all code after the sphinx.main() invocation will not be executed (python exits) on docker images (gitlab), despite the try: except: statements.
+# Workaround: launch this script as many times as needed (3 times for doc compilations and 1 time for post workarounds), see CMakeLists.txt.
 if(writer != "workarounds"):
 	genWrapperRst()
 	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
