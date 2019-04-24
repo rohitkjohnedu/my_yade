@@ -6,11 +6,75 @@ All functions written here also should have docstrings.
 
 # all C++ functions are accessible now:
 from yade._libVersions import *
+import yade.config
 
-def cmakeVer():
+def allVersionsCmake():
 	"""
-	Return cmake version with which yade was compiled, as detected from ``CMAKE_VERSION``.
+	This function returns library versions as provided by cmake during compilation.
+
+	:return: dictionary in folowing format: ``{ "libName" : [ (major,minor,patch) , "versionString" ] }``
+
+	.. note:: Please add here more libraries as yade starts using them or as you discover how to extract from cmake a version which I didn't add here.
 
 	"""
-	return '${CMAKE_VERSION}'
+
+	return {
+		  "cmake" : [ (${CMAKE_MAJOR_VERSION},${CMAKE_MINOR_VERSION},${CMAKE_PATCH_VERSION}) , '${CMAKE_VERSION}' ]
+		, "vtk"   : [ (${VTK_MAJOR_VERSION},${VTK_MINOR_VERSION},${VTK_PATCH_VERSION})       , '${VTK_VERSION}'   ]
+# uncomment when this bug is fixed in upstream: https://github.com/CGAL/cgal/issues/2820
+		, "cgal"  : [ (${CGAL_MAJOR_VERSION},${CGAL_MINOR_VERSION},${CGAL_BUGFIX_VERSION})   , '${CGAL_VERSION}'  ]
+		}
+
+def allVersions():
+	"""
+	This function returns a dictionary of yade version and all library versions with which yade was compiled. This information is collected during compilation by both cmake and C++.
+
+	:return: dictionary in folowing format: ``{ "libName" : [ (major,minor,patch) , "versionString" , float ] }``
+	"""
+	return 0
+
+
+def printAllVersions(rstFormat=False):
+	"""
+	This function prints a nicely formatted table with library versions.
+
+	:param bool rstFormat: whether to print table using the reStructuredText formatting. Defaults to `False` and prints using `Gitlab markdown rules<https://gitlab.com/help/user/markdown>`_ so that it is easy to paste into gitlab discussions.
+
+	As an example the table below actually reflects with what libraries this documentation was compiled:
+
+	.. ipython::
+	
+	   In [1]: from yade.libVersions import *
+
+	   In [1]: printAllVersions()
+
+	"""
+
+	print("TABLE")
+
+
+
+"""
+GITLAB format:
+
+| header 1 | header 2 |
+| -------- | -------- |
+| cell 1   | cell 2   |
+| cell 3   | cell 4   |
+
+
+reStructuredText format:
+
+=====  =====  ====== 
+   Inputs     Output 
+------------  ------ 
+  A      B    A or B 
+=====  =====  ====== 
+False  False  False 
+True   False  True 
+False  True   True 
+True   True   True 
+=====  =====  ======
+"""
+
 
