@@ -139,24 +139,15 @@ The following commands have to be executed in the command line of your correspon
 distribution. Just copy&paste to the terminal. Note, to execute these commands you
 need root privileges.
 
-* **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives::
-
-		sudo apt install cmake git freeglut3-dev libloki-dev \
-		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
-		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
-		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
-		python-xlib python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit \
-		gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg qt5-default \
-		libqglviewer-dev-qt5 python-pil libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen \
-		libopenblas-dev libsuitesparse-dev libmetis-dev \
-		libopenmpi-dev openmpi-bin openmpi-common
-
-
+		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot dpkg-dev build-essential g++ \
+		python3-dev python3-ipython python3-matplotlib libsqlite3-dev python3-numpy python3-tk gnuplot libgts-dev \
+		python3-pygraphviz libvtk6-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools python3-pyqt5.qtwebkit \
+		gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 python3-pil libjs-jquery python3-sphinx python3-git \
+		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python3-minieigen libopenblas-dev libsuitesparse-dev \
+		libmetis-dev python3-bibtexparser python3-future
 		
-* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``, and the package ``qt5-default`` is not required.
+* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
 
-* For building documentation (a ``make doc`` invocation explained below) additional package ``texlive-xetex`` is required. On some multi-language systems an error ``Building format(s) --all. This may take some time... fmtutil failed.`` may occur, in that case a package ``locales-all`` is required.
 
 Some of the packages (for example, cmake, eigen3) are mandatory, some of them
 are optional. Watch for notes and warnings/errors, which are shown
@@ -250,6 +241,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 	* USE_QT5: use QT5 for GUI (ON by default)
 	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
+	* PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system (-1 by default)
 
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_.
@@ -310,6 +302,17 @@ upon detecting the C and C++ compiler to use::
 
 Clang does not support OpenMP-parallelizing for the moment, that is why the
 feature will be disabled.
+
+Python 2 backward compatibility
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Python 2 support ends at the beginning of 2020. However, Yade can be compiled and used with python 2:
+
+* install the python 2 version of the packages: ``sudo apt install python-dev ipython python-matplotlib python-numpy python-tk python-pygraphviz python-numpy python-xlib python-pyqt5 python-pyqt5.qtwebkit python-argparse python-pyqt5.qtsvg python-pil python-sphinx python-git python-bibtexparser python-minieigen``
+
+* force python 2 in the cmake command line: ``cmake -DPYTHON_VERSION=2 -DCMAKE_INSTALL_PREFIX=../install ../trunk``
+
+Note that the cmake ``PYTHON_VERSION`` option can be set to force any python version, for example ``-DPYTHON_VERSION=3.5`` is valid.
 
 Speed-up compilation
 ^^^^^^^^^^^^^^^^^^^^^
