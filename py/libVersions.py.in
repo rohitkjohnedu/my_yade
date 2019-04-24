@@ -44,9 +44,48 @@ def printAllVersions(rstFormat=False):
 
 	"""
 
-	print("TABLE")
+	# there will be three columns: library , cmake , C++
+	headers  = ["library","cmake","C++"]
+	longest  = [None,None,None]
+	cmakeVer = allVersionsCmake()
+	cppVer   = allVersionsCpp()
+	namesSet = set()
+	for i in range(3): longest[i] = len(headers[i])
+	for key,val in cmakeVer.items():
+		longest[0] = max(longest[0],len(key))
+		if(len(val)==2):
+			namesSet.add(key)
+			longest[1] = max(longest[1],len(val[1]))
+	for key,val in cppVer.items():
+		longest[0] = max(longest[0],len(key))
+		if(len(val)==2):
+			namesSet.add(key)
+			longest[1] = max(longest[1],len(val[1]))
 
+	for i in range(3): longest[i]+=2
 
+	sep = '| '+'-'*longest[0]+' | '+'-'*longest[1]+' | '+'-'*longest[2]+' |\n'
+	lines="|"
+	if(rstFormat):
+		sep = '+-'+'-'*longest[0]+'-+-'+'-'*longest[1]+'-+-'+'-'*longest[2]+'-+\n'
+		lines = sep.replace('-','=')+'\n|'
+	# nice python formatting guide: https://pyformat.info/
+	for i in range(3):
+		lines+=" "+(('{:'+str(longest[i])+'}').format(headers[i]))+" |"
+	lines+='\n'
+	lines+=sep
+	for libName in namesSet:
+		lines+="| "+(('{:'+str(longest[0])+'}').format(libName))+" |"
+		if (libName in cmakeVer) and (len(cmakeVer[libName])==2):
+			lines+=" "+(('{:'+str(longest[1])+'}').format(cmakeVer[libName][1]))+" |"
+		else:
+			lines+=" "+(('{:'+str(longest[1])+'}').format(' '                 ))+" |"
+		if (libName in cppVer) and (len(cppVer[libName])==2):
+			lines+=" "+(('{:'+str(longest[2])+'}').format(cppVer[libName][1]  ))+" |"
+		else:
+			lines+=" "+(('{:'+str(longest[2])+'}').format(' '                 ))+" |"
+		lines+='\n'
+	print(lines)
 
 """
 GITLAB format:
@@ -59,16 +98,13 @@ GITLAB format:
 
 reStructuredText format:
 
-=====  =====  ====== 
-   Inputs     Output 
-------------  ------ 
-  A      B    A or B 
-=====  =====  ====== 
-False  False  False 
-True   False  True 
-False  True   True 
-True   True   True 
-=====  =====  ======
++----------+----------+
+| header 1 | header 2 |
++==========+==========+
+| cell 1   | cell 2   |
++----------+----------+
+| cell 3   | cell 4   |
++----------+----------+
 """
 
 
