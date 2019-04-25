@@ -32,7 +32,7 @@ def printAllVersions(rstFormat=False):
 	"""
 	This function prints a nicely formatted table with library versions.
 
-	:param bool rstFormat: whether to print table using the reStructuredText formatting. Defaults to `False` and prints using `Gitlab markdown rules<https://gitlab.com/help/user/markdown>`_ so that it is easy to paste into gitlab discussions.
+	:param bool rstFormat: whether to print table using the reStructuredText formatting. Defaults to `False` and prints using `Gitlab markdown rules <https://gitlab.com/help/user/markdown>`_ so that it is easy to paste into gitlab discussions.
 
 	As an example the table below actually reflects with what libraries this documentation was compiled:
 
@@ -67,13 +67,16 @@ def printAllVersions(rstFormat=False):
 	sep = '| '+'-'*longest[0]+' | '+'-'*longest[1]+' | '+'-'*longest[2]+' |\n'
 	lines="|"
 	if(rstFormat):
-		sep = '+-'+'-'*longest[0]+'-+-'+'-'*longest[1]+'-+-'+'-'*longest[2]+'-+\n'
-		lines = sep.replace('-','=')+'\n|'
+		sep = '+-'+'-'*longest[0]+'-+-'+'-'*longest[1]+'-+-'+'-'*longest[2]+'-+'
+		lines = sep+'\n|'
 	# nice python formatting guide: https://pyformat.info/
 	for i in range(3):
-		lines+=" "+(('{:'+str(longest[i])+'}').format(headers[i]))+" |"
+		lines +=" "+(('{:'+str(longest[i])+'}').format(headers[i]))+" |"
 	lines+='\n'
-	lines+=sep
+	if(rstFormat):
+		lines += sep.replace('-','=')+'\n'
+	else:
+		lines += sep
 	for libName in namesSet:
 		lines+="| "+(('{:'+str(longest[0])+'}').format(libName))+" |"
 		if (libName in cmakeVer) and (len(cmakeVer[libName])==2):
@@ -85,6 +88,8 @@ def printAllVersions(rstFormat=False):
 		else:
 			lines+=" "+(('{:'+str(longest[2])+'}').format(' '                 ))+" |"
 		lines+='\n'
+		if(rstFormat):
+			lines+= sep+'\n'
 	print(lines)
 
 """
