@@ -139,9 +139,9 @@ The following commands have to be executed in the command line of your correspon
 distribution. Just copy&paste to the terminal. Note, to execute these commands you
 need root privileges.
  
-* Yade with **Python3** on **Ubuntu**, **Debian** and their derivatives::
+* **Ubuntu**, **Debian** and their derivatives::
 
-		sudo apt-get install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot dpkg-dev build-essential g++ \
+		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot dpkg-dev build-essential g++ \
 		python3-dev python3-ipython python3-matplotlib libsqlite3-dev python3-numpy python3-tk gnuplot libgts-dev \
 		python3-pygraphviz libvtk6-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools python3-pyqt5.qtwebkit \
 		gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 python3-pil libjs-jquery python3-sphinx python3-git \
@@ -149,19 +149,6 @@ need root privileges.
 		libmetis-dev python3-bibtexparser python3-future
 		
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
-
-* Yade with **Python2.7** (deprecated)::
-		sudo apt-get install cmake git freeglut3-dev libloki-dev \
-		libboost-all-dev fakeroot dpkg-dev build-essential g++ \
-		python-dev ipython python-matplotlib libsqlite3-dev python-numpy python-tk gnuplot \
-		libgts-dev python-pygraphviz libvtk6-dev python-numpy libeigen3-dev \
-		python-xlib qt5-default python-pyqt5 pyqt5-dev-tools python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
-		libqglviewer-dev-qt5 python-future python-imaging libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen	\
-		libopenmpi-dev openmpi-bin openmpi-common
-		
-* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, and ``qt5-default`` can be skipped
-
 
 
 Some of the packages (for example, cmake, eigen3) are mandatory, some of them
