@@ -15,6 +15,8 @@ cmake:
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+  tags:
+  - lightweight
   artifacts:
     paths:
       - build
@@ -28,7 +30,7 @@ make:
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in "y_4pak_64cpu_256RAM_4TB_docker") echo "40" ;; "c_4pak_64cpu_256RAM_4TB_docker") echo "40" ;; "c_6pak_48cpu_128RAM_4TB_docker") echo "42" ;; "y_6pak_48cpu_128RAM_4TB_docker") echo "42" ;; "yade-runner") echo "12" ;; "yade-runner-01") echo "1" ;; *) echo "3";; esac)
     - echo $JOBSNUM
     - cd build
-    - make -j 12
+    - make -j $JOBSNUM
     - make install
     - make clean
   artifacts:
