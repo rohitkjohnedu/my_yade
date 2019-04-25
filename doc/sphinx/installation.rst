@@ -139,18 +139,18 @@ The following commands have to be executed in the command line of your correspon
 distribution. Just copy&paste to the terminal. Note, to execute these commands you
 need root privileges.
  
-* **Ubuntu**, **Debian** and their derivatives::
+* **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives::
 
-		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot dpkg-dev build-essential g++ \
-		python3-dev python3-ipython python3-matplotlib libsqlite3-dev python3-numpy python3-tk gnuplot libgts-dev \
-		python3-pygraphviz libvtk6-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools python3-pyqt5.qtwebkit \
-		gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 python3-pil libjs-jquery python3-sphinx python3-git \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python3-minieigen libopenblas-dev libsuitesparse-dev \
+		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot \
+		dpkg-dev build-essential g++ python3-dev python3-ipython python3-matplotlib \
+		libsqlite3-dev python3-numpy python3-tk gnuplot libgts-dev python3-pygraphviz \
+		libvtk6-dev libeigen3-dev python3-xlib python3-pyqt5 pyqt5-dev-tools \
+		python3-pyqt5.qtwebkit gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 \
+		python3-pil libjs-jquery python3-sphinx python3-git libxmu-dev libxi-dev libcgal-dev \
+		help2man libbz2-dev zlib1g-dev python3-minieigen libopenblas-dev libsuitesparse-dev \
 		libmetis-dev python3-bibtexparser python3-future
 		
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
-
-* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``, and the package ``qt5-default`` is not required.
 
 * For building documentation (the ``make doc`` invocation explained below) additional package ``texlive-xetex`` is required. On some multi-language systems an error ``Building format(s) --all. This may take some time... fmtutil failed.`` may occur, in that case a package ``locales-all`` is required.
 
@@ -313,11 +313,17 @@ Python 2 backward compatibility
 
 Python 2 support ends at the beginning of 2020. However, Yade can be compiled and used with python 2:
 
-* install the python 2 version of the packages: ``sudo apt install python-dev ipython python-matplotlib python-numpy python-tk python-pygraphviz python-numpy python-xlib python-pyqt5 python-pyqt5.qtwebkit python-argparse python-pyqt5.qtsvg python-pil python-sphinx python-git python-bibtexparser python-minieigen``
+* On **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives: install the python 2 version of the packages: ``sudo apt install python-dev ipython python-matplotlib python-numpy python-tk python-pygraphviz python-numpy python-xlib python-pyqt5 python-pyqt5.qtwebkit python-argparse python-pyqt5.qtsvg python-pil python-sphinx python-git python-bibtexparser python-minieigen``.
+
+* For **Ubuntu 16.04** ``python-pil`` is to be replaced by ``python-imaging``.
+
+* depending on linux version some of the following packages might be necessary also: ``python3-future python-future qt5-default texlive-xetex``.
 
 * force python 2 in the cmake command line: ``cmake -DPYTHON_VERSION=2 -DCMAKE_INSTALL_PREFIX=../install ../trunk``
 
 Note that the cmake ``PYTHON_VERSION`` option can be set to force any python version, for example ``-DPYTHON_VERSION=3.5`` is valid.
+
+Also see notes about :ref:`converting python 2 scripts into python 3<convert-python2-to3>`.
 
 Speed-up compilation
 ^^^^^^^^^^^^^^^^^^^^^
