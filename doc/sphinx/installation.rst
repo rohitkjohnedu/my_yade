@@ -150,6 +150,9 @@ need root privileges.
 		
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
 
+* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``, and the package ``qt5-default`` is not required.
+
+* For building documentation (the ``make doc`` invocation explained below) additional package ``texlive-xetex`` is required. On some multi-language systems an error ``Building format(s) --all. This may take some time... fmtutil failed.`` may occur, in that case a package ``locales-all`` is required.
 
 Some of the packages (for example, cmake, eigen3) are mandatory, some of them
 are optional. Watch for notes and warnings/errors, which are shown
@@ -224,6 +227,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* ENABLE_CGAL: enable CGAL option (ON by default)
 	* ENABLE_VTK: enable VTK-export option (ON by default)
 	* ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
+	* ENABLE_MPI: Enable MPI enviroment and communication, required for Yade-OpenFOAM coupling (OFF by default)
 	* ENABLE_GTS: enable GTS-option (ON by default)
 	* ENABLE_GL2PS: enable GL2PS-option (ON by default)
 	* ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
@@ -237,7 +241,6 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
 	* ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
 	* ENABLE_OAR: generate a script for oar-based task scheduler (OFF by default)
-	* ENABLE_MPI: Enable MPI enviroment and communication, required for Yade-OpenFOAM coupling (OFF by default)
 	* runtimePREFIX: used for packaging, when install directory is not the same as runtime directory (/usr/local by default)
 	* CHUNKSIZE: specifiy the chunk size if you want several sources to be compiled at once. Increases compilation speed but RAM-consumption during compilation as well (1 by default)
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
