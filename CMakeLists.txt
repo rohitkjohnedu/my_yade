@@ -10,6 +10,7 @@
 #  ENABLE_CGAL: enable CGAL option (ON by default)
 #  ENABLE_VTK: enable VTK-export option (ON by default)
 #  ENABLE_OPENMP: enable OpenMP-parallelizing option (ON by default)
+#  ENABLE_MPI : Enable MPI communications in Yade. Used for Yade-OpenFOAM coupling.
 #  ENABLE_GTS: enable GTS-option (ON by default)
 #  ENABLE_GL2PS: enable GL2PS-option (ON by default)
 #  ENABLE_LINSOLV: enable LINSOLV-option (ON by default)
@@ -43,6 +44,7 @@ SET(DISABLED_FEATS "")
 
 OPTION(ENABLE_VTK "Enable VTK" ${DEFAULT})
 OPTION(ENABLE_OPENMP "Enable OpenMP" ${DEFAULT})
+OPTION(ENABLE_MPI "Enable MPI environement and communications, required for coupling Yade with OpenFOAM  " OFF)
 OPTION(ENABLE_GTS "Enable GTS" ${DEFAULT})
 OPTION(ENABLE_GUI "Enable GUI" ${DEFAULT})
 OPTION(ENABLE_CGAL "Enable CGAL" ${DEFAULT})
@@ -63,7 +65,7 @@ OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" OFF)
 #Set -DPYTHON_VERSION numeric option below:
-set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defaults to -DPYTHON_VERSION=-1 which automatically uses the last python version on the system.")
+set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defaults to -DPYTHON_VERSION=-1 which automatically uses the newest available python version on the system.")
 #===========================================================
 
 
