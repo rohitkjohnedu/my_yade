@@ -1,10 +1,10 @@
-from __future__ import print_function
 #!${pyExecutable}
 # encoding: utf-8
 #
 # vim: syntax=python
 # portions © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
+from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
 
@@ -48,7 +48,7 @@ class JobInfo(object):
 		self.threadNum=None
 		self.plotsLastUpdate,self.plotsFile=0.,yade.Omega().tmpFilename()+'.'+yade.remote.plotImgFormat
 	def saveInfo(self):
-		log=file(self.log,'a')
+		log=open(self.log,'a')
 		log.write("""
 =================== JOB SUMMARY ================
 id      : %s
@@ -78,7 +78,7 @@ finished: %s
 		for l in open(self.log,'r'):
 			if not l.startswith('XMLRPC info provider on'): continue
 			url=l[:-1].split()[4]
-			self.xmlrpcConn=xmlrpc.client.ServerProxy(url,allow_none=True)
+			self.xmlrpcConn=xmlrpc.client.ServerProxy(url,allow_none=True,encoding="UTF-8")
 			self.hasXmlrpc=True
 			return True
 		if not self.hasXmlrpc: return False # catches the case where the magic line is not in the log yet
@@ -244,7 +244,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 		if 'refresh' in headers and headers['refresh']==0: del headers['refresh']
 		for h in headers: self.send_header(h,str(headers[h]))
 		self.end_headers()
-		self.wfile.write(data)
+		self.wfile.write(data.encode('utf-8'))
 		global httpLastServe
 		httpLastServe=time.time()
 	def sendPygmentizedFile(self,f,**kw):
@@ -574,7 +574,7 @@ if not gnuplotOut:
 else:
 	print('Assembling gnuplot files…')
 	for job in jobs:
-		for l in file(job.log):
+		for l in open(job.log):
 			if l.startswith('gnuplot '):
 				job.plot=l.split()[1]
 				break
@@ -583,7 +583,7 @@ else:
 		if not 'plot' in job.__dict__:
 			print("WARN: No plot found for job "+job.id)
 			continue
-		for l in file(job.plot):
+		for l in open(job.plot):
 			if l.startswith('plot'):
 				# attempt to parse the plot line
 				ll=l.split(' ',1)[1][:-1] # rest of the line, without newline
@@ -595,7 +595,7 @@ else:
 				break
 			if not plots: # first plot, copy all preceding lines
 				preamble+=l
-	gp=file(gnuplotOut,'w')
+	gp=open(gnuplotOut,'w')
 	gp.write(preamble)
 	gp.write('plot '+','.join(plots))
 	print("gnuplot",gnuplotOut)

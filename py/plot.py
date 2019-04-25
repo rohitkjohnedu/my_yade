@@ -642,18 +642,25 @@ def saveDataTxt(fileName,vars=None, headers=None):
 	import bz2,gzip
 	if not vars:
 		vars=list(data.keys()); vars.sort()
+	write_bytemode=False
 	if fileName.endswith('.bz2'): f=bz2.BZ2File(fileName,'w')
-	elif fileName.endswith('.gz'): f=gzip.GzipFile(fileName,'w')
+	elif fileName.endswith('.gz'): f=gzip.GzipFile(fileName,'w') ; write_bytemode=True
 	else: f=open(fileName,'w')
 	
 	if headers:
 		k = list(headers.keys());
 		for i in range(len(k)):
-			f.write(("# "+k[i]+"=\t"+str(headers[k[i]])+"\n").encode("ascii"));
+			out=("# "+k[i]+"=\t"+str(headers[k[i]])+"\n")
+			if(write_bytemode): out=out.encode("utf-8")
+			f.write(out)
 	
-	f.write(("# "+"\t\t".join(vars)+"\n").encode("ascii"))
+	out=str("# "+"\t\t".join(vars)+"\n")
+	if(write_bytemode): out=out.encode("utf-8")
+	f.write(out)
 	for i in range(len(data[vars[0]])):
-		f.write(("\t".join([str(data[var][i]) for var in vars])+"\n").encode("ascii"))
+		out="\t".join([str(data[var][i]) for var in vars])+"\n"
+		if(write_bytemode): out=out.encode("utf-8")
+		f.write(out)
 	f.close()
 
 
