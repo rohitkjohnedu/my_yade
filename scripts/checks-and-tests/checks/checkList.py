@@ -9,7 +9,7 @@ resultStatus = 0
 nFailed=0
 failedScripts=list()
 
-skipScripts = ['checkList.py','checkPolyhedraCrush.py']
+skipScripts = ['checkList.py','checkPolyhedraCrush.py','checkDEM-PFVPressureInjection.py']
 
 for script in scriptsToRun:
 	if (script[len(script)-3:]==".py" and script not in skipScripts):
