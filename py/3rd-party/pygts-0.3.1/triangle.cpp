@@ -38,6 +38,10 @@
   #define SELF_CHECK
 #endif
 
+// https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
+// https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 /*-------------------------------------------------------------------------*/
 /* Methods exported to python */
@@ -1066,3 +1070,6 @@ gboolean pygts_gts_triangle_is_ok (GtsTriangle * t)
   g_return_val_if_fail (!gts_triangle_is_duplicate (t), FALSE);
   return TRUE;
 }
+
+#pragma GCC diagnostic pop
+

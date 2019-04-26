@@ -37,6 +37,10 @@
   #define SELF_CHECK
 #endif
 
+// https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
+// https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 /*-------------------------------------------------------------------------*/
 /* Methods exported to python */
@@ -2248,3 +2252,6 @@ pygts_surface_new(GtsSurface *s) {
   pygts_object_register(surface);
   return PYGTS_SURFACE(surface);
 }
+
+#pragma GCC diagnostic pop
+

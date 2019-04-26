@@ -45,10 +45,13 @@
 #include <glib.h>
 #include <gts.h>
 
-// we never actually pop this again, but that is fine
-// important is that warnings are gone
+// https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
+// https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// Code that generates this warning, Note: we cannot do this trick in yade. If we have a warning in yade, we have to fix it! See also https://gitlab.com/yade-dev/trunk/merge_requests/73
+// This method will work once g++ bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431#c34 is fixed.
 
 #include "object.h"
 #include "point.h"
@@ -60,6 +63,8 @@
 #include "surface.h"
 
 #include "cleanup.h"
+
+#pragma GCC diagnostic pop
 
 // used in several cpp files without having any good header for it
 // defined in pygts.cpp

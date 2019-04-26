@@ -38,6 +38,10 @@
   #define SELF_CHECK
 #endif
 
+// https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
+// https://gcc.gnu.org/onlinedocs/gcc/Diagnostic-Pragmas.html
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 /*-------------------------------------------------------------------------*/
 /* Methods exported to python */
@@ -1244,3 +1248,6 @@ pygts_point_compare(GtsPoint* p1,GtsPoint* p2)
   if(r1<r2) return -1;
   return 1;
 }
+
+#pragma GCC diagnostic pop
+
