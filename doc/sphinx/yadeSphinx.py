@@ -180,7 +180,7 @@ def inheritanceDiagram(klass,willBeLater):
     if(extraPdfCaption[1] >= 2):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
     if(writer=='html'): extraPdfCaption[0] = ""
 
-    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+('\t\tsize="'+str(pageWidth-2*fixPdfMargin)+',999!";\n' if writer!='html' else "")+mkNode(klass)
+    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass+("\n\t\tdpi=400;" if writer=='latex' else "")+"\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+('\t\tsize="'+str(pageWidth-2*fixPdfMargin)+',999!";\n' if writer!='html' else "")+mkNode(klass)
     return head+ret+'\t}\n\n'
 
 
@@ -237,10 +237,10 @@ def makeBaseClassesClickable(f,writer):
     changed=False
     for l in open(f,encoding="utf8"):
         if writer=='html':
-            if not '(</big><em>inherits ' in l:
+            if not '(</span><em>inherits ' in l:
                 out.append(l)
                 continue
-            m=re.match(r'(^.*\(</big><em>inherits )([a-zA-Z0-9_ →]*)(</em><big>\).*$)',l)
+            m=re.match(r'(^.*\(</span><em>inherits )([a-zA-Z0-9_ →]*)(</em><span class="sig-paren">\).*$)',l)
             if not m:
                 out.append(l)
                 continue
@@ -251,7 +251,7 @@ def makeBaseClassesClickable(f,writer):
             bbb=' → '.join(['<a class="reference external" href="yade.wrapper.html#yade.wrapper.%s">%s</a>'%(b,b) for b in bb])
             out.append(m.group(1)+bbb+m.group(3))
         elif writer=='latex':
-            if not (r'\pysiglinewithargsret{\sphinxstrong{class }\code{yade.wrapper.}\bfcode{' in l and r'\emph{inherits' in l):
+            if not (r'\pysiglinewithargsret{\sphinxstrong{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l):
                 out.append(l)
                 continue
             #print l
