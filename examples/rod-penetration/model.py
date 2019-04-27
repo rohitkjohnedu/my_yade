@@ -21,7 +21,7 @@ sphereRadius = 0.01
 nbSpheres = (32,11,32) 
 print("Creating %d spheres..."%(nbSpheres[0]*nbSpheres[1]*nbSpheres[2]), end=' ')
 for i in range(nbSpheres[0]):
-    for j in range(nbSpheres[1]):
+	for j in range(nbSpheres[1]):
 		for k in range(nbSpheres[2]):
 			x = (i*2 - nbSpheres[0])*sphereRadius*1.1+sphereRadius*random.uniform(-0.1,0.1)
 			y = -j*sphereRadius*2.2-0.01

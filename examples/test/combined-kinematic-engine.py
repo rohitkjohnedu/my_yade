@@ -12,7 +12,7 @@ angVel = 8000*coeff
 
 # function for changing motion, sets transEngine.translationAxis, rotEngine.angularVelocity and rotEngine.zeroPoint
 def updateKinematicEngines():
-	part = (O.iter / nIterPerOneCycle) % 4
+	part = (O.iter // nIterPerOneCycle) % 4
 	if   part == 0: # fist part
 		v = Vector3(1,0,0)
 		av = 0

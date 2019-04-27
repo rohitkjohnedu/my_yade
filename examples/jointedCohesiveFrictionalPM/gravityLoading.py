@@ -45,24 +45,24 @@ Rmean=R/numSpheres
 #### Identification of the spheres on joint (some DIY here!) -> work to do on import function textExt to directly load material properties from the ascii file
 inFile=open(packing+'_jointedPM.spheres','r')
 for line in inFile:
-    if '#' in line : continue
-    id = int(line.split()[0])
-    onJ = int(line.split()[1])
-    nj = int(line.split()[2])
-    j11 = float(line.split()[3])
-    j12 = float(line.split()[4])
-    j13 = float(line.split()[5])
-    j21 = float(line.split()[6])
-    j22 = float(line.split()[7])
-    j23 = float(line.split()[8])
-    j31 = float(line.split()[9])
-    j32 = float(line.split()[10])
-    j33 = float(line.split()[11])
-    O.bodies[id].state.onJoint=onJ
-    O.bodies[id].state.joint=nj
-    O.bodies[id].state.jointNormal1=(j11,j12,j13)
-    O.bodies[id].state.jointNormal2=(j21,j22,j23)
-    O.bodies[id].state.jointNormal3=(j31,j32,j33)
+	if '#' in line : continue
+	id = int(line.split()[0])
+	onJ = int(line.split()[1])
+	nj = int(line.split()[2])
+	j11 = float(line.split()[3])
+	j12 = float(line.split()[4])
+	j13 = float(line.split()[5])
+	j21 = float(line.split()[6])
+	j22 = float(line.split()[7])
+	j23 = float(line.split()[8])
+	j31 = float(line.split()[9])
+	j32 = float(line.split()[10])
+	j33 = float(line.split()[11])
+	O.bodies[id].state.onJoint=onJ
+	O.bodies[id].state.joint=nj
+	O.bodies[id].state.jointNormal1=(j11,j12,j13)
+	O.bodies[id].state.jointNormal2=(j21,j22,j23)
+	O.bodies[id].state.jointNormal3=(j31,j32,j33)
 inFile.close
 
 #### Boundary conditions
@@ -72,18 +72,18 @@ Ymax=0
 baseBodies=[]
 
 for o in O.bodies:
-   if isinstance(o.shape,Sphere):
-      o.shape.color=(0.9,0.8,0.6)
-      ## to fix boundary particles on ground
-      if o.state.pos[1]<(yinf+2*e) :
-         o.state.blockedDOFs+='xyz'
-         baseBodies.append(o.id)
-         o.shape.color=(1,1,1)
+	if isinstance(o.shape,Sphere):
+		o.shape.color=(0.9,0.8,0.6)
+		## to fix boundary particles on ground
+		if o.state.pos[1]<(yinf+2*e) :
+			o.state.blockedDOFs+='xyz'
+			baseBodies.append(o.id)
+			o.shape.color=(1,1,1)
 
-      ## to identify indicator on top
-      if o.state.pos[1]>(ysup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[2]>(zinf+(Z-e)/2) and o.state.pos[2]<(zsup-(Z-e)/2) : 
-         refPoint=o.id
-         p0=o.state.pos[1]
+	## to identify indicator on top
+	if o.state.pos[1]>(ysup-e) and o.state.pos[0]>(xsup-e) and o.state.pos[2]>(zinf+(Z-e)/2) and o.state.pos[2]<(zsup-(Z-e)/2) : 
+		refPoint=o.id
+		p0=o.state.pos[1]
 
 baseBodies=tuple(baseBodies)
 O.bodies[refPoint].shape.color=(1,0,0)
@@ -119,16 +119,16 @@ stableIter=2000
 stableVel=0.001
 degrade=True
 def jointStrengthDegradation():
-    global degrade
-    if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[1])<stableVel :
-	print('!joint cohesion total degradation!', ' | iteration=', O.iter)
-	degrade=False
+	global degrade
+	if degrade and O.iter>=stableIter and abs(O.bodies[refPoint].state.vel[1])<stableVel :
+		print('!joint cohesion total degradation!', ' | iteration=', O.iter)
+		degrade=False
 	for i in O.interactions:
 		if i.phys.isOnJoint : 
-		if i.phys.isCohesive:
-			i.phys.isCohesive=False
-			i.phys.FnMax=0.
-			i.phys.FsMax=0.
+			if i.phys.isCohesive:
+				i.phys.isCohesive=False
+				i.phys.FnMax=0.
+				i.phys.FsMax=0.
 
 #### YADE windows
 from yade import qt

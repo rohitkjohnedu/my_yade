@@ -75,7 +75,7 @@ vxPartPY = np.zeros(ndimz-1)	# Vertical average particle velocity profile, evalu
 
 #Initialize the fluid velocity with a simple shear profile over the granular bed
 initVxFluid = np.zeros(ndimz+1)
-initVxFluid[ndimz/2:] = np.linspace(0,ndimz-ndimz/2+1,ndimz-ndimz/2+1)*uTop/(ndimz-ndimz/2+1)
+initVxFluid[ndimz//2:] = np.linspace(0,int(ndimz-ndimz/2+1),int(ndimz-ndimz/2+1))*uTop/(ndimz-ndimz/2+1)
 
 #Geometrical configuration, define useful quantities
 height = 5*fluidHeight	#heigth of the periodic cell, in m (bigger than the fluid height to take into particles jumping above the latter)
