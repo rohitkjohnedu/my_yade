@@ -258,7 +258,11 @@ def makeBaseClassesClickable(f,writer):
             out.append(m.group(1)+bbb+m.group(3))
         elif writer=='latex':
             # this works only on devuan ascii. FIXME: need to find the fix for other versions of some library.
-            if not (r'\pysiglinewithargsret{\sphinxstrong{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l):
+            if(     (not (r'\pysiglinewithargsret{\sphinxstrong{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l)) # debian stretch, devuan ascii
+                and (not (r'\pysiglinewithargsret{\strong{class }\code{yade.wrapper.}\bfcode{' in l and r'\emph{inherits' in l)) # ubuntu xenial 16.04
+                and (not (r'\pysiglinewithargsret{\sphinxbfcode{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l)) # ubuntu bionic 18.04
+                and (not (r'\pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{class }}\sphinxcode{\sphinxupquote{yade.wrapper.}}\sphinxbfcode{\sphinxupquote{' in l and r'\emph{inherits' in l)) #  debian buster, ubuntu cosmic 18.10, ubuntu disco, debian sid
+            ):
                 out.append(l)
                 continue
             #print l
