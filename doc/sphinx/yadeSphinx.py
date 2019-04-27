@@ -180,13 +180,7 @@ def inheritanceDiagram(klass,willBeLater):
     if(extraPdfCaption[1] >= 2):  extraPdfCaption[0] = " See also: "+extraPdfCaption[0][:-1]+"."
     if(writer=='html'): extraPdfCaption[0] = ""
 
-    dpi_fix=("\n\t\tdpi=400;" if writer=='latex' else "")
-    # So on ubuntu 18.04 this dpi fix is not ony useless, it destroys the inheritance graphs
-    # But on devuan ascii it is necessary otherwise graphs are all pixelated. And I would like to have the graphs good when I am testing this locally
-    # FIXME: So we need to test the version of something, maybe dot or graphviz version?.
-    # For now I disable it so that it works correctly on gitlab-runner docker image 18.04:
-    dpi_fix=""
-    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass + dpi_fix + "\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+('\t\tsize="'+str(pageWidth-2*fixPdfMargin)+',999!";\n' if writer!='html' else "")+mkNode(klass)
+    head=".. graphviz::"+("\n\t:caption: Inheritance graph of %s"%(klass))+extraCaption[0]+extraPdfCaption[0]+"\n\n\tdigraph %s {"%klass + "\n\t\trankdir=RL;\n\t\tmargin="+("\"%0.1f,0.05\""%(0.2 if writer=='html' else fixPdfMargin))+";\n"+('\t\tsize="'+str(pageWidth-2*fixPdfMargin)+',999!";\n' if writer!='html' else "")+mkNode(klass)
     return head+ret+'\t}\n\n'
 
 
@@ -257,7 +251,6 @@ def makeBaseClassesClickable(f,writer):
             bbb=' → '.join(['<a class="reference external" href="yade.wrapper.html#yade.wrapper.%s">%s</a>'%(b,b) for b in bb])
             out.append(m.group(1)+bbb+m.group(3))
         elif writer=='latex':
-            # this works only on devuan ascii. FIXME: need to find the fix for other versions of some library.
             if(     (not (r'\pysiglinewithargsret{\sphinxstrong{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l)) # debian stretch, devuan ascii
                 and (not (r'\pysiglinewithargsret{\strong{class }\code{yade.wrapper.}\bfcode{' in l and r'\emph{inherits' in l)) # ubuntu xenial 16.04
                 and (not (r'\pysiglinewithargsret{\sphinxbfcode{class }\sphinxcode{yade.wrapper.}\sphinxbfcode{' in l and r'\emph{inherits' in l)) # ubuntu bionic 18.04
