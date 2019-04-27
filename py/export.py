@@ -820,7 +820,7 @@ class VTKExporter(object):
 		for b in bodies:
 			ff = []
 			f = b.shape.GetSurfaceTriangulation()
-			for i in range(len(f)/3):
+			for i in range(len(f)//3):
 				ff.append([f[3*i+j] for j in (0,1,2)])
 			bodyFaces.append(ff)
 		# output file
