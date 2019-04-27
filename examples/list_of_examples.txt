@@ -1,13 +1,9 @@
-# 2019-01-18
-# Status of all examples:
-#  1st column: whether they are working
-#  2nd column: whether there is a brief explanation at the top of the file what this example is demonstrating
+# Status of all examples: 2019-04-28
 # Notation: 'OK' - runs and does not produce obvious errors, 'ok' - acceptable, 'OK?' - works but looks suspicious, 'ok?' - even worse, 'x' - very bad/missing/not working
-
 # the list below was created with command: tree -P "*.py" > list_of_examples.txt ; tree -P "*.py" ../doc/sphinx/tutorial >> list_of_examples.txt
 
 works on python3 ? 
-   │ works on python2 in commit cc928934f ? 
+   │works on python2 in commit cc928934f ? 
    │   │explained inside what it is demonstrating ?
    │   │   │has video uploaded to website documentation ?
    │   │   │   │
