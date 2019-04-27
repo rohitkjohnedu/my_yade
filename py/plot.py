@@ -375,7 +375,7 @@ nan=float('nan')
 
 def createPlots(subPlots=True,scatterSize=60,wider=False):
 	global currLineRefs
-	figs=set([l.line.get_axes().get_figure() for l in currLineRefs]) # get all current figures
+	figs=set([l.line.axes.get_figure() for l in currLineRefs]) # get all current figures
 	for f in figs: pylab.close(f) # close those
 	currLineRefs=[] # remove older plots (breaks live updates of windows that are still open)
 	if len(plots)==0: return # nothing to plot
