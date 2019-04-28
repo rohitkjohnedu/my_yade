@@ -191,7 +191,7 @@ namespace py = boost::python;
 
 #if defined(LINSOLV) || defined(YADE_POTENTIAL_PARTICLES) || defined(YADE_POTENTIAL_BLOCKS) || defined(FLOW_ENGINE)
 // 15. openblas
-	#include <openblas_config.h>
+	#include <openblas/openblas_config.h>
 	py::list openblasVer() {
 		py::list ret;
 		ret.append( py::make_tuple(                  SUITESPARSE_MAIN_VERSION   ,                                   SUITESPARSE_SUB_VERSION   ,                                   SUITESPARSE_SUBSUB_VERSION));
@@ -230,6 +230,8 @@ namespace py = boost::python;
 
 py::dict allVersionsCpp(){
 	py::dict ret;
+	// I found relevant names with commad:
+	// dpkg -L libName-dev |  xargs -I'{}' -P 1 cat {} | grep -i -E "defi.*versio.*"
 	ret["gcc"          ] = gccVer();
 	ret["clang"        ] = clangVer();
 	ret["boost"        ] = boostVer();
