@@ -4,7 +4,15 @@
 import unittest,inspect,sys
 
 # add any new test suites to the list here, so that they are picked up by testAll
-allTests=['wrapper','core','pbc','clump','cohesive-chain','engines']
+allTests=[
+	  'wrapper'
+	, 'core'
+	, 'pbc'
+	, 'clump'
+	, 'cohesive-chain'
+	, 'engines'
+	, 'utilsModule'
+]
 
 # all yade modules (ugly...)
 import yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet
@@ -35,6 +43,4 @@ def testAll():
 	for mod in allModules:
 		suite.addTest(doctest.DocTestSuite(mod))
 	return unittest.TextTestRunner(stream=sys.stdout,verbosity=2).run(suite)
-
-	
 
