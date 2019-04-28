@@ -132,6 +132,32 @@ namespace py = boost::python;
 	py::list mpiVer() { return {}; }
 #endif
 
+// 7. matplotlib (I don't think this could be detected from inside C++)
+
+// 8. eigen
+
+	#include <Eigen/Core>
+	py::list eigenVer() {
+		py::list ret;
+		ret.append( py::make_tuple(                  EIGEN_WORLD_VERSION ,                                     EIGEN_MAJOR_VERSION ,                                     EIGEN_MINOR_VERSION));
+		ret.append( boost::lexical_cast<std::string>(EIGEN_WORLD_VERSION)+"."+boost::lexical_cast<std::string>(EIGEN_MAJOR_VERSION)+"."+boost::lexical_cast<std::string>(EIGEN_MINOR_VERSION));
+		return ret;
+	}
+
+// 9. gdb (I don't think this could be detected from inside C++)
+
+// 10. sqlite3
+	#include <sqlite3.h>
+	py::list sqliteVer() {
+		py::list ret;
+		ret.append( py::make_tuple( SQLITE_VERSION_NUMBER / 1000000 , SQLITE_VERSION_NUMBER / 1000 % 1000 , SQLITE_VERSION_NUMBER % 1000 ));
+		ret.append( boost::lexical_cast<std::string>(SQLITE_VERSION));
+		return ret;
+	}
+
+// 11. Loki - very strange, but this library has no version inside header files. This doesn't mattery anyway - latest version is from year 2011.
+
+
 #ifdef YADE_OPENMP
 // https://www.openmp.org/specifications/
 // lib/base/openmp-accu.hpp
@@ -139,6 +165,7 @@ namespace py = boost::python;
 // Hmm, it seems that OpenMP version is connected with g++ version. So knowing compiler version is probably enough.
 #endif
 
+// 12. VTK
 #ifdef YADE_VTK
 	#include <vtkVersion.h>
 	py::list vtkVer() {
@@ -151,6 +178,7 @@ namespace py = boost::python;
         py::list vtkVer() { return {}; }
 #endif
 
+// 13. CGAL
 #ifdef YADE_CGAL
 	#include <CGAL/version_macros.h>
 	py::list cgalVer() {
@@ -163,19 +191,35 @@ namespace py = boost::python;
 	py::list cgalVer() { return {}; }
 #endif
 
+// 14. SuiteSparse
+#ifdef LINSOLV
+	#include <SuiteSparse_config.h>
+	py::list suitesparseVer() {
+		py::list ret;
+		ret.append( py::make_tuple(                  SUITESPARSE_MAIN_VERSION   ,                                   SUITESPARSE_SUB_VERSION   ,                                   SUITESPARSE_SUBSUB_VERSION));
+		ret.append( boost::lexical_cast<std::string>(SUITESPARSE_MAIN_VERSION)+"."+boost::lexical_cast<std::string>(SUITESPARSE_SUB_VERSION)+"."+boost::lexical_cast<std::string>(SUITESPARSE_SUBSUB_VERSION));
+		return ret;
+	}
+#else
+	py::list suitesparseVer() { return {}; }
+#endif
+
 py::dict allVersionsCpp(){
 	py::dict ret;
-	ret["gcc"      ] = gccVer();
-	ret["clang"    ] = clangVer();
-	ret["boost"    ] = boostVer();
-	ret["qt"       ] = qtVer();
-	ret["freeglut" ] = freeglutVer();
-	ret["gl"       ] = glVer();
-	ret["qglviewer"] = qglviewerVer();
-	ret["python   "] = pythonVer();
-	ret["mpi"      ] = mpiVer();
-	ret["vtk"      ] = vtkVer();
-	ret["cgal"     ] = cgalVer();
+	ret["gcc"          ] = gccVer();
+	ret["clang"        ] = clangVer();
+	ret["boost"        ] = boostVer();
+	ret["qt"           ] = qtVer();
+	ret["freeglut"     ] = freeglutVer();
+	ret["gl"           ] = glVer();
+	ret["qglviewer"    ] = qglviewerVer();
+	ret["python"       ] = pythonVer();
+	ret["eigen"        ] = eigenVer();
+	ret["sqlite"       ] = sqliteVer();
+	ret["mpi"          ] = mpiVer();
+	ret["vtk"          ] = vtkVer();
+	ret["cgal"         ] = cgalVer();
+	ret["suitesparse"  ] = suitesparseVer();
 	return ret;
 }
 
