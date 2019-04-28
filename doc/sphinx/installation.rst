@@ -313,11 +313,19 @@ Python 2 backward compatibility
 
 Python 2 support ends at the beginning of 2020. However, Yade can be compiled and used with python 2:
 
-* On **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives: install the python 2 version of the packages: ``sudo apt install python-dev ipython python-matplotlib python-numpy python-tk python-pygraphviz python-numpy python-xlib python-pyqt5 python-pyqt5.qtwebkit python-argparse python-pyqt5.qtsvg python-pil python-sphinx python-git python-bibtexparser python-minieigen``.
+* On **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives install the python 2 version of the packages (and other required packages)::
 
-* For **Ubuntu 16.04** ``python-pil`` is to be replaced by ``python-imaging``.
+		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot \
+		dpkg-dev build-essential g++ python-dev ipython python-matplotlib \
+		libsqlite3-dev python-numpy python-tk gnuplot libgts-dev python-pygraphviz \
+		libvtk6-dev python-numpy libeigen3-dev python-xlib python-pyqt5 pyqt5-dev-tools \
+		python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
+		libqglviewer-dev-qt5 python-pil libjs-jquery python-sphinx python-git python-bibtex \
+		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen \
+		libopenblas-dev libsuitesparse-dev libmetis-dev libopenmpi-dev openmpi-bin \
+		openmpi-common python-bibtexparser python3-future python-future python-gts
 
-* depending on linux version some of the following packages might be necessary also: ``python3-future python-future qt5-default texlive-xetex``.
+* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``.
 
 * force python 2 in the cmake command line: ``cmake -DPYTHON_VERSION=2 -DCMAKE_INSTALL_PREFIX=../install ../trunk``
 
