@@ -13,11 +13,13 @@ allTests=[
 	, 'cohesive-chain'
 	, 'engines'
 	, 'utilsModule'
+	, 'libVersions'
 ]
 
-# all yade modules (ugly...)
-import yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet
-allModules=(yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet)
+# add any new yade module (ugly...)
+import yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet,yade.libVersions
+allModules=(yade.export,yade.linterpolation,yade.pack,yade.plot,yade.post2d,yade.timing,yade.utils,yade.ymport,yade.geom,yade.gridpfacet,yade.libVersions)
+
 try:
 	import yade.qt
 	allModules+=(yade.qt,)
