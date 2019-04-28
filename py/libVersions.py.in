@@ -45,7 +45,7 @@ def allVersionsCmake():
 	addVer("python",'${PYTHON_VERSION_MAJOR}','${PYTHON_VERSION_MINOR}','${PYTHON_VERSION_PATCH}','${PYTHON_VERSION_STRING}')
 	# 7. matplotlib - I don't know how to detect it
 	# 8. eigen
-	addVer("eigen" ,'${Eigen3_FIND_VERSION_MAJOR}','${Eigen3_FIND_VERSION_MINOR}','${Eigen3_FIND_VERSION_PATCH}','${Eigen3_FIND_VERSION}')
+	addVer("eigen" ,'${EIGEN3_WORLD_VERSION}','${EIGEN3_MAJOR_VERSION}','${EIGEN3_MINOR_VERSION}','${EIGEN3_VERSION}')
 	# 9. gdb        - I don't know how to detect it
 	# 10. sqlite3   - I don't know how to detect it
 	# 11. loki      - I don't know how to detect it
@@ -57,8 +57,8 @@ def allVersionsCmake():
 	addVer("suitesparse",'${SUITESPARSE_MAIN_VERSION}','${SUITESPARSE_SUB_VERSION}','${SUITESPARSE_SUBSUB_VERSION}','${SUITESPARSE_VERSION}')
 	# 15. openblas  - I don't know how to detect it
 	# 16. metis     - I don't know how to detect it
-	# 17. mpi
-	addVer("mpi"   ,'${MPI_CXX_VERSION_MAJOR}','${OMPI_CXX_VERSION_MINOR}','${MPI_VERSION}', '${OMPI_VERSION}')
+	# 17. mpi       - This one is based on https://cmake.org/cmake/help/v3.10/module/FindMPI.html
+	addVer("mpi"   ,'${MPI_CXX_VERSION_MAJOR}','${MPI_CXX_VERSION_MINOR}','0', '${MPI_CXX_VERSION}')
 	return ret
 
 def printAllVersions(rstFormat=False):
