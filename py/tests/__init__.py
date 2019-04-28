@@ -5,7 +5,8 @@ import unittest,inspect,sys
 
 # add any new test suites to the list here, so that they are picked up by testAll
 allTests=[
-	  'wrapper'
+	  'dummyTest'
+	, 'wrapper'
 	, 'core'
 	, 'pbc'
 	, 'clump'
@@ -35,6 +36,11 @@ def testModule(module):
 	suite=unittest.defaultTestLoader.loadTestsFromName(module)
 	return unittest.TextTestRunner(stream=sys.stdout,verbosity=2).run(suite)
 
+# https://docs.python.org/3/library/unittest.html
+# https://stackoverflow.com/questions/10099491/how-does-pythons-unittest-module-detect-test-cases
+# In short: to add a TestCase a class must be written inside python module, like this:
+# class TestSomeYadeModule(unittest.TestCase):
+#	……
 def testAll():
 	"""Run all tests defined in all yade.tests.* modules and return
 	TestResult object for further examination."""
