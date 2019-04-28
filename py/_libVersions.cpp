@@ -65,7 +65,10 @@ namespace py = boost::python;
 	#include <QtGlobal>
 	py::list qtVer() {
 		py::list ret;
-		ret.append( py::make_tuple( QT_VERSION_MAJOR , QT_VERSION_MINOR , QT_VERSION_PATCH ));
+		// these were introduced in qt5
+		//ret.append( py::make_tuple( QT_VERSION_MAJOR , QT_VERSION_MINOR , QT_VERSION_PATCH ));
+		// so I have to use the old version macro.
+		ret.append( py::make_tuple( QT_VERSION / 65536 , QT_VERSION / 256 % 256 , QT_VERSION % 256 ));
 		ret.append( QT_VERSION_STR );
 		return ret;
 	}
@@ -110,7 +113,7 @@ namespace py = boost::python;
 	py::list pythonVer() {
 		py::list ret;
 		ret.append( py::make_tuple(                  PY_MAJOR_VERSION   ,                                   PY_MINOR_VERSION   ,                                   PY_MICRO_VERSION ));
-		ret.append( boost::lexical_cast<std::string>(PY_MICRO_VERSION)+"."+boost::lexical_cast<std::string>(PY_MINOR_VERSION)+"."+boost::lexical_cast<std::string>(PY_MICRO_VERSION ));
+		ret.append( boost::lexical_cast<std::string>(PY_MAJOR_VERSION)+"."+boost::lexical_cast<std::string>(PY_MINOR_VERSION)+"."+boost::lexical_cast<std::string>(PY_MICRO_VERSION ));
 		return ret;
 	}
 
