@@ -58,6 +58,62 @@ namespace py = boost::python;
 		return ret;
 	}
 
+// 3. qt
+// https://doc.qt.io/qt-5/qtglobal.html#QT_VERSION_STR
+// https://doc.qt.io/archives/qt-4.8/qtglobal.html#QT_VERSION_STR
+#if defined(YADE_QT4) || defined(YADE_QT5)
+	#include <QtGlobal>
+	py::list qtVer() {
+		py::list ret;
+		ret.append( py::make_tuple( QT_VERSION_MAJOR , QT_VERSION_MINOR , QT_VERSION_PATCH ));
+		ret.append( QT_VERSION_STR );
+		return ret;
+	}
+#else
+	py::list qtVer() { return {}; }
+#endif
+
+// 4. freeglut
+#ifdef YADE_OPENGL
+	// NOTE: maybe we should someday switch from freeglut3-dev to libglfw3-dev, https://www.glfw.org/
+	#include <GL/freeglut.h> // debian package 2.8.1-3
+	py::list freeglutVer() {
+		py::list ret;
+		// I couldn't find anything that would return the actual debian package version. So this returns 13.4.1, which is weird.
+		ret.append( py::make_tuple(                  GLUT_XLIB_IMPLEMENTATION   ,                                   GLUT_API_VERSION   ,                                   FREEGLUT));
+		ret.append( boost::lexical_cast<std::string>(GLUT_XLIB_IMPLEMENTATION)+"."+boost::lexical_cast<std::string>(GLUT_API_VERSION)+"."+boost::lexical_cast<std::string>(FREEGLUT));
+		return ret;
+	}
+	#include <GL/glext.h>    // debian package 13.0.6
+	py::list glVer() {
+		py::list ret;
+		// I couldn't find anything that would return the actual debian package version. So this returns 2016.07.14, which is weird.
+		ret.append( py::make_tuple( GL_GLEXT_VERSION / 10000 , GL_GLEXT_VERSION / 100 % 100 , GL_GLEXT_VERSION % 100 ));
+		ret.append( boost::lexical_cast<std::string>(GL_GLEXT_VERSION));
+		return ret;
+	}
+// 5. qglviewer
+	#include <QGLViewer/config.h>
+	py::list qglviewerVer() {
+		py::list ret;
+		ret.append( py::make_tuple(                  QGLVIEWER_VERSION / 65536   ,                                   QGLVIEWER_VERSION / 256 % 256   ,                                   QGLVIEWER_VERSION % 256 ));
+		ret.append( boost::lexical_cast<std::string>(QGLVIEWER_VERSION / 65536)+"."+boost::lexical_cast<std::string>(QGLVIEWER_VERSION / 256 % 256)+"."+boost::lexical_cast<std::string>(QGLVIEWER_VERSION % 256 ));
+		return ret;
+	}
+#else
+	py::list freeglutVer() { return {}; }
+	py::list glVer() { return {}; }
+	py::list qglviewerVer() { return {}; }
+#endif
+
+// 6. python
+	py::list pythonVer() {
+		py::list ret;
+		ret.append( py::make_tuple(                  PY_MAJOR_VERSION   ,                                   PY_MINOR_VERSION   ,                                   PY_MICRO_VERSION ));
+		ret.append( boost::lexical_cast<std::string>(PY_MICRO_VERSION)+"."+boost::lexical_cast<std::string>(PY_MINOR_VERSION)+"."+boost::lexical_cast<std::string>(PY_MICRO_VERSION ));
+		return ret;
+	}
+
 #ifdef YADE_MPI
 	#include <mpi.h>
 // https://www.open-mpi.org/software/ompi/versions/
@@ -106,12 +162,17 @@ namespace py = boost::python;
 
 py::dict allVersionsCpp(){
 	py::dict ret;
-	ret["gcc"   ] = gccVer();
-	ret["clang" ] = clangVer();
-	ret["boost" ] = boostVer();
-	ret["mpi"   ] = mpiVer();
-	ret["vtk"   ] = vtkVer();
-	ret["cgal"  ] = cgalVer();
+	ret["gcc"      ] = gccVer();
+	ret["clang"    ] = clangVer();
+	ret["boost"    ] = boostVer();
+	ret["qt"       ] = qtVer();
+	ret["freeglut" ] = freeglutVer();
+	ret["gl"       ] = glVer();
+	ret["qglviewer"] = qglviewerVer();
+	ret["python   "] = pythonVer();
+	ret["mpi"      ] = mpiVer();
+	ret["vtk"      ] = vtkVer();
+	ret["cgal"     ] = cgalVer();
 	return ret;
 }
 
