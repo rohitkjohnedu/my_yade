@@ -117,21 +117,6 @@ namespace py = boost::python;
 		return ret;
 	}
 
-#ifdef YADE_MPI
-	#include <mpi.h>
-// https://www.open-mpi.org/software/ompi/versions/
-	py::list mpiVer() {
-		py::list ret;
-		ret.append( py::make_tuple                  (OMPI_MAJOR_VERSION   ,                                   OMPI_MINOR_VERSION  ,                                    OMPI_RELEASE_VERSION ));
-// I didn't find a way to obtain a version string for mpi, so I construct my own. But if there is some MPI version string, better put it here.
-//		ret.append( boost::lexical_cast<std::string>(OMPI_VERSION) );
-		ret.append( boost::lexical_cast<std::string>(OMPI_MAJOR_VERSION)+"."+boost::lexical_cast<std::string>(OMPI_MINOR_VERSION)+"."+boost::lexical_cast<std::string>(OMPI_RELEASE_VERSION) );
-		return ret;
-	}
-#else
-	py::list mpiVer() { return {}; }
-#endif
-
 // 7. matplotlib (I don't think this could be detected from inside C++)
 
 // 8. eigen
@@ -204,6 +189,45 @@ namespace py = boost::python;
 	py::list suitesparseVer() { return {}; }
 #endif
 
+#if defined(LINSOLV) || defined(YADE_POTENTIAL_PARTICLES) || defined(YADE_POTENTIAL_BLOCKS) || defined(FLOW_ENGINE)
+// 15. openblas
+	#include <openblas_config.h>
+	py::list openblasVer() {
+		py::list ret;
+		ret.append( py::make_tuple(                  SUITESPARSE_MAIN_VERSION   ,                                   SUITESPARSE_SUB_VERSION   ,                                   SUITESPARSE_SUBSUB_VERSION));
+		ret.append( boost::lexical_cast<std::string>(SUITESPARSE_MAIN_VERSION)+"."+boost::lexical_cast<std::string>(SUITESPARSE_SUB_VERSION)+"."+boost::lexical_cast<std::string>(SUITESPARSE_SUBSUB_VERSION));
+		return ret;
+	}
+// 16. metis
+	#include <metis.h>
+	py::list metisVer() {
+		py::list ret;
+		ret.append( py::make_tuple(                  METIS_VER_MAJOR   ,                                   METIS_VER_MINOR   ,                                   METIS_VER_SUBMINOR));
+		ret.append( boost::lexical_cast<std::string>(METIS_VER_MAJOR)+"."+boost::lexical_cast<std::string>(METIS_VER_MINOR)+"."+boost::lexical_cast<std::string>(METIS_VER_SUBMINOR));
+		return ret;
+	}
+#else
+	py::list openblasVer() { return {}; }
+	py::list metisVer() { return {}; }
+#endif
+
+
+// 17. mpi
+#ifdef YADE_MPI
+	#include <mpi.h>
+// https://www.open-mpi.org/software/ompi/versions/
+	py::list mpiVer() {
+		py::list ret;
+		ret.append( py::make_tuple                  (OMPI_MAJOR_VERSION   ,                                   OMPI_MINOR_VERSION  ,                                    OMPI_RELEASE_VERSION ));
+// I didn't find a way to obtain a version string for mpi, so I construct my own. But if there is some MPI version string, better put it here.
+//		ret.append( boost::lexical_cast<std::string>(OMPI_VERSION) );
+		ret.append( boost::lexical_cast<std::string>(OMPI_MAJOR_VERSION)+"."+boost::lexical_cast<std::string>(OMPI_MINOR_VERSION)+"."+boost::lexical_cast<std::string>(OMPI_RELEASE_VERSION) );
+		return ret;
+	}
+#else
+	py::list mpiVer() { return {}; }
+#endif
+
 py::dict allVersionsCpp(){
 	py::dict ret;
 	ret["gcc"          ] = gccVer();
@@ -216,10 +240,12 @@ py::dict allVersionsCpp(){
 	ret["python"       ] = pythonVer();
 	ret["eigen"        ] = eigenVer();
 	ret["sqlite"       ] = sqliteVer();
-	ret["mpi"          ] = mpiVer();
 	ret["vtk"          ] = vtkVer();
 	ret["cgal"         ] = cgalVer();
 	ret["suitesparse"  ] = suitesparseVer();
+	ret["openblas"     ] = openblasVer();
+	ret["metis"        ] = metisVer();
+	ret["mpi"          ] = mpiVer();
 	return ret;
 }
 
