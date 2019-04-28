@@ -74,8 +74,10 @@ namespace py = boost::python;
 #endif
 
 #ifdef YADE_OPENMP
+// https://www.openmp.org/specifications/
 // lib/base/openmp-accu.hpp
-// FIXME - add it to doc/sphinx/installation.rst
+// it is not in doc/sphinx/installation.rst
+// Hmm, it seems that OpenMP version is connected with g++ version. So knowing compiler version is probably enough.
 #endif
 
 #ifdef YADE_VTK

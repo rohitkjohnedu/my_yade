@@ -32,7 +32,7 @@ def printAllVersions(rstFormat=False):
 	"""
 	This function prints a nicely formatted table with library versions.
 
-	:param bool rstFormat: whether to print table using the reStructuredText formatting. Defaults to `False` and prints using `Gitlab markdown rules <https://gitlab.com/help/user/markdown>`_ so that it is easy to paste into gitlab discussions.
+	:param bool rstFormat: whether to print table using the reStructuredText formatting. Defaults to ``False`` and prints using `Gitlab markdown rules <https://gitlab.com/help/user/markdown>`_ so that it is easy to paste into gitlab discussions.
 
 	As an example the table below actually reflects with what libraries this documentation was compiled:
 
