@@ -157,7 +157,7 @@ OK │OK │OK │YES│   └── hourglass.py                       https:
 OK │OK │ok │no │   ├── gravityBis.py
 x  │x  │x  │x  │   ├── gravityLoading.py                  No such file or directory: 'parallellepiped_10_persistentPlane30Deg.spheres'
 x  │x  │x  │x  │   ├── identificationSpheresOnJoint.py    No such file or directory: 'parallellepiped_10.spheres'
-?  │x  │x  │x  │   ├── packInGtsSurface.py                spams messages: UnbalancedForce=-nan, rel stress nan
+x  │x  │x  │x  │   ├── packInGtsSurface.py                spams messages: UnbalancedForce=-nan, rel stress nan, does not finish running after 20 hours.
 OK │OK │ok │no │   └── testingJoint.py
    │   │   │   ├── not-working
 x  │x  │x  │x  │   ├── Se3Interpolator.py                 NameError: name 'Se3Interpolator' is not defined
