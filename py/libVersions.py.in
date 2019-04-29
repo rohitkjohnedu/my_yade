@@ -109,9 +109,9 @@ def printAllVersions(rstFormat=False):
 
 	.. ipython::
 	
-	   In [1]: from yade.libVersions import *
-
 	   In [1]: printAllVersions()
+
+	.. note:: For convenience at startup ``from yade.libVersions import printAllVersions`` is executed, so that this function is readily accessible.
 
 	"""
 

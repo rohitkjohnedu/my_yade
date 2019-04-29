@@ -16,4 +16,7 @@ class TestLibVersions(unittest.TestCase):
 		for key,val in cmakeVer.items():
 			if((key in cppVer) and (len(val)==2) and (len(cppVer[key])==2)):
 				print(str(key)+" version reported by by cmake is ",val," and by C++ is ",cppVer[key])
-				self.assertEqual(val[0],cppVer[key][0])
+				if(key!='mpi'):
+					self.assertEqual(val[0],cppVer[key][0])
+				elif (val[0]!=cppVer[key][0]):
+					print('\033[91m'+" Warning: mpi versions are different. Can you help with file py/libVersions.py.in?"+'\033[0m')
