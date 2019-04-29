@@ -643,7 +643,7 @@ def saveDataTxt(fileName,vars=None, headers=None):
 	if not vars:
 		vars=list(data.keys()); vars.sort()
 	write_bytemode=False
-	if fileName.endswith('.bz2'): f=bz2.BZ2File(fileName,'w')
+	if fileName.endswith('.bz2'): f=bz2.BZ2File(fileName,'w') ; write_bytemode=True
 	elif fileName.endswith('.gz'): f=gzip.GzipFile(fileName,'w') ; write_bytemode=True
 	else: f=open(fileName,'w')
 	
@@ -672,7 +672,7 @@ def savePylab(baseName,timestamp=False,title=None):
 	baseNameNoPath=baseName.split('/')[-1]
 	saveDataTxt(fileName=baseName+'.data.bz2')
 	if len(plots)==0: raise RuntimeError("No plots to save, only data saved.")
-	py=file(baseName+'.py','w')
+	py=open(baseName+'.py','w')
 	py.write('#!/usr/bin/env python\n# encoding: utf-8\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\nimport pylab, numpy\n')
 	py.write("data=numpy.genfromtxt('%s.data.bz2',dtype=None,names=True)\n"%baseName)
 	subCols=int(round(math.sqrt(len(plots)))); subRows=int(math.ceil(len(plots)*1./subCols))
@@ -703,7 +703,7 @@ def saveGnuplot(baseName,term='wxt',extension=None,timestamp=False,comment=None,
 	baseNameNoPath=baseName.split('/')[-1]
 	vars=list(data.keys()); vars.sort()
 	saveDataTxt(fileName=baseName+'.data.bz2',vars=vars)
-	fPlot=file(baseName+".gnuplot",'w')
+	fPlot=open(baseName+".gnuplot",'w')
 	fPlot.write('#!/usr/bin/env gnuplot\n#\n# created '+time.asctime()+' ('+time.strftime('%Y%m%d_%H:%M')+')\n#\n')
 	if comment: fPlot.write('# '+comment.replace('\n','\n# ')+'#\n')
 	dataFile='"< bzcat %s.data.bz2"'%(baseNameNoPath)

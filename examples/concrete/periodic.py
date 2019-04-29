@@ -65,16 +65,16 @@ packingFile='periCube.pickle'
 # got periodic packing? Memoization not (yet) supported, so just generate it if there is not the right file
 # Save and reuse next time.
 if not os.path.exists(packingFile):
-	sp=pack.randomPeriPack(radius=.05e-3,rRelFuzz=0.,initSize=Vector3(1.5e-3,1.5e-3,1.5e-3))
+	sp=pack.randomPeriPack(radius=.1e-3,rRelFuzz=0.,initSize=Vector3(1.5e-3,1.5e-3,1.5e-3))
 	dd=dict(cell=(sp.cellSize[0],sp.cellSize[1],sp.cellSize[2]),spheres=sp.toList())
 	import pickle as pickle
-	pickle.dump(dd,open(packingFile,'w'))
+	pickle.dump(dd,open(packingFile,'wb'))
 #
 # load the packing (again);
 #
 import pickle as pickle
 concreteId=O.materials.append(CpmMat(young=young, frictionAngle=frictionAngle, density=4800, sigmaT=sigmaT, relDuctility=relDuctility, epsCrackOnset=epsCrackOnset, poisson=poisson, isoPrestress=isoPrestress))
-sphDict=pickle.load(open(packingFile))
+sphDict=pickle.load(open(packingFile,'rb'))
 from yade import pack
 sp=pack.SpherePack()
 sp.fromList(sphDict['spheres'])
@@ -112,7 +112,7 @@ O.engines=[
 #O.miscParams=[Gl1_CpmPhys(dmgLabel=False,colorStrain=False,epsNLabel=False,epsT=False,epsTAxes=False,normal=False,contactLine=True)]
 
 # plot stresses in ¼, ½ and ¾ if desired as well; too crowded in the graph that includes confinement, though
-plot.plots={'eps':('sigma','sig1','sig2','|||','eps','eps1','eps2'),'eps_':('sigma','|||','relResid',),} #'sigma.25','sigma.50','sigma.75')}
+plot.plots={'eps':('sigma','sig1','sig2',None,'eps','eps1','eps2'),'eps_':('sigma',None,'relResid',),} #'sigma.25','sigma.50','sigma.75')}
 plot.maxDataLen=4000
 
 O.saveTmp('initial');
@@ -152,13 +152,13 @@ def initTest():
 	# now reset the interaction radius and go ahead
 	ss2d3dg.interactionDetectionFactor=-1.
 	is2aabb.aabbEnlargeFactor=-1.
-	O.run()
+	O.run(wait=True)
 
 def stopIfDamaged():
 	global mode
 	if O.iter<2 or 'sigma' not in plot.data: return # do nothing at the very beginning
 	sigma,eps=plot.data['sigma'],plot.data['eps']
-	extremum=max(sigma) if (strainer.maxStrainRate>0) else min(sigma)
+	extremum=max(sigma) if (strainer.maxStrainRate[axis]>0) else min(sigma)
 	# FIXME: only temporary, should be .5
 	minMaxRatio=0.5 if mode=='tension' else 0.5
 	if extremum==0: return
@@ -182,12 +182,12 @@ def stopIfDamaged():
 			title=O.tags['description'] if 'description' in list(O.tags.keys()) else O.tags['params']
 			print('gnuplot',plot.saveGnuplot(O.tags['id'],title=title))
 			print('Bye.')
-			# O.pause()
-			sys.exit(0)
+			O.pause()
 		
 def addPlotData():
 	yade.plot.addData(t=O.time,i=O.iter,eps=strainer.strain[axis],eps_=strainer.strain[axis],sigma=strainer.stress[axis]+isoPrestress,eps1=strainer.strain[ax1],eps2=strainer.strain[ax2],sig1=strainer.stress[ax1],sig2=strainer.stress[ax2],relResid=updater.avgRelResidual)
 
 initTest()
 waitIfBatch()
+sys.exit(0)
 
