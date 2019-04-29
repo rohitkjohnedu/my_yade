@@ -11,7 +11,7 @@ FIND_LIBRARY(OPENBLAS_LIBRARY NAMES openblas blas PATHS /usr/lib/openblas-base )
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(OpenBlas  DEFAULT_MSG  OPENBLAS_LIBRARY)
 
-find_path(BLAS_INCLUDE_DIRS openblas_config.h /usr/include /usr/local/include /usr/include/openblas
+find_path(BLAS_INCLUDE_DIR openblas_config.h /usr/include /usr/local/include /usr/include/openblas
 /usr/include/aarch64-linux-gnu
 /usr/include/arm-linux-gnueabihf
 /usr/include/i386-kfreebsd-gnu
@@ -26,6 +26,6 @@ find_path(BLAS_INCLUDE_DIRS openblas_config.h /usr/include /usr/local/include /u
 /usr/include/x86_64-linux-gnu
 )
 
-message ("BLAS_INCLUDE_DIRS=${BLAS_INCLUDE_DIRS}")
+message ("-- BLAS_INCLUDE_DIR=${BLAS_INCLUDE_DIR}")
 
 MARK_AS_ADVANCED(OPENBLAS_LIBRARY)
