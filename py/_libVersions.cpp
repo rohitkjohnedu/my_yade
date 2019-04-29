@@ -191,11 +191,12 @@ namespace py = boost::python;
 
 #if defined(LINSOLV) || defined(YADE_POTENTIAL_PARTICLES) || defined(YADE_POTENTIAL_BLOCKS) || defined(FLOW_ENGINE)
 // 15. openblas
-	#include <openblas/openblas_config.h>
+	#include <openblas_config.h>
+	//#include <cblas.h>
 	py::list openblasVer() {
 		py::list ret;
-		ret.append( py::make_tuple(                  SUITESPARSE_MAIN_VERSION   ,                                   SUITESPARSE_SUB_VERSION   ,                                   SUITESPARSE_SUBSUB_VERSION));
-		ret.append( boost::lexical_cast<std::string>(SUITESPARSE_MAIN_VERSION)+"."+boost::lexical_cast<std::string>(SUITESPARSE_SUB_VERSION)+"."+boost::lexical_cast<std::string>(SUITESPARSE_SUBSUB_VERSION));
+		ret.append( py::make_tuple( 0 , 0 , 0 ));
+		ret.append( boost::lexical_cast<std::string>(OPENBLAS_VERSION));
 		return ret;
 	}
 // 16. metis
