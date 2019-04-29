@@ -271,15 +271,15 @@ BOOST_PYTHON_MODULE(_libVersions){
 	py::def("allVersionsCpp", allVersionsCpp, R"""(
 This function returns library versions as discovered by C++ during compilation from all the ``#include`` headers. This can be useful in debugging to detect some library ``.so`` conflicts.
 
-:return: dictionary in folowing format: ``{ "libName" : [ (major,minor,patch) , "versionString" ] }``
+:return: dictionary in folowing format: ``{ "libName" : [ (major, minor, patch) , "versionString" ] }``
 
-As an example the table below reflects with what libraries this documentation was compiled (here are only those detected by C++):
+As an example the dict below reflects what libraries this documentation was compiled with (here are only those detected by C++):
 
 .. ipython::
 
-	   In [1]: from yade._libVersions import *
+   In [1]: from yade.libVersions import *
 
-	   In [1]: allVersionsCpp()
+   In [1]: allVersionsCpp()
 
 .. note:: Please add here C++ detection of other libraries when yade starts using them.
 

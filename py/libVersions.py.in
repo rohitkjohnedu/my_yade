@@ -1,21 +1,59 @@
 # encoding: utf-8
 """
-XXXXXXXXX FIXME XXXXXXXXX Documentation description will go here. (Template file is processed by cmake to create the actual version information at build-time.)
-All functions written here also should have docstrings.
+The ``yade.libVersions`` module tracks versions of all libraries it was compiled with. Example usage is as follows::
 
-I used the list in https://yade-dem.org/doc/installation.html#prerequisites
-If we need a version of some library not listed in doc/sphinx/installation.rst, then it must also be added to that list!
+	from yade.libVersions import *
+	if(getVersion('cgal') > (4,9,0)):
+		…
+	else:
+		…
+
+To obtain a list of all libraries use the function :yref:`yade.libVersions.printAllVersions`.
+
+All libraries listed in :ref:`prerequisites<prerequisites>` are detected by this module.
+
+.. note:: If we need a version of some library not listed in :ref:`prerequisites<prerequisites>`, then it must also be added to :ysrc:`that list<doc/sphinx/installation.rst>`.
 """
 
 # all C++ functions are accessible now:
 from yade._libVersions import *
 import yade.config
 
+def getVersion(libName):
+	"""
+	This function returns the tuple ``(major, minor, patchlevel)`` with library version number. The ``yade --test`` in file :ysrc:`py/tests/libVersions.py` guarantees that this
+	version is the same as detected by cmake and C++. If only one of those could detect the library version, then this number is used.
+
+	:param string libName: the name of the library
+
+	:return: tuple in format ``(major, minor, patchlevel)``
+
+	.. note:: library openblas has no properly defined version in header files, this function will return ``(0,0,0)`` for openblas. Parsing the version string would be unreliable.
+	"""
+	cppVer   = allVersionsCpp()
+	if(libName == 'openblas'):
+		print("Warning: openblas has no properly defined version in header files, the obtained version is ",cppVer(libName))
+	if((libName in cppVer) and (len(cppVer[libName])==2)):
+		return cppVer[libName][0]
+	cmakeVer = allVersionsCmake()
+	if((libName in cmakeVer) and (len(cmakeVer[libName])==2)):
+		return cmakeVer[libName][0]
+	raise RuntimeError("Could not find library version of ",libName)
+
 def allVersionsCmake():
 	"""
 	This function returns library versions as provided by cmake during compilation.
 
-	:return: dictionary in folowing format: ``{ "libName" : [ (major,minor,patch) , "versionString" ] }``
+	:return: dictionary in following format: ``{ "libName" : [ (major, minor, patchlevel) , "versionString" ] }``
+
+
+	As an example the dict below reflects what libraries this documentation was compiled with (here are only those detected by `CMAKE <https://cmake.org>`_):
+
+	.. ipython::
+	
+	   In [1]: from yade.libVersions import *
+
+	   In [1]: allVersionsCmake()
 
 	.. note:: Please add here detection of other libraries when yade starts using them or if you discover how to extract from cmake a version which I didn't add here.
 
@@ -123,7 +161,18 @@ def printAllVersions(rstFormat=False):
 		lines+='\n'
 		if(rstFormat):
 			lines+= sep+'\n'
+
+	#print("Yade revision  : ",yade.config.revision)
+	print("Yade version   : ",yade.config.version)
+	#print("Yade prefix    : ",yade.config.prefix)
+	#print("Yade suffix    : ",yade.config.suffix)
+	feats = ""
+	for f in yade.config.features: feats+=" "+f
+	print("Yade features  :",feats)
+	print("Yade config dir:",yade.config.confDir)
+	print("\nLibraries used :\n")
 	print(lines)
+
 
 """
 GITLAB format:
@@ -144,5 +193,4 @@ reStructuredText format:
 | cell 3   | cell 4   |
 +----------+----------+
 """
-
 
