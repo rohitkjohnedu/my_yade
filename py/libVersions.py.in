@@ -33,7 +33,7 @@ def getVersion(libName):
 	cppVer   = allVersionsCpp()
 	cmakeVer = allVersionsCmake()
 	if(libName == 'openblas'):
-		print("Warning: openblas has no properly defined version in header files, the obtained version is ",cppVer(libName))
+		print("Warning: openblas has no properly defined version in header files, the obtained version is ",cppVer[libName])
 	if((libName == 'mpi' ) and (cppVer[libName][0] != cmakeVer[libName][0])):
 		print('\033[91m'+" Warning: mpi versions are different. Can you help with file py/libVersions.py.in?"+'\033[0m')
 		print("C++ is: " , cppVer[libName], " and cmake is: ",cmakeVer[libName], ", will return the C++ one.")
