@@ -38,7 +38,7 @@ def allVersionsCmake():
 	# 2. boost
 	addVer("boost",'${Boost_MAJOR_VERSION}','${Boost_MINOR_VERSION}','${Boost_SUBMINOR_VERSION}','${Boost_VERSION}')
 	# 3. qt
-	addVer("qt"   ,'${QT_VERSION_MAJOR}','${QT_VERSION_MINOR}','${QT_VERSION_PATCH}','${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}')
+	addVer("qt"   ,'${Used_QT_VERSION_MAJOR}','${Used_QT_VERSION_MINOR}','${Used_QT_VERSION_PATCH}','${Used_QT_VERSION_MAJOR}.${Used_QT_VERSION_MINOR}.${Used_QT_VERSION_PATCH}')
 	# 4. freeglut   - I don't know how to detect it
 	# 5. qglviewer  - I don't know how to detect it
 	# 6. python
