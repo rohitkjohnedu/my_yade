@@ -21,21 +21,24 @@ import yade.config
 
 def getVersion(libName):
 	"""
-	This function returns the tuple ``(major, minor, patchlevel)`` with library version number. The ``yade --test`` in file :ysrc:`py/tests/libVersions.py` guarantees that this
+	This function returns the tuple ``(major, minor, patchlevel)`` with library version number. The ``yade --test`` in file :ysrc:`py/tests/libVersions.py` tests that this
 	version is the same as detected by cmake and C++. If only one of those could detect the library version, then this number is used.
 
 	:param string libName: the name of the library
 
 	:return: tuple in format ``(major, minor, patchlevel)``
 
-	.. note:: library openblas has no properly defined version in header files, this function will return ``(0,0,0)`` for openblas. Parsing the version string would be unreliable.
+	.. note:: library openblas has no properly defined version in header files, this function will return ``(0,0,0)`` for openblas. Parsing the version string would be unreliable. The mpi version detected by cmake sometimes is different than version detected by C++, this needs further investigation.
 	"""
 	cppVer   = allVersionsCpp()
+	cmakeVer = allVersionsCmake()
 	if(libName == 'openblas'):
 		print("Warning: openblas has no properly defined version in header files, the obtained version is ",cppVer(libName))
+	if((libName == 'mpi' ) and (cppVer[libName][0] != cmakeVer[libName][0])):
+		print('\033[91m'+" Warning: mpi versions are different. Can you help with file py/libVersions.py.in?"+'\033[0m')
+		print("C++ is: " , cppVer[libName], " and cmake is: ",cmakeVer[libName], ", will return the C++ one.")
 	if((libName in cppVer) and (len(cppVer[libName])==2)):
 		return cppVer[libName][0]
-	cmakeVer = allVersionsCmake()
 	if((libName in cmakeVer) and (len(cmakeVer[libName])==2)):
 		return cmakeVer[libName][0]
 	raise RuntimeError("Could not find library version of ",libName)
