@@ -17,6 +17,8 @@ cmake:
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+  tags:
+    - workingrunner
   artifacts:
     paths:
       - build
@@ -27,9 +29,13 @@ cmake:
   stage: cmake
   only:
     - merge_request
+  except:
+    - branches
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+  tags:
+    - workingrunner
   artifacts:
     paths:
       - build
@@ -42,10 +48,11 @@ cmake:
     - branches
   except:
     - merge_request
-    - master
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+  tags:
+    - workingrunner
   artifacts:
     paths:
       - build
@@ -87,6 +94,7 @@ make:
       - install
   tags:
     - fast
+    - workingrunner
   dependencies:
     - cmake
 
@@ -100,6 +108,8 @@ test:
     - branches
   script:
     - install/bin/yade-ci --test
+  tags:
+    - workingrunner
   dependencies:
     - make
 
@@ -113,6 +123,8 @@ check:
     - branches
   script:
     - install/bin/yade-ci --checks
+  tags:
+    - workingrunner
   dependencies:
     - make
 
@@ -126,6 +138,8 @@ doc:
   script:
     - cd build
     - xvfb-run -s "-screen 0 1600x1200x24" make doc
+  tags:
+    - workingrunner
   dependencies:
     - cmake
     - make
@@ -143,6 +157,8 @@ pages:
     - mv install/share/doc/yade-ci/html public
     - mv install/share/doc/yade-ci/Yade.pdf public
     - mv install/share/doc/yade-ci/Yade.epub public
+  tags:
+    - workingrunner
   dependencies:
     - doc
   artifacts:
