@@ -25,12 +25,10 @@ cmake:
 
 
 # 1.2. only: merge_request will use -DCHUNKSIZE=4, to make compilation faster by 3 minutes
-#      only: branches      is for on-branch work. After each commit it is compiled with options from this one. So put here anything specific that you need.
 cmake:
   stage: cmake
   only:
     - merge_request
-    - branches
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
@@ -54,7 +52,6 @@ make:
   only:
     - master
     - merge_request
-    - branches
   script:
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in 
         "y_4pak_64cpu_256RAM_4TB_docker") echo "43" ;; 
@@ -88,7 +85,6 @@ test:
   only:
     - master
     - merge_request
-    - branches
   script:
     - install/bin/yade-ci --test
   tags:
@@ -103,7 +99,6 @@ check:
   only:
     - master
     - merge_request
-    - branches
   script:
     - install/bin/yade-ci --checks
   tags:
