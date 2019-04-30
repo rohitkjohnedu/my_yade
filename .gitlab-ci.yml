@@ -8,7 +8,7 @@ stages:
   - pages
 
 # https://docs.gitlab.com/ee/ci/yaml/#onlyexcept-basic
-# I create three "stage: cmake" instructions.
+# I create two "stage: cmake" instructions.
 # 1.1. only: master        will use -DCHUNKSIZE=1, to avoid future compilation errors caused by DCHUNKSIZE other than 1
 cmake:
   stage: cmake
@@ -25,29 +25,12 @@ cmake:
 
 
 # 1.2. only: merge_request will use -DCHUNKSIZE=4, to make compilation faster by 3 minutes
+#      only: branches      is for on-branch work. After each commit it is compiled with options from this one. So put here anything specific that you need.
 cmake:
   stage: cmake
   only:
     - merge_request
-  except:
     - branches
-  script:
-    - mkdir build && cd build
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-  tags:
-    - workingrunner
-  artifacts:
-    paths:
-      - build
-
-
-# 1.3. only: branches      is for on-branch work. After each commit it is compiled with options from this one. So put here anything specific that you need.
-cmake:
-  stage: cmake
-  only:
-    - branches
-  except:
-    - merge_request
   script:
     - mkdir build && cd build
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
