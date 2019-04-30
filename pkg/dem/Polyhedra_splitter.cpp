@@ -80,7 +80,7 @@ void PolyhedraSplitter::action()
 {
 	static bool first=true;
 	if(first) {
-		LOG_WARN("be careful, the PolyhedraSplitter returns different results depending on CGAL version! This is will not produce reproducible calculations. For details see https://gitlab.com/yade-dev/trunk/issues/45");
+		LOG_WARN("be careful, the PolyhedraSplitter returns different results depending on CGAL version! This will not produce reproducible calculations. For details see https://gitlab.com/yade-dev/trunk/issues/45");
 		first=false;
 	}
 
