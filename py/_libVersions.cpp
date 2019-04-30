@@ -191,8 +191,8 @@ namespace py = boost::python;
 
 #if defined(LINSOLV) || defined(YADE_POTENTIAL_PARTICLES) || defined(YADE_POTENTIAL_BLOCKS) || defined(FLOW_ENGINE)
 // 15. openblas
+	// if this include does not work then add relevant path specific to your system into file cMake/FindOpenBlas.cmake
 	#include <openblas_config.h>
-	//#include <cblas.h>
 	py::list openblasVer() {
 		py::list ret;
 		ret.append( py::make_tuple( 0 , 0 , 0 ));
