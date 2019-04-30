@@ -6,8 +6,8 @@ class TestLibVersions(unittest.TestCase):
 		pass # no setup needed for tests here
 	def testLibVersions(self):
 		# calling them is enough, to make sure they do not throw any errors.
-		cmakeVer = yade.libVersions.allVersionsCmake()
-		cppVer   = yade.libVersions.allVersionsCpp()
+		cmakeVer = yade.libVersions.getAllVersionsCmake()
+		cppVer   = yade.libVersions.getAllVersionsCpp()
 		print("cmake versions: ", cmakeVer)
 		print("C++ versions: ", cppVer)
 		print("\n")

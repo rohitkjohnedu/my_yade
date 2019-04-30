@@ -229,7 +229,7 @@ namespace py = boost::python;
 	py::list mpiVer() { return {}; }
 #endif
 
-py::dict allVersionsCpp(){
+py::dict getAllVersionsCpp(){
 	py::dict ret;
 	// I found relevant names with commad:
 	// dpkg -L libName-dev |  xargs -I'{}' -P 1 cat {} | grep -i -E "defi.*versio.*"
@@ -255,7 +255,7 @@ py::dict allVersionsCpp(){
 BOOST_PYTHON_MODULE(_libVersions){
 	YADE_SET_DOCSTRING_OPTS;
 /*
- * Maybe exporting them all is not necessary. All data is aggregated inside allVersionsCpp() anyway.
+ * Maybe exporting them all is not necessary. All data is aggregated inside getAllVersionsCpp() anyway.
  *
 	py::def("gccVer"  , gccVer   , "Returns g++   compiler version with which yade was compiled.                                                       \n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
 	py::def("clangVer", clangVer , "Returns clang compiler version with which yade was compiled.                                                       \n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
@@ -268,7 +268,7 @@ BOOST_PYTHON_MODULE(_libVersions){
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
 
-	py::def("allVersionsCpp", allVersionsCpp, R"""(
+	py::def("getAllVersionsCpp", getAllVersionsCpp, R"""(
 This function returns library versions as discovered by C++ during compilation from all the ``#include`` headers. This can be useful in debugging to detect some library ``.so`` conflicts.
 
 :return: dictionary in folowing format: ``{ "libName" : [ (major, minor, patch) , "versionString" ] }``
@@ -279,7 +279,7 @@ As an example the dict below reflects what libraries this documentation was comp
 
    In [1]: from yade.libVersions import *
 
-   In [1]: allVersionsCpp()
+   In [1]: getAllVersionsCpp()
 
 .. note:: Please add here C++ detection of other libraries when yade starts using them.
 
