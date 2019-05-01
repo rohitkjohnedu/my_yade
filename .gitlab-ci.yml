@@ -10,7 +10,7 @@ stages:
 # https://docs.gitlab.com/ee/ci/yaml/#onlyexcept-basic
 # I create two "stage: cmake" instructions.
 # 1.1. only: master        will use -DCHUNKSIZE=1, to avoid future compilation errors caused by DCHUNKSIZE other than 1
-cmake:
+cmake_master:
   stage: cmake
   only:
     - master
@@ -23,7 +23,7 @@ cmake:
 
 
 # 1.2. only: merge_request will use -DCHUNKSIZE=4, to make compilation faster by 3 minutes
-cmake:
+cmake_MR:
   stage: cmake
   only:
     - merge_request
@@ -71,7 +71,8 @@ make:
   tags:
     - fast
   dependencies:
-    - cmake
+    - cmake_master
+    - cmake_MR
 
 
 # 3.1. test stage
@@ -108,7 +109,8 @@ doc:
     - cd build
     - xvfb-run -s "-screen 0 1600x1200x24" make doc
   dependencies:
-    - cmake
+    - cmake_master
+    - cmake_MR
     - make
   artifacts:
     paths:
@@ -129,4 +131,5 @@ pages:
   artifacts:
     paths:
       - public
+
 
