@@ -113,6 +113,7 @@ ELSE()
 # on ubuntu 18.04 and 18.10 when ccache is used we need to fix some bug, see https://gitlab.kitware.com/cmake/cmake/issues/17275
 # but we can't do this on ubuntu 16.04 with cmake version 3.5.1, because that produces error: "list does not recognize sub-command FILTER".
 # So we must be above version 3.6, because https://cmake.org/cmake/help/v3.6/release/3.6.html?highlight=filter
+# Later maybe on some higher cmake version this will become unnecessary.
     IF(CMAKE_VERSION VERSION_GREATER 3.6 OR CMAKE_VERSION VERSION_EQUAL 3.6)
         string (STRIP "${CMAKE_CXX_COMPILER_ARG1}" __CXX_COMPILER_ARG1)
         set(CMAKE_CXX_COMPILER_PREDEFINES_COMMAND "${CMAKE_CXX_COMPILER}" "${__CXX_COMPILER_ARG1}" "-dM" "-E" "-c" "${CMAKE_ROOT}/Modules/CMakeCXXCompilerABI.cpp")
