@@ -352,8 +352,6 @@ In addition, and independently of distcc, caching previous compilations with `cc
 	export CXX="ccache g++"
 	cmake [options as usual]
 
-.. note:: There are some problems with ccache on ubuntu 18.04 and 18.10, the `issue <https://gitlab.com/yade-dev/trunk/issues/73>`_ is under investigation.
-
 The two tools can be combined very simply, adding to the above exports::
 
 	export CCACHE_PREFIX="distcc"
