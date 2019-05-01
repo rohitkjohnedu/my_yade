@@ -150,7 +150,7 @@ need root privileges.
 		python3-pyqt5.qtwebkit gtk2-engines-pixbuf python3-pyqt5.qtsvg libqglviewer-dev-qt5 \
 		python3-pil libjs-jquery python3-sphinx python3-git libxmu-dev libxi-dev libcgal-dev \
 		help2man libbz2-dev zlib1g-dev python3-minieigen libopenblas-dev libsuitesparse-dev \
-		libmetis-dev python3-bibtexparser python3-future
+		libmetis-dev python3-bibtexparser python3-future coinor-clp coinor-libclp-dev
 		
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
 
@@ -325,7 +325,8 @@ Python 2 support ends at the beginning of 2020. However, Yade can be compiled an
 		libqglviewer-dev-qt5 python-pil libjs-jquery python-sphinx python-git python-bibtex \
 		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen \
 		libopenblas-dev libsuitesparse-dev libmetis-dev libopenmpi-dev openmpi-bin \
-		openmpi-common python-bibtexparser python3-future python-future python-gts
+		openmpi-common python-bibtexparser python3-future python-future python-gts \
+		coinor-clp coinor-libclp-dev
 
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``.
 
@@ -350,6 +351,8 @@ In addition, and independently of distcc, caching previous compilations with `cc
 	export CC="ccache gcc"
 	export CXX="ccache g++"
 	cmake [options as usual]
+
+.. note:: There are some problems with ccache on ubuntu 18.04 and 18.10, the `issue <https://gitlab.com/yade-dev/trunk/issues/73>`_ is under investigation.
 
 The two tools can be combined very simply, adding to the above exports::
 
