@@ -72,9 +72,11 @@ set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defau
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
 
+INCLUDE(GetVersion)
+INCLUDE(GNUInstallDirs)
+
 INCLUDE(FindNumPy)
 INCLUDE(FindPythonModule)
-INCLUDE(GNUInstallDirs)
 
 INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 
