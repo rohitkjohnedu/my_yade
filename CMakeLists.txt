@@ -93,16 +93,35 @@ INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 # Can be removed later, if gcc fixes its regression
 # Taken from http://stackoverflow.com/questions/4058565/check-gcc-minor-in-cmake
 
-EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-IF (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8)
+# this line was trying to get the g++ version. But it does not work with ccache.
+# But we already have CMAKE_CXX_COMPILER_VERSION, so we don't need this line!
+#EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.8)
   MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0")
   ADD_DEFINITIONS("-ftrack-macro-expansion=0")
+ELSE()
+  MESSAGE(STATUS "GCC Version < 4.8. will not use -ftrack-macro-expansion=0")
 ENDIF()
 
 # -save-temps is not supported with ccache
-IF ((GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8) AND ( NOT "${CMAKE_CXX_COMPILER_LAUNCHER}" MATCHES ".*ccache" AND NOT DISABLE_SAVE_TEMPS))
+IF ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.8) AND ( NOT "${CMAKE_CXX_COMPILER_LAUNCHER}" MATCHES ".*ccache" AND NOT "${CMAKE_CXX_COMPILER}" MATCHES ".*ccache.*" AND NOT DISABLE_SAVE_TEMPS))
   MESSAGE(STATUS "GCC Version >= 4.8. Adding -save-temps")
   ADD_DEFINITIONS("-save-temps")
+ELSE()
+  IF ( "${CMAKE_CXX_COMPILER_LAUNCHER}" MATCHES ".*ccache" OR "${CMAKE_CXX_COMPILER}" MATCHES ".*ccache.*" )
+    MESSAGE(STATUS "ccache detected, will not use -save-temps")
+# on ubuntu 18.04 and 18.10 when ccache is used we need to fix some bug, see https://gitlab.kitware.com/cmake/cmake/issues/17275
+# but we can't do this on ubuntu 16.04 with cmake version 3.5.1, because that produces error: "list does not recognize sub-command FILTER".
+# So we must be above version 3.6, because https://cmake.org/cmake/help/v3.6/release/3.6.html?highlight=filter
+    IF(CMAKE_VERSION VERSION_GREATER 3.6 OR CMAKE_VERSION VERSION_EQUAL 3.6)
+        string (STRIP "${CMAKE_CXX_COMPILER_ARG1}" __CXX_COMPILER_ARG1)
+        set(CMAKE_CXX_COMPILER_PREDEFINES_COMMAND "${CMAKE_CXX_COMPILER}" "${__CXX_COMPILER_ARG1}" "-dM" "-E" "-c" "${CMAKE_ROOT}/Modules/CMakeCXXCompilerABI.cpp")
+        list(FILTER CMAKE_CXX_COMPILER_PREDEFINES_COMMAND EXCLUDE REGEX "^$")
+        unset(__CXX_COMPILER_ARG1)
+    ENDIF()
+  ELSE()
+    MESSAGE(STATUS "GCC Version < 4.8 or DISABLE_SAVE_TEMPS. will not use -save-temps")
+  ENDIF()
 ENDIF()
 
 #===========================================================
@@ -110,7 +129,7 @@ ENDIF()
 IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
   ADD_DEFINITIONS("-ftemplate-depth-512 -fstack-protector ")
 ELSE()
-  IF (GCC_VERSION VERSION_GREATER 4.9 OR GCC_VERSION VERSION_EQUAL 4.9)
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.9 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.9)
     MESSAGE(STATUS "GCC Version >= 4.9. Adding -fstack-protector-strong")
     ADD_DEFINITIONS("-fstack-protector-strong")
   ELSE()
