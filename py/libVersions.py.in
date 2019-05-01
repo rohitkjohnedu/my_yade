@@ -151,7 +151,7 @@ def printAllVersions(rstFormat=False):
 		lines += sep.replace('-','=')+'\n'
 	else:
 		lines += sep
-	for libName in namesSet:
+	for libName in sorted(namesSet):
 		lines+="| "+(('{:'+str(longest[0])+'}').format(libName))+" |"
 		if (libName in cmakeVer) and (len(cmakeVer[libName])==2):
 			lines+=" "+(('{:'+str(longest[1])+'}').format(cmakeVer[libName][1]))+" |"
