@@ -71,14 +71,7 @@ set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defau
 
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
-message(***PYTHON_VERSION*** ${PYTHON_VERSION})
-IF(${PYTHON_VERSION} EQUAL -1)
-	set(Python_ADDITIONAL_VERSIONS 3 2)
-ELSE()
-	set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION})
-ENDIF()
 
-INCLUDE(FindPythonInterp)
 INCLUDE(FindOpenMP)
 INCLUDE(FindQt4)
 INCLUDE(FindPkgConfig)
@@ -87,9 +80,7 @@ INCLUDE(FindOpenGL)
 INCLUDE(FindGTS)
 INCLUDE(FindGL2PS)
 INCLUDE(FindCGAL)
-INCLUDE(FindNumPy)
 INCLUDE(FindLoki)
-INCLUDE(FindPythonModule)
 INCLUDE(GNUInstallDirs)
 
 
@@ -137,47 +128,65 @@ ELSE (DEBUG)
   ADD_DEFINITIONS("-DNDEBUG")
 ENDIF (DEBUG)
 
-#===========================================================
-# Add possibility to use local boost installation (e.g. -DLocalBoost=1.46.1)
 
-IF ( NOT LocalBoost )
-  SET(LocalBoost "1.47.0") # Minimal required Boost version
-ENDIF ( NOT LocalBoost )
+#==================================
+#====== *** PYTHON/BOOST *** ======
+#==================================
+INCLUDE(YadePythonHelpers)
 
-IF ( ${PYTHON_VERSION_MAJOR} EQUAL 2 )
-  FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python thread filesystem iostreams regex serialization system date_time REQUIRED)
-ELSE() #python3
-  FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
-  IF(NOT Boost_FOUND)
-    FIND_PACKAGE(Boost ${LocalBoost} COMPONENTS python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
-      IF(NOT Boost_FOUND)
-        message( FATAL_ERROR "Can't find suitable libboost_python version." )
-      ENDIF()
-  ENDIF()
+SET(PY3_VERSIONS 3.8 3.7 3.6 3.5 3.4 3.3 3.2 3.1 3.0) #append newer python versions at the beginning here.
+SET(PY2_VERSIONS 2.7 2.6)
+IF(${PYTHON_VERSION} EQUAL -1)
+	SET(PY_VERSIONS_CHECK "${PY3_VERSIONS};${PY2_VERSIONS}")
+ELSEIF(${PYTHON_VERSION} EQUAL 2)
+	SET(PY_VERSIONS_CHECK "${PY2_VERSIONS}")
+ELSEIF(${PYTHON_VERSION} EQUAL 3)
+	SET(PY_VERSIONS_CHECK "${PY3_VERSIONS}")
+ELSE()
+	SET(PY_VERSIONS_CHECK "${PYTHON_VERSION}")
 ENDIF()
 
+MESSAGE("Loop on the following python versions and check available dependencies:${PY_VERSIONS_CHECK}" )
+FOREACH(py_version ${PY_VERSIONS_CHECK})
+	#Reset variables to be able to use finpythoninterp multiple times
+	unset(PYTHONINTERP_FOUND CACHE)
+	unset(PYTHON_EXECUTABLE CACHE)
+	#Set desired python version
+	set(Python_ADDITIONAL_VERSIONS ${py_version})
+	#Find python
+	FIND_PACKAGE(PythonInterp)
+	IF(NOT PythonInterp_FOUND)
+		MESSAGE(FATAL_ERROR "No python version could be found in your system.")
+	ENDIF()
+	#FindPythonInterp will try to fallback in older Python version, we have to check manually if it found the version we wish
+	PYTHON_VERSION_MATCHES(${py_version})
+	IF(NOT ${PYTHON_VERSION_MATCH})
+		CONTINUE()
+	ENDIF()
+	MESSAGE("Python version ${PYTHON_VERSION_STRING} found, try to import dependencies...")
+	FIND_PYTHON_PACKAGES()
+	IF(ALL_PYTHON_DEPENDENCIES_FOUND)
+		MESSAGE("Found all python dependencies with version ${PYTHON_VERSION_STRING}, will compile yade with that.")
+		BREAK()
+	ENDIF()
+ENDFOREACH()
 
-INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
-# for checking purpose
-MESSAGE("--   Boost_VERSION: " ${Boost_VERSION})
-MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
-MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
-MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
-ADD_DEFINITIONS(-DBOOST_MATH_DISABLE_FLOAT128=1)
+#After the loop on all python versions, having ALL_PYTHON_DEPENDENCIES_FOUND==FALSE must trigger an error:
+IF(NOT ALL_PYTHON_DEPENDENCIES_FOUND)
+	MESSAGE(FATAL_ERROR "No python version with all dependencies was found.")
+ENDIF()
+
+#======================================
+#====== *** END PYTHON/BOOST *** ======
+#======================================
 
 #===========================================================
-FIND_PACKAGE(NumPy REQUIRED)
-INCLUDE_DIRECTORIES(${NUMPY_INCLUDE_DIRS})
-
 FIND_PACKAGE(Loki REQUIRED)
 INCLUDE_DIRECTORIES(${LOKI_INCLUDE_DIR})
 
 FIND_PACKAGE(Eigen3 REQUIRED)
 FIND_PACKAGE(BZip2 REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
-
-FIND_PACKAGE(PythonLibs REQUIRED)
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
 #===========================================================
 
 # Use Eigen3 by default
@@ -466,7 +475,6 @@ ELSE(ENABLE_GL2PS)
   SET(DISABLED_FEATS "${DISABLED_FEATS} GL2PS")
 ENDIF(ENABLE_GL2PS)
 
-INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
 
 #===========================================================
@@ -627,16 +635,7 @@ IF (CHUNKSIZE)
 ELSE (CHUNKSIZE)
   ADD_LIBRARY(yade SHARED ${SRC_CORE} ${SRC_PKG} ${SRC_LIB})
 ENDIF (CHUNKSIZE)
-#===========================================================
 
-FOREACH(PYTHON_MODULE IPython matplotlib numpy pygraphviz Xlib minieigen future past)
-	find_python_module(${PYTHON_MODULE} REQUIRED)
-ENDFOREACH()
-IF(${PYTHON_VERSION_MAJOR} EQUAL 2)
-	find_python_module(Tkinter REQUIRED)
-ELSE()
-	find_python_module(tkinter REQUIRED)
-ENDIF()
 #===========================================================
 
 ADD_LIBRARY(boot SHARED ${CMAKE_CURRENT_SOURCE_DIR}/core/main/pyboot.cpp)
