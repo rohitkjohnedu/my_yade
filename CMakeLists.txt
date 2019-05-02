@@ -75,9 +75,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cMake")
 INCLUDE(GetVersion)
 INCLUDE(GNUInstallDirs)
 
-INCLUDE(FindNumPy)
-INCLUDE(FindPythonModule)
-
 INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 
 #===========================================================
