@@ -617,7 +617,7 @@ class pyOmega{
 	long stopAtIter_get(){return OMEGA.getScene()->stopAtIter; }
 	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIter=s; }
 	Real stopAtTime_get(){return OMEGA.getScene()->stopAtTime; }
-	void stopAtTime_set(long s){OMEGA.getScene()->stopAtTime=s; }
+	void stopAtTime_set(Real s){OMEGA.getScene()->stopAtTime=s; }
 
 
 	bool timingEnabled_get(){return TimingInfo::enabled;}
