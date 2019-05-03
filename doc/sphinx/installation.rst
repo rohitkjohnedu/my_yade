@@ -339,6 +339,9 @@ Also see notes about :ref:`converting python 2 scripts into python 3<convert-pyt
 .. _speed-up:
 
 Speed-up compilation
+---------------------
+
+Compile time
 ^^^^^^^^^^^^^^^^^^^^^
 
 When spliting the compilation on many cores (``make -jN``), ``N`` is limited by the available cores and memory. It is possible to use more cores if remote computers are available, distributing the compilation with `distcc <https://wiki.archlinux.org/index.php/Distcc>`_  (see distcc documentation for configuring slaves and master)::
@@ -357,6 +360,18 @@ In addition, and independently of distcc, caching previous compilations with `cc
 The two tools can be combined very simply, adding to the above exports::
 
 	export CCACHE_PREFIX="distcc"
+
+Link time
+^^^^^^^^^^^^^^^^^^^^^
+
+The link time can be reduced roughly 2 minutes by changing the default linker from ``ld`` to ``ld.gold``. They are both in the same package ``binutils``. To perform the switch execute these commands as root::
+
+	ld --version
+	update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" 20
+	update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" 10
+	ld --version
+
+To switch back run the commands above with reversed priorities ``10`` ↔ ``20``. Alternatively a manual selection can be performed by command: ``update-alternatives --config ld``.
 
 Cloud Computing
 ----------------
