@@ -369,3 +369,10 @@ O.timingEnabled=True
 #plot.saveDataTxt('plots.txt',vars=('i1','t','Fupper','Fbottom','Q','T'))
 
 #O.run(1,1)
+
+import tempfile, shutil
+dirpath = tempfile.mkdtemp()
+for fileName in ['./vtk', './Test.txt' ]:
+  if (os.path.exists(fileName)): shutil.move(fileName,dirpath)
+  print("File %s moved into %s/ directory"%(fileName,dirpath))
+
