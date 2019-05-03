@@ -19,12 +19,16 @@
 #	define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}
 #	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
 
-#ifdef YADE_DEBUG
+#if defined(YADE_DEBUG) ||  defined(YADE_TRACEONLY) 
 	# define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE",msg)
+#else
+	# define LOG_TRACE(msg)
+#endif
+
+#if defined(YADE_DEBUG) && !defined(YADE_TRACEONLY)
 	# define LOG_INFO(msg)  _POOR_MANS_LOG("INFO ",msg)
 	# define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG",msg)
 #else
-	# define LOG_TRACE(msg)
 	# define LOG_INFO(msg)
 	# define LOG_DEBUG(msg)
 #endif
@@ -38,7 +42,7 @@
 #define CREATE_LOGGER(classname)
 
 
-// these macros are temporary
+// macros for quick debugging
 #define TRACE LOG_TRACE("Been here")
 #define _TRVHEAD cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<": "
 #define _TRV(x) #x"="<<x<<"; "
@@ -48,3 +52,4 @@
 #define TRVAR4(a,b,c,d) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) );
 #define TRVAR5(a,b,c,d,e) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) );
 #define TRVAR6(a,b,c,d,e,f) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) << _TRV(f) );
+

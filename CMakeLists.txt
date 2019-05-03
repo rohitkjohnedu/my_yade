@@ -2,6 +2,7 @@
 #  CMAKE_INSTALL_PREFIX: path, where Yade will be installed (/usr/local by default)
 #  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 #  DEBUG: compile in debug-mode (OFF by default)
+#  TRACEONLY: of all debug macros enable only the TRACE macro in lib/base/Logging.hpp, even if DEBUG=OFF (OFF by default)
 #  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 #  SUFFIX: suffix, added after binary-names (version number by default)
 #  NOSUFFIX: do not add a suffix after binary-name (OFF by default)
@@ -142,6 +143,14 @@ ELSE (DEBUG)
   ADD_DEFINITIONS("-DNDEBUG")
 ENDIF (DEBUG)
 
+IF (TRACEONLY)
+  ADD_DEFINITIONS("-DYADE_TRACEONLY")
+  IF (DEBUG)
+    MESSAGE(STATUS "Enabling lib/base/Logging.hpp *only* TRACE macro, macros LOG_INFO, LOG_DEBUG are disabled.")
+  ELSE (DEBUG)
+    MESSAGE(STATUS "Enabling lib/base/Logging.hpp TRACE macro without any extra debug info.")
+  ENDIF (DEBUG)
+ENDIF (TRACEONLY)
 
 #==================================
 #====== *** PYTHON/BOOST *** ======

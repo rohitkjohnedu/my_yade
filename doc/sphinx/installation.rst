@@ -232,6 +232,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* CMAKE_INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 	* DEBUG: compile in debug-mode (OFF by default)
+	* TRACEONLY: of all debug macros enable only the TRACE macro in :ysrc:`lib/base/Logging.hpp`. This enables TRACE even when DEBUG=OFF (OFF by default)
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 	* SUFFIX: suffix, added after binary-names (version number by default)
 	* NOSUFFIX: do not add a suffix after binary-name (OFF by default)
