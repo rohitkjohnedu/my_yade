@@ -208,17 +208,15 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 			}
 		}
 	}
-	assert(M>0); LOG_TRACE("M=\n"<<M<<"\nIg=\n"<<Ig<<"\nSg=\n"<<Sg);
+	assert(M>0);
 	// clump's centroid
 	state->pos=Sg/M;
 	// this will calculate translation only, since rotation is zero
 	Matrix3r Ic_orientG=inertiaTensorTranslate(Ig, -M /* negative mass means towards centroid */, state->pos); // inertia at clump's centroid but with world orientation
-	LOG_TRACE("Ic_orientG=\n"<<Ic_orientG);
 	Ic_orientG(1,0)=Ic_orientG(0,1); Ic_orientG(2,0)=Ic_orientG(0,2); Ic_orientG(2,1)=Ic_orientG(1,2); // symmetrize
 	Eigen::SelfAdjointEigenSolver<Matrix3r> decomposed(Ic_orientG);
 	const Matrix3r& R_g2c(decomposed.eigenvectors());
 	// has NaNs for identity matrix??
-	LOG_TRACE("R_g2c=\n"<<R_g2c);
 	// set quaternion from rotation matrix
 	state->ori=Quaternionr(R_g2c); state->ori.normalize();
 	state->inertia=decomposed.eigenvalues();

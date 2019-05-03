@@ -82,8 +82,6 @@ CREATE_LOGGER(Law2_ScGeom_WirePhys_WirePM);
 
 bool Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 
-	LOG_TRACE( "Law2_ScGeom_WirePhys_WirePM::go - contact law" );
-
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	WirePhys* phys = static_cast<WirePhys*>(ip.get());
 	const int &id1 = contact->getId1();
@@ -117,11 +115,9 @@ bool Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	/* compute normal force Fn */
 	Real Fn = 0.;
 	if ( D > DFValues[0](0) ) { // unloading
-		LOG_TRACE("WirePM: Unloading");
 		Fn = kn * (D-phys->plastD);
 	}
 	else { // loading
-		LOG_TRACE("WirePM: Loading");
 		for (unsigned int i=1; i<DFValues.size(); i++) { 
 			if ( D > DFValues[i](0) ) {
 				Fn = DFValues[i-1](1) + (D-DFValues[i-1](0))*kValues[i-1];
@@ -136,8 +132,6 @@ bool Law2_ScGeom_WirePhys_WirePM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& i
 	
 	/* compression forces cannot be applied to wires */
 	if (Fn > 0.) Fn = 0.;
-	
-	TRVAR3( displN, D, Fn );
 	
 	phys->normalForce = Fn*geom->normal; // NOTE: normal is position2-position1 - It is directed from particle1 to particle2
 
@@ -173,8 +167,6 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	/* avoid any updates if interactions which already exist */
 	if(interaction->phys) return; 
 	//TODO: make boolean to make sure physics are never updated, optimisation of contact detection mesh (no contact detection after link is created) 
-	
-	LOG_TRACE( "Ip2_WireMat_WireMat_WirePhys::go - create interaction physics" );
 	
 	ScGeom* geom=dynamic_cast<ScGeom*>(interaction->geom.get());
 	assert(geom);
@@ -297,7 +289,6 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	/* store elastic/unloading stiffness as kn in physics */
 	contactPhysics->kn = k;
 	contactPhysics->ks = 0.;
-	TRVAR1( k );
 
 	/* consider an additional point for the initial shift if type==2 */
 	if ( mat1->type==2 ) {
