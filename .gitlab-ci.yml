@@ -22,14 +22,24 @@ cmake_master:
       - build
 
 
-# 1.2. only: merge_request will use -DCHUNKSIZE=4, to make compilation faster by 3 minutes
+# 1.2. only: merge_request uses ccache for faster compilation. ccache works only with -DCHUNKSIZE=1
+# Important: to get ccache to work an external volume must be mounted by gitlab-runner (in config file: /etc/gitlab-runner/config.toml)
+#            into docker directory /root/.ccache. By default in /etc/gitlab-runner/config.toml there is already this line:
+#               volumes = ["/cache"]
+#            it must be replaced with:
+#               volumes = ["/cache","/home/docker/ccache:/root/.ccache:rw"]
+#            where /home/docker/ccache is the directory in the host with write access.
+# See also : https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/advanced-configuration.md#example-2-mount-a-host-directory-as-a-data-volume
 cmake_MR:
   stage: cmake
   only:
     - merge_request
   script:
     - mkdir build && cd build
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=4 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - ccache -s
   artifacts:
     paths:
       - build
@@ -71,8 +81,10 @@ make:
     - echo $JOBSNUM
     - cd build
     - make -j $JOBSNUM
+    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
     - make install
     - make clean
+    - ccache -s
   artifacts:
     paths:
       - install
