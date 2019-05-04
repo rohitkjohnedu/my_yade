@@ -80,8 +80,8 @@ make:
         esac)
     - echo $JOBSNUM
     - cd build
-    - make -j $JOBSNUM
     - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
+    - make -j $JOBSNUM
     - make install
     - make clean
     - ccache -s
