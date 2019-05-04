@@ -28,6 +28,7 @@ cmake_master_16_04:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 cmake_master_18_04:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
@@ -40,6 +41,7 @@ cmake_master_18_04:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 cmake_master_stretch:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
@@ -52,6 +54,7 @@ cmake_master_stretch:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 cmake_master_buster:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
@@ -64,6 +67,7 @@ cmake_master_buster:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 
 # 1.2. only: merge_request uses ccache for faster compilation. ccache works only with -DCHUNKSIZE=1
@@ -88,6 +92,7 @@ cmake_MR_16_04:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 cmake_MR_18_04:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
@@ -103,6 +108,7 @@ cmake_MR_18_04:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 cmake_MR_stretch:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
@@ -118,6 +124,7 @@ cmake_MR_stretch:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 cmake_MR_buster:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
@@ -133,6 +140,7 @@ cmake_MR_buster:
   artifacts:
     paths:
       - build
+    expire_in: 2 weeks
 
 
 # Perhaps two more will added later
@@ -179,6 +187,7 @@ make_16_04:
   artifacts:
     paths:
       - install
+    expire_in: 2 weeks
   tags:
     - fast
   dependencies:
@@ -219,6 +228,7 @@ make_18_04:
   artifacts:
     paths:
       - install
+    expire_in: 2 weeks
   tags:
     - fast
   dependencies:
@@ -259,6 +269,7 @@ make_stretch:
   artifacts:
     paths:
       - install
+    expire_in: 2 weeks
   tags:
     - fast
   dependencies:
@@ -299,6 +310,7 @@ make_buster:
   artifacts:
     paths:
       - install
+    expire_in: 2 weeks
   tags:
     - fast
   dependencies:
