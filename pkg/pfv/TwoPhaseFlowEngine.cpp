@@ -2652,9 +2652,10 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(unsigned startingId, unsigned
 	CellHandle& newPore = solver->tesselation().cellHandles[imbibedId];
 	PhaseCluster* cluster = clusters[origin->info().label].get();
 	cluster->resetSolver();//reset the linear system
-	//unsigned facet; // Note by Janek: warning: unused variable ‘facet’ [-Wunused-variable]
 	clusterGetPore(cluster,newPore);
-	unsigned facetIdx;
+	//NOTE: the code below could be a starting point for more efficient removal, it's currently useless (and parameter index as well)
+	// Further, removing from lists should be faster than from vectors, OTOH we probably also need access by index.
+	/*unsigned facetIdx;
 	if (	index>=0 and unsigned(index)<cluster->interfaces.size() and
 		cluster->interfaces[index].first.first == startingId and
 		cluster->interfaces[index].first.second == imbibedId)  {
@@ -2663,10 +2664,7 @@ vector<int> TwoPhaseFlowEngine::clusterOutvadePore(unsigned startingId, unsigned
 	  if (index>=0) LOG_WARN("index mismatch wrt. cell ids");
 	  for (facetIdx=0; cluster->interfaces[facetIdx].first.first != startingId or cluster->interfaces[facetIdx].first.second!=imbibedId; facetIdx++)
 		{if ((facetIdx+1)>=cluster->interfaces.size()) LOG_WARN("interface not found");}
-	} 
-	
-	vector<unsigned> interfacesToRemove = {facetIdx};
-	vector<unsigned> interfacesToAdd;
+	}*/	
 	bool updateIntfs=false;//if turned true later we will have to clean interfaces
 	vector<int> merged = {cluster->label};
 	
