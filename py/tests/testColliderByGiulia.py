@@ -5,20 +5,7 @@
 
 import unittest
 
-from builtins import range
-from math import *
-from minieigen import *
-from yade import *
-from yade import system
-from yade._customConverters import *
-from yade.gridpfacet import *
 from yade.utils import *
-from yade.wrapper import *
-import random
-import sys,re,os
-import unittest
-import yade, yade.utils, yade.config, yade.remote
-
 
 # https://docs.python.org/3/library/unittest.html
 
@@ -31,7 +18,8 @@ class TestColliderByGiulia(unittest.TestCase):
 		self.radius_bigSphere= self.DbigSphere/2
 		self.radius_sph	= self.DbigSphere/10
 	def tearDown(self):
-		pass # here finalize the tests, maybe close an opened file, or something else
+		# here finalize the tests, maybe close an opened file, or something else
+		O.reset()
 	def printOK(self,sign,ordering,axis,initialSortAxis,change):
 		self.assertTrue(True)
 		#axis = (2-axis)%3 # bacause the movement is along Z axis, while axis numbering referes to X. Better to print the axis which causes problems, than axis used in the loop numbering.
@@ -102,5 +90,4 @@ class TestColliderByGiulia(unittest.TestCase):
 							except Exception as e:
 								self.noteFail(sign,ordering,axis,initialSortAxis,change)
 
-							O.reset()
 
