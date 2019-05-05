@@ -12,7 +12,7 @@ resultStatus = 0
 nFailed=0
 failedScripts=list()
 
-skipScripts = ['checkList.py','check_TwoPhaseFlowEngine_PressureInjection.py']
+skipScripts = ['checkList.py','check_TwoPhaseFlowEngine_PressureInjection.py','checkDEM-PFVPressureInjection.py']
 onlyOneScript = []
 
 def mustCheck(sc):
