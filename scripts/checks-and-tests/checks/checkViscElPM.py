@@ -47,8 +47,8 @@ mat = O.materials.append(ViscElMat(tc=tc,en=en,et=et,
 
 r   = 0.1  # [m] sphere radius
 
-b1 = O.bodies.append(utils.sphere(center=(2*r,0,0),radius=r,material=mat))
-b2 = O.bodies.append(utils.sphere(center=(0,0,0),radius=r,material=mat))
+b1 = O.bodies.append(sphere(center=(2*r,0,0),radius=r,material=mat))
+b2 = O.bodies.append(sphere(center=(0,0,0),radius=r,material=mat))
 
 
 ################################################################################

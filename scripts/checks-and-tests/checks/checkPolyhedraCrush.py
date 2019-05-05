@@ -26,7 +26,7 @@ def checkForcesBodies(fR, bodNum):
       printSuccess()
 
 mat1 = PolyhedraMat(density=densityIn, young=youngIn,poisson=poissonIn, frictionAngle=frictionIn,IsSplitable=True,strength=1)
-O.bodies.append(utils.wall(0,axis=2,sense=1, material = mat1))
+O.bodies.append(wall(0,axis=2,sense=1, material = mat1))
 
 vertices = [[0,0,0],[sizeB,0,0],[sizeB,sizeB,0],[sizeB,sizeB,sizeB],[0,sizeB,0],[0,sizeB,sizeB],[0,0,sizeB],[sizeB,0,sizeB]]
 t = polyhedra_utils.polyhedra(mat1,v=vertices)

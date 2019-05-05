@@ -250,7 +250,7 @@ file=open('Test.txt',"w")
 checkdifference=0
 def equilibriumtest():
    global F33,F22,checkdifference,errors
-   #unbalanced=utils.unbalancedForce()
+   #unbalanced=unbalancedForce()
    F33=abs(O.forces.f(flow.wallIds[flow.ymax])[1])
    F22=abs(O.forces.f(flow.wallIds[flow.ymin])[1])
    #F11 =abs(O.forces.f(flow.wallIds[flow.xmax])[0]),

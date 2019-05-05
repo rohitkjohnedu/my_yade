@@ -5,7 +5,7 @@
 # internal compaction without friction, so that it is initially at equilibrium without shear forces. 
 # Positions and reference results are in data folder.
 from __future__ import print_function
-from yade import pack,utils,export,plot
+from yade import pack,export,plot
 import math,os,sys,shutil,tempfile
 
 tolerance=0.01

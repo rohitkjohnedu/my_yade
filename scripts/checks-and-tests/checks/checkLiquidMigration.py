@@ -3,7 +3,7 @@
 
 # The model checks liquid migration model if it is enabled during compilation
 from __future__ import print_function
-from yade import utils, plot
+from yade import plot
 
 if ('LIQMIGRATION' in features):
   o = Omega()

@@ -25,9 +25,9 @@ v_up = 5.0
 g = -9.81
 tolerance = 1e-3
 
-id_0=o.bodies.append(utils.sphere((0.0,0,0),0.2,material=sphereMat))    #The body has no initial vertical Velocity
-id_down=o.bodies.append(utils.sphere((1.0,0,0),0.2,material=sphereMat)) #The body has an initial vertical Velocity -5
-id_up=o.bodies.append(utils.sphere((2.0,0,0),0.2,material=sphereMat))   #The body has an initial vertical Velocity +5
+id_0=o.bodies.append(sphere((0.0,0,0),0.2,material=sphereMat))    #The body has no initial vertical Velocity
+id_down=o.bodies.append(sphere((1.0,0,0),0.2,material=sphereMat)) #The body has an initial vertical Velocity -5
+id_up=o.bodies.append(sphere((2.0,0,0),0.2,material=sphereMat))   #The body has an initial vertical Velocity +5
 
 O.bodies[id_down].state.vel[1] = v_down
 O.bodies[id_up].state.vel[1] = v_up

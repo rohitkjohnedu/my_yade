@@ -2,7 +2,7 @@
 # 2011 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
 # A dummy test, just to give an example, and detect possible path problems
 from __future__ import print_function
-from yade import pack,utils,export,plot
+from yade import pack,export,plot
 import math,os,sys
 print('checkTest mechanism')
 

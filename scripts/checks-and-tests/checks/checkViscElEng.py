@@ -7,7 +7,7 @@
 # This check-simulation checks the correctness of ViscoElasticEngine
 
 from __future__ import print_function
-from yade import utils, plot
+from yade import plot
 o = Omega()
 fr = 0.5;rho=2000
 tc = 0.001; en = 0.7; et = 0.7; o.dt = 0.0002*tc
