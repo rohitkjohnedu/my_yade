@@ -26,7 +26,7 @@ cmake_16_04:
   stage: cmake
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - mkdir build && cd build
     - export CC="ccache gcc"
@@ -60,7 +60,7 @@ cmake_stretch:
   stage: cmake
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - mkdir build && cd build
     - export CC="ccache gcc"
@@ -77,7 +77,7 @@ cmake_buster:
   stage: cmake
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - mkdir build && cd build
     - export CC="ccache gcc"
@@ -105,7 +105,7 @@ make_16_04:
   stage: build
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
@@ -185,7 +185,7 @@ make_stretch:
   stage: build
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
@@ -225,7 +225,7 @@ make_buster:
   stage: build
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
@@ -267,7 +267,7 @@ test_16_04:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --test
     - cat /etc/issue
@@ -291,7 +291,7 @@ test_stretch:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --test
     - cat /etc/issue
@@ -303,7 +303,7 @@ test_buster:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --test
     - cat /etc/issue
@@ -322,7 +322,7 @@ check_16_04:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --checks
   dependencies:
@@ -344,7 +344,7 @@ check_stretch:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --checks
   dependencies:
@@ -355,7 +355,7 @@ check_buster:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --checks
   dependencies:
