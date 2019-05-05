@@ -1199,7 +1199,6 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	VectorCell& cellHandles=T[noCache?(!currentTes):currentTes].cellHandles;
 	
-	cerr<<"noCache?"<<noCache<<endl;
 	if (permeabilityMap){
 		vtkWrite.begin_data("Permeability",CELL_DATA,SCALARS,FLOAT);
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
