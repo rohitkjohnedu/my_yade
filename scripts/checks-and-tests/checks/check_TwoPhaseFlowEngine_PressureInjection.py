@@ -129,7 +129,7 @@ while (iniok==0):
          celleini0[c0.getInterfaces()[ii][1]]=c0.getInterfaces()[ii][0]
   for ii in range(nvoids):
     if celleini1[ii]!=nvoids+1:
-        flow.clusterOutvadePore(celleini0[ii],ii,celleini1[ii])
+        flow.clusterOutvadePore(celleini0[ii],ii)
   no=0
   for ii in range(nvoids):
      if bar[ii]<initiallevel:
@@ -197,7 +197,7 @@ def pressureImbibition():
            
    for jj in range(nvoids):
       if col1[jj]==1:
-          flow.clusterOutvadePore(col0[jj],jj,col[jj])
+          flow.clusterOutvadePore(col0[jj],jj)
           #totalCellSat+=initialvol[jj]       
    
    for ii in range(len(c0.getInterfaces())):
@@ -235,7 +235,7 @@ def pressureImbibition():
              col[ll]=ii             
      for jj in range(nvoids):
         if col1[jj]==1:
-            flow.clusterOutvadePore(col0[jj],jj,col[jj])
+            flow.clusterOutvadePore(col0[jj],jj)
             #totalCellSat+=initialvol[jj]          
      for ii in range(len(c0.getInterfaces())):
         ll=c0.getInterfaces()[ii][0]
@@ -272,7 +272,7 @@ def pressureImbibition():
               col[ll]=ii           
        for jj in range(nvoids):
           if col1[jj]==1:
-              flow.clusterOutvadePore(col0[jj],jj,col[jj])
+              flow.clusterOutvadePore(col0[jj],jj)
               #totalCellSat+=initialvol[jj]
    
    total2=0.0
