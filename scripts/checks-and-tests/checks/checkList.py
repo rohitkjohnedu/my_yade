@@ -10,9 +10,14 @@ nFailed=0
 failedScripts=list()
 
 skipScripts = ['checkList.py']
+onlyOneScript = []
+
+def mustCheck(sc):
+	if(len(onlyOneScript)==1): return sc in onlyOneScript
+	return sc not in skipScripts
 
 for script in scriptsToRun:
-	if (script[len(script)-3:]==".py" and script not in skipScripts):
+	if (script[len(script)-3:]==".py" and mustCheck(script)):
 		try:
 			print("###################################")
 			print("running: ",script)
@@ -30,10 +35,10 @@ for script in scriptsToRun:
 			failedScripts.append(script)
 			print('\033[91m',script," failure, caught exception: ",e,'\033[0m')
 		O.reset()
-	elif (script in skipScripts):
+	elif (not mustCheck(script)):
 		print("###################################")
 		print("Skipping %s, because it is in SkipScripts"%script)
-		
+
 if (resultStatus>0):
 	print('\033[91m', resultStatus, " tests are failed"+'\033[0m')
 	for s in failedScripts: print("  "+s)
