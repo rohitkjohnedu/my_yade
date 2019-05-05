@@ -261,12 +261,7 @@ void HydroForceEngine::averageProfilePP(){
                         velAverageZ[n]/=phiAverage[n];
 			dragAverage[n]/=phiAverage[n];
 			//Normalize the concentration after
-			if(volPart) {
-				phiAverage[n]*=(volPart.get()/vCell);
-			} else {
-				LOG_FATAL("cannot use uninitialized volPart!");
-				throw std::logic_error("cannot use uninitialized volPart!");
-			}
+			phiAverage[n]*=(volPart.value()/vCell);
 		}
 		else {
 			velAverageX[n] = 0.0;
