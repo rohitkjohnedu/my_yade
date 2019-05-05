@@ -381,7 +381,7 @@ doc_18_04:
 
 
 # 5. pages stage; uploads documentation to the website
-pages_18_04:
+pages:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   stage: pages
   only:
