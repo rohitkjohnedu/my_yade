@@ -31,7 +31,7 @@ cmake_16_04:
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
     - ccache -s
   artifacts:
     paths:
@@ -48,7 +48,7 @@ cmake_18_04:
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
     - ccache -s
   artifacts:
     paths:
@@ -65,7 +65,7 @@ cmake_stretch:
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
     - ccache -s
   artifacts:
     paths:
@@ -82,7 +82,7 @@ cmake_buster:
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCHUNKSIZE=1 -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
     - ccache -s
   artifacts:
     paths:
