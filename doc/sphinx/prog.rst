@@ -162,55 +162,58 @@ Log levels
 
 .. warning:: this section is under construction.
 
-Yade uses `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for flexible logging levels and per-class debugging. A cmake compilation option ``-DBOOST_LOGGER`` must be supplied during compilation, otherwise the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output. Following debug levels are supported:
+Yade uses `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for flexible logging levels and per-class debugging.
+A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_. Following debug levels are supported:
 
 .. table:: Yade logging verbosity levels.
-	:widths: 20, 25, 10, 10, 15, 30
 
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| macro name     | macro aliases           | level | urgency | option       | explanation                                                                |
-	+================+=========================+=======+=========+==============+============================================================================+
-	|                |                         | 0     | off     | ``yade -v0`` | Will not log anything, not useful unless                                   |
-	|                |                         |       |         |              | a very silent mode is necessary.                                           |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_FATAL``  | ``LOG_1`` ``LOG_1_FAT`` | 1     | fatal   | ``yade -v1`` | Critical error. Even a throw to yade python                                |
-	|                |                         |       |         |              | interface will not recover from this situation.                            |
-	|                |                         |       |         |              | This is usually followed by yade exiting to shell.                         |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_THROW``  | ``LOG_2`` ``LOG_2_THR`` | 2     | throw   | ``yade -v2`` | Severe error, but yade can continue running. This macro produces           |
-	|                |                         |       |         |              | a log message and also throws the message to the python interface.         |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_ERROR``  | ``LOG_3`` ``LOG_3_ERR`` | 3     | error   | ``yade -v3`` | Error which does not require to throw to yade python interface.            |
-	|                |                         |       |         |              | Calculations will continue, but very likely the results will be all wrong. |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_WARN``   | ``LOG_4`` ``LOG_4_WAR`` | 4     | warn    | ``yade -v4`` | Recoverable problem that you should be notified about (e.g., invalid       |
-	|                |                         |       |         |              | value in a configuration file, so yade fell back to the default value).    |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_INFO``   | ``LOG_5`` ``LOG_5_INF`` | 5     | info    | ``yade -v5`` | Informational messages (e.g. something was loaded,                         |
-	|                |                         |       |         |              | something was called, etc.).                                               |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_DEBUG``  | ``LOG_6`` ``LOG_6_DEB`` | 6     | debug   | ``yade -v6`` | Debug messages. A yade developer puts them everywhere, and yade user       |
-	|                |                         |       |         |              | enables them on :ref:`per-class basis<debugging-a-class>` to               |
-	|                |                         |       |         |              | provide some extra debug info.                                             |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_MORE``   | ``LOG_7`` ``LOG_7_MOR`` | 7     | debug   | ``yade -v7`` | Highly grained debug messages.                                             |
-	|                |                         |       |         |              |                                                                            |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	| ``LOG_TRACE``  | ``LOG_8`` ``LOG_8_TRA`` | 8     | trace   | ``yade -v8`` | Trace messages, they capture every possible detail about yade behavior.    |
-	|                |                         |       |         |              |                                                                            |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
-	|                |                         | 9     | all     | ``yade -v9`` | Enables all debug messages, including some custom log levels not in the    |
-	|                |                         |       |         |              | list above. Intended for developer use only.                               |
-	+----------------+-------------------------+-------+---------+--------------+----------------------------------------------------------------------------+
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| macro name     | macro aliases            | option  | explanation                                                                |
+	+================+==========================+=========+============================================================================+
+	|                |                          | ``-v0`` | Will not log anything, not useful unless                                   |
+	|                |                          |         | a very silent mode is necessary.                                           |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_FATAL``  | ``LOG_1``, ``LOG_1_FAT`` | ``-v1`` | Critical error. Even a throw to yade python                                |
+	|                |                          |         | interface will not recover from this situation.                            |
+	|                |                          |         | This is usually followed by yade exiting to shell.                         |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_THROW``  | ``LOG_2``, ``LOG_2_THR`` | ``-v2`` | Severe error, but yade can continue running. This macro produces           |
+	|                |                          |         | a log message and also throws the message to the python interface.         |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_ERROR``  | ``LOG_3``, ``LOG_3_ERR`` | ``-v3`` | Error which does not require to throw to yade python interface.            |
+	|                |                          |         | Calculations will continue, but very likely the results will be all wrong. |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_WARN``   | ``LOG_4``, ``LOG_4_WAR`` | ``-v4`` | Recoverable problem that you should be notified about (e.g., invalid       |
+	|                |                          |         | value in a configuration file, so yade fell back to the default value).    |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_INFO``   | ``LOG_5``, ``LOG_5_INF`` | ``-v5`` | Informational messages (e.g. something was loaded,                         |
+	|                |                          |         | something was called, etc.).                                               |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_DEBUG``  | ``LOG_6``, ``LOG_6_DEB`` | ``-v6`` | Debug messages. A yade developer puts them everywhere, and yade user       |
+	|                |                          |         | enables them on :ref:`per-class basis<debugging-a-class>` to               |
+	|                |                          |         | provide some extra debug info.                                             |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_MORE``   | ``LOG_7``, ``LOG_7_MOR`` | ``-v7`` | Highly grained debug messages.                                             |
+	|                |                          |         |                                                                            |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	| ``LOG_TRACE``  | ``LOG_8``, ``LOG_8_TRA`` | ``-v8`` | Trace messages, they capture every possible detail about yade behavior.    |
+	|                |                          |         |                                                                            |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
+	|                |                          | ``-v9`` | Enables all debug messages, including some custom log levels not in the    |
+	|                |                          |         | list above. Intended for developer use only.                               |
+	+----------------+--------------------------+---------+----------------------------------------------------------------------------+
 
-Yade default log level is ``-v4``.
+Yade default log level is the same as invoking ``yade -v4``.
 
 .. note:: as a convenience feature the ``LOG_THROW`` does **both** things:
 
 		* logs an error 
 		* and throws an exception.
 
-	No need to call a throw with a duplicated error message. It throws exception ``(exception name here)`` even when logging is disabled and the message isn't logged.
+	No need to throw with a duplicated error message. It throws exception ``(exception name here)`` even when logging is disabled and the message isn't logged.
+
+.. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
+
 
 .. _debugging-a-class:
 
