@@ -172,7 +172,14 @@ def printAllVersions(rstFormat=False):
 	feats = ""
 	for f in yade.config.features: feats+=" "+f
 	print("Yade features  :",feats)
-	print("Yade config dir:",yade.config.confDir)
+	# print yade config dir relative to ${HOME}
+	confD = yade.config.confDir
+	try:
+		import os
+		confD = "~/"+os.path.relpath(yade.config.confDir,os.environ['HOME'])
+	except Exception as e:
+		pass
+	print("Yade config dir:",confD)
 	print("\nLibraries used :\n")
 	print(lines)
 
