@@ -3,7 +3,7 @@
 #  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 #  DEBUG: compile in debug-mode (OFF by default)
 #  TRACEONLY: of all debug macros enable only the TRACE macro in lib/base/Logging.hpp, even if DEBUG=OFF (OFF by default)
-#  BOOSTLOG: use boost::log library for logging (OFF by default)  [name BOOST_LOG is a macro in boost. I don't want any problems due to overwriting that name.]
+#  BOOST_LOGGER: use boost::log library for logging (OFF by default)
 #  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 #  SUFFIX: suffix, added after binary-names (version number by default)
 #  NOSUFFIX: do not add a suffix after binary-name (OFF by default)
@@ -153,7 +153,7 @@ IF (TRACEONLY)
   ENDIF (DEBUG)
 ENDIF (TRACEONLY)
 
-IF(BOOSTLOG)
+IF(BOOST_LOGGER)
   ADD_DEFINITIONS("-D YADE_BOOST_LOG")
   ADD_DEFINITIONS("-D BOOST_LOG_DYN_LINK")
   IF (DEBUG)
@@ -161,7 +161,7 @@ IF(BOOSTLOG)
   ELSE (DEBUG)
     MESSAGE(STATUS "Enabling boost::log library and DEBUG=OFF. What will come out of this?")
   ENDIF (DEBUG)
-ENDIF(BOOSTLOG)
+ENDIF(BOOST_LOGGER)
 
 #==================================
 #====== *** PYTHON/BOOST *** ======
