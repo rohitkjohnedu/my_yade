@@ -151,7 +151,7 @@ to add yade external ppa from https://launchpad.net/~yade-users/+archive/externa
 The following commands have to be executed in the command line of your corresponding
 distribution. Just copy&paste to the terminal. Note, to execute these commands you
 need root privileges.
- 
+
 * **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives::
 
 		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot \
@@ -162,7 +162,7 @@ need root privileges.
 		python3-pil libjs-jquery python3-sphinx python3-git libxmu-dev libxi-dev libcgal-dev \
 		help2man libbz2-dev zlib1g-dev python3-minieigen libopenblas-dev libsuitesparse-dev \
 		libmetis-dev python3-bibtexparser python3-future coinor-clp coinor-libclp-dev
-		
+
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
 
 * For building documentation (the ``make doc`` invocation explained below) additional package ``texlive-xetex`` is required. On some multi-language systems an error ``Building format(s) --all. This may take some time... fmtutil failed.`` may occur, in that case a package ``locales-all`` is required.
@@ -233,6 +233,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 	* DEBUG: compile in debug-mode (OFF by default)
 	* TRACEONLY: of all debug macros enable only the TRACE macro in :ysrc:`lib/base/Logging.hpp`. This enables TRACE even when DEBUG=OFF (OFF by default)
+	* BOOSTLOG: use `boost::log <https://www.boost.org/doc/libs/1_70_0/libs/log/doc/html/index.html>`_ library for logging separately for each class (OFF by default)
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 	* SUFFIX: suffix, added after binary-names (version number by default)
 	* NOSUFFIX: do not add a suffix after binary-name (OFF by default)

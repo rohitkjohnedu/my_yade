@@ -1,4 +1,5 @@
-// 2006-2008 © Václav Šmilauer <eudoxos@arcig.cz> 
+// 2006-2008 © Václav Šmilauer <eudoxos@arcig.cz>
+// 2019        Janek Kozicki
 #pragma once
 /*
  * This file defines various useful logging-related macros - userspace stuff is
@@ -16,10 +17,16 @@
 
 #include <iostream>
 
+#ifdef YADE_BOOST_LOG
+#	include <boost/log/trivial.hpp>
+#	define _POOR_MANS_LOG(level,msg) {BOOST_LOG_TRIVIAL(trace)<<" "<<_LOG_HEAD<<msg<<std::endl;}
+#	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
+#else
 #	define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}
 #	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
+#endif
 
-#if defined(YADE_DEBUG) ||  defined(YADE_TRACEONLY) 
+#if defined(YADE_DEBUG) ||  defined(YADE_TRACEONLY)
 	# define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE",msg)
 #else
 	# define LOG_TRACE(msg)
