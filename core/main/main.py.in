@@ -49,13 +49,15 @@ par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.
   Available features: %s.\
   Homepage http://www.yade-dem.org, code hosted at http://www.launchpad.net/yade."%features
   )
-par.add_argument('-v','--version',help='Print version and exit.',dest='version',action='store_true')
+par.add_argument('-V','--version',help='Print version and exit.',dest='version',action='store_true')
 par.add_argument('-j','--threads',help='Number of OpenMP threads to run; defaults to 1. Equivalent to setting OMP_NUM_THREADS environment variable.',dest='threads',type=int)
 par.add_argument('--cores',help='Set number of OpenMP threads (as \-\-threads) and in addition set affinity of threads to the cores given. Please provide a string with comma-separated core-ids.',dest='cores',type=str)
 par.add_argument('-mit','--mpi-interactive-threads',help='Number of MPI threads (interactive mode, master+spawns). Values <2 disables mit, -mit x sets 1 master and x-1 workers.',dest='mit',default=0,type=int)
 par.add_argument('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',nargs='+')
 par.add_argument('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type=int)
 par.add_argument('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
+par.add_argument('-v',help=('Set global logging verbosity https://yade-dem.org/doc/prog.html#log-levels, default is -v4 for all classes.'+
+                ('' if 'BoostLog' in features else " (Since this build doesn't use boost::log this option is unavailable, use cmake option -DBOOST_LOGGER=ON to enable)")),dest='verbosity',type=int)
 par.add_argument('-n',help="Run without graphical interface (equivalent to unsetting the DISPLAY environment variable)",dest='nogui',action='store_true')
 par.add_argument('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
 par.add_argument('--checks',help='Run a series of user-defined check tests as described in /yade/scripts/checks-and-tests/checks/README and https://yade-dem.org/doc/prog.html#regression-tests',dest='checks',action='store_true')
@@ -83,12 +85,10 @@ if opts.version:
 if opts.script:
 	args.insert(0,opts.script) # for compatibility with userSession(), could be modified in the future
 
-	
 ## Check if this script is exec'd or imported as part of a mpi process
 # If yade is run with mpiexec prefix (on clusters for example), all processes will be in mpi_mode.
 # If yade is run with -mit x(>1), master will disable mpi_mode (for interactivity) and will spawn processes that will be in mpi_mode.
 opts.mpi_mode = os.getenv('OMPI_COMM_WORLD_RANK')!=None
-
 
 ## remove later
 ## python2.5 relative module imports workaround
@@ -146,6 +146,7 @@ import yade
 # other parts we will need soon
 import yade.config
 import yade.wrapper
+import yade.log
 import yade.system
 import yade.runtime
 # import to have quick access to function printAllVersions()
@@ -156,6 +157,11 @@ from yade.libVersions import printAllVersions
 if opts.updateScripts:
 	yade.system.updateScripts(args)
 	sys.exit(0)
+
+if 'BoostLog' in yade.config.features and opts.verbosity:
+	print("Setting log level to: ",opts.verbosity)
+	yade.log.setLevel(opts.verbosity)
+#	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,2)])
 
 # modify sys.argv in-place so that it can be handled by userSession
 sys.yade_argv=sys.argv

@@ -82,6 +82,8 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	  --nice=NICE           Increase nice level (i.e. decrease priority) by given
 	                        number.
 	  -x                    Exit when the script finishes
+	  -v                    Set :global ref:`logging verbosity <log-levels>`, default
+	                        is -v4 for all classes
 	  -n                    Run without graphical interface (equivalent to
 	                        unsetting the DISPLAY environment variable)
 	  --test                Run regression test suite and exit; the exists status
