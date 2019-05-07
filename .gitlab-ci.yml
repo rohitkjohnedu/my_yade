@@ -1,11 +1,12 @@
 # The previously used image:
 # image: registry.gitlab.com/yade-dev/docker-yade
 #
-# Four new images:
+# Five new images:
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+# image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
 
 stages:
   - cmake
@@ -43,7 +44,7 @@ cmake_18_04:
   stage: cmake
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - mkdir build && cd build
     - export CC="ccache gcc"
@@ -78,6 +79,23 @@ cmake_buster:
   only:
     - master
 #   - merge_request
+  script:
+    - mkdir build && cd build
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - ccache -s
+  artifacts:
+    paths:
+      - build
+    expire_in: 2 weeks
+
+cmake_opensuse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+  stage: cmake
+  only:
+    - master
+    - merge_request
   script:
     - mkdir build && cd build
     - export CC="ccache gcc"
@@ -145,7 +163,7 @@ make_18_04:
   stage: build
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
@@ -279,7 +297,7 @@ test_18_04:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --test
     - cat /etc/issue
@@ -333,7 +351,7 @@ check_18_04:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - install/bin/yade-ci --checks
   dependencies:
@@ -368,7 +386,7 @@ doc_18_04:
   stage: test
   only:
     - master
-    - merge_request
+#   - merge_request
   script:
     - cd build
     - xvfb-run -s "-screen 0 1600x1200x24" make doc
