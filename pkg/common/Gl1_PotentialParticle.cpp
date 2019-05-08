@@ -429,7 +429,7 @@ void PotentialParticleVTKRecorder::action() {
 		c[2]=color[2];
 		int nbCells=polydata->GetNumberOfPoints();
 		for (int i=0; i<nbCells; i++) {
-			pbColors->INSERT_NEXT_TUPLE(c);
+			pbColors->INSERT_NEXT_TYPED_TUPLE(c);
 		}
 		polydata->GetPointData()->SetScalars(pbColors);
 		//polydata->Update();

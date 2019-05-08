@@ -16,8 +16,10 @@ And use a macro in these places:
 // fix InsertNextTupleValue → InsertNextTuple name change
 	#if VTK_MAJOR_VERSION < 8
 		#define INSERT_NEXT_TUPLE(a) InsertNextTupleValue(a)
+		#define INSERT_NEXT_TYPED_TUPLE(a) InsertNextTupleValue(a)
 	#else
 		#define INSERT_NEXT_TUPLE(a) InsertNextTuple(a)
+		#define INSERT_NEXT_TYPED_TUPLE(a) InsertNextTypedTuple(a)
 	#endif
 // (and others in the future)
 #endif
