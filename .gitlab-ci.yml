@@ -376,7 +376,7 @@ test_opensuse15:
 #   - merge_request
   script:
     - install/bin/yade-ci --test
-    - cat /etc/issue
+    - cat /etc/*elease
   dependencies:
     - make_opensuse15
 
