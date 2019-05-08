@@ -19,6 +19,34 @@ All libraries listed in :ref:`prerequisites<prerequisites>` are detected by this
 from yade._libVersions import *
 import yade.config
 
+def getLinuxVersion():
+	"""
+	This function returns the linux release and version information
+	"""
+	ret=""
+	try:
+		import os
+		listDir = os.listdir("/etc")
+		once = ("os-release" in listDir)
+		for f in listDir:
+			if((once and f=="os-release") or ((not once) and f.endswith("elease"))):
+				with open(os.path.join("/etc", f), 'r') as fin:
+					lines=""
+					for line in fin:
+						if(line.startswith("PRETTY_NAME")):
+							try:
+								ret=(line.split('"')[1])
+							except Exception as e:
+								ret=(line)
+							break
+						lines+=line
+					if(ret==""): ret=("\n"+lines)
+	except Exception as e:
+		print("Error: cannot find file /etc/os-release. Caught exception:",e)
+		ret="Unknown"
+	return ret
+
+
 def getVersion(libName):
 	"""
 	This function returns the tuple ``(major, minor, patchlevel)`` with library version number. The ``yade --test`` in file :ysrc:`py/tests/libVersions.py` tests that this
@@ -194,26 +222,7 @@ def printAllVersions(rstFormat=False):
 	if(rstFormat==False): print("```")
 	print("\nLibraries used :\n")
 	print(lines)
-	print("Linux version: ", end = '')
-	try:
-		import os
-		for f in os.listdir("/etc"):
-			if f.endswith("elease"):
-				with open(os.path.join("/etc", f), 'r') as fin:
-					printed=False
-					lines=""
-					for line in fin:
-						if(line.startswith("PRETTY_NAME")):
-							try:
-								print(line.split('"')[1])
-							except Exception as e:
-								print(line)
-							printed=True
-							break
-						lines+=line
-					if(not printed): print("\n"+lines)
-	except Exception as e:
-		print("Error: cannot find file /etc/os-release. Caught exception:",e)
+	print("Linux version: "+str(getLinuxVersion()))
 	print("")
 
 
