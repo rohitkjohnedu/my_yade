@@ -21,7 +21,7 @@ import yade.config
 
 def getLinuxVersion():
 	"""
-	This function returns the linux release and version information
+	:return: string containing linux release and version, preferably the value of ``PRETTY_NAME`` from file ``/etc/os-release``.
 	"""
 	ret=""
 	try:
