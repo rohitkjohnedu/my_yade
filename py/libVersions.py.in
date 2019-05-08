@@ -194,18 +194,27 @@ def printAllVersions(rstFormat=False):
 	if(rstFormat==False): print("```")
 	print("\nLibraries used :\n")
 	print(lines)
-	if(rstFormat==False): print("\n```")
-	print("Linux version:")
+	print("Linux version: ", end = '')
 	try:
 		import os
 		for f in os.listdir("/etc"):
 			if f.endswith("elease"):
 				with open(os.path.join("/etc", f), 'r') as fin:
-					print(fin.read())
+					printed=False
+					lines=""
+					for line in fin:
+						if(line.startswith("PRETTY_NAME")):
+							try:
+								print(line.split('"')[1])
+							except Exception as e:
+								print(line)
+							printed=True
+							break
+						lines+=line
+					if(not printed): print("\n"+lines)
 	except Exception as e:
 		print("Error: cannot find file /etc/os-release. Caught exception:",e)
-	if(rstFormat==False): print("```\n")
-
+	print("")
 
 
 """
