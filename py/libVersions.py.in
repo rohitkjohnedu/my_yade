@@ -182,6 +182,16 @@ def printAllVersions(rstFormat=False):
 	print("Yade config dir:",confD)
 	print("\nLibraries used :\n")
 	print(lines)
+	print("\nLinux version:")
+	try:
+		import os
+		for f in os.listdir("/etc"):
+			if f.endswith("elease"):
+				with open(os.path.join("/etc", f), 'r') as fin:
+					print(fin.read())
+	except Exception as e:
+		print("Error: cannot find file /etc/os-release. Caught exception:",e)
+
 
 
 """
