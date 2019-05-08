@@ -43,7 +43,7 @@ def getLinuxVersion():
 					if(ret==""): ret=("\n"+lines)
 	except Exception as e:
 		print("Error: cannot find file /etc/os-release. Caught exception:",e)
-		ret="Unknown"
+	if(ret==""): ret="Unknown"
 	return ret
 
 
