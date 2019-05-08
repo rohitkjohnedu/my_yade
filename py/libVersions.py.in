@@ -165,6 +165,7 @@ def printAllVersions(rstFormat=False):
 		if(rstFormat):
 			lines+= sep+'\n'
 
+	if(rstFormat==False): print("\n```")
 	#print("Yade revision  : ",yade.config.revision)
 	print("Yade version   : ",yade.config.version)
 	#print("Yade prefix    : ",yade.config.prefix)
@@ -180,9 +181,11 @@ def printAllVersions(rstFormat=False):
 	except Exception as e:
 		pass
 	print("Yade config dir:",confD)
+	if(rstFormat==False): print("```")
 	print("\nLibraries used :\n")
 	print(lines)
-	print("\nLinux version:")
+	if(rstFormat==False): print("\n```")
+	print("Linux version:")
 	try:
 		import os
 		for f in os.listdir("/etc"):
@@ -191,6 +194,7 @@ def printAllVersions(rstFormat=False):
 					print(fin.read())
 	except Exception as e:
 		print("Error: cannot find file /etc/os-release. Caught exception:",e)
+	if(rstFormat==False): print("```\n")
 
 
 
