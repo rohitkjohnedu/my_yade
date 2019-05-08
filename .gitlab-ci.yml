@@ -6,7 +6,7 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-# image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+# image: registry.gitlab.com/yade-dev/docker-yade:suse15
 
 stages:
   - cmake
@@ -90,8 +90,8 @@ cmake_buster:
       - build
     expire_in: 2 weeks
 
-cmake_opensuse15:
-  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+cmake_suse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
   stage: cmake
   only:
     - master
@@ -278,8 +278,8 @@ make_buster:
   dependencies:
     - cmake_buster
 
-make_opensuse15:
-  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+make_suse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
   stage: build
   only:
     - master
@@ -316,7 +316,7 @@ make_opensuse15:
   tags:
     - fast
   dependencies:
-    - cmake_opensuse15
+    - cmake_suse15
 
 
 # 3.1. test stage
@@ -368,8 +368,8 @@ test_buster:
   dependencies:
     - make_buster
 
-test_opensuse15:
-  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+test_suse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
   stage: test
   only:
     - master
@@ -378,7 +378,7 @@ test_opensuse15:
     - install/bin/yade-ci --test
     - cat /etc/*elease
   dependencies:
-    - make_opensuse15
+    - make_suse15
 
 
 # Four new images:
@@ -431,8 +431,8 @@ check_buster:
   dependencies:
     - make_buster
 
-check_opensuse15:
-  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+check_suse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
   stage: test
   only:
     - master
@@ -440,7 +440,7 @@ check_opensuse15:
   script:
     - install/bin/yade-ci --checks
   dependencies:
-    - make_opensuse15
+    - make_suse15
 
 
 # 4. doc stage
