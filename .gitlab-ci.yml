@@ -97,8 +97,6 @@ cmake_opensuse15:
     - master
     - merge_request
   script:
-# FIXME: cmake should detect libboost_python3.so or libboost_python-py3.so.1.66.0 or libboost_python-py3.so
-    - ln -s /usr/lib64/libboost_python3.so /usr/lib64/libboost_python-py36.so
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
