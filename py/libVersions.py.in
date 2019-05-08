@@ -100,6 +100,10 @@ def getAllVersionsCmake():
 	# 16. metis     - I don't know how to detect it
 	# 17. mpi       - This one is based on https://cmake.org/cmake/help/v3.10/module/FindMPI.html
 	addVer("mpi"   ,'${MPI_CXX_VERSION_MAJOR}','${MPI_CXX_VERSION_MINOR}','0', '${MPI_CXX_VERSION}')
+	# 18. numpy
+	addVer("numpy" ,'${NUMPY_VERSION_MAJOR}','${NUMPY_VERSION_MINOR}','${NUMPY_VERSION_PATCH}', '${NUMPY_VERSION}')
+	# 19. ipython
+	addVer("ipython" ,'${IPYTHON_VERSION_MAJOR}','${IPYTHON_VERSION_MINOR}','${IPYTHON_VERSION_PATCH}', '${IPYTHON_VERSION}')
 	return ret
 
 def printAllVersions(rstFormat=False):
