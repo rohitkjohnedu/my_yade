@@ -97,8 +97,6 @@ cmake_opensuse15:
     - master
     - merge_request
   script:
-# XXX: it will take to long to build new docker image. Let's quickly remove the bad symlink here.
-    - rm -f /usr/lib64/libboost_python-py36.so
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
@@ -280,6 +278,46 @@ make_buster:
   dependencies:
     - cmake_buster
 
+make_opensuse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+  stage: build
+  only:
+    - master
+    - merge_request
+  script:
+    - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
+    - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
+    - ld --version
+    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
+    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
+    - ld --version
+    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
+        "y_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
+        "c_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
+        "y_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
+        "c_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
+        "y_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
+        "c_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
+        "yade-runner") echo "12" ;;
+        "yade-runner-01") echo "1" ;;
+        *) echo "8";;
+        esac)
+    - echo $JOBSNUM
+    - cd build
+    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
+    - make -j $JOBSNUM
+    - make install
+    - make clean
+    - ccache -s
+  artifacts:
+    paths:
+      - install
+    expire_in: 2 weeks
+  tags:
+    - fast
+  dependencies:
+    - cmake_opensuse15
+
 
 # 3.1. test stage
 test_16_04:
@@ -329,6 +367,18 @@ test_buster:
     - cat /etc/issue
   dependencies:
     - make_buster
+
+test_opensuse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+  stage: test
+  only:
+    - master
+    - merge_request
+  script:
+    - install/bin/yade-ci --test
+    - cat /etc/issue
+  dependencies:
+    - make_opensuse15
 
 
 # Four new images:
@@ -380,6 +430,17 @@ check_buster:
     - install/bin/yade-ci --checks
   dependencies:
     - make_buster
+
+check_opensuse15:
+  image: registry.gitlab.com/yade-dev/docker-yade:opensuse15
+  stage: test
+  only:
+    - master
+    - merge_request
+  script:
+    - install/bin/yade-ci --checks
+  dependencies:
+    - make_opensuse15
 
 
 # 4. doc stage
