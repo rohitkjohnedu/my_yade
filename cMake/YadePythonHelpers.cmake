@@ -64,6 +64,9 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 				BREAK()
 			ENDIF()
 		ENDFOREACH()
+		IF(NOT Boost_FOUND) # for opensuze
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time)
+		ENDIF()
 	ENDIF()
 	IF(NOT Boost_FOUND) #as we try multiple python prefixes we have to handle manually the required behavior: fail if we didn't found boost
 		MESSAGE(${fail_message} libboost-python)
