@@ -103,7 +103,13 @@ def getAllVersionsCmake():
 	# 18. numpy
 	addVer("numpy" ,'${NUMPY_VERSION_MAJOR}','${NUMPY_VERSION_MINOR}','${NUMPY_VERSION_PATCH}', '${NUMPY_VERSION}')
 	# 19. ipython
-	addVer("ipython" ,'${IPYTHON_VERSION_MAJOR}','${IPYTHON_VERSION_MINOR}','${IPYTHON_VERSION_PATCH}', '${IPYTHON_VERSION}')
+	try:
+		import IPython
+		ipver=IPython.__version__
+		ipvertab=IPython.__version__.split('.')
+		addVer("ipython", ipvertab[0] , ipvertab[1] , ipvertab[2] , ipver )
+	except:
+		pass
 	return ret
 
 def printAllVersions(rstFormat=False):
