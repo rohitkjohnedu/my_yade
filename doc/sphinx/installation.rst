@@ -364,7 +364,7 @@ The two tools can be combined very simply, adding to the above exports::
 Link time
 ^^^^^^^^^^^^^^^^^^^^^
 
-The link time can be reduced roughly 2 minutes by changing the default linker from ``ld`` to ``ld.gold``. They are both in the same package ``binutils``. To perform the switch execute these commands as root::
+The link time can be reduced roughly 2 minutes by changing the default linker from ``ld`` to ``ld.gold``. They are both in the same package ``binutils`` (on opensuse15 it is package ``binutils-gold``). To perform the switch execute these commands as root::
 
 	ld --version
 	update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" 20
