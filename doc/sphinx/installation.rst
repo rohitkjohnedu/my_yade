@@ -310,6 +310,19 @@ upon detecting the C and C++ compiler to use::
 Clang does not support OpenMP-parallelizing for the moment, that is why the
 feature will be disabled.
 
+Supported linux releases
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+`Currently supported <https://gitlab.com/yade-dev/trunk/pipelines?scope=branches>`_ [#buildLog]_ linux releases and their respective `docker <https://docs.docker.com/>`_ `files <https://docs.docker.com/engine/reference/builder/>`_ are:
+
+* `Ubuntu 16.04 xenial <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu16-py3/Dockerfile>`_
+* `Ubuntu 18.04 bionic <https://gitlab.com/yade-dev/docker-yade/blob/ubuntu18.04/Dockerfile>`_
+* `Debian 9 stretch <https://gitlab.com/yade-dev/docker-yade/blob/debian-stretch/Dockerfile>`_
+* `Debian 10 buster <https://gitlab.com/yade-dev/docker-yade/blob/debian-buster/Dockerfile>`_
+* `openSUSE 15 <https://gitlab.com/yade-dev/docker-yade/blob/suse15/Dockerfile>`_
+
+.. [#buildLog] To see details of the latest build log click on the *master* branch.
+
 Python 2 backward compatibility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
