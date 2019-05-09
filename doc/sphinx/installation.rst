@@ -321,6 +321,25 @@ Supported linux releases
 * `Debian 10 buster <https://gitlab.com/yade-dev/docker-yade/blob/debian-buster/Dockerfile>`_
 * `openSUSE 15 <https://gitlab.com/yade-dev/docker-yade/blob/suse15/Dockerfile>`_
 
+These are the bash commands used to prepare the linux distribution and environment for installing and testing yade.
+These instructions are automatically performed using the `gitlab continuous integration <https://docs.gitlab.com/ee/ci/quick_start/>`_ service after
+each merge to master. This makes sure that yade always works correctly on these linux distributions.
+In fact yade can be installed manually by following step by step these instructions in following order:
+
+1. Bash commands in the respective Dockerfile to install necessary packages,
+
+2. do ``git clone https://gitlab.com/yade-dev/trunk.git``,
+
+3. then the ``cmake_*`` commands in the `.gitlab-ci.yml file <https://gitlab.com/yade-dev/trunk/blob/master/.gitlab-ci.yml>`_ for respective distribution,
+
+4. then the ``make_*`` commands to compile yade,
+
+5. and finally the ``--check`` and ``--test`` commands.
+
+6. Optionally documentation can be built with ``make doc`` command, however currently it is not guaranteed to work on all linux distributions due to frequent interface changes in `sphinx <http://www.sphinx-doc.org/en/master/>`_.
+
+These instructions use ``ccache`` and ``ld.gold`` to :ref:`speed-up compilation <speed-up>` as described below.
+
 .. [#buildLog] To see details of the latest build log click on the *master* branch.
 
 Python 2 backward compatibility
