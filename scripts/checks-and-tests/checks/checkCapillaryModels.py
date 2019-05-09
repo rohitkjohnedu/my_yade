@@ -80,11 +80,11 @@ f3 = -O.forces.f(id6)[2]
 O.wait()
 
 if ((abs(2.07328148666e-07-f1)/f1)>tolerance):
-  resultStatus += 1
-  
+  raise YadeCheckError("error 1")
+
 if ((abs(6.78192074e-07-f2)/f2)>tolerance):
-  resultStatus += 1
-  
+  raise YadeCheckError("error 2")
+
 if ((abs(1.58617796928e-06-f3)/f3)>tolerance):
-  resultStatus += 1
+  raise YadeCheckError("error 3")
 

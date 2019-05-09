@@ -12,8 +12,6 @@ def errprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 scriptsToRun=os.listdir(checksPath)
-resultStatus = 0
-nFailed=0
 failedScripts=list()
 
 skipScripts = ['checkList.py']
@@ -29,16 +27,9 @@ for script in scriptsToRun:
 			errprint("###################################")
 			errprint("running: ",script)
 			execfile(checksPath+"/"+script)
-			if (resultStatus>nFailed):
-				errprint('\033[91m'+"Status: FAILURE!!!"+'\033[0m')
-				nFailed=resultStatus
-				failedScripts.append(script)
-			else:
-				errprint("Status: success")
+			errprint("Status: success")
 			errprint("___________________________________")
 		except Exception as e:
-			resultStatus+=1
-			nFailed=resultStatus
 			failedScripts.append(script)
 			errprint('\033[91m',script," failure, caught exception ",e.__class__.__name__,": ",e,'\033[0m')
 		O.reset()
@@ -46,8 +37,8 @@ for script in scriptsToRun:
 		errprint("###################################")
 		errprint("Skipping %s, because it is in SkipScripts"%script)
 
-if (resultStatus>0):
-	errprint('\033[91m', resultStatus, " tests are failed"+'\033[0m')
+if (len(failedScripts)!=0):
+	errprint('\033[91m', len(failedScripts) , " tests are failed"+'\033[0m')
 	for s in failedScripts: errprint("  "+s)
 	sys.exit(1)
 else:

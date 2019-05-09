@@ -71,14 +71,10 @@ def getCurrentVel(inVel=0):
   return inVel + g*t
 
 def warningMessagePos(inVel, y_pos, y_pos_need):
-  print("The body with the initial velocity %.3f, has an y-position %.3f, but it should be %.3f" % (inVel, y_pos, y_pos_need))
-  global resultStatus
-  resultStatus+=1
-  
+  raise YadeCheckError("The body with the initial velocity %.3f, has an y-position %.3f, but it should be %.3f" % (inVel, y_pos, y_pos_need))
+
 def warningMessageVel(inVel, y_vel, y_pos_vel):
-  print("The body with the initial velocity %.3f, has an y-velocity %.3f, but it should be %.3f" % (inVel, y_vel, y_pos_vel))
-  global resultStatus
-  resultStatus+=1
+  raise YadeCheckError("The body with the initial velocity %.3f, has an y-velocity %.3f, but it should be %.3f" % (inVel, y_vel, y_pos_vel))
 
 O.dt=0.02*tc
 O.saveTmp('init');

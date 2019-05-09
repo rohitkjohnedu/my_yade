@@ -12,6 +12,7 @@ finalFricDegree = 30 # contact friction during the deviatoric loading
 mn,mx=Vector3(0,0,0),Vector3(1,1,0.4) # corners of the initial packing
 graindensity=2600
 errors=0
+errMsg=""
 toleranceWarning =1.e-11
 toleranceCritical=1.e-6
 
@@ -302,7 +303,8 @@ def equilibriumtest():
      if checkdifference==0:
        print('check F done')
        if deltaF>0.01*press:
-         print('Error: too high difference between forces acting at the bottom and upper walls')
+         errMsg+='Error: too high difference between forces acting at the bottom and upper walls'
+         print(errMsg)
          errors+=1
          #O.pause()
        checkdifference=1
@@ -317,7 +319,8 @@ def fluxtest():
    if error>toleranceWarning:
       print("Warning: difference between total water volume flowing through bottom wall and water loss due to air bubble generations",QinOk," vs. total water volume flowing inside dry or partially saturated cells",total2)
    if error>toleranceCritical:
-      print("The difference is more, than the critical tolerance!")
+      errMsg+="The difference is more, than the critical tolerance!"
+      print(errMsg)
       errors+=1         
    file.write(str(O.time-timeini)+" "+str(total2)+" "+str(QinOk)+" "+str(error)+"\n") 
    
@@ -331,14 +334,15 @@ def fluxtest():
          if voidvol-total2>toleranceWarning:
            print("Warning: initial volume of dry voids",voidvol," vs. total water volume flowing inside dry or partially saturated cells",total2)
          if voidvol-total2>toleranceCritical:
-           print("The difference is more, than the critical tolerance!")
+           errMsg+="The difference is more, than the critical tolerance!"
+           print(errMsg)
            errors+=1
          print(errors)
          file.write(str(imbtime)+" "+str(voidvol)+" "+str(total2)+" "+str(QinOk)+" "+str(errors)+"\n") 
          once=1
          timing.stats()
          if (errors):
-            resultStatus+=1
+            raise YadeCheckError(errMsg)
    
 
 def addPlotData():

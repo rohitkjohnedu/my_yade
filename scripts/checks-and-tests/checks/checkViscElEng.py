@@ -55,4 +55,4 @@ O.run(1000000)
 O.wait()
 
 if ((abs(0.736356797441-en)/en)>tolerance):
-  resultStatus += 1
+  raise YadeCheckError("((abs(0.736356797441-en)/en)>tolerance)")

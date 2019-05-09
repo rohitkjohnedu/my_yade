@@ -100,11 +100,11 @@ omegad      = omega0 * math.sqrt(1 - zeta**2)
 xAnalytical = v/omegad * math.exp(-zeta*omega0*O.time) * math.sin(omegad*O.time)
 
 
-# Comparison (if ok, resultStatus is not incremented)
+# Comparison (if ok, YadeCheckError Exception is not thrown)
 tolerance = 0.0001
 
 xNumerical = O.bodies[b2].state.pos[0]
 
 if ((abs(xNumerical-xAnalytical)/xAnalytical)>tolerance):
-  resultStatus += 1
+  raise YadeCheckError("((abs(xNumerical-xAnalytical)/xAnalytical)>tolerance)")
 

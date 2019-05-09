@@ -50,5 +50,5 @@ print ("Precalculated weight %f" % sphMass)
 print ("Obtained weight %f" % curForce)
 
 if (((sphMass-curForce)/curForce)>tolerance):
-	resultStatus += 1
+	raise YadeCheckError("(((sphMass-curForce)/curForce)>tolerance)")
 
