@@ -4,6 +4,10 @@ from __future__ import print_function
 from past.builtins import execfile
 import yade,math,os,sys
 
+class YadeCheckError(Exception):
+	"""Use ``raise YadeCheckError("message") when check fails. Or throw any other python exception that seems suitable."""
+	pass
+
 def errprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
@@ -36,7 +40,7 @@ for script in scriptsToRun:
 			resultStatus+=1
 			nFailed=resultStatus
 			failedScripts.append(script)
-			errprint('\033[91m',script," failure, caught exception: ",e,'\033[0m')
+			errprint('\033[91m',script," failure, caught exception ",e.__class__.__name__,": ",e,'\033[0m')
 		O.reset()
 	elif (not mustCheck(script)):
 		errprint("###################################")

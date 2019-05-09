@@ -5,16 +5,12 @@ from yade import pack,export,plot
 import math,os,sys
 print('checkColliderCorrectness for InsertionSortCollider')
 
-failCollider=False
-
 #### This is useful for printing the linenumber in the script
 # import inspect
 # print inspect.currentframe().f_lineno
 
 if((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1')):
-	print("This test will only work on single core, because it must be fully reproducible, but -j "+str(opts.threads)+" or --cores "+str(opts.cores)+" is used.")
-	print(inspect.currentframe().f_lineno)
-	failCollider=True
+	raise YadeCheckError("This test will only work on single core, because it must be fully reproducible, but -j "+str(opts.threads)+" or --cores "+str(opts.cores)+" is used.")
 
 from yade import pack
 
@@ -94,16 +90,11 @@ for per in sorted(results):
 						line = resultFile.readline()
 						tmp = float(line)
 						if(abs(tmp - number) > 1e-8):
-							failCollider=True
-							print("InsertionSortCollider check failed in file scripts/checks-and-tests/checks/data/checkColider.txt line: %d"%lineCount)
+							raise YadeCheckError("InsertionSortCollider check failed in file scripts/checks-and-tests/checks/data/checkColider.txt line: %d"%lineCount)
 					else:
 						if(type(number) is int):
 							resultFile.write(str(number)+'\n')
 						else:
 							resultFile.write("%.8f"%number+'\n')
-
-if failCollider: #put a condition on the result here, is it the expected result? else:
-	print("InsertionSortCollider failed.")
-	resultStatus+=1
 
 
