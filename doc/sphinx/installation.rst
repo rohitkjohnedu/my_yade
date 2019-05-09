@@ -11,6 +11,8 @@ Installation
 Packages
 ----------
 
+.. warning:: yade-daily packages are currently out of date, this `issue <https://gitlab.com/yade-dev/trunk/issues/58>`_ is being worked on. Yade can be installed from :ref:`source code <install-from-source-code>`.
+
 Pre-built packages are provided for all currently supported Debian and Ubuntu
 versions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>`_ .
 
@@ -64,6 +66,8 @@ Debians.
 
 Daily and stable Yade versions can coexist without any conflicts, i.e., you can use ``yade`` and ``yadedaily``
 at the same time.
+
+.. _install-from-source-code:
 
 Source code
 ------------
