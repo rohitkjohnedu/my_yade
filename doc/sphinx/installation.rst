@@ -336,6 +336,8 @@ Note that the cmake ``PYTHON_VERSION`` option can be set to force any python ver
 
 Also see notes about :ref:`converting python 2 scripts into python 3<convert-python2-to3>`.
 
+.. _speed-up:
+
 Speed-up compilation
 ^^^^^^^^^^^^^^^^^^^^^
 
