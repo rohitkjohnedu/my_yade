@@ -22,6 +22,19 @@ stages:
 #               volumes = ["/cache","/home/docker/ccache:/root/.ccache:rw"]
 #            where /home/docker/ccache is the directory in the host with write access.
 # See also : https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/advanced-configuration.md#example-2-mount-a-host-directory-as-a-data-volume
+.cmake_template: &cmake_def
+  stage: cmake
+  script:
+    - mkdir build && cd build
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - ccache -s
+  artifacts:
+    paths:
+      - build
+    expire_in: 2 weeks
+
 cmake_16_04:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
   stage: cmake
