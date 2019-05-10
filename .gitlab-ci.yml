@@ -22,7 +22,7 @@ stages:
 #               volumes = ["/cache","/home/docker/ccache:/root/.ccache:rw"]
 #            where /home/docker/ccache is the directory in the host with write access.
 # See also : https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/advanced-configuration.md#example-2-mount-a-host-directory-as-a-data-volume
-.cmake_template: &cmake_def
+.cmake_template: &cmake_definition
   stage: cmake
   script:
     - mkdir build && cd build
@@ -36,72 +36,32 @@ stages:
     expire_in: 2 weeks
 
 cmake_16_04:
+  <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-  stage: cmake
   only:
     - master
 #   - merge_request
-  script:
-    - mkdir build && cd build
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
-  artifacts:
-    paths:
-      - build
-    expire_in: 2 weeks
 
 cmake_18_04:
+  <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  stage: cmake
   only:
     - master
     - merge_request
-  script:
-    - mkdir build && cd build
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
-  artifacts:
-    paths:
-      - build
-    expire_in: 2 weeks
 
 cmake_stretch:
+  <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  stage: cmake
   only:
     - master
 #   - merge_request
-  script:
-    - mkdir build && cd build
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
-  artifacts:
-    paths:
-      - build
-    expire_in: 2 weeks
 
 cmake_buster:
+  <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  stage: cmake
   only:
     - master
 #   - merge_request
-  script:
-    - mkdir build && cd build
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
-  artifacts:
-    paths:
-      - build
-    expire_in: 2 weeks
 
 cmake_suse15:
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
