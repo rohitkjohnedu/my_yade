@@ -142,6 +142,7 @@ make_stretch:
     - cmake_stretch
 
 make_buster:
+  <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
   only:
     - master
