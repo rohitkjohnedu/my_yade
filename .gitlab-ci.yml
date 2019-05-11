@@ -7,12 +7,22 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 # image: registry.gitlab.com/yade-dev/docker-yade:suse15
+#
+# Useful link to validator: https://gitlab.com/yade-dev/trunk/-/ci/lint
+
 
 stages:
   - cmake
   - build
   - test
   - pages
+
+# If you want to compile everything also on merge_request, change this template.
+# If you want to compile on one platform see [1] note below.
+.plaftorms_template: &platforms_definition
+  only:
+    - master
+    - merge_request
 
 # stage: cmake uses ccache for faster compilation. ccache works only with -DCHUNKSIZE=1
 # Important: to get ccache to work an external volume must be mounted by gitlab-runner (in config file: /etc/gitlab-runner/config.toml)
@@ -23,6 +33,7 @@ stages:
 #            where /home/docker/ccache is the directory in the host with write access.
 # See also : https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/advanced-configuration.md#example-2-mount-a-host-directory-as-a-data-volume
 .cmake_template: &cmake_definition
+  <<: *platforms_definition
   stage: cmake
   script:
     - mkdir build && cd build
@@ -38,37 +49,25 @@ stages:
 cmake_16_04:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-  only:
-    - master
-    - merge_request
 
 cmake_18_04:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+# [1] if you need to compile merge_request on another platform for testing, move these 2 lines to that platform. And do the same in stages: build, test, check.
   only:
-    - master
     - merge_request
 
 cmake_stretch:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  only:
-    - master
-    - merge_request
 
 cmake_buster:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  only:
-    - master
-    - merge_request
 
 cmake_suse15:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  only:
-    - master
-    - merge_request
 
 
 # Perhaps two more will added later
@@ -80,6 +79,7 @@ cmake_suse15:
 # in master        use the regular linker: ld.bfd.  Very rarely we might encounter linker errors. It's worth the faster build in merge_request.
 
 .make_template: &make_definition
+  <<: *platforms_definition
   stage: build
   script:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
@@ -117,9 +117,6 @@ cmake_suse15:
 make_16_04:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-  only:
-    - master
-    - merge_request
   dependencies:
     - cmake_16_04
 
@@ -127,7 +124,6 @@ make_18_04:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   only:
-    - master
     - merge_request
   dependencies:
     - cmake_18_04
@@ -135,33 +131,25 @@ make_18_04:
 make_stretch:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  only:
-    - master
-    - merge_request
   dependencies:
     - cmake_stretch
 
 make_buster:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  only:
-    - master
-    - merge_request
   dependencies:
     - cmake_buster
 
 make_suse15:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  only:
-    - master
-    - merge_request
   dependencies:
     - cmake_suse15
 
 
 # 3.1. test stage
 .test_template: &test_definition
+  <<: *platforms_definition
   stage: test
   script:
     - install/bin/yade-ci --test
@@ -171,9 +159,6 @@ make_suse15:
 test_16_04:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_16_04
 
@@ -181,7 +166,6 @@ test_18_04:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   only:
-    - master
     - merge_request
   dependencies:
     - make_18_04
@@ -189,27 +173,18 @@ test_18_04:
 test_stretch:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_stretch
 
 test_buster:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_buster
 
 test_suse15:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_suse15
 
@@ -221,6 +196,7 @@ test_suse15:
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 # 3.2. check stage
 .check_template: &check_definition
+  <<: *platforms_definition
   stage: test
   script:
     - install/bin/yade-ci --checks
@@ -228,9 +204,6 @@ test_suse15:
 check_16_04:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_16_04
 
@@ -238,7 +211,6 @@ check_18_04:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   only:
-    - master
     - merge_request
   dependencies:
     - make_18_04
@@ -246,27 +218,18 @@ check_18_04:
 check_stretch:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_stretch
 
 check_buster:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_buster
 
 check_suse15:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_suse15
 
