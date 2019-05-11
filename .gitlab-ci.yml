@@ -64,21 +64,11 @@ cmake_buster:
 #   - merge_request
 
 cmake_suse15:
+  <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  stage: cmake
   only:
     - master
 #   - merge_request
-  script:
-    - mkdir build && cd build
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
-  artifacts:
-    paths:
-      - build
-    expire_in: 2 weeks
 
 
 # Perhaps two more will added later
@@ -89,14 +79,8 @@ cmake_suse15:
 # in merge_request use the faster  linker: ld.gold. We save 2 minutes on every build.
 # in master        use the regular linker: ld.bfd.  Very rarely we might encounter linker errors. It's worth the faster build in merge_request.
 
-
-# 2.1 build stage: ubuntu 16.04
-make_16_04:
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+.make_template: &make_definition
   stage: build
-  only:
-    - master
-#   - merge_request
   script:
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
@@ -128,228 +112,103 @@ make_16_04:
     expire_in: 2 weeks
   tags:
     - fast
+
+# 2.1 build stage: ubuntu 16.04
+make_16_04:
+  <<: *make_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+  only:
+    - master
+#   - merge_request
   dependencies:
     - cmake_16_04
 
 make_18_04:
+  <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  stage: build
   only:
     - master
     - merge_request
-  script:
-    - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
-    - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
-    - ld --version
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
-    - ld --version
-    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "c_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "y_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "c_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "y_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "c_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "yade-runner") echo "12" ;;
-        "yade-runner-01") echo "1" ;;
-        *) echo "8";;
-        esac)
-    - echo $JOBSNUM
-    - cd build
-    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
-    - make -j $JOBSNUM
-    - make install
-    - make clean
-    - ccache -s
-  artifacts:
-    paths:
-      - install
-    expire_in: 2 weeks
-  tags:
-    - fast
   dependencies:
     - cmake_18_04
 
 make_stretch:
+  <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  stage: build
   only:
     - master
 #   - merge_request
-  script:
-    - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
-    - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
-    - ld --version
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
-    - ld --version
-    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "c_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "y_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "c_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "y_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "c_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "yade-runner") echo "12" ;;
-        "yade-runner-01") echo "1" ;;
-        *) echo "8";;
-        esac)
-    - echo $JOBSNUM
-    - cd build
-    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
-    - make -j $JOBSNUM
-    - make install
-    - make clean
-    - ccache -s
-  artifacts:
-    paths:
-      - install
-    expire_in: 2 weeks
-  tags:
-    - fast
   dependencies:
     - cmake_stretch
 
 make_buster:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  stage: build
   only:
     - master
 #   - merge_request
-  script:
-    - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
-    - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
-    - ld --version
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
-    - ld --version
-    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "c_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "y_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "c_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "y_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "c_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "yade-runner") echo "12" ;;
-        "yade-runner-01") echo "1" ;;
-        *) echo "8";;
-        esac)
-    - echo $JOBSNUM
-    - cd build
-    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
-    - make -j $JOBSNUM
-    - make install
-    - make clean
-    - ccache -s
-  artifacts:
-    paths:
-      - install
-    expire_in: 2 weeks
-  tags:
-    - fast
   dependencies:
     - cmake_buster
 
 make_suse15:
+  <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  stage: build
   only:
     - master
 #   - merge_request
-  script:
-    - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
-    - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
-    - ld --version
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
-    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
-    - ld --version
-    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "c_4pak_64cpu_256RAM_4TB_docker") echo "43" ;;
-        "y_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "c_6pak_48cpu_128RAM_4TB_docker") echo "46" ;;
-        "y_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "c_7pak_48cpu_128RAM_1TB_docker") echo "46" ;;
-        "yade-runner") echo "12" ;;
-        "yade-runner-01") echo "1" ;;
-        *) echo "8";;
-        esac)
-    - echo $JOBSNUM
-    - cd build
-    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
-    - make -j $JOBSNUM
-    - make install
-    - make clean
-    - ccache -s
-  artifacts:
-    paths:
-      - install
-    expire_in: 2 weeks
-  tags:
-    - fast
   dependencies:
     - cmake_suse15
 
 
 # 3.1. test stage
-test_16_04:
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+.test_template: &test_definition
   stage: test
+  script:
+    - install/bin/yade-ci --test
+    - cat /etc/os-release
+
+
+test_16_04:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --test
-    - cat /etc/issue
   dependencies:
     - make_16_04
 
 test_18_04:
+  <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  stage: test
   only:
     - master
     - merge_request
-  script:
-    - install/bin/yade-ci --test
-    - cat /etc/issue
   dependencies:
     - make_18_04
 
 test_stretch:
+  <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  stage: test
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --test
-    - cat /etc/issue
   dependencies:
     - make_stretch
 
 test_buster:
+  <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  stage: test
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --test
-    - cat /etc/issue
   dependencies:
     - make_buster
 
 test_suse15:
+  <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  stage: test
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --test
-    - cat /etc/*elease
   dependencies:
     - make_suse15
 
@@ -360,62 +219,58 @@ test_suse15:
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 # 3.2. check stage
-check_16_04:
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+.check_template: &check_definition
   stage: test
+  script:
+    - install/bin/yade-ci --checks
+
+check_16_04:
+  <<: *check_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --checks
   dependencies:
     - make_16_04
 
 check_18_04:
+  <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  stage: test
   only:
     - master
     - merge_request
-  script:
-    - install/bin/yade-ci --checks
   dependencies:
     - make_18_04
 
 check_stretch:
+  <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  stage: test
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --checks
   dependencies:
     - make_stretch
 
 check_buster:
+  <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  stage: test
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --checks
   dependencies:
     - make_buster
 
 check_suse15:
+  <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  stage: test
   only:
     - master
 #   - merge_request
-  script:
-    - install/bin/yade-ci --checks
   dependencies:
     - make_suse15
 
 
+# currently doc is build only on ubuntu 18.04. Without .doc_template. We may fix this later.
 # 4. doc stage
 doc_18_04:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
