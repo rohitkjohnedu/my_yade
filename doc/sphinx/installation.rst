@@ -112,12 +112,12 @@ Yade relies on a number of external software to run; they are checked before the
 Some of them are only optional. The last ones are only relevant for using the fluid coupling module (:yref:`FlowEngine`).
 
 * `cmake <http://www.cmake.org/>`_ build system
-* `gcc <http://www.gcc.gnu.org>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
+* `gcc <https://gcc.gnu.org/>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
 * `boost <http://www.boost.org/>`_ 1.47 or later
 * `Qt <http://www.qt.io/>`_ library
 * `freeglut3 <http://freeglut.sourceforge.net>`_
 * `libQGLViewer <http://www.libqglviewer.com>`_
-* `python <http://www.python.org>`_, `numpy <http://numpy.scipy.org>`_, `ipython <http://ipython.scipy.org>`_
+* `python <http://www.python.org>`_, `numpy <https://www.numpy.org/>`_, `ipython <https://ipython.org/>`_, `sphinx <https://www.sphinx-doc.org/en/master/>`_
 * `matplotlib <http://matplotlib.sf.net>`_
 * `eigen <http://eigen.tuxfamily.org>`_ algebra library (minimal required version 3.2.1)
 * `gdb <http://www.gnu.org/software/gdb>`_ debugger
@@ -125,7 +125,7 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `Loki <http://loki-lib.sf.net>`_ library
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 * `CGAL <http://www.cgal.org/>`_ library (optional)
-* `SuiteSparse <http://www.cise.ufl.edu/research/sparse/SuiteSparse/>`_ sparse algebra library (fluid coupling, optional, requires eigen>=3.1)
+* `SuiteSparse <http://www.suitesparse.com>`_ sparse algebra library (fluid coupling, optional, requires eigen>=3.1)
 * `OpenBLAS <http://www.openblas.net/>`_ optimized and parallelized alternative to the standard blas+lapack (fluid coupling, optional)
 * `Metis <http://glaros.dtc.umn.edu/gkhome/metis/metis/overview/>`_ matrix preconditioning (fluid coupling, optional)
 * `OpenMPI <https://www.open-mpi.org/software/>`_ library for parallel distributed computing (For MPI and OpenFOAM coupling, optional)

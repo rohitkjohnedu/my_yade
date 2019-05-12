@@ -138,6 +138,13 @@ def getAllVersionsCmake():
 		addVer("ipython", ipvertab[0] , ipvertab[1] , ipvertab[2] , ipver )
 	except:
 		pass
+	# 20. sphinx, https://www.sphinx-doc.org/en/master/extdev/appapi.html#checking-the-sphinx-version
+	try:
+		import sphinx
+		spver=sphinx.version_info
+		addVer("sphinx", spver[0] , spver[1] , spver[2] , '%i.%i.%i-%s-%i'%spver )
+	except:
+		pass
 	return ret
 
 def printAllVersions(rstFormat=False):
