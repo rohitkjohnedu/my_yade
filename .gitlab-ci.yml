@@ -53,8 +53,9 @@ cmake_16_04:
 cmake_18_04:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-# [1] if you need to compile merge_request on another platform for testing, move these 2 lines to that platform. And do the same in stages: build, test, check.
+# [1] if you need to compile merge_request on another platform for testing, move these 3 lines to that platform. And do the same in stages: build, test, check.
   only:
+    - master
     - merge_request
 
 cmake_stretch:
@@ -124,6 +125,7 @@ make_18_04:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   only:
+    - master
     - merge_request
   dependencies:
     - cmake_18_04
@@ -166,6 +168,7 @@ test_18_04:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   only:
+    - master
     - merge_request
   dependencies:
     - make_18_04
@@ -211,6 +214,7 @@ check_18_04:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   only:
+    - master
     - merge_request
   dependencies:
     - make_18_04
