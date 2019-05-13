@@ -2,20 +2,54 @@
 // 2019 Janek Kozicki
 // hint: follow changes in d067b0696a8 to add new modules.
 
-#include <core/Omega.hpp>
-#include <lib/pyutil/doc_opts.hpp>
+#include<core/Omega.hpp>
+#include<lib/pyutil/doc_opts.hpp>
+#include<lib/base/Logging.hpp>
+#include<string>
 
 namespace py = boost::python;
 
+/*
 py::list placeholder() {
 	return {};
+}
+*/
+
+void testAllLevels() {
+	int count=0;
+	std::string str="test_string";
+
+	LOG_8_TRACE ("Test log level: LOG_8_TRACE , test streaming: " << count++ << ", string: "<< str);
+	LOG_7_MORE  ("Test log level: LOG_7_MORE  , test streaming: " << count++ << ", string: "<< str);
+	LOG_6_DEBUG ("Test log level: LOG_6_DEBUG , test streaming: " << count++ << ", string: "<< str);
+	LOG_5_INFO  ("Test log level: LOG_5_INFO  , test streaming: " << count++ << ", string: "<< str);
+	LOG_4_WARN  ("Test log level: LOG_4_WARN  , test streaming: " << count++ << ", string: "<< str);
+	LOG_3_ERROR ("Test log level: LOG_3_ERROR , test streaming: " << count++ << ", string: "<< str);
+	LOG_2_THROW ("Test log level: LOG_2_THROW , test streaming: " << count++ << ", string: "<< str);
+	LOG_1_FATAL ("Test log level: LOG_1_FATAL , test streaming: " << count++ << ", string: "<< str);
+
+	LOG_TRACE   ("Test log level: LOG_TRACE   , test streaming: " << count++ << ", string: "<< str);
+	LOG_MORE    ("Test log level: LOG_MORE    , test streaming: " << count++ << ", string: "<< str);
+	LOG_DEBUG   ("Test log level: LOG_DEBUG   , test streaming: " << count++ << ", string: "<< str);
+	LOG_INFO    ("Test log level: LOG_INFO    , test streaming: " << count++ << ", string: "<< str);
+	LOG_WARN    ("Test log level: LOG_WARN    , test streaming: " << count++ << ", string: "<< str);
+	LOG_ERROR   ("Test log level: LOG_ERROR   , test streaming: " << count++ << ", string: "<< str);
+	LOG_THROW   ("Test log level: LOG_THROW   , test streaming: " << count++ << ", string: "<< str);
+	LOG_FATAL   ("Test log level: LOG_FATAL   , test streaming: " << count++ << ", string: "<< str);
+}
+
+void setLevel(int i) {
+	std::cerr << "FIXME: setLevel " << i << "\n";
 }
 
 BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
-	py::def("placeholder", placeholder, R"""(
+	py::def("testAllLevels", testAllLevels, R"""(
+.. warning:: I must write docstring here!
+	)""");
+	py::def("setLevel", setLevel, R"""(
 .. warning:: I must write docstring here!
 	)""");
 }

@@ -73,9 +73,11 @@
 #endif
 
 #if defined(YADE_DEBUG) && !defined(YADE_TRACEONLY)
+	# define LOG_MORE(msg)  _POOR_MANS_LOG("MORE ",msg)
 	# define LOG_INFO(msg)  _POOR_MANS_LOG("INFO ",msg)
 	# define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG",msg)
 #else
+	# define LOG_MORE(msg)
 	# define LOG_INFO(msg)
 	# define LOG_DEBUG(msg)
 #endif
@@ -83,6 +85,7 @@
 
 #define LOG_WARN(msg)  _POOR_MANS_LOG("WARN ",msg)
 #define LOG_ERROR(msg) _POOR_MANS_LOG("ERROR",msg)
+#define LOG_THROW(msg) _POOR_MANS_LOG("THROW",msg)
 #define LOG_FATAL(msg) _POOR_MANS_LOG("FATAL",msg)
 
 #define DECLARE_LOGGER
@@ -99,4 +102,14 @@
 #define TRVAR4(a,b,c,d) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) );
 #define TRVAR5(a,b,c,d,e) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) );
 #define TRVAR6(a,b,c,d,e,f) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) << _TRV(f) );
+
+// Logger aliases:
+#define LOG_8_TRACE(msg) LOG_TRACE(msg)
+#define LOG_7_MORE(msg)  LOG_MORE(msg)
+#define LOG_6_DEBUG(msg) LOG_DEBUG(msg)
+#define LOG_5_INFO(msg)  LOG_INFO(msg)
+#define LOG_4_WARN(msg)  LOG_WARN(msg)
+#define LOG_3_ERROR(msg) LOG_ERROR(msg)
+#define LOG_2_THROW(msg) LOG_THROW(msg)
+#define LOG_1_FATAL(msg) LOG_FATAL(msg)
 
