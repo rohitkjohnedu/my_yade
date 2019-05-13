@@ -3,7 +3,8 @@
 # hint: follow changes in d067b0696a8 to add new modules. 
 
 """
-The ``yade.log`` module serves as an interface to yade logging framework implemented on top of `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_. Example usage in python is as follows:
+The ``yade.log`` module serves as an interface to yade logging framework implemented on top of `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_.
+For full documentation see :ref:`debugging section<debugging>`. Example usage in python is as follows:
 
 .. code-block:: python
 

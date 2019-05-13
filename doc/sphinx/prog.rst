@@ -147,6 +147,8 @@ The buildbot activity and logs can be `browsed online <https://gitlab.com/yade-d
 The output of each particular build is directly accessible by clicking the green `"Passed" button <https://gitlab.com/yade-dev/trunk/-/jobs>`__,
 and then clicking "Browse" in the "Job Artifacts" on the right.
 
+.. _debugging:
+
 Debugging
 ================
 
@@ -169,6 +171,7 @@ Log levels
 .. warning:: this section is under construction.
 
 Yade uses `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for flexible logging levels and per-class debugging.
+See also description of :yref:`yade.log module<yade.log>`.
 A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_. Following debug levels are supported:
 
 .. table:: Yade logging verbosity levels.
