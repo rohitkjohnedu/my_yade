@@ -42,6 +42,22 @@ void setLevel(int i) {
 	std::cerr << "FIXME: setLevel " << i << "\n";
 }
 
+// accepted sinks, separately for each log level:
+// "cerr", "cout", "file:name", "sms", "shell:scriptName"
+void addSink(std::string sink, int level) {
+	std::cerr << "FIXME: addSink: " << sink << " level: " << level << "\n";
+}
+
+// removes all sinks for selected log level. Attention: even 'cerr' sink is removed!
+void clearSink(int level) {
+	std::cerr << "FIXME: clearSink level: " << level << "\n";
+}
+
+// resets all sinks to default values: 'cerr' for those below logLevel, 'none' for those above logLevel
+void resetAllSinks() {
+	std::cerr << "FIXME: resetAllSinks\n";
+}
+
 BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
@@ -50,6 +66,15 @@ BOOST_PYTHON_MODULE(_log){
 .. warning:: I must write docstring here!
 	)""");
 	py::def("setLevel", setLevel, R"""(
+.. warning:: I must write docstring here!
+	)""");
+	py::def("addSink", addSink, R"""(
+.. warning:: I must write docstring here!
+	)""");
+	py::def("clearSink", clearSink, R"""(
+.. warning:: I must write docstring here!
+	)""");
+	py::def("resetAllSinks", resetAllSinks, R"""(
 .. warning:: I must write docstring here!
 	)""");
 }
