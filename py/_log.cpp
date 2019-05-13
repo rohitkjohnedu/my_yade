@@ -1,9 +1,31 @@
+// 2006-2008 © Václav Šmilauer
+// 2019 Janek Kozicki
+// hint: follow changes in d067b0696a8 to add new modules.
+
+#include <core/Omega.hpp>
+#include <lib/pyutil/doc_opts.hpp>
+
+namespace py = boost::python;
+
+py::list placeholder() {
+	return {};
+}
+
+BOOST_PYTHON_MODULE(_log){
+	YADE_SET_DOCSTRING_OPTS;
+// We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
+// The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
+	py::def("placeholder", placeholder, R"""(
+.. warning:: I must write docstring here!
+	)""");
+}
+
 /* this was in git revision 014b11496
 
 #include<boost/python.hpp>
 #include<string>
-#include<yade/lib/base/Logging.hpp>
-#include<yade/lib/pyutil/doc_opts.hpp>
+#include<lib/base/Logging.hpp>
+#include<lib/pyutil/doc_opts.hpp>
 using namespace boost;
 enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 
@@ -18,7 +40,7 @@ enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
 		if(!log4cxx::LogManager::exists(fullName)){
 			LOG_WARN("No logger named "<<loggerName<<", ignoring level setting.");
 			// throw std::invalid_argument("No logger named `"+fullName+"'");
-		} 
+		}
 		log4cxx::LevelPtr l;
 		switch(level){
 			#ifdef LOG4CXX_TRACE
