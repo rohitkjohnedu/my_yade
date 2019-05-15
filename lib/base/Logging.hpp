@@ -17,7 +17,7 @@
 
 
 /* BOOST_LOGGER 014b11496
-=======
+//=======
 #ifdef YADE_LOG4CXX
 
 #	include<log4cxx/logger.h>
@@ -54,6 +54,8 @@
 >>>>>>> parent of 014b11496... Remove log4cxx support and yade.log module.
 
 */
+
+// FIXME - now it's time to rewrite all these macros.
 
 #include <iostream>
 
