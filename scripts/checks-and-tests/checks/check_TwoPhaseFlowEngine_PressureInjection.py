@@ -177,7 +177,7 @@ def pressureImbibition():
    delta=[0.0] * (nvoids)   
    for ii in range(nvoids):
         if flow.getCellLabel(ii)==0:
-	    totalflux[ii]+=flow.getCellInVolumeFromId(ii,O.dt)   
+	    totalflux[ii]+=-1.*flow.getCellFluxFromId(ii)*O.dt   
 	    if (totalflux[ii])>=initialvol[ii]:
 	       col1[ii]=1
 	    if (totalflux[ii])>initialvol[ii]:
@@ -191,7 +191,6 @@ def pressureImbibition():
 	if celleok[ll]==0:
 	   celleok[ll]=1
 	   col0[ll]=c0.getInterfaces()[ii][0]
-	   col[ll]=ii
            
    for jj in range(nvoids):
       if col1[jj]==1:
