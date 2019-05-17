@@ -192,7 +192,7 @@ class PhaseCluster : public Serializable
 		boost::python::list getInterfaces(int cellId=-1){
 			boost::python::list ints;
 			for (vector<Interface>::iterator it =  interfaces.begin(); it!=interfaces.end(); it++)
-				if (CellId==-1 or unsigned(CellId)==it->first.first) ints.append(boost::python::make_tuple(it->first.first,it->first.second,it->second));
+				if (cellId==-1 or unsigned(cellId)==it->first.first) ints.append(boost::python::make_tuple(it->first.first,it->first.second,it->second));
 			return ints;
 		}
 		Real getFlux(unsigned nf) {
@@ -576,7 +576,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("initialization",&TwoPhaseFlowEngine::initialization,"Initialize invasion setup. Build network, compute pore geometry info and initialize reservoir boundary conditions. ")
 	.def("updatePressure",&TwoPhaseFlowEngine::updatePressure,"Apply the values of :yref:`FlowEngine::bndCondValue` to the boundary cells. Note: boundary pressure will be updated automatically in many cases, this function is for some low-level manipulations.")
 	.def("getPoreThroatRadiusList",&TwoPhaseFlowEngine::cellporeThroatRadius,(boost::python::arg("cell_ID")),"get 4 pore throat radii of a cell.")
-	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,(boost::python::arg("id"),boost::python::arg("withInfCell")=True),"get 4 neigboring cells, optionally exclude the infinite cells if withInfCell is False")
+	.def("getNeighbors",&TwoPhaseFlowEngine::getNeighbors,(boost::python::arg("id"),boost::python::arg("withInfCell")=true),"get 4 neigboring cells, optionally exclude the infinite cells if withInfCell is False")
 	.def("getCellHasInterface",&TwoPhaseFlowEngine::cellHasInterface,"indicates whether a NW-W interface is present within the cell")
 	.def("getCellInSphereRadius",&TwoPhaseFlowEngine::cellInSphereRadius,"get the radius of the inscribed sphere in a pore unit")
 	.def("setPoreBodyRadius",&TwoPhaseFlowEngine::setPoreBodyRadius,"set the entry pore body radius.")
