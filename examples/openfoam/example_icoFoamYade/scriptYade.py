@@ -196,8 +196,8 @@ class simulation():
 
 if __name__=="__main__":
     sim = simulation()
-    sim.irun(1000000)
-    fluidCoupling.killmpi()
+    sim.irun(5000)
+    fluidCoupling.killMPI()
 
 import __builtin__
 __builtin__.sim=sim
