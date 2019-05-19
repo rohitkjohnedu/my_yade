@@ -82,8 +82,10 @@ while 1:
 	if unb<0.001:
 		break
 
+
 press=1000.    
 O.run(10,1)
+
 flow.dead=0
 flow.meshUpdateInterval=-1
 flow.useSolver=3
@@ -96,17 +98,16 @@ flow.bndCondIsPressure=[0,0,1,0,0,0]
 flow.bndCondValue=[0,0,press,0,0,0]
 flow.boundaryUseMaxMin=[0,0,0,0,0,0]
 flow.iniVoidVolumes=True
-newton.damping=0.1
 GlobalStiffnessTimeStepper.dead=True
 O.dt=min(0.8*PWaveTimeStep(),0.8*1./1200.*pi/flow.viscosity*graindensity*radius**2)
 O.dynDt=False
+newton.damping=0.1
 
 flow.surfaceTension = 0.0
 flow.drainageFirst=False
 flow.isDrainageActivated=False
 flow.isImbibitionActivated=True
 flow.isCellLabelActivated=True
-flow.consInfCell=True
 flow.initialization()
 cs=flow.getClusters()
 c0=cs[1] 
@@ -148,6 +149,7 @@ while (iniok==0):
 c0.solvePressure()
 flow.computeCapillaryForce(addForces=True,permanently=True)
 O.run(1,1)
+newton.dead=True
 flow.savePhaseVtk("./vtk",True)
 
 timeini=O.time 
@@ -237,7 +239,7 @@ def pressureImbibition():
 		ints=c0.getInterfaces()
 		for ll in invadedPores:
 			if delta[ll]!=0.0:
-				adjacentIds=flow.getNeighbors(ll)
+				adjacentIds=flow.getNeighbors(ll,True)
 				for n in range(4):
 					if flow.getCellLabel(adjacentIds[n])==0:
 						neighK[ll]+=flow.getConductivity(ll,n)
@@ -278,7 +280,7 @@ def pressureImbibition():
 			ints=c0.getInterfaces()
 			for ll in invadedPores:
 				if delta[ll]!=0.0:
-					adjacentIds=flow.getNeighbors(ll)
+					adjacentIds=flow.getNeighbors(ll,True)
 					for n in range(4):
 						if flow.getCellLabel(adjacentIds[n])==0:
 							neighK[ll]+=flow.getConductivity(ll,n)
@@ -322,7 +324,7 @@ def pressureImbibition():
 	c0.solvePressure()
 	#print "10",time.time()-start
 	#start=time.time() 
-	flow.computeCapillaryForce(addForces=True,permanently=True)
+	flow.computeCapillaryForce(addForces=True,permanently=False)
 	#print "11",time.time()-start
 	#start=time.time() 
 	#not needed with new version of computeCapillaryForce()
@@ -344,7 +346,7 @@ def equilibriumtest():
 	#F55=abs(O.forces.f(flow.wallIds[flow.zmax])[2]),
 	deltaF=abs(F33-F22)
 	file.write(str(O.iter)+" "+str(F33)+" "+str(F22)+" "+str(deltaF)+"\n")
-	if O.time>=timeini+1.5:
+	if O.time>=timeini+2.0:
 		if checkdifference==0:
 			print ("check F done")
 			if deltaF>0.01*press:
@@ -405,10 +407,11 @@ def pl():
 
 O.engines=O.engines+[PyRunner(iterPeriod=100,command='pl()')]
 #O.engines=O.engines+[VTKRecorder(iterPeriod=100,recorders=['spheres'],fileName='./exp')]
-O.engines=O.engines+[PyRunner(iterPeriod=1,command='equilibriumtest()')]
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='pressureImbibition()')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='equilibriumtest()')]
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='fluxtest()')]
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='addPlotData()')]
+O.engines=O.engines+[NewtonIntegrator(damping=0.1)]
 
 O.timingEnabled=True
 #O.run(100,True)
