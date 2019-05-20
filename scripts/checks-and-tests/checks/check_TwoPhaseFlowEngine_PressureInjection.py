@@ -164,7 +164,7 @@ dd=0.0
 celleok=[0] * (nvoids)  
 deltabubble=0
 col0=[0] * (nvoids)
-neighK=[0.0] * (nvoids)
+neighK=[0.0] * (nvoids)  #FIXME: after remeshing the size will be invalid since nvoids can change, initializations will have to go in the function itself
 def pressureImbibition():
    global Qin,total2,dd,deltabubble,bubble
    
@@ -177,20 +177,25 @@ def pressureImbibition():
    delta=[0.0] * (nvoids)   
    for ii in range(nvoids):
         if flow.getCellLabel(ii)==0:
-	    totalflux[ii]+=-1.*flow.getCellFluxFromId(ii)*O.dt   
-	    if (totalflux[ii])>=initialvol[ii]:
-	       col1[ii]=1
-	    if (totalflux[ii])>initialvol[ii]:
-	      delta[ii]=totalflux[ii]-initialvol[ii]
-	      totalflux[ii]+=-1*delta[ii]
-	      #dd+=delta[ii]
-   	    	      
+            totalflux[ii]+=-1.*flow.getCellFluxFromId(ii)*O.dt   
+            if (totalflux[ii])>=initialvol[ii]:
+                col1[ii]=1
+            if (totalflux[ii])>initialvol[ii]:
+                delta[ii]=totalflux[ii]-initialvol[ii]
+                totalflux[ii]+=-1*delta[ii]
+                #dd+=delta[ii]
+                
+   # advices:
+   # never write 'getInterfaces()' inside a loop, it's expensive, get the list once outside loop
+   # get interfaces again only if you know the list could have change (cluster got/lost pores).
+   # I'm fixing only the first loop below (old version left commented)
+   # 
    for ii in range(len(c0.getInterfaces())):
       ll=c0.getInterfaces()[ii][1]
       if col1[ll]==1:
-	if celleok[ll]==0:
-	   celleok[ll]=1
-	   col0[ll]=c0.getInterfaces()[ii][0]
+        if celleok[ll]==0:
+            celleok[ll]=1
+            col0[ll]=c0.getInterfaces()[ii][0]
            
    for jj in range(nvoids):
       if col1[jj]==1:
@@ -200,7 +205,7 @@ def pressureImbibition():
    for ii in range(len(c0.getInterfaces())):
       ll=c0.getInterfaces()[ii][0]
       if delta[ll]!=0:
-         neighK[ll]+=c0.getConductivity(ii)      
+         neighK[ll]+=c0.getConductivity(ii)
    for ii in range(len(c0.getInterfaces())):
       ll=c0.getInterfaces()[ii][0]
       if delta[ll]!=0:
