@@ -249,7 +249,7 @@ def pressureImbibition():
 		for idx in range(len(ints)):
 			ll=ints[idx][0]
 			if delta[ll]!=0.0:
-				if neighK[ll]!=0.0:					
+				if neighK[ll]!=0.0:	
 					c0.setCapVol(idx,delta[ll]/neighK[ll]*c0.getConductivity(idx))
 					totalflux[ints[idx][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(idx)  
                        
@@ -407,15 +407,15 @@ def pl():
 
 O.engines=O.engines+[PyRunner(iterPeriod=100,command='pl()')]
 #O.engines=O.engines+[VTKRecorder(iterPeriod=100,recorders=['spheres'],fileName='./exp')]
-O.engines=O.engines+[PyRunner(iterPeriod=1,command='pressureImbibition()')]
-O.engines=O.engines+[PyRunner(iterPeriod=1,command='equilibriumtest()')]
-O.engines=O.engines+[PyRunner(iterPeriod=1,command='fluxtest()')]
-O.engines=O.engines+[PyRunner(iterPeriod=1,command='addPlotData()')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='pressureImbibition()',label='pressureImbibition')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='equilibriumtest()',label='equilibriumtest')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='fluxtest()',label='fluxtest')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='addPlotData()',label='addPlotData')]
 O.engines=O.engines+[NewtonIntegrator(damping=0.1)]
 
 O.timingEnabled=True
-#O.run(100,True)
-#timing.stats()
+O.run(100,True)
+timing.stats()
 
 #file.close()
 #plot.saveDataTxt('plots.txt',vars=('i1','t','Fupper','Fbottom','Q','T'))
