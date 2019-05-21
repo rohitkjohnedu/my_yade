@@ -52,7 +52,9 @@ public:
 	using FlowType::tolerance;
 	using FlowType::relax;
 	using FlowType::fluidBulkModulus;
+	using FlowType::equivalentCompressibility;
 	using FlowType::reApplyBoundaryConditions;
+	using FlowType::phiZero;
 	using FlowType::pressureChanged;
 	using FlowType::computedOnce;
 	using FlowType::resetNetwork;
@@ -66,6 +68,9 @@ public:
 	using FlowType::fluidRho;
 	using FlowType::fluidCp;
 	using FlowType::thermalEngine;
+	using FlowType::controlCavityPressure;
+	using FlowType::controlCavityVolumeChange;
+	using FlowType::cavityDV;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
