@@ -11,13 +11,33 @@ Installation
 Packages
 ----------
 
-.. warning:: yade-daily packages are currently out of date, this `issue <https://gitlab.com/yade-dev/trunk/issues/58>`_ is being worked on. Yade can be installed from :ref:`source code <install-from-source-code>`.
+**Stable packages**
 
-Pre-built packages are provided for all currently supported Debian and Ubuntu
+
+Since 2011, all Ubuntu (starting from 11.10, Oneiric) and Debian (starting from Wheezy) versions
+have Yade in their main repositories. There are only stable releases in place.
+To install Yade, run the following::
+
+	sudo apt-get install yade
+
+After that you can normally start Yade using the command ``yade`` or ``yade-batch``.
+
+To check, what version of Yade is included in your specific distribution, visit
+`Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ or
+`Debian <http://packages.qa.debian.org/y/yade.html>`_.
+The `Debian-Backports <http://backports.debian.org/Instructions>`_
+repository is updated regularly to bring the newest Yade version to the users of stable
+Debians.
+
+**Daily packages**
+
+Pre-built packages updated more frequently than the stable versions are provided for all currently supported Debian and Ubuntu
 versions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>`_ .
 
 These are "daily" versions of the packages which are being updated regularly and, hence, include
 all the newly added features.
+
+.. warning:: yade-daily packages are currently out of date, this `issue <https://gitlab.com/yade-dev/trunk/issues/58>`_ is being worked on. Yade can be installed from :ref:`source code <install-from-source-code>`.
 
 To install the daily-version you need to add the repository to your
 /etc/apt/sources.list, add the PGP-key AA915EEB as trusted and install ``yadedaily``::
@@ -48,21 +68,6 @@ corresponding line in /etc/apt/sources.list and the package itself::
 To remove our key from keyring, execute the following command::
 
 	sudo apt-key remove AA915EEB
-
-Since 2011, all Ubuntu (starting from 11.10, Oneiric) and Debian (starting from Wheezy) versions
-have Yade in their main repositories. There are only stable releases in place.
-To install Yade, run the following::
-
-	sudo apt-get install yade
-
-After that you can normally start Yade using the command ``yade`` or ``yade-batch``.
-
-To check, what version of Yade is included in your specific distribution, visit
-`Ubuntu <https://launchpad.net/ubuntu/+source/yade>`_ or
-`Debian <http://packages.qa.debian.org/y/yade.html>`_.
-The `Debian-Backports <http://backports.debian.org/Instructions>`_
-repository is updated regularly to bring the newest Yade version to the users of stable
-Debians.
 
 Daily and stable Yade versions can coexist without any conflicts, i.e., you can use ``yade`` and ``yadedaily``
 at the same time.
