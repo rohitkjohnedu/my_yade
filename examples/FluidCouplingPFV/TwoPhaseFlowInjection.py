@@ -238,19 +238,18 @@ def pressureImbibition():
 		ints=c0.getInterfaces()
 		for ll in invadedPores:
 			if delta[ll]!=0.0:
-				adjacentIds=flow.getNeighbors(ll,True)
-				for n in range(len(adjacentIds)):
-					if flow.getCellLabel(adjacentIds[n])==0:
-						neighK[ll]+=flow.getConductivity(ll,n)
+				intfs=c0.getInterfaces(cellId=ll)
+				for ii in intfs:
+					if flow.getCellLabel(ii[1])==0:
+						neighK[ll]+=c0.getConductivity(ii[3])
 				if neighK[ll]==0.0:
 					deltabubble+=delta[ll]
 					bubble+=1
-		for idx in range(len(ints)):
-			ll=ints[idx][0]
-			if delta[ll]!=0.0:
-				if neighK[ll]!=0.0:					
-					c0.setCapVol(idx,delta[ll]/neighK[ll]*c0.getConductivity(idx))
-					totalflux[ints[idx][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(idx)  
+				else:
+					for ii in intfs:
+						if flow.getCellLabel(ii[1])==0:
+							c0.setCapVol(ii[3],delta[ll]/neighK[ll]*c0.getConductivity(ii[3]))
+							totalflux[ii[1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii[3])  
 
 	#print "7",time.time()-start
 	#start=time.time()
@@ -279,19 +278,19 @@ def pressureImbibition():
 			ints=c0.getInterfaces()
 			for ll in invadedPores:
 				if delta[ll]!=0.0:
-					adjacentIds=flow.getNeighbors(ll,True)
-					for n in range(len(adjacentIds)):
-						if flow.getCellLabel(adjacentIds[n])==0:
-							neighK[ll]+=flow.getConductivity(ll,n)
+					intfs=c0.getInterfaces(cellId=ll)
+					for ii in intfs:
+						if flow.getCellLabel(ii[1])==0:
+							neighK[ll]+=c0.getConductivity(ii[3])
 					if neighK[ll]==0.0:
 						deltabubble+=delta[ll]
 						bubble+=1
-			for idx in range(len(ints)):
-				ll=ints[idx][0]
-				if delta[ll]!=0.0:
-					if neighK[ll]!=0.0:					
-						c0.setCapVol(idx,delta[ll]/neighK[ll]*c0.getConductivity(idx))
-						totalflux[ints[idx][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(idx)
+					else:
+						for ii in intfs:
+							if flow.getCellLabel(ii[1])==0:
+								c0.setCapVol(ii[3],delta[ll]/neighK[ll]*c0.getConductivity(ii[3]))
+								totalflux[ii[1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii[3])  
+
 			unsatPores=[]
 			invadedPores=[]
 			incidentInterfaces=[[] for i in range(nvoids)]
