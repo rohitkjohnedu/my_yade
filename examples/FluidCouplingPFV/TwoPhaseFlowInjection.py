@@ -211,96 +211,56 @@ def pressureImbibition():
 	ints=c0.getInterfaces()
    
    
-	optimize=False
-	if optimize:
-		if len(unsatPores)==0 or len(invadedPores)>0: #if not initialized or needs update
-			# reset all lists if invasion occured in previous iterations
-			# TODO: could be more atomic if they were updated after each local invasion
-			unsatPores=[]
-			invadedPores=[]
-			incidentInterfaces=[[] for i in range(nvoids)]
-			for idx in range(len(ints)):
-				intf = ints[idx]
-				if len(incidentInterfaces[intf[1]])==0:
-					unsatPores.append(intf[1])
-				incidentInterfaces[intf[1]].append(idx)
+
+	if len(unsatPores)==0 or len(invadedPores)>0: #if not initialized or needs update
+		# reset all lists if invasion occured in previous iterations
+		# TODO: could be more atomic if they were updated after each local invasion
+		unsatPores=[]
+		invadedPores=[]
+		incidentInterfaces=[[] for i in range(nvoids)]
+		for idx in range(len(ints)):
+			intf = ints[idx]
+			if len(incidentInterfaces[intf[1]])==0:
+				unsatPores.append(intf[1])
+			incidentInterfaces[intf[1]].append(idx)
         
-		for ii in unsatPores:
-			totalflux[ii]=0
-			for intf in incidentInterfaces[ii]:
-				totalflux[ii]+=c0.getCapVol(intf)
-			if (totalflux[ii])>initialvol[ii]:
-				col1[ii]=1
-				invadedPores.append(ii) #more efficient later than looping on nvoids to check ==1
-				delta[ii]=totalflux[ii]-initialvol[ii]
-				totalflux[ii]=initialvol[ii]
-				if celleok[ii]==0:
-					celleok[ii]=1
-					intf = incidentInterfaces[ii][0]
-					col0[ii]=ints[intf][0]
-					col[ii]=intf
-		if len(invadedPores)>0: print( "## invasion ##",len(invadedPores))
-	else:
-		for ii in range(nvoids):
-			if flow.getCellLabel(ii)==0:
-				totalflux[ii]+=flow.getCellInVolumeFromId(ii,O.dt)   
-				if (totalflux[ii])>=initialvol[ii]:
-					col1[ii]=1
-				if (totalflux[ii])>initialvol[ii]:
-					delta[ii]=totalflux[ii]-initialvol[ii]
-					totalflux[ii]+=-1*delta[ii]
-					#dd+=delta[ii]
+	for ii in unsatPores:
+		totalflux[ii]=0
+		for intf in incidentInterfaces[ii]:
+			totalflux[ii]+=c0.getCapVol(intf)
+		if (totalflux[ii])>initialvol[ii]:
+			col1[ii]=1
+			invadedPores.append(ii) #more efficient later than looping on nvoids to check ==1
+			delta[ii]=totalflux[ii]-initialvol[ii]
+			totalflux[ii]=initialvol[ii]
+			if celleok[ii]==0:
+				celleok[ii]=1
+				intf = incidentInterfaces[ii][0]
+				col0[ii]=ints[intf][0]
+				col[ii]=intf
+	if len(invadedPores)>0: print( "## invasion ##",len(invadedPores))
                     
 	#print "2",time.time()-start
 	#start=time.time()
    
-   
-	if not optimize: #else already part of step 2
-		for ii in range(len(ints)):
-			ll=ints[ii][1]
-			if col1[ll]==1:
-				if celleok[ll]==0:
-					celleok[ll]=1
-					col0[ll]=ints[ii][0]
-					col[ll]=ii
-   
-	#print "3",time.time()-start
-	#start=time.time()
-   
-	if optimize:
-		for jj in invadedPores:
-			flow.clusterOutvadePore(col0[jj],jj)
-	else:
-		for jj in range(nvoids):
-			if col1[jj]==1:
-				flow.clusterOutvadePore(col0[jj],jj)
-				#totalCellSat+=initialvol[jj]       
+	for jj in invadedPores:
+		flow.clusterOutvadePore(col0[jj],jj)     
    
 	#print "4",time.time()-start
 	#start=time.time()
    
-	if optimize:
-		if len(invadedPores)>0:
-			#updateInterfaces() #redefine interfaces if outvade() changed them
-			ints=c0.getInterfaces()
-			for ll in invadedPores+unsatPores:
-				if delta[ll]!=0:
-					neighK[ll]=0
-					adjacentIds=flow.getNeighbors(ll)
-					for n in range(4):
-						if flow.getCellLabel(adjacentIds[n])==0:
-							neighK[ll]+=flow.getConductivity(ll,n)
-	else:
-		ints=c0.getInterfaces() #redefine interfaces since outvade() changed them
-		for ii in range(len(ints)):
-			ll=ints[ii][0]
+	if len(invadedPores)>0:
+		#updateInterfaces() #redefine interfaces if outvade() changed them
+		ints=c0.getInterfaces()
+		for ll in invadedPores+unsatPores:
 			if delta[ll]!=0:
-				neighK[ll]+=c0.getConductivity(ii) 
-                        
-	#print "5",time.time()-start
-	#start=time.time()
+				neighK[ll]=0
+				adjacentIds=flow.getNeighbors(ll)
+				for n in range(4):
+					if flow.getCellLabel(adjacentIds[n])==0:
+						neighK[ll]+=flow.getConductivity(ll,n)
    
-	if len(invadedPores)>0 or not optimize: #my lazy escape for iterations with no invasion, further improvement possible by loops replacement like above
+	if len(invadedPores)>0: #my lazy escape for iterations with no invasion, further improvement possible by loops replacement like above
 		for ii in range(len(ints)):
 			ll=ints[ii][0]
 			if delta[ll]!=0:
@@ -308,7 +268,7 @@ def pressureImbibition():
 				totalflux[ints[ii][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii)  
 	#print "6",time.time()-start
 	#start=time.time()
-	if len(invadedPores)>0 or not optimize:
+	if len(invadedPores)>0:
 		for ii in range(nvoids):
 			if delta[ii]!=0:
 				if neighK[ii]==0:
@@ -317,7 +277,7 @@ def pressureImbibition():
 	#print "7",time.time()-start
 	#start=time.time()
    
-	if len(invadedPores)>0 or not optimize:
+	if len(invadedPores)>0:
 		col1=[0] * (nvoids)
 		delta=[0.0] * (nvoids)
 		for ii in range(nvoids):
