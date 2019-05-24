@@ -371,8 +371,9 @@ def fluxtest():
 	for ii in range(nvoids):
 		if flow.getCellLabel(ii)==0:
 			no=1
-	if once==0:
-		if no==0:
+			break
+	if no==0:
+		if once==0:
 			imbtime=O.time-timeini
 			print( imbtime,voidvol,total2,QinOk)
 			if voidvol-total2>toleranceWarning:
