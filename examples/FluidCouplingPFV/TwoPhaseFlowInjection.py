@@ -2,7 +2,6 @@
 
 # This script and features used in it are experimental. PLease wait stabilization before asking questions about it.
 
-
 from yade import pack
 from yade import export
 from yade import timing
@@ -10,17 +9,11 @@ from yade import plot
 import time
 from math import *
 
-#Remarks:
-#- The following new functions are superfluous. The sake of concision of source code I suggest to remove them
-	#* getBoundaryVolume (multiplying by dt can be done ni python, or do I miss something?)
-	#* getCellInVolumeFromId (same thing)
-        
-
 num_spheres=1000# number of spheres
-young=1e6
+young=1.e6
 compFricDegree = 3 # initial contact friction during the confining phase
 finalFricDegree = 30 # contact friction during the deviatoric loading
-mn,mx=Vector3(0,0,0),Vector3(1,1,0.4) # corners of the initial packing
+mn,mx=Vector3(0,0,0),Vector3(1.,1.,0.4) # corners of the initial packing
 graindensity=2600
 errors=0
 toleranceWarning =1.e-11
@@ -91,6 +84,7 @@ while 1:
 
 press=1000.    
 O.run(10,1)
+
 flow.dead=0
 flow.meshUpdateInterval=-1
 flow.useSolver=3
@@ -103,10 +97,10 @@ flow.bndCondIsPressure=[0,0,1,0,0,0]
 flow.bndCondValue=[0,0,press,0,0,0]
 flow.boundaryUseMaxMin=[0,0,0,0,0,0]
 flow.iniVoidVolumes=True
-newton.damping=0.1
 GlobalStiffnessTimeStepper.dead=True
 O.dt=min(0.8*PWaveTimeStep(),0.8*1./1200.*pi/flow.viscosity*graindensity*radius**2)
 O.dynDt=False
+newton.damping=0.1
 
 flow.surfaceTension = 0.0
 flow.drainageFirst=False
@@ -120,8 +114,8 @@ c0=cs[1]
 voidvol=0.0
 voidvoltot=0.0
 nvoids=flow.nCells()
-initialvol=[0] * (nvoids)
-bar=[0] * (nvoids)
+initialvol=[0.0] * (nvoids)
+bar=[0.0] * (nvoids)
 initiallevel=O.bodies[flow.wallIds[flow.ymin]].state.pos[1]+(O.bodies[flow.wallIds[flow.ymax]].state.pos[1]-O.bodies[flow.wallIds[flow.ymin]].state.pos[1])/3
 
 for ii in range(nvoids):
@@ -152,10 +146,9 @@ while (iniok==0):
 			c0.setCapVol(ii,0.0)
 
 c0.solvePressure()
-flow.computeCapillaryForce()
-for b in O.bodies:
-	O.forces.setPermF(b.id, flow.fluidForce(b.id))
+flow.computeCapillaryForce(addForces=True,permanently=False)
 O.run(1,1)
+newton.dead=True
 flow.savePhaseVtk("./vtk",True)
 
 timeini=O.time 
@@ -164,7 +157,7 @@ ini=O.iter
 Qin=0.0
 #Qout=0.0
 
-totalflux=[0] * (nvoids)
+totalflux=[0.0] * (nvoids)
 #totalCellSat=0.0
 
 for ii in range(nvoids):
@@ -172,11 +165,9 @@ for ii in range(nvoids):
 		voidvol+=initialvol[ii]
 
 bubble=0
-dd=0.0 
-celleok=[0] * (nvoids)  
+dd=0.0   
 deltabubble=0
 col0=[0] * (nvoids)
-col=[0] * (nvoids)
 neighK=[0.0] * (nvoids)
 
 ints=c0.getInterfaces() #current interfaces
@@ -195,22 +186,19 @@ def updateInterfaces():
 
 def pressureImbibition():
 	global Qin,total2,dd,deltabubble,bubble,unsatPores,incidentInterfaces,invadedPores,ints
-   
+
 	start=time.time()
-   
+
 	c0.updateCapVolList(O.dt)
        
-	Qin+=flow.getBoundaryVolume(flow.wallIds[flow.ymin],O.dt)
+	Qin+=-1*(flow.getBoundaryFlux(flow.wallIds[flow.ymin]))*O.dt
 	#Qout+=(flow.getBoundaryFlux(flow.wallIds[flow.ymax]))*O.dt   
    
 	#print "1",time.time()-start
 	#start=time.time()
    
-	col1=[0] * (nvoids)
 	delta=[0.0] * (nvoids)   
 	ints=c0.getInterfaces()
-   
-   
 
 	if len(unsatPores)==0 or len(invadedPores)>0: #if not initialized or needs update
 		# reset all lists if invasion occured in previous iterations
@@ -225,20 +213,16 @@ def pressureImbibition():
 			incidentInterfaces[intf[1]].append(idx)
         
 	for ii in unsatPores:
-		totalflux[ii]=0
+		totalflux[ii]=0.0
 		for intf in incidentInterfaces[ii]:
 			totalflux[ii]+=c0.getCapVol(intf)
-		if (totalflux[ii])>initialvol[ii]:
-			col1[ii]=1
+		if (totalflux[ii])>=initialvol[ii]:
 			invadedPores.append(ii) #more efficient later than looping on nvoids to check ==1
 			delta[ii]=totalflux[ii]-initialvol[ii]
 			totalflux[ii]=initialvol[ii]
-			if celleok[ii]==0:
-				celleok[ii]=1
-				intf = incidentInterfaces[ii][0]
-				col0[ii]=ints[intf][0]
-				col[ii]=intf
-	if len(invadedPores)>0: print( "## invasion ##",len(invadedPores))
+			intf = incidentInterfaces[ii][0]
+			col0[ii]=ints[intf][0]
+	#if len(invadedPores)>0: print( "## invasion ##",len(invadedPores))
                     
 	#print "2",time.time()-start
 	#start=time.time()
@@ -252,109 +236,101 @@ def pressureImbibition():
 	if len(invadedPores)>0:
 		#updateInterfaces() #redefine interfaces if outvade() changed them
 		ints=c0.getInterfaces()
-		for ll in invadedPores+unsatPores:
-			if delta[ll]!=0:
-				neighK[ll]=0
-				adjacentIds=flow.getNeighbors(ll)
-				for n in range(4):
+		for ll in invadedPores:
+			if delta[ll]!=0.0:
+				adjacentIds=flow.getNeighbors(ll,True)
+				for n in range(len(adjacentIds)):
 					if flow.getCellLabel(adjacentIds[n])==0:
 						neighK[ll]+=flow.getConductivity(ll,n)
-   
-	if len(invadedPores)>0: #my lazy escape for iterations with no invasion, further improvement possible by loops replacement like above
-		for ii in range(len(ints)):
-			ll=ints[ii][0]
-			if delta[ll]!=0:
-				c0.setCapVol(ii,delta[ll]/neighK[ll]*c0.getConductivity(ii))
-				totalflux[ints[ii][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii)  
-	#print "6",time.time()-start
-	#start=time.time()
-	if len(invadedPores)>0:
-		for ii in range(nvoids):
-			if delta[ii]!=0:
-				if neighK[ii]==0:
-					deltabubble+=delta[ii]
+				if neighK[ll]==0.0:
+					deltabubble+=delta[ll]
 					bubble+=1
+		for idx in range(len(ints)):
+			ll=ints[idx][0]
+			if delta[ll]!=0.0:
+				if neighK[ll]!=0.0:					
+					c0.setCapVol(idx,delta[ll]/neighK[ll]*c0.getConductivity(idx))
+					totalflux[ints[idx][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(idx)  
+
 	#print "7",time.time()-start
 	#start=time.time()
    
 	if len(invadedPores)>0:
-		col1=[0] * (nvoids)
-		delta=[0.0] * (nvoids)
-		for ii in range(nvoids):
-			if flow.getCellLabel(ii)==0:
-				if (totalflux[ii])>=initialvol[ii]:
-					col1[ii]=1
-				if (totalflux[ii])>initialvol[ii]:
-					delta[ii]=totalflux[ii]-initialvol[ii]
-					totalflux[ii]+=-1*delta[ii]
-					#dd+=delta[ii]
-		if col1!=[0] * (nvoids):#NOTE: this is an expensive comparison, better check len() of something or just a bool      
-			for ii in range(len(ints)):
-				ll=ints[ii][1]
-				if col1[ll]==1:
-					if celleok[ll]==0:
-						celleok[ll]=1
-						col0[ll]=ints[ii][0]
-						col[ll]=ii             
-		for jj in range(nvoids):
-			if col1[jj]==1:
-				flow.clusterOutvadePore(col0[jj],jj)
-				#totalCellSat+=initialvol[jj]
-		ints=c0.getInterfaces() #redefine interfaces since outvade() changed them
-		for ii in range(len(ints)):
-			ll=ints[ii][0]
-			if delta[ll]!=0:
-				neighK[ll]+=c0.getConductivity(ii)       
-		for ii in range(len(ints)):
-			ll=ints[ii][0]
-			if delta[ll]!=0:
-				c0.setCapVol(ii,delta[ll]/neighK[ll]*c0.getConductivity(ii))
-				totalflux[ints[ii][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(ii)   
-		for ii in range(nvoids):
-			if delta[ii]!=0:
-				if neighK[ii]==0:
-					deltabubble+=delta[ii]
-					bubble+=1
-		col1=[0] * (nvoids)
-		delta=[0.0] * (nvoids)
-		for ii in range(nvoids):
-			if flow.getCellLabel(ii)==0:
-				if (totalflux[ii])>=initialvol[ii]:
-					col1[ii]=1
-			if (totalflux[ii])>initialvol[ii]:
+		# TODO: could be more atomic if they were updated after each local invasion
+		unsatPores=[]
+		invadedPores=[]
+		incidentInterfaces=[[] for i in range(nvoids)]
+		for idx in range(len(ints)):
+			intf = ints[idx]
+			if len(incidentInterfaces[intf[1]])==0:
+				unsatPores.append(intf[1])
+			incidentInterfaces[intf[1]].append(idx)
+		for ii in unsatPores:
+			if (totalflux[ii])>=initialvol[ii]:
+				invadedPores.append(ii) #more efficient later than looping on nvoids to check ==1
 				delta[ii]=totalflux[ii]-initialvol[ii]
-				totalflux[ii]+=-1*delta[ii]
-				dd+=delta[ii]
-				print( O.iter,'waterloss',ii,delta[ii])
-		if col1!=[0] * (nvoids):
-			for ii in range(len(ints)):
-				ll=ints[ii][1]
-				if col1[ll]==1:
-					if celleok[ll]==0:
-						celleok[ll]=1
-						col0[ll]=ints[ii][0]
-						col[ll]=ii           
-			for jj in range(nvoids):
-				if col1[jj]==1:
-					flow.clusterOutvadePore(col0[jj],jj)
-		#totalCellSat+=initialvol[jj]
+				totalflux[ii]=initialvol[ii]
+				intf = incidentInterfaces[ii][0]
+				col0[ii]=ints[intf][0]
+		for jj in invadedPores:
+			flow.clusterOutvadePore(col0[jj],jj)
+		if len(invadedPores)>0:
+			#updateInterfaces() #redefine interfaces if outvade() changed them
+			ints=c0.getInterfaces()
+			for ll in invadedPores:
+				if delta[ll]!=0.0:
+					adjacentIds=flow.getNeighbors(ll,True)
+					for n in range(len(adjacentIds)):
+						if flow.getCellLabel(adjacentIds[n])==0:
+							neighK[ll]+=flow.getConductivity(ll,n)
+					if neighK[ll]==0.0:
+						deltabubble+=delta[ll]
+						bubble+=1
+			for idx in range(len(ints)):
+				ll=ints[idx][0]
+				if delta[ll]!=0.0:
+					if neighK[ll]!=0.0:					
+						c0.setCapVol(idx,delta[ll]/neighK[ll]*c0.getConductivity(idx))
+						totalflux[ints[idx][1]]+=delta[ll]/neighK[ll]*c0.getConductivity(idx)
+			unsatPores=[]
+			invadedPores=[]
+			incidentInterfaces=[[] for i in range(nvoids)]
+			for idx in range(len(ints)):
+				intf = ints[idx]
+				if len(incidentInterfaces[intf[1]])==0:
+					unsatPores.append(intf[1])
+				incidentInterfaces[intf[1]].append(idx)
+			for ii in unsatPores:
+				if (totalflux[ii])>=initialvol[ii]:
+					invadedPores.append(ii) #more efficient later than looping on nvoids to check ==1
+					delta[ii]=totalflux[ii]-initialvol[ii]
+					totalflux[ii]=initialvol[ii]
+					intf = incidentInterfaces[ii][0]
+					col0[ii]=ints[intf][0]
+					dd+=delta[ii]
+					print (O.iter,"waterloss",ii,delta[ii])
+			for jj in invadedPores:
+				flow.clusterOutvadePore(col0[jj],jj)
+
 	#print "8",time.time()-start
-	#start=time.time()
+	#start=time.time
+
 	total2=0.0
 	for ii in range(nvoids):
 		total2+=totalflux[ii]
 	#print "9",time.time()-start
+	#start=time.time()
 	start=time.time()   
 	c0.solvePressure()
-	print("10",time.time()-start)
-	start=time.time() 
+	#print("10",time.time()-start)
+	#start=time.time() 
 	flow.computeCapillaryForce(addForces=True,permanently=False)
-	print( "11",time.time()-start)
-	start=time.time() 
+	#print( "11",time.time()-start)
+	#start=time.time() 
 	#not needed with new version of computeCapillaryForce()
 	#for b in O.bodies:
 	#O.forces.setPermF(b.id, flow.fluidForce(b.id))
-	print( "12",time.time()-start)
+	#print( "12",time.time()-start)
 
 
 file=open('Test.txt',"w")
@@ -370,7 +346,7 @@ def equilibriumtest():
 	#F55=abs(O.forces.f(flow.wallIds[flow.zmax])[2]),
 	deltaF=abs(F33-F22)
 	file.write(str(O.iter)+" "+str(F33)+" "+str(F22)+" "+str(deltaF)+"\n")
-	if O.time>=timeini+1.5:
+	if O.time>=timeini+2.0:
 		if checkdifference==0:
 			print( 'check F done')
 			if deltaF>0.01*press:
@@ -431,14 +407,15 @@ def pl():
 
 O.engines=O.engines+[PyRunner(iterPeriod=100,command='pl()')]
 #O.engines=O.engines+[VTKRecorder(iterPeriod=100,recorders=['spheres'],fileName='./exp')]
-O.engines=O.engines+[PyRunner(iterPeriod=1,command='equilibriumtest()')]
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='pressureImbibition()')]
+O.engines=O.engines+[PyRunner(iterPeriod=1,command='equilibriumtest()')]
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='fluxtest()')]
 O.engines=O.engines+[PyRunner(iterPeriod=1,command='addPlotData()')]
+O.engines=O.engines+[NewtonIntegrator(damping=0.1)]
 
 O.timingEnabled=True
-O.run(100,True)
-timing.stats()
+#O.run(100,True)
+#timing.stats()
 
 #file.close()
 #plot.saveDataTxt('plots.txt',vars=('i1','t','Fupper','Fbottom','Q','T'))
