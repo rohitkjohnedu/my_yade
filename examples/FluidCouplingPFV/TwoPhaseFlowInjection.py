@@ -127,11 +127,12 @@ iniok=0
 while (iniok==0):
 	celleini1=[nvoids+1] * (nvoids)
 	celleini0=[0] * (nvoids)
-	for ii in range(len(c0.getInterfaces())):
-		if bar[c0.getInterfaces()[ii][1]]<initiallevel:
-			if celleini1[c0.getInterfaces()[ii][1]]==nvoids+1:
-				celleini1[c0.getInterfaces()[ii][1]]=ii
-				celleini0[c0.getInterfaces()[ii][1]]=c0.getInterfaces()[ii][0]
+	getInt=c0.getInterfaces()
+	for ii in range(len(getInt)):
+		if bar[getInt[ii][1]]<initiallevel:
+			if celleini1[getInt[ii][1]]==nvoids+1:
+				celleini1[getInt[ii][1]]=ii
+				celleini0[getInt[ii][1]]=getInt[ii][0]
 	for ii in range(nvoids):
 		if celleini1[ii]!=nvoids+1:
 			flow.clusterOutvadePore(celleini0[ii],ii)
@@ -140,6 +141,7 @@ while (iniok==0):
 		if bar[ii]<initiallevel:
 			if flow.getCellLabel(ii)==0:
 				no=1
+				break
 	if no==0:
 		iniok=1
 		for ii in range(len(c0.getInterfaces())):
