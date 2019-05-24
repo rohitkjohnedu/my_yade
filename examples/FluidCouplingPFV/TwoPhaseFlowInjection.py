@@ -238,7 +238,7 @@ def pressureImbibition():
 		ints=c0.getInterfaces()
 		for ll in invadedPores:
 			if delta[ll]!=0.0:
-				intfs=c0.getInterfaces(cellId=ll)
+				intfs=c0.getInterfaces(ll)
 				for ii in intfs:
 					if flow.getCellLabel(ii[1])==0:
 						neighK[ll]+=c0.getConductivity(ii[3])
@@ -278,7 +278,7 @@ def pressureImbibition():
 			ints=c0.getInterfaces()
 			for ll in invadedPores:
 				if delta[ll]!=0.0:
-					intfs=c0.getInterfaces(cellId=ll)
+					intfs=c0.getInterfaces(ll)
 					for ii in intfs:
 						if flow.getCellLabel(ii[1])==0:
 							neighK[ll]+=c0.getConductivity(ii[3])
