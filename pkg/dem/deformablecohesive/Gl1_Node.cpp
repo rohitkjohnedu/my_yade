@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #ifdef YADE_OPENGL
+#ifdef YADE_FEM
 
 
 #include <pkg/dem/deformablecohesive/Gl1_Node.hpp>
@@ -140,7 +141,7 @@ void Gl1_Node::initGlutGlList(){
 		glutSolidSphere(1.0,max(quality*glutSlices,(Real)2.),max(quality*glutStacks,(Real)3.));
 	glEndList();
 }
-
+#endif //YADE_FEM
 #endif /* YADE_OPENGL */
 
 //      ///The old Galizzi's lists

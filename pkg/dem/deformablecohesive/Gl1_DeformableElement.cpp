@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #ifdef YADE_OPENGL
+#ifdef YADE_FEM
 
 #include <pkg/dem/deformablecohesive/Gl1_DeformableElement.hpp>
 #include <pkg/dem/deformablecohesive/DeformableElement.hpp>
@@ -94,5 +95,5 @@ void Gl1_DeformableElement::go(const shared_ptr<Shape>& cm, const shared_ptr<Sta
 }
 
 YADE_PLUGIN((Gl1_DeformableElement));
-
+#endif //YADE_FEM
 #endif /* YADE_OPENGL */

@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
  
+#ifdef YADE_FEM
 #include <pkg/dem/deformablecohesive/Bo1_Node_Aabb.hpp>
 #include <pkg/dem/deformablecohesive/Node.hpp>
 #include <pkg/common/Aabb.hpp>
@@ -36,3 +37,4 @@ void Bo1_Node_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const
 }
 	
 YADE_PLUGIN((Bo1_Node_Aabb));
+#endif //YADE_FEM

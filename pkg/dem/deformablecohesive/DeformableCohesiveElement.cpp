@@ -5,6 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_FEM
 #include <algorithm>
 #include <core/Scene.hpp>
 #include <pkg/dem/deformablecohesive/DeformableCohesiveElement.hpp>
@@ -52,3 +53,4 @@ void DeformableCohesiveElement::delPair(const shared_ptr<Body>& node1,const shar
 //	if(this->localmap.erase(subBody)!=1) throw std::invalid_argument(("Node #"+boost::lexical_cast<string>(subBody->id)+" not a part of the deformable element, not removing...").c_str());
 //	LOG_DEBUG("Removed node #"<<subBody->id);
 }
+#endif //YADE_FEM

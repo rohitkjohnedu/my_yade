@@ -5,6 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_FEM
 #include <pkg/dem/deformablecohesive/DeformableElement.hpp>
 #include <pkg/dem/deformablecohesive/FEInternalForceDispatchers.hpp>
 YADE_PLUGIN((InternalForceFunctor)(InternalForceDispatcher));
@@ -33,3 +34,4 @@ void InternalForceDispatcher::action()
 //
 //}
 
+#endif //YADE_FEM

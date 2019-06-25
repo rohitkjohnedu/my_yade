@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#ifdef YADE_FEM
 #include <pkg/dem/deformablecohesive/DeformableElement.hpp>
 #include <pkg/dem/deformablecohesive/If2_Lin4NodeTetra_LinIsoRayleighDampElast.hpp>
 YADE_PLUGIN((If2_Lin4NodeTetra_LinIsoRayleighDampElast));
@@ -80,3 +81,4 @@ void If2_Lin4NodeTetra_LinIsoRayleighDampElast::go(const shared_ptr<Shape>& elem
 
 	return;
 }
+#endif //YADE_FEM

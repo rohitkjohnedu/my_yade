@@ -5,6 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_FEM
 #include <pkg/dem/deformablecohesive/Lin4NodeTetra.hpp>
 #include <algorithm>
 #include <core/Scene.hpp>
@@ -123,5 +124,5 @@ Matrix Lin4NodeTetra::calculateStiffness(Real E, Real v,Vector3r pos0,Vector3r p
 
 }
 
-
+#endif //YADE_FEM
 

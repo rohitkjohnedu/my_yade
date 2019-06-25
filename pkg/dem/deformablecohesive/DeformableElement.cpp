@@ -5,6 +5,7 @@
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
+#ifdef YADE_FEM
 #include <pkg/dem/deformablecohesive/DeformableElement.hpp>
 #include <algorithm>
 #include <core/Scene.hpp>
@@ -100,4 +101,4 @@ void DeformableElement::delNode(const shared_ptr<Body>& subBody){
 	LOG_DEBUG("Removed node #"<<subBody->id);
 }
 
-
+#endif //YADE_FEM
