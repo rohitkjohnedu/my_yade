@@ -90,9 +90,9 @@ class JCFpmPhys: public NormShearPhys {
 			((int,eventNumber,0,,"cluster event number"))
 			((int,temporalWindow,0,,"temporal window for the clustering algorithm"))
 			((Vector3r,momentCentroid,Vector3r::Zero(),,"centroid of the AE event (avg location of clustered breaks)"))
-			((vector<Interaction*>,clusterInts,,,"vector of pointers to the broken interactions nearby constituting a cluster"))		
-			((Interaction*,originalEvent,,,"pointer to the original interaction of a cluster"))
-			((vector<Interaction*>,nearbyInts,,,"vector of pointers to the nearby ints used for moment calc"))
+			((vector<Interaction*>,clusterInts,,Attr::hidden,"vector of pointers to the broken interactions nearby constituting a cluster"))
+			((Interaction*,originalEvent,,Attr::hidden,"pointer to the original interaction of a cluster"))
+			((vector<Interaction*>,nearbyInts,,Attr::hidden,"vector of pointers to the nearby ints used for moment calc"))
 			((Real,strainEnergy,0,,"strain energy of interaction"))
 			((Real,kineticEnergy,0,,"kinetic energy of the two spheres participating in the interaction (easiest to store this value with interaction instead of spheres since we are using this information for moment magnitude estimations and associated interaction searches)"))
 			,
