@@ -76,9 +76,9 @@ class JCFpmPhys: public NormShearPhys {
 			((Real,momentEnergy,0,,"reference strain (or kinetic) energy of surrounding interactions (particles)"))
 			((Real,momentEnergyChange,0,,"storage of the maximum strain (or kinetic) energy change for surrounding interactions (particles)"))
 			((Real,momentMagnitude,0,,"Moment magnitude of a failed interaction"))
-			((bool,firstMomentCalc,true,,"Flag for moment calculation"))
+			((bool,firstMomentCalc,true,,"Flag for moment calculation |yupdate|"))
 			((Real,elapsedIter,0,,"number of elapsed iterations for moment calculation"))
-			((bool,momentCalculated,false,,"Flag for moment calculation"))
+			((bool,momentCalculated,false,,"Flag for moment calculation to avoid repeating twice the operations |yupdate|"))
 			((bool,computedCentroid,false,,"Flag for moment calculation"))
 			((bool,checkedForCluster,false,,"Have we checked if this int belongs in cluster?"))
 			((bool,originalClusterEvent,false,,"the original AE event for a cluster"))
@@ -90,9 +90,9 @@ class JCFpmPhys: public NormShearPhys {
 			((int,eventNumber,0,,"cluster event number"))
 			((int,temporalWindow,0,,"temporal window for the clustering algorithm"))
 			((Vector3r,momentCentroid,Vector3r::Zero(),,"centroid of the AE event (avg location of clustered breaks)"))
-			((vector<Interaction*>,clusterInts,,Attr::hidden,"vector of pointers to the broken interactions nearby constituting a cluster"))
-			((Interaction*,originalEvent,,Attr::hidden,"pointer to the original interaction of a cluster"))
-			((vector<Interaction*>,nearbyInts,,Attr::hidden,"vector of pointers to the nearby ints used for moment calc"))
+			((vector<shared_ptr<Interaction>>,clusterInts,,Attr::readonly,"vector of pointers to the broken interactions nearby constituting a cluster"))
+			((shared_ptr<Interaction>,originalEvent,,Attr::readonly,"pointer to the original interaction of a cluster"))
+			((vector<shared_ptr<Interaction>>,nearbyInts,,Attr::readonly,"vector of pointers to the nearby ints used for moment calc"))
 			((Real,strainEnergy,0,,"strain energy of interaction"))
 			((Real,kineticEnergy,0,,"kinetic energy of the two spheres participating in the interaction (easiest to store this value with interaction instead of spheres since we are using this information for moment magnitude estimations and associated interaction searches)"))
 			,
@@ -127,8 +127,8 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 	public:
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,JCFpmPhys);
-		void checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, Interaction* contact);
-		void clusterInteractions(JCFpmPhys* phys, Interaction* contact);
+		void checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, shared_ptr<Interaction> contact);
+		void clusterInteractions(JCFpmPhys* phys, shared_ptr<Interaction> contact);
 		void computeClusteredMoment(JCFpmPhys* phys);
 		void computeCentroid(JCFpmPhys* phys);
 		void addUniqueIntsToList(JCFpmPhys* phys, JCFpmPhys* nearbyPhys);

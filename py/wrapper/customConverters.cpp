@@ -1,5 +1,6 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
+// for some reading about these conversions, see e.g. https://misspent.wordpress.com/2009/09/27/how-to-write-boost-python-converters/ (except the latter advocates using some "borrowed()" in the from-Python construc(), which is not done here)
 
 #include<lib/base/Math.hpp>
 #include<lib/base/openmp-accu.hpp>
@@ -15,6 +16,7 @@
 	#include<pkg/common/OpenGLRenderer.hpp>
 #endif
 #include<pkg/common/MatchMaker.hpp>
+#include<core/Interaction.hpp>
 
 // move this to the miniEigen wrapper later
 
@@ -192,6 +194,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 	boost::python::to_python_converter<std::vector<std::vector<std::string> >,custom_vvector_to_list<std::string> >();
 	boost::python::to_python_converter<std::vector<std::vector<Matrix3r> >,custom_vvector_to_list<Matrix3r> >();
 	boost::python::to_python_converter<std::vector<std::vector<int> >,custom_vvector_to_list<int> >();
+	boost::python::to_python_converter<std::vector<shared_ptr<Interaction> >,custom_vector_to_list<shared_ptr<Interaction>> >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
 
