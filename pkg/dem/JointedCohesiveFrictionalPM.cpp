@@ -335,7 +335,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::addUniqueIntsToList(JCFp
 
 
 // function used for clustering broken bonds and nearby interactions
-void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFpmPhys* phys, const shared_ptr<Interaction> contact){
+void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFpmPhys* phys, shared_ptr<Interaction> contact){
 	JCFpmPhys* originalPhys = YADE_CAST<JCFpmPhys*>(phys->originalEvent->phys.get());
 	addUniqueIntsToList(originalPhys, phys);  //NEED TO PUSHBACK ONLY UNIQUE INTS. we don't want a list with duplicate events (also updates reference strain)
 	phys->interactionsAdded = true;
@@ -348,7 +348,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFp
 } 
 
 // function used to check if the newly broken bond belongs in a cluster or not, if so attach to proper cluster and set appropriate flags
-void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, const shared_ptr<Interaction> contact){
+void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, shared_ptr<Interaction> contact){
 
 	const shared_ptr<Shape>& sphere1 = b1->shape;
 	const shared_ptr<Shape>& sphere2 = b2->shape;
