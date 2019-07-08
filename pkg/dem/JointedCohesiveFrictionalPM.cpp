@@ -22,8 +22,6 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	JCFpmPhys* phys = static_cast<JCFpmPhys*>(ip.get());
 	
-		
-	
 	Body* b1 = Body::byId(id1,scene).get();
 	Body* b2 = Body::byId(id2,scene).get();
 
