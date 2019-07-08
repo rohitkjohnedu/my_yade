@@ -22,9 +22,6 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 	ScGeom* geom = static_cast<ScGeom*>(ig.get()); 
 	JCFpmPhys* phys = static_cast<JCFpmPhys*>(ip.get());
 	
-	shared_ptr<Interaction> shrdPtrContact; // for sake of acoustic emission operations, we will use a shared_ptr instead of raw pointer contact. We always declare it here (on an appropriate scope)
-	if(recordMoments && !phys->momentCalculated) // but we will search for the correct shared_ptr only when needed
-		shrdPtrContact = scene->interactions->find(id1,id2);
 		
 	
 	Body* b1 = Body::byId(id1,scene).get();
@@ -138,8 +135,8 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
                 file << boost::lexical_cast<string> ( scene->iter ) << " " << boost::lexical_cast<string> ( scene->time ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[0] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[1] ) <<" "<< boost::lexical_cast<string> ( geom->contactPoint[2] ) <<" "<< 1 <<" "<< boost::lexical_cast<string> ( 0.5*(geom->radius1+geom->radius2) ) <<" "<< boost::lexical_cast<string> ( crackNormal[0] ) <<" "<< boost::lexical_cast<string> ( crackNormal[1] ) <<" "<< boost::lexical_cast<string> ( crackNormal[2] ) <<" "<< boost::lexical_cast<string> ( 0.5*( ((scalarNF*scalarNF)/phys->kn) + ((scalarSF*scalarSF)/phys->ks) ) ) <<" "<< boost::lexical_cast<string> ( phys->isOnJoint ) << endl;
 	    }
         if (recordMoments && !phys->momentCalculated){
-        	checkForCluster(phys, geom, b1, b2, shrdPtrContact);
-		clusterInteractions(phys, shrdPtrContact);
+        	checkForCluster(phys, geom, b1, b2, contact);
+		clusterInteractions(phys, contact);
 		computeTemporalWindow(phys, b1, b2);
         }
 	    cracksFileExist=true;
@@ -246,8 +243,8 @@ bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig
 //             }
 
         if (recordMoments && !phys->momentCalculated){
-        	checkForCluster(phys, geom, b1, b2, shrdPtrContact);
-		clusterInteractions(phys, shrdPtrContact);
+        	checkForCluster(phys, geom, b1, b2, contact);
+		clusterInteractions(phys, contact);
 		computeTemporalWindow(phys, b1, b2);
         }
             
@@ -335,7 +332,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::addUniqueIntsToList(JCFp
 
 
 // function used for clustering broken bonds and nearby interactions
-void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFpmPhys* phys, shared_ptr<Interaction> contact){
+void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFpmPhys* phys, Interaction* contact){
 	JCFpmPhys* originalPhys = YADE_CAST<JCFpmPhys*>(phys->originalEvent->phys.get());
 	addUniqueIntsToList(originalPhys, phys);  //NEED TO PUSHBACK ONLY UNIQUE INTS. we don't want a list with duplicate events (also updates reference strain)
 	phys->interactionsAdded = true;
@@ -344,11 +341,11 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFp
 	phys->momentMagnitude = 0; // dirty way to avoid recording these clustered events twice? maybe dont need this if proper recording is applied
 	originalPhys->computedCentroid=false;  // set flag to compute a new centroid since we added more ints
 	boost::mutex::scoped_lock lock(clusterInts_mutex);
-	originalPhys->clusterInts.push_back(contact);  // add this broken interaction to list of broken bonds in this event
+	originalPhys->clusterInts.push_back(scene->interactions->find(contact->getId1(),contact->getId2()));  // add this broken interaction to list of broken bonds in this event
 } 
 
 // function used to check if the newly broken bond belongs in a cluster or not, if so attach to proper cluster and set appropriate flags
-void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, shared_ptr<Interaction> contact){
+void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, Interaction* contact){
 
 	const shared_ptr<Shape>& sphere1 = b1->shape;
 	const shared_ptr<Shape>& sphere2 = b2->shape;
@@ -397,7 +394,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::checkForCluster(JCFpmPhy
 	if (!phys->clusteredEvent) {
 		phys->originalClusterEvent = true; // if not clustered, its an original event. We use this interaction as the master for the cluster. Its list of nearbyInts will expand if other ints break nearby. 
 		phys->eventBeginTime=scene->time;
-		phys->originalEvent = contact;
+		phys->originalEvent = scene->interactions->find(contact->getId1(),contact->getId2());
 		eventNumber += 1;
 		phys->eventNumber = eventNumber;
 	}

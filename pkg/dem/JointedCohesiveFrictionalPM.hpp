@@ -127,8 +127,8 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 	public:
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,JCFpmPhys);
-		void checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, shared_ptr<Interaction> contact);
-		void clusterInteractions(JCFpmPhys* phys, shared_ptr<Interaction> contact);
+		void checkForCluster(JCFpmPhys* phys, ScGeom* geom, Body* b1, Body* b2, Interaction* contact);
+		void clusterInteractions(JCFpmPhys* phys, Interaction* contact);
 		void computeClusteredMoment(JCFpmPhys* phys);
 		void computeCentroid(JCFpmPhys* phys);
 		void addUniqueIntsToList(JCFpmPhys* phys, JCFpmPhys* nearbyPhys);
