@@ -53,10 +53,8 @@ WALL_ID=O.bodies.append(box(center=(numThreads*N*0.5,-0.5,0),extents=(2*numThrea
 collider.verletDist = 0.5
 newton=typedEngine("NewtonIntegrator")
 newton.gravity=(0,-10,0) #else nothing would move
-
 tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper. Very important: we don't want subdomains to use many different timesteps...
 O.engines=O.engines[0:tsIdx]+O.engines[tsIdx+1:]
-
 O.dt=0.001 #this very small timestep will make it possible to run 2000 iter without merging
 #O.dt=0.1*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
 
