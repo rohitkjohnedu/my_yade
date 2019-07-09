@@ -47,6 +47,7 @@ userScriptInCheckList=""	# the simulation script from which mpy.py is used
 
 ACCUMULATE_FORCES=True #control force summation on master's body. FIXME: if false master goes out of sync since nothing is blocking rank=0 thread
 VERBOSE_OUTPUT=False
+NO_OUTPUT=False
 SEND_SHAPES=False #if false only bodies' states are communicated between threads, else shapes as well (to be implemented)
 ERASE_REMOTE = True #erase bodies not interacting wit a given subdomain? else keep dead clones of all bodies in each scene
 OPTIMIZE_COM=True
@@ -89,6 +90,7 @@ bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033
 #rank_color = [str(red[rank_color_id]),str(green[rank_color_id]),str(blue[rank_color_id])]
 
 def mprint(*args): #this one will print regardless of VERBOSE_OUTPUT
+	if NO_OUTPUT: return
 	m=bcolors[min(rank,len(bcolors)-2)]
 	if rank==0:
 		m+='1;' #bold for master
