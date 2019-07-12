@@ -177,13 +177,21 @@ if opts.performance:
 	checksPath=libDir+'/py/yade/tests/checks/performance'
 	execfile(checksPath+'/checkPerf.py')
 
+def checkVersions():
+	# put here all yade compatibility tests with other libraries
+	import yade.libVersions
+	glutVer = yade.libVersions.getVersion('freeglut')
+	if(glutVer > (2,8,1) or glutVer == (-1,-1,-1)):
+		print("\033[93mWarning: freeglut versions higher than 2.8.1 are known to crash\033[0m, see https://gitlab.com/yade-dev/trunk/merge_requests/160")
+
 def userSession(gui='none',qapp=None):
 	# prepare nice namespace for users
 	import yade.runtime
 	import sys
 	if __name__ != "__main__": # for importing as python module
 		return
-	
+
+	checkVersions()
 	# common ipython configuration
 	# use standard terminal color codes to make F12, F11 bold, and underline the word "help", see https://stackoverflow.com/questions/4842424/list-of-ansi-color-escape-sequences
 	banner='[[ ^L clears screen, ^U kills line. '+', '.join((['\033[1mF12\033[0m controller','\033[1mF11\033[0m 3D view (press \033[4m"h"\033[0m in 3D view for \033[4mhelp\033[0m)','\033[1mF10\033[0m both','\033[1mF9\033[0m generator'] if (gui!='none') else [])+['\033[1mF8\033[0m plot'])+'. ]]'
