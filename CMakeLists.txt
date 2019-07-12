@@ -597,6 +597,13 @@ ENDIF(ENABLE_POTENTIAL_BLOCKS)
 #===========================================================
 
 
+#===========================================================
+#= Forced detection of library versions for libVersions ====
+#===========================================================
+INCLUDE(FindMissingVersions)
+#===========================================================
+
+
 
 IF (INSTALL_PREFIX)
   SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})

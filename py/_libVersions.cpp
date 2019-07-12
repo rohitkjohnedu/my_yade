@@ -101,14 +101,7 @@ py::tuple extractNumbers(std::string verStr, std::string what) {
 // 4. freeglut
 #ifdef YADE_OPENGL
 	// NOTE: maybe we should someday switch from freeglut3-dev to libglfw3-dev, https://www.glfw.org/
-	#include <GL/freeglut.h> // debian package 2.8.1-3
-	py::list freeglutVer() {
-		py::list ret;
-		// I couldn't find anything that would return the actual debian package version. So this returns 13.4.1, which is weird.
-		ret.append( py::make_tuple(                  GLUT_XLIB_IMPLEMENTATION   ,                                   GLUT_API_VERSION   ,                                   FREEGLUT));
-		ret.append( boost::lexical_cast<std::string>(GLUT_XLIB_IMPLEMENTATION)+"."+boost::lexical_cast<std::string>(GLUT_API_VERSION)+"."+boost::lexical_cast<std::string>(FREEGLUT));
-		return ret;
-	}
+	#include <GL/freeglut.h>
 	#include <GL/glext.h>    // debian package 13.0.6
 	py::list glVer() {
 		py::list ret;
@@ -126,7 +119,6 @@ py::tuple extractNumbers(std::string verStr, std::string what) {
 		return ret;
 	}
 #else
-	py::list freeglutVer() { return {}; }
 	py::list glVer() { return {}; }
 	py::list qglviewerVer() { return {}; }
 #endif
@@ -335,7 +327,6 @@ py::dict getAllVersionsCpp(){
 	ret["clang"        ] = clangVer();
 	ret["boost"        ] = boostVer();
 	ret["qt"           ] = qtVer();
-	ret["freeglut"     ] = freeglutVer();
 	ret["gl"           ] = glVer();
 	ret["qglviewer"    ] = qglviewerVer();
 	ret["python"       ] = pythonVer();

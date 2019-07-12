@@ -13,6 +13,12 @@ To obtain a list of all libraries use the function :yref:`yade.libVersions.print
 All libraries listed in :ref:`prerequisites<prerequisites>` are detected by this module.
 
 .. note:: If we need a version of some library not listed in :ref:`prerequisites<prerequisites>`, then it must also be added to :ysrc:`that list<doc/sphinx/installation.rst>`.
+
+When adding a new version please have a look at these three files: 
+
+1. :ysrc:`py/_libVersions.cpp`: detection of versions from ``#include`` files by C++.
+2. :ysrc:`py/libVersions.py.in`: python module which is constructed by cmake during compilation. All ``*.in`` files are processed by cmake.
+3. :ysrc:`cMake/FindMissingVersions.cmake`: forced detection of library with undetectable version.
 """
 
 # all C++ functions are accessible now:
@@ -108,7 +114,8 @@ def getAllVersionsCmake():
 	addVer("boost",'${Boost_MAJOR_VERSION}','${Boost_MINOR_VERSION}','${Boost_SUBMINOR_VERSION}','${Boost_VERSION}')
 	# 3. qt
 	addVer("qt"   ,'${Used_QT_VERSION_MAJOR}','${Used_QT_VERSION_MINOR}','${Used_QT_VERSION_PATCH}','${Used_QT_VERSION_MAJOR}.${Used_QT_VERSION_MINOR}.${Used_QT_VERSION_PATCH}')
-	# 4. freeglut   - I don't know how to detect it
+	# 4. freeglut
+	addVer("freeglut" ,'${FREEGLUT_VERSION_MAJOR}','${FREEGLUT_VERSION_MINOR}','${FREEGLUT_VERSION_PATCH}','${FREEGLUT_VERSION_STR}')
 	# 5. qglviewer  - I don't know how to detect it
 	# 6. python
 	addVer("python",'${PYTHON_VERSION_MAJOR}','${PYTHON_VERSION_MINOR}','${PYTHON_VERSION_PATCH}','${PYTHON_VERSION_STRING}')
@@ -147,6 +154,7 @@ def getAllVersionsCmake():
 	except:
 		pass
 	# 21. clp
+	# Note: this can be fixed in the same way as forced detection of freeglut, with file cMake/FindMissingVersions.cmake
 	addVer("clp",'${CLP_VERSION_MAJOR}','${CLP_VERSION_MINOR}','${CLP_VERSION_RELEASE}','${CLP_VERSION}')
 	# 22. PyMPI
 	try:
