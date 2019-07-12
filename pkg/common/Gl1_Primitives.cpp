@@ -250,20 +250,12 @@ void Gl1_Sphere::initStripedGlList() {
 
 void Gl1_Sphere::initGlutGlList(){
 	//Generate the "no-stripes" display list, each time quality is modified
-TRACE;
 	glDeleteLists(glGlutSphereList,1);
-TRACE;
 	glGlutSphereList = glGenLists(1);
-TRACE;
 	glNewList(glGlutSphereList,GL_COMPILE);
-TRACE;
 		glEnable(GL_LIGHTING);
-TRACE;
 		glShadeModel(GL_SMOOTH);
-TRACE;
 		glutSolidSphere(1.0,max(quality*glutSlices,(Real)2.),max(quality*glutStacks,(Real)3.));
-TRACE;
 	glEndList();
-TRACE;
 }
 #endif /* YADE_OPENGL */
