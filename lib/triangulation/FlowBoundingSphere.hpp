@@ -57,6 +57,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		double fluidRho;
 		double fluidCp;
 		bool sphericalVertexAreaCalculated = 0;
+		double thermalPorosity;
 
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point,Real> > imposedP;
@@ -191,6 +192,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		int getCell (double X,double Y,double Z);
 		double boundaryFlux(unsigned int boundaryId);
 		double boundaryArea(unsigned int boundaryId);
+		std::vector<std::vector<double>> boundaryVel(unsigned int booundaryId);
 		void setBlocked(CellHandle& cell);
 		void adjustCavityPressure(double dt, int stepsSinceLastMesh, double pZero);
 		void adjustCavityVolumeChange(double dt, int stepsSinceLastMesh, double pZero);

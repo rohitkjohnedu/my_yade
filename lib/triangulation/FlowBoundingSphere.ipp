@@ -107,7 +107,7 @@ void FlowBoundingSphere<Tesselation>::averageRelativeCellVelocity()
                 numCells++;
 		Real totFlowRate = 0;//used to acount for influxes in elements where pressure is imposed
                 for ( int i=0; i<4; i++ ) if (!Tri.is_infinite(cell->neighbor(i))){
-				CVector Surfk = cell->info()-cell->neighbor(i)->info();
+				CVector Surfk =  cell->info()-cell->neighbor(i)->info();
 				Real area = sqrt ( Surfk.squared_length() );
 				Surfk = Surfk/area;
                         	CVector branch = cell->vertex ( facetVertices[i][0] )->point().point() - cell->info();
@@ -597,7 +597,11 @@ void FlowBoundingSphere<Tesselation>::computePermeability()
 					
 					if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
 					if (k<0 && debugOut) {surfneg+=1; cout<<"__ k<0 __"<<k<<" "<<" fluidArea "<<fluidArea<<" area "<<area<<" "<<crossSections[0]<<" "<<crossSections[1]<<" "<<crossSections[2] <<" "<<W[0]->info().id()<<" "<<W[1]->info().id()<<" "<<W[2]->info().id()<<" "<<p1<<" "<<p2<<" test "<<endl;}
-				} else  {cout <<"infinite K1!"<<endl; k = infiniteK;}//Will be corrected in the next loop
+				} else  {
+					cout <<"infinite K1!"<<endl;
+					k = infiniteK;	
+					cell->info().kNorm()[j]=infiniteK;
+				}//Will be corrected in the next loop
 				if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
 			}
 		}
@@ -1105,6 +1109,45 @@ double FlowBoundingSphere<Tesselation>::boundaryArea(unsigned int boundaryId)
 	return A;
 }
 
+template <class Tesselation>
+std::vector<std::vector<double>> FlowBoundingSphere<Tesselation>::boundaryVel(unsigned int boundaryId)
+{
+	//if (noCache && T[!currentTes].Max_id()<=0) return 0;
+	bool tes = noCache?(!currentTes):currentTes;
+	RTriangulation& Tri = T[tes].Triangulation();
+	//double avgVel=0;
+	//int numCells=0;
+	std::vector<std::vector<double>> velocities;
+	VectorCell tmpCells;
+	tmpCells.resize(10000);
+	VCellIterator cells_it = tmpCells.begin();
+	std::vector<double> vectorVel(4,0);
+
+	VCellIterator cell_up_end = Tri.incident_cells(T[tes].vertexHandles[boundaryId],cells_it);
+	for (VCellIterator it = tmpCells.begin(); it != cell_up_end; it++)
+	{
+//		numCells+=1;
+		const CellHandle& cell = *it;
+		if (cell->info().isGhost) continue;
+
+		for (int j=0; j<4; j++) {
+			if (cell->neighbor(j)->info().isFictious) continue;
+			const CVector& Surfk = cell->info().facetSurfaces[j];
+			Real area = sqrt(Surfk.squared_length());
+			vectorVel[0] = cell->info().averageVelocity()[0];
+			vectorVel[1] = cell->info().averageVelocity()[1];
+			vectorVel[2] = cell->info().averageVelocity()[2];
+			vectorVel[3] = cell->info().facetFluidSurfacesRatio[j]*area;
+			//vectorVel[4] = cell->info().kNorm()[j];
+			velocities.push_back(vectorVel);
+			//avgVel += sqrt(cell->info().averageVelocity().squared_length());
+		}
+	}
+	//avgVel /= double(numCells);
+	return velocities;
+}
+
+
 
 
 template <class Tesselation>
@@ -1396,8 +1439,15 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 			for (unsigned kk=0; kk<allIds.size(); kk++){
 				bool isDrawable = cellHandles[allIds[kk]]->info().isReal() && cellHandles[allIds[kk]]->vertex(0)->info().isReal() && cellHandles[allIds[kk]]->vertex(1)->info().isReal() && cellHandles[allIds[kk]]->vertex(2)->info().isReal() && cellHandles[allIds[kk]]->vertex(3)->info().isReal();
 				 if(isDrawable) vtkWrite.write_data(cellHandles[allIds[kk]]->info().temp());
-			vtkWrite.end_data();
 			}
+			vtkWrite.end_data();
+
+			vtkWrite.begin_data("Reynolds",CELL_DATA,SCALARS,FLOAT);
+			for (unsigned kk=0; kk<allIds.size(); kk++){
+				bool isDrawable = cellHandles[allIds[kk]]->info().isReal() && cellHandles[allIds[kk]]->vertex(0)->info().isReal() && cellHandles[allIds[kk]]->vertex(1)->info().isReal() && cellHandles[allIds[kk]]->vertex(2)->info().isReal() && cellHandles[allIds[kk]]->vertex(3)->info().isReal();
+				 if(isDrawable) vtkWrite.write_data(cellHandles[allIds[kk]]->info().Reynolds);
+			}
+			vtkWrite.end_data();
 			
 			vtkWrite.begin_data("Tcondition",CELL_DATA,SCALARS,FLOAT);
 			for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {

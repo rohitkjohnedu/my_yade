@@ -71,6 +71,7 @@ public:
 	using FlowType::controlCavityPressure;
 	using FlowType::controlCavityVolumeChange;
 	using FlowType::cavityDV;
+	using FlowType::thermalPorosity;
 
 	//! TAUCS DECs
 	vector<FiniteCellsIterator> orderedCells;
@@ -187,7 +188,7 @@ public:
 	void vectorizedGaussSeidel(Real dt);
 	virtual int setLinearSystemFullGS(Real dt);
 	void augmentConductivityMatrix(Real dt);
-	void setNewCellTemps();
+	void setNewCellTemps(bool addToDeltaTemp);
 	void initializeInternalEnergy();
 	
 	int taucsSolveTest();

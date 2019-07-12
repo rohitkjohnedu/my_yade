@@ -35,25 +35,22 @@ void ThermalEngine::action()
 	}	
 	// some initialization stuff for timestep and efficiency. 
 	elapsedTime += scene->dt;
-	if (elapsedIters > conductionIterPeriod || first){
+	if (elapsedIters >= conductionIterPeriod || first){
 	        runConduction = true;
 	        timeStepEstimated = false;
 	        if (first) thermalDT = scene->dt;
 	        else thermalDT = elapsedTime;	
-		if (advection && first) {// save excessive CPU time by computing these once. if we want to modify heat capacity, visc, thermal cond with temp, we need to move back to computeSolidFluidFluxes()
+		if (advection && first) {
 			Pr = flow->fluidCp*flow->viscosity/fluidK;
-			if (Reynolds > 0){
-				Nu = 2. + 0.6*pow(Reynolds,0.5)*pow(Pr,0.33333);
-				NutimesFluidK = Nu*fluidK;
-			} else if ((0 <= Reynolds) && (Reynolds <= 100)) { //Tavassoli, H., Peters, E.A.J.F., and Kuipers, J.A.M. (2015) Direct numerical simulation of fluid–particle heat transfer in fixed random arrays of non‐spherical particles. Chemical Engineering Science, 129, 42–48
-				const double poro = Shop::getPorosityAlt();
-				Nu = (7.-10.*poro+5.*poro*poro)*(1.+0.1*pow(Reynolds,0.2)*pow(Pr,0.333))+(1.33-2.19*poro+1.15*poro*poro)*pow(Reynolds,0.7)*pow(Pr,0.333);
-				NutimesFluidK = Nu*fluidK;
-			}
+			setReynoldsNumbers();
 		}	
 	        first = false;	
 	} else if (tsSafetyFactor <= 0) {
 		thermalDT = scene->dt;
+	}
+	if (flow->updateTriangulation) { 
+		setReynoldsNumbers();
+		flow->updateTriangulation=false; // thermalFlipping this back for FlowEngine	
 	}
 	if (thermoMech && letThermalRunFlowForceUpdates) flow->decoupleForces=true;  // let thermal engine handle force estimates
 //	if ((elapsedIters == conductionIterPeriod) && tsSafetyFactor>0) flow->decoupleForces=true; // don't let flow handle forces during next step, since thermal will be adjusting pressures and handling forces // CURRENTLY NOT USEFUL
@@ -74,10 +71,14 @@ void ThermalEngine::action()
 		if (advection) computeSolidFluidFluxes();
 	}
 	if (unboundCavityBodies) unboundCavityParticles();
-	if (advection && fluidConduction) computeFluidFluidConduction();
+	if (advection && fluidConduction) { // need to avoid duplicating energy, so reinitializing pore energy before conduction
+		flow->solver->setNewCellTemps(false);
+		flow->solver->initializeInternalEnergy();
+		computeFluidFluidConduction();
+	}
 	if (debug) cout << "conduction done" << endl;
 	if (conduction && runConduction) computeNewParticleTemperatures();
-	if (advection) computeNewPoreTemperatures();
+	if (advection) flow->solver->setNewCellTemps(fluidConduction); // in case of fluid conduction, the delta temps are added to, not replaced 
 	if (debug) cout << "temps set" << endl;
 	if (delT>0 && runConduction) applyTempDeltaToSolids(delT);
 	if (thermoMech && runConduction) {
@@ -89,6 +90,53 @@ void ThermalEngine::action()
 	if (!timeStepEstimated && tsSafetyFactor>0) timeStepEstimate();
 	if (debug) cout << "timeStepEstimated " << timeStepEstimated << endl;
 	if (tsSafetyFactor>0) elapsedIters += 1;
+}
+
+void ThermalEngine::setReynoldsNumbers(){
+	Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
+	const long size = Tes.cellHandles.size();
+	if (uniformReynolds!=-1) { // gain efficiency if we know the flow is creep (assigning uniform low reynolds to all cells)
+		double NussfluidK = (2. + 0.6*pow(uniformReynolds,0.5)*pow(Pr,0.33333))*fluidK;
+		#pragma omp parallel for
+    		for (long i=0; i<size; i++){
+			CellHandle& cell = Tes.cellHandles[i];
+			cell->info().Reynolds=uniformReynolds;
+			cell->info().NutimesFluidK = NussfluidK;
+		}
+		return;
+	}
+		
+	// else get fluid velocity, compute reynolds, compute proper nusselt
+	flow->solver->averageRelativeCellVelocity();
+//	#ifdef YADE_OPENMP
+	const double poro = Shop::getPorosityAlt();
+	#pragma omp parallel for
+    	for (long i=0; i<size; i++){
+		CellHandle& cell = Tes.cellHandles[i];
+		CVector l;
+		double charLength = 0.000001;
+		//double NutimesFluidK = 2*fluidK;
+		double Nusselt=2.;
+		for(int i=0;i<4;i++) {
+			if(!cell->neighbor(i)->info().isFictious) {
+				l = cell->info() - cell->neighbor(i)->info();
+				charLength = sqrt(l.squared_length());
+			}
+		}
+		const double avgCellFluidVel = sqrt(cell->info().averageVelocity().squared_length());
+		double Reynolds = flow->solver->fluidRho*avgCellFluidVel*charLength/flow->viscosity;
+		if (Reynolds<0 || isnan(Reynolds)){cerr<<"Reynolds is negative or nan"<<endl; Reynolds = 0;}
+		if (Reynolds > 1000 || poro<0.35){
+			Nusselt = 2. + 0.6*pow(Reynolds,0.5)*pow(Pr,0.33333);
+			cell->info().Reynolds = Reynolds;
+		} else if ((0 <= Reynolds) && (Reynolds <= 1000)) { //Tavassoli, H., Peters, E.A.J.F., and Kuipers, J.A.M. (2015) Direct numerical simulation of fluid–particle heat transfer in fixed random arrays of non‐spherical particles. Chemical Engineering Science, 129, 42–48
+			Nusselt = (7.-10.*poro+5.*poro*poro)*(1.+0.1*pow(Reynolds,0.2)*pow(Pr,0.333))+(1.33-2.19*poro+1.15*poro*poro)*pow(Reynolds,0.7)*pow(Pr,0.333);
+			NutimesFluidK = Nu*fluidK;
+			cell->info().Reynolds = Reynolds;
+		}
+		cell->info().NutimesFluidK = Nusselt*fluidK;
+	}
+	return;
 }
 
 void ThermalEngine::setInitialValues() {
@@ -120,6 +168,27 @@ void ThermalEngine::timeStepEstimate() {
        		if (!maxTimeStep) maxTimeStep = bodyTimeStep;
         	if (bodyTimeStep < maxTimeStep) maxTimeStep = bodyTimeStep;
 	}
+
+	if (advection && fluidConduction) {
+	Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
+//	#ifdef YADE_OPENMP
+	const long sizeCells = Tes.cellHandles.size();
+//	#pragma omp parallel for
+    	for (long i=0; i<sizeCells; i++){
+		CellHandle& cell = Tes.cellHandles[i];
+		double poreVolume;
+		if (cell->info().isCavity) poreVolume = cell->info().volume();
+		else if (porosityFactor > 0)  poreVolume = cell->info().volume()*porosityFactor; 
+		else poreVolume = 1./cell->info().invVoidVolume();
+		const Real mass = flow->fluidRho * poreVolume;
+		const Real poreTimeStep = mass*flow->fluidCp / cell->info().stabilityCoefficient;
+		cell->info().stabilityCoefficient=0;
+		if (!maxTimeStep) maxTimeStep = poreTimeStep;
+		if (poreTimeStep < maxTimeStep) maxTimeStep = poreTimeStep;
+	}
+	}
+	
+
 	if (debug) cout << "body steps done" <<endl;
 	timeStepEstimated = true;
     	// estimate the conduction iterperiod based on current mechanical/fluid timestep
@@ -262,9 +331,13 @@ void ThermalEngine::computeVertexSphericalArea(){
 void ThermalEngine::computeFlux(CellHandle& cell,const shared_ptr<Body>& b, const double surfaceArea) {
 	const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 	auto* thState = b->state.get(); 
-	const Real h = NutimesFluidK / (2.*sphere->radius); // heat transfer coeff assuming Re<<1 (stokes flow)
+	const Real h = cell->info().NutimesFluidK / (2.*sphere->radius);
+	//const Real h = cell->info().NutimesFluidK / (2.*sphere->radius); // heat transfer coeff assuming Re<<1 (stokes flow)
 	const Real flux = h*surfaceArea*(cell->info().temp() - thState->temp);
-   	if (runConduction && tsSafetyFactor>0) thState->stabilityCoefficient += h*surfaceArea; // for auto time step estimation
+   	if (runConduction && tsSafetyFactor>0) {
+		thState->stabilityCoefficient += h*surfaceArea; // for auto time step estimation
+		cell->info().stabilityCoefficient += h*surfaceArea;
+	}
 	if (!cell->info().Tcondition && !cell->info().isFictious && !cell->info().blocked) cell->info().internalEnergy -= flux*thermalDT; 
 	if (!thState->Tcondition) thState->stepFlux += flux;  
 }
@@ -362,64 +435,72 @@ void ThermalEngine::computeSolidSolidFluxes() {
 }
 
 void ThermalEngine::computeFluidFluidConduction() {
-	CVector fluidSurfK; CVector poreVector; Real distance; Real area; Real conductionEnergy;
+	//CVector fluidSurfK; CVector poreVector; Real distance; Real area; Real conductionEnergy;
 	// cycle through facets instead of cells to avoid duplicate math
 
 	/* Parallel version */
-//   	Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
-//	const long sizeFacets = Tes.facetCells.size();
-//	#pragma omp parallel for
-//    	for (long i=0; i<sizeFacets; i++){
-//		std::pair<CellHandle,int> facetPair = Tes.facetCells[i];
-//		const CellHandle& cell = facetPair.first;
-//		const CellHandle& neighborCell = cell->neighbor(facetPair.second);
-//		if (cell->info().isFictious || neighborCell->info().isFictious || cell->info().blocked || neighborCell->info().blocked) continue;
-//		delT = cell->info().temp() - neighborCell->info().temp();
-//		double fluidToSolidRatio;
-//		if (cell->info().isCavity && neighborCell->info().isCavity) fluidToSolidRatio = 1.;
-//		else fluidToSolidRatio = cell->info().facetFluidSurfacesRatio[facetPair.second];
-//		area = fluidConductionAreaFactor * sqrt(cell->info().facetSurfaces[facetPair.second].squared_length())*fluidToSolidRatio;
-
-//		poreVector = cellBarycenter(cell) - cellBarycenter(neighborCell);  // voronoi was breaking for hexagonal packings
-//		distance = sqrt(poreVector.squared_length());
-//		//cout << "conduction distance" << distance << endl;
-//		//if (distance < area) continue;  // hexagonal packings result in extremely small distances that blow up the simulation
-//		conductionEnergy = (fluidK * area / distance) * delT * thermalDT;
-//		if (isnan(conductionEnergy)) conductionEnergy=0;
-//		//cout << "conduction distance" << distance << endl;
-//		if (!cell->info().Tcondition && !isnan(conductionEnergy)) cell->info().internalEnergy -= conductionEnergy;
-//		if (!neighborCell->info().Tcondition && !isnan(conductionEnergy)) neighborCell->info().internalEnergy += conductionEnergy;
-//		//cout << "added conduction energy"<< conductionEnergy << endl; 
-//	}
+   	Tesselation& Tes = flow->solver->T[flow->solver->currentTes];
+	const long sizeFacets = Tes.facetCells.size();
+//	#pragma omp parallel for  //FIXME: does not like running in parallel for some reason
+    	for (long i=0; i<sizeFacets; i++){
+		CVector fluidSurfK; CVector poreVector; Real distance; Real area; Real conductionEnergy;
+		std::pair<CellHandle,int> facetPair = Tes.facetCells[i];
+		const CellHandle& cell = facetPair.first;
+		const CellHandle& neighborCell = cell->neighbor(facetPair.second);
+		if (cell->info().isFictious || neighborCell->info().isFictious || cell->info().blocked || neighborCell->info().blocked) continue;
+		delT = cell->info().temp() - neighborCell->info().temp();
+		double fluidToSolidRatio;
+		if (cell->info().isCavity && neighborCell->info().isCavity) fluidToSolidRatio = 1.;
+		else fluidToSolidRatio = cell->info().facetFluidSurfacesRatio[facetPair.second];
+		if (flow->thermalPorosity>0) fluidConductionAreaFactor*=flow->thermalPorosity;
+		area = fluidConductionAreaFactor * sqrt(cell->info().facetSurfaces[facetPair.second].squared_length())*fluidToSolidRatio;
+		//area = sqrt(fluidSurfK.squared_length());
+		//poreVector = cell->info() - neighborCell->info();
+		poreVector = cellBarycenter(cell) - cellBarycenter(neighborCell);  // voronoi was breaking for hexagonal packings
+		distance = sqrt(poreVector.squared_length());
+		if (distance<minimumFluidCondDist) distance = minimumFluidCondDist;
+		//cout << "conduction distance" << distance << endl;
+		//if (distance < area) continue;  // hexagonal packings result in extremely small distances that blow up the simulation
+		const double thermalResist = fluidK*area/distance;
+		conductionEnergy = thermalResist * delT * thermalDT;
+		if (isnan(conductionEnergy)) conductionEnergy=0;
+		cell->info().stabilityCoefficient+=thermalResist;
+		//cout << "conduction distance" << distance << endl;
+		if (!cell->info().Tcondition && !isnan(conductionEnergy)) cell->info().internalEnergy -= conductionEnergy;
+		if (!neighborCell->info().Tcondition && !isnan(conductionEnergy)) neighborCell->info().internalEnergy += conductionEnergy;
+		//cout << "added conduction energy"<< conductionEnergy << endl; 	
+	}
 
 
 
 
 
 	/* non parallel version */
-	RTriangulation& Tri = flow->solver->T[flow->solver->currentTes].Triangulation();
-	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
-		const CellHandle& cell = f_it->first;
-		const CellHandle& neighborCell = f_it->first->neighbor(f_it->second);
-		if (cell->info().isFictious || neighborCell->info().isFictious || cell->info().blocked || neighborCell->info().blocked) continue;
-		delT = cell->info().temp() - neighborCell->info().temp();
-		double fluidToSolidRatio;
-		if (cell->info().isCavity && neighborCell->info().isCavity) fluidToSolidRatio = 1.;
-		else fluidToSolidRatio = cell->info().facetFluidSurfacesRatio[f_it->second];
-		area = fluidConductionAreaFactor * sqrt(cell->info().facetSurfaces[f_it->second].squared_length())*fluidToSolidRatio;
-		//area = sqrt(fluidSurfK.squared_length());
-		//poreVector = cell->info() - neighborCell->info();
-		poreVector = cellBarycenter(cell) - cellBarycenter(neighborCell);  // voronoi was breaking for hexagonal packings
-		distance = sqrt(poreVector.squared_length());
-		//cout << "conduction distance" << distance << endl;
-		//if (distance < area) continue;  // hexagonal packings result in extremely small distances that blow up the simulation
-		conductionEnergy = (fluidK * area / distance) * delT * thermalDT;
-		if (isnan(conductionEnergy)) conductionEnergy=0;
-		//cout << "conduction distance" << distance << endl;
-		if (!cell->info().Tcondition && !isnan(conductionEnergy)) cell->info().internalEnergy -= conductionEnergy;
-		if (!neighborCell->info().Tcondition && !isnan(conductionEnergy)) neighborCell->info().internalEnergy += conductionEnergy;
-		//cout << "added conduction energy"<< conductionEnergy << endl; 
-	}
+//	RTriangulation& Tri = flow->solver->T[flow->solver->currentTes].Triangulation();
+//	for (FiniteFacetsIterator f_it=Tri.finite_facets_begin(); f_it != Tri.finite_facets_end();f_it++){
+//		const CellHandle& cell = f_it->first;
+//		const CellHandle& neighborCell = f_it->first->neighbor(f_it->second);
+//		if (cell->info().isFictious || neighborCell->info().isFictious || cell->info().blocked || neighborCell->info().blocked) continue;
+//		delT = cell->info().temp() - neighborCell->info().temp();
+//		double fluidToSolidRatio;
+//		if (cell->info().isCavity && neighborCell->info().isCavity) fluidToSolidRatio = 1.;
+//		else fluidToSolidRatio = cell->info().facetFluidSurfacesRatio[f_it->second];
+//		area = fluidConductionAreaFactor * sqrt(cell->info().facetSurfaces[f_it->second].squared_length())*fluidToSolidRatio;
+//		//area = sqrt(fluidSurfK.squared_length());
+//		//poreVector = cell->info() - neighborCell->info();
+//		poreVector = cellBarycenter(cell) - cellBarycenter(neighborCell);  // voronoi was breaking for hexagonal packings
+//		distance = sqrt(poreVector.squared_length());
+//		//cout << "conduction distance" << distance << endl;
+//		//if (distance < area) continue;  // hexagonal packings result in extremely small distances that blow up the simulation
+//		const double thermalResist = fluidK*area/distance;
+//		conductionEnergy = thermalResist * delT * thermalDT;
+//		if (isnan(conductionEnergy)) conductionEnergy=0;
+//		cell->info().stabilityCoefficient+=thermalResist;
+//		//cout << "conduction distance" << distance << endl;
+//		if (!cell->info().Tcondition && !isnan(conductionEnergy)) cell->info().internalEnergy -= conductionEnergy;
+//		if (!neighborCell->info().Tcondition && !isnan(conductionEnergy)) neighborCell->info().internalEnergy += conductionEnergy;
+//		//cout << "added conduction energy"<< conductionEnergy << endl; 
+//	}
 }
 
 CVector ThermalEngine::cellBarycenter(const CellHandle& cell)
@@ -430,7 +511,8 @@ CVector ThermalEngine::cellBarycenter(const CellHandle& cell)
 }
 
 void ThermalEngine::computeNewPoreTemperatures() {
-    flow->solver->setNewCellTemps();
+    bool addToDeltaTemp = false;
+    flow->solver->setNewCellTemps(addToDeltaTemp);
 }
 
 void ThermalEngine::computeNewParticleTemperatures() {
@@ -448,7 +530,7 @@ void ThermalEngine::computeNewParticleTemperatures() {
         if (thState->Tcondition) continue;
         thState->oldTemp = thState->temp; 
         thState->temp = thState->stepFlux*thermalDT/(thState->Cp*density*volume) + thState->oldTemp; // first order forward difference
-        thState->stepFlux=0;
+        thState->stepFlux=0; //thState->capVol=0;
     }
 }
 

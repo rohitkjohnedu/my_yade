@@ -62,6 +62,7 @@ class ThermalEngine : public PartialEngine
 		
 		virtual ~ThermalEngine();
 		virtual void action();
+		void setReynoldsNumbers();
 		void setInitialValues();
 		void applyTempDeltaToSolids(Real delT);
 		void resetFlowBoundaryTemps();
@@ -116,23 +117,24 @@ class ThermalEngine : public PartialEngine
 		((Real,particleDensity,0,,"If > 0, this value will override material density for thermodynamic calculations (useful for quasi-static simulations involving unphysical particle densities)"))
         	((Real
 ,fluidK,0.580,,"Thermal conductivity of the fluid."))
-		((Real,Reynolds,0.,,"Used for the fluid-solid conduction model (calculation of Nusselt). Anything other than 0 is experimental. "))
+		((Real,uniformReynolds,-1.,,"Control reynolds number in all cells (mostly debugging purposes). "))
 		((double,fluidBulkModulus,0,,"If > 0, thermalEngine uses this value instead of flow.fluidBulkModulus."))
 		((Real, delT, 0,,"Allows user to apply a delT to solids and observe macro thermal expansion. Resets to 0 after one conduction step."))
         	((double,tsSafetyFactor,0.8,,"Allow user to control the timstep estimate with a safety factor. Default 0.8. If <= 0, thermal timestep is equal to DEM"))
         	((double,porosityFactor,0,,"If >0, factors the fluid thermal expansion. Useful for simulating low porosity matrices."))
         	((bool,tempDependentFluidBeta,false,,"If true, fluid volumetric thermal expansion is temperature dependent (linear model between 20-70 degC)"))
-
+        	((double,minimumFluidCondDist,0,,"Useful for maintaining stability despite poor external triangulations involving flat tetrahedrals. Consider setting to minimum particle diameter to keep scale."))
 		,
 		/* extra initializers */
 		,
 		/* ctor */
-		energySet=false;timeStepEstimated=false;thermalDT=0;elapsedTime=0;elapsedIters=0;conductionIterPeriod=1;first=true;runConduction=false;maxTimeStep=10000;Nu=0;Pr=0;NutimesFluidK=0;
+		energySet=false;timeStepEstimated=false;thermalDT=0;elapsedTime=0;elapsedIters=0;conductionIterPeriod=1;first=true;runConduction=false;maxTimeStep=10000;Nu=0;NutimesFluidK=0;Pr=0;
 		,
 		/* py */
         	.def("getThermalDT",&ThermalEngine::getThermalDT,"let user check estimated thermalDT .")
         	.def("getConductionIterPeriod",&ThermalEngine::getConductionIterPeriod,"let user check estimated conductionIterPeriod .")
         	.def("getMaxTimeStep",&ThermalEngine::getMaxTimeStep,"let user check estimated maxTimeStep.")
+		.def("setReynoldsNumbers",&ThermalEngine::setReynoldsNumbers,"update the cell reynolds numbers manually (computationally expensive)")
 	)
 	DECLARE_LOGGER;
 

@@ -704,7 +704,10 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::initializeInternalEnergy(
 	#pragma omp parallel for
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
-		if (!cell->info().isFictious && !cell->info().blocked && !cell->info().isCavity) cell->info().internalEnergy = fluidCp*fluidRho*cell->info().temp()*(1./cell->info().invVoidVolume());
+		if (!cell->info().isFictious && !cell->info().blocked && !cell->info().isCavity){
+			Real volume = thermalPorosity>0 ? thermalPorosity/cell->info().invVoidVolume() : 1./cell->info().invVoidVolume();		
+			cell->info().internalEnergy = fluidCp*fluidRho*cell->info().temp()*volume;
+		}
 		if (cell->info().isCavity) cell->info().internalEnergy = fluidCp*fluidRho*cell->info().temp()*(cell->info().volume()); // ignore particles used for fluid discr. in cavity (i.e. use volume())
 	}
 }
@@ -756,7 +759,7 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::augmentConductivityMatrix
 
 
 template<class _Tesselation, class FlowType>
-void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setNewCellTemps()
+void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setNewCellTemps(bool addToDeltaTemp)
 {
    	Tesselation& Tes = T[currentTes];
 	const long sizeCells = Tes.cellHandles.size();
@@ -769,11 +772,13 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setNewCellTemps()
 			Real oldTemp = cell->info().temp();
 			//cell->info().temp()=cell->info().internalEnergy/(cell->info().volume()*fluidCp*fluidRho);
 			if (!cell->info().isCavity){
-            			cell->info().temp()=cell->info().internalEnergy/((1./cell->info().invVoidVolume())*fluidCp*fluidRho); //FIXME: invVoidVolume depends on volumeSolidPore() which uses CGAL points only updated each remesh. We might need our own volumeSolidPore(). 
+				Real volume = thermalPorosity>0 ? thermalPorosity/cell->info().invVoidVolume() : 1./cell->info().invVoidVolume();
+            			cell->info().temp()=cell->info().internalEnergy/(volume*fluidCp*fluidRho); //FIXME: invVoidVolume depends on volumeSolidPore() which uses CGAL points only updated each remesh. We might need our own volumeSolidPore(). 
 			} else { 
 				cell->info().temp()=cell->info().internalEnergy/((cell->info().volume())*fluidCp*fluidRho);
 			}
-			cell->info().dtemp() = cell->info().temp() - oldTemp;
+			if (!addToDeltaTemp) cell->info().dtemp() = cell->info().temp() - oldTemp;
+			else cell->info().dtemp() += cell->info().temp()-oldTemp; // fluid conduction is a midstep proces that uses a midsteptemp, in this case we want to add to the existing deltatemp so that fluid expansion is computed based on full temp step
 		}
 		if (controlCavityPressure && cell->info().isCavity && !cell->info().blocked) {
 			cavityInternalEnergy += cell->info().internalEnergy;

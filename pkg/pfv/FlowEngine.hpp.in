@@ -141,6 +141,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Real getBoundaryVolume(unsigned int boundary, Real dt) {return -1.0*solver->boundaryFlux(boundary)*dt;}
 		Real getCellInVolumeFromId(unsigned long id, Real dt) {return -1.0*getCellFluxFromId(id)*dt;}
 		Real getBoundaryArea(unsigned int boundary) {return solver->boundaryArea(boundary);}
+		std::vector<std::vector<double>> getBoundaryVel(unsigned int boundary) {return solver->boundaryVel(boundary);}
 		Vector3r fluidForce(unsigned int idSph) {
 			const CGT::CVector& f=solver->T[solver->currentTes].vertex(idSph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		Vector3r averageVelocity();
@@ -385,6 +386,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((double, phiZero, 0,,"if >0, considers water aircontent impact on fluid compressibility."))
 		((double, cavityFlux, 0,,"For adding flux to pressuremanaged cavity model (:yref:`FlowEngine::controlCavityPressure`). Negavite influx, postive outflux."))
 		((double, cavityFluidDensity, 0,,">0 means cavity compressibility model considers density changes instead of volume changes."))
+		((double, thermalPorosity, 0,,">0 means the void volume space will be factored by thermalPorosity for pore internal energy considerations."))
 		((bool, averageCavityPressure, false,,"true means the pressure in the cavity will be averaged each iteration."))
 		,
 		/*deprec*/
@@ -416,6 +418,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		.def("getBoundaryFlux",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getBoundaryFlux,(boost::python::arg("boundary")),"Get total flux through boundary defined by its body id.\n\n.. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 		.def("getBoundaryVolume",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getBoundaryVolume,(boost::python::arg("boundary")),(boost::python::arg("dt")),"Get total volume flowing through boundary defined by its body id in current timestep dt.\n\n.. note:: The volume may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such volume evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 		.def("getBoundaryFluidArea",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getBoundaryArea,(boost::python::arg("boundary")),"Get total fluid area associated with boundary defined by its body id.")
+		.def("getBoundaryVel",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getBoundaryVel,(boost::python::arg("boundary")),"Get total avg cell velocity associated with boundary defined by its body id.")
 		.def("getConstrictions",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getConstrictions,(boost::python::arg("all")=true),"Get the list of constriction radii (inscribed circle) for all finite facets (if all==True) or all facets not incident to a virtual bounding sphere (if all==False).  When all facets are returned, negative radii denote facet incident to one or more fictious spheres.")
 		.def("getConstrictionsFull",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getConstrictionsFull,(boost::python::arg("all")=true),"Get the list of constrictions (inscribed circle) for all finite facets (if all==True), or all facets not incident to a fictious bounding sphere (if all==False). When all facets are returned, negative radii denote facet incident to one or more fictious spheres. The constrictions are returned in the format {{cell1,cell2}{rad,nx,ny,nz}}")
 		.def("edgeSize",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::edgeSize,"Return the number of interactions.")
@@ -513,6 +516,9 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	double internalEnergy;
 	bool Tcondition;
 	bool isCavity;
+	double Reynolds;
+	double NutimesFluidK;
+	double stabilityCoefficient;
 	
 
 	FlowCellInfo_@TEMPLATE_FLOW_NAME@ (void)
@@ -527,7 +533,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		sphericalVertexSurface.resize(4,0);
 		rayHydr.resize(4, 0);
-		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=temperature=tempVariation=0;
+		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=temperature=tempVariation=Reynolds=NutimesFluidK=stabilityCoefficient=0;
 		isFictious=false; Pcondition = false; isGhost = false; Tcondition= false;
 		isvisited = false; isCavity=false;
 		isGhost=false;

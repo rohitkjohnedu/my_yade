@@ -139,7 +139,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			setPositionsBuffer(false);//set "parallel" buffer for background calculation 
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
-			updateTriangulation=false;
+			if (!thermalEngine) updateTriangulation=false;// thermalEngine needs this flag for reynolds numbers updates, let thermalEngine flip this flag back to false
 			epsVolCumulative=0;
 			ellapsedIter=0;
 			boost::thread workerThread(&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::backgroundAction,this);
@@ -160,7 +160,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			buildTriangulation (pZero, *solver);
 			initializeVolumes(*solver);
 			computeViscousForces(*solver);
-               		updateTriangulation = false;
+               		if (!thermalEngine) updateTriangulation = false; // thermalEngine needs this flag for reynolds numbers updates, let thermalEngine flip this flag back to false
 			epsVolCumulative=0;
 			retriangulationLastIter=0;
 			ReTrg++;}
@@ -286,6 +286,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	flow.cavityFluidDensity = cavityFluidDensity;
 	if (fluidBulkModulus>0) flow.equivalentCompressibility = phiZero/pZero + (1.-phiZero)*(1./fluidBulkModulus); // initial equiv compressibility.
 	flow.cavityDV = 0;
+	flow.thermalPorosity=thermalPorosity;
 	flow.getCHOLMODPerfTimings=getCHOLMODPerfTimings;
 //         flow.tesselation().Clear();
         flow.tesselation().maxId=-1;
@@ -335,7 +336,19 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		cell->info().id=k++;}//define unique numbering now, corresponds to position in cellHandles
 
 // for fast loop on facets ( useful in thermal engine only)
-/*	if (thermalEngine){*/
+	if (thermalEngine){
+		flow.tesselation().facetCells.clear();
+		flow.tesselation().facetCells.reserve(flow.tesselation().Triangulation().number_of_finite_facets());
+		for ( FiniteCellsIterator cell = flow.tesselation().Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
+			for(int i=0;i<4;i++){
+				if (cell->info().id<cell->neighbor(i)->info().id){
+					flow.tesselation().facetCells.push_back(std::pair<CellHandle,int>(cell,i));
+				}
+			}
+		}
+
+
+
 /*		flow.tesselation().facetCells.clear();*/
 /*		flow.tesselation().facetCells.reserve(flow.tesselation().Triangulation().number_of_finite_facets());*/
 /*		FiniteFacetsIterator facet_end = flow.tesselation().Triangulation().finite_facets_end();*/
@@ -343,7 +356,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 /*			flow.tesselation().facetCells.push_back(std::pair<CellHandle,int> (f_it->first,f_it->second));*/
 /*			//f_it->info().id=k++;*/
 /*		}*/
-/*	}*/
+	}
 
 
         flow.displayStatistics ();
