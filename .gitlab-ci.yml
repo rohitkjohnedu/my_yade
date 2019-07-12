@@ -289,7 +289,7 @@ variables:
 .deb_template: &deb_definition
   stage: deb
   only:
-    - branches
+    - master
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
     - apt-get update && apt-get -y build-dep .

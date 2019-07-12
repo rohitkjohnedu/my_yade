@@ -7,7 +7,8 @@ set -e
 for i in bionic buster stretch
 do
     cd /root/deb
-    wget https://gitlab.com/api/v4/projects/10133144/jobs/artifacts/feature%2Fdailypackages/download?job=deb_$i -O yade.zip
+#wget https://gitlab.com/api/v4/projects/10133144/jobs/artifacts/feature%2Fdailypackages/download?job=deb_$i -O yade.zip
+    wget https://gitlab.com/api/v4/projects/10133144/jobs/artifacts/master/download?job=deb_$i -O yade.zip
     unzip yade.zip
     aptly repo remove yadedaily-$i 'yadedaily'
     aptly repo remove yadedaily-$i 'libyadedaily'
