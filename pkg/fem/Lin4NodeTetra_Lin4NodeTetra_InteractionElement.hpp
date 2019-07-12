@@ -14,7 +14,7 @@
 #include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
 #include <core/PartialEngine.hpp>
-#include <pkg/dem/deformablecohesive/DeformableCohesiveElement.hpp>
+#include <pkg/fem/DeformableCohesiveElement.hpp>
 
 
 

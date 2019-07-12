@@ -8,8 +8,8 @@
 #ifdef YADE_OPENGL
 #ifdef YADE_FEM
 
-#include <pkg/dem/deformablecohesive/Gl1_DeformableElement.hpp>
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
+#include <pkg/fem/Gl1_DeformableElement.hpp>
+#include <pkg/fem/DeformableElement.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 
 typedef DeformableElement::NodeMap NodeMap;

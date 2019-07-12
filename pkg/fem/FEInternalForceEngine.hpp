@@ -8,7 +8,7 @@
 #pragma once
 #include <core/GlobalEngine.hpp>
 #include <pkg/common/Callbacks.hpp>
-#include <pkg/dem/deformablecohesive/FEInternalForceDispatchers.hpp>
+#include <pkg/fem/FEInternalForceDispatchers.hpp>
 
 #ifdef USE_TIMING_DELTAS
 	#define TIMING_DELTAS_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)

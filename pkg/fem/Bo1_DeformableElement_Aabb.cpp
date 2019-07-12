@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/Bo1_DeformableElement_Aabb.hpp>
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
+#include <pkg/fem/Bo1_DeformableElement_Aabb.hpp>
+#include <pkg/fem/DeformableElement.hpp>
 #include <pkg/common/Aabb.hpp>
 
 void Bo1_DeformableElement_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){

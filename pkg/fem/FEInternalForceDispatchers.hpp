@@ -18,7 +18,7 @@
 #include <core/Functor.hpp>
 #include <core/Dispatcher.hpp>
 #include <pkg/common/Aabb.hpp>
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
+#include <pkg/fem/DeformableElement.hpp>
 
 
 /*Functor of Internal Force Calculation*/

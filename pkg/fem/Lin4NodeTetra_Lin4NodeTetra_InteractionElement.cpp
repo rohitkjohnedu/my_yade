@@ -6,13 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/Lin4NodeTetra_Lin4NodeTetra_InteractionElement.hpp>
+#include <pkg/fem/Lin4NodeTetra_Lin4NodeTetra_InteractionElement.hpp>
 #include <algorithm>
 #include <core/Scene.hpp>
 #include <core/BodyContainer.hpp>
 #include <core/State.hpp>
 #include <pkg/common/Sphere.hpp>
-#include <pkg/dem/deformablecohesive/Node.hpp>
+#include <pkg/fem/Node.hpp>
 #include <lib/base/Math.hpp>
 
 YADE_PLUGIN((Lin4NodeTetra_Lin4NodeTetra_InteractionElement));

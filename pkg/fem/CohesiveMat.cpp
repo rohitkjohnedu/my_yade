@@ -6,7 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/CohesiveMat.hpp>
+#include <pkg/fem/CohesiveMat.hpp>
 YADE_PLUGIN((CohesiveDeformableElementMaterial)(LinCohesiveElasticMaterial)(LinCohesiveStiffPropDampElastMat));
 
 CohesiveDeformableElementMaterial::~CohesiveDeformableElementMaterial(void){}

@@ -10,7 +10,7 @@
 #ifdef YADE_FEM
 
 
-#include <pkg/dem/deformablecohesive/Gl1_Node.hpp>
+#include <pkg/fem/Gl1_Node.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 #include <pkg/common/Sphere.hpp>
 bool Gl1_Node::wire;

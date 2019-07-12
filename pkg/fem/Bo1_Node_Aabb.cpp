@@ -7,8 +7,8 @@
 *************************************************************************/
  
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/Bo1_Node_Aabb.hpp>
-#include <pkg/dem/deformablecohesive/Node.hpp>
+#include <pkg/fem/Bo1_Node_Aabb.hpp>
+#include <pkg/fem/Node.hpp>
 #include <pkg/common/Aabb.hpp>
 
 void Bo1_Node_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body* b){

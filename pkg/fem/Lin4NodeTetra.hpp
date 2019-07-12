@@ -10,7 +10,7 @@
 
 #include <core/Body.hpp>
 #include <core/PartialEngine.hpp>
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
+#include <pkg/fem/DeformableElement.hpp>
 #include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
 

@@ -10,11 +10,11 @@
 
 #include <core/Body.hpp>
 #include <core/PartialEngine.hpp>
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
+#include <pkg/fem/DeformableElement.hpp>
 #include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
 
-//#include <yade/trunk/pkg/dem/deformablecohesive/Node.hpp> //Node shape
+//#include <yade/trunk/pkg/fem/Node.hpp> //Node shape
 
 /* Before starting the implementation of the deformable element, I am really dissappointed that deformableelement's algorithm relies on its shape.
 Shape means "shape" and I think it should not contain any other physical meaning or anything else.

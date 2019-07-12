@@ -6,8 +6,8 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
-#include <pkg/dem/deformablecohesive/FEInternalForceDispatchers.hpp>
+#include <pkg/fem/DeformableElement.hpp>
+#include <pkg/fem/FEInternalForceDispatchers.hpp>
 YADE_PLUGIN((InternalForceFunctor)(InternalForceDispatcher));
 InternalForceFunctor::~InternalForceFunctor(){};
 

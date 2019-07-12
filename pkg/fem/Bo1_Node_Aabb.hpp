@@ -9,7 +9,7 @@
 #pragma once
 
 #include <pkg/common/Dispatching.hpp>
-#include <pkg/dem/deformablecohesive/Node.hpp>
+#include <pkg/fem/Node.hpp>
 
 class Bo1_Node_Aabb : public BoundFunctor
 {

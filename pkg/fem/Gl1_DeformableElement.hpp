@@ -8,7 +8,7 @@
 #pragma once
 
 #include <pkg/common/GLDrawFunctors.hpp>
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
+#include <pkg/fem/DeformableElement.hpp>
 
 class Gl1_DeformableElement : public GlShapeFunctor
 {	

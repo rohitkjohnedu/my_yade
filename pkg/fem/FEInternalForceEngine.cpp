@@ -7,9 +7,9 @@
 *************************************************************************/
 #ifdef YADE_FEM
 
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
-#include <pkg/dem/deformablecohesive/FEInternalForceDispatchers.hpp>
-#include <pkg/dem/deformablecohesive/FEInternalForceEngine.hpp>
+#include <pkg/fem/DeformableElement.hpp>
+#include <pkg/fem/FEInternalForceDispatchers.hpp>
+#include <pkg/fem/FEInternalForceEngine.hpp>
 
 YADE_PLUGIN((FEInternalForceEngine));
 CREATE_LOGGER(FEInternalForceEngine);

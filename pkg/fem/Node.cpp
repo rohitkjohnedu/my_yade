@@ -1,5 +1,5 @@
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/Node.hpp>
+#include <pkg/fem/Node.hpp>
 Node::~Node(){}
 YADE_PLUGIN((Node));
 #endif //YADE_FEM

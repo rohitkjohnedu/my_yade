@@ -7,8 +7,8 @@
 *************************************************************************/
 
 #ifdef YADE_FEM
-#include <pkg/dem/deformablecohesive/DeformableElement.hpp>
-#include <pkg/dem/deformablecohesive/If2_Lin4NodeTetra_LinIsoRayleighDampElast.hpp>
+#include <pkg/fem/DeformableElement.hpp>
+#include <pkg/fem/If2_Lin4NodeTetra_LinIsoRayleighDampElast.hpp>
 YADE_PLUGIN((If2_Lin4NodeTetra_LinIsoRayleighDampElast));
 If2_Lin4NodeTetra_LinIsoRayleighDampElast::~If2_Lin4NodeTetra_LinIsoRayleighDampElast(){};
 

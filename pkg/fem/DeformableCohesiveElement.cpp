@@ -8,11 +8,11 @@
 #ifdef YADE_FEM
 #include <algorithm>
 #include <core/Scene.hpp>
-#include <pkg/dem/deformablecohesive/DeformableCohesiveElement.hpp>
+#include <pkg/fem/DeformableCohesiveElement.hpp>
 #include <core/BodyContainer.hpp>
 #include <core/State.hpp>
 #include <pkg/common/Sphere.hpp>
-#include <pkg/dem/deformablecohesive/Node.hpp>
+#include <pkg/fem/Node.hpp>
 #include <lib/base/Math.hpp>
 
 DeformableCohesiveElement::~DeformableCohesiveElement(){

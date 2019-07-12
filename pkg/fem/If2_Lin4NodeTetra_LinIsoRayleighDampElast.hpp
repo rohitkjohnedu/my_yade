@@ -18,9 +18,9 @@
 #include <core/Functor.hpp>
 #include <core/Dispatcher.hpp>
 #include <pkg/common/Aabb.hpp>
-#include <pkg/dem/deformablecohesive/FEInternalForceDispatchers.hpp>
-#include <pkg/dem/deformablecohesive/Lin4NodeTetra.hpp>
-#include <pkg/dem/deformablecohesive/LinElastMat.hpp>
+#include <pkg/fem/FEInternalForceDispatchers.hpp>
+#include <pkg/fem/Lin4NodeTetra.hpp>
+#include <pkg/fem/LinElastMat.hpp>
 
 
 
