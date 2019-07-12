@@ -361,7 +361,7 @@ Python 2 support ends at the beginning of 2020. However, Yade can be compiled an
 * On **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives install the python 2 version of the packages (and other required packages)::
 
 		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot \
-		dpkg-dev build-essential g++ python-dev ipython python-matplotlib \
+		dpkg-dev build-essential g++ python-dev ipython python-matplotlib python-mpi4py \
 		libsqlite3-dev python-numpy python-tk gnuplot libgts-dev python-pygraphviz \
 		libvtk6-dev python-numpy libeigen3-dev python-xlib python-pyqt5 pyqt5-dev-tools \
 		python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
