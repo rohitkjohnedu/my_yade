@@ -102,7 +102,7 @@
 #----------------------------------------------------------------------------------------------------------------#
 
 
-
+from __future__ import print_function
 import sys
 from yadeimport import *
 from yade.utils import *
