@@ -10,6 +10,9 @@ Check test for JCFpm acoustic emission module
 if((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1')):
 	raise YadeCheckError("This test will only work on single core, because it must be fully reproducible, but -j "+str(opts.threads)+" or --cores "+str(opts.cores)+" is used.")
 
+if os.path.exists('cracks_.txt'):
+    os.remove('cracks_.txt')
+
 if os.path.exists('moments_.txt'):
 	os.remove('moments_.txt')
 
@@ -48,6 +51,6 @@ if not sum(AEdata[:,5])==41:
 	raise YadeCheckError('JCFpm checktest: clustering acoustic emission algorithm incorrect')
 
 os.remove('moments_.txt')
-
+os.remove('cracks_.txt')
 
 
