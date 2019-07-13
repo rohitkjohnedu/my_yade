@@ -199,5 +199,5 @@ if __name__=="__main__":
     sim.irun(5000)
     fluidCoupling.killMPI()
 
-import __builtin__
-__builtin__.sim=sim
+import builtins
+builtins.sim=sim

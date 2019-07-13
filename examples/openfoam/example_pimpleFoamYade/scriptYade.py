@@ -193,7 +193,7 @@ class simulation():
 if __name__=="__main__":
     sim = simulation()
     sim.irun(1000000)
-    fluidCoupling.killmpi()
+    fluidCoupling.killMPI()
 
-import __builtin__
-__builtin__.sim=sim
+import builtins
+builtins.sim=sim
