@@ -111,3 +111,12 @@
 #define LOG_2_THROW(msg) LOG_THROW(msg)
 #define LOG_1_FATAL(msg) LOG_FATAL(msg)
 
+#define LOG_8(msg) LOG_TRACE(msg)
+#define LOG_7(msg) LOG_MORE(msg)
+#define LOG_6(msg) LOG_DEBUG(msg)
+#define LOG_5(msg) LOG_INFO(msg)
+#define LOG_4(msg) LOG_WARN(msg)
+#define LOG_3(msg) LOG_ERROR(msg)
+#define LOG_2(msg) LOG_THROW(msg)
+#define LOG_1(msg) LOG_FATAL(msg)
+

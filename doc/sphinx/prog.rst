@@ -218,7 +218,7 @@ Yade default log level is the same as invoking ``yade -v4``.
 
 .. note:: as a convenience feature the ``LOG_THROW`` does **both** things:
 
-		* logs an error 
+		* logs an error
 		* and throws an exception.
 
 	No need to throw with a duplicated error message. It throws exception ``(exception name here)`` even when logging is disabled and the message isn't logged.
