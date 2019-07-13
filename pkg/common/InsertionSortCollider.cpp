@@ -96,6 +96,11 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 			while(j>=chunks[k] && v[j]>viInit){
 				v[j+1]=v[j];
 				if(isMin && !v[j].flags.isMin && doCollide && viInitBB && v[j].flags.hasBB && (viInit.id!=v[j].id)) {
+#ifdef YADE_MPI
+	#warning "Debug: #define YADE_MPI is OK."
+#else
+	#warning "Debug: #define YADE_MPI disappeared here."
+#endif
 					const Body::id_t& id1 = v[j].id; const Body::id_t& id2 = viInit.id; 
 					//(see #0 if compilation fails)
 					if (spatialOverlap(id1,id2) && Collider::mayCollide(Body::byId(id1,scene).get(),Body::byId(id2,scene).get(),scene->subdomain) && !interactions->found(id1,id2))
