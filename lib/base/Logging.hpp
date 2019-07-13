@@ -68,17 +68,13 @@
 #	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
 #endif
 
-#if defined(YADE_DEBUG) ||  defined(YADE_TRACEONLY)
+#ifdef YADE_DEBUG
 	# define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE",msg)
-#else
-	# define LOG_TRACE(msg)
-#endif
-
-#if defined(YADE_DEBUG) && !defined(YADE_TRACEONLY)
 	# define LOG_MORE(msg)  _POOR_MANS_LOG("MORE ",msg)
 	# define LOG_INFO(msg)  _POOR_MANS_LOG("INFO ",msg)
 	# define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG",msg)
 #else
+	# define LOG_TRACE(msg)
 	# define LOG_MORE(msg)
 	# define LOG_INFO(msg)
 	# define LOG_DEBUG(msg)
