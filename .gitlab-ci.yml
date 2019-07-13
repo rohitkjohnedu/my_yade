@@ -19,7 +19,6 @@ stages:
   - deb
 
 # If you want to compile everything also on merge_request, change this template.
-# If you want to compile on one platform see [1] note below.
 .plaftorms_template: &platforms_definition
   only:
     - master
@@ -54,10 +53,6 @@ cmake_16_04:
 cmake_18_04:
   <<: *cmake_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-# [1] if you need to compile merge_request on another platform for testing, move these 3 lines to that platform. And do the same in stages: build, test, check.
-  only:
-    - master
-    - merge_request
 
 cmake_stretch:
   <<: *cmake_definition
@@ -125,9 +120,6 @@ make_16_04:
 make_18_04:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  only:
-    - master
-    - merge_request
   dependencies:
     - cmake_18_04
 
@@ -168,9 +160,6 @@ test_16_04:
 test_18_04:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_18_04
 
@@ -218,9 +207,6 @@ check_16_04:
 check_18_04:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  only:
-    - master
-    - merge_request
   dependencies:
     - make_18_04
 
