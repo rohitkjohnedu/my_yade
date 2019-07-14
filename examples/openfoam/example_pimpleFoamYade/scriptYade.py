@@ -77,7 +77,7 @@
 #           mkdir yadep
 #
 #       d) run the example :
-#           mpiexec -n 1 python scriptYade.py : -n 2 pimpleFoamYade -parallel
+#           mpiexec -n 1 python3 scriptYade.py : -n 2 pimpleFoamYade -parallel
 #
 # 9. Notes (OpenFOAM side):
 #     to configure the mesh, edit :  system/blockMeshDict
@@ -95,11 +95,6 @@
 #
 #10. Post-Processing : Paraview or ParaFOAM can be used to visualize the results, you can also use the OpenFOAM
 #    utilities to postprocess the fluid side.
-#
-#
-#
-#
-#
 #
 #       DISCLAIMER : The settings provided in this example are not universal, depending on your problem, you
 #       should change the solver settings such as timestep, under relaxation factors, linear solver settings etc.
