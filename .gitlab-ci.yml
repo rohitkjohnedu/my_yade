@@ -191,6 +191,7 @@ test_18_foam:
     - make_18_04
   script:
     - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
     - /builds/yade-dev/trunk/scripts/checks-and-tests/testOpenFoam.sh
 
 
