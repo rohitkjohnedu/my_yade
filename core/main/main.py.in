@@ -210,7 +210,12 @@ def userSession(gui='none',qapp=None):
 				'"\e[A": history-search-backward', '"\e[B": history-search-forward', # incremental history forward/backward
 		]
 	)
-
+	
+	# Simultaneous calls to InteractiveShellEmbed() sometimes lead to race condition for /root/.ipython/* in mpi spawn (https://gitlab.com/yade-dev/trunk/issues/94)
+	# We try to to avoid it here by shifting workers in time
+	#if opts.mpi_mode:
+	#	time.sleep(os.getenv('OMPI_COMM_WORLD_RANK')*0.02)
+	
 	# show python console
 	# handle ipython version (version 10 nost tested after some changes here)
 	if yade.runtime.ipython_version==10:
@@ -246,7 +251,12 @@ def userSession(gui='none',qapp=None):
 		for k in ipconfig['readline_parse_and_bind']: readline.parse_and_bind(k)
 		InteractiveShellEmbed.config=cfg
 		InteractiveShellEmbed.banner1=banner+'\n'
-		ipshell=InteractiveShellEmbed()
+		while True:
+			try:	#simultaneous calls to InteractiveShellEmbed() sometimes lead to race condition for /root/.ipython/* in mpi spawn (https://gitlab.com/yade-dev/trunk/issues/94)
+				ipshell=InteractiveShellEmbed()
+				break
+			except:
+				continue
 
 		# ipython since version 5.0 stopped using libreadline, now we must make the bindings in another way
 		# see: https://python-prompt-toolkit.readthedocs.io/en/1.0.14/pages/full_screen_apps.html?highlight=add_binding
