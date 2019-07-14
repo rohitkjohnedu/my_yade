@@ -211,11 +211,6 @@ def userSession(gui='none',qapp=None):
 		]
 	)
 	
-	# Simultaneous calls to InteractiveShellEmbed() sometimes lead to race condition for /root/.ipython/* in mpi spawn (https://gitlab.com/yade-dev/trunk/issues/94)
-	# We try to to avoid it here by shifting workers in time
-	#if opts.mpi_mode:
-	#	time.sleep(os.getenv('OMPI_COMM_WORLD_RANK')*0.02)
-	
 	# show python console
 	# handle ipython version (version 10 nost tested after some changes here)
 	if yade.runtime.ipython_version==10:
