@@ -72,32 +72,43 @@ stages:
     - make install
     - make clean
     - ccache -s
+  tags:
+    - fast
+
+.artifacts_template: &artifacts_definition
   artifacts:
     paths:
       - install
     expire_in: 2 weeks
-  tags:
-    - fast
 
 # 2.1 build stage: ubuntu 16.04
 make_16_04:
   <<: *make_definition
+  <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
 
 make_18_04:
   <<: *make_definition
+  artifacts:
+    paths:
+      - install
+      - build
+    expire_in: 2 weeks
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 
 make_stretch:
   <<: *make_definition
+  <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 
 make_buster:
   <<: *make_definition
+  <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 
 make_suse15:
   <<: *make_definition
+  <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
 
 
