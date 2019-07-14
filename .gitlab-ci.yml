@@ -12,7 +12,6 @@
 
 
 stages:
-  - cmake
   - build
   - test
   - pages
@@ -32,40 +31,6 @@ stages:
 #               volumes = ["/cache","/home/docker/ccache:/root/.ccache:rw"]
 #            where /home/docker/ccache is the directory in the host with write access.
 # See also : https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/advanced-configuration.md#example-2-mount-a-host-directory-as-a-data-volume
-.cmake_template: &cmake_definition
-  <<: *platforms_definition
-  stage: cmake
-  script:
-    - mkdir build && cd build
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
-  artifacts:
-    paths:
-      - build
-    expire_in: 2 weeks
-
-cmake_16_04:
-  <<: *cmake_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-
-cmake_18_04:
-  <<: *cmake_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-
-cmake_stretch:
-  <<: *cmake_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-
-cmake_buster:
-  <<: *cmake_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-
-cmake_suse15:
-  <<: *cmake_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:suse15
-
 
 # Perhaps two more will added later
 # 1.4. only: tags       Perhaps creating tags would trigger a build, e.g. tagging a new release?
@@ -79,6 +44,11 @@ cmake_suse15:
   <<: *platforms_definition
   stage: build
   script:
+    - mkdir build && cd build
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - ccache -s
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
     - ld --version
@@ -97,7 +67,6 @@ cmake_suse15:
         *) echo "8";;
         esac)
     - echo $JOBSNUM
-    - cd build
     - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
     - make -j $JOBSNUM
     - make install
@@ -114,32 +83,22 @@ cmake_suse15:
 make_16_04:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
-  dependencies:
-    - cmake_16_04
 
 make_18_04:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  dependencies:
-    - cmake_18_04
 
 make_stretch:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
-  dependencies:
-    - cmake_stretch
 
 make_buster:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
-  dependencies:
-    - cmake_buster
 
 make_suse15:
   <<: *make_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
-  dependencies:
-    - cmake_suse15
 
 
 # 3.1. test stage
@@ -258,7 +217,6 @@ doc_18_04:
     - cd build
     - xvfb-run -s "-screen 0 1600x1200x24" make doc
   dependencies:
-    - cmake_18_04
     - make_18_04
   artifacts:
     paths:
