@@ -27,7 +27,7 @@ from yade import pack
 
 # The following 5 lines will be used later for batch execution
 nRead=readParamsFromTable(
-	num_spheres=10000,# number of spheres
+	num_spheres=1000,# number of spheres
 	compFricDegree = 30, # contact friction during the confining phase
 	key='_triax_base_', # put you simulation's name here
 	unknownOk=True
@@ -127,16 +127,16 @@ if nRead==0: yade.qt.Controller(), yade.qt.View()
 #the value of (isotropic) confining stress defines the target stress to be applied in all three directions
 triax.goal1=triax.goal2=triax.goal3=-10000
 
-while 1:
-  O.run(1000, True)
-  #the global unbalanced force on dynamic bodies, thus excluding boundaries, which are not at equilibrium
-  unb=unbalancedForce()
-  print 'unbalanced force:',unb,' mean stress: ',triax.meanStress
-  if unb<stabilityThreshold and abs(-10000-triax.meanStress)/10000<0.001:
-    break
+#while 1:
+  #O.run(1000, True)
+  ##the global unbalanced force on dynamic bodies, thus excluding boundaries, which are not at equilibrium
+  #unb=unbalancedForce()
+  #print 'unbalanced force:',unb,' mean stress: ',triax.meanStress
+  #if unb<stabilityThreshold and abs(-10000-triax.meanStress)/10000<0.001:
+    #break
 
-O.save('confinedState'+key+'.yade.gz')
-print "###      Isotropic state saved      ###"
+#O.save('confinedState'+key+'.yade.gz')
+#print "###      Isotropic state saved      ###"
 
 ###################################################
 ###   REACHING A SPECIFIED POROSITY PRECISELY   ###
@@ -146,20 +146,20 @@ print "###      Isotropic state saved      ###"
 ### (see http://dx.doi.org/10.2516/ogst/2012032 and
 ### http://www.geosyntheticssociety.org/Resources/Archive/GI/src/V9I2/GI-V9-N2-Paper1.pdf)
 
-import sys #this is only for the flush() below
-while triax.porosity>targetPorosity:
-	# we decrease friction value and apply it to all the bodies and contacts
-	compFricDegree = 0.95*compFricDegree
-	setContactFriction(radians(compFricDegree))
-	print "\r Friction: ",compFricDegree," porosity:",triax.porosity,
-	sys.stdout.flush()
-	# while we run steps, triax will tend to grow particles as the packing
-	# keeps shrinking as a consequence of decreasing friction. Consequently
-	# porosity will decrease
-	O.run(500,1)
+#import sys #this is only for the flush() below
+#while triax.porosity>targetPorosity:
+	## we decrease friction value and apply it to all the bodies and contacts
+	#compFricDegree = 0.95*compFricDegree
+	#setContactFriction(radians(compFricDegree))
+	#print "\r Friction: ",compFricDegree," porosity:",triax.porosity,
+	#sys.stdout.flush()
+	## while we run steps, triax will tend to grow particles as the packing
+	## keeps shrinking as a consequence of decreasing friction. Consequently
+	## porosity will decrease
+	#O.run(500,1)
 
-O.save('compactedState'+key+'.yade.gz')
-print "###    Compacted state saved      ###"
+#O.save('compactedState'+key+'.yade.gz')
+#print "###    Compacted state saved      ###"
 
 ##############################
 ###   DEVIATORIC LOADING   ###
