@@ -7,8 +7,16 @@
 *************************************************************************/
 /* This engine is under active development. Experimental only */
 /* Thermal Engine was developed with funding provided by the Chateaubriand Fellowship */
+
+/* Theoretical framework and experimental validation presented in:
+
+Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8, Enschede Netherlands, July 2019. 
+
+*/
+
 //#define THERMAL
 #ifdef THERMAL
+#ifdef YADE_OPENMP  
 #include<pkg/pfv/Thermal.hpp>
 #include<core/Scene.hpp>
 #include<core/Omega.hpp>
@@ -776,5 +784,5 @@ void ThermalEngine::resetFlowBoundaryTemps()
 //         return abs(2*atan(ratio));
 // }
 
-
+#endif//YADE_OPENMP
 #endif//THERMAL

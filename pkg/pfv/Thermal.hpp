@@ -6,6 +6,13 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 /* This engine is under active development. Experimental only */
+/* Thermal Engine was developed with funding provided by the Chateaubriand Fellowship */
+
+/* Theoretical framework and experimental validation presented in:
+
+Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8, Enschede Netherlands, July 2019. 
+
+*/
 
 //#define THERMAL
 #ifdef THERMAL
