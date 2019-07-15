@@ -44,11 +44,12 @@ ss2sc.interactionDetectionFactor=1.
 is2aabb.aabbEnlargeFactor=1.
 O.run(5000,1)
 AEdata = np.loadtxt('moments_.txt',skiprows=1)
+cracksdata = np.loadtxt('cracks_.txt',skiprows=1)
 
+if not len(cracksdata)==sum(AEdata[:,5]):  # number of cracks should be equivalent to sum of cluster counts
+	raise YadeCheckError('JCFpm checktest: cracks or AE clustering algorithm incorrect')
 if not len(AEdata)==26:
 	raise YadeCheckError('JCFpm checktest: number of acoustic emission events incorrect')
-if not sum(AEdata[:,5])==41:
-	raise YadeCheckError('JCFpm checktest: clustering acoustic emission algorithm incorrect')
 
 os.remove('moments_.txt')
 os.remove('cracks_.txt')
