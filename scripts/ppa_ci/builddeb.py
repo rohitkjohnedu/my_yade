@@ -16,7 +16,7 @@ dirpath = "./deb"
 dirpathyade = dirpath + '/yadedaily/'
 
 repoups = git.Repo('.')
-versiondebian = dt.strftime("%Y%m%d") + "~" + repoups.head.commit.hexsha[0:7] + "~" + args.dist + "1"
+versiondebian = dt.strftime("%Y%m%d") + "-" + os.environ['CI_PIPELINE_IID'] + "~" + repoups.head.commit.hexsha[0:7] + "~" + args.dist + "1"
 tarballname = 'yadedaily_%s.orig.tar.xz'%(versiondebian)
 
 # Create tempdir
