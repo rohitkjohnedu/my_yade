@@ -39,15 +39,19 @@ import yade.bisectionDecomposition as dd
 ##  Initialization
 
 this = sys.modules[__name__]
-
 sys.stderr.write=sys.stdout.write #so we see error messages from workers
-comm = MPI.COMM_WORLD
+
+worldComm = MPI.COMM_WORLD
+color = 1 ; key = 0 ; 
+comm = worldComm.Split(color, key)
 parent = comm.Get_parent()
 if parent!=MPI.COMM_NULL:
 	comm=parent.Merge()
 
 rank = comm.Get_rank()
 numThreads = comm.Get_size()
+commSplit = False 
+
 
 waitingCommands=False #are workers currently interactive?
 userScriptInCheckList=""	# detect if mpy is executed by checkList.py
@@ -78,6 +82,7 @@ REALLOCATE_FILTER = None # pointer to filtering function, will be set to 'median
 AUTO_COLOR = True
 MINIMAL_INTERSECTIONS = False # Reduces the size of position/velocity comms (at the end of the colliding phase, we can exclude those bodies with no interactions besides body<->subdomain from intersections). 
 REALLOCATE_MINIMAL = False # if true, intersections are minimized before reallocations, hence minimizing the number of reallocated bodies
+
 
 #tags for mpi messages
 _SCENE_=11
