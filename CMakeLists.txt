@@ -66,7 +66,7 @@ OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" ON)
 OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(ENABLE_FEMLIKE "Enable deformable solids" OFF)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
-OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" OFF)
+OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" ON)
 #Set -DPYTHON_VERSION numeric option below:
 set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defaults to -DPYTHON_VERSION=-1 which automatically uses the newest available python version on the system.")
 #===========================================================
