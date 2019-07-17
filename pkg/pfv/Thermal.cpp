@@ -133,7 +133,7 @@ void ThermalEngine::setReynoldsNumbers(){
 		}
 		const double avgCellFluidVel = sqrt(cell->info().averageVelocity().squared_length());
 		double Reynolds = flow->solver->fluidRho*avgCellFluidVel*charLength/flow->viscosity;
-		if (Reynolds<0 || isnan(Reynolds)){cerr<<"Reynolds is negative or nan"<<endl; Reynolds = 0;}
+		if (Reynolds<0 || std::isnan(Reynolds)){cerr<<"Reynolds is negative or nan"<<endl; Reynolds = 0;}
 		if (Reynolds > 1000 || poro<0.35){
 			Nusselt = 2. + 0.6*pow(Reynolds,0.5)*pow(Pr,0.33333);
 			cell->info().Reynolds = Reynolds;
@@ -471,11 +471,11 @@ void ThermalEngine::computeFluidFluidConduction() {
 		//if (distance < area) continue;  // hexagonal packings result in extremely small distances that blow up the simulation
 		const double thermalResist = fluidK*area/distance;
 		conductionEnergy = thermalResist * delT * thermalDT;
-		if (isnan(conductionEnergy)) conductionEnergy=0;
+		if (std::isnan(conductionEnergy)) conductionEnergy=0;
 		cell->info().stabilityCoefficient+=thermalResist;
 		//cout << "conduction distance" << distance << endl;
-		if (!cell->info().Tcondition && !isnan(conductionEnergy)) cell->info().internalEnergy -= conductionEnergy;
-		if (!neighborCell->info().Tcondition && !isnan(conductionEnergy)) neighborCell->info().internalEnergy += conductionEnergy;
+		if (!cell->info().Tcondition && !std::isnan(conductionEnergy)) cell->info().internalEnergy -= conductionEnergy;
+		if (!neighborCell->info().Tcondition && !std::isnan(conductionEnergy)) neighborCell->info().internalEnergy += conductionEnergy;
 		//cout << "added conduction energy"<< conductionEnergy << endl; 	
 	}
 

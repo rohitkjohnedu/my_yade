@@ -95,7 +95,7 @@ class ThermalEngine : public PartialEngine
         	Real getThermalDT() {return thermalDT;}
         	int getConductionIterPeriod() {return conductionIterPeriod;}
         	Real getMaxTimeStep() {return maxTimeStep;}
-		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ThermalEngine,PartialEngine,"preliminary",
+		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ThermalEngine,PartialEngine,"An engine typically used in combination with FlowEngine to simulate thermal-hydraulic-mechanical processes. Framework description and demonstration presented within the following paper: Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8, Enschede Netherlands, July 2019.",
 		/*attributes*/
 		((bool,advection,true,,"Activates advection"))
 		((bool,fluidConduction,true,,"Activates conduction within fluid"))
