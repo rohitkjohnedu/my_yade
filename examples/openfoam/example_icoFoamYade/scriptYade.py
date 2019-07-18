@@ -103,7 +103,7 @@ from yadeimport import *
 from yade.utils import *
 
 initMPI()                           #Initialize the mpi environment, always required.
-fluidCoupling = FoamCoupling();     #Initialize the engine
+fluidCoupling = yade.FoamCoupling();     #Initialize the engine
 fluidCoupling.getRank();            #part of Initialization.
 
 
