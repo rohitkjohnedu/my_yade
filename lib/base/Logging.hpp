@@ -61,7 +61,7 @@
 
 #ifdef YADE_BOOST_LOG
 #	include <boost/log/trivial.hpp>
-#	define _POOR_MANS_LOG(level,msg) {BOOST_LOG_TRIVIAL(trace)<<" "<<_LOG_HEAD<<msg<<std::endl;}
+#	define _POOR_MANS_LOG(level,msg) {BOOST_LOG_TRIVIAL(trace)<<" "<<_LOG_HEAD<<msg;}
 #	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
 #else
 #	define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}
