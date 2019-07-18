@@ -86,8 +86,34 @@
 #define LOG_THROW(msg) _POOR_MANS_LOG("THROW",msg)
 #define LOG_FATAL(msg) _POOR_MANS_LOG("FATAL",msg)
 
-#define DECLARE_LOGGER
-#define CREATE_LOGGER(classname)
+#ifdef YADE_BOOST_LOG
+	#include <boost/log/expressions.hpp>
+	#include <boost/log/trivial.hpp>
+	#include <boost/log/utility/setup.hpp>
+
+	enum severity_level { eFATAL=1, eTHROW=2, eERROR=3, eWARN=4, eINFO=5, eDEBUG=6, eMORE=7, eTRACE=8 };
+	std::ostream& operator<< (std::ostream& strm, severity_level level)
+	{
+		static const char* strings[] = { "UNKNOWN", "FATAL", "THROW", "ERROR", "WARN", "INFO", "DEBUG", "MORE", "TRACE" };
+		if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
+			strm << strings[level];
+		else
+			strm << static_cast< int >(level);
+		return strm;
+	}
+
+	BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", severity_level)
+	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "ClassNameTag", std::string)
+
+	#define DECLARE_LOGGER public: static boost::log::sources::severity_logger< severity_level > logger;
+	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< severity_level > classname::logger;\
+	__attribute__((constructor)) void initLog##classname() { \
+		Omega::instance().classLogLevels[#classname] = -1;\
+	};
+#else
+	#define DECLARE_LOGGER
+	#define CREATE_LOGGER(classname)
+#endif
 
 
 // macros for quick debugging
