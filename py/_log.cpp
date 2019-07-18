@@ -38,10 +38,6 @@ void testAllLevels() {
 	LOG_FATAL   ("Test log level: LOG_FATAL   , test streaming: " << count++ << ", string: "<< str);
 }
 
-void setLevel(int i) {
-	std::cerr << "FIXME: setLevel " << i << "\n";
-}
-
 // accepted sinks, separately for each log level:
 // "cerr", "cout", "file:name", "sms", "shell:scriptName"
 void addSink(std::string sink, int level) {
@@ -58,14 +54,19 @@ void resetAllSinks() {
 	std::cerr << "FIXME: resetAllSinks\n";
 }
 
+void setLevel(std::string className, int level) {
+	Omega::instance().classLogLevels[className]=level;
+}
+
+py::dict getLevels() {
+	return Omega::instance().classLogLevels;
+}
+
 BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
 	py::def("testAllLevels", testAllLevels, R"""(
-.. warning:: I must write docstring here!
-	)""");
-	py::def("setLevel", setLevel, R"""(
 .. warning:: I must write docstring here!
 	)""");
 	py::def("addSink", addSink, R"""(
@@ -75,6 +76,12 @@ BOOST_PYTHON_MODULE(_log){
 .. warning:: I must write docstring here!
 	)""");
 	py::def("resetAllSinks", resetAllSinks, R"""(
+.. warning:: I must write docstring here!
+	)""");
+	py::def("setLevel", setLevel , R"""(
+.. warning:: I must write docstring here!
+	)""");
+	py::def("getLevels", getLevels , R"""(
 .. warning:: I must write docstring here!
 	)""");
 }
