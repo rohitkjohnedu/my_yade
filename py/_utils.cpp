@@ -8,7 +8,7 @@
 #include <numpy/arrayobject.h>
 #pragma GCC diagnostic pop
 
-CREATE_LOCAL_LOGGER("pyUtils");
+CREATE_LOCAL_LOGGER("_utils.cpp");
 
 py::tuple negPosExtremeIds(int axis, Real distFactor){
 	py::tuple extrema=Shop::aabbExtrema();
