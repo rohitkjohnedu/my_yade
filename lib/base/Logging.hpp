@@ -18,6 +18,8 @@
 
 // boost::log inspired by git 014b11496
 #ifdef YADE_BOOST_LOG
+	#include <string>
+	#include <map>
 	#include <lib/base/Singleton.hpp>
 	#include <boost/log/expressions.hpp>
 	#include <boost/log/trivial.hpp>
@@ -25,19 +27,37 @@
 
 	#define _LOG_HEAD ":"<<__LINE__<<" "<<__PRETTY_FUNCTION__<<": "
 	// If you get "error: ‘logger’ was not declared in this scope" then you have to declare logger.
-	// Use DECLARE_LOGGER; inside class and CREATE_LOGGER(className); inside .cpp file
-	// or use CREATE_LOCAL_LOGGER("SomeName") if you need logging outside some class.
-	#define LOG_TRACE(msg)  { BOOST_LOG_SEV(logger, severity_level::eTRACE) << _LOG_HEAD << msg; }
-	#define LOG_MORE(msg)   { BOOST_LOG_SEV(logger, severity_level::eMORE)  << _LOG_HEAD << msg; }
-	#define LOG_DEBUG(msg)  { BOOST_LOG_SEV(logger, severity_level::eDEBUG) << _LOG_HEAD << msg; }
-	#define LOG_INFO(msg)   { BOOST_LOG_SEV(logger, severity_level::eINFO)  << _LOG_HEAD << msg; }
-	#define LOG_WARN(msg)   { BOOST_LOG_SEV(logger, severity_level::eWARN)  << _LOG_HEAD << msg; }
-	#define LOG_ERROR(msg)  { BOOST_LOG_SEV(logger, severity_level::eERROR) << _LOG_HEAD << msg; }
-	#define LOG_THROW(msg)  { BOOST_LOG_SEV(logger, severity_level::eTHROW) << _LOG_HEAD << msg; }
-	#define LOG_FATAL(msg)  { BOOST_LOG_SEV(logger, severity_level::eFATAL) << _LOG_HEAD << msg; }
+	// Use DECLARE_LOGGER; inside class and CREATE_LOGGER(ClassName); inside .cpp file
+	// or use CREATE_CPP_LOCAL_LOGGER("filename.cpp") if you need logging outside some class.
+	#define LOG_TRACE(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eTRACE) << _LOG_HEAD << msg; }
+	#define LOG_MORE(msg)   { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eMORE)  << _LOG_HEAD << msg; }
+	#define LOG_DEBUG(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eDEBUG) << _LOG_HEAD << msg; }
+	#define LOG_INFO(msg)   { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eINFO)  << _LOG_HEAD << msg; }
+	#define LOG_WARN(msg)   { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eWARN)  << _LOG_HEAD << msg; }
+	#define LOG_ERROR(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eERROR) << _LOG_HEAD << msg; }
+	#define LOG_THROW(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eTHROW) << _LOG_HEAD << msg; }
+	#define LOG_FATAL(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eFATAL) << _LOG_HEAD << msg; }
 
-	enum severity_level { eFATAL=1, eTHROW=2, eERROR=3, eWARN=4, eINFO=5, eDEBUG=6, eMORE=7, eTRACE=8 };
-	inline std::ostream& operator<< (std::ostream& strm, severity_level level) // necessary for formatting output.
+	class Logging : public Singleton<Logging> {
+		public:
+			enum SeverityLevel { eFATAL=1, eTHROW=2, eERROR=3, eWARN=4, eINFO=5, eDEBUG=6, eMORE=7, eTRACE=8 };
+			Logging();
+			void        readConfigFile(const std::string&);
+			void        setDefaultLogLevel(signed char);
+			signed char getDefaultLogLevel() { return defaultLogLevel;};
+			signed char getNamedLogLevel  (const std::string&);
+			void        setNamedLogLevel  (const std::string&,signed char);
+			void        unsetNamedLogLevel(const std::string&);
+			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
+		private:
+			std::map<std::string,signed char>::iterator findFilterName(const std::string&);
+			signed char			            defaultLogLevel{4};
+			std::map<std::string,signed char>           classLogLevels{{"Default",4}};
+		FRIEND_SINGLETON(Logging);
+	};
+	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity" , Logging::SeverityLevel )
+	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "NameTag"  , std::string            )
+	inline std::ostream& operator<< (std::ostream& strm, Logging::SeverityLevel level) // necessary for formatting output.
 	{
 		static const char* strings[] = { "UNKNOWN" , "FATAL_1" , "THROW_2" , "ERROR_3" , "WARN__4" , "INFO__5" , "DEBUG_6" , "MORE__7" , "TRACE_8" };
 		if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
@@ -46,25 +66,10 @@
 			strm << static_cast< int >(level);
 		return strm;
 	}
-
-	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity"    , severity_level )
-	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "ClassNameTag", std::string    )
-
-	struct Logging : public Singleton<Logging> {
-		std::map<std::string,int> classLogLevels;
-		FRIEND_SINGLETON(Logging);
-	};
-
-	inline boost::log::sources::severity_logger< severity_level > createNamedLogger(std::string name) {
-		boost::log::sources::severity_logger< severity_level > l;
-		l.add_attribute("ClassNameTag", boost::log::attributes::constant< std::string >(name));
-		Logging::instance().classLogLevels[name] = -1;
-		return l;
-	};
 	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
-	#define DECLARE_LOGGER public: static boost::log::sources::severity_logger< severity_level > logger;
-	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< severity_level > classname::logger=createNamedLogger(#classname);
-	#define CREATE_LOCAL_LOGGER(filtername) namespace{ boost::log::sources::severity_logger< severity_level > logger=createNamedLogger(filtername); };
+	#define DECLARE_LOGGER public: static boost::log::sources::severity_logger< Logging::SeverityLevel > logger;
+	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< Logging::SeverityLevel > classname::logger=Logging::instance().createNamedLogger(#classname);
+	#define CREATE_CPP_LOCAL_LOGGER(filtername) namespace{ boost::log::sources::severity_logger< Logging::SeverityLevel > logger=Logging::instance().createNamedLogger(filtername); };
 #else
 	#include <iostream>
 	#define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}

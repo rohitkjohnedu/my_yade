@@ -1680,18 +1680,18 @@ Yade's main program is python script in :ysrc:`core/main/main.py.in`; the build 
 #. Manage further actions, such as running scripts given at command line, opening :yref:`yade.qt.Controller` (if desired), launching the ``ipython`` prompt.
 
 
-Singletons 
+Singletons
 -----------
 There are several "global variables" that are always accessible from c++ code; properly speaking, they are `Singletons <http://en.wikipedia.org/wiki/Singleton_pattern>`_, classes of which exactly one instance always exists. The interest is to have some general functionality acessible from anywhere in the code, without the necessity of passing pointers to such objects everywhere. The instance is created at startup and can be always retrieved (as non-const reference) using the ``instance()`` static method (e.g. ``Omega::instance().getScene()``).
 
 There are 3 singletons:
 
-``SerializableSingleton``
-	Handles serialization/deserialization; it is not used anywhere except for the serialization code proper.
 ``ClassFactory``
 	Registers classes from plugins and able to factor instance of a class given its name as string (the class must derive from ``Factorable``). Not exposed to python.
 ``Omega``
 	Access to simulation(s); deserves separate section due to its importance.
+``Logging``
+	Handles logging filters for all named loggers, see :global ref:`logging verbosity <log-levels>`.
 
 Omega
 ^^^^^^
