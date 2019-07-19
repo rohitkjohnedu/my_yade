@@ -56,7 +56,7 @@ par.add_argument('-mit','--mpi-interactive-threads',help='Number of MPI threads 
 par.add_argument('--update',help='Update deprecated class names in given script(s) using text search & replace. Changed files will be backed up with ~ suffix. Exit when done without running any simulation.',dest='updateScripts',nargs='+')
 par.add_argument('--nice',help='Increase nice level (i.e. decrease priority) by given number.',dest='nice',type=int)
 par.add_argument('-x',help='Exit when the script finishes',dest='exitAfter',action='store_true')
-par.add_argument('-v',help=('Set global logging verbosity https://yade-dem.org/doc/prog.html#log-levels, default is -v4 for all classes.'+
+par.add_argument('-v',help=('Set "Default" logging verbosity https://yade-dem.org/doc/prog.html#log-levels, default is -v4 for all classes.'+
                 ('' if 'BoostLog' in features else " (Since this build doesn't use boost::log this option is unavailable, use cmake option -DBOOST_LOGGER=ON to enable)")),dest='verbosity',type=int)
 par.add_argument('-n',help="Run without graphical interface (equivalent to unsetting the DISPLAY environment variable)",dest='nogui',action='store_true')
 par.add_argument('--test',help="Run regression test suite and exit; the exists status is 0 if all tests pass, 1 if a test fails and 2 for an unspecified exception.",dest="test",action='store_true')
@@ -160,7 +160,7 @@ if opts.updateScripts:
 
 if 'BoostLog' in yade.config.features and opts.verbosity:
 	print("Setting log level to: ",opts.verbosity)
-	yade.log.setLevel(opts.verbosity)
+	yade.log.setLevel("Default",opts.verbosity)
 #	yade.log.setLevel('',[yade.log.INFO,yade.log.DEBUG,yade.log.TRACE][min(opts.verbosity,2)])
 
 # modify sys.argv in-place so that it can be handled by userSession
