@@ -42,7 +42,7 @@ this = sys.modules[__name__]
 sys.stderr.write=sys.stdout.write #so we see error messages from workers
 
 worldComm = MPI.COMM_WORLD
-color = 1 ; key = 0 ; 
+color = 1; key =1; 
 comm = worldComm.Split(color, key)
 parent = comm.Get_parent()
 if parent!=MPI.COMM_NULL:
@@ -51,7 +51,6 @@ if parent!=MPI.COMM_NULL:
 rank = comm.Get_rank()
 numThreads = comm.Get_size()
 commSplit = False 
-
 
 waitingCommands=False #are workers currently interactive?
 userScriptInCheckList=""	# detect if mpy is executed by checkList.py
@@ -82,7 +81,6 @@ REALLOCATE_FILTER = None # pointer to filtering function, will be set to 'median
 AUTO_COLOR = True
 MINIMAL_INTERSECTIONS = False # Reduces the size of position/velocity comms (at the end of the colliding phase, we can exclude those bodies with no interactions besides body<->subdomain from intersections). 
 REALLOCATE_MINIMAL = False # if true, intersections are minimized before reallocations, hence minimizing the number of reallocated bodies
-
 
 #tags for mpi messages
 _SCENE_=11
@@ -689,7 +687,6 @@ def mergeScene():
 			else:
 				dspl=None
 				dat=None
-
 			# data sent = [data, size of data] (for each worker)
 			# data recv = [allocated target_array, array of different sizes, displacement, data type]
 			timing_comm.Gatherv("mergeScene_data",[send_buff, size], [dat, sizes, dspl, MPI.DOUBLE], root=0)
@@ -714,9 +711,9 @@ def mergeScene():
 		
 		if (AUTO_COLOR): colorDomains()
 		if rank==0: O.engines = O.initialEngines
-			
-def splitScene(): 
 
+
+def splitScene(): 
 	'''
 	Split a monolithic scene into distributed scenes on threads
 	precondition: the bodies have subdomain no. set in user script
@@ -1059,6 +1056,7 @@ def mpirun(nSteps,np=None,withMerge=False):
 		mprint( "#####  Worker "+str(rank)+"  ######")
 		timing.stats() #specific numbers for -n4 and gabion.py
 
+<<<<<<< 911c5e41e67de79960a6478a04bf2f7d82359db7
 #######################################
 #######  Bodies re-allocation  ########
 #######################################
@@ -1265,4 +1263,3 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	#mprint("sending to ",otherDomain,": ",len(candidates))
 	migrateBodies(candidates,rank,otherDomain) #send
 	migrateBodies(None,otherDomain,rank)       #recv
-
