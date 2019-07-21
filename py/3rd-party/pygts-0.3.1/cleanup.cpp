@@ -36,6 +36,7 @@
 #include "pygts.h"
 
 #pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 
 
