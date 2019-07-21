@@ -155,7 +155,7 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 			}
 	}
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wpragmas"
 // this is to remove warning about manipulating raw memory
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
 	/* reset stored values */
