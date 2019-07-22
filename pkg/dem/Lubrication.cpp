@@ -564,13 +564,8 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(Lubric
 	Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
 
 	if(phys->delta > 0.) {
-<<<<<<< HEAD
 		if(activateRollLubrication && phys->eta > 0.) Cr = -phys->nun*a*3./2.*(21./250.*std::exp(phys->delta)+1.)*phys->delta*relRollVelocity;
 		if (activateTwistLubrication && phys->eta > 0.) Ct = -phys->nun*a*std::exp(phys->delta)*phys->delta*relTwistVelocity;
-=======
-		if(activateRollLubrication && phys->eta > 0.) Cr = -M_PI*phys->eta*a*a*a*(3./2.+63./500.*std::exp(phys->delta))*phys->delta*relRollVelocity;
-		if (activateTwistLubrication && phys->eta > 0.) Ct = -M_PI*phys->eta*a*a*a*std::exp(phys->delta)*phys->delta*relTwistVelocity;
->>>>>>> Interaction length is user-definable
 	}
 	// total torque
 	C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
