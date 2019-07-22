@@ -112,6 +112,9 @@ make_buster:
 make_suse15:
   <<: *make_definition
   <<: *artifacts_definition
+  before_script:
+    - export CXXFLAGS="-Wno-int-in-bool-context -Wno-comment $CXXFLAGS"
+    - echo $CXXFLAGS
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
 
 
