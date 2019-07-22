@@ -466,7 +466,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	//    Vector3r relVT = relV - relVN; // Tangeancial velocity
 	Real undot = relV.dot(geom->normal); // Normal velocity norm
     
-    if(-geom->penetrationDepth > a)
+    if(-geom->penetrationDepth > MaxDist*a)
     {
            //FIXME: it needs to go to potential always based on distance, the "undot < 0" here is dangerous (let the collider do its job), ex: if true is returned here the interaction is still alive and it will be included in the stress
 //         return undot < 0; // Only go to potential if distance is increasing 
@@ -532,9 +532,10 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(Lubricatio
 		Vector3r relTwistVelocity = relAngularVelocity.dot(geom->normal)*geom->normal;
 		Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
 
-		if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/phys->u)+63./500.*phys->u/a*std::log(a/phys->u))*relRollVelocity;
-		if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*a*phys->u*std::log(a/phys->u)*relTwistVelocity;
-		
+		if(a > phys->u) {
+			if(activateRollLubrication && phys->eta > 0.) Cr = M_PI*phys->eta*a*a*a*(3./2.*std::log(a/phys->u)+63./500.*phys->u/a*std::log(a/phys->u))*relRollVelocity;
+			if (activateTwistLubrication && phys->eta > 0.) Ct = M_PI*phys->eta*a*a*phys->u*std::log(a/phys->u)*relTwistVelocity;
+		}
 	    // total torque
 		C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
 		C2 = -(geom->radius2-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
@@ -562,9 +563,10 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(Lubric
 	Vector3r relTwistVelocity = relAngularVelocity.dot(geom->normal)*geom->normal;
 	Vector3r relRollVelocity = relAngularVelocity - relTwistVelocity;
 
-	if(activateRollLubrication && phys->eta > 0.) Cr = -M_PI*phys->eta*a*a*a*(3./2.+63./500.*std::exp(phys->delta))*phys->delta*relRollVelocity;
-	if (activateTwistLubrication && phys->eta > 0.) Ct = -M_PI*phys->eta*a*a*a*std::exp(phys->delta)*phys->delta*relTwistVelocity;
-	
+	if(phys->delta > 0.) {
+		if(activateRollLubrication && phys->eta > 0.) Cr = -M_PI*phys->eta*a*a*a*(3./2.+63./500.*std::exp(phys->delta))*phys->delta*relRollVelocity;
+		if (activateTwistLubrication && phys->eta > 0.) Ct = -M_PI*phys->eta*a*a*a*std::exp(phys->delta)*phys->delta*relTwistVelocity;
+	}
 	// total torque
 	C1 = -(geom->radius1-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)+Cr+Ct;
 	C2 = -(geom->radius2-geom->penetrationDepth/2.)*phys->shearForce.cross(geom->normal)-Cr-Ct;
