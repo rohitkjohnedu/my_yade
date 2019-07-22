@@ -127,7 +127,6 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 REGISTER_SERIALIZABLE(Law2_ScGeom_ImplicitLubricationPhys);
 
 
-
 class LubricationPDFEngine: public PDFEngine {
 	public :
 		virtual void action();
