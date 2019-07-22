@@ -45,7 +45,8 @@ stages:
   stage: build
   script:
     - export GCC_COLORS="error=01;31:warning=01;35:note=01;36:range1=04;32:range2=04;34:locus=93:quote=07;96:fixit-insert=92:fixit-delete=91:diff-filename=01;91:diff-hunk=33:diff-delete=31:diff-insert=32"
-    - export CXXFLAGS="-fdiagnostics-color=always"
+    - export CXXFLAGS="-fdiagnostics-color=always $CXXFLAGS"
+    - echo $CXXFLAGS
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
