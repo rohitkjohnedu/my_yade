@@ -30,7 +30,6 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,kno,0.0,,"Coefficient for normal stiffness (Hertzian-like contact) [N/m^(3/2)]"))
                 ((Real,nun,0.0,,"Coefficient for normal lubrication [N.s]"))
                 ((Real,mum,0.3,,"Friction coefficient [-]"))
-				
 				// Output
                 ((Real,ue,0.,Attr::readonly,"Surface deflection (ue) at t-dt [m]"))
                 ((Real,u,-1,Attr::readonly,"Interfacial distance (u) at t-dt [m]"))
