@@ -42,7 +42,6 @@ Build-Depends-Indep:
  graphviz,
  libjs-jquery,
  lmodern,
- python-bibtex,
  python3-sphinx (>= 1.0.7+dfsg),
  texlive-fonts-recommended,
  texlive-generic-extra,
