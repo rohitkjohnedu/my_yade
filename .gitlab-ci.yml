@@ -12,9 +12,9 @@
 
 
 stages:
-  - build
-  - test
-  - pages
+#  - build
+#  - test
+#  - pages
   - deb
 
 # If you want to compile everything also on merge_request, change this template.
@@ -260,7 +260,7 @@ variables:
 .deb_template: &deb_definition
   stage: deb
   only:
-    - master
+    - branches
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
     - apt-get update && apt-get -y build-dep .
