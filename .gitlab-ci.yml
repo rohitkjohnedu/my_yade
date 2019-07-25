@@ -24,7 +24,7 @@ variables:
     - branches
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
-    - apt-get update && apt-get -y build-dep .
+#    - apt-get update && apt-get -y build-dep .
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
         "y4pak") echo "43" ;;
         "c4pak") echo "43" ;;
