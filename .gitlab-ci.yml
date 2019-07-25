@@ -71,3 +71,10 @@ deb_bionic:
   before_script:
     - rm -rf ./deb
     - ./scripts/ppa_ci/builddeb.py -d "bionic"
+
+deb_xenial:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "xenial"
