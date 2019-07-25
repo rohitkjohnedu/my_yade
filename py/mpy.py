@@ -138,7 +138,6 @@ def makeColorScale(n=numThreads):
 
 colorScale= makeColorScale(numThreads)
 
-
 def colorDomains():
 	'''
 	Apply color to body to reflect their subdomain idx
