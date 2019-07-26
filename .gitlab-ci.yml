@@ -14,9 +14,6 @@
 stages:
   - deb
 
-variables:
-  CCACHE_WORK_DIR: $CI_PROJECT_DIR/.ccache
-
 # 6. build debian packages
 .deb_template: &deb_definition
   stage: deb
@@ -37,19 +34,16 @@ variables:
         *) echo "8";;
         esac)
     - echo $JOBSNUM
-    - export CCACHE_DIR=${CCACHE_WORK_DIR}
+    - ccache -s
     - DEB_BUILD_OPTIONS=noddebs dpkg-buildpackage -j$JOBSNUM
 #    - dpkg-buildpackage -j$JOBSNUM
-    - ccache -s
     - rm -rf $CI_PROJECT_DIR/deb/yadedaily
     - ls -l $CI_PROJECT_DIR/deb
+    - ccache -s
   artifacts:
     paths:
       - ./deb
     expire_in: 5 day
-  cache:
-    paths:
-      - ${CCACHE_WORK_DIR}
 
 deb_buster:
   <<: *deb_definition
