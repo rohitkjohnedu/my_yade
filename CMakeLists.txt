@@ -64,7 +64,7 @@ OPTION(ENABLE_OAR "Generate script for oar-based task scheduler" OFF)
 OPTION(USE_QT5 "USE Qt5 for GUI" ON)
 OPTION(ENABLE_POTENTIAL_BLOCKS "Enable PotentialBlocks" ON)
 OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
-OPTION(ENABLE_FEMLIKE "Enable deformable solids" OFF)
+OPTION(ENABLE_FEMLIKE "Enable deformable solids" ON)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" ON)
 #Set -DPYTHON_VERSION numeric option below:
