@@ -12,16 +12,254 @@
 
 
 stages:
+  - build
+  - test
+  - pages
   - deb
+
+# If you want to compile everything also on merge_request, change this template.
+.plaftorms_template: &platforms_definition
+  only:
+    - master
+    - merge_request
+
+# stage: cmake uses ccache for faster compilation. ccache works only with -DCHUNKSIZE=1
+# Important: to get ccache to work an external volume must be mounted by gitlab-runner (in config file: /etc/gitlab-runner/config.toml)
+#            into docker directory /root/.ccache. By default in /etc/gitlab-runner/config.toml there is already this line:
+#               volumes = ["/cache"]
+#            it must be replaced with:
+#               volumes = ["/cache","/home/docker/ccache:/root/.ccache:rw"]
+#            where /home/docker/ccache is the directory in the host with write access.
+# See also : https://gitlab.com/gitlab-org/gitlab-runner/blob/master/docs/configuration/advanced-configuration.md#example-2-mount-a-host-directory-as-a-data-volume
+
+# Perhaps two more will added later
+# 1.4. only: tags       Perhaps creating tags would trigger a build, e.g. tagging a new release?
+# 1.5. only: schedules  For scheluded pipelines. Perhaps it will be e.g. for https://gitlab.com/yade-dev/trunk/issues/58
+#                       It is possible to send an environment variable to the pipeline from the schedule. So here maybe a selection of
+#                       what .deb package to build could be performed using an env variable.
+# in merge_request use the faster  linker: ld.gold. We save 2 minutes on every build.
+# in master        use the regular linker: ld.bfd.  Very rarely we might encounter linker errors. It's worth the faster build in merge_request.
+
+.make_template: &make_definition
+  <<: *platforms_definition
+  stage: build
+  script:
+    - export GCC_COLORS="error=01;31:warning=01;35:note=01;36:range1=04;32:range2=04;34:locus=93:quote=07;96:fixit-insert=92:fixit-delete=91:diff-filename=01;91:diff-hunk=33:diff-delete=31:diff-insert=32"
+    - export CXXFLAGS="-fdiagnostics-color=always $CXXFLAGS"
+    - echo $CXXFLAGS
+    - mkdir build && cd build
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
+    - ccache -s
+    - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
+    - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
+    - ld --version
+    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
+    - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
+    - ld --version
+    - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
+        "y4pak") echo "43" ;;
+        "c4pak") echo "43" ;;
+        "y6pak") echo "46" ;;
+        "c6pak") echo "46" ;;
+        "y7pak") echo "46" ;;
+        "c7pak") echo "46" ;;
+        "yade-runner") echo "12" ;;
+        "yade-runner-01") echo "1" ;;
+        *) echo "8";;
+        esac)
+    - echo $JOBSNUM
+    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
+    - make -j $JOBSNUM
+    - make install
+    - make clean
+    - ccache -s
+  tags:
+    - fast
+
+.artifacts_template: &artifacts_definition
+  artifacts:
+    paths:
+      - install
+    expire_in: 2 weeks
+
+# 2.1 build stage: ubuntu 16.04
+make_16_04:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+
+make_18_04:
+  <<: *make_definition
+  artifacts:
+    paths:
+      - install
+      - build
+    expire_in: 2 weeks
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+
+make_stretch:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
+
+make_buster:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+
+make_suse15:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
+
+
+# 3.1. test stage
+.test_template: &test_definition
+  <<: *platforms_definition
+  stage: test
+  script:
+    - install/bin/yade-ci --test
+    - cat /etc/os-release
+
+
+test_16_04:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+  dependencies:
+    - make_16_04
+
+test_18_04:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  dependencies:
+    - make_18_04
+
+test_stretch:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
+  dependencies:
+    - make_stretch
+
+test_buster:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+  dependencies:
+    - make_buster
+
+test_suse15:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
+  dependencies:
+    - make_suse15
+
+test_18_foam:
+  stage: test
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam
+  only:
+    - master
+    - merge_request
+  dependencies:
+    - make_18_04
+  script:
+    - cat /etc/os-release
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - /builds/yade-dev/trunk/scripts/checks-and-tests/testOpenFoam.sh
+
+
+# Four new images:
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+# image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
+# image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+# 3.2. check stage
+.check_template: &check_definition
+  <<: *platforms_definition
+  stage: test
+#  before_script:
+#    - export OMPI_MCA_rmaps_base_oversubscribe=1
+#    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+#    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org/faq/?category=running#oversubscribing)
+  script:
+    - install/bin/yade-ci --checks
+
+check_16_04:
+  <<: *check_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+  dependencies:
+    - make_16_04
+
+check_18_04:
+  <<: *check_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  dependencies:
+    - make_18_04
+
+check_stretch:
+  <<: *check_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
+  dependencies:
+    - make_stretch
+
+check_buster:
+  <<: *check_definition
+  before_script:
+    - export OMPI_MCA_rmaps_base_oversubscribe=1
+    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
+    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+  dependencies:
+    - make_buster
+
+check_suse15:
+  <<: *check_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:suse15
+  dependencies:
+    - make_suse15
+
+
+# currently doc is build only on ubuntu 18.04. Without .doc_template. We may fix this later.
+# 4. doc stage
+doc_18_04:
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  stage: test
+  only:
+    - master
+    - merge_request
+  script:
+    - cd build
+    - xvfb-run -s "-screen 0 1600x1200x24" make doc
+  dependencies:
+    - make_18_04
+  artifacts:
+    paths:
+      - install
+
+
+# 5. pages stage; uploads documentation to the website
+pages:
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  stage: pages
+  only:
+    - master
+  script:
+    - mv install/share/doc/yade-ci/html public
+    - mv install/share/doc/yade-ci/Yade.pdf public
+    - mv install/share/doc/yade-ci/Yade.epub public
+  dependencies:
+    - doc_18_04
+  artifacts:
+    paths:
+      - public
 
 # 6. build debian packages
 .deb_template: &deb_definition
   stage: deb
   only:
-    - branches
+    - master
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
-#    - apt-get update && apt-get -y build-dep .
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
         "y4pak") echo "43" ;;
         "c4pak") echo "43" ;;
@@ -37,7 +275,6 @@ stages:
     - export CCACHE_DIR=/root/.ccache
     - ccache -s
     - DEB_BUILD_OPTIONS=noddebs dpkg-buildpackage -j$JOBSNUM
-#    - dpkg-buildpackage -j$JOBSNUM
     - rm -rf $CI_PROJECT_DIR/deb/yadedaily
     - ls -l $CI_PROJECT_DIR/deb
     - ccache -s
