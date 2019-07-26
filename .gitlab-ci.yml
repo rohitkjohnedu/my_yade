@@ -2,7 +2,7 @@
 # image: registry.gitlab.com/yade-dev/docker-yade
 #
 # Five new images:
-# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04-py3
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
