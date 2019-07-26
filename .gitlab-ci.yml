@@ -260,7 +260,7 @@ pages:
 .deb_template: &deb_definition
   stage: deb
   only:
-    - master
+    - branches
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
@@ -281,6 +281,7 @@ pages:
     - rm -rf $CI_PROJECT_DIR/deb/yadedaily
     - ls -l $CI_PROJECT_DIR/deb
     - ccache -s
+  dependencies: []
   artifacts:
     paths:
       - ./deb
