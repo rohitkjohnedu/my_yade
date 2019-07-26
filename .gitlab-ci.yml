@@ -260,7 +260,7 @@ pages:
 .deb_template: &deb_definition
   stage: deb
   only:
-    - branches
+    - merge_request
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
