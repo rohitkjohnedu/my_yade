@@ -170,7 +170,6 @@ ELSE(BOOST_LOGGER)
   ENDIF (DEBUG)
 ENDIF(BOOST_LOGGER)
 
-MESSAGE(STATUS "${Esc}[36mUsing MAX_LOG_LEVEL=${MAX_LOG_LEVEL}${Esc}[m")
 ADD_DEFINITIONS("-DMAX_LOG_LEVEL=${MAX_LOG_LEVEL}")
 
 #==================================
@@ -790,6 +789,7 @@ INSTALL(TARGETS yade DESTINATION ${YADE_LIB_PATH})
 MESSAGE(STATUS "===========================================================")
 MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
 MESSAGE(STATUS "Disabled features:${DISABLED_FEATS}")
+MESSAGE(STATUS "${Esc}[36mUsing MAX_LOG_LEVEL=${MAX_LOG_LEVEL}${Esc}[m")
 IF (DEBUG)
   MESSAGE(STATUS "Debug build")
   SET (debugbuild " (debug build)")
