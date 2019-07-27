@@ -3,8 +3,10 @@
 #ifdef YADE_BOOST_LOG
 
 #include <ostream>
+#include <fstream>
 #include <lib/base/Logging.hpp>
 #include <boost/core/null_deleter.hpp>
+#include <boost/log/utility/setup/file.hpp>
 #include <boost/phoenix/bind/bind_function.hpp>
 
 SINGLETON_SELF(Logging);
@@ -37,7 +39,15 @@ bool logFilterLevels(  boost::log::value_ref< Logging::SeverityLevel , tag::seve
 }
 
 // Setup the common formatter for all sinks
-Logging::Logging() : defaultLogLevel(4), classLogLevels{{"Default",defaultLogLevel}}, sink{boost::make_shared< text_sink >()}, colors{true} {
+Logging::Logging()
+	: defaultLogLevel(3)
+	, classLogLevels{{"Default",defaultLogLevel}}
+	, sink{boost::make_shared< TextSink >()}
+	, streamClog(&std::clog, boost::null_deleter())
+	, streamCerr(&std::cerr, boost::null_deleter())
+	, streamCout(&std::cout, boost::null_deleter())
+	, colors{true}
+{
 	boost::log::formatter fmt = boost::log::expressions::stream
 		<< "<" << severity << "> "
 		<< boost::log::expressions::if_(boost::log::expressions::has_attr(class_name_tag))
@@ -46,11 +56,42 @@ Logging::Logging() : defaultLogLevel(4), classLogLevels{{"Default",defaultLogLev
 		]
 		<< boost::log::expressions::smessage;
 
-	boost::shared_ptr< std::ostream > stream(&std::clog, boost::null_deleter());
-	sink->locked_backend()->add_stream(stream);
+	sink->locked_backend()->add_stream(streamClog);
 	sink->set_formatter(fmt);
 	sink->set_filter( boost::phoenix::bind(&logFilterLevels, severity.or_none(), class_name_tag.or_none() ));
 	boost::log::core::get()->add_sink(sink);
+}
+
+// It is possible in boost::log to have different output sinks (e.g. different log files), each with a different filtering level.
+// For now it is not necessary so I don't use it. If it becomes necessary in the future, see following examples:
+//   https://www.boost.org/doc/libs/1_70_0/libs/log/doc/html/log/detailed/expressions.html#log.detailed.expressions.formatters.conditional
+//   https://www.boost.org/doc/libs/1_70_0/libs/log/example/doc/tutorial_filtering.cpp
+// To do this multiple variables like the variable 'sink' below would have to be defined. Each with a different filter level.
+// Below all add_stream(…), remove_stream(…) calls are to the same sink. So they all have the same filtering level.
+void Logging::setOutputStream(const std::string& name , bool reset) {
+	if(reset) {
+		sink->locked_backend()->remove_stream(streamClog);
+		sink->locked_backend()->remove_stream(streamCerr);
+		sink->locked_backend()->remove_stream(streamCout);
+		sink->locked_backend()->remove_stream(streamFile);
+		for(const auto& oldFile : streamOld) {
+			sink->locked_backend()->remove_stream(oldFile);
+		}
+		streamOld.clear();
+	}
+	switch(hash(name.c_str())) {
+		case hash("clog") : sink->locked_backend()->add_stream(streamClog); break;
+		case hash("cerr") : sink->locked_backend()->add_stream(streamCerr); break;
+		case hash("cout") : sink->locked_backend()->add_stream(streamCout); break;
+		default           : {
+			if(not reset) {
+				std::cerr << "LOGGER Warning: adding a new log file without resetting the old one means that the logs will go to both files.\n";
+				streamOld.push_back(streamFile);
+			}
+			streamFile = boost::make_shared< std::ofstream >(name.c_str());
+			sink->locked_backend()->add_stream(streamFile);
+		}
+	}
 }
 
 void Logging::readConfigFile(const std::string& fname) {

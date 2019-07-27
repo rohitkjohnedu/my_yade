@@ -59,19 +59,28 @@ void testAllLevels() {
 }
 
 // accepted sinks, separately for each log level:
-// "cerr", "cout", "file:name", "sms", "shell:scriptName"
-void addSink(std::string sink, int level) {
-	std::cerr << "FIXME: addSink: " << sink << " level: " << level << "\n";
-}
-
-// removes all sinks for selected log level. Attention: even 'cerr' sink is removed!
-void clearSink(int level) {
-	std::cerr << "FIXME: clearSink level: " << level << "\n";
+// "clog", "cerr", "cout", "filename"
+void setOutputStream(std::string sink, bool reset) {
+#ifdef YADE_BOOST_LOG
+	Logging::instance().setOutputStream(sink , reset);
+	if(reset) {
+		LOG_INFO("Log output stream has been set to "<< sink <<". Other sinks were removed.");
+	} else {
+		LOG_INFO("Additional output stream has been set to "<< sink <<".");
+	}
+#else
+	printNoBoostLogWarning();
+#endif
 }
 
 // resets all sinks to default values: 'cerr' for those below logLevel, 'none' for those above logLevel
-void resetAllSinks() {
-	std::cerr << "FIXME: resetAllSinks\n";
+void resetOutputStream() {
+#ifdef YADE_BOOST_LOG
+	Logging::instance().setOutputStream("clog" , true);
+	LOG_INFO("Log output stream has been reset to std::clog. File sinks are not removed.");
+#else
+	printNoBoostLogWarning();
+#endif
 }
 
 void setLevel(std::string className, int level) {
@@ -99,14 +108,13 @@ BOOST_PYTHON_MODULE(_log){
 	py::def("testAllLevels", testAllLevels, R"""(
 .. warning:: I must write docstring here!
 	)""");
-	py::def("addSink", addSink, R"""(
+	py::def("setOutputStream", setOutputStream, R"""(
+:param str className: The logger name for which the filter level is to be set. Use name ``Default`` to change the default filter level.
+:param int level: The filter level to be set.
 .. warning:: I must write docstring here!
 	)""");
-	py::def("clearSink", clearSink, R"""(
-.. warning:: I must write docstring here!
-	)""");
-	py::def("resetAllSinks", resetAllSinks, R"""(
-.. warning:: I must write docstring here!
+	py::def("resetOutputStream", resetOutputStream, R"""(
+Resets log output stream to default state: all logs are printed on ``std::clog`` channel, which usually redirects to ``std::cerr``.
 	)""");
 	py::def("setLevel", setLevel , R"""(
 :param str className: The logger name for which the filter level is to be set. Use name ``Default`` to change the default filter level.

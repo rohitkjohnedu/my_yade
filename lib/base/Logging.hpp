@@ -16,7 +16,7 @@
  *
  */
 
-// boost::log inspired by git 014b11496
+// boost::log inspired by git show 014b11496
 #ifdef YADE_BOOST_LOG
 	#include <string>
 	#include <map>
@@ -24,6 +24,9 @@
 	#include <boost/log/expressions.hpp>
 	#include <boost/log/trivial.hpp>
 	#include <boost/log/utility/setup.hpp>
+
+	// TODO: move this when fixing https://gitlab.com/yade-dev/trunk/issues/97
+	constexpr unsigned long hash(const char* str, int ha = 0) { return !str[ha] ? 5381 : (hash(str, ha+1) * 33) ^ str[ha]; }
 
 	#define _LOG_HEAD ":"<<__LINE__<<" "<<__PRETTY_FUNCTION__<<": "
 	// If you get "error: ‘logger’ was not declared in this scope" then you have to declare logger.
@@ -44,19 +47,22 @@
 			void        readConfigFile(const std::string&);
 			void        setUseColors(bool);
 			void        setDefaultLogLevel(short int);
+			void        setOutputStream(const std::string& , bool reset);
 			short int   getDefaultLogLevel() { return defaultLogLevel;};
 			short int   getNamedLogLevel  (const std::string&);
 			void        setNamedLogLevel  (const std::string&,short int);
 			void        unsetNamedLogLevel(const std::string&);
 			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
-			static constexpr short int                maxLogLevel{MAX_LOG_LEVEL};
+			static constexpr short int                   maxLogLevel{MAX_LOG_LEVEL};
 		private:
-			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > text_sink;
-			std::map<std::string,short int>::iterator   findFilterName(const std::string&);
-			short int                                   defaultLogLevel{4};
-			std::map<std::string,short int>             classLogLevels{{"Default",4}};
-			boost::shared_ptr< text_sink >              sink{boost::make_shared< text_sink >()};
-			bool                                        colors{true};
+			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > TextSink;
+			std::map<std::string,short int>::iterator      findFilterName(const std::string&);
+			short int                                      defaultLogLevel{3}; // see constructor in Logging.cpp, at later stages of initialization it is overwritten by core/main/main.py.in line 163
+			std::map<std::string,short int>                classLogLevels{{"Default",defaultLogLevel}};
+			boost::shared_ptr< TextSink >                  sink{boost::make_shared< TextSink >()};
+			boost::shared_ptr< std::ostream >              streamClog{}, streamCerr{}, streamCout{}, streamFile{};
+			std::vector< boost::shared_ptr<std::ostream> > streamOld{};
+			bool                                           colors{true};
 		FRIEND_SINGLETON(Logging);
 	};
 	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity" , Logging::SeverityLevel )
