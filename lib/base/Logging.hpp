@@ -81,10 +81,12 @@
 
 	#ifdef YADE_DEBUG
 	// when compiling with debug symbols and without boost::log it will print everything.
+		#define MAX_HARDCODED_LOG_LEVEL 6
 		#define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE_6",msg)
 		#define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG_5",msg)
 		#define LOG_INFO(msg)  _POOR_MANS_LOG("INFO__4",msg)
 	#else
+		#define MAX_HARDCODED_LOG_LEVEL 3
 		#define LOG_TRACE(msg)
 		#define LOG_DEBUG(msg)
 		#define LOG_INFO(msg)
