@@ -8,6 +8,8 @@
 #include <numpy/arrayobject.h>
 #pragma GCC diagnostic pop
 
+CREATE_LOCAL_LOGGER("pyUtils");
+
 py::tuple negPosExtremeIds(int axis, Real distFactor){
 	py::tuple extrema=Shop::aabbExtrema();
 	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();

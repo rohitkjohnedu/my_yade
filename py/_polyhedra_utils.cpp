@@ -14,6 +14,8 @@
 
 #include <numpy/ndarraytypes.h>
 
+CREATE_LOCAL_LOGGER("PolyhedraUtils");
+
 namespace py = boost::python;
 
 //**********************************************************************************

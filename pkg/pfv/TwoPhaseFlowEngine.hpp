@@ -239,6 +239,8 @@ class PhaseCluster : public Serializable
 		.def("updateCapVolList",&PhaseCluster::updateCapVolList,(boost::python::arg("dt")),"increments throat's volume of all interfaces by flux*dt")
 		.def("solvePressure",&PhaseCluster::solvePressure,"Solve 1-phase flow in one single cluster defined by its id.")
 		)
+
+	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(PhaseCluster);
 

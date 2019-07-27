@@ -19,6 +19,8 @@
 
 YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 
+CREATE_LOCAL_LOGGER("CapillaryPhysCapillarityLocal");
+
 void Law2_ScGeom_CapillaryPhys_Capillarity::postLoad(Law2_ScGeom_CapillaryPhys_Capillarity&){
 
   capillary = shared_ptr<capillarylaw>(new capillarylaw);

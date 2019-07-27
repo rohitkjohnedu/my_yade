@@ -1,5 +1,7 @@
 #include <core/ForceContainer.hpp>
 
+CREATE_LOGGER(ForceContainer);
+
 void ForceContainer::ensureSynced() {
   if(!synced) throw runtime_error("ForceContainer not thread-synchronized; call sync() first!");
 }

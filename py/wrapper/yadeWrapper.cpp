@@ -43,6 +43,8 @@
 
 #include <pkg/common/KinematicEngines.hpp>
 
+CREATE_LOCAL_LOGGER("yadeWrapper.cpp");
+
 namespace py = boost::python;
 
 /*

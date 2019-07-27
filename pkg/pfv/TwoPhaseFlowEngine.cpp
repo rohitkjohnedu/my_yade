@@ -14,6 +14,7 @@
 YADE_PLUGIN((TwoPhaseFlowEngineT));
 YADE_PLUGIN((TwoPhaseFlowEngine));
 YADE_PLUGIN((PhaseCluster));
+CREATE_LOGGER(PhaseCluster);
 
 PhaseCluster::~PhaseCluster(){
 	#ifdef LINSOLV
