@@ -231,6 +231,32 @@ Debugging a particular class
 
 Logging can be enabled on per-class level basis using .............
 
+Debug macros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the backets, such as ``LOG_TRACE(a<<b<<" text")``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
+
+Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They are used by providing the macro with variables to be printed, such as: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp` for example use.
+
+The macro ``TRACE;`` prints a ``"Been here"`` message, and is used for quick debugging.
+
+All debug macros are summarized in the table below:
+
+
+.. table:: Yade debug macros.
+
+	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
+	| macro name                                                | explanation                                                                     |
+	+===========================================================+=================================================================================+
+	| ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, | Prints message using ``std::ostream`` syntax, like:                             |
+	| ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``            | ``LOG_TRACE( a << b << " text" )``                                              |
+	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
+	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints variables like ``TRVAR3(testInt,testStr,testReal);``.                    |
+	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                   |
+	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
+	| ``TRACE;``                                                | Prints a ``"Been here"`` message.                                               |
+	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
+
 
 .. _regression-tests:
 
