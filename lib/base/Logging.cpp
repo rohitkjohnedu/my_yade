@@ -14,7 +14,7 @@ bool logFilterLevels(  boost::log::value_ref< Logging::SeverityLevel , tag::seve
 {
 /*
 	auto itEnd          = Logging::instance().classLogLevels.end();
-	signed char itDefault = Logging::instance().getDefaultLogLevel();
+	short int itDefault = Logging::instance().getDefaultLogLevel();
 	if(itDefault == itEnd) { // something is seriously broken, we resort to std::cerr to report that.
 		std::cerr << "LOGGER Warning: \"Default\" log level is missing. Expect problems with logging.\n";
 		return true;
@@ -57,16 +57,16 @@ void Logging::readConfigFile(const std::string& fname) {
 	// TODO ...
 }
 
-void Logging::setDefaultLogLevel(signed char level) {
+void Logging::setDefaultLogLevel(short int level) {
 	classLogLevels["Default"] = level;
 	defaultLogLevel           = level;
 }
 
-signed char Logging::getNamedLogLevel  (const std::string& name) {
+short int Logging::getNamedLogLevel  (const std::string& name) {
 	return findFilterName(name)->second;
 }
 
-void Logging::setNamedLogLevel  (const std::string& name , signed char level) {
+void Logging::setNamedLogLevel  (const std::string& name , short int level) {
 	if(level > maxLogLevel) {
 		std::cerr << "LOGGER Warning: setting \""<<name<<"\" log level higher than MAX_LOG_LEVEL="<<maxLogLevel<<" will have no effect. Logs will not be printed, they were removed during compilation.\n";
 		std::cerr << "LOGGER Warning: to be able to use \""<<name<<"\"="<<level<<" you have to recompile yade with cmake option MAX_LOG_LEVEL="<<level<<" or higher.\n";
@@ -95,7 +95,7 @@ boost::log::sources::severity_logger< Logging::SeverityLevel > Logging::createNa
 	return l;
 };
 
-std::map<std::string,signed char>::iterator Logging::findFilterName(const std::string& name) {
+std::map<std::string,short int>::iterator Logging::findFilterName(const std::string& name) {
 	auto it = classLogLevels.find(name);
 	if( it == classLogLevels.end() ) {
 		throw std::runtime_error(name+" is not recognized. Did you forget CREATE_LOGGER; and DECLARE_LOGGER(Classname); macros? Or maybe CREATE_CPP_LOCAL_LOGGER(\"filename.cpp\"); macro?\n");

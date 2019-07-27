@@ -43,18 +43,18 @@
 			Logging();
 			void        readConfigFile(const std::string&);
 			void        setUseColors(bool);
-			void        setDefaultLogLevel(signed char);
-			signed char getDefaultLogLevel() { return defaultLogLevel;};
-			signed char getNamedLogLevel  (const std::string&);
-			void        setNamedLogLevel  (const std::string&,signed char);
+			void        setDefaultLogLevel(short int);
+			short int   getDefaultLogLevel() { return defaultLogLevel;};
+			short int   getNamedLogLevel  (const std::string&);
+			void        setNamedLogLevel  (const std::string&,short int);
 			void        unsetNamedLogLevel(const std::string&);
 			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
-			static constexpr signed char                maxLogLevel{MAX_LOG_LEVEL};
+			static constexpr short int                maxLogLevel{MAX_LOG_LEVEL};
 		private:
 			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > text_sink;
-			std::map<std::string,signed char>::iterator findFilterName(const std::string&);
-			signed char			            defaultLogLevel{4};
-			std::map<std::string,signed char>           classLogLevels{{"Default",4}};
+			std::map<std::string,short int>::iterator   findFilterName(const std::string&);
+			short int                                   defaultLogLevel{4};
+			std::map<std::string,short int>             classLogLevels{{"Default",4}};
 			boost::shared_ptr< text_sink >              sink{boost::make_shared< text_sink >()};
 			bool                                        colors{true};
 		FRIEND_SINGLETON(Logging);
