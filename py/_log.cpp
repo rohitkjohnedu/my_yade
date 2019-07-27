@@ -85,6 +85,7 @@ BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
+// The docstrings can use syntax :param ……: ……… :return: ……. For details see https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
 	py::def("testAllLevels", testAllLevels, R"""(
 .. warning:: I must write docstring here!
 	)""");
@@ -98,7 +99,9 @@ BOOST_PYTHON_MODULE(_log){
 .. warning:: I must write docstring here!
 	)""");
 	py::def("setLevel", setLevel , R"""(
-.. warning:: I must write docstring here!
+:param str className: The logger name for which the filter level is to be set. Use name ``Default`` for changing default filter level.
+:param int level: The filter level to be set.
+.. warning:: setting "Default" log level higher than ``MAX_LOG_LEVEL`` provided during compilation will have no effect. Logs will not be printed, they were removed during compilation.
 	)""");
 	py::def("getLevels", getLevels , R"""(
 .. warning:: I must write docstring here!
