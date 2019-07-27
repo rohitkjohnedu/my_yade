@@ -99,6 +99,9 @@ void Logging::readConfigFile(const std::string& fname) {
 }
 
 void Logging::setDefaultLogLevel(short int level) {
+	if(level < (short int)(SeverityLevel::eNOFILTER) or level > (short int)(SeverityLevel::eTRACE)) {
+		throw std::runtime_error("The level must be >= NOFILTER and <= TRACE, other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
+	}
 	classLogLevels["Default"] = level;
 	defaultLogLevel           = level;
 }
