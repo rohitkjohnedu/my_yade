@@ -62,8 +62,9 @@ void resetAllSinks() {
 }
 
 void setLevel(std::string className, int level) {
-// TODO: check if exists, even at -1, print warning that CREATE_LOGGER is missing otherwise
-//	Logging::instance().classLogLevels[className]=level;
+//FIXME: use some #ifdef YADE_BOOST_LOG
+	Logging::instance().setNamedLogLevel(className , level);
+	LOG_INFO("filter log level for "<<className<<" has been set to " << Logging::instance().getNamedLogLevel(className));
 }
 
 py::dict getLevels() {
@@ -75,6 +76,7 @@ py::dict getLevels() {
 }
 
 BOOST_PYTHON_MODULE(_log){
+	python::scope().attr("__doc__") = "Access and manipulation of yade logging.";
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
@@ -96,6 +98,13 @@ BOOST_PYTHON_MODULE(_log){
 	py::def("getLevels", getLevels , R"""(
 .. warning:: I must write docstring here!
 	)""");
+
+	python::scope().attr("TRACE")=int(6)
+	python::scope().attr("DEBUG")=int(5)
+	python::scope().attr("INFO")= int(4)
+	python::scope().attr("WARN")= int(3)
+	python::scope().attr("ERROR")=int(2)
+	python::scope().attr("FATAL")=int(1)
 }
 
 /* this was in git revision 014b11496
