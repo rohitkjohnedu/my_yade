@@ -22,7 +22,7 @@ void testAllLevels() {
 	std::string testStr = "test_string";
 	Real testReal(11);
 	Vector3r testVec(1,2,3);
-	Matrix3r testMat(1,2,3,4,5,6,7,8,9);
+	Matrix3r testMat = (Matrix3r() << 1, 2, 3, 4, 5, 6, 7, 8, 9).finished();
 	std::complex<Real> testComplex(-1,1);
 
 	LOG_6_TRACE   ("Test log level: LOG_6_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
