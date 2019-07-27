@@ -210,8 +210,8 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 
 
-.. comment: Yade default log level is the same as invoking ``yade -v4``.
-.. comment: 
+Yade default log level is the same as invoking ``yade -v3``.
+
 .. comment: .. note:: as a convenience feature the ``LOG_THROW`` does **both** things:
 .. comment: 
 .. comment: 		* logs an error
