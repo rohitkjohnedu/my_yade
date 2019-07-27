@@ -3,6 +3,7 @@
 #  LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 #  DEBUG: compile in debug-mode (OFF by default)
 #  BOOST_LOGGER: use boost::log library for logging (OFF by default)
+#  MAX_LOG_LEVEL: set maximum level for LOG_* macros compiled with BOOST_LOGGER. For production build use MAX_LOG_LEVEL<=4, to avoid filter integer comparison on each call to LOG_DEBUG(…), LOG_TRACE(…)
 #  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 #  SUFFIX: suffix, added after binary-names (version number by default)
 #  NOSUFFIX: do not add a suffix after binary-name (OFF by default)
@@ -45,6 +46,7 @@ SET(LINKLIBS "")
 SET(CONFIGURED_FEATS "")
 SET(DISABLED_FEATS "")
 
+OPTION(MAX_LOG_LEVEL "set maximum level for LOG_* macros compiled with BOOST_LOGGER. For production build use MAX_LOG_LEVEL<=4, to avoid filter integer comparison on each call to LOG_DEBUG(…), LOG_TRACE(…)" 4)
 OPTION(ENABLE_VTK "Enable VTK" ${DEFAULT})
 OPTION(ENABLE_OPENMP "Enable OpenMP" ${DEFAULT})
 OPTION(ENABLE_MPI "Enable MPI environement and communications, required for coupling Yade with OpenFOAM  " ON)
@@ -149,6 +151,10 @@ IF(BOOST_LOGGER)
   ADD_DEFINITIONS("-D BOOST_LOG_DYN_LINK")
   IF (DEBUG)
     MESSAGE(STATUS "Enabling boost::log library and DEBUG=ON. Files will be very large with full debug info inside.")
+    IF(MAX_LOG_LEVEL < 6)
+      # https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake
+      MESSAGE(STATUS "${Esc}[33mWarning: using DEBUG=ON with MAX_LOG_LEVEL=${MAX_LOG_LEVEL} (less than 6, the maximum log level) rarely makes sense, use cmake option MAX_LOG_LEVEL=6 to fix this.${Esc}[m")
+    ENDIF()
   ELSE (DEBUG)
     MESSAGE(STATUS "Enabling boost::log library and DEBUG=OFF. Logging will work nicely, backtraces will not have debug info, files will be small.")
   ENDIF (DEBUG)
@@ -159,6 +165,8 @@ ELSE(BOOST_LOGGER)
     MESSAGE(STATUS "Disabling boost::log library (only rudimentary LOG_* macros will work, and only up to LOG_WARN) and DEBUG=OFF. Backtraces will not have debug info, files will be small.")
   ENDIF (DEBUG)
 ENDIF(BOOST_LOGGER)
+
+ADD_DEFINITIONS("-DMAX_LOG_LEVEL=${MAX_LOG_LEVEL}")
 
 #==================================
 #====== *** PYTHON/BOOST *** ======
