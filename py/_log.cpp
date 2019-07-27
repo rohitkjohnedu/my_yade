@@ -25,13 +25,11 @@ void testAllLevels() {
 	Matrix3r testMat(1,2,3,4,5,6,7,8,9);
 	std::complex<Real> testComplex(-1,1);
 
-	LOG_8_TRACE   ("Test log level: LOG_8_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_7_MORE    ("Test log level: LOG_7_MORE    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_6_DEBUG   ("Test log level: LOG_6_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_5_INFO    ("Test log level: LOG_5_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_4_WARN    ("Test log level: LOG_4_WARN    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_3_ERROR   ("Test log level: LOG_3_ERROR   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_2_THROW   ("Test log level: LOG_2_THROW   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_6_TRACE   ("Test log level: LOG_6_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_5_DEBUG   ("Test log level: LOG_5_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_4_INFO    ("Test log level: LOG_4_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_3_WARN    ("Test log level: LOG_3_WARN    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_2_ERROR   ("Test log level: LOG_2_ERROR   , test int: " << testInt++ << ", test string: "<< testStr);
 	LOG_1_FATAL   ("Test log level: LOG_1_FATAL   , test int: " << testInt++ << ", test string: "<< testStr);
 	LOG_0_NOFILTER("Test log level: LOG_0_NOFILTER, test int: " << testInt++ << ", test string: "<< testStr);
 
@@ -43,6 +41,8 @@ void testAllLevels() {
 	TRVAR5(testInt,testStr,testReal,testVec,testMat);
 	TRVAR6(testInt,testStr,testReal,testVec,testMat,testComplex);
 
+	LOG_0_NOFILTER("Below is macro TRACE;");
+	TRACE;
 }
 
 // accepted sinks, separately for each log level:

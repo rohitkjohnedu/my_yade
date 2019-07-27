@@ -29,18 +29,17 @@
 	// If you get "error: ‘logger’ was not declared in this scope" then you have to declare logger.
 	// Use DECLARE_LOGGER; inside class and CREATE_LOGGER(ClassName); inside .cpp file
 	// or use CREATE_CPP_LOCAL_LOGGER("filename.cpp") if you need logging outside some class.
-	#define LOG_TRACE(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eTRACE) << _LOG_HEAD << msg; }
-	#define LOG_MORE(msg)   { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eMORE)  << _LOG_HEAD << msg; }
-	#define LOG_DEBUG(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eDEBUG) << _LOG_HEAD << msg; }
-	#define LOG_INFO(msg)   { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eINFO)  << _LOG_HEAD << msg; }
-	#define LOG_WARN(msg)   { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eWARN)  << _LOG_HEAD << msg; }
-	#define LOG_ERROR(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eERROR) << _LOG_HEAD << msg; }
-	#define LOG_THROW(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eTHROW) << _LOG_HEAD << msg; }
-	#define LOG_FATAL(msg)  { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eFATAL) << _LOG_HEAD << msg; }
+	#define LOG_TRACE(msg)    { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eTRACE) << _LOG_HEAD << msg; }
+	#define LOG_DEBUG(msg)    { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eDEBUG) << _LOG_HEAD << msg; }
+	#define LOG_INFO(msg)     { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eINFO)  << _LOG_HEAD << msg; }
+	#define LOG_WARN(msg)     { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eWARN)  << _LOG_HEAD << msg; }
+	#define LOG_ERROR(msg)    { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eERROR) << _LOG_HEAD << msg; }
+	#define LOG_FATAL(msg)    { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eFATAL) << _LOG_HEAD << msg; }
+	#define LOG_NOFILTER(msg) { boost::log::sources::severity_logger< Logging::SeverityLevel > slg; BOOST_LOG_SEV(slg, Logging::eUNKNOWN ) << _LOG_HEAD << msg; };
 
 	class Logging : public Singleton<Logging> {
 		public:
-			enum SeverityLevel { eFATAL=1, eTHROW=2, eERROR=3, eWARN=4, eINFO=5, eDEBUG=6, eMORE=7, eTRACE=8 };
+			enum SeverityLevel { eNOFILTER=0, eFATAL=1, eERROR=2, eWARN=3, eINFO=4, eDEBUG=5, eTRACE=6 };
 			Logging();
 			void        readConfigFile(const std::string&);
 			void        setDefaultLogLevel(signed char);
@@ -59,7 +58,7 @@
 	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "NameTag"  , std::string            )
 	inline std::ostream& operator<< (std::ostream& strm, Logging::SeverityLevel level) // necessary for formatting output.
 	{
-		static const char* strings[] = { "UNKNOWN" , "FATAL_1" , "THROW_2" , "ERROR_3" , "WARN__4" , "INFO__5" , "DEBUG_6" , "MORE__7" , "TRACE_8" };
+		static const char* strings[] = { "NOFILTER" , "FATAL_1" , "ERROR_2" , "WARN__3" , "INFO__4" , "DEBUG_5" , "TRACE_6" };
 		if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
 			strm << strings[level];
 		else
@@ -77,21 +76,19 @@
 
 	#ifdef YADE_DEBUG
 	// when compiling with debug symbols and without boost::log it will print everything.
-		#define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE_8",msg)
-		#define LOG_MORE(msg)  _POOR_MANS_LOG("MORE__7",msg)
-		#define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG_6",msg)
-		#define LOG_INFO(msg)  _POOR_MANS_LOG("INFO__5",msg)
+		#define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE_6",msg)
+		#define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG_5",msg)
+		#define LOG_INFO(msg)  _POOR_MANS_LOG("INFO__4",msg)
 	#else
 		#define LOG_TRACE(msg)
-		#define LOG_MORE(msg)
-		#define LOG_INFO(msg)
 		#define LOG_DEBUG(msg)
+		#define LOG_INFO(msg)
 	#endif
 
-	#define LOG_WARN(msg)  _POOR_MANS_LOG("WARN__4",msg)
-	#define LOG_ERROR(msg) _POOR_MANS_LOG("ERROR_3",msg)
-	#define LOG_THROW(msg) _POOR_MANS_LOG("THROW_2",msg)
-	#define LOG_FATAL(msg) _POOR_MANS_LOG("FATAL_1",msg)
+	#define LOG_WARN(msg)     _POOR_MANS_LOG("WARN__3",msg)
+	#define LOG_ERROR(msg)    _POOR_MANS_LOG("ERROR_2",msg)
+	#define LOG_FATAL(msg)    _POOR_MANS_LOG("FATAL_1",msg)
+	#define LOG_NOFILTER(msg) _POOR_MANS_LOG("NOFILTER",msg)
 
 	#define DECLARE_LOGGER
 	#define CREATE_LOGGER(classname)
@@ -109,21 +106,19 @@
 #define TRVAR6(a,b,c,d,e,f) LOG_TRACE( _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) << _TRV(f) );
 
 // Logger aliases:
-#define LOG_8_TRACE(msg) LOG_TRACE(msg)
-#define LOG_7_MORE(msg)  LOG_MORE(msg)
-#define LOG_6_DEBUG(msg) LOG_DEBUG(msg)
-#define LOG_5_INFO(msg)  LOG_INFO(msg)
-#define LOG_4_WARN(msg)  LOG_WARN(msg)
-#define LOG_3_ERROR(msg) LOG_ERROR(msg)
-#define LOG_2_THROW(msg) LOG_THROW(msg)
+#define LOG_6_TRACE(msg) LOG_TRACE(msg)
+#define LOG_5_DEBUG(msg) LOG_DEBUG(msg)
+#define LOG_4_INFO(msg)  LOG_INFO(msg)
+#define LOG_3_WARN(msg)  LOG_WARN(msg)
+#define LOG_2_ERROR(msg) LOG_ERROR(msg)
 #define LOG_1_FATAL(msg) LOG_FATAL(msg)
+#define LOG_0_NOFILTER(msg) LOG_NOFILTER(msg)
 
-#define LOG_8(msg) LOG_TRACE(msg)
-#define LOG_7(msg) LOG_MORE(msg)
-#define LOG_6(msg) LOG_DEBUG(msg)
-#define LOG_5(msg) LOG_INFO(msg)
-#define LOG_4(msg) LOG_WARN(msg)
-#define LOG_3(msg) LOG_ERROR(msg)
-#define LOG_2(msg) LOG_THROW(msg)
+#define LOG_6(msg) LOG_TRACE(msg)
+#define LOG_5(msg) LOG_DEBUG(msg)
+#define LOG_4(msg) LOG_INFO(msg)
+#define LOG_3(msg) LOG_WARN(msg)
+#define LOG_2(msg) LOG_ERROR(msg)
 #define LOG_1(msg) LOG_FATAL(msg)
+#define LOG_0(msg) LOG_NOFILTER(msg)
 
