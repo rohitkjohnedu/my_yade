@@ -101,7 +101,6 @@ class Omega: public Singleton<Omega>{
 
 		// configuration directory used for logging config and possibly other things
 		std::string confDir;
-		boost::python::dict classLogLevels;
 
 	DECLARE_LOGGER;
 

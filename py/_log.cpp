@@ -7,6 +7,8 @@
 #include<lib/base/Logging.hpp>
 #include<string>
 
+CREATE_LOCAL_LOGGER("_log.cpp");
+
 namespace py = boost::python;
 
 /*
@@ -55,11 +57,16 @@ void resetAllSinks() {
 }
 
 void setLevel(std::string className, int level) {
-	Omega::instance().classLogLevels[className]=level;
+// TODO: check if exists, even at -1, print warning that CREATE_LOGGER is missing otherwise
+	Logging::instance().classLogLevels[className]=level;
 }
 
 py::dict getLevels() {
-	return Omega::instance().classLogLevels;
+	py::dict ret{};
+//	for(const auto& a : Logging::instance().classLogLevels) {
+//		if(a->second != -1) ret[a->first]=a->second;
+//	}
+	return ret;
 }
 
 BOOST_PYTHON_MODULE(_log){

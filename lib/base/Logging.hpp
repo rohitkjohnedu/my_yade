@@ -6,6 +6,7 @@
  * - LOG_* for actual logging,
  * - DECLARE_LOGGER; that should be used in class header to create separate logger for that class,
  * - CREATE_LOGGER(className); that must be used in class implementation file to create the static variable.
+ * - CREATE_LOCAL_LOGGER(name); use this inside a *.cpp file which has code that does not belong to any class, and needs logging. The name will be used for filtering logging.
  *
  * Note that the latter 2 may change their name to something like LOG_DECLARE and LOG_CREATE, to be consistent.
  * Some other macros will be very likely added, to allow for easy variable tracing etc. Suggestions welcome.
@@ -15,86 +16,30 @@
  *
  */
 
-
-/* BOOST_LOGGER 014b11496
-//=======
-#ifdef YADE_LOG4CXX
-
-#	include<log4cxx/logger.h>
-#	include<log4cxx/basicconfigurator.h>
-#	include<log4cxx/propertyconfigurator.h>
-#	include<log4cxx/helpers/exception.h>
-
-#	define _LOG_HEAD __FILE__":"<<__LINE__<<" "<<__FUNCTION__<<": "
-	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
-// TRACE doesn't really exist in log4cxx 0.9.7 (does in 0.10), otput through DEBUG then
-#ifdef NDEBUG
-#	define LOG_TRACE(msg){}
-#	define LOG_DEBUG(msg){}
-#else
-#	ifdef LOG4CXX_TRACE
-#		define LOG_TRACE(msg) {LOG4CXX_TRACE(logger, _LOG_HEAD<<msg);}
-#	else
-#		define LOG_TRACE(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
-#	endif
-#	define LOG_DEBUG(msg) {LOG4CXX_DEBUG(logger, _LOG_HEAD<<msg);}
-#endif
-#	define LOG_INFO(msg)  {LOG4CXX_INFO(logger,  _LOG_HEAD<<msg);}
-#	define LOG_WARN(msg)  {LOG4CXX_WARN(logger,  _LOG_HEAD<<msg);}
-#	define LOG_ERROR(msg) {LOG4CXX_ERROR(logger, _LOG_HEAD<<msg);}
-#	define LOG_FATAL(msg) {LOG4CXX_FATAL(logger, _LOG_HEAD<<msg);}
-
-#	define DECLARE_LOGGER public: static log4cxx::LoggerPtr logger
-#	define CREATE_LOGGER(classname) log4cxx::LoggerPtr classname::logger = log4cxx::Logger::getLogger("yade." #classname)
-
-#else
-
-#include<iostream>
-
->>>>>>> parent of 014b11496... Remove log4cxx support and yade.log module.
-
-*/
-
-// FIXME - now it's time to rewrite all these macros.
-
-#include <iostream>
-
+// boost::log inspired by git 014b11496
 #ifdef YADE_BOOST_LOG
-#	include <boost/log/trivial.hpp>
-#	define _POOR_MANS_LOG(level,msg) {BOOST_LOG_TRIVIAL(trace)<<" "<<_LOG_HEAD<<msg;}
-#	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
-#else
-#	define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}
-#	define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__FUNCTION__<<": "
-#endif
-
-#ifdef YADE_DEBUG
-	# define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE",msg)
-	# define LOG_MORE(msg)  _POOR_MANS_LOG("MORE ",msg)
-	# define LOG_INFO(msg)  _POOR_MANS_LOG("INFO ",msg)
-	# define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG",msg)
-#else
-	# define LOG_TRACE(msg)
-	# define LOG_MORE(msg)
-	# define LOG_INFO(msg)
-	# define LOG_DEBUG(msg)
-#endif
-
-
-#define LOG_WARN(msg)  _POOR_MANS_LOG("WARN ",msg)
-#define LOG_ERROR(msg) _POOR_MANS_LOG("ERROR",msg)
-#define LOG_THROW(msg) _POOR_MANS_LOG("THROW",msg)
-#define LOG_FATAL(msg) _POOR_MANS_LOG("FATAL",msg)
-
-#ifdef YADE_BOOST_LOG
+	#include <lib/base/Singleton.hpp>
 	#include <boost/log/expressions.hpp>
 	#include <boost/log/trivial.hpp>
 	#include <boost/log/utility/setup.hpp>
 
+	#define _LOG_HEAD ":"<<__LINE__<<" "<<__PRETTY_FUNCTION__<<": "
+	// If you get "error: ‘logger’ was not declared in this scope" then you have to declare logger.
+	// Use DECLARE_LOGGER; inside class and CREATE_LOGGER(className); inside .cpp file
+	// or use CREATE_LOCAL_LOGGER("SomeName") if you need logging outside some class.
+	#define LOG_TRACE(msg)  { BOOST_LOG_SEV(logger, severity_level::eTRACE) << _LOG_HEAD << msg; }
+	#define LOG_MORE(msg)   { BOOST_LOG_SEV(logger, severity_level::eMORE)  << _LOG_HEAD << msg; }
+	#define LOG_DEBUG(msg)  { BOOST_LOG_SEV(logger, severity_level::eDEBUG) << _LOG_HEAD << msg; }
+	#define LOG_INFO(msg)   { BOOST_LOG_SEV(logger, severity_level::eINFO)  << _LOG_HEAD << msg; }
+	#define LOG_WARN(msg)   { BOOST_LOG_SEV(logger, severity_level::eWARN)  << _LOG_HEAD << msg; }
+	#define LOG_ERROR(msg)  { BOOST_LOG_SEV(logger, severity_level::eERROR) << _LOG_HEAD << msg; }
+	#define LOG_THROW(msg)  { BOOST_LOG_SEV(logger, severity_level::eTHROW) << _LOG_HEAD << msg; }
+	#define LOG_FATAL(msg)  { BOOST_LOG_SEV(logger, severity_level::eFATAL) << _LOG_HEAD << msg; }
+
 	enum severity_level { eFATAL=1, eTHROW=2, eERROR=3, eWARN=4, eINFO=5, eDEBUG=6, eMORE=7, eTRACE=8 };
-	inline std::ostream& operator<< (std::ostream& strm, severity_level level)
+	inline std::ostream& operator<< (std::ostream& strm, severity_level level) // necessary for formatting output.
 	{
-		static const char* strings[] = { "UNKNOWN", "FATAL", "THROW", "ERROR", "WARN", "INFO", "DEBUG", "MORE", "TRACE" };
+		static const char* strings[] = { "UNKNOWN" , "FATAL_1" , "THROW_2" , "ERROR_3" , "WARN__4" , "INFO__5" , "DEBUG_6" , "MORE__7" , "TRACE_8" };
 		if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
 			strm << strings[level];
 		else
@@ -102,23 +47,54 @@
 		return strm;
 	}
 
-	BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", severity_level)
-	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "ClassNameTag", std::string)
+	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity"    , severity_level )
+	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "ClassNameTag", std::string    )
 
+	struct Logging : public Singleton<Logging> {
+		std::map<std::string,int> classLogLevels;
+		FRIEND_SINGLETON(Logging);
+	};
+
+	inline boost::log::sources::severity_logger< severity_level > createNamedLogger(std::string name) {
+		boost::log::sources::severity_logger< severity_level > l;
+		l.add_attribute("ClassNameTag", boost::log::attributes::constant< std::string >(name));
+		Logging::instance().classLogLevels[name] = -1;
+		return l;
+	};
+	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
 	#define DECLARE_LOGGER public: static boost::log::sources::severity_logger< severity_level > logger;
-	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< severity_level > classname::logger;
-//	__attribute__((constructor)) void initLog##classname() {
-//		Omega::instance().classLogLevels[#classname] = -1;
-//	};
+	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< severity_level > classname::logger=createNamedLogger(#classname);
+	#define CREATE_LOCAL_LOGGER(filtername) namespace{ boost::log::sources::severity_logger< severity_level > logger=createNamedLogger(filtername); };
 #else
+	#include <iostream>
+	#define _POOR_MANS_LOG(level,msg) {std::cerr<<level " "<<_LOG_HEAD<<msg<<std::endl;}
+	#define _LOG_HEAD __FILE__ ":"<<__LINE__<<" "<<__PRETTY_FUNCTION__<<": "
+
+	#ifdef YADE_DEBUG
+	// when compiling with debug symbols and without boost::log it will print everything.
+		#define LOG_TRACE(msg) _POOR_MANS_LOG("TRACE_8",msg)
+		#define LOG_MORE(msg)  _POOR_MANS_LOG("MORE__7",msg)
+		#define LOG_DEBUG(msg) _POOR_MANS_LOG("DEBUG_6",msg)
+		#define LOG_INFO(msg)  _POOR_MANS_LOG("INFO__5",msg)
+	#else
+		#define LOG_TRACE(msg)
+		#define LOG_MORE(msg)
+		#define LOG_INFO(msg)
+		#define LOG_DEBUG(msg)
+	#endif
+
+	#define LOG_WARN(msg)  _POOR_MANS_LOG("WARN__4",msg)
+	#define LOG_ERROR(msg) _POOR_MANS_LOG("ERROR_3",msg)
+	#define LOG_THROW(msg) _POOR_MANS_LOG("THROW_2",msg)
+	#define LOG_FATAL(msg) _POOR_MANS_LOG("FATAL_1",msg)
+
 	#define DECLARE_LOGGER
 	#define CREATE_LOGGER(classname)
+	#define CREATE_LOCAL_LOGGER(name)
 #endif
-
 
 // macros for quick debugging
 #define TRACE LOG_TRACE("Been here")
-#define _TRVHEAD cerr<<__FILE__<<":"<<__LINE__<<":"<<__FUNCTION__<<": "
 #define _TRV(x) #x"="<<x<<"; "
 #define TRVAR1(a) LOG_TRACE( _TRV(a) );
 #define TRVAR2(a,b) LOG_TRACE( _TRV(a) << _TRV(b) );
