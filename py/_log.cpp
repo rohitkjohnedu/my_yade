@@ -18,26 +18,31 @@ py::list placeholder() {
 */
 
 void testAllLevels() {
-	int count=0;
-	std::string str="test_string";
+	int testInt     = 0;
+	std::string testStr = "test_string";
+	Real testReal(11);
+	Vector3r testVec(1,2,3);
+	Matrix3r testMat(1,2,3,4,5,6,7,8,9);
+	std::complex<Real> testComplex(-1,1);
 
-	LOG_8_TRACE ("Test log level: LOG_8_TRACE , test streaming: " << count++ << ", string: "<< str);
-	LOG_7_MORE  ("Test log level: LOG_7_MORE  , test streaming: " << count++ << ", string: "<< str);
-	LOG_6_DEBUG ("Test log level: LOG_6_DEBUG , test streaming: " << count++ << ", string: "<< str);
-	LOG_5_INFO  ("Test log level: LOG_5_INFO  , test streaming: " << count++ << ", string: "<< str);
-	LOG_4_WARN  ("Test log level: LOG_4_WARN  , test streaming: " << count++ << ", string: "<< str);
-	LOG_3_ERROR ("Test log level: LOG_3_ERROR , test streaming: " << count++ << ", string: "<< str);
-	LOG_2_THROW ("Test log level: LOG_2_THROW , test streaming: " << count++ << ", string: "<< str);
-	LOG_1_FATAL ("Test log level: LOG_1_FATAL , test streaming: " << count++ << ", string: "<< str);
+	LOG_8_TRACE   ("Test log level: LOG_8_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_7_MORE    ("Test log level: LOG_7_MORE    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_6_DEBUG   ("Test log level: LOG_6_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_5_INFO    ("Test log level: LOG_5_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_4_WARN    ("Test log level: LOG_4_WARN    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_3_ERROR   ("Test log level: LOG_3_ERROR   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_2_THROW   ("Test log level: LOG_2_THROW   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_1_FATAL   ("Test log level: LOG_1_FATAL   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_0_NOFILTER("Test log level: LOG_0_NOFILTER, test int: " << testInt++ << ", test string: "<< testStr);
 
-	LOG_TRACE   ("Test log level: LOG_TRACE   , test streaming: " << count++ << ", string: "<< str);
-	LOG_MORE    ("Test log level: LOG_MORE    , test streaming: " << count++ << ", string: "<< str);
-	LOG_DEBUG   ("Test log level: LOG_DEBUG   , test streaming: " << count++ << ", string: "<< str);
-	LOG_INFO    ("Test log level: LOG_INFO    , test streaming: " << count++ << ", string: "<< str);
-	LOG_WARN    ("Test log level: LOG_WARN    , test streaming: " << count++ << ", string: "<< str);
-	LOG_ERROR   ("Test log level: LOG_ERROR   , test streaming: " << count++ << ", string: "<< str);
-	LOG_THROW   ("Test log level: LOG_THROW   , test streaming: " << count++ << ", string: "<< str);
-	LOG_FATAL   ("Test log level: LOG_FATAL   , test streaming: " << count++ << ", string: "<< str);
+	LOG_0_NOFILTER("Below 6 variables are printed at filter level TRACE");
+	TRVAR1(testInt);
+	TRVAR2(testInt,testStr);
+	TRVAR3(testInt,testStr,testReal);
+	TRVAR4(testInt,testStr,testReal,testVec);
+	TRVAR5(testInt,testStr,testReal,testVec,testMat);
+	TRVAR6(testInt,testStr,testReal,testVec,testMat,testComplex);
+
 }
 
 // accepted sinks, separately for each log level:
