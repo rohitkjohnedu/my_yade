@@ -39,6 +39,12 @@
 project(Yade C CXX)
 cmake_minimum_required(VERSION 2.8.11)
 
+# https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake , use ${Esc} for printing colors
+string(ASCII 27 Esc)
+# To have a cmake option with multiple values I used https://cmake.org/pipermail/cmake/2016-October/064342.html
+set(MAX_LOG_LEVEL "4" CACHE STRING "set maximum level for LOG_* macros compiled with BOOST_LOGGER. For production build use MAX_LOG_LEVEL<=4, to avoid filter integer comparison on each call to LOG_DEBUG(…), LOG_TRACE(…)")
+set_property(CACHE MAX_LOG_LEVEL PROPERTY STRINGS "0" "1" "2" "3" "4" "5" "6")  # define list of values GUI will offer for the variable
+
 
 #===========================================================
 SET(DEFAULT ON CACHE INTERNAL "Default value for enabled by default options")
@@ -46,7 +52,6 @@ SET(LINKLIBS "")
 SET(CONFIGURED_FEATS "")
 SET(DISABLED_FEATS "")
 
-OPTION(MAX_LOG_LEVEL "set maximum level for LOG_* macros compiled with BOOST_LOGGER. For production build use MAX_LOG_LEVEL<=4, to avoid filter integer comparison on each call to LOG_DEBUG(…), LOG_TRACE(…)" 4)
 OPTION(ENABLE_VTK "Enable VTK" ${DEFAULT})
 OPTION(ENABLE_OPENMP "Enable OpenMP" ${DEFAULT})
 OPTION(ENABLE_MPI "Enable MPI environement and communications, required for coupling Yade with OpenFOAM  " ON)
@@ -152,7 +157,6 @@ IF(BOOST_LOGGER)
   IF (DEBUG)
     MESSAGE(STATUS "Enabling boost::log library and DEBUG=ON. Files will be very large with full debug info inside.")
     IF(MAX_LOG_LEVEL < 6)
-      # https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake
       MESSAGE(STATUS "${Esc}[33mWarning: using DEBUG=ON with MAX_LOG_LEVEL=${MAX_LOG_LEVEL} (less than 6, the maximum log level) rarely makes sense, use cmake option MAX_LOG_LEVEL=6 to fix this.${Esc}[m")
     ENDIF()
   ELSE (DEBUG)
@@ -166,6 +170,7 @@ ELSE(BOOST_LOGGER)
   ENDIF (DEBUG)
 ENDIF(BOOST_LOGGER)
 
+MESSAGE(STATUS "${Esc}[36mUsing MAX_LOG_LEVEL=${MAX_LOG_LEVEL}${Esc}[m")
 ADD_DEFINITIONS("-DMAX_LOG_LEVEL=${MAX_LOG_LEVEL}")
 
 #==================================
