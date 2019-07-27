@@ -2,7 +2,6 @@
 
 #ifdef YADE_BOOST_LOG
 
-#include <stdexcept>
 #include <ostream>
 #include <lib/base/Logging.hpp>
 #include <boost/core/null_deleter.hpp>
@@ -38,7 +37,7 @@ bool logFilterLevels(  boost::log::value_ref< Logging::SeverityLevel , tag::seve
 }
 
 // Setup the common formatter for all sinks
-Logging::Logging() : defaultLogLevel(4), classLogLevels{{"Default",defaultLogLevel}} {
+Logging::Logging() : defaultLogLevel(4), classLogLevels{{"Default",defaultLogLevel}}, sink{boost::make_shared< text_sink >()}, colors{true} {
 	boost::log::formatter fmt = boost::log::expressions::stream
 		<< "<" << severity << "> "
 		<< boost::log::expressions::if_(boost::log::expressions::has_attr(class_name_tag))
@@ -47,9 +46,7 @@ Logging::Logging() : defaultLogLevel(4), classLogLevels{{"Default",defaultLogLev
 		]
 		<< boost::log::expressions::smessage;
 
-	typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > text_sink;
 	boost::shared_ptr< std::ostream > stream(&std::clog, boost::null_deleter());
-	boost::shared_ptr< text_sink > sink = boost::make_shared< text_sink >();
 	sink->locked_backend()->add_stream(stream);
 	sink->set_formatter(fmt);
 	sink->set_filter( boost::phoenix::bind(&logFilterLevels, severity.or_none(), class_name_tag.or_none() ));

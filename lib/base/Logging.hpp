@@ -42,6 +42,7 @@
 			enum SeverityLevel { eNOFILTER=0, eFATAL=1, eERROR=2, eWARN=3, eINFO=4, eDEBUG=5, eTRACE=6 };
 			Logging();
 			void        readConfigFile(const std::string&);
+			void        setUseColors(bool);
 			void        setDefaultLogLevel(signed char);
 			signed char getDefaultLogLevel() { return defaultLogLevel;};
 			signed char getNamedLogLevel  (const std::string&);
@@ -49,9 +50,12 @@
 			void        unsetNamedLogLevel(const std::string&);
 			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
 		private:
+			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > text_sink;
 			std::map<std::string,signed char>::iterator findFilterName(const std::string&);
 			signed char			            defaultLogLevel{4};
 			std::map<std::string,signed char>           classLogLevels{{"Default",4}};
+			boost::shared_ptr< text_sink >              sink{boost::make_shared< text_sink >()};
+			bool                                        colors{true};
 		FRIEND_SINGLETON(Logging);
 	};
 	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity" , Logging::SeverityLevel )
