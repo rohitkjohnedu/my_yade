@@ -27,6 +27,8 @@ void testAllLevels() {
 	Matrix3r testMat = (Matrix3r() << 1, 2, 3, 4, 5, 6, 7, 8, 9).finished();
 	std::complex<Real> testComplex(-1,1);
 
+	LOG_0_NOFILTER("Current \"Default\" filter level is " << Logging::instance().getDefaultLogLevel());
+
 	LOG_6_TRACE   ("Test log level: LOG_6_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
 	LOG_5_DEBUG   ("Test log level: LOG_5_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
 	LOG_4_INFO    ("Test log level: LOG_4_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
@@ -99,9 +101,9 @@ BOOST_PYTHON_MODULE(_log){
 .. warning:: I must write docstring here!
 	)""");
 	py::def("setLevel", setLevel , R"""(
-:param str className: The logger name for which the filter level is to be set. Use name ``Default`` for changing default filter level.
+:param str className: The logger name for which the filter level is to be set. Use name ``Default`` to change the default filter level.
 :param int level: The filter level to be set.
-.. warning:: setting "Default" log level higher than ``MAX_LOG_LEVEL`` provided during compilation will have no effect. Logs will not be printed, they were removed during compilation.
+.. warning:: setting ``Default`` log level higher than ``MAX_LOG_LEVEL`` provided during compilation will have no effect. Logs will not be printed because they are removed during compilation.
 	)""");
 	py::def("getLevels", getLevels , R"""(
 .. warning:: I must write docstring here!

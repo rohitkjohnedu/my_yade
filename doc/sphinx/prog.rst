@@ -152,7 +152,7 @@ and then clicking "Browse" in the "Job Artifacts" on the right.
 Debugging
 ================
 
-.. todo: write about debug symbols, yade-dbgsym package, enabling debug builds, ptrace permission problems in newer linux kernels, and a few more yade specific debug stuff.
+.. todo FIXME: write about debug symbols, yade-dbgsym package, enabling debug builds, ptrace permission problems in newer linux kernels, and a few more yade specific debug stuff.
 
 Logging
 ----------------
@@ -167,8 +167,6 @@ Log levels
 	    https://stackoverflow.com/questions/312378/debug-levels-when-writing-an-application
 	    https://www.tutorialspoint.com/log4j/log4j_logging_levels.htm
 
-
-.. warning:: this section is under construction.
 
 Yade uses `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for flexible logging levels and per-class debugging.
 See also description of :yref:`yade.log module<yade.log>`.
@@ -212,13 +210,6 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 
 Yade default log level is the same as invoking ``yade -v3``.
 
-.. comment: .. note:: as a convenience feature the ``LOG_THROW`` does **both** things:
-.. comment: 
-.. comment: 		* logs an error
-.. comment: 		* and throws an exception.
-.. comment: 
-.. comment: 	No need to throw with a duplicated error message. It throws exception ``(exception name here)`` even when logging is disabled and the message isn't logged.
-
 .. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
 
 
@@ -230,9 +221,9 @@ Setting a filter level
 
 There or two settings for the filter level, the ``Default`` level used when no class specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
 
-1. during yade invocation with ``yade -vN`` command, where ``N`` sets the ``Default`` filter level.
+1. When starting yade with ``yade -vN`` command, where ``N`` sets the ``Default`` filter level. The default is ``yade.log.WARN``.
 
-2. to change ``Default`` filter level during runtime invoke command:
+2. To change ``Default`` filter level during runtime invoke command:
 
 .. ipython::
 	:okexcept:
@@ -243,7 +234,9 @@ There or two settings for the filter level, the ``Default`` level used when no c
 
 	In [3]: log.setLevel("Default",3)
 
-3. to change filter level for ``SomeClass`` invoke command:
+	In [4]: log.testAllLevels()
+
+3. To change filter level for ``SomeClass`` invoke command:
 
 .. ipython::
 	:okexcept:
@@ -259,13 +252,14 @@ There or two settings for the filter level, the ``Default`` level used when no c
 Maximum log level
 ^^^^^^^^^^^^^^^^^
 
-Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must have a single integer comparison to determine if the message passes current filter level. For production, when calculations should be as fast as possible this is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain.
+Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must have a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain.
 
+The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
 
 Debug macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the backets, such as ``LOG_TRACE(a<<b<<" text")``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
+All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the brackets, such as ``LOG_TRACE( a << b << " text" )``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
 
 Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp` for example use.
 
@@ -282,7 +276,7 @@ All debug macros are summarized in the table below:
 	| ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, | Prints message using ``std::ostream`` syntax, like:                             |
 	| ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``            | ``LOG_TRACE( a << b << " text" )``                                              |
 	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
-	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints variables like ``TRVAR3(testInt,testStr,testReal);``.                    |
+	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints provided variables. E.g.: ``TRVAR3(testInt,testStr,testReal);``.         |
 	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                   |
 	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
 	| ``TRACE;``                                                | Prints a ``"Been here"`` message at ``TRACE`` log filter level.                 |
