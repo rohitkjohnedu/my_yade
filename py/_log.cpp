@@ -105,12 +105,12 @@ BOOST_PYTHON_MODULE(_log){
 .. warning:: I must write docstring here!
 	)""");
 
-	py::scope().attr("TRACE")=int(6)
-	py::scope().attr("DEBUG")=int(5)
-	py::scope().attr("INFO")= int(4)
-	py::scope().attr("WARN")= int(3)
-	py::scope().attr("ERROR")=int(2)
-	py::scope().attr("FATAL")=int(1)
+	py::scope().attr("TRACE")=int(6);
+	py::scope().attr("DEBUG")=int(5);
+	py::scope().attr("INFO") =int(4);
+	py::scope().attr("WARN") =int(3);
+	py::scope().attr("ERROR")=int(2);
+	py::scope().attr("FATAL")=int(1);
 }
 
 /* this was in git revision 014b11496
