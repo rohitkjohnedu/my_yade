@@ -175,7 +175,7 @@ See also description of :yref:`yade.log module<yade.log>`.
 A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_. Following debug levels are supported:
 
 .. table:: Yade logging verbosity levels.
-	:widths: 15,15,10,60
+	:widths: 17,19,8,56
 
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 	| macro name       | macro alias        | option  | explanation                                                                     |
