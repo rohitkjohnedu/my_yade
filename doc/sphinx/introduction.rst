@@ -67,7 +67,7 @@ Yade will run the script and then drop to the command-line again. [#f2]_ If you 
 There is more command-line options than just ``-x``, run ``yade -h`` to see all of them.
 
 	Options:
-	  --version             show program's version number and exit
+	  -v, --version         show program's version number and exit
 	  -h, --help            show this help message and exit
 	  -j THREADS, --threads=THREADS
 	                        Number of OpenMP threads to run; defaults to 1.
@@ -82,8 +82,8 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	  --nice=NICE           Increase nice level (i.e. decrease priority) by given
 	                        number.
 	  -x                    Exit when the script finishes
-	  -v                    Set :global ref:`logging verbosity <log-levels>`, default
-	                        is -v4 for all classes
+	  -f                    Set :global ref:`logging verbosity <log-levels>`, default
+	                        is -f3 (yade.log.WARN) for all classes
 	  -n                    Run without graphical interface (equivalent to
 	                        unsetting the DISPLAY environment variable)
 	  --test                Run regression test suite and exit; the exists status

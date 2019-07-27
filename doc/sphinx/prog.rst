@@ -178,37 +178,37 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 	| macro name       | macro alias        | option  | explanation                                                                     |
 	+==================+====================+=========+=================================================================================+
-	| ``LOG_NOFILTER`` | ``LOG_0_NOFILTER`` | ``-v0`` | Will print only the unfiltered messages. The LOG_NOFILTER macro is for          |
-	|                  |                    |         | developer use only, so basically ``-v0`` means that nothing will be printed.    |
+	| ``LOG_NOFILTER`` | ``LOG_0_NOFILTER`` | ``-f0`` | Will print only the unfiltered messages. The LOG_NOFILTER macro is for          |
+	|                  |                    |         | developer use only, so basically ``-f0`` means that nothing will be printed.    |
         |                  |                    |         | This log level is not useful unless a very silent mode is necessary.            |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_FATAL``    | ``LOG_1_FATAL``    | ``-v1`` | Will print only critical errors. Even a throw to yade python                    |
+	| ``LOG_FATAL``    | ``LOG_1_FATAL``    | ``-f1`` | Will print only critical errors. Even a throw to yade python                    |
 	|                  |                    |         | interface will not recover from this situation.                                 |
 	|                  |                    |         | This is usually followed by yade exiting to shell.                              |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_ERROR``    | ``LOG_2_ERROR``    | ``-v2`` | Will also print errors which do not require to throw to yade python interface.  |
+	| ``LOG_ERROR``    | ``LOG_2_ERROR``    | ``-f2`` | Will also print errors which do not require to throw to yade python interface.  |
 	|                  |                    |         | Calculations will continue, but very likely the results will be all wrong.      |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_WARN``     | ``LOG_3_WARN``     | ``-v3`` | Will also print warnings about recoverable problems that you should be notified |
+	| ``LOG_WARN``     | ``LOG_3_WARN``     | ``-f3`` | Will also print warnings about recoverable problems that you should be notified |
 	|                  |                    |         | about (e.g., invalid value in a configuration file, so yade fell back to the    |
         |                  |                    |         | default value).                                                                 |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_INFO``     | ``LOG_4_INFO``     | ``-v4`` | Will also print all informational messages (e.g. something was loaded,          |
+	| ``LOG_INFO``     | ``LOG_4_INFO``     | ``-f4`` | Will also print all informational messages (e.g. something was loaded,          |
 	|                  |                    |         | something was called, etc.).                                                    |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_DEBUG``    | ``LOG_5_DEBUG``    | ``-v5`` | Will also print debug messages. A yade developer puts them everywhere, and yade |
+	| ``LOG_DEBUG``    | ``LOG_5_DEBUG``    | ``-f5`` | Will also print debug messages. A yade developer puts them everywhere, and yade |
 	|                  |                    |         | user enables them on :ref:`per-class basis<debugging-a-class>` to               |
 	|                  |                    |         | provide some extra debug info.                                                  |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_TRACE``    | ``LOG_6_TRACE``    | ``-v6`` | Trace messages, they capture every possible detail about yade behavior.         |
+	| ``LOG_TRACE``    | ``LOG_6_TRACE``    | ``-f6`` | Trace messages, they capture every possible detail about yade behavior.         |
 	|                  |                    |         |                                                                                 |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	|                  |                    | ``-v7`` | Enables all debug messages, including some custom log levels not in the         |
+	|                  |                    | ``-f7`` | Enables all debug messages, including some custom log levels not in the         |
 	|                  |                    |         | list above. Intended for developer use only.                                    |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 
 
-Yade default log level is the same as invoking ``yade -v3``.
+Yade default log level is the same as invoking ``yade -f3``.
 
 .. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
 
@@ -221,7 +221,7 @@ Setting a filter level
 
 There or two settings for the filter level, the ``Default`` level used when no class specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
 
-1. When starting yade with ``yade -vN`` command, where ``N`` sets the ``Default`` filter level. The default is ``yade.log.WARN``.
+1. When starting yade with ``yade -fN`` command, where ``N`` sets the ``Default`` filter level. The default is ``yade.log.WARN``.
 
 2. To change ``Default`` filter level during runtime invoke command:
 
