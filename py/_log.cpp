@@ -82,7 +82,6 @@ py::dict getLevels() {
 }
 
 BOOST_PYTHON_MODULE(_log){
-	py::scope().attr("__doc__") = "Access and manipulation of yade logging.";
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.

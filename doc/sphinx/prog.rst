@@ -210,17 +210,20 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 
 
-Yade default log level is the same as invoking ``yade -v4``.
-
-.. note:: as a convenience feature the ``LOG_THROW`` does **both** things:
-
-		* logs an error
-		* and throws an exception.
-
-	No need to throw with a duplicated error message. It throws exception ``(exception name here)`` even when logging is disabled and the message isn't logged.
+.. comment: Yade default log level is the same as invoking ``yade -v4``.
+.. comment: 
+.. comment: .. note:: as a convenience feature the ``LOG_THROW`` does **both** things:
+.. comment: 
+.. comment: 		* logs an error
+.. comment: 		* and throws an exception.
+.. comment: 
+.. comment: 	No need to throw with a duplicated error message. It throws exception ``(exception name here)`` even when logging is disabled and the message isn't logged.
 
 .. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
 
+
+.. _debugging-a-class:
+.. _setting-filter-level:
 
 Setting a filter level
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -259,23 +262,14 @@ Maximum log level
 Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must have a single integer comparison to determine if the message passes current filter level. For production, when calculations should be as fast as possible this is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain.
 
 
-.. _debugging-a-class:
-
-Debugging a particular class
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. warning:: this section is under construction.
-
-Logging can be enabled on per-class level basis using .............
-
 Debug macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the backets, such as ``LOG_TRACE(a<<b<<" text")``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
 
-Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They are used by providing the macro with variables to be printed, such as: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp` for example use.
+Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp` for example use.
 
-The macro ``TRACE;`` prints a ``"Been here"`` message, and is used for quick debugging.
+The macro ``TRACE;`` prints a ``"Been here"`` message at ``TRACE`` log filter level, and can be used for quick debugging.
 
 All debug macros are summarized in the table below:
 
@@ -291,7 +285,7 @@ All debug macros are summarized in the table below:
 	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints variables like ``TRVAR3(testInt,testStr,testReal);``.                    |
 	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                   |
 	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
-	| ``TRACE;``                                                | Prints a ``"Been here"`` message.                                               |
+	| ``TRACE;``                                                | Prints a ``"Been here"`` message at ``TRACE`` log filter level.                 |
 	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
 
 
