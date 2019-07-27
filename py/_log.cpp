@@ -12,7 +12,12 @@ CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 namespace py = boost::python;
 
 void printNoBoostLogWarning() {
+	static bool throwOnce=false;
 	std::cerr << "\nWarning: yade was compiled with cmake option -DBOOST_LOGGER=OFF, any attempts to manipulate log filter levels will not have effect.\n\n";
+	if(not throwOnce) {
+		throwOnce=true;
+		throw std::runtime_error("yade was compiled with cmake option -DBOOST_LOGGER=OFF, any attempts to manipulate log filter levels will not have effect.");
+	}
 }
 
 int getDefaultLogLevel() {
@@ -25,9 +30,9 @@ int getDefaultLogLevel() {
 
 void setDefaultLogLevel(int level) {
 #ifdef YADE_BOOST_LOG
-	return Logging::instance().setDefaultLogLevel(level);
+	Logging::instance().setDefaultLogLevel(level);
 #else
-	return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL);
+	printNoBoostLogWarning();
 #endif
 }
 
@@ -82,7 +87,6 @@ void setOutputStream(std::string streamName, bool reset /*, int level */ ) {
 #endif
 }
 
-// resets all sinks to default values: 'cerr' for those below logLevel, 'none' for those above logLevel
 void resetOutputStream() {
 #ifdef YADE_BOOST_LOG
 	Logging::instance().setOutputStream("clog" , true);
@@ -158,6 +162,8 @@ This function prints test messages on all log levels. Can be used to see how fil
 Resets log output stream to default state: all logs are printed on ``std::clog`` channel, which usually redirects to ``std::cerr``.
 	)""");
 	py::def("setLevel", setLevel , R"""(
+Set minimum filter *level* (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN`` (3), ``ERROR`` (2), ``FATAL`` (1), ``NOFILTER`` (0)) for given logger.
+
 :param str className: The logger name for which the filter level is to be set. Use name ``Default`` to change the default filter level.
 :param int level: The filter level to be set.
 .. warning:: setting ``Default`` log level higher than ``MAX_LOG_LEVEL`` provided during compilation will have no effect. Logs will not be printed because they are removed during compilation.
@@ -183,77 +189,8 @@ Resets log output stream to default state: all logs are printed on ``std::clog``
 
 /* this was in git revision 014b11496
 
-#include<boost/python.hpp>
-#include<string>
-#include<lib/base/Logging.hpp>
-#include<lib/pyutil/doc_opts.hpp>
-using namespace boost;
-enum{ll_TRACE,ll_DEBUG,ll_INFO,ll_WARN,ll_ERROR,ll_FATAL};
-
-#ifdef YADE_LOG4CXX
-
-	log4cxx::LoggerPtr logger=log4cxx::Logger::getLogger("yade.log");
-
-	#include<log4cxx/logmanager.h>
-
-	void logSetLevel(std::string loggerName,int level){
-		std::string fullName(loggerName.empty()?"yade":("yade."+loggerName));
-		if(!log4cxx::LogManager::exists(fullName)){
-			LOG_WARN("No logger named "<<loggerName<<", ignoring level setting.");
-			// throw std::invalid_argument("No logger named `"+fullName+"'");
-		}
-		log4cxx::LevelPtr l;
-		switch(level){
-			#ifdef LOG4CXX_TRACE
-				case ll_TRACE: l=log4cxx::Level::getTrace(); break;
-				case ll_DEBUG: l=log4cxx::Level::getDebug(); break;
-				case ll_INFO:  l=log4cxx::Level::getInfo(); break;
-				case ll_WARN:  l=log4cxx::Level::getWarn(); break;
-				case ll_ERROR: l=log4cxx::Level::getError(); break;
-				case ll_FATAL: l=log4cxx::Level::getFatal(); break;
-			#else
-				case ll_TRACE: l=log4cxx::Level::DEBUG; break;
-				case ll_DEBUG: l=log4cxx::Level::DEBUG; break;
-				case ll_INFO:  l=log4cxx::Level::INFO; break;
-				case ll_WARN:  l=log4cxx::Level::WARN; break;
-				case ll_ERROR: l=log4cxx::Level::ERROR; break;
-				case ll_FATAL: l=log4cxx::Level::FATAL; break;
-			#endif
-			default: throw std::invalid_argument("Unrecognized logging level "+lexical_cast<std::string>(level));
-		}
-		log4cxx::LogManager::getLogger("yade."+loggerName)->setLevel(l);
-	}
-	void logLoadConfig(std::string f){ log4cxx::PropertyConfigurator::configure(f); }
-#else
-	bool warnedOnce=false;
-	void logSetLevel(std::string loggerName, int level){
-		// better somehow python's raise RuntimeWarning, but not sure how to do that from c++
-		// it shouldn't be trapped by boost::python's exception translator, just print warning
-		// Do like this for now.
-		if(warnedOnce) return;
-		LOG_WARN("Yade was compiled without boost::log support. Setting log levels from python will have no effect (warn once).");
-		warnedOnce=true;
-	}
-	void logLoadConfig(std::string f){
-		if(warnedOnce) return;
-		LOG_WARN("Yade was compiled without boost::log support. Loading log file will have no effect (warn once).");
-		warnedOnce=true;
-	}
-#endif
-
 BOOST_PYTHON_MODULE(log){
-	python::scope().attr("__doc__") = "Access and manipulation of log4cxx loggers.";
-
-	YADE_SET_DOCSTRING_OPTS;
-
-	python::def("setLevel",logSetLevel,(python::arg("logger"),python::arg("level")),"Set minimum severity *level* (constants ``TRACE``, ``DEBUG``, ``INFO``, ``WARN``, ``ERROR``, ``FATAL``) for given logger. \nLeading 'yade.' will be appended automatically to the logger name; if logger is '', the root logger 'yade' will be operated on.");
 	python::def("loadConfig",logLoadConfig,(python::arg("fileName")),"Load configuration from file (log4cxx::PropertyConfigurator::configure)");
-	python::scope().attr("TRACE")=(int)ll_TRACE;
-	python::scope().attr("DEBUG")=(int)ll_DEBUG;
-	python::scope().attr("INFO")= (int)ll_INFO;
-	python::scope().attr("WARN")= (int)ll_WARN;
-	python::scope().attr("ERROR")=(int)ll_ERROR;
-	python::scope().attr("FATAL")=(int)ll_FATAL;
 }
 
 */

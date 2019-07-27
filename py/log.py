@@ -16,8 +16,6 @@ Example usage in C++ is as follows:
 .. code-block:: c++
 
 	LOG_WARN("Something: "<<something)
-	// also a logger can be obtained with example command:
-	YadeLogger logger = Logger::getLogger("yade.pack.predicates");
 """
 
 # all C++ functions are accessible now:
