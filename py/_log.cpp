@@ -7,7 +7,7 @@
 #include<lib/base/Logging.hpp>
 #include<string>
 
-CREATE_LOCAL_LOGGER("_log.cpp");
+CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 
 namespace py = boost::python;
 
@@ -58,7 +58,7 @@ void resetAllSinks() {
 
 void setLevel(std::string className, int level) {
 // TODO: check if exists, even at -1, print warning that CREATE_LOGGER is missing otherwise
-	Logging::instance().classLogLevels[className]=level;
+//	Logging::instance().classLogLevels[className]=level;
 }
 
 py::dict getLevels() {

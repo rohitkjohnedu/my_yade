@@ -5,8 +5,8 @@
  * This file defines various useful logging-related macros - userspace stuff is
  * - LOG_* for actual logging,
  * - DECLARE_LOGGER; that should be used in class header to create separate logger for that class,
- * - CREATE_LOGGER(className); that must be used in class implementation file to create the static variable.
- * - CREATE_LOCAL_LOGGER(name); use this inside a *.cpp file which has code that does not belong to any class, and needs logging. The name will be used for filtering logging.
+ * - CREATE_LOGGER(ClassName); that must be used in class implementation file to create the static variable.
+ * - CREATE_CPP_LOCAL_LOGGER("filename.cpp"); use this inside a *.cpp file which has code that does not belong to any class, and needs logging. The name will be used for filtering logging.
  *
  * Note that the latter 2 may change their name to something like LOG_DECLARE and LOG_CREATE, to be consistent.
  * Some other macros will be very likely added, to allow for easy variable tracing etc. Suggestions welcome.
@@ -90,7 +90,7 @@
 
 	#define DECLARE_LOGGER
 	#define CREATE_LOGGER(classname)
-	#define CREATE_LOCAL_LOGGER(name)
+	#define CREATE_CPP_LOCAL_LOGGER(name)
 #endif
 
 // macros for quick debugging
