@@ -74,6 +74,7 @@ void Logging::setOutputStream(const std::string& name , bool reset) {
 		sink->locked_backend()->remove_stream(streamCerr);
 		sink->locked_backend()->remove_stream(streamCout);
 		sink->locked_backend()->remove_stream(streamFile);
+		streamFile=boost::shared_ptr< std::ostream >{};
 		for(const auto& oldFile : streamOld) {
 			sink->locked_backend()->remove_stream(oldFile);
 		}
@@ -84,12 +85,13 @@ void Logging::setOutputStream(const std::string& name , bool reset) {
 		case hash("cerr") : sink->locked_backend()->add_stream(streamCerr); break;
 		case hash("cout") : sink->locked_backend()->add_stream(streamCout); break;
 		default           : {
-			if(not reset) {
+			if(not reset and streamFile) {
 				std::cerr << "LOGGER Warning: adding a new log file without resetting the old one means that the logs will go to both files.\n";
 				streamOld.push_back(streamFile);
 			}
 			streamFile = boost::make_shared< std::ofstream >(name.c_str());
 			sink->locked_backend()->add_stream(streamFile);
+			sink->locked_backend()->auto_flush(true); // make sure that log is written immediately to file without long time buffering.
 		}
 	}
 }
