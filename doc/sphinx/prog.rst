@@ -237,6 +237,10 @@ There or two settings for the filter level, the ``Default`` level used when no c
 
 	In [3]: log.setLevel("Default",3)
 
+	In [2]: log.setDefaultLogLevel(log.WARN)
+
+	In [3]: log.setDefaultLogLevel(3)
+
 	In [4]: log.testAllLevels()
 
 3. To change filter level for ``SomeClass`` invoke command:

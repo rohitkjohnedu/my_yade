@@ -23,6 +23,14 @@ int getDefaultLogLevel() {
 #endif
 }
 
+void setDefaultLogLevel(int level) {
+#ifdef YADE_BOOST_LOG
+	return Logging::instance().setDefaultLogLevel(level);
+#else
+	return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL);
+#endif
+}
+
 void testAllLevels() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -139,7 +147,7 @@ This function prints test messages on all log levels. Can be used to see how fil
 	py::def("getDefaultLogLevel", getDefaultLogLevel, R"""(
 :return: The current ``Default`` filter log level.
 	)""");
-	py::def("setDefaultLogLevel", getDefaultLogLevel, R"""(
+	py::def("setDefaultLogLevel", setDefaultLogLevel, R"""(
 :param int level: Sets the ``Default`` filter log level, same as calling ``log.setLevel("Default",level)``.
 	)""");
 	py::def("setOutputStream", setOutputStream, R"""(
