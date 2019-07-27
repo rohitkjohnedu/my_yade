@@ -35,7 +35,7 @@
 	#define LOG_WARN(msg)     { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eWARN)  << _LOG_HEAD << msg; }
 	#define LOG_ERROR(msg)    { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eERROR) << _LOG_HEAD << msg; }
 	#define LOG_FATAL(msg)    { BOOST_LOG_SEV(logger, Logging::SeverityLevel::eFATAL) << _LOG_HEAD << msg; }
-	#define LOG_NOFILTER(msg) { boost::log::sources::severity_logger< Logging::SeverityLevel > slg; BOOST_LOG_SEV(slg, Logging::eUNKNOWN ) << _LOG_HEAD << msg; };
+	#define LOG_NOFILTER(msg) { boost::log::sources::severity_logger< Logging::SeverityLevel > slg; BOOST_LOG_SEV(slg, Logging::eNOFILTER ) << _LOG_HEAD << msg; };
 
 	class Logging : public Singleton<Logging> {
 		public:
