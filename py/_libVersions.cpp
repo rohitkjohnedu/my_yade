@@ -6,7 +6,7 @@
 
 namespace py = boost::python;
 
-CREATE_LOCAL_LOGGER("_libVersions.cpp")
+CREATE_CPP_LOCAL_LOGGER("_libVersions.cpp")
 
 py::tuple extractNumbers(std::string verStr, std::string what) {
 	std::stringstream ss(verStr);
