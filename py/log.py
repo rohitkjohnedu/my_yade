@@ -1,6 +1,6 @@
 # encoding: utf-8
 # 2019 Janek Kozicki
-# hint: follow changes in d067b0696a8 to add new modules. 
+# hint: follow changes in d067b0696a8 to add new modules.
 
 """
 The ``yade.log`` module serves as an interface to yade logging framework implemented on top of `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_.

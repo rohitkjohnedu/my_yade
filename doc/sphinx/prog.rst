@@ -180,7 +180,7 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	+==================+====================+=========+=================================================================================+
 	| ``LOG_NOFILTER`` | ``log.NOFILTER``   | ``-f0`` | Will print only the unfiltered messages. The LOG_NOFILTER macro is for          |
 	|                  |                    |         | developer use only, so basically ``-f0`` means that nothing will be printed.    |
-        |                  |                    |         | This log level is not useful unless a very silent mode is necessary.            |
+	|                  |                    |         | This log level is not useful unless a very silent mode is necessary.            |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 	| ``LOG_FATAL``    | ``log.FATAL``      | ``-f1`` | Will print only critical errors. Even a throw to yade python                    |
 	|                  |                    |         | interface will not recover from this situation.                                 |
@@ -191,7 +191,7 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 	| ``LOG_WARN``     | ``log.WARN``       | ``-f3`` | Will also print warnings about recoverable problems that you should be notified |
 	|                  |                    |         | about (e.g., invalid value in a configuration file, so yade fell back to the    |
-        |                  |                    |         | default value).                                                                 |
+	|                  |                    |         | default value).                                                                 |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 	| ``LOG_INFO``     | ``log.INFO``       | ``-f4`` | Will also print all informational messages (e.g. something was loaded,          |
 	|                  |                    |         | something was called, etc.).                                                    |
