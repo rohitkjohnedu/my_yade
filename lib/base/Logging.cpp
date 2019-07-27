@@ -67,6 +67,10 @@ signed char Logging::getNamedLogLevel  (const std::string& name) {
 }
 
 void Logging::setNamedLogLevel  (const std::string& name , signed char level) {
+	if(level > maxLogLevel) {
+		std::cerr << "LOGGER Warning: setting \""<<name<<"\" log level higher than MAX_LOG_LEVEL="<<maxLogLevel<<" will have no effect. Logs will not be printed, they were removed during compilation.\n";
+		std::cerr << "LOGGER Warning: to be able to use \""<<name<<"\"="<<level<<" you have to recompile yade with cmake option MAX_LOG_LEVEL="<<level<<" or higher.\n";
+	}
 	if( name == "Default" ) {
 		setDefaultLogLevel(level);
 	} else {

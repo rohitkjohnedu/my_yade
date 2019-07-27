@@ -49,6 +49,7 @@
 			void        setNamedLogLevel  (const std::string&,signed char);
 			void        unsetNamedLogLevel(const std::string&);
 			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
+			static constexpr signed char                maxLogLevel{MAX_LOG_LEVEL};
 		private:
 			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > text_sink;
 			std::map<std::string,signed char>::iterator findFilterName(const std::string&);
@@ -125,4 +126,43 @@
 #define LOG_2(msg) LOG_ERROR(msg)
 #define LOG_1(msg) LOG_FATAL(msg)
 #define LOG_0(msg) LOG_NOFILTER(msg)
+
+// honor MAX_LOG_LEVEL cmake option to disable selected macros
+#if MAX_LOG_LEVEL<6
+	#undef LOG_TRACE
+	#define LOG_TRACE(msg)
+#endif
+
+#if MAX_LOG_LEVEL<5
+	#undef LOG_DEBUG
+	#define LOG_DEBUG(msg)
+#endif
+
+#if MAX_LOG_LEVEL<4
+	#undef LOG_INFO
+	#define LOG_INFO(msg)
+#endif
+
+#if MAX_LOG_LEVEL<3
+	#undef LOG_WARN
+	#define LOG_WARN(msg)
+#endif
+
+#if MAX_LOG_LEVEL<2
+	#warning "MAX_LOG_LEVEL<2 means that all LOG_ERROR messages are ignored, be careful with this option."
+	#undef LOG_ERROR
+	#define LOG_ERROR(msg)
+#endif
+
+#if MAX_LOG_LEVEL<1
+	#warning "MAX_LOG_LEVEL<1 means that all LOG_ERROR, LOG_FATAL messages are ignored, be careful with this option."
+	#undef LOG_FATAL
+	#define LOG_FATAL(msg)
+#endif
+
+#if MAX_LOG_LEVEL<0
+	#warning "MAX_LOG_LEVEL<0 means that all LG_ERROR, LOG_FATAL and LOG_NOFILTER messages are are ignored, be careful with this option."
+	#undef LOG_NOFILTER
+	#define LOG_NOFILTER(msg)
+#endif
 
