@@ -42,7 +42,7 @@
 	#include<pkg/common/Gl1_NormPhys.hpp>
 #endif
 
-CREATE_LOGGER(Shop);
+//CREATE_LOGGER(Shop);
 
 /*! Flip periodic cell by given number of cells.
 
