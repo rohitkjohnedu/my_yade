@@ -222,6 +222,43 @@ Yade default log level is the same as invoking ``yade -v4``.
 .. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
 
 
+Setting a filter level
+^^^^^^^^^^^^^^^^^^^^^^
+
+There or two settings for the filter level, the ``Default`` level used when no class specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
+
+1. during yade invocation with ``yade -vN`` command, where ``N`` sets the ``Default`` filter level.
+
+2. to change ``Default`` filter level during runtime invoke command:
+
+.. ipython::
+	:okexcept:
+
+	In [1]: import log
+
+	In [2]: log.setLevel("Default",log.WARN)
+
+	In [3]: log.setLevel("Default",3)
+
+3. to change filter level for ``SomeClass`` invoke command:
+
+.. ipython::
+	:okexcept:
+
+	In [1]: import log
+
+	In [2]: log.setLevel("NewtonIntegrator",log.TRACE)
+
+	In [3]: log.setLevel("NewtonIntegrator",6)
+
+
+
+Maximum log level
+^^^^^^^^^^^^^^^^^
+
+Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must have a single integer comparison to determine if the message passes current filter level. For production, when calculations should be as fast as possible this is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain.
+
+
 .. _debugging-a-class:
 
 Debugging a particular class
