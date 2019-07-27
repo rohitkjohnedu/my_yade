@@ -53,11 +53,12 @@
 			void        setNamedLogLevel  (const std::string&,short int);
 			void        unsetNamedLogLevel(const std::string&);
 			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
-			static constexpr short int                   maxLogLevel{MAX_LOG_LEVEL};
+			const std::map<std::string,short int>&         getClassLogLevels() { return classLogLevels; };
+			static constexpr short int                     maxLogLevel{MAX_LOG_LEVEL};
 		private:
 			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > TextSink;
 			std::map<std::string,short int>::iterator      findFilterName(const std::string&);
-			short int                                      defaultLogLevel{3}; // see constructor in Logging.cpp, at later stages of initialization it is overwritten by core/main/main.py.in line 163
+			short int                                      defaultLogLevel{(short int)(SeverityLevel::eWARN)}; // see constructor in Logging.cpp, at later stages of initialization it is overwritten by core/main/main.py.in line 163
 			std::map<std::string,short int>                classLogLevels{{"Default",defaultLogLevel}};
 			boost::shared_ptr< TextSink >                  sink{boost::make_shared< TextSink >()};
 			boost::shared_ptr< std::ostream >              streamClog{}, streamCerr{}, streamCout{}, streamFile{};

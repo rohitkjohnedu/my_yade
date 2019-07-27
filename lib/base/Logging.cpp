@@ -40,7 +40,7 @@ bool logFilterLevels(  boost::log::value_ref< Logging::SeverityLevel , tag::seve
 
 // Setup the common formatter for all sinks
 Logging::Logging()
-	: defaultLogLevel(3)
+	: defaultLogLevel{(short int)(SeverityLevel::eWARN)}
 	, classLogLevels{{"Default",defaultLogLevel}}
 	, sink{boost::make_shared< TextSink >()}
 	, streamClog(&std::clog, boost::null_deleter())
@@ -108,6 +108,9 @@ short int Logging::getNamedLogLevel  (const std::string& name) {
 }
 
 void Logging::setNamedLogLevel  (const std::string& name , short int level) {
+	if(level < (short int)(SeverityLevel::eNOFILTER) or level > (short int)(SeverityLevel::eTRACE)) {
+		throw std::runtime_error("The level must be >= NOFILTER and <= TRACE, other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
+	}
 	if(level > maxLogLevel) {
 		std::cerr << "LOGGER Warning: setting \""<<name<<"\" log level higher than MAX_LOG_LEVEL="<<maxLogLevel<<" will have no effect. Logs will not be printed, they were removed during compilation.\n";
 		std::cerr << "LOGGER Warning: to be able to use \""<<name<<"\"="<<level<<" you have to recompile yade with cmake option MAX_LOG_LEVEL="<<level<<" or higher.\n";
@@ -122,7 +125,7 @@ void Logging::setNamedLogLevel  (const std::string& name , short int level) {
 void Logging::unsetNamedLogLevel(const std::string& name) {
 	if(name == "Default") {
 		// unsetting Default will result in printing everything.
-		classLogLevels["Default"] = 8;
+		classLogLevels["Default"] = (short int)(SeverityLevel::eTRACE);
 	} else {
 		// unsetting anything else will result in printing it at Default level.
 		findFilterName(name)->second = -1;

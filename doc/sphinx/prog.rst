@@ -173,34 +173,34 @@ See also description of :yref:`yade.log module<yade.log>`.
 A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_. Following debug levels are supported:
 
 .. table:: Yade logging verbosity levels.
-	:widths: 17,19,8,56
+	:widths: 17,18,8,57
 
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| macro name       | macro alias        | option  | explanation                                                                     |
+	| macro name       | filter name        | option  | explanation                                                                     |
 	+==================+====================+=========+=================================================================================+
-	| ``LOG_NOFILTER`` | ``LOG_0_NOFILTER`` | ``-f0`` | Will print only the unfiltered messages. The LOG_NOFILTER macro is for          |
+	| ``LOG_NOFILTER`` | ``log.NOFILTER``   | ``-f0`` | Will print only the unfiltered messages. The LOG_NOFILTER macro is for          |
 	|                  |                    |         | developer use only, so basically ``-f0`` means that nothing will be printed.    |
         |                  |                    |         | This log level is not useful unless a very silent mode is necessary.            |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_FATAL``    | ``LOG_1_FATAL``    | ``-f1`` | Will print only critical errors. Even a throw to yade python                    |
+	| ``LOG_FATAL``    | ``log.FATAL``      | ``-f1`` | Will print only critical errors. Even a throw to yade python                    |
 	|                  |                    |         | interface will not recover from this situation.                                 |
 	|                  |                    |         | This is usually followed by yade exiting to shell.                              |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_ERROR``    | ``LOG_2_ERROR``    | ``-f2`` | Will also print errors which do not require to throw to yade python interface.  |
+	| ``LOG_ERROR``    | ``log.ERROR``      | ``-f2`` | Will also print errors which do not require to throw to yade python interface.  |
 	|                  |                    |         | Calculations will continue, but very likely the results will be all wrong.      |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_WARN``     | ``LOG_3_WARN``     | ``-f3`` | Will also print warnings about recoverable problems that you should be notified |
+	| ``LOG_WARN``     | ``log.WARN``       | ``-f3`` | Will also print warnings about recoverable problems that you should be notified |
 	|                  |                    |         | about (e.g., invalid value in a configuration file, so yade fell back to the    |
         |                  |                    |         | default value).                                                                 |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_INFO``     | ``LOG_4_INFO``     | ``-f4`` | Will also print all informational messages (e.g. something was loaded,          |
+	| ``LOG_INFO``     | ``log.INFO``       | ``-f4`` | Will also print all informational messages (e.g. something was loaded,          |
 	|                  |                    |         | something was called, etc.).                                                    |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_DEBUG``    | ``LOG_5_DEBUG``    | ``-f5`` | Will also print debug messages. A yade developer puts them everywhere, and yade |
+	| ``LOG_DEBUG``    | ``log.DEBUG``      | ``-f5`` | Will also print debug messages. A yade developer puts them everywhere, and yade |
 	|                  |                    |         | user enables them on :ref:`per-class basis<debugging-a-class>` to               |
 	|                  |                    |         | provide some extra debug info.                                                  |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	| ``LOG_TRACE``    | ``LOG_6_TRACE``    | ``-f6`` | Trace messages, they capture every possible detail about yade behavior.         |
+	| ``LOG_TRACE``    | ``log.TRACE``      | ``-f6`` | Trace messages, they capture every possible detail about yade behavior.         |
 	|                  |                    |         |                                                                                 |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 	|                  |                    | ``-f7`` | Enables all debug messages, including some custom log levels not in the         |
@@ -208,16 +208,19 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 
 
-Yade default log level is the same as invoking ``yade -f3``.
+Yade default log level is ``yade.log.WARN`` which is the same as invoking ``yade -f3``.
 
 .. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
 
 
 .. _debugging-a-class:
 .. _setting-filter-level:
+.. _filter-level-warning:
 
 Setting a filter level
 ^^^^^^^^^^^^^^^^^^^^^^
+
+.. warning:: The messages (such as ``a << b << " message."``) given as arguments to ``LOG_*`` macros are used only if the message passes the filter level. **Do not use such messages to perform mission critical calculations**.
 
 There or two settings for the filter level, the ``Default`` level used when no class specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
 
@@ -252,7 +255,7 @@ There or two settings for the filter level, the ``Default`` level used when no c
 Maximum log level
 ^^^^^^^^^^^^^^^^^
 
-Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must have a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain.
+Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain with current build.
 
 The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
 

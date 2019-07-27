@@ -27,6 +27,7 @@ void testAllLevels() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 // ignore unused variable warning because when log level is low, they are not used (not printed).
+#pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	int testInt     = 0;
 	std::string testStr = "test_string";
@@ -58,15 +59,15 @@ void testAllLevels() {
 #pragma GCC diagnostic pop
 }
 
-// accepted sinks, separately for each log level:
-// "clog", "cerr", "cout", "filename"
-void setOutputStream(std::string sink, bool reset) {
+// accepted streams: "clog", "cerr", "cout", "filename"
+// It is possible to set different levels per log file, see notes about that in Logging::setOutputStream(…)
+void setOutputStream(std::string streamName, bool reset /*, int level */ ) {
 #ifdef YADE_BOOST_LOG
-	Logging::instance().setOutputStream(sink , reset);
+	Logging::instance().setOutputStream( streamName , reset );
 	if(reset) {
-		LOG_INFO("Log output stream has been set to "<< sink <<". Other sinks were removed.");
+		LOG_INFO("Log output stream has been set to "<< streamName <<". Other output streams were removed.");
 	} else {
-		LOG_INFO("Additional output stream has been set to "<< sink <<".");
+		LOG_INFO("Additional output stream has been set to "<< streamName <<".");
 	}
 #else
 	printNoBoostLogWarning();
@@ -86,17 +87,44 @@ void resetOutputStream() {
 void setLevel(std::string className, int level) {
 #ifdef YADE_BOOST_LOG
 	Logging::instance().setNamedLogLevel(className , level);
-	LOG_INFO("filter log level for "<<className<<" has been set to " << Logging::instance().getNamedLogLevel(className));
+	LOG_INFO("filter log level for " << className << " has been set to " << Logging::instance().getNamedLogLevel(className));
 #else
 	printNoBoostLogWarning();
 #endif
 }
 
-py::dict getLevels() {
+void unsetLevel(std::string className) {
+#ifdef YADE_BOOST_LOG
+	Logging::instance().unsetNamedLogLevel(className);
+	LOG_INFO("filter log level for " << className << " has been unset to " << Logging::instance().getNamedLogLevel(className));
+#else
+	printNoBoostLogWarning();
+#endif
+}
+
+py::dict getAllLevels() {
 	py::dict ret{};
-//	for(const auto& a : Logging::instance().classLogLevels) {
-//		if(a->second != -1) ret[a->first]=a->second;
-//	}
+#ifdef YADE_BOOST_LOG
+	for(const auto& a : Logging::instance().getClassLogLevels()) {
+		ret[a.first]=a.second;
+	}
+#else
+	printNoBoostLogWarning();
+#endif
+	return ret;
+}
+
+py::dict getUsedLevels() {
+	py::dict ret{};
+#ifdef YADE_BOOST_LOG
+	for(const auto& a : Logging::instance().getClassLogLevels()) {
+		if(a.second != -1) {
+			ret[a.first]=a.second;
+		}
+	}
+#else
+	printNoBoostLogWarning();
+#endif
 	return ret;
 }
 
@@ -106,12 +134,17 @@ BOOST_PYTHON_MODULE(_log){
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
 // The docstrings can use syntax :param ……: ……… :return: ……. For details see https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
 	py::def("testAllLevels", testAllLevels, R"""(
-.. warning:: I must write docstring here!
+This function prints test messages on all log levels. Can be used to see how filtering works and to what streams the logs are written.
+	)""");
+	py::def("getDefaultLogLevel", getDefaultLogLevel, R"""(
+:return: The current ``Default`` filter log level.
+	)""");
+	py::def("setDefaultLogLevel", getDefaultLogLevel, R"""(
+:param int level: Sets the ``Default`` filter log level, same as calling ``log.setLevel("Default",level)``.
 	)""");
 	py::def("setOutputStream", setOutputStream, R"""(
-:param str className: The logger name for which the filter level is to be set. Use name ``Default`` to change the default filter level.
-:param int level: The filter level to be set.
-.. warning:: I must write docstring here!
+:param str streamName: sets the output stream, special names ``cout``, ``cerr``, and default ``clog`` use the ``std::cout``, ``std::cerr``, ``std::clog`` counterpart. Every other name means that log will be written to a filename.
+:param bool reset: dictates whether all previously set output streams are to be removed. When set to false: the new output stream is set additionally to the current one.
 	)""");
 	py::def("resetOutputStream", resetOutputStream, R"""(
 Resets log output stream to default state: all logs are printed on ``std::clog`` channel, which usually redirects to ``std::cerr``.
@@ -121,11 +154,14 @@ Resets log output stream to default state: all logs are printed on ``std::clog``
 :param int level: The filter level to be set.
 .. warning:: setting ``Default`` log level higher than ``MAX_LOG_LEVEL`` provided during compilation will have no effect. Logs will not be printed because they are removed during compilation.
 	)""");
-	py::def("getDefaultLogLevel", getDefaultLogLevel, R"""(
-:return: The current ``Default`` filter level.
+	py::def("unsetLevel", unsetLevel , R"""(
+:param str className: The logger name for which the filter level is to be unset, so that a ``Default`` will be used instead. Unsetting the ``Default`` level will change it to max level and print everything.
 	)""");
-	py::def("getLevels", getLevels , R"""(
-.. warning:: I must write docstring here!
+	py::def("getAllLevels", getAllLevels , R"""(
+:return: A python dictionary with all known loggers in yade. Those without a debug level set will have value -1 to indicate that ``Default`` filter log level is to be used for them.
+	)""");
+	py::def("getUsedLevels", getUsedLevels , R"""(
+:return: A python dictionary with all used log levels in yade. Those without a debug level (value -1) are omitted.
 	)""");
 
 	py::scope().attr("TRACE")=int(6);
@@ -134,6 +170,7 @@ Resets log output stream to default state: all logs are printed on ``std::clog``
 	py::scope().attr("WARN") =int(3);
 	py::scope().attr("ERROR")=int(2);
 	py::scope().attr("FATAL")=int(1);
+	py::scope().attr("NOFILTER")=int(0);
 }
 
 /* this was in git revision 014b11496

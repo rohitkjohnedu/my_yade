@@ -18,18 +18,17 @@ Example usage in C++ is as follows:
 	LOG_WARN("Something: "<<something)
 	// also a logger can be obtained with example command:
 	YadeLogger logger = Logger::getLogger("yade.pack.predicates");
-
-.. warning:: This documentation is incomplete.
 """
 
 # all C++ functions are accessible now:
 from yade._log import *
 
-def test():
-	"""
-	.. warning:: This is a test.
-	"""
-	print("Test OK")
+# some python functions can be added here too, like this one:
+## def test():
+## 	"""
+## 	.. note:: This is a test.
+## 	"""
+## 	print("Test OK")
 
 
 # Maybe add here python commands that would respect the filtering levels?
