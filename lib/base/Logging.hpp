@@ -92,7 +92,7 @@
 	#include <boost/log/utility/setup.hpp>
 
 	enum severity_level { eFATAL=1, eTHROW=2, eERROR=3, eWARN=4, eINFO=5, eDEBUG=6, eMORE=7, eTRACE=8 };
-	std::ostream& operator<< (std::ostream& strm, severity_level level)
+	inline std::ostream& operator<< (std::ostream& strm, severity_level level)
 	{
 		static const char* strings[] = { "UNKNOWN", "FATAL", "THROW", "ERROR", "WARN", "INFO", "DEBUG", "MORE", "TRACE" };
 		if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
@@ -106,10 +106,10 @@
 	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "ClassNameTag", std::string)
 
 	#define DECLARE_LOGGER public: static boost::log::sources::severity_logger< severity_level > logger;
-	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< severity_level > classname::logger;\
-	__attribute__((constructor)) void initLog##classname() { \
-		Omega::instance().classLogLevels[#classname] = -1;\
-	};
+	#define CREATE_LOGGER(classname) boost::log::sources::severity_logger< severity_level > classname::logger;
+//	__attribute__((constructor)) void initLog##classname() {
+//		Omega::instance().classLogLevels[#classname] = -1;
+//	};
 #else
 	#define DECLARE_LOGGER
 	#define CREATE_LOGGER(classname)
