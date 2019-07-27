@@ -11,13 +11,15 @@ CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 
 namespace py = boost::python;
 
-/*
-py::list placeholder() {
-	return {};
+void printNoBoostLogWarning() {
+	std::cerr << "\nWarning: yade was compiled with cmake option -DBOOST_LOGGER=OFF, any attempts to manipulate log filter levels will not have effect.\n\n";
 }
-*/
 
 void testAllLevels() {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+// ignore unused variable warning because when log level is low, they are not used (not printed).
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	int testInt     = 0;
 	std::string testStr = "test_string";
 	Real testReal(11);
@@ -43,6 +45,7 @@ void testAllLevels() {
 
 	LOG_0_NOFILTER("Below is macro TRACE;");
 	TRACE;
+#pragma GCC diagnostic pop
 }
 
 // accepted sinks, separately for each log level:
@@ -62,9 +65,12 @@ void resetAllSinks() {
 }
 
 void setLevel(std::string className, int level) {
-//FIXME: use some #ifdef YADE_BOOST_LOG
+#ifdef YADE_BOOST_LOG
 	Logging::instance().setNamedLogLevel(className , level);
 	LOG_INFO("filter log level for "<<className<<" has been set to " << Logging::instance().getNamedLogLevel(className));
+#else
+	printNoBoostLogWarning();
+#endif
 }
 
 py::dict getLevels() {
@@ -76,7 +82,7 @@ py::dict getLevels() {
 }
 
 BOOST_PYTHON_MODULE(_log){
-	python::scope().attr("__doc__") = "Access and manipulation of yade logging.";
+	py::scope().attr("__doc__") = "Access and manipulation of yade logging.";
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
@@ -99,12 +105,12 @@ BOOST_PYTHON_MODULE(_log){
 .. warning:: I must write docstring here!
 	)""");
 
-	python::scope().attr("TRACE")=int(6)
-	python::scope().attr("DEBUG")=int(5)
-	python::scope().attr("INFO")= int(4)
-	python::scope().attr("WARN")= int(3)
-	python::scope().attr("ERROR")=int(2)
-	python::scope().attr("FATAL")=int(1)
+	py::scope().attr("TRACE")=int(6)
+	py::scope().attr("DEBUG")=int(5)
+	py::scope().attr("INFO")= int(4)
+	py::scope().attr("WARN")= int(3)
+	py::scope().attr("ERROR")=int(2)
+	py::scope().attr("FATAL")=int(1)
 }
 
 /* this was in git revision 014b11496
