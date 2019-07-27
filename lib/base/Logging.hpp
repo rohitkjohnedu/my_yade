@@ -161,7 +161,7 @@
 #endif
 
 #if MAX_LOG_LEVEL<0
-	#warning "MAX_LOG_LEVEL<0 means that all LG_ERROR, LOG_FATAL and LOG_NOFILTER messages are are ignored, be careful with this option."
+	#warning "MAX_LOG_LEVEL<0 means that all LOG_ERROR, LOG_FATAL and LOG_NOFILTER messages are are ignored, be careful with this option."
 	#undef LOG_NOFILTER
 	#define LOG_NOFILTER(msg)
 #endif
