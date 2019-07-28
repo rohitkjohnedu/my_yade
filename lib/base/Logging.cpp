@@ -76,6 +76,7 @@ void Logging::updateFormatter() {
 // To do this multiple variables like the variable 'sink' below would have to be defined. Each with a different filter level.
 // Below all add_stream(…), remove_stream(…) calls are to the same sink. So they all have the same filtering level.
 void Logging::setOutputStream(const std::string& name , bool reset) {
+	lastOutputStream = name;
 	if(reset) {
 		sink->locked_backend()->remove_stream(streamClog);
 		sink->locked_backend()->remove_stream(streamCerr);
@@ -124,6 +125,7 @@ void Logging::setNamedLogLevel  (const std::string& name , short int level) {
 		throw std::runtime_error("The level must be >= NOFILTER (0) and <= TRACE (6), other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
 	}
 	if(level > maxLogLevel) {
+		// apparently the macros LOG_* are compiled away. So use std::cerr to make sure that the message is printed.
 		std::cerr << "LOGGER Warning: setting \""<<name<<"\" log level higher than MAX_LOG_LEVEL="<<maxLogLevel<<" will have no effect. Logs will not be printed, they were removed during compilation.\n";
 		std::cerr << "LOGGER Warning: to be able to use \""<<name<<"\"="<<level<<" you have to recompile yade with cmake option MAX_LOG_LEVEL="<<level<<" or higher.\n";
 	}
@@ -174,7 +176,7 @@ std::string Logging::colorSeverity(Logging::SeverityLevel level) {
 		case SeverityLevel::eERROR     : return esc+"[31m";
 		case SeverityLevel::eWARN      : return esc+"[93m";
 		case SeverityLevel::eINFO      : return esc+"[96m";
-		case SeverityLevel::eDEBUG     : return esc+"[33m";
+		case SeverityLevel::eDEBUG     : return esc+"[95m";
 		case SeverityLevel::eTRACE     : return esc+"[92m";
 		default                        : return "";
 	}

@@ -45,6 +45,8 @@
 			enum SeverityLevel { eNOFILTER=0, eFATAL=1, eERROR=2, eWARN=3, eINFO=4, eDEBUG=5, eTRACE=6 };
 			Logging();
 			void        readConfigFile(const std::string&);
+			void        saveConfigFile(const std::string&);
+			std::string defaultConfigFileName();
 			void        setDefaultLogLevel(short int);
 			void        setOutputStream(const std::string& , bool reset);
 			short int   getDefaultLogLevel() { return defaultLogLevel;};
@@ -72,6 +74,8 @@
 			std::vector< boost::shared_ptr<std::ostream> > streamOld{};
 			bool                                           colors{false}; // can't be set here to avoid race condition, in later initialization it is overwritten by core/main/main.py.in line 163
 			const                                          std::string esc{char{27}};
+			std::string                                    lastOutputStream{};
+			boost::log::sources::severity_logger< Logging::SeverityLevel > logger{};
 		FRIEND_SINGLETON(Logging);
 	};
 	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity" , Logging::SeverityLevel )
