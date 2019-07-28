@@ -45,7 +45,7 @@ void testAllLevels() {
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	int testInt     = 0;
-	std::string testStr = "test_string";
+	std::string testStr = "test string";
 	Real testReal(11);
 	Vector3r testVec(1,2,3);
 	Matrix3r testMat = (Matrix3r() << 1, 2, 3, 4, 5, 6, 7, 8, 9).finished();
@@ -53,13 +53,13 @@ void testAllLevels() {
 
 	LOG_0_NOFILTER("Current \"Default\" filter level is " << getDefaultLogLevel());
 
-	LOG_6_TRACE   ("Test log level: LOG_6_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_5_DEBUG   ("Test log level: LOG_5_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_4_INFO    ("Test log level: LOG_4_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_3_WARN    ("Test log level: LOG_3_WARN    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_2_ERROR   ("Test log level: LOG_2_ERROR   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_1_FATAL   ("Test log level: LOG_1_FATAL   , test int: " << testInt++ << ", test string: "<< testStr);
 	LOG_0_NOFILTER("Test log level: LOG_0_NOFILTER, test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_1_FATAL   ("Test log level: LOG_1_FATAL   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_2_ERROR   ("Test log level: LOG_2_ERROR   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_3_WARN    ("Test log level: LOG_3_WARN    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_4_INFO    ("Test log level: LOG_4_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_5_DEBUG   ("Test log level: LOG_5_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
+	LOG_6_TRACE   ("Test log level: LOG_6_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
 
 	LOG_0_NOFILTER("Below 6 variables are printed at filter level TRACE");
 	TRVAR1(testInt);
@@ -142,6 +142,14 @@ py::dict getUsedLevels() {
 	return ret;
 }
 
+void setUseColors(bool use) {
+#ifdef YADE_BOOST_LOG
+	Logging::instance().setUseColors(use);
+#else
+	printNoBoostLogWarning();
+#endif
+}
+
 BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
@@ -178,6 +186,9 @@ Set minimum filter *level* (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4)
 	)""");
 	py::def("getUsedLevels", getUsedLevels , R"""(
 :return: A python dictionary with all used log levels in yade. Those without a debug level (value -1) are omitted.
+	)""");
+	py::def("setUseColors", setUseColors, R"""(
+Turn on/off colors in log messages. By default is on. When logging to file it is better turned off.
 	)""");
 
 	py::scope().attr("TRACE")=int(6);
