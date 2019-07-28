@@ -2,9 +2,6 @@
 #include<lib/base/Logging.hpp>
 
 #include<signal.h>
-#include<boost/filesystem.hpp>
-
-CREATE_CPP_LOCAL_LOGGER("pyboot.cpp")
 
 #ifdef YADE_DEBUG
 	void crashHandler(int sig){
