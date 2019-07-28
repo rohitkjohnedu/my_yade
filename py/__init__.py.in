@@ -73,8 +73,8 @@ if 'YADE_DEBUG' in os.environ:
 from yade import boot
 boot.initialize(plugins,config.confDir)
 from yade import system
-## BOOST_LOGGER ## this was in git revision 014b11496 YADE_LOG4CXX → YADE_BOOST_LOG ##
-## BOOST_LOGGER #? system.setExitHandlers() # avoid backtrace if crash at finalization (log4cxx)
+## ENABLE_LOGGER ## this was in git revision 014b11496 YADE_LOG4CXX → YADE_BOOST_LOG ##
+## ENABLE_LOGGER #? system.setExitHandlers() # avoid backtrace if crash at finalization (log4cxx)
 
 # create proxies for deprecated classes
 deprecatedTypes=system.cxxCtorsDict()

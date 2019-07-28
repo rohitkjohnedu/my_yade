@@ -182,7 +182,7 @@ Logging
 
 Yade uses `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for flexible logging levels and per-class debugging.
 See also description of :yref:`yade.log module<yade.log>`.
-A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_.
+A cmake compilation option ``-DENABLE_LOGGER=ON`` must be supplied during compilation [#flogcerr]_.
 
 .. _imgLogging:
 .. image:: fig/logging.png
@@ -201,7 +201,7 @@ Figure imgLogging_ shows example use of logging framework.
 Config files can be saved and loaded via :yref:`readConfigFile<yade._log.readConfigFile>` and :yref:`saveConfigFile<yade._log.saveConfigFile>`. The :yref:`defaultConfigFileName<yade._log.defaultConfigFileName>` is read upon startup if it exists. The filter level setting ``-f`` supplied from command line will override the setting in config file.
 
 
-.. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
+.. [#flogcerr] Without ``-DENABLE_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
 
 .. _log-levels:
 

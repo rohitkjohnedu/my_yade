@@ -150,14 +150,14 @@ def cxxCtorsDict(proxyNamespace=__builtins__):
 	return proxyNamespace
 
 
-## BOOST_LOGGER ## def setExitHandlers():
-## BOOST_LOGGER ## 	"""Set exit handler to avoid gdb run if log4cxx crashes at exit."""
-## BOOST_LOGGER ## 	# avoid backtrace at regular exit, even if we crash
-## BOOST_LOGGER ## 	if 'log4cxx' in config.features:
-## BOOST_LOGGER ## 		__builtins__['quit']=wrapper.Omega().exitNoBacktrace
-## BOOST_LOGGER ## 		sys.exit=wrapper.Omega().exitNoBacktrace
-## BOOST_LOGGER ## 	# this seems to be not needed anymore:
-## BOOST_LOGGER ## 	#sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
+## ENABLE_LOGGER ## def setExitHandlers():
+## ENABLE_LOGGER ## 	"""Set exit handler to avoid gdb run if log4cxx crashes at exit."""
+## ENABLE_LOGGER ## 	# avoid backtrace at regular exit, even if we crash
+## ENABLE_LOGGER ## 	if 'log4cxx' in config.features:
+## ENABLE_LOGGER ## 		__builtins__['quit']=wrapper.Omega().exitNoBacktrace
+## ENABLE_LOGGER ## 		sys.exit=wrapper.Omega().exitNoBacktrace
+## ENABLE_LOGGER ## 	# this seems to be not needed anymore:
+## ENABLE_LOGGER ## 	#sys.excepthook=sys.__excepthook__ # apport on ubuntu overrides this, we don't need it
 
 
 # consistency check

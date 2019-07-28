@@ -19,7 +19,7 @@ CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 namespace py = boost::python;
 
 void printNoBoostLogWarning() {
-	std::cerr << "\nWarning: yade was compiled with cmake option -DBOOST_LOGGER=OFF, any attempts to manipulate log filter levels will not have effect.\n\n";
+	std::cerr << "\nWarning: yade was compiled with cmake option -DENABLE_LOGGER=OFF, any attempts to manipulate log filter levels will not have effect.\n\n";
 }
 
 int getDefaultLogLevel() {
