@@ -82,7 +82,7 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	  --nice=NICE           Increase nice level (i.e. decrease priority) by given
 	                        number.
 	  -x                    Exit when the script finishes
-	  -f                    Set :ref:`logging verbosity <log-levels>`, default
+	  -f                    Set :ref:`logging verbosity <logging>`, default
 	                        is -f3 (yade.log.WARN) for all classes
 	  -n                    Run without graphical interface (equivalent to
 	                        unsetting the DISPLAY environment variable)

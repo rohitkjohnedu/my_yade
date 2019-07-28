@@ -161,25 +161,18 @@ For yade debugging two tools are available:
 	a) Compiling yade with cmake option ``-DDEBUG=ON``,
 	b) Installing ``yade-dbgsym`` debian/ubuntu package (this option will be available after `this task <https://gitlab.com/yade-dev/trunk/issues/58>`_ is completed).
 
-2. Use :ref:`log-levels` framework described below.
+2. Use :ref:`logging` framework described below.
 
 These tools can be used in conjunction with other software. A detailed discussion of these is on `yade <https://yade-dem.org/wiki/Introduction_to_debugging>`_ `wiki <https://yade-dem.org/wiki/Debugging_using_Kdevelop>`_. These tools include: `kdevelop <https://www.kdevelop.org/>`_, `valgrind <http://valgrind.org/>`_, `alleyoop <http://alleyoop.sourceforge.net/>`_, `kcachegrind <http://kcachegrind.sourceforge.net/html/Home.html>`_, `ddd <http://www.gnu.org/software/ddd/>`_, `gdb <https://www.gnu.org/software/gdb/>`_, `kompare <https://en.wikipedia.org/wiki/Kompare>`_, `kdiff3 <http://kdiff3.sourceforge.net/>`_, `meld <https://meldmerge.org/>`_.
 
-When yade crashes and debug information is available (Ad. point 1 above) a full stack trace is displayed after the crash which is very useful. However on some linux systems stack trace will not be shown and a message ``ptrace: Operation not permitted`` will appear instead. To enable stack trace issue command: ``sudo echo 0 > /proc/sys/kernel/yama/ptrace_scope``. To disable stack trace issue command ``sudo echo 1 > /proc/sys/kernel/yama/ptrace_scope``.
+When yade crashes and debug information is available (Ad. point 1 above) a full stack trace is displayed after the crash which is very useful.
+
+.. note:: On some linux systems stack trace will not be shown and a message ``ptrace: Operation not permitted`` will appear instead. To enable stack trace issue command: ``sudo echo 0 > /proc/sys/kernel/yama/ptrace_scope``. To disable stack trace issue command ``sudo echo 1 > /proc/sys/kernel/yama/ptrace_scope``.
+
+.. _logging:
 
 Logging
 ----------------
-
-.. _imgLogging:
-.. image:: fig/logging.png
-
-Figure imgLogging_ shows example use of logging framework. Log filter levels can be set separately for each class. Messages can be redirected from ``std::cclog`` to other stream or to a log file.
-
-
-.. _log-levels:
-
-Log levels
-^^^^^^^^^^^^^^^^
 
 .. comment: https://www.boost.org/doc/libs/1_70_0/libs/log/doc/html/log/defs.html
 	    https://dzone.com/articles/logging-levels-what-they-are-and-how-they-help-you
@@ -189,7 +182,26 @@ Log levels
 
 Yade uses `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for flexible logging levels and per-class debugging.
 See also description of :yref:`yade.log module<yade.log>`.
-A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_. Following debug levels are supported:
+A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compilation [#flogcerr]_.
+
+.. _imgLogging:
+.. image:: fig/logging.png
+
+Figure imgLogging_ shows example use of logging framework.
+
+.. hint:: Default format of log message is: ``<severity level> ClassName:LineNumber FunctionName: Log Message``, special macro ``LOG_NOFILTER`` is printed without ``ClassName`` because it lacks one.
+
+Config files can be saved and loaded via :yref:`readConfigFile<yade._log.readConfigFile>` and :yref:`saveConfigFile<yade._log.saveConfigFile>`. The :yref:`defaultConfigFileName<yade._log.defaultConfigFileName>` is read upon startup if it exists. The filter level setting ``-f`` supplied from command line will override the setting in config file.
+
+
+.. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
+
+.. _log-levels:
+
+Log levels
+^^^^^^^^^^^^^^^^
+
+Following debug levels are supported:
 
 .. table:: Yade logging verbosity levels.
 	:widths: 17,18,8,57
@@ -225,9 +237,6 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 
 
 Yade default log level is ``yade.log.WARN`` which is the same as invoking ``yade -f3``.
-
-.. [#flogcerr] Without ``-DBOOST_LOGGER=ON`` cmake option the debug macros in :ysrc:`/lib/base/Logging.hpp` use regular ``std::cerr`` for output, per-class logging and log levels do not work.
-
 
 .. _debugging-a-class:
 .. _setting-filter-level:
@@ -282,8 +291,6 @@ There are two settings for the filter level, the ``Default`` level used when no 
 	In [3]: log.getUsedLevels()
 
 	In [3]: log.getAllLevels()["_log.cpp"]
-
-	In [4]: log.testAllLevels()
 
 
 Maximum log level
@@ -1795,7 +1802,7 @@ There are 3 singletons:
 ``Omega``
 	Access to simulation(s); deserves separate section due to its importance.
 ``Logging``
-	Handles logging filters for all named loggers, see :ref:`logging verbosity <log-levels>`.
+	Handles logging filters for all named loggers, see :ref:`logging verbosity <logging>`.
 
 Omega
 ^^^^^^
