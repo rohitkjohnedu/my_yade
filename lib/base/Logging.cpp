@@ -49,20 +49,24 @@ Logging::Logging()
 	, streamClog(&std::clog, boost::null_deleter())
 	, streamCerr(&std::cerr, boost::null_deleter())
 	, streamCout(&std::cout, boost::null_deleter())
-	, colors{true}
+	, colors{false}
+	, esc{char{27}}
 {
+	sink->locked_backend()->add_stream(streamClog);
+	updateFormatter();
+	sink->set_filter( boost::phoenix::bind(&logFilterLevels, severity.or_none(), class_name_tag.or_none() ));
+	boost::log::core::get()->add_sink(sink);
+}
+
+void Logging::updateFormatter() {
 	boost::log::formatter fmt = boost::log::expressions::stream
 		<< "<" << severity << "> "
 		<< boost::log::expressions::if_(boost::log::expressions::has_attr(class_name_tag))
 		[
-			boost::log::expressions::stream << class_name_tag
+			boost::log::expressions::stream << colorNameTag() << class_name_tag << colorEnd()
 		]
 		<< boost::log::expressions::smessage;
-
-	sink->locked_backend()->add_stream(streamClog);
 	sink->set_formatter(fmt);
-	sink->set_filter( boost::phoenix::bind(&logFilterLevels, severity.or_none(), class_name_tag.or_none() ));
-	boost::log::core::get()->add_sink(sink);
 }
 
 // It is possible in boost::log to have different output sinks (e.g. different log files), each with a different filtering level.
@@ -153,6 +157,47 @@ std::map<std::string,short int>::iterator Logging::findFilterName(const std::str
 		throw std::runtime_error(name+" is not recognized. Did you forget CREATE_LOGGER; and DECLARE_LOGGER(Classname); macros? Or maybe CREATE_CPP_LOCAL_LOGGER(\"filename.cpp\"); macro?\n");
 	}
 	return it;
+}
+
+// https://misc.flogisoft.com/bash/tip_colors_and_formatting
+// https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake , use ${Esc} for printing colors
+void Logging::setUseColors(bool use) {
+	colors=use;
+	updateFormatter();
+}
+
+std::string Logging::colorSeverity(Logging::SeverityLevel level) {
+	if(not colors) return "";
+	switch(level) {
+		case SeverityLevel::eNOFILTER  : return esc+"[36m";
+		case SeverityLevel::eFATAL     : return esc+"[91m";
+		case SeverityLevel::eERROR     : return esc+"[31m";
+		case SeverityLevel::eWARN      : return esc+"[93m";
+		case SeverityLevel::eINFO      : return esc+"[96m";
+		case SeverityLevel::eDEBUG     : return esc+"[33m";
+		case SeverityLevel::eTRACE     : return esc+"[92m";
+		default                        : return "";
+	}
+}
+
+std::string Logging::colorNameTag() {
+	if(not colors) return "";
+	return esc+"[93m";
+}
+
+std::string Logging::colorLineNumber() {
+	if(not colors) return "";
+	return esc+"[93m";
+}
+
+std::string Logging::colorFunction() {
+	if(not colors) return "";
+	return esc+"[32m";
+}
+
+std::string Logging::colorEnd() {
+	if(not colors) return "";
+	return esc+"[0m";
 }
 
 #endif

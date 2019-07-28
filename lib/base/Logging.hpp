@@ -20,6 +20,7 @@
 #ifdef YADE_BOOST_LOG
 	#include <string>
 	#include <map>
+	#include <vector>
 	#include <lib/base/Singleton.hpp>
 	#include <boost/log/expressions.hpp>
 	#include <boost/log/trivial.hpp>
@@ -28,7 +29,7 @@
 	// TODO: move this when fixing https://gitlab.com/yade-dev/trunk/issues/97
 	constexpr unsigned long hash(const char* str, int ha = 0) { return !str[ha] ? 5381 : (hash(str, ha+1) * 33) ^ str[ha]; }
 
-	#define _LOG_HEAD ":"<<__LINE__<<" "<<__PRETTY_FUNCTION__<<": "
+	#define _LOG_HEAD ":"<< Logging::instance().colorLineNumber() <<__LINE__<< Logging::instance().colorFunction() << " " << __PRETTY_FUNCTION__ << Logging::instance().colorEnd()<< ": "
 	// If you get "error: ‘logger’ was not declared in this scope" then you have to declare logger.
 	// Use DECLARE_LOGGER; inside class and CREATE_LOGGER(ClassName); inside .cpp file
 	// or use CREATE_CPP_LOCAL_LOGGER("filename.cpp") if you need logging outside some class.
@@ -45,7 +46,6 @@
 			enum SeverityLevel { eNOFILTER=0, eFATAL=1, eERROR=2, eWARN=3, eINFO=4, eDEBUG=5, eTRACE=6 };
 			Logging();
 			void        readConfigFile(const std::string&);
-			void        setUseColors(bool);
 			void        setDefaultLogLevel(short int);
 			void        setOutputStream(const std::string& , bool reset);
 			short int   getDefaultLogLevel() { return defaultLogLevel;};
@@ -55,26 +55,35 @@
 			boost::log::sources::severity_logger< Logging::SeverityLevel > createNamedLogger(std::string name);
 			const std::map<std::string,short int>&         getClassLogLevels() { return classLogLevels; };
 			static constexpr short int                     maxLogLevel{MAX_LOG_LEVEL};
+
+			void        setUseColors(bool);
+			std::string colorSeverity(Logging::SeverityLevel);
+			std::string colorNameTag();
+			std::string colorLineNumber();
+			std::string colorFunction();
+			std::string colorEnd();
 		private:
 			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > TextSink;
 			std::map<std::string,short int>::iterator      findFilterName(const std::string&);
+			void                                           updateFormatter();
 			short int                                      defaultLogLevel{(short int)(SeverityLevel::eWARN)}; // see constructor in Logging.cpp, at later stages of initialization it is overwritten by core/main/main.py.in line 163
 			std::map<std::string,short int>                classLogLevels{{"Default",defaultLogLevel}};
 			boost::shared_ptr< TextSink >                  sink{boost::make_shared< TextSink >()};
 			boost::shared_ptr< std::ostream >              streamClog{}, streamCerr{}, streamCout{}, streamFile{};
 			std::vector< boost::shared_ptr<std::ostream> > streamOld{};
-			bool                                           colors{true};
+			bool                                           colors{false}; // can't be set here to avoid race condition, in later initialization it is overwritten by core/main/main.py.in line 163
+			const                                          std::string esc{char{27}};
 		FRIEND_SINGLETON(Logging);
 	};
 	BOOST_LOG_ATTRIBUTE_KEYWORD(severity      , "Severity" , Logging::SeverityLevel )
 	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "NameTag"  , std::string            )
 	inline std::ostream& operator<< (std::ostream& strm, Logging::SeverityLevel level) // necessary for formatting output.
 	{
-		static const char* strings[] = { "NOFILTER" , "FATAL_1" , "ERROR_2" , "WARN__3" , "INFO__4" , "DEBUG_5" , "TRACE_6" };
-		if (static_cast< std::size_t >(level) < sizeof(strings) / sizeof(*strings))
-			strm << strings[level];
+		static std::vector<std::string> names = { "NOFILTER" , "FATAL_1" , "ERROR_2" , "WARN__3" , "INFO__4" , "DEBUG_5" , "TRACE_6" };
+		if ( (int(level) < int(names.size())) and (int(level) >= 0))
+			strm << Logging::instance().colorSeverity(level) << names[level] << Logging::instance().colorEnd();
 		else
-			strm << static_cast< int >(level);
+			strm << int(level);
 		return strm;
 	}
 	// logger is local for every class, but if it is missing, we will use the parent's class logger automagically.
