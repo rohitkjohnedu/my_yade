@@ -197,7 +197,7 @@ This function prints test messages on all log levels. Can be used to see how fil
 Resets log output stream to default state: all logs are printed on ``std::clog`` channel, which usually redirects to ``std::cerr``.
 	)""");
 	py::def("setLevel", setLevel , R"""(
-Set minimum filter *level* (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN`` (3), ``ERROR`` (2), ``FATAL`` (1), ``NOFILTER`` (0)) for given logger.
+Set filter level (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN`` (3), ``ERROR`` (2), ``FATAL`` (1), ``NOFILTER`` (0)) for given logger.
 
 :param str className: The logger name for which the filter level is to be set. Use name ``Default`` to change the default filter level.
 :param int level: The filter level to be set.
