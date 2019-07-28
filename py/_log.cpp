@@ -224,6 +224,7 @@ Loads the given configuration file.
 	)""");
 	py::def("saveConfigFile", saveConfigFile, R"""(
 Saves log config to specified file.
+
 :param str fname: the config file to be saved.
 	)""");
 	py::def("defaultConfigFileName", defaultConfigFileName, R"""(
