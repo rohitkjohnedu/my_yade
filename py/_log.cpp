@@ -1,5 +1,12 @@
-// 2006-2008 © Václav Šmilauer
-// 2019 Janek Kozicki
+/*************************************************************************
+*  2006-2008 © Václav Šmilauer                                           *
+*  2019      © Janek Kozicki, rewritten using boost::log the version     *
+*              which was removed in 2008 (git revision 014b11496)        *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
 // hint: follow changes in d067b0696a8 to add new modules.
 
 #include<core/Omega.hpp>
