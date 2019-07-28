@@ -159,7 +159,7 @@ For yade debugging two tools are available:
 1. Use the debug build so that the stack trace provides complete information about potential crash. This can be achieved in two ways:
 
 	a) Compiling yade with cmake option ``-DDEBUG=ON``,
-	b) Installing ``yade-dbgsym`` debian/ubuntu package (this option will be available after `issue <https://gitlab.com/yade-dev/trunk/issues/58>`_ is completed).
+	b) Installing ``yade-dbgsym`` debian/ubuntu package (this option will be available after `this task <https://gitlab.com/yade-dev/trunk/issues/58>`_ is completed).
 
 2. Use :ref:`log-levels` framework described below.
 
@@ -216,9 +216,6 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 	| ``LOG_TRACE``    | ``log.TRACE``      | ``-f6`` | Trace messages, they capture every possible detail about yade behavior.         |
 	|                  |                    |         |                                                                                 |
 	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
-	|                  |                    | ``-f7`` | Enables all debug messages, including some custom log levels not in the         |
-	|                  |                    |         | list above. Intended for developer use only.                                    |
-	+------------------+--------------------+---------+---------------------------------------------------------------------------------+
 
 
 Yade default log level is ``yade.log.WARN`` which is the same as invoking ``yade -f3``.
@@ -235,7 +232,7 @@ Setting a filter level
 
 .. warning:: The messages (such as ``a << b << " message."``) given as arguments to ``LOG_*`` macros are used only if the message passes the filter level. **Do not use such messages to perform mission critical calculations**.
 
-There or two settings for the filter level, the ``Default`` level used when no class (or ``"filename.cpp"``) specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
+There are two settings for the filter level, the ``Default`` level used when no ``ClassName`` (or ``"filename.cpp"``) specific filter is set and a filter level set for specific ``ClassName`` (or ``"filename.cpp"``). They can be set with following means:
 
 1. When starting yade with ``yade -fN`` command, where ``N`` sets the ``Default`` filter level. The default value is ``yade.log.WARN`` (3).
 
@@ -265,7 +262,7 @@ There or two settings for the filter level, the ``Default`` level used when no c
 
 	In [3]: log.setLevel("NewtonIntegrator",6)
 
-4. To change the filter level for ``"filename.cpp"`` use the named specified when creating it. For example manipulating filter log level of ``"_log.cpp"`` might look like following:
+4. To change the filter level for ``"filename.cpp"`` use the name specified when creating it. For example manipulating filter log level of ``"_log.cpp"`` might look like following:
 
 .. ipython::
 	:okexcept:
@@ -325,7 +322,7 @@ All debug macros are summarized in the table below:
 	| ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, | Prints message using ``std::ostream`` syntax, like:                                |
 	| ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``            | ``LOG_TRACE( a << b << " text" )``                                                 |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
-	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints provided variables. E.g.: ``TRVAR3(testInt,testStr,testReal);``.            |
+	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints provided variables like: ``TRVAR3(testInt,testStr,testReal);``              |
 	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                      |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
 	| ``TRACE;``                                                | Prints a ``"Been here"`` message at ``TRACE`` log filter level.                    |
