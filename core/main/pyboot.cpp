@@ -38,17 +38,6 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 		signal(SIGSEGV,crashHandler);
 	#endif
 
-// BOOST_LOGGER recovered from git show 014b11496
-/*
-	#ifdef YADE_BOOST_LOG
-		// read logging configuration from file and watch it (creates a separate thread)
-		if(filesystem::exists(confDir+"/logging.conf")){
-			std::string logConf=confDir+"/logging.conf";
-			log4cxx::PropertyConfigurator::configure(logConf);
-			LOG_INFO("Loaded "<<logConf);
-		}
-	#endif
-*/
 	vector<string> ppp; for(int i=0; i<boost::python::len(pp); i++) ppp.push_back(boost::python::extract<string>(pp[i]));
 	Omega::instance().loadPlugins(ppp);
 }

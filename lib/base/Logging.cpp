@@ -13,6 +13,8 @@
 #include <boost/core/null_deleter.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <boost/phoenix/bind/bind_function.hpp>
+#include <boost/filesystem.hpp>
+#include <core/Omega.hpp>
 
 SINGLETON_SELF(Logging);
 
@@ -51,11 +53,14 @@ Logging::Logging()
 	, streamCout(&std::cout, boost::null_deleter())
 	, colors{false}
 	, esc{char{27}}
+	, lastOutputStream{"clog"}
+	, logger{}
 {
 	sink->locked_backend()->add_stream(streamClog);
 	updateFormatter();
 	sink->set_filter( boost::phoenix::bind(&logFilterLevels, severity.or_none(), class_name_tag.or_none() ));
 	boost::log::core::get()->add_sink(sink);
+	logger = createNamedLogger("Logging");
 }
 
 void Logging::updateFormatter() {
@@ -76,6 +81,10 @@ void Logging::updateFormatter() {
 // To do this multiple variables like the variable 'sink' below would have to be defined. Each with a different filter level.
 // Below all add_stream(…), remove_stream(…) calls are to the same sink. So they all have the same filtering level.
 void Logging::setOutputStream(const std::string& name , bool reset) {
+	LOG_INFO("setting new stream to '" << name << "'");
+	if(name.empty()) {
+		throw std::runtime_error("Cannot use empty stream name.");
+	}
 	lastOutputStream = name;
 	if(reset) {
 		sink->locked_backend()->remove_stream(streamClog);
@@ -94,7 +103,7 @@ void Logging::setOutputStream(const std::string& name , bool reset) {
 		case hash("cout") : sink->locked_backend()->add_stream(streamCout); break;
 		default           : {
 			if(not reset and streamFile) {
-				std::cerr << "LOGGER Warning: adding a new log file without resetting the old one means that the logs will go to both files.\n";
+				LOG_WARN("adding a new log file without resetting the old one means that the logs will go to both files.");
 				streamOld.push_back(streamFile);
 			}
 			streamFile = boost::make_shared< std::ofstream >(name.c_str());
@@ -105,10 +114,68 @@ void Logging::setOutputStream(const std::string& name , bool reset) {
 }
 
 void Logging::readConfigFile(const std::string& fname) {
-	// TODO ...
+	LOG_INFO("Loading " << fname);
+	if(boost::filesystem::exists(fname)) {
+		std::ifstream f(fname);
+		if (f.is_open()) {
+			std::string line;
+			while (getline( f,line )) {
+				if(line.empty() or line[0]=='#') {
+					continue;
+				}
+				std::stringstream ss(line);
+				std::string option="";
+				ss >> line;
+				ss >> option;
+				try {
+					int val = boost::lexical_cast<int>(option);
+					switch(hash(line.c_str())) {
+						case hash("colors") : setUseColors(bool(val)); break;
+						default             : setNamedLogLevel(line,val); break;
+						// other special strings can be added here to set various settings
+						// for example to configure colors for each type of message.
+					}
+				} catch(const boost::bad_lexical_cast&) { // option is not a number
+					switch(hash(line.c_str())) {
+						case hash("output") : setOutputStream(option,true); break;
+						default             : LOG_WARN("invalid value (" << option << ") in config file \"" << fname <<"\"."); break;
+					}
+				}
+			}
+		}
+	} else {
+		LOG_ERROR(fname << " does not exist");
+	}
+}
+
+void Logging::saveConfigFile(const std::string& fname) {
+	LOG_INFO("Saving " << fname);
+	std::ofstream f(fname);
+	if (f.is_open()) {
+		f << "# YADE LOG config file\n";
+		f << "# special keywords are:\n";
+		f << "# 1. \"Default\" to set default filter level\n";
+		f << "# 2. \"colors\" to indicate if colors should be used, use 0 or 1.\n";
+		f << "# 3. \"output\" to redirect output to cout, cerr, clog stream or to a file\n";
+		f << "colors "  << int(colors) << "\n";
+		f << "output "  << lastOutputStream << "\n";
+		f << "Default " << getDefaultLogLevel() << "\n";
+		for(const auto& a : classLogLevels ) {
+			if((a.second != -1) and (a.first != "Default")) {
+				f << a.first << " " << a.second << "\n";
+			}
+		}
+	} else {
+		throw std::runtime_error("Cannot open file to save logging config.");
+	}
+}
+
+std::string Logging::defaultConfigFileName() {
+	return Omega::instance().confDir+"/logging.conf";
 }
 
 void Logging::setDefaultLogLevel(short int level) {
+	LOG_TRACE("setting \"Default\" log level to "<<level)
 	if(level < (short int)(SeverityLevel::eNOFILTER) or level > (short int)(SeverityLevel::eTRACE)) {
 		throw std::runtime_error("The level must be >= NOFILTER (0) and <= TRACE (6), other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
 	}
@@ -121,7 +188,9 @@ short int Logging::getNamedLogLevel  (const std::string& name) {
 }
 
 void Logging::setNamedLogLevel  (const std::string& name , short int level) {
+	LOG_INFO("setting \"" << name << "\" log level to " << level)
 	if(level < (short int)(SeverityLevel::eNOFILTER) or level > (short int)(SeverityLevel::eTRACE)) {
+		LOG_ERROR("Cannot use level = " << level << ", if this is from loading config file, then comment out this line with '#'")
 		throw std::runtime_error("The level must be >= NOFILTER (0) and <= TRACE (6), other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
 	}
 	if(level > maxLogLevel) {

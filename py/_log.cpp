@@ -150,6 +150,31 @@ void setUseColors(bool use) {
 #endif
 }
 
+void readConfigFile(std::string fname){
+#ifdef YADE_BOOST_LOG
+	Logging::instance().readConfigFile(fname);
+#else
+	printNoBoostLogWarning();
+#endif
+}
+
+void saveConfigFile(std::string fname) {
+#ifdef YADE_BOOST_LOG
+	Logging::instance().saveConfigFile(fname);
+#else
+	printNoBoostLogWarning();
+#endif
+}
+
+std::string defaultConfigFileName() {
+#ifdef YADE_BOOST_LOG
+	return Logging::instance().defaultConfigFileName();
+#else
+	printNoBoostLogWarning();
+	return "";
+#endif
+}
+
 BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
@@ -189,6 +214,19 @@ Set minimum filter *level* (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4)
 	)""");
 	py::def("setUseColors", setUseColors, R"""(
 Turn on/off colors in log messages. By default is on. When logging to file it is better turned off.
+	)""");
+
+// Config file
+	py::def("readConfigFile", readConfigFile, R"""(
+Loads the given configuration file.
+:param str fname: the config file to be loaded.
+	)""");
+	py::def("saveConfigFile", saveConfigFile, R"""(
+Saves log config to specified file.
+:param str fname: the config file to be saved.
+	)""");
+	py::def("defaultConfigFileName", defaultConfigFileName, R"""(
+:return: the default log config file, which is loaded at startup.
 	)""");
 
 	py::scope().attr("TRACE")=int(6);
