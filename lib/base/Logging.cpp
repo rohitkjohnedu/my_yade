@@ -14,28 +14,21 @@ SINGLETON_SELF(Logging);
 bool logFilterLevels(  boost::log::value_ref< Logging::SeverityLevel , tag::severity      > const& level
 		     , boost::log::value_ref< std::string            , tag::class_name_tag> const& name )
 {
-/*
-	auto itEnd          = Logging::instance().classLogLevels.end();
+	auto itEnd          = Logging::instance().getClassLogLevels().end();
 	short int itDefault = Logging::instance().getDefaultLogLevel();
-	if(itDefault == itEnd) { // something is seriously broken, we resort to std::cerr to report that.
-		std::cerr << "LOGGER Warning: \"Default\" log level is missing. Expect problems with logging.\n";
-		return true;
-	}
 	if(not level) { // something is seriously broken, we resort to std::cerr to report that.
 		std::cerr << "LOGGER Warning: Logging::SeverityLevel is missing. Expect problems with logging.\n";
 		return true;
 	}
 	if(name) {
-		auto it = Logging::instance().classLogLevels.find(name.get());
+		auto it = Logging::instance().getClassLogLevels().find(name.get());
 		if( ( it != itEnd ) and ( it->second >= 0 ) ) {
 			return level <= it->second;
 		}
 	} else {
 		std::cerr << "LOGGER Warning: class_name_tag needed for filtering is missing. Expect problems with logging.\n";
 	}
-	return level <= itDefault->second;
-*/
-	return true;
+	return level <= itDefault;
 }
 
 // Setup the common formatter for all sinks
