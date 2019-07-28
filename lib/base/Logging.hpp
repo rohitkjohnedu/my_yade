@@ -8,10 +8,6 @@
  * - CREATE_LOGGER(ClassName); that must be used in class implementation file to create the static variable.
  * - CREATE_CPP_LOCAL_LOGGER("filename.cpp"); use this inside a *.cpp file which has code that does not belong to any class, and needs logging. The name will be used for filtering logging.
  *
- * Note that the latter 2 may change their name to something like LOG_DECLARE and LOG_CREATE, to be consistent.
- * Some other macros will be very likely added, to allow for easy variable tracing etc. Suggestions welcome.
- *
- *
  * Yade has the logging config file by default in ~/.yade-$VERSION/logging.conf.
  *
  */
