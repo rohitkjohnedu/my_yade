@@ -243,9 +243,9 @@ std::string Logging::colorSeverity(Logging::SeverityLevel level) {
 		case SeverityLevel::eNOFILTER  : return esc+"[36m";
 		case SeverityLevel::eFATAL     : return esc+"[91m";
 		case SeverityLevel::eERROR     : return esc+"[31m";
-		case SeverityLevel::eWARN      : return esc+"[93m";
+		case SeverityLevel::eWARN      : return esc+"[95m";
 		case SeverityLevel::eINFO      : return esc+"[96m";
-		case SeverityLevel::eDEBUG     : return esc+"[95m";
+		case SeverityLevel::eDEBUG     : return esc+"[94m";
 		case SeverityLevel::eTRACE     : return esc+"[92m";
 		default                        : return "";
 	}

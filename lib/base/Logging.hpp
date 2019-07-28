@@ -82,7 +82,7 @@
 	BOOST_LOG_ATTRIBUTE_KEYWORD(class_name_tag, "NameTag"  , std::string            )
 	inline std::ostream& operator<< (std::ostream& strm, Logging::SeverityLevel level) // necessary for formatting output.
 	{
-		static std::vector<std::string> names = { "NOFILTER" , "FATAL_1" , "ERROR_2" , "WARN__3" , "INFO__4" , "DEBUG_5" , "TRACE_6" };
+		static std::vector<std::string> names = { "NOFILTER" , "FATAL ERROR" , "ERROR" , "WARNING" , "INFO" , "DEBUG" , "TRACE" };
 		if ( (int(level) < int(names.size())) and (int(level) >= 0))
 			strm << Logging::instance().colorSeverity(level) << names[level] << Logging::instance().colorEnd();
 		else
