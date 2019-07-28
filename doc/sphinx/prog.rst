@@ -152,7 +152,20 @@ and then clicking "Browse" in the "Job Artifacts" on the right.
 Debugging
 ================
 
-.. todo FIXME: write about debug symbols, yade-dbgsym package, enabling debug builds, ptrace permission problems in newer linux kernels, and a few more yade specific debug stuff.
+.. todo : ✓write about debug symbols, ✓yade-dbgsym package, ✓enabling debug builds, ✓ptrace permission problems in newer linux kernels, and a few more yade specific debug stuff.
+
+For yade debugging two tools are available:
+
+1. Use the debug build so that the stack trace provides complete information about potential crash. This can be achieved in two ways:
+
+	a) Compiling yade with cmake option ``-DDEBUG=ON``,
+	b) Installing ``yade-dbgsym`` debian/ubuntu package (this option will be available after `issue <https://gitlab.com/yade-dev/trunk/issues/58>`_ is completed).
+
+2. Use :ref:`log-levels` framework described below.
+
+These tools can be used in conjunction with other software. A detailed discussion of these is on `yade <https://yade-dem.org/wiki/Introduction_to_debugging>`_ `wiki <https://yade-dem.org/wiki/Debugging_using_Kdevelop>`_. These tools include: `kdevelop <https://www.kdevelop.org/>`_, `valgrind <http://valgrind.org/>`_, `alleyoop <http://alleyoop.sourceforge.net/>`_, `kcachegrind <http://kcachegrind.sourceforge.net/html/Home.html>`_, `ddd <http://www.gnu.org/software/ddd/>`_, `gdb <https://www.gnu.org/software/gdb/>`_, `kompare <https://en.wikipedia.org/wiki/Kompare>`_, `kdiff3 <http://kdiff3.sourceforge.net/>`_, `meld <https://meldmerge.org/>`_.
+
+When yade crashes and debug information is available (Ad. point 1 above) a full stack trace is displayed after the crash which is very useful. However on some linux systems stack trace will not be shown and a message ``ptrace: Operation not permitted`` will appear instead. To enable stack trace issue command: ``sudo echo 0 > /proc/sys/kernel/yama/ptrace_scope``. To disable stack trace issue command ``sudo echo 1 > /proc/sys/kernel/yama/ptrace_scope``.
 
 Logging
 ----------------
@@ -222,11 +235,11 @@ Setting a filter level
 
 .. warning:: The messages (such as ``a << b << " message."``) given as arguments to ``LOG_*`` macros are used only if the message passes the filter level. **Do not use such messages to perform mission critical calculations**.
 
-There or two settings for the filter level, the ``Default`` level used when no class specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
+There or two settings for the filter level, the ``Default`` level used when no class (or ``"filename.cpp"``) specific filter is set and a filter level set for specific ``ClassName``. They can be set with following means:
 
-1. When starting yade with ``yade -fN`` command, where ``N`` sets the ``Default`` filter level. The default is ``yade.log.WARN``.
+1. When starting yade with ``yade -fN`` command, where ``N`` sets the ``Default`` filter level. The default value is ``yade.log.WARN`` (3).
 
-2. To change ``Default`` filter level during runtime invoke command:
+2. To change ``Default`` filter level during runtime invoke command ``log.setLevel("Default",value)`` or ``log.setDefaultLogLevel(value)``:
 
 .. ipython::
 	:okexcept:
@@ -241,8 +254,6 @@ There or two settings for the filter level, the ``Default`` level used when no c
 
 	In [3]: log.setDefaultLogLevel(3)
 
-	In [4]: log.testAllLevels()
-
 3. To change filter level for ``SomeClass`` invoke command:
 
 .. ipython::
@@ -254,6 +265,22 @@ There or two settings for the filter level, the ``Default`` level used when no c
 
 	In [3]: log.setLevel("NewtonIntegrator",6)
 
+4. To change the filter level for ``"filename.cpp"`` use the named specified when creating it. For example manipulating filter log level of ``"_log.cpp"`` might look like following:
+
+.. ipython::
+	:okexcept:
+
+	In [1]: import log
+
+	In [1]: log.getUsedLevels()
+
+	In [2]: log.setLevel("_log.cpp",log.WARN)
+
+	In [3]: log.getUsedLevels()
+
+	In [3]: log.getAllLevels()["_log.cpp"]
+
+	In [4]: log.testAllLevels()
 
 
 Maximum log level
@@ -266,28 +293,48 @@ The upside of this approach is that yade can be compiled in a non-debug build, a
 Debug macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+To enable debugging for particular class the ``DECLARE_LOGGER;`` macro should be put in class definition inside header to create a separate named logger for that class. Then the ``CREATE_LOGGER(ClassName);`` macro must be used in the class implementation ``.cpp`` file to create the static variable. Sometimes a logger is necessary outside the class, such named logger can be created inside a ``.cpp`` file and by convention its name should correspond to the name of the file, use the macro ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");`` for this. On rare occasions logging is necessary inside ``.hpp`` file outside of a class (where the local class named logger is unavailable), then the solution is to use ``LOG_NOFILTER(…)`` macro, because it is the only one that can work without a named logger. If the need arises this solution can be improved, see :ysrc:`lib/lib/base/Logging.hpp` for details.
+
 All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the brackets, such as ``LOG_TRACE( a << b << " text" )``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
 
 Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp` for example use.
 
 The macro ``TRACE;`` prints a ``"Been here"`` message at ``TRACE`` log filter level, and can be used for quick debugging.
 
+There are additionally specified macro aliases, for easier use in editors with tab completion, which have a filter level number in their name:
+
+	* ``LOG_6_TRACE``, ``LOG_5_DEBUG``, ``LOG_4_INFO``, ``LOG_3_WARN``, ``LOG_2_ERROR``, ``LOG_1_FATAL``, ``LOG_0_NOFILTER``.
+	* ``LOG_6``, ``LOG_5``, ``LOG_4``, ``LOG_3``, ``LOG_2``, ``LOG_1``, ``LOG_0``.
+
 All debug macros are summarized in the table below:
 
 
 .. table:: Yade debug macros.
 
-	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
-	| macro name                                                | explanation                                                                     |
-	+===========================================================+=================================================================================+
-	| ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, | Prints message using ``std::ostream`` syntax, like:                             |
-	| ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``            | ``LOG_TRACE( a << b << " text" )``                                              |
-	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
-	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints provided variables. E.g.: ``TRVAR3(testInt,testStr,testReal);``.         |
-	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                   |
-	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
-	| ``TRACE;``                                                | Prints a ``"Been here"`` message at ``TRACE`` log filter level.                 |
-	+-----------------------------------------------------------+---------------------------------------------------------------------------------+
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| macro name                                                | explanation                                                                        |
+	+===========================================================+====================================================================================+
+	| ``DECLARE_LOGGER;``                                       | Declares logger variable inside class definition in ``.hpp`` file.                 |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``CREATE_LOGGER(ClassName);``                             | Creates logger static variable (with name ``"ClassName"``) inside class            |
+	|                                                           | implementation in ``.cpp`` file.                                                   |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");``              | Creates logger static variable outside of any class (with name ``"filename.cpp"``) |
+	|                                                           | inside the ``filename.cpp`` file.                                                  |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, | Prints message using ``std::ostream`` syntax, like:                                |
+	| ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``            | ``LOG_TRACE( a << b << " text" )``                                                 |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints provided variables. E.g.: ``TRVAR3(testInt,testStr,testReal);``.            |
+	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                      |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``TRACE;``                                                | Prints a ``"Been here"`` message at ``TRACE`` log filter level.                    |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``LOG_6_TRACE``, ``LOG_5_DEBUG``, ``LOG_4_INFO``,         | Additional macro aliases for easier use in editors with tab completion.            |
+	| ``LOG_3_WARN``, ``LOG_2_ERROR``, ``LOG_1_FATAL``,         | They have have a filter level number in their name                                 |
+	| ``LOG_0_NOFILTER``, ``LOG_6``, ``LOG_5``, ``LOG_4``,      |                                                                                    |
+	| ``LOG_3``, ``LOG_2``, ``LOG_1``, ``LOG_0``                |                                                                                    |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
 
 
 .. _regression-tests:
@@ -1745,7 +1792,7 @@ There are 3 singletons:
 ``Omega``
 	Access to simulation(s); deserves separate section due to its importance.
 ``Logging``
-	Handles logging filters for all named loggers, see :global ref:`logging verbosity <log-levels>`.
+	Handles logging filters for all named loggers, see :ref:`logging verbosity <log-levels>`.
 
 Omega
 ^^^^^^
