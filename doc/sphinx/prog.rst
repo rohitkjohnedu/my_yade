@@ -165,9 +165,9 @@ For yade debugging two tools are available:
 
 These tools can be used in conjunction with other software. A detailed discussion of these is on `yade <https://yade-dem.org/wiki/Introduction_to_debugging>`_ `wiki <https://yade-dem.org/wiki/Debugging_using_Kdevelop>`_. These tools include: `kdevelop <https://www.kdevelop.org/>`_, `valgrind <http://valgrind.org/>`_, `alleyoop <http://alleyoop.sourceforge.net/>`_, `kcachegrind <http://kcachegrind.sourceforge.net/html/Home.html>`_, `ddd <http://www.gnu.org/software/ddd/>`_, `gdb <https://www.gnu.org/software/gdb/>`_, `kompare <https://en.wikipedia.org/wiki/Kompare>`_, `kdiff3 <http://kdiff3.sourceforge.net/>`_, `meld <https://meldmerge.org/>`_.
 
-When yade crashes and debug information is available (Ad. point 1 above) a full stack trace is displayed after the crash which is very useful.
-
 .. note:: On some linux systems stack trace will not be shown and a message ``ptrace: Operation not permitted`` will appear instead. To enable stack trace issue command: ``sudo echo 0 > /proc/sys/kernel/yama/ptrace_scope``. To disable stack trace issue command ``sudo echo 1 > /proc/sys/kernel/yama/ptrace_scope``.
+
+.. hint:: When debugging make sure there is enough free space in /tmp.
 
 .. _logging:
 
@@ -189,7 +189,14 @@ A cmake compilation option ``-DBOOST_LOGGER=ON`` must be supplied during compila
 
 Figure imgLogging_ shows example use of logging framework.
 
-.. hint:: Default format of log message is: ``<severity level> ClassName:LineNumber FunctionName: Log Message``, special macro ``LOG_NOFILTER`` is printed without ``ClassName`` because it lacks one.
+.. note::
+	Default format of log message is:
+
+	.. code-block:: python
+
+		<severity level> ClassName:LineNumber FunctionName: Log Message
+	
+	special macro ``LOG_NOFILTER`` is printed without ``ClassName`` because it lacks one.
 
 Config files can be saved and loaded via :yref:`readConfigFile<yade._log.readConfigFile>` and :yref:`saveConfigFile<yade._log.saveConfigFile>`. The :yref:`defaultConfigFileName<yade._log.defaultConfigFileName>` is read upon startup if it exists. The filter level setting ``-f`` supplied from command line will override the setting in config file.
 
