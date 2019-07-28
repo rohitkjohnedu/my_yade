@@ -219,6 +219,7 @@ Turn on/off colors in log messages. By default is on. When logging to file it is
 // Config file
 	py::def("readConfigFile", readConfigFile, R"""(
 Loads the given configuration file.
+
 :param str fname: the config file to be loaded.
 	)""");
 	py::def("saveConfigFile", saveConfigFile, R"""(
