@@ -30,9 +30,14 @@ bool logFilterLevels(  boost::log::value_ref< Logging::SeverityLevel , tag::seve
 		if( ( it != itEnd ) and ( it->second >= 0 ) ) {
 			return level <= it->second;
 		}
-	} else {
-		std::cerr << "LOGGER Warning: class_name_tag needed for filtering is missing. Expect problems with logging.\n";
 	}
+	// this is triggered for LOG_NOFILTER macros. I comment this out, because they are legal now. Although I could 
+	// slg.add_attribute("NameTag", boost::log::attributes::constant< std::string >("NoFilter"));
+	// inside the LOG_NOFILTER macro. And then they would become filterable. Then they would need a different name. Because eNOFILTER is level 0 now.
+	// I don't expect that a logger inside .hpp without a class logger available will be needed, so I don't do this now.
+	//else {
+	//	std::cerr << "LOGGER Warning: class_name_tag needed for filtering is missing. Expect problems with logging.\n";
+	//}
 	return level <= itDefault;
 }
 
@@ -100,7 +105,7 @@ void Logging::readConfigFile(const std::string& fname) {
 
 void Logging::setDefaultLogLevel(short int level) {
 	if(level < (short int)(SeverityLevel::eNOFILTER) or level > (short int)(SeverityLevel::eTRACE)) {
-		throw std::runtime_error("The level must be >= NOFILTER and <= TRACE, other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
+		throw std::runtime_error("The level must be >= NOFILTER (0) and <= TRACE (6), other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
 	}
 	classLogLevels["Default"] = level;
 	defaultLogLevel           = level;
@@ -112,7 +117,7 @@ short int Logging::getNamedLogLevel  (const std::string& name) {
 
 void Logging::setNamedLogLevel  (const std::string& name , short int level) {
 	if(level < (short int)(SeverityLevel::eNOFILTER) or level > (short int)(SeverityLevel::eTRACE)) {
-		throw std::runtime_error("The level must be >= NOFILTER and <= TRACE, other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
+		throw std::runtime_error("The level must be >= NOFILTER (0) and <= TRACE (6), other values are not meaningful. To unset level to \"Default\" level use function unsetLevel(…).");
 	}
 	if(level > maxLogLevel) {
 		std::cerr << "LOGGER Warning: setting \""<<name<<"\" log level higher than MAX_LOG_LEVEL="<<maxLogLevel<<" will have no effect. Logs will not be printed, they were removed during compilation.\n";
