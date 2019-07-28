@@ -170,6 +170,12 @@ When yade crashes and debug information is available (Ad. point 1 above) a full 
 Logging
 ----------------
 
+.. _imgLogging:
+.. image:: fig/logging.png
+
+Figure imgLogging_ shows example use of logging framework. Log filter levels can be set separately for each class. Messages can be redirected from ``std::cclog`` to other stream or to a log file.
+
+
 .. _log-levels:
 
 Log levels

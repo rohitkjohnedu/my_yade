@@ -2,11 +2,14 @@
 // 2019        Janek Kozicki
 #pragma once
 /*
- * This file defines various useful logging-related macros - userspace stuff is
+ * This file defines various useful logging-related macros. For full description see https://yade-dem.org/doc/prog.html#debugging
+ * Quick summary:
  * - LOG_* for actual logging,
  * - DECLARE_LOGGER; that should be used in class header to create separate logger for that class,
  * - CREATE_LOGGER(ClassName); that must be used in class implementation file to create the static variable.
  * - CREATE_CPP_LOCAL_LOGGER("filename.cpp"); use this inside a *.cpp file which has code that does not belong to any class, and needs logging. The name will be used for filtering logging.
+ * - TRVARn(…) for printing variables
+ * - TRACE; for quick tracing
  *
  * Yade has the logging config file by default in ~/.yade-$VERSION/logging.conf.
  *
