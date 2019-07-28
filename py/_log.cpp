@@ -32,7 +32,7 @@ int getDefaultLogLevel() {
 
 void setDefaultLogLevel(int level) {
 #ifdef YADE_BOOST_LOG
-	Logging::instance().setDefaultLogLevel(level);
+	Logging::instance().setNamedLogLevel("Default",level);
 #else
 	printNoBoostLogWarning();
 #endif

@@ -47,7 +47,6 @@
 			void        readConfigFile(const std::string&);
 			void        saveConfigFile(const std::string&);
 			std::string defaultConfigFileName();
-			void        setDefaultLogLevel(short int);
 			void        setOutputStream(const std::string& , bool reset);
 			short int   getDefaultLogLevel() { return defaultLogLevel;};
 			short int   getNamedLogLevel  (const std::string&);
@@ -64,6 +63,7 @@
 			std::string colorFunction();
 			std::string colorEnd();
 		private:
+			void                                           setDefaultLogLevel(short int);
 			typedef boost::log::sinks::synchronous_sink< boost::log::sinks::text_ostream_backend > TextSink;
 			std::map<std::string,short int>::iterator      findFilterName(const std::string&);
 			void                                           updateFormatter();
