@@ -160,9 +160,11 @@ if opts.updateScripts:
 
 if 'BoostLog' in yade.config.features and opts.verbosity:
 	print("Setting log level to: ",opts.verbosity)
+	yade.log.setUseColors(True)
 	yade.log.setLevel("Default",opts.verbosity)
 else:
 	# overwrites the default set in Logging.cpp constructor. This level is mentioned in documentation as the starting default level.
+	yade.log.setUseColors(True)
 	yade.log.setLevel("Default",yade.log.WARN)
 
 # modify sys.argv in-place so that it can be handled by userSession
