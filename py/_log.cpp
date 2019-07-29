@@ -236,7 +236,7 @@ Saves log config to specified file.
 :param str fname: the config file to be saved.
 	)""");
 	py::def("defaultConfigFileName", defaultConfigFileName, R"""(
-:return: the default log config file, which is loaded at startup.
+:return: the default log config file, which is loaded at startup, if it exists.
 	)""");
 
 	py::scope().attr("TRACE")=int(6);
