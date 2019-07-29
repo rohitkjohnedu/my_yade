@@ -51,17 +51,15 @@ void testAllLevels() {
 	Matrix3r testMat = (Matrix3r() << 1, 2, 3, 4, 5, 6, 7, 8, 9).finished();
 	std::complex<Real> testComplex(-1,1);
 
-	LOG_0_NOFILTER("Current \"Default\" filter level is " << getDefaultLogLevel());
+	LOG_0_NOFILTER("Test log level: LOG_0_NOFILTER, test int: " << testInt++);
+	LOG_1_FATAL   ("Test log level: LOG_1_FATAL, test int: " << testInt++);
+	LOG_2_ERROR   ("Test log level: LOG_2_ERROR, test int: " << testInt++);
+	LOG_3_WARN    ("Test log level: LOG_3_WARN, test int: " << testInt++);
+	LOG_4_INFO    ("Test log level: LOG_4_INFO, test int: " << testInt++);
+	LOG_5_DEBUG   ("Test log level: LOG_5_DEBUG, test int: " << testInt++);
+	LOG_6_TRACE   ("Test log level: LOG_6_TRACE, test int: " << testInt++);
 
-	LOG_0_NOFILTER("Test log level: LOG_0_NOFILTER, test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_1_FATAL   ("Test log level: LOG_1_FATAL   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_2_ERROR   ("Test log level: LOG_2_ERROR   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_3_WARN    ("Test log level: LOG_3_WARN    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_4_INFO    ("Test log level: LOG_4_INFO    , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_5_DEBUG   ("Test log level: LOG_5_DEBUG   , test int: " << testInt++ << ", test string: "<< testStr);
-	LOG_6_TRACE   ("Test log level: LOG_6_TRACE   , test int: " << testInt++ << ", test string: "<< testStr);
-
-	LOG_0_NOFILTER("Below 6 variables are printed at filter level TRACE");
+	LOG_0_NOFILTER("Below 6 variables are printed at filter level TRACE, then macro TRACE; is used");
 	TRVAR1(testInt);
 	TRVAR2(testInt,testStr);
 	TRVAR3(testInt,testStr,testReal);
@@ -69,7 +67,6 @@ void testAllLevels() {
 	TRVAR5(testInt,testStr,testReal,testVec,testMat);
 	TRVAR6(testInt,testStr,testReal,testVec,testMat,testComplex);
 
-	LOG_0_NOFILTER("Below is macro TRACE;");
 	TRACE;
 #pragma GCC diagnostic pop
 }
