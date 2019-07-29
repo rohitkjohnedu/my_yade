@@ -187,7 +187,7 @@ A cmake compilation option ``-DENABLE_LOGGER=ON`` must be supplied during compil
 .. _imgLogging:
 .. image:: fig/logging.png
 
-Figure imgLogging_ shows example use of logging framework.
+Figure imgLogging_ shows example use of logging framework. Usually a ``ClassName`` appears in place of ``_log.cpp`` shown on the screenshot. It is there because the ``yade.log`` module uses ``CREATE_CPP_LOCAL_LOGGER`` macro instead of the regular ``DECLARE_LOGGER`` and ``CREATE_LOGGER``, which are :ref:`discussed below <debug-macros>`.
 
 .. note::
 	Default format of log message is:
@@ -306,6 +306,8 @@ Maximum log level
 Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain with current build.
 
 The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
+
+.. _debug-macros:
 
 Debug macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
