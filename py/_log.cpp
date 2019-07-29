@@ -172,6 +172,14 @@ std::string defaultConfigFileName() {
 #endif
 }
 
+int getMaxLevel() {
+#ifdef YADE_BOOST_LOG
+	return Logging::instance().maxLogLevel;
+#else
+	return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL);
+#endif
+}
+
 BOOST_PYTHON_MODULE(_log){
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
@@ -208,6 +216,9 @@ Set filter level (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN``
 	)""");
 	py::def("getUsedLevels", getUsedLevels , R"""(
 :return: A python dictionary with all used log levels in yade. Those without a debug level (value -1) are omitted.
+	)""");
+	py::def("getMaxLevel", getMaxLevel, R"""(
+:return: the MAX_LOG_LEVEL with which current build was compiled.
 	)""");
 	py::def("setUseColors", setUseColors, R"""(
 Turn on/off colors in log messages. By default is on. When logging to file it is better turned off.
