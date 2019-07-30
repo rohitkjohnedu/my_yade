@@ -185,22 +185,31 @@ BOOST_PYTHON_MODULE(_log){
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
 // The docstrings can use syntax :param ……: ……… :return: ……. For details see https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
+
 	py::def("testAllLevels", testAllLevels, R"""(
 This function prints test messages on all log levels. Can be used to see how filtering works and to what streams the logs are written.
 	)""");
+
+// default level
 	py::def("getDefaultLogLevel", getDefaultLogLevel, R"""(
 :return: The current ``Default`` filter log level.
 	)""");
+
 	py::def("setDefaultLogLevel", setDefaultLogLevel, R"""(
 :param int level: Sets the ``Default`` filter log level, same as calling ``log.setLevel("Default",level)``.
 	)""");
+
+// output streams, files, cout, cerr, clog.
 	py::def("setOutputStream", setOutputStream, R"""(
 :param str streamName: sets the output stream, special names ``cout``, ``cerr``, and default ``clog`` use the ``std::cout``, ``std::cerr``, ``std::clog`` counterpart. Every other name means that log will be written to a file with name provided as argument.
 :param bool reset: dictates whether all previously set output streams are to be removed. When set to false: the new output stream is set additionally to the current one.
 	)""");
+
 	py::def("resetOutputStream", resetOutputStream, R"""(
 Resets log output stream to default state: all logs are printed on ``std::clog`` channel, which usually redirects to ``std::cerr``.
 	)""");
+
+// filter levels
 	py::def("setLevel", setLevel , R"""(
 Set filter level (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN`` (3), ``ERROR`` (2), ``FATAL`` (1), ``NOFILTER`` (0)) for given logger.
 
@@ -208,23 +217,29 @@ Set filter level (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN``
 :param int level: The filter level to be set.
 .. warning:: setting ``Default`` log level higher than ``MAX_LOG_LEVEL`` provided during compilation will have no effect. Logs will not be printed because they are removed during compilation.
 	)""");
+
 	py::def("unsetLevel", unsetLevel , R"""(
 :param str className: The logger name for which the filter level is to be unset, so that a ``Default`` will be used instead. Unsetting the ``Default`` level will change it to max level and print everything.
 	)""");
+
 	py::def("getAllLevels", getAllLevels , R"""(
 :return: A python dictionary with all known loggers in yade. Those without a debug level set will have value -1 to indicate that ``Default`` filter log level is to be used for them.
 	)""");
+
 	py::def("getUsedLevels", getUsedLevels , R"""(
 :return: A python dictionary with all used log levels in yade. Those without a debug level (value -1) are omitted.
 	)""");
+
 	py::def("getMaxLevel", getMaxLevel, R"""(
 :return: the MAX_LOG_LEVEL with which current build was compiled.
 	)""");
+
+// colors
 	py::def("setUseColors", setUseColors, R"""(
 Turn on/off colors in log messages. By default is on. When logging to a file it is better turned off.
 	)""");
 
-// Config file
+// config file
 	py::def("readConfigFile", readConfigFile, R"""(
 Loads the given configuration file.
 
