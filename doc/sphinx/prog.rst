@@ -300,13 +300,6 @@ There are two settings for the filter level, the ``Default`` level used when no 
 	In [3]: log.getAllLevels()["_log.cpp"]
 
 
-Maximum log level
-^^^^^^^^^^^^^^^^^
-
-Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain with current build.
-
-The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
-
 .. _debug-macros:
 
 Debug macros
@@ -355,6 +348,49 @@ All debug macros are summarized in the table below:
 	| ``LOG_3``, ``LOG_2``, ``LOG_1``, ``LOG_0``                |                                                                                    |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
 
+
+.. _maximum-log-level:
+
+Maximum log level
+^^^^^^^^^^^^^^^^^
+
+Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain with current build.
+
+The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
+
+.. comment todo : Measuring effect of MAX_LOG_LEVEL right now makes no sense, because logging is barely used.
+   comment todo : We can do this later, when more LOG_* macros are present in the code.
+.. comment:
+.. comment: .. _logging-performance:
+.. comment: 
+.. comment: Logging performance
+.. comment: ^^^^^^^^^^^^^^^^^^^
+.. comment: 
+.. comment: To determine influence of ``MAX_LOG_LEVEL`` a test was done with ``yade -f0 --performance`` invocation. Four runs for each ``MAX_LOG_LEVEL`` with error smaller than 4% for 193480 spheres were used. The iteration per second results were averaged, and following results were obtained:
+.. comment: 
+.. comment: .. table:: Effect of ``MAX_LOG_LEVEL`` setting on computation speed.
+.. comment: 
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| ``MAX_LOG_LEVEL`` setting   | averaged iter/sec            | how many times faster than ``MAX_LOG_LEVEL=6``                                     |
+.. comment: 	+=============================+==============================+====================================================================================+
+.. comment: 	| 6                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| 5                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| 4                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| 3                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| 2                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| 1                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| 0                           |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+.. comment: 	| -1                          |                              |                                                                                    |
+.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
+
+.. hint:: ``MAX_LOG_LEVEL=-1`` disables all macros, but speed up is nearly the same as for ``MAX_LOG_LEVEL=?``. The default setting is ``MAX_LOG_LEVEL=5``.
 
 .. _regression-tests:
 
