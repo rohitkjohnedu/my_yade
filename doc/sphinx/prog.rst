@@ -360,35 +360,6 @@ The upside of this approach is that yade can be compiled in a non-debug build, a
 
 .. comment todo : Measuring effect of MAX_LOG_LEVEL right now makes no sense, because logging is barely used.
    comment todo : We can do this later, when more LOG_* macros are present in the code.
-.. comment:
-.. comment: .. _logging-performance:
-.. comment: 
-.. comment: Logging performance
-.. comment: ^^^^^^^^^^^^^^^^^^^
-.. comment: 
-.. comment: To determine influence of ``MAX_LOG_LEVEL`` a test was done with ``yade -f0 --performance`` invocation. Four runs for each ``MAX_LOG_LEVEL`` with error smaller than 4% for 193480 spheres were used. The iteration per second results were averaged, and following results were obtained:
-.. comment: 
-.. comment: .. table:: Effect of ``MAX_LOG_LEVEL`` setting on computation speed.
-.. comment: 
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| ``MAX_LOG_LEVEL`` setting   | averaged iter/sec            | how many times faster than ``MAX_LOG_LEVEL=6``                                     |
-.. comment: 	+=============================+==============================+====================================================================================+
-.. comment: 	| 6                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| 5                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| 4                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| 3                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| 2                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| 1                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| 0                           |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
-.. comment: 	| -1                          |                              |                                                                                    |
-.. comment: 	+-----------------------------+------------------------------+------------------------------------------------------------------------------------+
 
 .. hint:: ``MAX_LOG_LEVEL=-1`` disables all macros, but speed up is nearly the same as for ``MAX_LOG_LEVEL=?``. The default setting is ``MAX_LOG_LEVEL=5``.
 
