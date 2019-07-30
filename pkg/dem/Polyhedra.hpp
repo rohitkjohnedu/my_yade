@@ -92,7 +92,7 @@ class Polyhedra: public Shape{
 		void GenerateRandomGeometry();
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Polyhedra,Shape,"Polyhedral (convex) geometry.",
-			((std::vector<Vector3r>,v,,,"Tetrahedron vertices in global coordinate system."))
+			((std::vector<Vector3r>,v,,,"Polyhedron vertices in local coordinate system."))
 			((int,seed, time(NULL),,"Seed for random generator."))
 			((Vector3r, size, Vector3r(1.,1.,1.),,"Size of the grain in meters - x,y,z - before random rotation")),
 			/*init*/,
