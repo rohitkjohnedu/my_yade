@@ -201,7 +201,7 @@ This function prints test messages on all log levels. Can be used to see how fil
 
 // output streams, files, cout, cerr, clog.
 	py::def("setOutputStream", setOutputStream, R"""(
-:param str streamName: sets the output stream, special names ``cout``, ``cerr``, and default ``clog`` use the ``std::cout``, ``std::cerr``, ``std::clog`` counterpart. Every other name means that log will be written to a file with name provided as argument.
+:param str streamName: sets the output stream, special names ``cout``, ``cerr``, ``clog`` use the ``std::cout``, ``std::cerr``, ``std::clog`` counterpart (``std::clog`` the is the default output stream). Every other name means that log will be written to a file with name provided in the argument.
 :param bool reset: dictates whether all previously set output streams are to be removed. When set to false: the new output stream is set additionally to the current one.
 	)""");
 
@@ -236,7 +236,7 @@ Set filter level (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN``
 
 // colors
 	py::def("setUseColors", setUseColors, R"""(
-Turn on/off colors in log messages. By default is on. When logging to a file it is better turned off.
+Turn on/off colors in log messages. By default is on. When logging to a file, then it is better to be turned off.
 	)""");
 
 // config file

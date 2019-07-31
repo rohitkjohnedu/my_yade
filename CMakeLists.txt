@@ -43,7 +43,8 @@ cmake_minimum_required(VERSION 2.8.11)
 # https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake , use ${Esc} for printing colors
 string(ASCII 27 Esc)
 # To have a cmake option with multiple values I used https://cmake.org/pipermail/cmake/2016-October/064342.html
-set(MAX_LOG_LEVEL "5" CACHE STRING "set maximum level for LOG_* macros compiled with ENABLE_LOGGER. For production build use MAX_LOG_LEVEL<=5, to avoid filter integer comparison on each call to LOG_TRACE(…)".)
+# set maximum level for LOG_* macros compiled with ENABLE_LOGGER. For production build use MAX_LOG_LEVEL below 5, to avoid filter integer comparison on each call to LOG_TRACE(…)
+set(MAX_LOG_LEVEL "5" CACHE STRING "default MAX_LOG_LEVEL")
 set_property(CACHE MAX_LOG_LEVEL PROPERTY STRINGS "0" "1" "2" "3" "4" "5" "6")  # define list of values GUI will offer for the variable
 
 
