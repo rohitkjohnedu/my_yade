@@ -354,14 +354,13 @@ All debug macros are summarized in the table below:
 Maximum log level
 ^^^^^^^^^^^^^^^^^
 
-Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain with current build.
+Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run slightly faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level is impossible to obtain with current build.
 
 The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
 
 .. comment todo : Measuring effect of MAX_LOG_LEVEL right now makes no sense, because logging is barely used.
-   comment todo : We can do this later, when more LOG_* macros are present in the code.
-
-.. hint:: ``MAX_LOG_LEVEL=-1`` disables all macros, but speed up is nearly the same as for ``MAX_LOG_LEVEL=?``. The default setting is ``MAX_LOG_LEVEL=5``.
+   comment : We can do this later, when more LOG_* macros are present in the code.
+   comment : .. hint:: ``MAX_LOG_LEVEL=-1`` disables all macros, but speed up is nearly the same as for ``MAX_LOG_LEVEL=?``. The default setting is ``MAX_LOG_LEVEL=5``.
 
 .. _regression-tests:
 
