@@ -231,12 +231,12 @@ Set filter level (constants ``TRACE`` (6), ``DEBUG`` (5), ``INFO`` (4), ``WARN``
 	)""");
 
 	py::def("getMaxLevel", getMaxLevel, R"""(
-:return: the MAX_LOG_LEVEL with which current build was compiled.
+:return: the MAX_LOG_LEVEL of the current yade build.
 	)""");
 
 // colors
 	py::def("setUseColors", setUseColors, R"""(
-Turn on/off colors in log messages. By default is on. When logging to a file, then it is better to be turned off.
+Turn on/off colors in log messages. By default is on. If logging to a file then it is better to be turned off.
 	)""");
 
 // config file

@@ -233,7 +233,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)
 	* DEBUG: compile in debug-mode (OFF by default)
 	* ENABLE_LOGGER: use `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for logging separately for each class (ON by default)
-	* MAX_LOG_LEVEL: set maximum level for LOG_* macros compiled with ENABLE_LOGGER. For production build use MAX_LOG_LEVEL<=5, to avoid integer comparison on each call to LOG_TRACE(…)
+	* MAX_LOG_LEVEL: :ref:`set maximum level <maximum-log-level>` for LOG_* macros compiled with ENABLE_LOGGER, (default is 5)
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 	* SUFFIX: suffix, added after binary-names (version number by default)
 	* NOSUFFIX: do not add a suffix after binary-name (OFF by default)
