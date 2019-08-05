@@ -6,6 +6,7 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
+# image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 # image: registry.gitlab.com/yade-dev/docker-yade:suse15
 #
 # Useful link to validator: https://gitlab.com/yade-dev/trunk/-/ci/lint
@@ -109,6 +110,11 @@ make_buster:
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 
+make_bullseye:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+
 make_suse15:
   <<: *make_definition
   <<: *artifacts_definition
@@ -150,6 +156,12 @@ test_buster:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
   dependencies:
     - make_buster
+
+test_bullseye:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_bullseye
 
 test_suse15:
   <<: *test_definition
@@ -209,6 +221,13 @@ check_buster:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
   dependencies:
     - make_buster
+
+check_bullseye:
+  <<: *check_definition
+  before_script:
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_bullseye
 
 check_suse15:
   <<: *check_definition
