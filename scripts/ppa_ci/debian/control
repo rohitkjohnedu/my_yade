@@ -44,7 +44,7 @@ Build-Depends-Indep:
  lmodern,
  python3-sphinx (>= 1.0.7+dfsg),
  texlive-fonts-recommended,
- texlive-generic-extra,
+ texlive-generic-extra | texlive-plain-generic,
  texlive-latex-extra,
  texlive-latex-recommended,
  texlive-pictures,

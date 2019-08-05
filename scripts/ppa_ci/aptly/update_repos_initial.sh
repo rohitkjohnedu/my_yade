@@ -4,7 +4,7 @@
 
 set -e
 
-for i in bionic buster stretch xenial
+for i in bionic buster stretch xenial bullseye
 do
     cd /root/deb
 #wget https://gitlab.com/api/v4/projects/10133144/jobs/artifacts/feature%2Fdailypackages/download?job=deb_$i -O yade.zip

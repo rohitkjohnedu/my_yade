@@ -282,6 +282,13 @@ pages:
       - ./deb
     expire_in: 5 day
 
+deb_bullseye:
+  <<: *deb_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  before_script:
+    - rm -rf ./deb
+    - ./scripts/ppa_ci/builddeb.py -d "bullseye"
+
 deb_buster:
   <<: *deb_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
