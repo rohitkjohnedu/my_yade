@@ -127,7 +127,6 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			++TW.n_spheres;
 		}
 	}
-	Tes.redirected = true;
 	//cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
 }
 
@@ -212,14 +211,14 @@ void TesselationWrapper::computeTesselation(void)
 
 void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz)
 {
-	if (not Tes->vertexHandles.size()>0) insertSceneSpheres();
+	if (not (Tes->vertexHandles.size()>0)) insertSceneSpheres();
 	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz);
 	computeTesselation();
 }
 
 void TesselationWrapper::computeVolumes(void)
 {
-	if (not Tes->vertexHandles.size()>0) insertSceneSpheres();
+	if (not (Tes->vertexHandles.size()>0)) insertSceneSpheres();
 	if (!bounded) addBoundingPlanes();
 	computeTesselation();
 	Tes->computeVolumes();
@@ -274,38 +273,6 @@ void TesselationWrapper::addBoundingPlanes(double pminx, double pmaxx, double pm
 }
 
 void  TesselationWrapper::addBoundingPlanes(void) {addBoundingPlanes(Pmin.x(),Pmax.x(),Pmin.y(),Pmax.y(),Pmin.z(),Pmax.z());}
-// {
-// 	if (!bounded) {
-// 		if (!rad_divided) {
-// 			mean_radius /= n_spheres;
-// 			rad_divided = true;
-// 		}
-// 		double FAR = 10000;
-// 		//Add big bounding spheres with isFictious=true
-// 		Tes->vertexHandles[0]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmin.y()-FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 0, true);
-// 		Tes->vertexHandles[1]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),Pmax.y()+FAR*(Pmax.x()-Pmin.x()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.x()-Pmin.x()), 1, true);
-// 		Tes->vertexHandles[2]=Tes->insert(Pmin.x()-FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),2, true);
-// 		Tes->vertexHandles[3]=Tes->insert(Pmax.x()+FAR*(Pmax.y()-Pmin.y()),0.5*(Pmax.y()+Pmin.y()),0.5*(Pmax.z()+Pmin.z()),FAR*(Pmax.y()-Pmin.y()),3,true);
-// 		Tes->vertexHandles[4]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmin.z()-FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),4,true);
-// 		Tes->vertexHandles[5]=Tes->insert(0.5*(Pmin.x()+Pmax.x()),0.5*(Pmax.y()+Pmin.y()),Pmax.z()+FAR*(Pmax.y()-Pmin.y()),FAR*(Pmax.y()-Pmin.y()),5, true);
-// 		bounded = true;
-// 	}
-// }
-
-void  TesselationWrapper::RemoveBoundingPlanes(void)
-{
-	Tes->remove(0);
-	Tes->remove(1);
-	Tes->remove(2);
-	Tes->remove(3);
-	Tes->remove(4);
-	Tes->remove(5);
-	Pmin = CGT::Point(inf, inf, inf);
-	Pmax = CGT::Point(-inf, -inf, -inf);
-	mean_radius = 0;
-	rad_divided = false;
-	bounded = false;
-}
 
 void TesselationWrapper::setState (bool state){ mma.setState(state ? 2 : 1);}
 

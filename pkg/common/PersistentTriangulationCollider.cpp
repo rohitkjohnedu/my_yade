@@ -55,34 +55,8 @@ void PersistentTriangulationCollider::action ()
 		Tes->addBoundingPlanes();
 		isTriangulated = true;
 		triangulationIteration = true;
-		//}
-//  else
-//  {
-//   //if (scene->iter % 100 == 0) {
-//   if (1) {
-//   Tes->RemoveBoundingPlanes();
-//   BodyContainer::iterator bi    = bodies->begin();
-//   BodyContainer::iterator biEnd = bodies->end();
-//   for ( ; bi!=biEnd ; ++bi )
-//   {
-//    if ( ( *bi )->isDynamic() )
-//    {//means "is it a sphere (not a wall)"
-//     const Sphere* s = YADE_CAST<Sphere*> ( ( *bi )->shape.get() );
-//     const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*> ( ( *bi )->physicalParameters.get() );
-//     Tes->move ( p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, ( *bi )->getId() );
-// //    else {
-// //    const Box* s = YADE_CAST<Box*>((*bi)->shape.get());
-// //    const RigidBodyParameters* p = YADE_CAST<RigidBodyParameters*>((*bi)->physicalParameters.get());
-// //    Tes.move(p->se3.position[0],p->se3.position[1],p->se3.position[2], s->radius, (*bi)->getId());
-// //    }
-//    }
-//   }
-//   Tes->AddBoundingPlanes();
-//   }
 	}
 //ENDOF VORONOI TESSELATION
-
-
 	interactions = scene->interactions;
 
 	if ( triangulationIteration )

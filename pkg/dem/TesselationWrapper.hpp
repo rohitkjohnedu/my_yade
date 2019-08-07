@@ -70,7 +70,6 @@ public:
   	void 	addBoundingPlanes (void);
 	/// Force boudaries at positions not equal to precomputed ones
  	void	addBoundingPlanes(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz);
-	void 	RemoveBoundingPlanes (void);
 	///compute voronoi centers then stop (don't compute anything else)
  	void	computeTesselation (void);
  	void	computeTesselation( double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz);

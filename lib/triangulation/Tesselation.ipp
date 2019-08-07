@@ -29,8 +29,6 @@ _Tesselation<TT>::_Tesselation ( void )
 	area=0;
 	TotalInternalVoronoiPorosity=0;
 	TotalInternalVoronoiVolume=0;
-	redirected = false;
-	//FIXME : find a better way to avoid segfault when insert() is used before resizing this vector
 }
 template<class TT>
 _Tesselation<TT>::_Tesselation ( RTriangulation &T ) : Tri ( &T ), Tes ( &T ), computed ( false )
@@ -48,7 +46,6 @@ template<class TT>
 void _Tesselation<TT>::Clear ( void )
 {
 	Tri->clear();
-	redirected = false;
 	vertexHandles.clear();
 	maxId=0;
 }
@@ -84,35 +81,6 @@ typename _Tesselation<TT>::VertexHandle _Tesselation<TT>::move ( Real x, Real y,
 	return Vh;
 }
 
-
-template<class TT>
-bool _Tesselation<TT>::redirect ( void )
-{
-	if ( !redirected )
-	{
-		//Set size of the redirection vector
-		if ( (unsigned int)maxId+1 != vertexHandles.size() ) vertexHandles.resize ( maxId+1,NULL );
-		maxId = 0;
-		FiniteVerticesIterator verticesEnd = Tri->finite_vertices_end ();
-		for ( FiniteVerticesIterator vIt = Tri->finite_vertices_begin (); vIt !=  verticesEnd; vIt++ )
-		{
-			vertexHandles[vIt->info().id()]= vIt;
-			maxId = max(maxId, (int) vIt->info().id());
-		}
-		if ( (unsigned int)maxId+1 != vertexHandles.size() ) vertexHandles.resize ( maxId+1 );
-		redirected = true;
-	} else return false;
-	return true;
-}
-
-template<class TT>
-bool _Tesselation<TT>::remove ( unsigned int id )
-{
-	redirect();
-	Tri->remove ( vertexHandles[id] );
-	return true;
-}
-
 template<class TT>
 void _Tesselation<TT>::voisins ( VertexHandle v, VectorVertex& Output_vector )
 { Tri->incident_vertices ( v, back_inserter ( Output_vector ) ); }
@@ -145,24 +113,8 @@ Point _Tesselation<TT>::Dual ( const CellHandle &cell )
 template<class TT>
 void _Tesselation<TT>::compute ()
 {
-	if (!redirected) redirect();
 	FiniteCellsIterator cellEnd = Tri->finite_cells_end();
 	for ( FiniteCellsIterator cell = Tri->finite_cells_begin(); cell != cellEnd; cell++ ) cell->info().setPoint(circumCenter(cell));
-// 	{
-// 
-// 		const Sphere& S0 = cell->vertex ( 0 )->point();
-// 		const Sphere& S1 = cell->vertex ( 1 )->point();
-// 		const Sphere& S2 = cell->vertex ( 2 )->point();
-// 		const Sphere& S3 = cell->vertex ( 3 )->point();
-// 		Real x,y,z;
-// 		CGAL::weighted_circumcenterC3 (
-// 			S0.point().x(), S0.point().y(), S0.point().z(), S0.weight(),
-// 			S1.point().x(), S1.point().y(), S1.point().z(), S1.weight(),
-// 			S2.point().x(), S2.point().y(), S2.point().z(), S2.weight(),
-// 			S3.point().x(), S3.point().y(), S3.point().z(), S3.weight(),
-// 			x, y, z );
-// 		cell->info().setPoint(Point(x,y,z));
-// 	}
 	computed = true;
 }
 
@@ -1162,28 +1114,6 @@ typename Tesselation::VertexHandle PeriodicTesselation<Tesselation>::insert(Real
 	}
 	else cerr << " : Vh==NULL!!" << " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad<<" fictious="<<isFictious<<", isGhost="<< bool(duplicateOfId>=0)<<endl;
 	return Vh;
-}
-
-template<class Tesselation>
-bool PeriodicTesselation<Tesselation>::redirect ( void )
-{
-	if ( !redirected )
-	{
-		//Set size of the redirection vector
-		if ( (unsigned int)maxId+1 != vertexHandles.size() ) vertexHandles.resize ( maxId+1,NULL );
-		cout << "!redirected" << endl;
-		maxId = 0;
-		FiniteVerticesIterator verticesEnd = Tri->finite_vertices_end ();
-		for ( FiniteVerticesIterator vIt = Tri->finite_vertices_begin (); vIt !=  verticesEnd; vIt++ )
-		{
-			if (vIt->info().isGhost) continue;
-			vertexHandles[vIt->info().id()]= vIt;
-			maxId = max(maxId, (int) vIt->info().id());
-		}
-		if ( (unsigned int)maxId+1 != vertexHandles.size() ) vertexHandles.resize ( maxId+1 );
-		redirected = true;
-	} else return false;
-	return true;
 }
 
 } //namespace CGT

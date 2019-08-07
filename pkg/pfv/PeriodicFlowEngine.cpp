@@ -273,7 +273,6 @@ void PeriodicFlowEngine::triangulate( FlowSolver& flow )
 		//re-assign the original vertex pointer since duplicates may have overwrite it
 		Tes.vertexHandles[id]=vh0;
         }
-        Tes.redirected=true;//By inserting one-by-one, we already redirected
         flow.shearLubricationForces.resize ( Tes.maxId+1 );
 	flow.shearLubricationTorques.resize ( Tes.maxId+1 );
 	flow.pumpLubricationTorques.resize ( Tes.maxId+1 );

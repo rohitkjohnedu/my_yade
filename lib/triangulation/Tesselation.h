@@ -114,7 +114,6 @@ public:
 	VectorVertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
 	VectorCell cellHandles;//for speedup of global loops, iterating on this vector is faster than cellIterator++
 	VectorFacetPair facetCells; //for speedup on global loops (can be parallelized)
-	bool redirected;//is vertexHandles filled with current vertex pointers? 
 	bool computed;
 
 	_Tesselation(void);
@@ -125,10 +124,6 @@ public:
 	VertexHandle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false);
 	/// move a spheres
 	VertexHandle move (Real x, Real y, Real z, Real rad, unsigned int id);
-	///Fill a vector with vertexHandles[i] = handle of vertex with id=i for fast access
-	bool redirect (void);
-	///Remove a sphere
-	bool remove (unsigned int id); 
 	int Max_id (void) {return maxId;}
 	
 	void	compute ();	//Calcule le centres de Voronoi pour chaque cellule
@@ -191,12 +186,10 @@ class PeriodicTesselation : public Tesselation
 	using Tesselation::Tri;
 	using Tesselation::vertexHandles;
 	using Tesselation::maxId;
-	using Tesselation::redirected;
 		
 	///Insert a sphere, which can be a duplicate one from the base period if duplicateOfId>=0
 	VertexHandle insert(Real x, Real y, Real z, Real rad, unsigned int id, bool isFictious = false, int duplicateOfId=-1);
 	///Fill a vector with vertexHandles[i] = handle of vertex with id=i for fast access, contains only spheres from the base period
-	bool redirect (void);
 };
 
 } // namespace CGT

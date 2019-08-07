@@ -469,8 +469,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                 if ( flow.boundary ( *flow.boundsIds[i] ).useMaxMin ) flow.addBoundingPlane(Normal, *flow.boundsIds[i] );
                 else {
 			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow.boundsIds[i]].pos[h];
-// 			cerr << "id="<<*flow.boundsIds[i] <<" center="<<center[0]<<","<<center[1]<<","<<center[2]<<endl;
-			cerr<<"inserting "<<*flow.boundsIds[i]<<"while solver handles has size "<<solver->tesselation().vertexHandles.size()<<endl;
                         flow.addBoundingPlane (center, wallThickness, Normal,*flow.boundsIds[i] );
                 }
         }
@@ -490,7 +488,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if ( !b.exists || b.id==ignoredBody ) continue;
 		if ( b.isSphere || b.isClump ) flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
 	}
-	flow.tesselation().redirected=true;//By inserting one-by-one, we already redirected
 	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
 	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );
 	flow.pumpLubricationTorques.resize ( flow.tesselation().maxId+1 );
