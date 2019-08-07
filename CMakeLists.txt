@@ -24,8 +24,8 @@
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
-#  ENABLE_POTENTIAL_BLOCKS: enable potential blocks option (OFF by default)
-#  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
+#  ENABLE_POTENTIAL_BLOCKS: enable potential blocks option (ON by default)
+#  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (ON by default)
 #  ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
 #  ENABLE_FEMLIKE: enable meshed solids (FEM-like)
 #  ENABLE_OAR: generate a script for oar-based task scheduler (OFF by default)
@@ -415,9 +415,9 @@ ELSE(ENABLE_GUI)
 ENDIF(ENABLE_GUI)
 #===========================================================
 # This one will cry on attempts to build CGAL-based packages without cgal
-IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_PARTICLES))
-  MESSAGE(STATUS "PFVFLOW, TWOPHASEFLOW, THERMAL, and POTENTIAL_PARTICLES depends on CGAL, but CGAL is disabled (not found or turned OFF)")
-ENDIF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_PARTICLES))
+IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_BLOCKS))
+  MESSAGE(STATUS "PFVFLOW, TWOPHASEFLOW, THERMAL, and POTENTIAL_BLOCKS depends on CGAL, but CGAL is disabled (not found or turned OFF)")
+ENDIF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_BLOCKS))
 #===========================================================
 IF(ENABLE_CGAL)
   INCLUDE(FindGMP)
@@ -643,7 +643,7 @@ ELSE(ENABLE_PROFILING)
 ENDIF(ENABLE_PROFILING)
 
 #===========================================================
-IF(ENABLE_POTENTIAL_PARTICLES AND ENABLE_CGAL)
+IF(ENABLE_POTENTIAL_PARTICLES)
   FIND_PACKAGE(OpenBlas REQUIRED)
   FIND_PACKAGE(LAPACK REQUIRED)
   IF(OPENBLAS_FOUND AND LAPACK_FOUND)
@@ -658,9 +658,9 @@ IF(ENABLE_POTENTIAL_PARTICLES AND ENABLE_CGAL)
     SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialParticles")
     SET(ENABLE_POTENTIAL_PARTICLES OFF)
   ENDIF(OPENBLAS_FOUND AND LAPACK_FOUND)
-ELSE(ENABLE_POTENTIAL_PARTICLES AND ENABLE_CGAL)
+ELSE(ENABLE_POTENTIAL_PARTICLES)
   SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialParticles")
-ENDIF(ENABLE_POTENTIAL_PARTICLES AND ENABLE_CGAL)
+ENDIF(ENABLE_POTENTIAL_PARTICLES)
 #===========================================================
 
 
