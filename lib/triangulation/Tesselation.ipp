@@ -31,7 +31,6 @@ _Tesselation<TT>::_Tesselation ( void )
 	TotalInternalVoronoiVolume=0;
 	redirected = false;
 	//FIXME : find a better way to avoid segfault when insert() is used before resizing this vector
-	vertexHandles.resize(MAX_ID+1,NULL);
 }
 template<class TT>
 _Tesselation<TT>::_Tesselation ( RTriangulation &T ) : Tri ( &T ), Tes ( &T ), computed ( false )
@@ -51,7 +50,6 @@ void _Tesselation<TT>::Clear ( void )
 	Tri->clear();
 	redirected = false;
 	vertexHandles.clear();
-	vertexHandles.resize(MAX_ID+1,NULL);
 	maxId=0;
 }
 template<class TT>
@@ -67,7 +65,7 @@ typename _Tesselation<TT>::VertexHandle _Tesselation<TT>::insert ( Real x, Real 
 		vertexHandles[id] = Vh;
 		/*if ( !isFictious ) */maxId = std::max ( maxId, (int) id );
 	}
-	else cout << id <<  " : Vh==NULL!!"<< " id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
+	else cout << "Failed to triangulate body with id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
 	return Vh;
 }
 template<class TT>

@@ -70,6 +70,8 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	std::vector<std::pair<const CGT::Sphere*,Body::id_t> > pointsPtrs;
 	spheres.reserve(bodies->size());
 	pointsPtrs.reserve(bodies->size());
+	Tes.vertexHandles.clear();
+	Tes.vertexHandles.resize(bodies->size()+6,NULL);//+6 extra slots in case boundaries will be added latter as additional vertices
 
 	BodyContainer::iterator biBegin    = bodies->begin();
 	BodyContainer::iterator biEnd = bodies->end();
@@ -101,8 +103,6 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	TW.mean_radius /= Ng; TW.rad_divided = true;
 	spheres.resize(Ng);
 	pointsPtrs.resize(Ng);
-	Tes.vertexHandles.resize(MaxId+1+max(0,6-nonSpheres),NULL);//+6 extra slots max for adding boundaries latter
-	Tes.redirected = 1;
 	std::random_shuffle(pointsPtrs.begin(), pointsPtrs.end());
 	spatial_sort(pointsPtrs.begin(),pointsPtrs.end(), RTraits_for_spatial_sort()/*, CGT::RTriangulation::Weighted_point*/);
 
@@ -127,6 +127,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 			++TW.n_spheres;
 		}
 	}
+	Tes.redirected = true;
 	//cerr << " loaded : " << Ng<<", triangulated : "<<TW.n_spheres<<", mean radius = " << TW.mean_radius<<endl;
 }
 
@@ -143,6 +144,7 @@ void TesselationWrapper::clear(void)
 	n_spheres = 0;
 	rad_divided = false;
 	bounded = false;
+	Tes->vertexHandles.clear();
 	facet_it = Tes->Triangulation().finite_edges_end();
 }
 
@@ -200,6 +202,7 @@ bool TesselationWrapper::move(double x, double y, double z, double rad, unsigned
 
 void TesselationWrapper::computeTesselation(void)
 {
+	if (not (Tes->vertexHandles.size()>0)) insertSceneSpheres();
 	if (!rad_divided) {
 		mean_radius /= n_spheres;
 		rad_divided = true;
@@ -209,12 +212,14 @@ void TesselationWrapper::computeTesselation(void)
 
 void TesselationWrapper::computeTesselation(double pminx, double pmaxx, double pminy, double pmaxy, double pminz, double pmaxz)
 {
+	if (not Tes->vertexHandles.size()>0) insertSceneSpheres();
 	addBoundingPlanes(pminx, pmaxx,  pminy,  pmaxy, pminz, pmaxz);
 	computeTesselation();
 }
 
 void TesselationWrapper::computeVolumes(void)
 {
+	if (not Tes->vertexHandles.size()>0) insertSceneSpheres();
 	if (!bounded) addBoundingPlanes();
 	computeTesselation();
 	Tes->computeVolumes();

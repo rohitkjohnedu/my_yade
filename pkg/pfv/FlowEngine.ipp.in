@@ -294,6 +294,8 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	flow.tempDependentViscosity = tempDependentViscosity;
 	flow.sphericalVertexAreaCalculated=false;
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
+	flow.tesselation().vertexHandles.clear();
+	flow.tesselation().vertexHandles.resize(scene->bodies->size()+6,NULL);
 }
 
 #ifdef LINSOLV
@@ -468,6 +470,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                 else {
 			for ( int h=0;h<3;h++ ) center[h] = buffer[*flow.boundsIds[i]].pos[h];
 // 			cerr << "id="<<*flow.boundsIds[i] <<" center="<<center[0]<<","<<center[1]<<","<<center[2]<<endl;
+			cerr<<"inserting "<<*flow.boundsIds[i]<<"while solver handles has size "<<solver->tesselation().vertexHandles.size()<<endl;
                         flow.addBoundingPlane (center, wallThickness, Normal,*flow.boundsIds[i] );
                 }
         }
