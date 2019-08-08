@@ -66,6 +66,14 @@ def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
 	"Handle the :ysrc:`` role, making hyperlink to git repository webpage with that path. Supports :ysrc:`Link text<file/name>` syntax, like usual hyperlinking roles. If target ends with ``/``, it is assumed to be a directory."
 	id=rawtext.split(':',2)[2][1:-1]
 	txt=id
+	if( "#L" in id):
+		msg = "\n\n\033[93m"+(80*'=')+"\nYADE :ysrc: ERROR processing: '"+id+"'\033[0m\n\033[92mIf you want to link to a line number in source, you should use :ysrccommit:\ninstead of :ysrc: otherwise the link will break when someone changes the file.\nThe :ysrccommit: allows to link to a specific git commit hash and a line number.\033[0m\n\033[93m"+(80*'=')+"\033[0m\n\n"
+		import sys
+		sys.__stderr__.write(msg)
+		sys.__stderr__.flush()
+		# unfortunately sphinx ignores this one
+		#raise RuntimeError(":ysrc: error, doc/sphinx/conf.py")
+		sys.exit(1)
 	m=re.match('(.*)\s*<(.*)>\s*',id)
 	if m:
 		txt,id=m.group(1),m.group(2)
