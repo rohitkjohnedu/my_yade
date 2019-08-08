@@ -1,4 +1,4 @@
-.. _yade-github-label:
+.. _yade-gitlab-label:
 
 ##############
 Yade on GitLab

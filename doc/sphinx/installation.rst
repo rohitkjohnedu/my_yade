@@ -101,7 +101,7 @@ management (install the ``git`` package on your system and create a `GitLab acco
 
 		git clone git@gitlab.com:yade-dev/trunk.git
 
-will download the whole code repository of the ``trunk``. Check out :ref:`yade-github-label`
+will download the whole code repository of the ``trunk``. Check out :ref:`yade-gitlab-label`
 for more details on how to collaborate using ``git``.
 
 Alternatively, a read-only checkout is possible via https without a GitLab account (easier if you don't want to modify the trunk version)::
