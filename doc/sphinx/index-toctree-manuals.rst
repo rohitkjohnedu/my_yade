@@ -18,7 +18,7 @@ Using and Programming
   
   prog.rst
   
-  gitlab.rst
+  gitrepo.rst
   
   citing.rst
   
