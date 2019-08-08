@@ -18,7 +18,7 @@ Using and Programming
   
   prog.rst
   
-  github.rst
+  gitlab.rst
   
   citing.rst
   
