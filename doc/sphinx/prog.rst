@@ -305,11 +305,11 @@ There are two settings for the filter level, the ``Default`` level used when no 
 Debug macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To enable debugging for particular class the ``DECLARE_LOGGER;`` macro should be put in class definition inside header to create a separate named logger for that class. Then the ``CREATE_LOGGER(ClassName);`` macro must be used in the class implementation ``.cpp`` file to create the static variable. Sometimes a logger is necessary outside the class, such named logger can be created inside a ``.cpp`` file and by convention its name should correspond to the name of the file, use the macro ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");`` for this. On rare occasions logging is necessary inside ``.hpp`` file outside of a class (where the local class named logger is unavailable), then the solution is to use ``LOG_NOFILTER(…)`` macro, because it is the only one that can work without a named logger. If the need arises this solution can be improved, see :ysrc:`lib/base/Logging.cpp#L21` for details.
+To enable debugging for particular class the ``DECLARE_LOGGER;`` macro should be put in class definition inside header to create a separate named logger for that class. Then the ``CREATE_LOGGER(ClassName);`` macro must be used in the class implementation ``.cpp`` file to create the static variable. Sometimes a logger is necessary outside the class, such named logger can be created inside a ``.cpp`` file and by convention its name should correspond to the name of the file, use the macro ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");`` for this. On rare occasions logging is necessary inside ``.hpp`` file outside of a class (where the local class named logger is unavailable), then the solution is to use ``LOG_NOFILTER(…)`` macro, because it is the only one that can work without a named logger. If the need arises this solution can be improved, see :ysrccommit:`Logging.cpp<775ae7436/lib/base/Logging.cpp#L37>` for details.
 
 All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the brackets, such as ``LOG_TRACE( a << b << " text" )``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
 
-Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp#L41` for example use.
+Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See :ysrccommit:`function testAllLevels<775ae7436/py/_log.cpp#L41>` for example use.
 
 The macro ``TRACE;`` prints a ``"Been here"`` message at ``TRACE`` log filter level, and can be used for quick debugging.
 
@@ -1850,7 +1850,7 @@ Python                   c++
 Engine loop
 ------------
 
-Running simulation consists in looping over :yref:`Engines<Engine>` and calling them in sequence. This loop is defined in ``Scene::moveToNextTimeStep`` function in :ysrc:`core/Scene.cpp<core/Scene.cpp#L73>`. Before the loop starts, :yref:`O.initializers<Omega.initializers>` are called; they are only run once. The engine loop does the following in each iteration over :yref:`O.engines<Omega.engines>`:
+Running simulation consists in looping over :yref:`Engines<Engine>` and calling them in sequence. This loop is defined in ``Scene::moveToNextTimeStep`` function in :ysrccommit:`core/Scene.cpp<775ae7436/core/Scene.cpp#L71>`. Before the loop starts, :yref:`O.initializers<Omega.initializers>` are called; they are only run once. The engine loop does the following in each iteration over :yref:`O.engines<Omega.engines>`:
 
 #. set ``Engine::scene`` pointer to point to the current ``Scene``.
 #. Call ``Engine::isActivated()``; if it returns ``false``, the engine is skipped.
