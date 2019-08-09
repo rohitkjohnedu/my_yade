@@ -4,6 +4,8 @@
 # Five new images:
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
 # image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
+# image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
@@ -51,6 +53,7 @@ stages:
     - mkdir build && cd build
     - export CC="ccache gcc"
     - export CXX="ccache g++"
+    - echo $EXTRA_CMAKE_ARGS
     - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install $EXTRA_CMAKE_ARGS -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
     - ccache -s
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
@@ -129,7 +132,7 @@ make_18_04_nogui:
   before_script:
     - export EXTRA_CMAKE_ARGS="-DENABLE_GUI=OFF $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
 
 
 # 3.1. test stage
@@ -192,7 +195,7 @@ test_18_foam:
 
 test_18_04_nogui:
   <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
   dependencies:
     - make_18_04_nogui
 
