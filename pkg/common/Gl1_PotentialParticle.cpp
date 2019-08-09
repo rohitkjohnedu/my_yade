@@ -1,9 +1,12 @@
 /*CWBoon 2015 */
 #include<lib/compatibility/VTKCompatibility.hpp> // fix InsertNextTupleValue → InsertNextTuple name change (and others in the future)
 #ifdef YADE_POTENTIAL_PARTICLES
-#include "Gl1_PotentialParticle.hpp"
 
-//#include<lib-opengl/OpenGLWrapper.hpp>
+#include "Gl1_PotentialParticle.hpp"
+#ifdef YADE_OPENGL
+	#include <lib/opengl/OpenGLWrapper.hpp>
+#endif
+
 #include <vtkFloatArray.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -27,15 +30,12 @@
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkAppendPolyData.h>
 
-
 #include <vtkRenderWindowInteractor.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPointData.h>
 #include <vtkLookupTable.h>
 #include <vtkXMLDataSetWriter.h>
 
-
-#include <lib/opengl/OpenGLWrapper.hpp>
 #include <pkg/dem/KnKsLaw.hpp>
 #include <pkg/dem/ScGeom.hpp>
 #include <vtkLine.h>
@@ -56,6 +56,7 @@
 #include <vtkIntArray.h>
 
 #ifdef YADE_OPENGL
+
 void Gl1_PotentialParticle::calcMinMax(const PotentialParticle& pp) {
 //	int planeNo = pp.d.size();
 //	Real maxD = pp.d[0];
@@ -87,15 +88,11 @@ void Gl1_PotentialParticle::generateScalarField(const PotentialParticle& pp) {
 	}
 }
 
-
-
 vector<Gl1_PotentialParticle::scalarF> Gl1_PotentialParticle::SF;
 int Gl1_PotentialParticle::sizeX, Gl1_PotentialParticle::sizeY, Gl1_PotentialParticle::sizeZ;
 Real Gl1_PotentialParticle::aabbEnlargeFactor;
 bool Gl1_PotentialParticle::store;
 bool Gl1_PotentialParticle::initialized;
-
-
 bool Gl1_PotentialParticle::wire;
 
 void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<State>& /*state*/ ,bool wire2, const GLViewInfo&) {
@@ -109,7 +106,6 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 			initialized = false;
 		}
 	}
-
 
 	if(initialized == false ) {
 		FOREACH(const shared_ptr<Body>& b, *scene->bodies) {
@@ -133,7 +129,6 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 		}
 		initialized = true;
 	}
-
 
 		const vector<Vector3r>& triangles = SF[shapeId].triangles; //mc.getTriangles();
 		int nbTriangles = SF[shapeId].nbTriangles; // //mc.getNbTriangles();
@@ -187,18 +182,9 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 //			}
 //			glEnd();
 
-
-
 		}
 	return;
 }
-
-
-
-
-
-
-
 
 
 Real Gl1_PotentialParticle::evaluateF(const PotentialParticle& pp, Real x, Real y, Real z) {
@@ -232,6 +218,8 @@ Real Gl1_PotentialParticle::evaluateF(const PotentialParticle& pp, Real x, Real 
 
 	return f;
 }
+
+YADE_PLUGIN((Gl1_PotentialParticle));
 #endif // YADE_OPENGL
 
 
@@ -641,7 +629,7 @@ void PotentialParticleVTKRecorder::action() {
 
 }
 
-YADE_PLUGIN((Gl1_PotentialParticle)(PotentialParticleVTKRecorder));
+YADE_PLUGIN((PotentialParticleVTKRecorder));
 
 
 //YADE_REQUIRE_FEATURE(OPENGL)

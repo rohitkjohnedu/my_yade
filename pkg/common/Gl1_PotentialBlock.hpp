@@ -114,6 +114,7 @@ using CGAL_ORIGIN = CGAL::Origin;
 using CGAL_AABB_tree = CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_primitive<K,std::vector<Triangle>::iterator>>>;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#endif // YADE_CGAL
 
 #ifdef YADE_OPENGL
 	#include<pkg/common/GLDrawFunctors.hpp>
@@ -123,7 +124,8 @@ using CGAL_AABB_tree = CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_p
 	#include<pkg/dem/Shop.hpp>
 	
 	/* Draw PotentialBlocks using OpenGL */
-	class Gl1_PotentialBlock: public GlShapeFunctor{	
+	class Gl1_PotentialBlock: public GlShapeFunctor{
+	#ifdef YADE_CGAL
 		public:
 			struct TriangulationMatrix{
 				vector<Vector3i> triangles;
@@ -155,14 +157,17 @@ using CGAL_AABB_tree = CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_p
 			Vector3r centroid;
 			Real volume; // used to be: vo
 			bool init;
+	#endif // YADE_CGAL
 	};
 	REGISTER_SERIALIZABLE(Gl1_PotentialBlock);
 
+#ifdef YADE_CGAL
 bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 //Polyhedron Simplify(Polyhedron P, Real lim);
+#endif // YADE_CGAL
 
 #endif // YADE_OPENGL
-#endif // YADE_CGAL
+
 
 
 

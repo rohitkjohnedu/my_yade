@@ -1,8 +1,6 @@
 /* CWBoon 2016 */
 #ifdef YADE_POTENTIAL_BLOCKS
 
-#include "Gl1_PotentialBlock.hpp"
-
 #include<core/Clump.hpp>
 #include<pkg/dem/KnKsPBLaw.hpp>
 #include<pkg/dem/ScGeom.hpp>
@@ -10,6 +8,7 @@
 
 #include <lib/compatibility/VTKCompatibility.hpp>
 
+#include "Gl1_PotentialBlock.hpp"
 #ifdef YADE_OPENGL
 	#include <lib/opengl/OpenGLWrapper.hpp>
 #endif
@@ -37,7 +36,6 @@
 #include<vtkXMLPolyDataWriter.h>
 #include <vtkAppendPolyData.h>
 
-
 #include <vtkRenderWindowInteractor.h> 
 #include <vtkUnsignedCharArray.h>
 #include <vtkPointData.h>
@@ -63,10 +61,8 @@
 /* New script to visualise the PBs using OPENGL and CGAL */
 
 #ifdef YADE_OPENGL
-#ifdef YADE_CGAL
-	#include <lib/opengl/OpenGLWrapper.hpp>
-	bool Gl1_PotentialBlock::wire;
 
+	bool Gl1_PotentialBlock::wire;
 
 	bool initialized;
 	int iterBornMax=0;
@@ -77,6 +73,7 @@
 
 	void Gl1_PotentialBlock::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)	{
 
+	#ifdef YADE_CGAL
 		PotentialBlock* pp = static_cast<PotentialBlock*>(cm.get());
 			int shapeId = pp->id;
 
@@ -184,10 +181,11 @@
 			}
 			glEnd();
 		}
+	#endif  // YADE_CGAL
 	}
 
+YADE_PLUGIN((Gl1_PotentialBlock));
 
-#endif  // YADE_CGAL
 #endif  // YADE_OPENGL
 
 
@@ -1274,7 +1272,7 @@ void PotentialBlockVTKRecorder::action(){
 
 }
 
-YADE_PLUGIN((Gl1_PotentialBlock)(PotentialBlockVTKRecorder)(PotentialBlockVTKRecorderTunnel));
+YADE_PLUGIN((PotentialBlockVTKRecorder)(PotentialBlockVTKRecorderTunnel));
 
 
 //YADE_REQUIRE_FEATURE(OPENGL)
