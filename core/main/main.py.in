@@ -197,7 +197,7 @@ def checkVersions():
 	# put here all yade compatibility tests with other libraries
 	import yade.libVersions
 	glutVer = yade.libVersions.getVersion('freeglut')
-	if(glutVer > (2,8,1) or glutVer == (-1,-1,-1)):
+	if((glutVer != None) and (glutVer > (2,8,1) or glutVer == (-1,-1,-1))):
 		print("\033[93mWarning: freeglut versions higher than 2.8.1 are known to crash\033[0m, see https://gitlab.com/yade-dev/trunk/merge_requests/160")
 
 def userSession(gui='none',qapp=None):
