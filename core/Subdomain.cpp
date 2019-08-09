@@ -16,8 +16,6 @@
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 
-// #include <lib/pyutil/numpy_boost.hpp>
-
 YADE_PLUGIN((Subdomain));
 CREATE_LOGGER(Subdomain);
 
