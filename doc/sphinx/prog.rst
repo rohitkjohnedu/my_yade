@@ -518,11 +518,20 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 	yielding :yref:`Material used in the CPM model<CpmMat>`.
 
 ``:ysrc:``
-	creates hyperlink to file within the source tree (to its latest version in the repository), for instance :ysrc:`core/Cell.hpp`. Just like with `:yref:`, alternate text can be used with ::
+	creates hyperlink to file within the source tree (to its latest version in the repository), for instance :ysrc:`core/Cell.hpp`. Just like with ``:yref:``, alternate text can be used with ::
 	
 		:ysrc:`Link text<target/file>`
 		
-	like :ysrc:`this<core/Cell.hpp>`.
+	like :ysrc:`this<core/Cell.hpp>`. This cannot be used to link to a specified line number, since changing the file will cause the line numbers to become outdated. To link to a line number use ``:ysrccommit:`` described below.
+
+``:ysrccommit:``
+	creates hyperlink to file within the source tree at the specified commit hash. This allows to link to the line numbers using for example ``#L121`` at the end of the link. Use it just like the ``:ysrc:`` except that commit hash must be provided at the beginning::
+
+		:ysrccommit:`Link text<commithash/target/file#Lnumber>`
+
+		:ysrccommit:`default engines<775ae7436/py/__init__.py.in#L112>`
+
+	becomes :ysrccommit:`default engines<775ae7436/py/__init__.py.in#L112>`.
 
 ``|ycomp|``
 	is used in attribute description for those that should not be provided by the user, but are auto-computed instead; ``|ycomp|`` expands to |ycomp|.
