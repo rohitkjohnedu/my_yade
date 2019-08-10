@@ -108,7 +108,7 @@ Performance increase
 
 .. _fig-cpuvsgpu:
 .. figure:: fig/particleVsFactortime.*
-	:width: 17 cm
+	:width: 16.2 cm
 	:align: center
 
 	Time required to factorize and analyze various sized matrices for 10-core CPU, 1050Ti GPU, and Tesla K20 GPU.

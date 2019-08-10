@@ -533,6 +533,9 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 
 	becomes :ysrccommit:`default engines<775ae7436/py/__init__.py.in#L112>`.
 
+Linking to ``inheritanceGraph*``
+	To link to an inheritance graph of some base class a :ref:`global anchor<global-rst-anchors>` is created with name ``inheritanceGraph*`` added in front of the class name, for example ``:ref:`Shape<inheritanceGraphShape>``` yields link to :ref:`inheritance graph of Shape<inheritanceGraphShape>`.
+
 ``|ycomp|``
 	is used in attribute description for those that should not be provided by the user, but are auto-computed instead; ``|ycomp|`` expands to |ycomp|.
 
@@ -548,6 +551,22 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 	
 	Displayed mathematics (standalone equations) can be inserted as explained in `Math support in Sphinx <http://sphinx.pocoo.org/ext/math.html>`_.
 
+
+.. _global-rst-anchors:
+
+As a reminder in the standard ReST syntax the references are:
+
+``:ref:``
+	is the the standard restructured text reference to an anchor placed elsewere in the text. For instance an anchor ``.. _NumericalDamping:`` is placed in :ysrccommit:`formulation.rst<775ae7436/doc/sphinx/formulation.rst#L564>` then it is linked to with ``:ref:`NumericalDamping``` inside the :ysrccommit:`source code<775ae7436/pkg/dem/NewtonIntegrator.hpp#L64>`.
+
+``.. _anchor-name:``
+	is used to place anchors in the text, to be referenced from elsewhere in the text. Symbol ``_`` is forbidden in the anchor name, because it has a special meaning: ``_anchor`` specifies anchor, while ``anchor_`` links to it, see below.
+
+``anchor-name_``
+	is used to place a link to anchor within the same file. It is a shorter form compared to the one which works between different files: ``:ref:``. For example usage on anchor ``imgQtGui`` see :ysrccommit:`here<775ae7436/doc/sphinx/introduction.rst#L258>` and :ysrccommit:`here<775ae7436/doc/sphinx/introduction.rst#L261>`.
+
+
+.. note:: The command ``:scale: NN %`` (with percent) does not work well with ``.html`` + ``.pdf`` output, better to specify ``:width: NN cm``. Then it is the same size in ``.html`` and ``.pdf.``. For example see :ysrccommit:`here<775ae7436/doc/sphinx/GPUacceleration.rst#L111>` which becomes :ref:`this picture<fig-cpuvsgpu>`. But bear in mind that maximum width in ``.pdf`` is ``16.2 cm``.
 
 
 Bibliographical references
