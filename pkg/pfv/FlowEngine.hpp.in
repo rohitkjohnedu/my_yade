@@ -35,10 +35,11 @@ The files are
 #pragma once
 #include<core/PartialEngine.hpp>
 #include<pkg/dem/TriaxialCompressionEngine.hpp>
-#include<pkg/dem/TesselationWrapper.hpp>
+// #include<pkg/dem/TesselationWrapper.hpp>
 #include<lib/triangulation/FlowBoundingSphere.hpp>
 #include<lib/triangulation/PeriodicFlow.hpp>
 #include<pkg/pfv/FlowEngine.hpp>
+#include<pkg/common/Sphere.hpp>
 #include<core/Clump.hpp>
 #include<pkg/dem/Shop.hpp>
 
