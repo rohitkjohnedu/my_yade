@@ -566,7 +566,7 @@ As a reminder in the standard ReST syntax the references are:
 	is used to place a link to anchor within the same file. It is a shorter form compared to the one which works between different files: ``:ref:``. For example usage on anchor ``imgQtGui`` see :ysrccommit:`here<775ae7436/doc/sphinx/introduction.rst#L258>` and :ysrccommit:`here<775ae7436/doc/sphinx/introduction.rst#L261>`.
 
 
-.. note:: The command ``:scale: NN %`` (with percent) does not work well with ``.html`` + ``.pdf`` output, better to specify ``:width: NN cm``. Then it is the same size in ``.html`` and ``.pdf.``. For example see :ysrccommit:`here<775ae7436/doc/sphinx/GPUacceleration.rst#L111>` which becomes :ref:`this picture<fig-cpuvsgpu>`. But bear in mind that maximum width in ``.pdf`` is ``16.2 cm``.
+.. note:: The command ``:scale: NN %`` (with percent) does not work well with ``.html`` + ``.pdf`` output, better to specify ``:width: NN cm``. Then it is the same size in ``.html`` and ``.pdf.``. For example see :ysrccommit:`here<eb6bdedac/doc/sphinx/GPUacceleration.rst#L111>` which becomes :ref:`this picture<fig-cpuvsgpu>`. But bear in mind that maximum width in ``.pdf`` is ``16.2 cm``.
 
 
 Bibliographical references
