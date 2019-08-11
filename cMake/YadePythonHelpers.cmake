@@ -61,8 +61,8 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 		ELSE(ENABLE_LOGGER)
 			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python thread filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
-	ELSE() # Python 3: next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try two possibilities that cover all distros. Last form is for boost 1.71 in NIX/Gricad.
-		FOREACH(PYTHON_PREFIX python-py python3-py python)
+	ELSE() # Python 3: next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
+		FOREACH(PYTHON_PREFIX python python-py python3-py) #boost>1.67 should pick-up the first one (https://gitlab.kitware.com/cmake/cmake/merge_requests/1865).
 			IF(ENABLE_LOGGER)
 				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
 			ELSE(ENABLE_LOGGER)
@@ -116,7 +116,7 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	# NOTE: If we are here, we found a suitable Python version with all packages needed.
 	SET(ALL_PYTHON_DEPENDENCIES_FOUND TRUE PARENT_SCOPE)
 	#Export findpythonlibs vars to global parent scope:
-	FOREACH(pythonlibs_var PYTHONLIBS_FOUND PYTHON_LIBRARIES PYTHON_INCLUDE_PATH PYTHON_INCLUDE_DIRS PYTHONLIBS_VERSION_STRING)
+	FOREACH(pythonlibs_var PYTHONLIBS_FOUND PYTHON_LIBRARIES PYTHON_INCLUDE_PATH PYTHON_INCLUDE_DIRS PYTHONLIBS_VERSION_STRING NUMPY_VERSION_MAJOR NUMPY_VERSION_MINOR)
 		SET(${pythonlibs_var} ${${pythonlibs_var}} PARENT_SCOPE)
 	ENDFOREACH()
 	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})

@@ -146,7 +146,8 @@ ELSE()
 ENDIF()
 
 FIND_PACKAGE(Eigen3 REQUIRED)
-FIND_PACKAGE(NumPy QUIET)
+#FIND_PACKAGE(NumPy QUIET)  #handled in the PYTHON/BOOST section below, this line finds regardless of python version, hence possibly inconsistently
+
 #================== Use compiler warnings ==================
 if(ENABLE_USEFUL_ERRORS)
   # Enable as many warnings as possible, and treat them as errors (using -Werror flag).
@@ -169,10 +170,7 @@ if(ENABLE_USEFUL_ERRORS)
     ENDIF()
   ENDIF()
 
-  IF((${NUMPY_VERSION_MAJOR} EQUAL 1) AND (${NUMPY_VERSION_MINOR} LESS 13))
-    # numpy 1.11.0 has unused-function, 1.13 does not. So we have to print warning only when it appears.
-    SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=unused-function")
-  ENDIF()
+ 
 
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra                           -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment ${USE_WARNING_ERRORS}         -Wno-error=cpp -std=c++14 -fdce")
 
@@ -265,6 +263,11 @@ ENDFOREACH()
 #After the loop on all python versions, having ALL_PYTHON_DEPENDENCIES_FOUND==FALSE must trigger an error:
 IF(NOT ALL_PYTHON_DEPENDENCIES_FOUND)
 	MESSAGE(FATAL_ERROR "No python version with all dependencies was found.")
+ENDIF()
+
+IF((${NUMPY_VERSION_MAJOR} EQUAL 1) AND (${NUMPY_VERSION_MINOR} LESS 13))
+    # numpy 1.11.0 has unused-function, 1.13 does not. So we have to print warning only when it appears.
+    SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=unused-function")
 ENDIF()
 
 #======================================
@@ -539,10 +542,10 @@ IF(ENABLE_MPI)
 #     /usr/lib/x86_64-kfreebsd-gnu /usr/lib/x86_64-linux-gnux32
 #     )
 #     INCLUDE_DIRECTORIES(${MPI_H_INCLUDE_DIR})
-  ELSE(MPI_FOUND  AND MPI4PY_FOUND)
+  ELSE(MPI_FOUND AND MPI4PY_FOUND)
     MESSAGE(STATUS "MPI NOT FOUND, YADE-OpenFOAM coupling disabled")
     SET (DISABLED_FEATS "${DISABLED_FEATS} MPI")
-  ENDIF(MPI_FOUND  AND MPI4PY_FOUND)
+  ENDIF(MPI_FOUND AND MPI4PY_FOUND)
 ELSE(ENABLE_MPI)
     SET (DISABLED_FEATS "${DISABLED_FEATS} MPI")
 ENDIF(ENABLE_MPI)
