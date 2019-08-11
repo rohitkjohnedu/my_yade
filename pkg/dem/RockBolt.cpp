@@ -111,8 +111,8 @@ void RockBolt::action(){
 					//localCoordinates.push_back(tempCoord[0]);
 					/*add last*/
 					Vector3r endPoint = startingPoint + boltLength*boltDirection;
-					State* state1  = Body::byId(blockIDs[blockIDs.size()-1],scene)->state.get();
-					endPoint = state1 ->ori.conjugate()*(endPoint-state1->pos);
+					State* state1a  = Body::byId(blockIDs[blockIDs.size()-1],scene)->state.get();
+					endPoint = state1a ->ori.conjugate()*(endPoint-state1a->pos);
 					if(useMidPoint == false){
 						localCoordinates.push_back(tempCoord[0]);
 					}else{
@@ -344,7 +344,7 @@ void RockBolt::action(){
 }
 
 
-Vector3r RockBolt::getNodeDistance(const PotentialBlock* cm1,const State* state1,const PotentialBlock* cm2,const State* state2, const Vector3r localPt1, const Vector3r localPt2){
+Vector3r RockBolt::getNodeDistance(const PotentialBlock* /*cm1*/,const State* state1,const PotentialBlock* /*cm2*/,const State* state2, const Vector3r localPt1, const Vector3r localPt2){
 	//Vector3r nodeDist = Vector3r(0,0,0.0);
 	Vector3r global1 = state1->ori*localPt1 + state1->pos;
 	Vector3r global2 = state2->ori*localPt2 + state2->pos;

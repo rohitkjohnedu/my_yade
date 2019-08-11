@@ -42,7 +42,7 @@ YADE_PLUGIN((Ig2_PB_PB_ScGeom)
 CREATE_LOGGER(Ig2_PB_PB_ScGeom);
 
 
-bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1, const State& state2, const Vector3r& shift2, const bool& force,const shared_ptr<Interaction>& c)
+bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1, const State& state2, const Vector3r& /*shift2*/, const bool& force,const shared_ptr<Interaction>& c)
 {	
 	
 
@@ -532,15 +532,15 @@ if(!twoD){ //search counter-clockwise
 		searchDir = searchDirOri;//*bisectionStepSize;
 		
 		prevPoint = ptOnBoundary;
-		Vector3r ptOnP1(0,0,0); Vector3r ptOnP2(0,0,0);
+		Vector3r ptOnP1a(0,0,0); Vector3r ptOnP2a(0,0,0);
 		
-		if( getPtOnParticleAreaNormal(cm1,state1,ptOnBoundary, searchDir, prevNoA, ptOnP1, searchDirA, newNoA)){
+		if( getPtOnParticleAreaNormal(cm1,state1,ptOnBoundary, searchDir, prevNoA, ptOnP1a, searchDirA, newNoA)){
 			prevNoA = newNoA;	
 		}else{ 
 			std::cout<<"no intersection A? "<<endl;
 			prevNoA = -1;
 		}
-		if ( getPtOnParticleAreaNormal(cm2,state2,ptOnBoundary, searchDir, prevNoB, ptOnP2, searchDirB, newNoB)){
+		if ( getPtOnParticleAreaNormal(cm2,state2,ptOnBoundary, searchDir, prevNoB, ptOnP2a, searchDirB, newNoB)){
 			prevNoB = newNoB;
 		}else{
 			std::cout<<"no intersection B? "<<endl;
@@ -549,15 +549,15 @@ if(!twoD){ //search counter-clockwise
 		if(prevNoA == -1 && prevNoB == -1){std::cout<<"loop fail"<<endl;}
 
 
-		Vector3r p1 = (ptOnP1 - prevPoint);
-		Vector3r p2 = (ptOnP2 - prevPoint);
+		Vector3r p1 = (ptOnP1a - prevPoint);
+		Vector3r p2 = (ptOnP2a - prevPoint);
 		if ((p1-p2).norm() > pow(10,-6)) {
 			if(  p1.norm()<p2.norm()  ){
-				ptOnBoundary = ptOnP1; countParticleA++;
+				ptOnBoundary = ptOnP1a; countParticleA++;
 				normalDir = searchDirA;
 				prevNoB = -1;
 			}else{
-				ptOnBoundary = ptOnP2; countParticleB++;
+				ptOnBoundary = ptOnP2a; countParticleB++;
 				normalDir = searchDirB; 
 				prevNoA = -1;
 			}
@@ -568,11 +568,11 @@ if(!twoD){ //search counter-clockwise
 			double dotA = dirA.dot(normalDir);
 			double dotB = dirB.dot(normalDir);
 			if (dotA < dotB) {  //the larger the angle, the smaller the dot product (perpendicular)
-				ptOnBoundary = ptOnP1; countParticleA++;
+				ptOnBoundary = ptOnP1a; countParticleA++;
 				normalDir = searchDirA;
 				prevNoB = -1;
 			}else{
-				ptOnBoundary = ptOnP2; countParticleB++;
+				ptOnBoundary = ptOnP2a; countParticleB++;
 				normalDir = searchDirB; 
 				prevNoA = -1;
 			}
@@ -980,7 +980,7 @@ double Ig2_PB_PB_ScGeom::getDet(const Eigen::MatrixXd A){
 
 
 
-bool Ig2_PB_PB_ScGeom::startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPoint, bool &convergeFeasibility){
+bool Ig2_PB_PB_ScGeom::startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPoint, bool &/*convergeFeasibility*/){
 
 //timingDeltas->start(); 
   Vector3r xGlobal (0,0,0); double rescale = 1.0; //bool converge = true;

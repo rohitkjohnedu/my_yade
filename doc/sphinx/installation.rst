@@ -101,7 +101,7 @@ management (install the ``git`` package on your system and create a `GitLab acco
 
 		git clone git@gitlab.com:yade-dev/trunk.git
 
-will download the whole code repository of the ``trunk``. Check out :ref:`yade-github-label`
+will download the whole code repository of the ``trunk``. Check out :ref:`yade-gitrepo-label`
 for more details on how to collaborate using ``git``.
 
 Alternatively, a read-only checkout is possible via https without a GitLab account (easier if you don't want to modify the trunk version)::
@@ -234,6 +234,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* DEBUG: compile in debug-mode (OFF by default)
 	* ENABLE_LOGGER: use `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ library for logging separately for each class (ON by default)
 	* MAX_LOG_LEVEL: :ref:`set maximum level <maximum-log-level>` for LOG_* macros compiled with ENABLE_LOGGER, (default is 5)
+	* ENABLE_USEFUL_ERRORS: enable useful compiler errors which help a lot in error-free development.
 	* CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 	* SUFFIX: suffix, added after binary-names (version number by default)
 	* NOSUFFIX: do not add a suffix after binary-name (OFF by default)

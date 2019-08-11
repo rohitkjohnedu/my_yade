@@ -4,6 +4,7 @@
 #  DEBUG: compile in debug-mode (OFF by default)
 #  ENABLE_LOGGER: use boost::log library for logging (ON by default)
 #  MAX_LOG_LEVEL: set maximum level for LOG_* macros compiled with ENABLE_LOGGER. For production build use MAX_LOG_LEVEL<=5, to avoid filter integer comparison on each call to LOG_TRACE(…)
+#  ENABLE_USEFUL_ERRORS: enable useful compiler errors which help a lot in error-free development.
 #  CMAKE_VERBOSE_MAKEFILE: output additional information during compiling (OFF by default)
 #  SUFFIX: suffix, added after binary-names (version number by default)
 #  NOSUFFIX: do not add a suffix after binary-name (OFF by default)
@@ -23,8 +24,8 @@
 #  ENABLE_LIQMIGRATION: enable LIQMIGRATION-option, see [Mani2013] for details (OFF by default)
 #  ENABLE_MASK_ARBITRARY: enable MASK_ARBITRARY option (OFF by default)
 #  ENABLE_PROFILING: enable profiling, e.g. shows some more metrics, which can define bottlenecks of the code (OFF by default)
-#  ENABLE_POTENTIAL_BLOCKS: enable potential blocks option (OFF by default)
-#  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (OFF by default)
+#  ENABLE_POTENTIAL_BLOCKS: enable potential blocks option (ON by default)
+#  ENABLE_POTENTIAL_PARTICLES: enable potential particles option (ON by default)
 #  ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
 #  ENABLE_FEMLIKE: enable meshed solids (FEM-like)
 #  ENABLE_OAR: generate a script for oar-based task scheduler (OFF by default)
@@ -55,6 +56,7 @@ SET(CONFIGURED_FEATS "")
 SET(DISABLED_FEATS "")
 
 OPTION(ENABLE_LOGGER "use boost::log library for logging (ON by default)" ON)
+OPTION(ENABLE_USEFUL_ERRORS "enable useful compiler errors which help a lot in error-free development." ON)
 OPTION(ENABLE_VTK "Enable VTK" ${DEFAULT})
 OPTION(ENABLE_OPENMP "Enable OpenMP" ${DEFAULT})
 OPTION(ENABLE_MPI "Enable MPI environement and communications, required for coupling Yade with OpenFOAM  " ON)
@@ -146,7 +148,48 @@ ELSE()
   ENDIF()
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++11")
+FIND_PACKAGE(Eigen3 REQUIRED)
+FIND_PACKAGE(NumPy QUIET)
+#================== Use compiler warnings ==================
+if(ENABLE_USEFUL_ERRORS)
+  # Enable as many warnings as possible, and treat them as errors (using -Werror flag).
+  # Three warnings are impossible to fix, because they are in external libraries:
+  #   (1) libeigen: -Wmaybe-uninitialized, -Wcomment
+  #   (2) open mpi: -Wcast-function-type
+  # So depending on compiler version I need to turn these errors off.
+  # They will be still printed as warnings. But they will not be an error due to -Werror flag.
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
+    SET(USE_WARNING_ERRORS "-Wno-error=cast-function-type")
+  ENDIF()
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.0)
+    SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wshadow=compatible-local")
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+      SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=int-in-bool-context")
+    ENDIF()
+    IF((${EIGEN3_MAJOR_VERSION} EQUAL 3) AND ( (${EIGEN3_MINOR_VERSION} LESS 4) OR (${EIGEN3_MINOR_VERSION} EQUAL 4)))
+      # eigen <= 3.3.4
+      SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=shadow=compatible-local")
+    ENDIF()
+  ENDIF()
+
+  IF((${NUMPY_VERSION_MAJOR} EQUAL 1) AND (${NUMPY_VERSION_MINOR} LESS 13))
+    # numpy 1.11.0 has unused-function, 1.13 does not. So we have to print warning only when it appears.
+    SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=unused-function")
+  ENDIF()
+
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra                           -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment ${USE_WARNING_ERRORS}         -Wno-error=cpp -std=c++14 -fdce")
+
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow=compatible-local -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment -Wno-error=cast-function-type -Wno-error=cpp -std=c++14 -fdce")
+
+# Target flags, which will find every possible warning
+# https://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow                  -Wnarrowing -Wreturn-type -Wuninitialized                                                                                 -Wno-error=cpp -Werror=pedantic -Werror=conversion -Werror=sign-conversion -std=c++14 -fdce")
+
+ELSE(ENABLE_USEFUL_ERRORS)
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++14")
+ENDIF(ENABLE_USEFUL_ERRORS)
+#===========================================================
+
 
 IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
@@ -159,8 +202,8 @@ ENDIF (DEBUG)
 IF(ENABLE_LOGGER)
   MESSAGE(STATUS "${Esc}[36mLog filtering: enabled${Esc}[0m")
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} BoostLog")
-  ADD_DEFINITIONS("-D YADE_BOOST_LOG")
-  ADD_DEFINITIONS("-D BOOST_LOG_DYN_LINK")
+  ADD_DEFINITIONS("-DYADE_BOOST_LOG")
+  ADD_DEFINITIONS("-DBOOST_LOG_DYN_LINK")
   IF (DEBUG)
     MESSAGE(STATUS "Enabling boost::log library and DEBUG=ON. Files will be very large with full debug info inside.")
     IF(${MAX_LOG_LEVEL} LESS 6)
@@ -235,7 +278,6 @@ ENDIF()
 FIND_PACKAGE(Loki REQUIRED)
 INCLUDE_DIRECTORIES(${LOKI_INCLUDE_DIR})
 
-FIND_PACKAGE(Eigen3 REQUIRED)
 FIND_PACKAGE(BZip2 REQUIRED)
 FIND_PACKAGE(ZLIB REQUIRED)
 #===========================================================
@@ -376,9 +418,9 @@ ELSE(ENABLE_GUI)
 ENDIF(ENABLE_GUI)
 #===========================================================
 # This one will cry on attempts to build CGAL-based packages without cgal
-IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW))
-  MESSAGE(STATUS "PFVFLOW and TWOPHASEFLOW depends on CGAL, and ENABLE_CGAL is disabled (not found or turned OFF)")
-ENDIF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW))
+IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_BLOCKS))
+  MESSAGE(STATUS "PFVFLOW, TWOPHASEFLOW, THERMAL, and POTENTIAL_BLOCKS depends on CGAL, but CGAL is disabled (not found or turned OFF)")
+ENDIF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_BLOCKS))
 #===========================================================
 IF(ENABLE_CGAL)
   INCLUDE(FindGMP)
@@ -414,8 +456,22 @@ IF(ENABLE_CGAL)
 ELSE(ENABLE_CGAL)
   SET(DISABLED_FEATS "${DISABLED_FEATS} CGAL")
 ENDIF(ENABLE_CGAL)
+
 #===========================================================
-IF(ENABLE_LINSOLV)
+IF(ENABLE_PFVFLOW)
+	IF(ENABLE_CGAL)
+		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DFLOW_ENGINE")
+		SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PFVFLOW")
+	ELSE(ENABLE_CGAL)
+		SET(DISABLED_FEATS "${DISABLED_FEATS} PFVFLOW")
+		SET(ENABLE_PFVFLOW OFF)
+	ENDIF(ENABLE_CGAL)
+ELSE(ENABLE_PFVFLOW)
+	SET(DISABLED_FEATS "${DISABLED_FEATS} PFVFLOW")
+ENDIF(ENABLE_PFVFLOW)
+
+#===========================================================
+IF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
   FIND_PACKAGE(Cholmod)
   FIND_PACKAGE(OpenBlas)
   FIND_PACKAGE(Metis)
@@ -453,18 +509,19 @@ IF(ENABLE_LINSOLV)
     SET(DISABLED_FEATS "${DISABLED_FEATS} LINSOLV")
     SET(ENABLE_LINSOLV OFF)
   ENDIF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND AND CGAL_FOUND)
-ELSE(ENABLE_LINSOLV)
+ELSE(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
   SET(DISABLED_FEATS "${DISABLED_FEATS} LINSOLV")
       IF(ENABLE_TWOPHASEFLOW)
          MESSAGE(STATUS "TWOPHASEFLOW was disabled automatically because LINSOLV is disabled")
          SET(ENABLE_TWOPHASEFLOW OFF)
       ENDIF(ENABLE_TWOPHASEFLOW)
-ENDIF(ENABLE_LINSOLV)
+ENDIF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
 #===============================================
 IF(ENABLE_MPI)
-  FIND_PACKAGE(MPI)
-  IF (MPI_FOUND)
-    INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH})
+  FIND_PACKAGE(MPI REQUIRED)
+  FIND_PACKAGE(MPI4PY REQUIRED)
+  IF (MPI_FOUND AND MPI4PY_FOUND)
+    INCLUDE_DIRECTORIES(${MPI_CXX_INCLUDE_PATH} ${MPI4PY_INCLUDE_DIR})
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS} -DYADE_MPI")
     string (STRIP "${MPI_CXX_LIBRARIES}" MPI_LIBRARIES)
     string (STRIP "${MPI_CXX_LINK_FLAGS}" MPI_LINK_FLAGS)
@@ -485,10 +542,10 @@ IF(ENABLE_MPI)
 #     /usr/lib/x86_64-kfreebsd-gnu /usr/lib/x86_64-linux-gnux32
 #     )
 #     INCLUDE_DIRECTORIES(${MPI_H_INCLUDE_DIR})
-  ELSE(MPI_FOUND)
+  ELSE(MPI_FOUND  AND MPI4PY_FOUND)
     MESSAGE(STATUS "MPI NOT FOUND, YADE-OpenFOAM coupling disabled")
     SET (DISABLED_FEATS "${DISABLED_FEATS} MPI")
-  ENDIF(MPI_FOUND)
+  ENDIF(MPI_FOUND  AND MPI4PY_FOUND)
 ELSE(ENABLE_MPI)
     SET (DISABLED_FEATS "${DISABLED_FEATS} MPI")
 ENDIF(ENABLE_MPI)
@@ -575,12 +632,12 @@ ENDIF(ENABLE_MASK_ARBITRARY)
 
 #===========================================================
 
-IF(ENABLE_THERMAL)
+IF(ENABLE_THERMAL AND ENABLE_PFVFLOW)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTHERMAL")
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} THERMAL")
-ELSE(ENABLE_THERMAL)
+ELSE(ENABLE_THERMAL AND ENABLE_PFVFLOW)
   SET(DISABLED_FEATS "${DISABLED_FEATS} THERMAL")
-ENDIF(ENABLE_THERMAL)
+ENDIF(ENABLE_THERMAL AND ENABLE_PFVFLOW)
 
 IF(ENABLE_PROFILING)
   SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} PROFILING")
@@ -612,7 +669,7 @@ ENDIF(ENABLE_POTENTIAL_PARTICLES)
 
 
 #===========================================================
-IF(ENABLE_POTENTIAL_BLOCKS)
+IF(ENABLE_POTENTIAL_BLOCKS AND ENABLE_CGAL)
   INCLUDE(FindCLP)
   FIND_PACKAGE(OpenBlas REQUIRED)
   FIND_PACKAGE(LAPACK REQUIRED)
@@ -628,9 +685,9 @@ IF(ENABLE_POTENTIAL_BLOCKS)
     SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialBlocks")
     SET(ENABLE_POTENTIAL_BLOCKS OFF)
   ENDIF(CLP_FOUND AND OPENBLAS_FOUND AND LAPACK_FOUND)
-ELSE(ENABLE_POTENTIAL_BLOCKS)
+ELSE(ENABLE_POTENTIAL_BLOCKS AND ENABLE_CGAL)
   SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialBlocks")
-ENDIF(ENABLE_POTENTIAL_BLOCKS)
+ENDIF(ENABLE_POTENTIAL_BLOCKS AND ENABLE_CGAL)
 #===========================================================
 
 

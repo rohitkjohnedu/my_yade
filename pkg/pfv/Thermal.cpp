@@ -125,9 +125,9 @@ void ThermalEngine::setReynoldsNumbers(){
 		double charLength = 0.000001;
 		//double NutimesFluidK = 2*fluidK;
 		double Nusselt=2.;
-		for(int i=0;i<4;i++) {
-			if(!cell->neighbor(i)->info().isFictious) {
-				l = cell->info() - cell->neighbor(i)->info();
+		for(int j=0;j<4;j++) {
+			if(!cell->neighbor(j)->info().isFictious) {
+				l = cell->info() - cell->neighbor(j)->info();
 				charLength = sqrt(l.squared_length());
 			}
 		}
@@ -652,7 +652,7 @@ void ThermalEngine::computeCellVolumeChangeFromSolidVolumeChange(CellHandle& cel
 //	}
 //}
 
-void ThermalEngine::computeCellVolumeChangeFromDeltaTemp(CellHandle& cell,double cavDens){
+void ThermalEngine::computeCellVolumeChangeFromDeltaTemp(CellHandle& cell,double /*cavDens*/){
 	double beta;
 	if (tempDependentFluidBeta) beta = 7.5e-6*cell->info().temp()+5.7e-5; // linear model for thermal expansion
 	else beta = fluidBeta;

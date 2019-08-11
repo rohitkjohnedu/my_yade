@@ -61,8 +61,8 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 		ELSE(ENABLE_LOGGER)
 			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python thread filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
-	ELSE() # Python 3: next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try two possibilities that cover all distros.
-		FOREACH(PYTHON_PREFIX python-py python3-py)
+	ELSE() # Python 3: next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try two possibilities that cover all distros. Last form is for boost 1.71 in NIX/Gricad.
+		FOREACH(PYTHON_PREFIX python-py python3-py python)
 			IF(ENABLE_LOGGER)
 				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
 			ELSE(ENABLE_LOGGER)

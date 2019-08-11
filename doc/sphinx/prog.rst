@@ -118,7 +118,7 @@ and `GitLab <https://gitlab.com/yade-dev/>`__:
 * `questions and answers on launchpad <https://answers.launchpad.net/yade/>`__
 
 The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
-tutorial can be found in :ref:`yade-github-label`.
+tutorial can be found in :ref:`yade-gitrepo-label`.
 GIT is a distributed revision control system. It is available packaged for all major linux distributions.
 
 The `suorce code <https://gitlab.com/yade-dev/>`__ is periodically

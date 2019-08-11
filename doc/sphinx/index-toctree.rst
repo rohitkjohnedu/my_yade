@@ -48,7 +48,7 @@ Yade for programmers
 
   prog.rst
 
-  github.rst
+  gitrepo.rst
 
 ######################################
 Theoretical background and extensions

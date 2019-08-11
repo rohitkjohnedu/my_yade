@@ -84,7 +84,7 @@ for usePeriod in [True,False]:
 
 resultFile=None
 # careful, I used this loop to save the reference results in git revision 2bc5ac90b. When doing tests it must be readonly, and loading=True
-loading=False
+loading=True
 if(loading):
 	resultFile=open( checksPath+'/data/checkColliderCorrect.txt', "r" )
 else:

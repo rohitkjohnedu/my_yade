@@ -60,7 +60,7 @@ def getVersion(libName):
 
 	:param string libName: the name of the library
 
-	:return: tuple in format ``(major, minor, patchlevel)``
+	:return: tuple in format ``(major, minor, patchlevel)`` if ``libName`` exists. Otherwise it returns ``None``.
 
 	.. note:: library openblas has no properly defined version in header files, this function will return ``(0,0,0)`` for openblas. Parsing the version string would be unreliable. The mpi version detected by cmake sometimes is different than version detected by C++, this needs further investigation.
 	"""
@@ -75,7 +75,8 @@ def getVersion(libName):
 		return cppVer[libName][0]
 	if((libName in cmakeVer) and (len(cmakeVer[libName])==2)):
 		return cmakeVer[libName][0]
-	raise RuntimeError("Could not find library version of ",libName)
+	#raise RuntimeError("Could not find library version of ",libName)
+	return None
 
 def getAllVersionsCmake():
 	"""
