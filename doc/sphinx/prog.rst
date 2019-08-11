@@ -305,11 +305,11 @@ There are two settings for the filter level, the ``Default`` level used when no 
 Debug macros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To enable debugging for particular class the ``DECLARE_LOGGER;`` macro should be put in class definition inside header to create a separate named logger for that class. Then the ``CREATE_LOGGER(ClassName);`` macro must be used in the class implementation ``.cpp`` file to create the static variable. Sometimes a logger is necessary outside the class, such named logger can be created inside a ``.cpp`` file and by convention its name should correspond to the name of the file, use the macro ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");`` for this. On rare occasions logging is necessary inside ``.hpp`` file outside of a class (where the local class named logger is unavailable), then the solution is to use ``LOG_NOFILTER(…)`` macro, because it is the only one that can work without a named logger. If the need arises this solution can be improved, see :ysrc:`lib/base/Logging.cpp#L21` for details.
+To enable debugging for particular class the ``DECLARE_LOGGER;`` macro should be put in class definition inside header to create a separate named logger for that class. Then the ``CREATE_LOGGER(ClassName);`` macro must be used in the class implementation ``.cpp`` file to create the static variable. Sometimes a logger is necessary outside the class, such named logger can be created inside a ``.cpp`` file and by convention its name should correspond to the name of the file, use the macro ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");`` for this. On rare occasions logging is necessary inside ``.hpp`` file outside of a class (where the local class named logger is unavailable), then the solution is to use ``LOG_NOFILTER(…)`` macro, because it is the only one that can work without a named logger. If the need arises this solution can be improved, see :ysrccommit:`Logging.cpp<775ae7436/lib/base/Logging.cpp#L37>` for details.
 
 All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the brackets, such as ``LOG_TRACE( a << b << " text" )``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
 
-Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See file :ysrc:`py/_log.cpp#L41` for example use.
+Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See :ysrccommit:`function testAllLevels<775ae7436/py/_log.cpp#L41>` for example use.
 
 The macro ``TRACE;`` prints a ``"Been here"`` message at ``TRACE`` log filter level, and can be used for quick debugging.
 
@@ -518,11 +518,23 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 	yielding :yref:`Material used in the CPM model<CpmMat>`.
 
 ``:ysrc:``
-	creates hyperlink to file within the source tree (to its latest version in the repository), for instance :ysrc:`core/Cell.hpp`. Just like with `:yref:`, alternate text can be used with ::
+	creates hyperlink to file within the source tree (to its latest version in the repository), for instance :ysrc:`core/Cell.hpp`. Just like with ``:yref:``, alternate text can be used with ::
 	
 		:ysrc:`Link text<target/file>`
 		
-	like :ysrc:`this<core/Cell.hpp>`.
+	like :ysrc:`this<core/Cell.hpp>`. This cannot be used to link to a specified line number, since changing the file will cause the line numbers to become outdated. To link to a line number use ``:ysrccommit:`` described below.
+
+``:ysrccommit:``
+	creates hyperlink to file within the source tree at the specified commit hash. This allows to link to the line numbers using for example ``#L121`` at the end of the link. Use it just like the ``:ysrc:`` except that commit hash must be provided at the beginning::
+
+		:ysrccommit:`Link text<commithash/target/file#Lnumber>`
+
+		:ysrccommit:`default engines<775ae7436/py/__init__.py.in#L112>`
+
+	becomes :ysrccommit:`default engines<775ae7436/py/__init__.py.in#L112>`.
+
+Linking to ``inheritanceGraph*``
+	To link to an inheritance graph of some base class a :ref:`global anchor<global-rst-anchors>` is created with name ``inheritanceGraph*`` added in front of the class name, for example ``:ref:`Shape<inheritanceGraphShape>``` yields link to :ref:`inheritance graph of Shape<inheritanceGraphShape>`.
 
 ``|ycomp|``
 	is used in attribute description for those that should not be provided by the user, but are auto-computed instead; ``|ycomp|`` expands to |ycomp|.
@@ -539,6 +551,22 @@ In addition to standard ReST syntax, yade provides several shorthand macros:
 	
 	Displayed mathematics (standalone equations) can be inserted as explained in `Math support in Sphinx <http://sphinx.pocoo.org/ext/math.html>`_.
 
+
+.. _global-rst-anchors:
+
+As a reminder in the standard ReST syntax the references are:
+
+``:ref:``
+	is the the standard restructured text reference to an anchor placed elsewere in the text. For instance an anchor ``.. _NumericalDamping:`` is placed in :ysrccommit:`formulation.rst<775ae7436/doc/sphinx/formulation.rst#L564>` then it is linked to with ``:ref:`NumericalDamping``` inside the :ysrccommit:`source code<775ae7436/pkg/dem/NewtonIntegrator.hpp#L64>`.
+
+``.. _anchor-name:``
+	is used to place anchors in the text, to be referenced from elsewhere in the text. Symbol ``_`` is forbidden in the anchor name, because it has a special meaning: ``_anchor`` specifies anchor, while ``anchor_`` links to it, see below.
+
+``anchor-name_``
+	is used to place a link to anchor within the same file. It is a shorter form compared to the one which works between different files: ``:ref:``. For example usage on anchor ``imgQtGui`` see :ysrccommit:`here<775ae7436/doc/sphinx/introduction.rst#L258>` and :ysrccommit:`here<775ae7436/doc/sphinx/introduction.rst#L261>`.
+
+
+.. note:: The command ``:scale: NN %`` (with percent) does not work well with ``.html`` + ``.pdf`` output, better to specify ``:width: NN cm``. Then it is the same size in ``.html`` and ``.pdf.``. For example see :ysrccommit:`here<eb6bdedac/doc/sphinx/GPUacceleration.rst#L111>` which becomes :ref:`this picture<fig-cpuvsgpu>`. But bear in mind that maximum picture width in ``.pdf`` is ``16.2 cm``.
 
 
 Bibliographical references
@@ -1850,7 +1878,7 @@ Python                   c++
 Engine loop
 ------------
 
-Running simulation consists in looping over :yref:`Engines<Engine>` and calling them in sequence. This loop is defined in ``Scene::moveToNextTimeStep`` function in :ysrc:`core/Scene.cpp<core/Scene.cpp#L73>`. Before the loop starts, :yref:`O.initializers<Omega.initializers>` are called; they are only run once. The engine loop does the following in each iteration over :yref:`O.engines<Omega.engines>`:
+Running simulation consists in looping over :yref:`Engines<Engine>` and calling them in sequence. This loop is defined in ``Scene::moveToNextTimeStep`` function in :ysrccommit:`core/Scene.cpp<775ae7436/core/Scene.cpp#L71>`. Before the loop starts, :yref:`O.initializers<Omega.initializers>` are called; they are only run once. The engine loop does the following in each iteration over :yref:`O.engines<Omega.engines>`:
 
 #. set ``Engine::scene`` pointer to point to the current ``Scene``.
 #. Call ``Engine::isActivated()``; if it returns ``false``, the engine is skipped.
