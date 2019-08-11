@@ -89,9 +89,9 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_AdimExp(LubricationPhys *p
 	
 	Real d;
 	if(dichotomie)
-		d = DichoAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun*3./2., phys->delta, phys->nun/phys->kn/std::pow(a,2)*undot, phys->contact ? phys->ladh : 0.);
+		d = DichoAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun*3./2., phys->delta, 3./2.*phys->nun/phys->kn/std::pow(a,2)*undot, phys->contact ? phys->ladh : 0.);
 	else
-		d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun*3./2., phys->delta, phys->nun/phys->kn/std::pow(a,2)*undot); // Newton-Rafson
+		d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun*3./2., phys->delta, 3./2.*phys->nun/phys->kn/std::pow(a,2)*undot); // Newton-Rafson
 		
 	if(phys->contact) { // We where in contact. Contact is maintained while u'-2*eps < ladh
 		phys->contact = std::exp(d)-2.*phys->eps < phys->ladh;
@@ -522,7 +522,7 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(Lubricatio
 		if(activateTangencialLubrication) shearForce_firstOrder(phys,geom);
 		else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
 		
-		if (phys->nun > 0.) phys->cn = phys->nun/phys->u;
+		if (phys->nun > 0.) phys->cn = 3./2.*phys->nun/phys->u;
 		
 		Vector3r Cr = Vector3r::Zero();
 		Vector3r Ct = Vector3r::Zero();
@@ -553,7 +553,7 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(Lubric
 	if(activateTangencialLubrication) shearForce_firstOrder_log(phys,geom);
 	else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
 	
-	if (phys->nun > 0.) phys->cn = phys->nun/phys->u;
+	if (phys->nun > 0.) phys->cn = 3./2.*phys->nun/phys->u;
 	
 	Vector3r Cr = Vector3r::Zero();
 	Vector3r Ct = Vector3r::Zero();
