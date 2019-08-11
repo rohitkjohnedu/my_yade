@@ -64,7 +64,8 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 		ENDIF(ENABLE_LOGGER)
 		IF(Boost_FOUND)
 			# for some reason boost_python37 is found but not linked with boost 1.71, we add it here (is it a specific issue within NIX?)
-			IF (Boost_VERSION VERSION_GREATER 1.71 OR Boost_VERSION VERSION_EQUAL 1.71) #maybe it should start at boost 1.67?
+			IF (${Boost_VERSION} GREATER 107100 OR ${Boost_VERSION} EQUAL 107100) #maybe it should start at boost 1.67?
+				MESSAGE("Boost_VERSION=${Boost_VERSION}, adding boost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} lib")
 				SET(Boost_LIBRARIES "${Boost_LIBRARIES};libboost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.so")
 
 			ENDIF()
