@@ -101,11 +101,14 @@ INCLUDE_DIRECTORIES (${CMAKE_SOURCE_DIR})
 # this line was trying to get the g++ version. But it does not work with ccache.
 # But we already have CMAKE_CXX_COMPILER_VERSION, so we don't need this line!
 #EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.8)
-  MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0")
-  ADD_DEFINITIONS("-ftrack-macro-expansion=0")
-ELSE()
-  MESSAGE(STATUS "GCC Version < 4.8. will not use -ftrack-macro-expansion=0")
+
+IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")  # Check whether we compile with GCC
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.8 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.8 and "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    MESSAGE(STATUS "GCC Version >= 4.8. Adding -ftrack-macro-expansion=0")
+    ADD_DEFINITIONS("-ftrack-macro-expansion=0")
+  ELSE()
+    MESSAGE(STATUS "GCC Version < 4.8. will not use -ftrack-macro-expansion=0")
+  ENDIF()
 ENDIF()
 
 # -save-temps is not supported with ccache
