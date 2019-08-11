@@ -55,31 +55,32 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	IF ( NOT LocalBoost )
 		SET(LocalBoost "1.47.0") # Minimal required Boost version
 	ENDIF ( NOT LocalBoost )
-	IF ( ${PYTHON_VERSION_MAJOR} EQUAL 2 ) # Python 2
+	# Next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
+	FOREACH(PYTHON_PREFIX python python-py python${PYTHON_VERSION_MAJOR}-py) #boost>1.67 should pick-up the first one.
 		IF(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python thread filesystem iostreams regex serialization system date_time log)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
 		ELSE(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python thread filesystem iostreams regex serialization system date_time)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
-	ELSE() # Python 3: next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try two possibilities that cover all distros. Last form is for boost 1.71 in NIX/Gricad.
-		FOREACH(PYTHON_PREFIX python-py python3-py python)
-			IF(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
-			ELSE(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
-			ENDIF(ENABLE_LOGGER)
-			IF(Boost_FOUND)
-				BREAK()
+		IF(Boost_FOUND)
+			# for some reason boost_python37 is found but not linked with boost 1.71, we add it here (is it a specific issue within NIX?)
+			IF (${Boost_VERSION} GREATER 107100 OR ${Boost_VERSION} EQUAL 107100) #maybe it should start at boost 1.67?
+				MESSAGE("Boost_VERSION=${Boost_VERSION}, adding boost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} lib")
+				SET(Boost_LIBRARIES "${Boost_LIBRARIES};libboost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.so")
+
 			ENDIF()
-		ENDFOREACH()
-		IF(NOT Boost_FOUND) # for opensuze
-			IF(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time log)
-			ELSE(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time)
-			ENDIF(ENABLE_LOGGER)
+			BREAK()
 		ENDIF()
+	ENDFOREACH()
+	
+	IF(NOT Boost_FOUND) # for opensuze
+		IF(ENABLE_LOGGER)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time log)
+		ELSE(ENABLE_LOGGER)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time)
+		ENDIF(ENABLE_LOGGER)
 	ENDIF()
+	
 	IF(NOT Boost_FOUND) #as we try multiple python prefixes we have to handle manually the required behavior: fail if we didn't found boost
 		MESSAGE(${fail_message} libboost-python)
 		RETURN()
@@ -91,7 +92,8 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	IF(NOT NUMPY_FOUND)
 		MESSAGE(${fail_message} numpy)
 		RETURN()
-	ENDIF()
+	ENDIF(NOT NUMPY_FOUND)
+	
 	FOREACH(PYTHON_MODULE IPython matplotlib pygraphviz Xlib minieigen future past)
 		FIND_PYTHON_MODULE(${PYTHON_MODULE} QUIET)
 		IF( NOT ${PYTHON_MODULE}_FOUND )
@@ -116,7 +118,7 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	# NOTE: If we are here, we found a suitable Python version with all packages needed.
 	SET(ALL_PYTHON_DEPENDENCIES_FOUND TRUE PARENT_SCOPE)
 	#Export findpythonlibs vars to global parent scope:
-	FOREACH(pythonlibs_var PYTHONLIBS_FOUND PYTHON_LIBRARIES PYTHON_INCLUDE_PATH PYTHON_INCLUDE_DIRS PYTHONLIBS_VERSION_STRING)
+	FOREACH(pythonlibs_var PYTHONLIBS_FOUND PYTHON_LIBRARIES PYTHON_INCLUDE_PATH PYTHON_INCLUDE_DIRS PYTHONLIBS_VERSION_STRING NUMPY_VERSION_MAJOR NUMPY_VERSION_MINOR)
 		SET(${pythonlibs_var} ${${pythonlibs_var}} PARENT_SCOPE)
 	ENDFOREACH()
 	INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
