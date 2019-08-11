@@ -149,8 +149,6 @@ ELSE()
 ENDIF()
 
 FIND_PACKAGE(Eigen3 REQUIRED)
-<<<<<<< HEAD
-=======
 FIND_PACKAGE(NumPy QUIET)
 #================== Use compiler warnings ==================
 if(ENABLE_USEFUL_ERRORS)
@@ -197,7 +195,6 @@ ELSE(ENABLE_USEFUL_ERRORS)
 ENDIF(ENABLE_USEFUL_ERRORS)
 #===========================================================
 
->>>>>>> origin/add/enable_clang-build
 
 IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
