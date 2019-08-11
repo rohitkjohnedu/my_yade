@@ -56,13 +56,18 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 		SET(LocalBoost "1.47.0") # Minimal required Boost version
 	ENDIF ( NOT LocalBoost )
 	# Next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
-	FOREACH(PYTHON_PREFIX python python-py python${PYTHON_VERSION_MAJOR}-py) #boost>1.67 should pick-up the first one (https://gitlab.kitware.com/cmake/cmake/merge_requests/1865).
+	FOREACH(PYTHON_PREFIX python python-py python${PYTHON_VERSION_MAJOR}-py) #boost>1.67 should pick-up the first one.
 		IF(ENABLE_LOGGER)
 			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
 		ELSE(ENABLE_LOGGER)
 			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
 		IF(Boost_FOUND)
+			# for some reason boost_python37 is found but not linked with boost 1.71, we add it here (is it a specific issue within NIX?)
+			IF (Boost_VERSION VERSION_GREATER 1.71 OR Boost_VERSION VERSION_EQUAL 1.71) #maybe it should start at boost 1.67?
+				SET(Boost_LIBRARIES "${Boost_LIBRARIES};libboost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}.so")
+
+			ENDIF()
 			BREAK()
 		ENDIF()
 	ENDFOREACH()
