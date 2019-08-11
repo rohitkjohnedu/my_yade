@@ -49,9 +49,7 @@ stages:
     - export CXXFLAGS="-fdiagnostics-color=always $CXXFLAGS"
     - echo $CXXFLAGS
     - mkdir build && cd build
-    - export CC="${CC:-ccache gcc}"   # set only if CC empty
-    - export CXX="${CXX:-ccache g++}" # set only if CXX empty
-    - cmake -DSUFFIX=-ci -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 $ADDITIONAL_COMPILE_FLAGS ..
+    - cmake -DSUFFIX=-ci -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 $ADDITIONAL_COMPILE_FLAGS ..
     - ccache -s
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
