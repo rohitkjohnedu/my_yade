@@ -58,9 +58,9 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	# Next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
 	FOREACH(PYTHON_PREFIX python python-py python${PYTHON_VERSION_MAJOR}-py) #boost>1.67 should pick-up the first one (https://gitlab.kitware.com/cmake/cmake/merge_requests/1865).
 		IF(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} python thread filesystem iostreams regex serialization system date_time log)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
 		ELSE(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} python thread filesystem iostreams regex serialization system date_time)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
 		IF(Boost_FOUND)
 			BREAK()
