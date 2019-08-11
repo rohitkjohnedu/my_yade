@@ -149,6 +149,55 @@ ELSE()
 ENDIF()
 
 FIND_PACKAGE(Eigen3 REQUIRED)
+<<<<<<< HEAD
+=======
+FIND_PACKAGE(NumPy QUIET)
+#================== Use compiler warnings ==================
+if(ENABLE_USEFUL_ERRORS)
+  # Enable as many warnings as possible, and treat them as errors (using -Werror flag).
+  # Three warnings are impossible to fix, because they are in external libraries:
+  #   (1) libeigen: -Wmaybe-uninitialized, -Wcomment
+  #   (2) open mpi: -Wcast-function-type
+  # So depending on compiler version I need to turn these errors off.
+  # They will be still printed as warnings. But they will not be an error due to -Werror flag.
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
+    SET(USE_WARNING_ERRORS "-Wno-error=cast-function-type")
+  ENDIF()
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.0)
+    SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wshadow=compatible-local")
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+      SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=int-in-bool-context")
+    ENDIF()
+    IF((${EIGEN3_MAJOR_VERSION} EQUAL 3) AND ( (${EIGEN3_MINOR_VERSION} LESS 4) OR (${EIGEN3_MINOR_VERSION} EQUAL 4)))
+      # eigen <= 3.3.4
+      SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=shadow=compatible-local")
+    ENDIF()
+  ENDIF()
+
+  IF((${NUMPY_VERSION_MAJOR} EQUAL 1) AND (${NUMPY_VERSION_MINOR} LESS 13))
+    # numpy 1.11.0 has unused-function, 1.13 does not. So we have to print warning only when it appears.
+    SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=unused-function")
+  ENDIF()
+
+IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")  # Check whether we compile with GCC
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra                           -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment ${USE_WARNING_ERRORS}         -Wno-error=cpp -std=c++14 -fdce")
+ELSE()
+  # use different flags for clang. These flags maximize -Werror : turn all warnings into errors. Just like in the line above for g++
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra                           -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment ${USE_WARNING_ERRORS}         -Wno-error=cpp -std=c++14")
+ENDIF()
+
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow=compatible-local -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment -Wno-error=cast-function-type -Wno-error=cpp -std=c++14 -fdce")
+
+# Target flags, which will find every possible warning
+# https://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
+# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow                  -Wnarrowing -Wreturn-type -Wuninitialized                                                                                 -Wno-error=cpp -Werror=pedantic -Werror=conversion -Werror=sign-conversion -std=c++14 -fdce")
+
+ELSE(ENABLE_USEFUL_ERRORS)
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++14")
+ENDIF(ENABLE_USEFUL_ERRORS)
+#===========================================================
+
+>>>>>>> origin/add/enable_clang-build
 
 IF (DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
