@@ -55,31 +55,26 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	IF ( NOT LocalBoost )
 		SET(LocalBoost "1.47.0") # Minimal required Boost version
 	ENDIF ( NOT LocalBoost )
-	IF ( ${PYTHON_VERSION_MAJOR} EQUAL 2 ) # Python 2
+	# Next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
+	FOREACH(PYTHON_PREFIX python python-py python${PYTHON_VERSION_MAJOR}-py) #boost>1.67 should pick-up the first one (https://gitlab.kitware.com/cmake/cmake/merge_requests/1865).
 		IF(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python thread filesystem iostreams regex serialization system date_time log)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} python thread filesystem iostreams regex serialization system date_time log)
 		ELSE(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python thread filesystem iostreams regex serialization system date_time)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} python thread filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
-	ELSE() # Python 3: next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
-		FOREACH(PYTHON_PREFIX python python-py python3-py) #boost>1.67 should pick-up the first one (https://gitlab.kitware.com/cmake/cmake/merge_requests/1865).
-			IF(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
-			ELSE(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
-			ENDIF(ENABLE_LOGGER)
-			IF(Boost_FOUND)
-				BREAK()
-			ENDIF()
-		ENDFOREACH()
-		IF(NOT Boost_FOUND) # for opensuze
-			IF(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time log)
-			ELSE(ENABLE_LOGGER)
-				FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time)
-			ENDIF(ENABLE_LOGGER)
+		IF(Boost_FOUND)
+			BREAK()
 		ENDIF()
+	ENDFOREACH()
+	
+	IF(NOT Boost_FOUND) # for opensuze
+		IF(ENABLE_LOGGER)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time log)
+		ELSE(ENABLE_LOGGER)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time)
+		ENDIF(ENABLE_LOGGER)
 	ENDIF()
+	
 	IF(NOT Boost_FOUND) #as we try multiple python prefixes we have to handle manually the required behavior: fail if we didn't found boost
 		MESSAGE(${fail_message} libboost-python)
 		RETURN()
@@ -91,7 +86,8 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	IF(NOT NUMPY_FOUND)
 		MESSAGE(${fail_message} numpy)
 		RETURN()
-	ENDIF()
+	ENDIF(NOT NUMPY_FOUND)
+	
 	FOREACH(PYTHON_MODULE IPython matplotlib pygraphviz Xlib minieigen future past)
 		FIND_PYTHON_MODULE(${PYTHON_MODULE} QUIET)
 		IF( NOT ${PYTHON_MODULE}_FOUND )
