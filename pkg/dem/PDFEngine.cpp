@@ -21,7 +21,7 @@ void PDFEngine::getSpectrums(vector<PDFEngine::PDF> & pdfs)
 		nTheta.push_back(pdfs[i].shape()[0]);
 		nPhi.push_back(pdfs[i].shape()[1]);
 		dTheta.push_back(Mathr::PI / nTheta[i]);
-		dPhi.push_back(2.*Mathr::PI / nPhi[i]);
+		dPhi.push_back(Mathr::PI / nPhi[i]);
 	}
 	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions) {
@@ -31,20 +31,22 @@ void PDFEngine::getSpectrums(vector<PDFEngine::PDF> & pdfs)
 		if(geom)
 		{
 			Real theta 	= acos(geom->normal.y()); //[0;pi]
- 			Real phi 	= atan2(geom->normal.z(), geom->normal.x()) + Mathr::PI; //[-pi;pi] => [0; 2pi] for index calculation
+ 			Real phi 	= atan2(geom->normal.z(), geom->normal.x()); //[-pi;pi]
+			
+			phi = (phi < 0) ? phi + Mathr::PI : phi; // Half plane (everything is central-symmetric)
  			
  			for(uint i(0);i<pdfs.size();i++)
 			{
+				
 				Real dS = sin(theta) * dTheta[i] * dPhi[i];
 				
 				// Calculate indexes
 				int idT1 = ((int)round((theta) / dTheta[i])) % nTheta[i];
 				int idP1 = ((int)round((phi) / dPhi[i])) % nPhi[i];
-				int idT2 = ((int)round((Mathr::PI - theta) / dTheta[i])) % nTheta[i];
-				int idP2 = ((int)round((Mathr::PI + phi) / dPhi[i])) % nPhi[i];
+				
+				idP1 = (idT1 == 0) ? 0 : idP1; // if theta == 0, phi doesn't matter.
 				
 				if(pdfs[i][idT1][idP1]) pdfs[i][idT1][idP1]->addData(I, dS, V, N);
-				if(pdfs[i][idT2][idP2]) pdfs[i][idT2][idP2]->addData(I, dS, V, N);
 			}
 		}
 	}
@@ -62,16 +64,16 @@ void PDFEngine::writeToFile(vector<PDFEngine::PDF> const& pdfs)
 				uint nTheta = pdfs[i].shape()[0];
 				uint nPhi = pdfs[i].shape()[1];
 				Real dTheta = (Mathr::PI / nTheta);
-				Real dPhi = (2.*Mathr::PI / nPhi);
+				Real dPhi = (Mathr::PI / nPhi);
 				
 				for(uint t(0);t<nTheta;t++) for(uint p(0);p<nPhi;p++) if(pdfs[i][t][p]) {
 					vector<string> ss = pdfs[i][t][p]->getSuffixes();
 					
 					if(ss.size() > 1)
 						for(uint j(0);j<ss.size();j++)
-							fprintf(fid, "%s_%s(%f,%f)\t",pdfs[i][t][p]->name.c_str(),  ss[j].c_str(), t*dTheta, p*dPhi - Mathr::PI);
+							fprintf(fid, "%s_%s(%f,%f)\t",pdfs[i][t][p]->name.c_str(),  ss[j].c_str(), t*dTheta, p*dPhi);
 					else
-						fprintf(fid, "%s(%f,%f)\t", pdfs[i][t][p]->name.c_str(), t*dTheta, p*dPhi - Mathr::PI);
+						fprintf(fid, "%s(%f,%f)\t", pdfs[i][t][p]->name.c_str(), t*dTheta, p*dPhi);
 				}
 			}
 			firstRun = false;
@@ -107,6 +109,7 @@ void PDFEngine::action()
 	
 	// Hint: If you want data on particular points, allocate only those pointers.
 	for(uint t(0);t<numDiscretizeAngleTheta;t++) for(uint p(0);p<numDiscretizeAnglePhi;p++) {
+		if((t == 0 || t == numDiscretizeAngleTheta-1) && p > 0) break; // theta = 0 || theta = pi => phi doesn't matter.
 		pdfs[0][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<NormPhys>(&NormPhys::normalForce, "normalStress"));
 		pdfs[1][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<NormShearPhys>(&NormShearPhys::shearForce, "shearStress"));
 		pdfs[2][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresDistanceCalculator("h"));

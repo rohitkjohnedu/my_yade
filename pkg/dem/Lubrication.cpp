@@ -676,6 +676,7 @@ void LubricationPDFEngine::action()
 	
 	// Hint: If you want data on particular points, allocate only those pointers.
 	for(uint t(0);t<numDiscretizeAngleTheta;t++) for(uint p(0);p<numDiscretizeAnglePhi;p++) {
+		if((t == 0 || t == numDiscretizeAngleTheta-1) && p > 0) break;
 		pdfs[0][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::normalContactForce, "NC"));
 		pdfs[1][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::shearContactForce, "SC"));
 		pdfs[2][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::normalLubricationForce, "NL"));

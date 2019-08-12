@@ -32,7 +32,7 @@ public:
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PDFEngine, PeriodicEngine,
 		"Base class for spectrums calculations. Compute Probability Density Functions of normalStress, shearStress, distance, velocity and interactions in spherical coordinates and write result to a file. Column name format is: Data(theta, phi). Convention used: x: phi = 0, y: theta = 0, z: phi = pi/2",
 		((uint, numDiscretizeAngleTheta, 20,,"Number of sector for theta-angle"))
-		((uint, numDiscretizeAnglePhi, 40,,"Number of sector for phi-angle"))
+		((uint, numDiscretizeAnglePhi, 20,,"Number of sector for phi-angle"))
 		//((Real, discretizeRadius, 0.1,,"d/a interval size"))
 		((string, filename, "PDF.txt", , "Filename"))
 		((bool, firstRun, true, (Attr::hidden | Attr::readonly), ""))
