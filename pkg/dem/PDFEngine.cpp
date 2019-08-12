@@ -57,7 +57,7 @@ void PDFEngine::writeToFile(vector<PDFEngine::PDF> const& pdfs)
 	if(fid) {
 		if(firstRun) {
 			
-			fprintf(fid, "# ");
+			fprintf(fid, "# time\t");
 			for(uint i(0);i<pdfs.size();i++) {
 				uint nTheta = pdfs[i].shape()[0];
 				uint nPhi = pdfs[i].shape()[1];
@@ -77,6 +77,8 @@ void PDFEngine::writeToFile(vector<PDFEngine::PDF> const& pdfs)
 			firstRun = false;
 			fprintf(fid, "\n");
 		}
+		
+		fprintf(fid, "%f\t",scene->time);
 		
 		for(uint i(0);i<pdfs.size();i++) for(uint t(0);t<pdfs[i].shape()[0];t++) for(uint p(0);p<pdfs[i].shape()[1];p++)
 			if(pdfs[i][t][p]) {
