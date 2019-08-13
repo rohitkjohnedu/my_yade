@@ -668,7 +668,7 @@ py::tuple Law2_ScGeom_ImplicitLubricationPhys::PyGetTotalStresses()
 void LubricationPDFEngine::action()
 {
 	vector<PDFEngine::PDF> pdfs;
-	pdfs.resize(7);
+	pdfs.resize(8);
 	
 	for(uint i(0);i<pdfs.size();i++) {
 		pdfs[i].resize(boost::extents[numDiscretizeAngleTheta][numDiscretizeAnglePhi]);
@@ -676,7 +676,6 @@ void LubricationPDFEngine::action()
 	
 	// Hint: If you want data on particular points, allocate only those pointers.
 	for(uint t(0);t<numDiscretizeAngleTheta;t++) for(uint p(0);p<numDiscretizeAnglePhi;p++) {
-		if((t == 0 || t == numDiscretizeAngleTheta-1) && p > 0) break;
 		pdfs[0][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::normalContactForce, "NC"));
 		pdfs[1][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::shearContactForce, "SC"));
 		pdfs[2][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::normalLubricationForce, "NL"));
@@ -684,6 +683,17 @@ void LubricationPDFEngine::action()
 		pdfs[4][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresDistanceCalculator("h"));
 		pdfs[5][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresVelocityCalculator("v"));
 		pdfs[6][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("P"));
+		pdfs[6][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("Pc", [](shared_ptr<Interaction> const& I) -> bool {
+            
+        ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());                      
+        LubricationPhys *ph = dynamic_cast<LubricationPhys*>(I->phys.get());
+        
+        if(geom && ph) {
+            return ph->contact;
+        }
+        return false;
+            
+        }));
 	}
 	
 	getSpectrums(pdfs); // Where the magic happen :)

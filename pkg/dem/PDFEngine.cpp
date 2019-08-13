@@ -31,22 +31,23 @@ void PDFEngine::getSpectrums(vector<PDFEngine::PDF> & pdfs)
 		if(geom)
 		{
 			Real theta 	= acos(geom->normal.y()); //[0;pi]
- 			Real phi 	= atan2(geom->normal.z(), geom->normal.x()); //[-pi;pi]
+ 			Real phi 	= atan2(geom->normal.x(), geom->normal.z()); //[-pi;pi]
 			
-			phi = (phi < 0) ? phi + Mathr::PI : phi; // Half plane (everything is central-symmetric)
+            bool inversed = false;
+			if(phi < 0) {
+                phi += Mathr::PI; // Half plane (everything is central-symmetric)
+                inversed = true;
+            }
  			
  			for(uint i(0);i<pdfs.size();i++)
 			{
-				
-				Real dS = sin(theta) * dTheta[i] * dPhi[i];
-				
 				// Calculate indexes
-				int idT1 = ((int)round((theta) / dTheta[i])) % nTheta[i];
-				int idP1 = ((int)round((phi) / dPhi[i])) % nPhi[i];
+				int idT1 = ((int)floor((theta) / dTheta[i])) % nTheta[i];
+				int idP1 = ((int)floor((phi) / dPhi[i])) % nPhi[i];
+                
+                Real dS = sin(((double)idT1 + 0.5)*dTheta[i])*dTheta[i]*dPhi[i];
 				
-				idP1 = (idT1 == 0) ? 0 : idP1; // if theta == 0, phi doesn't matter.
-				
-				if(pdfs[i][idT1][idP1]) pdfs[i][idT1][idP1]->addData(I, dS, V, N);
+				if(pdfs[i][idT1][idP1]) pdfs[i][idT1][idP1]->addData(I, dS, V, N, inversed);
 			}
 		}
 	}
@@ -71,9 +72,9 @@ void PDFEngine::writeToFile(vector<PDFEngine::PDF> const& pdfs)
 					
 					if(ss.size() > 1)
 						for(uint j(0);j<ss.size();j++)
-							fprintf(fid, "%s_%s(%f,%f)\t",pdfs[i][t][p]->name.c_str(),  ss[j].c_str(), t*dTheta, p*dPhi);
+							fprintf(fid, "%s_%s(%f,%f)\t",pdfs[i][t][p]->name.c_str(),  ss[j].c_str(), ((double)t + 0.5)*dTheta, ((double)p + 0.5)*dPhi);
 					else
-						fprintf(fid, "%s(%f,%f)\t", pdfs[i][t][p]->name.c_str(), t*dTheta, p*dPhi);
+						fprintf(fid, "%s(%f,%f)\t", pdfs[i][t][p]->name.c_str(), ((double)t+0.5)*dTheta, ((double)p+0.5)*dPhi);
 				}
 			}
 			firstRun = false;
@@ -109,7 +110,6 @@ void PDFEngine::action()
 	
 	// Hint: If you want data on particular points, allocate only those pointers.
 	for(uint t(0);t<numDiscretizeAngleTheta;t++) for(uint p(0);p<numDiscretizeAnglePhi;p++) {
-		if((t == 0 || t == numDiscretizeAngleTheta-1) && p > 0) break; // theta = 0 || theta = pi => phi doesn't matter.
 		pdfs[0][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<NormPhys>(&NormPhys::normalForce, "normalStress"));
 		pdfs[1][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<NormShearPhys>(&NormShearPhys::shearForce, "shearStress"));
 		pdfs[2][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresDistanceCalculator("h"));
@@ -143,7 +143,7 @@ void PDFSpheresDistanceCalculator::cleanData()
 	m_N = 0;
 }
 
-bool PDFSpheresDistanceCalculator::addData(const shared_ptr<Interaction>& I, Real const& /*dS*/ ,Real const& /*V*/, int const& /*N*/)
+bool PDFSpheresDistanceCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& V, int const& N, bool inversed)
 {
 	if(!I->isReal()) return false;
 	ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());
@@ -184,17 +184,20 @@ void PDFSpheresVelocityCalculator::cleanData()
 	m_N = 0;
 }
 
-bool PDFSpheresVelocityCalculator::addData(const shared_ptr<Interaction>& I, Real const& /*dS*/ ,Real const& /*V*/, int const& /*N*/)
+
+bool PDFSpheresVelocityCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& V, int const& N, bool inversed)
 {
 	if(!I->isReal()) return false;
 	
 	// Geometry
-    ScGeom* geom=static_cast<ScGeom*>(I->geom.get());
+    ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());
 	if(!geom) return false;
 
     // geometric parameters
    // Real a((geom->radius1+geom->radius2)/2.);
     Vector3r relV = geom->getIncidentVel_py(I, false);
+    
+    if(inversed) relV *=-1;
 	
 	m_N++;
 	m_vel += relV;
@@ -202,9 +205,10 @@ bool PDFSpheresVelocityCalculator::addData(const shared_ptr<Interaction>& I, Rea
 	return true;
 }
 
-PDFSpheresIntrsCalculator::PDFSpheresIntrsCalculator(string name) :
+PDFSpheresIntrsCalculator::PDFSpheresIntrsCalculator(string name, bool (*fp)(shared_ptr<Interaction> const&)) :
 	PDFEngine::PDFCalculator(name),
-	m_P(0.)
+	m_P(0.),
+	m_accepter(fp)
 {
 	
 }
@@ -219,11 +223,13 @@ void PDFSpheresIntrsCalculator::cleanData()
 	m_P = 0.;
 }
 
-bool PDFSpheresIntrsCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& /*V*/, int const& N)
+
+bool PDFSpheresIntrsCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& V, int const& N, bool inversed)
 {
 	if(!I->isReal()) return false;
 	
-	m_P += 1./(dS*N);
+    if(m_accepter(I))
+        m_P += 1./(dS*N);
 	
 	return true;
 }

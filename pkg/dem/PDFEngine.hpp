@@ -19,7 +19,7 @@ public:
 		virtual vector<string> getSuffixes() const { return vector<string>({""}); }
 		virtual vector<string> getDatas() const = 0;
 		virtual void cleanData() = 0;
-		virtual bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N) = 0;
+		virtual bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N, bool inversed) = 0;
 		
 		string name;
 	};
@@ -59,7 +59,7 @@ public:
 		return out;
 	}
 	void cleanData() { m_stress = Matrix3r::Zero(); }
-	bool addData(const shared_ptr<Interaction>& I, Real const& dS, Real const& V, int const& /*N*/) {
+	bool addData(const shared_ptr<Interaction>& I, Real const& dS, Real const& V, int const& N, bool inversed) {
 		if(!I->isReal()) return false;
 	ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());
 	Phys* phys=dynamic_cast<Phys*>(I->phys.get());
@@ -84,7 +84,7 @@ public:
 	PDFSpheresDistanceCalculator(string name);
 	vector<string> getDatas() const;
 	void cleanData();
-	bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N);
+	bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N, bool inversed);
 	
 private:
 	Real m_h;
@@ -97,7 +97,7 @@ public:
 	vector<string> getSuffixes() const;
 	vector<string> getDatas() const;
 	void cleanData();
-	bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N);
+	bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N, bool inversed);
 	
 private:
 	Vector3r m_vel;
@@ -106,11 +106,12 @@ private:
 
 class PDFSpheresIntrsCalculator : public PDFEngine::PDFCalculator {
 public:
-	PDFSpheresIntrsCalculator(string name);
+	PDFSpheresIntrsCalculator(string name, bool (*)(shared_ptr<Interaction> const&) = [](shared_ptr<Interaction> const&){ return true; });
 	vector<string> getDatas() const;
 	void cleanData();
-	bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N);
+	bool addData(const shared_ptr<Interaction>&, Real const& dS ,Real const& V, int const& N, bool inversed);
 	
 private:
 	Real m_P;
+    bool (m_accepter*)(shared_ptr<Interaction> const&);
 };
