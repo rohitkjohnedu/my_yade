@@ -144,7 +144,7 @@ void PDFSpheresDistanceCalculator::cleanData()
 	m_N = 0;
 }
 
-bool PDFSpheresDistanceCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& V, int const& N, bool inversed)
+bool PDFSpheresDistanceCalculator::addData(const shared_ptr<Interaction>& I, Real const&  ,Real const& , int const& , bool)
 {
 	if(!I->isReal()) return false;
 	ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());
@@ -186,7 +186,7 @@ void PDFSpheresVelocityCalculator::cleanData()
 }
 
 
-bool PDFSpheresVelocityCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& V, int const& N, bool inversed)
+bool PDFSpheresVelocityCalculator::addData(const shared_ptr<Interaction>& I, Real const& ,Real const& , int const& , bool inversed)
 {
 	if(!I->isReal()) return false;
 	
@@ -224,8 +224,7 @@ void PDFSpheresIntrsCalculator::cleanData()
 	m_P = 0.;
 }
 
-
-bool PDFSpheresIntrsCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& V, int const& N, bool inversed)
+bool PDFSpheresIntrsCalculator::addData(const shared_ptr<Interaction>& I, Real const& dS ,Real const& , int const& N, bool)
 {
 	if(!I->isReal()) return false;
 	
