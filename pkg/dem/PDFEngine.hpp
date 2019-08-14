@@ -113,5 +113,5 @@ public:
 	
 private:
 	Real m_P;
-    bool (m_accepter*)(shared_ptr<Interaction> const&);
+    bool (*m_accepter)(shared_ptr<Interaction> const&);
 };

@@ -683,7 +683,7 @@ void LubricationPDFEngine::action()
 		pdfs[4][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresDistanceCalculator("h"));
 		pdfs[5][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresVelocityCalculator("v"));
 		pdfs[6][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("P"));
-		pdfs[6][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("Pc", [](shared_ptr<Interaction> const& I) -> bool {
+		pdfs[7][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("Pc", [](shared_ptr<Interaction> const& I) -> bool {
             
         ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());                      
         LubricationPhys *ph = dynamic_cast<LubricationPhys*>(I->phys.get());

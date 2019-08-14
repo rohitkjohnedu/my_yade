@@ -31,11 +31,12 @@ void PDFEngine::getSpectrums(vector<PDFEngine::PDF> & pdfs)
 		if(geom)
 		{
 			Real theta 	= acos(geom->normal.y()); //[0;pi]
- 			Real phi 	= atan2(geom->normal.x(), geom->normal.z()); //[-pi;pi]
+ 			Real phi 	= atan2(geom->normal.x(),geom->normal.z()); //[-pi;pi]
 			
             bool inversed = false;
-			if(phi < 0) {
-                phi += Mathr::PI; // Half plane (everything is central-symmetric)
+			if(phi < 0) { // Everything has central-symmetry. Let's take only positive angles.
+                theta = Mathr::PI - theta;
+                phi += Mathr::PI;
                 inversed = true;
             }
  			
