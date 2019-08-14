@@ -62,7 +62,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		}
 		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::Zero();}
 	} else {
-		if (_flip.determinant()!=1) LOG_WARN("Flipping cell needs det(Id+flip)=1, check your input.");
+		if ((_flip+Matrix3r::Identity()).determinant()!=1) LOG_WARN("Flipping cell needs det(Id+flip)=1, check your input.");
 		flip=_flip.cast<int>();
 	}
 	cell->hSize+=cell->hSize*flip.cast<Real>();
