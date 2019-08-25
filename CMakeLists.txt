@@ -201,9 +201,6 @@ ENDIF()
 
 MESSAGE("Loop on the following python versions and check available dependencies:${PY_VERSIONS_CHECK}" )
 FOREACH(py_version ${PY_VERSIONS_CHECK})
-	#Reset variables to be able to use finpythoninterp multiple times
-	unset(PYTHONINTERP_FOUND CACHE)
-	unset(PYTHON_EXECUTABLE CACHE)
 	#Set desired python version
 	set(Python_ADDITIONAL_VERSIONS ${py_version})
 	#Find python
@@ -221,6 +218,10 @@ FOREACH(py_version ${PY_VERSIONS_CHECK})
 	IF(ALL_PYTHON_DEPENDENCIES_FOUND)
 		MESSAGE("Found all python dependencies with version ${PYTHON_VERSION_STRING}, will compile yade with that.")
 		BREAK()
+	ELSE()
+	        #Reset variables to be able to use finpythoninterp multiple times
+		unset(PYTHON_EXECUTABLE CACHE)
+		unset(PYTHONINTERP_FOUND CACHE)
 	ENDIF()
 ENDFOREACH()
 
