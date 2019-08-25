@@ -10,7 +10,8 @@
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
 			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			int ret = std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			if (ret!=0) cerr << "unable to execute gdb" << endl;
 			raise(sig); // reemit signal after exiting gdb
 			break;
 		}
