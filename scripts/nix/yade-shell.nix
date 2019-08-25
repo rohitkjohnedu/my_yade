@@ -14,7 +14,7 @@ let
         sha256 = "1jksrbbcxshxx8iqpxkc1y0v091hwji9xvz9w963gjpan4jf61wj";                     
       };                                                                                     
                                                                                              
-      buildInputs = [ unzip pythonPackages.boost boost.dev eigen ];                       
+      buildInputs = [ unzip pythonPackages.boost eigen ];                       
                                                                                              
       patchPhase = ''                                                                        
         sed -i "s/^.*libraries=libraries.//g" setup.py                                       
@@ -26,7 +26,6 @@ let
       '';
 
     };
-
  
   in 
 
@@ -35,7 +34,7 @@ let
 
 yade-env = stdenv.mkDerivation rec {
 
-      name = "yade-env-minimal";
+      name = "yade-env";
 
       buildInputs = [
 	boost
@@ -53,6 +52,7 @@ yade-env = stdenv.mkDerivation rec {
         python37Packages.matplotlib
         python37Packages.pillow
         python37Packages.mpi4py
+	python37Packages.tkinter
         openmpi
 	freeglut
 	sqlite
@@ -72,9 +72,8 @@ yade-env = stdenv.mkDerivation rec {
      ] ++ (with pythonPackages; [
                         pygments mpi4py pexpect decorator numpy
                         ipython ipython_genutils traitlets
-                        six boost minieigen pygraphviz xlib future gts
+                        six boost minieigen pygraphviz xlib tkinter future gts
                       ]) ;
-
     };
-  }
+ }
 

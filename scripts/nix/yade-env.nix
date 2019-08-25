@@ -21,7 +21,6 @@ minieigen = pkgs.python37Packages.buildPythonPackage rec{
         export LDFLAGS="-L${eigen.out}/lib -L${python37Packages.boost.out} -lboost_python37"
         export CFLAGS="-I${eigen.out}/include/eigen3"
       '';
-
 };
 
 in 
@@ -29,12 +28,11 @@ in
 { yade-env = pkgs.python37.buildEnv.override rec{
 
         extraLibs = with pkgs.python37Packages;[
-                        pygments mpi4py pexpect decorator numpy
-                        ipython ipython_genutils traitlets
-                        six minieigen ipython future matplotlib
+                        pygments mpi4py pexpect decorator numpy xlib
+                        ipython ipython_genutils traitlets pygraphviz
+                        six minieigen ipython future matplotlib tkinter pkgs.cmake
                       ] ;
         ignoreCollisions = true;
-
     };
 }
 )
