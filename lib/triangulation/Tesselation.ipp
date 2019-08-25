@@ -194,6 +194,7 @@ Point _Tesselation<TT>::setCircumCenter (const CellHandle& cell,bool force) {
 	return (Point) cell->info();
 }
 
+#ifdef ALPHASHAPE
 template<class TT>
 std::vector<int> _Tesselation<TT>::getAlphaVertices(double alpha)
 {
@@ -483,35 +484,6 @@ void _Tesselation<TT>::setExtendedAlphaCaps ( std::vector<AlphaCap>& faces, doub
 		}
 	}
 
-}
-
-template<class TT>
-Segment _Tesselation<TT>::Dual ( FiniteFacetsIterator &f_it )
-{
-	return Segment ( f_it->first->info(), ( f_it->first->neighbor ( f_it->second ) )->info() );
-}
-
-template<class TT>
-double _Tesselation<TT>::computeVFacetArea ( FiniteEdgesIterator ed_it )
-{
-	CellCirculator cell0 = Tri->incident_cells ( *ed_it );
-	CellCirculator cell2 = cell0;
-
-	if ( Tri->is_infinite ( cell2 ) ){
-		++cell2;
-		while ( Tri->is_infinite ( cell2 ) && cell2!=cell0 ) ++cell2;
-		if ( cell2==cell0 ) return 0;
-	}
-	cell0=cell2++;
-	CellCirculator cell1=cell2++;
-	Real area = 0;
-
-	while ( cell2!=cell0 ){
-	  	area+= sqrt(std::abs (( Triangle ( cell0->info(), cell1->info(), cell2->info() ) ).squared_area())) ;
-		++cell1;
-		++cell2;
-	}
-	return area;
 }
 
 template<class TT>
@@ -1005,8 +977,36 @@ CVector _Tesselation<TT>::alphaVoronoiPartialCapArea ( Facet facet, const AlphaS
 	return CVector(0,0,0);
 }
 
+#endif //ALPHASHAPE
 
+template<class TT>
+Segment _Tesselation<TT>::Dual ( FiniteFacetsIterator &f_it )
+{
+	return Segment ( f_it->first->info(), ( f_it->first->neighbor ( f_it->second ) )->info() );
+}
 
+template<class TT>
+double _Tesselation<TT>::computeVFacetArea ( FiniteEdgesIterator ed_it )
+{
+	CellCirculator cell0 = Tri->incident_cells ( *ed_it );
+	CellCirculator cell2 = cell0;
+	
+	if ( Tri->is_infinite ( cell2 ) ){
+		++cell2;
+		while ( Tri->is_infinite ( cell2 ) && cell2!=cell0 ) ++cell2;
+		if ( cell2==cell0 ) return 0;
+	}
+	cell0=cell2++;
+	CellCirculator cell1=cell2++;
+	Real area = 0;
+	
+	while ( cell2!=cell0 ){
+		area+= sqrt(std::abs (( Triangle ( cell0->info(), cell1->info(), cell2->info() ) ).squared_area())) ;
+		++cell1;
+		++cell2;
+	}
+	return area;
+}
 
 template<class TT>
 void _Tesselation<TT>::AssignPartialVolume ( FiniteEdgesIterator& ed_it )

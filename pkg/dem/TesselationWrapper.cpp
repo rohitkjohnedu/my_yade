@@ -372,7 +372,7 @@ boost::python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		return ret;
 }
 
-
+#ifdef ALPHASHAPE
 boost::python::list TesselationWrapper::getAlphaFaces(double alpha)
 {
 	vector<AlphaFace> faces;
@@ -420,5 +420,6 @@ boost::python::list TesselationWrapper::getAlphaVertices(double alpha)
 		ret.append(*f);
 	return ret;
 }
+#endif //ALPHASHAPE
 
 #endif /* YADE_CGAL */

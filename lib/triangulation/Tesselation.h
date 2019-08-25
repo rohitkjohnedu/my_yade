@@ -149,6 +149,7 @@ public:
 	inline const VertexHandle&	vertex (unsigned int id) const { return vertexHandles[id]; }
 
 	// Alpha Shapes
+	#ifdef ALPHASHAPE
 	void testAlphaShape(double alpha=0);
 	struct AlphaFace {unsigned int ids[3]; CVector normal;};
         struct AlphaCap {unsigned int id; CVector normal;};
@@ -159,13 +160,10 @@ public:
         CVector alphaVoronoiPartialCapArea (const Edge& ed_it, const AlphaShape& as,std::vector<Vector3r>& vEdges);
         CVector alphaVoronoiPartialCapArea (Facet facet, const AlphaShape& as, double shrinkedAlpha, std::vector<Vector3r>& vEdges);
 	std::vector<int> getAlphaVertices(double alpha=0);
-	
-// 	FiniteCellsIterator finite_cells_begin(void);// {return Tri->finite_cells_begin();}
-// 	FiniteCellsIterator finiteCellsEnd(void);// {return Tri->finite_cells_end();}
+	#endif
+
 	void voisins (VertexHandle v, VectorVertex& Output_vector);// {Tri->incident_vertices(v, back_inserter(Output_vector));}
 	RTriangulation& Triangulation (void);// {return *Tri;}
-
-// 	bool computed (void) {return computed;}
 
 	bool is_short ( FiniteFacetsIterator f_it );
 	inline bool is_internal ( FiniteFacetsIterator &facet );//
