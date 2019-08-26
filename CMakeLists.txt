@@ -212,6 +212,11 @@ FOREACH(py_version ${PY_VERSIONS_CHECK})
 	IF(NOT PythonInterp_FOUND)
 		MESSAGE(FATAL_ERROR "No python version could be found in your system.")
 	ENDIF()
+	IF (DEFINED USER_DEFINED_PYTHON_EX)
+        	MESSAGE("Using user defined PYTHON_EXECUTABLE: ${USER_DEFINED_PYTHON_EX}")
+        	SET(PYTHON_EXECUTABLE ${USER_DEFINED_PYTHON_EX} CACHE FILEPATH "user defined python executable" FORCE)
+	ENDIF()
+
 	#FindPythonInterp will try to fallback in older Python version, we have to check manually if it found the version we wish
 	PYTHON_VERSION_MATCHES(${py_version})
 	IF(NOT ${PYTHON_VERSION_MATCH})
@@ -232,10 +237,6 @@ FOREACH(py_version ${PY_VERSIONS_CHECK})
 	ENDIF()
 ENDFOREACH()
 
-IF (DEFINED USER_DEFINED_PYTHON_EX)
-	MESSAGE("Using user defined PYTHON_EXECUTABLE: $USER_DEFINED_PYTHON_EX")
-	SET(PYTHON_EXECUTABLE $USER_DEFINED_PYTHON_EX)
-ENDIF()
 #After the loop on all python versions, having ALL_PYTHON_DEPENDENCIES_FOUND==FALSE must trigger an error:
 IF(NOT ALL_PYTHON_DEPENDENCIES_FOUND)
 	MESSAGE(FATAL_ERROR "No python version with all dependencies was found.")
