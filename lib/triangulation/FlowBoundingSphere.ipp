@@ -119,7 +119,8 @@ void FlowBoundingSphere<Tesselation>::averageRelativeCellVelocity()
 		//This is the influx term
 		if (cell->info().Pcondition) cell->info().averageVelocity() = cell->info().averageVelocity() - (totFlowRate)*((Point) cell->info()-CGAL::ORIGIN );
 		//now divide by volume
-		if (cell->info().volume()!=0) cell->info().averageVelocity() = cell->info().averageVelocity() /std::abs(cell->info().volume());
+		if (cell->info().volume()==0) cerr << "zero volume pore interrupting velocity calculation" << endl;
+		else cell->info().averageVelocity() = cell->info().averageVelocity() /std::abs(cell->info().volume());
 	}
 }
 
