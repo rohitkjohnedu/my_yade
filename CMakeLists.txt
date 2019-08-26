@@ -211,6 +211,9 @@ FOREACH(py_version ${PY_VERSIONS_CHECK})
 	#FindPythonInterp will try to fallback in older Python version, we have to check manually if it found the version we wish
 	PYTHON_VERSION_MATCHES(${py_version})
 	IF(NOT ${PYTHON_VERSION_MATCH})
+	    #Reset variables to be able to use finpythoninterp multiple times
+		unset(PYTHON_EXECUTABLE CACHE)
+		unset(PYTHONINTERP_FOUND CACHE)
 		CONTINUE()
 	ENDIF()
 	MESSAGE("Python version ${PYTHON_VERSION_STRING} found, try to import dependencies...")
@@ -219,7 +222,7 @@ FOREACH(py_version ${PY_VERSIONS_CHECK})
 		MESSAGE("Found all python dependencies with version ${PYTHON_VERSION_STRING}, will compile yade with that.")
 		BREAK()
 	ELSE()
-	        #Reset variables to be able to use finpythoninterp multiple times
+	    #Reset variables to be able to use finpythoninterp multiple times
 		unset(PYTHON_EXECUTABLE CACHE)
 		unset(PYTHONINTERP_FOUND CACHE)
 	ENDIF()
