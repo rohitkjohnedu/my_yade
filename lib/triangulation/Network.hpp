@@ -64,6 +64,9 @@ class Network
 		int nOfSpheres;
 		int xMinId, xMaxId, yMinId, yMaxId, zMinId, zMaxId;
 		int* boundsIds [6];
+		vector<int> alphaBoundsIds;
+		vector<vector<CellHandle>> alphaBoundingCells;
+		
 		vector<CellHandle> boundingCells [6];
 		vector<CellHandle> thermalBoundingCells [6];
 		vector<CellHandle> conductionBoundingCells [6];
@@ -71,19 +74,25 @@ class Network
 		Point cornerMax;
 		Real VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalPorosity;
 		Boundary boundaries [6];
+		
+		std::vector<Boundary> alphaBoundaries;
+		
 		ThermalBoundary thermalBoundaries [6];
 		ThermalBoundary conductionBoundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-idOffset];}
+		Boundary& alphaBoundary (int b) {return alphaBoundaries[b-alphaIdOffset];}
 		ThermalBoundary& thermalBoundary (int b) {return thermalBoundaries[b-idOffset];}
 		ThermalBoundary& conductionBoundary (int b) {return conductionBoundaries[b-idOffset];}
 		short idOffset;
+		short alphaIdOffset;
 		int vtkInfiniteVertices, vtkInfiniteCells, num_particles;
 
 		void addBoundingPlanes();
 		void addBoundingPlane (CVector Normal, int id_wall);
 		void addBoundingPlane (Real center[3], double thickness, CVector Normal, int id_wall );
+		void setAlphaBoundary(double alpha, bool fixedAlpha);
 
-		void defineFictiousCells( );
+		void defineFictiousCells(double alphaBound);
 		int detectFacetFictiousVertices (CellHandle& cell, int& j);
 		double volumeSolidPore (const CellHandle& cell);
 		double volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, CVector& facetSurface);

@@ -59,6 +59,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         if (first) {
 	  if (multithread) setPositionsBuffer(false);
 	  buildTriangulation(pZero,*solver);
+	  cout << "built tri, about to init vols" << endl;
 	  initializeVolumes(*solver);
 	  if (phiZero>0) solver->adjustCavityCompressibility(pZero);
 	  backgroundSolver=solver;
@@ -91,6 +92,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if (controlCavityVolumeChange) solver->adjustCavityVolumeChange(scene->dt,1,pZero);
 		if (phiZero>0) solver->adjustCavityCompressibility(pZero);
 		cavityFluidDensity = getCavityDensity(); // keep this for carrying between remeshes
+		cout << "about to solve the linear system" <<endl;
 		solver->gaussSeidel(scene->dt);
 
 		//if (phiZero>0) solver->adjustCavityCompressibility(pZero);
@@ -104,6 +106,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	timingDeltas->checkpoint ( "viscous forces" );
 	if (!decoupleForces) applyForces(*solver);
         timingDeltas->checkpoint ( "Applying Forces" );
+		cout << "computed forces" << endl;
 	///End compute flow and forces
 	#ifdef LINSOLV
 	int sleeping = 0;
@@ -190,6 +193,12 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		flow.boundary (wallIds[k]).flowCondition=!bndCondIsPressure[k];
                 flow.boundary (wallIds[k]).value=bndCondValue[k];
                 flow.boundary (wallIds[k]).velocity = boundaryVelocity[k];//FIXME: needs correct implementation, maybe update the cached pos/vel?
+	}
+	
+	if (alphaBound==0) return;
+	for (unsigned int k=0;k<flow.alphaBoundsIds.size();k++) {
+		flow.alphaBoundaries[k].flowCondition=!alphaFlowCond;
+		flow.alphaBoundaries[k].value=alphaBoundValue;
 	}
 }
 
@@ -296,6 +305,8 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
 	flow.tesselation().vertexHandles.clear();
 	flow.tesselation().vertexHandles.resize(scene->bodies->size()+6,NULL);
+	flow.alphaBound = alphaBound;
+	flow.alphaBoundValue = alphaBoundValue;
 }
 
 #ifdef LINSOLV
@@ -327,7 +338,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         triangulate ( flow );
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
         flow.tesselation().compute();
-        flow.defineFictiousCells();
+		if (debug ) cout<< "finished computing" << endl;
+        flow.defineFictiousCells(alphaBound);
+		if (debug ) cout<< "finished defining fictious cells" << endl;
 	// For faster loops on cells define these vectors
 	flow.tesselation().cellHandles.clear();
 	flow.tesselation().cellHandles.reserve(flow.tesselation().Triangulation().number_of_finite_cells());
@@ -369,7 +382,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
         boundaryConditions ( flow );
+		cout << "finished boundary conditions"<<endl;
         flow.initializePressure ( pZero );
+		cout << "finished initializing pressure"<< endl;
 	flow.computePermeability();
 	if (thermalEngine) {
 		thermalBoundaryConditions ( flow ); 
@@ -487,6 +502,10 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	FOREACH ( const posData& b, buffer ) {
 		if ( !b.exists || b.id==ignoredBody ) continue;
 		if ( b.isSphere || b.isClump ) flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
+	}
+	
+	if (alphaBound!=0){
+		flow.setAlphaBoundary(0,true);
 	}
 	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
 	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );

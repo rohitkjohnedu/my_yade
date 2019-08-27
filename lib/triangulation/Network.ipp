@@ -109,8 +109,7 @@ template<class Tesselation>
 double Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, CVector& facetSurface)
 {
         double A [3], B[3];
-
-        Boundary &bi1 =  boundary(SV1->info().id());
+	Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
 	
         for (int m=0;m<3;m++) {A[m]= (SV2->point())[m];}
         for (int m=0;m<3;m++) {B[m]= (SV3->point())[m];}
@@ -143,9 +142,10 @@ template<class Tesselation>
 double Network<Tesselation>::volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, CVector& facetSurface)
 {
         double A [3], B[3];
-
-	Boundary &bi1 =  boundary(SV1->info().id());
-        Boundary &bi2 =  boundary(SV2->info().id());
+	Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
+	Boundary &bi2 = SV1->info().isAlpha ? alphaBoundary(SV2->info().id()) :  boundary(SV2->info().id());
+	//Boundary &bi1 =  boundary(SV1->info().id());
+        //Boundary &bi2 =  boundary(SV2->info().id());
         for (int m=0;m<3;m++) {A[m]=B[m]= SV3->point()[m];}
 
         A[bi1.coordinate]=bi1.p[bi1.coordinate];
@@ -291,7 +291,7 @@ double Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool sli
 		VertexHandle SV2 = cell->vertex(facetVertices[j][facetRe1]);
 		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe2]);
 
-		Boundary &bi1 =  boundary(SV1->info().id());
+		Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
                 Ssolid1 = 0;
 		if (bi1.flowCondition && ! slipBoundary) {
                         Ssolid1 = abs(0.5*CGAL::cross_product(p1-p2, SV2->point().point()-SV3->point().point())[bi1.coordinate]);
@@ -312,8 +312,11 @@ double Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool sli
 		VertexHandle SV2 = cell->vertex(facetVertices[j][facetF2]);
 		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe1]);
 
-		Boundary &bi1 =  boundary(SV1->info().id());
-                Boundary &bi2 =  boundary(SV2->info().id());
+		Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
+		Boundary &bi2 = SV1->info().isAlpha ? alphaBoundary(SV2->info().id()) :  boundary(SV2->info().id());
+		
+// 		Boundary &bi1 =  boundary(SV1->info().id());
+//                 Boundary &bi2 =  boundary(SV2->info().id());
                 for (int m=0;m<3;m++) {
                         A[m]=B[m]=C[m]= (SV3->point())[m];
                 }
@@ -388,7 +391,7 @@ double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bo
 		VertexHandle SV2 = cell->vertex(facetVertices[j][facetRe1]);
 		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe2]);
 
-		Boundary &bi1 =  boundary(SV1->info().id());
+		Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
                 Ssolid1 = 0;
 		if (bi1.flowCondition && ! slipBoundary) Ssolid1 = abs(0.5*CGAL::cross_product(p1-SV2->point().point(), SV2->point().point()-SV3->point().point())[bi1.coordinate]);
                 Ssolid2 = fastSphericalTriangleArea(SV2->point(),SV3->point().point(),p1, SV2->point().point()+bi1.normal);
@@ -399,8 +402,10 @@ double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bo
 		VertexHandle SV1 = cell->vertex(facetVertices[j][facetF1]);
 		VertexHandle SV2 = cell->vertex(facetVertices[j][facetF2]);
 		VertexHandle SV3 = cell->vertex(facetVertices[j][facetRe1]);
-		Boundary &bi1 =  boundary(SV1->info().id());
-                Boundary &bi2 =  boundary(SV2->info().id());
+		Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
+		Boundary &bi2 = SV2->info().isAlpha ? alphaBoundary(SV2->info().id()) :  boundary(SV2->info().id());
+		//Boundary &bi1 =  boundary(SV1->info().id());
+          //      Boundary &bi2 =  boundary(SV2->info().id());
                 for (int m=0;m<3;m++) {A[m]=B[m]=C[m]= (SV3->point())[m];}
                 A[bi1.coordinate]=bi1.p[bi1.coordinate];
                 B[bi2.coordinate]=bi2.p[bi2.coordinate];
@@ -426,9 +431,11 @@ double Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bo
 template<class Tesselation>
 CVector Network<Tesselation>::surfaceDoubleFictiousFacet(VertexHandle fSV1, VertexHandle fSV2, VertexHandle SV3)
 {
-        //This function is correct only with axis-aligned boundaries
-        const Boundary &bi1 = boundary(fSV1->info().id());
-        const Boundary &bi2 = boundary(fSV2->info().id());
+        //This function is correct only with axis-aligned boundaries FIXME: alpha is not axis aligned, is there a problem?
+	const Boundary &bi1 = fSV1->info().isAlpha ? alphaBoundary(fSV1->info().id()) :  boundary(fSV1->info().id());
+	const Boundary &bi2 = fSV2->info().isAlpha ? alphaBoundary(fSV2->info().id()) :  boundary(fSV2->info().id());
+        //const Boundary &bi1 = boundary(fSV1->info().id());
+        //const Boundary &bi2 = boundary(fSV2->info().id());
         double area=(bi1.p[bi1.coordinate]-SV3->point()[bi1.coordinate])*(bi2.p[bi2.coordinate]-SV3->point()[bi2.coordinate]);
         double surf [3] = {1,1,1};
         surf[bi1.coordinate]=0;
@@ -440,7 +447,7 @@ template<class Tesselation>
 CVector Network<Tesselation>::surfaceSingleFictiousFacet(VertexHandle fSV1, VertexHandle SV2, VertexHandle SV3)
 {
         //This function is correct only with axis-aligned boundaries
-        const Boundary &bi1 =  boundary(fSV1->info().id());
+        const Boundary &bi1 = fSV1->info().isAlpha ? alphaBoundary(fSV1->info().id()) :  boundary(fSV1->info().id());
 //  const Boundary &bi2 = boundary ( fSV2->info().id() );
         CVector mean_height = (bi1.p[bi1.coordinate]-0.5*(SV3->point()[bi1.coordinate]+SV2->point()[bi1.coordinate]))*bi1.normal;
 
@@ -456,8 +463,8 @@ double Network<Tesselation>::surfaceSolidDoubleFictiousFacet(VertexHandle SV1, V
                 A[m]=B[m]= (SV3->point())[m];
         }
 
-        const Boundary &bi1 = boundary(SV1->info().id());
-        const Boundary &bi2 = boundary(SV2->info().id());
+	const Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
+	const Boundary &bi2 = SV2->info().isAlpha ? alphaBoundary(SV2->info().id()) :  boundary(SV2->info().id());
 
         A[bi1.coordinate]=bi1.p[bi1.coordinate];
         B[bi2.coordinate]=bi2.p[bi2.coordinate];
@@ -568,26 +575,47 @@ void Network<Tesselation>::addBoundingPlane (Real center[3], double thickness, C
 }
 
 template<class Tesselation>
-void Network<Tesselation>::defineFictiousCells()
+void Network<Tesselation>::defineFictiousCells(double alphaBound)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
-
 	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
-	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
-	  cell->info().fictious()=0;}
-
+	for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {cell->info().fictious()=0;}
 	for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
                 if (id<0) continue;
+		T[currentTes].vertexHandles[id];
                 VectorCell tmpCells;
-                tmpCells.resize(10000);
+                tmpCells.resize(10000); // limiting if we have >10000 fictitious cells?
                 VCellIterator cells_it = tmpCells.begin();
-                VCellIterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);
+                VCellIterator cells_end = Tri.incident_cells(T[currentTes].vertexHandles[id],cells_it);  //
                 for (VCellIterator it = tmpCells.begin(); it != cells_end; it++)
 		{
 		  CellHandle& cell = *it;
 		  (cell->info().fictious())+=1;
 		  cell->info().isFictious=true;
+		}
+	}
+	
+	if (alphaBound!=0) {// using alpha boundary functionality
+		if (debugOut) cout << "setting fictious number for alpha boundary cells" <<endl;
+		for (unsigned int i=0; i<alphaBoundsIds.size();i++) {
+			int id = alphaBoundsIds[i];
+			if (id<0) continue;
+			//cout << "size of alpha boundaries" << alphaBoundaries.size() << endl;
+			VectorCell tmpCells;
+			tmpCells.resize(10000); // most likely only a few cells per boundary, 100 to be safe
+			VCellIterator cells_it = tmpCells.begin();
+			if (T[currentTes].vertexHandles[id]==NULL) {
+				cout<<"vertex pointer null, skipping" << endl;
+				continue;
+			}
+			VertexHandle vh = T[currentTes].vertexHandles[id];
+			VCellIterator cells_end = Tri.incident_cells(vh,cells_it);
+			for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
+				CellHandle& cell = *it;
+				(cell->info().fictious())+=1;
+				cell->info().isFictious=true;
+			}
 		}
 	}
 	
@@ -656,7 +684,7 @@ void Network<Tesselation>::lineSolidPore(CellHandle cell, int j)
 		cell->info().solidLine[j][facetRe1]=lineSolidFacet(SV1->point(), SV2->point(), SV3->point());
 		cell->info().solidLine[j][facetRe2]=lineSolidFacet(SV2->point(), SV1->point(), SV3->point());
 
-		Boundary &bi =  boundary(SV3->info().id());
+		Boundary &bi = SV3->info().isAlpha ? alphaBoundary(SV3->info().id()) :  boundary(SV3->info().id());
 		double A [3], B[3];
 		for (int m=0;m<3;m++) {A[m]=SV1->point()[m];B[m]= SV2->point()[m];}
 		A[bi.coordinate]=bi.p[bi.coordinate];
@@ -673,8 +701,10 @@ void Network<Tesselation>::lineSolidPore(CellHandle cell, int j)
 		
 		cell->info().solidLine[j][facetRe1]=0.5*M_PI*sqrt(SV3->point().weight());
 		
-		Boundary &bi1 =  boundary(SV1->info().id());
-		Boundary &bi2 =  boundary(SV2->info().id());
+		Boundary &bi1 = SV1->info().isAlpha ? alphaBoundary(SV1->info().id()) :  boundary(SV1->info().id());
+		Boundary &bi2 = SV2->info().isAlpha ? alphaBoundary(SV2->info().id()) :  boundary(SV2->info().id());
+//		Boundary &bi1 =  boundary(SV1->info().id());
+//		Boundary &bi2 =  boundary(SV2->info().id());
 		
 		double d13 = bi1.p[bi1.coordinate] - (SV3->point())[bi1.coordinate];
 		double d23 = bi2.p[bi2.coordinate] - (SV3->point())[bi2.coordinate];
@@ -702,6 +732,47 @@ double Network<Tesselation>::lineSolidFacet(Sphere ST1, Sphere ST2, Sphere ST3)
         double cosA = v12*v13 / (sqrt(norme13 * norme12));
         line = acos(cosA) * sqrt(squaredRadius);
         return line;
+}
+
+template<class Tesselation>
+void Network<Tesselation>::setAlphaBoundary(double alpha, bool fixedAlpha)
+{
+	//std::vector<int> alphaBoundsIds;
+	std::vector<Vector3r> vSegments;
+	RTriangulation temp ( T[currentTes].Triangulation() );
+	AlphaShape as ( temp );
+	alphaIdOffset = T[currentTes].vertexHandles.size();
+	double minAlpha=as.find_alpha_solid();
+	if ( !alpha ) as.set_alpha ( minAlpha );
+	else {
+		as.set_alpha ( alpha );
+		if (alpha<minAlpha) cerr<<"TesselationWrapper: Using alpha<minAlpha will not work. Consider using default alpha (=0)"<<endl;
+	}	
+	if (fixedAlpha) {//insert one sphere per regular facet, with a fixed size shrinkedAlpha
+		std::list<Facet> facets;
+		as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
+		for ( auto fp=facets.begin(); fp!=facets.end(); fp++ ) {
+			Facet f = *fp;    
+			if (as.classify(f.first)!=AlphaShape::INTERIOR) f=as.mirror_facet(f);
+			Sphere sph; bool b; CVector n;
+			T[currentTes].circumCenter(f.first,f.second,alpha,b,sph,n);
+			unsigned int id = T[currentTes].vertexHandles.size();
+			const double bigRad = FAR*(cornerMax.y()-cornerMin.y());
+			VertexHandle Vh = T[currentTes].Triangulation().insert(Sphere(sph.point(),pow(bigRad,2)));
+			Vh->info().setId(id); Vh->info().isAlpha=true;
+			//alphaVertices.push_back(Vh);
+			int Coordinate = abs(n[0])*0 + abs(n[1])*1 + abs(n[2])*2; //what is this??
+			Boundary tmpBoundary;tmpBoundary.p=sph.point();tmpBoundary.normal=n;tmpBoundary.coordinate=Coordinate;tmpBoundary.flowCondition=1;tmpBoundary.value=0;
+			alphaBoundaries.push_back(tmpBoundary);
+			//cout << "size of vertexhandles " << T[currentTes].vertexHandles.size() << endl;
+			T[currentTes].vertexHandles.push_back(Vh);
+			alphaBoundsIds.push_back(id);
+			T[currentTes].maxId = std::max ( T[currentTes].maxId, (int) id );
+			if ( Vh!=NULL ) Vh->info().isFictious = true;
+			else cerr << " : __Vh==NULL__ :(" << endl;}
+	} else { cerr << "alpha not set, bad things ensue" << endl;}
+	alphaBoundingCells.resize(alphaBoundsIds.size());
+	//return alphaBoundsIds;
 }
 
 } //namespace CGT

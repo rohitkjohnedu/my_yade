@@ -75,6 +75,7 @@ class SimpleCellInfo : public Point {
 	unsigned int id;
 	Real s;
 	bool isFictious;//true if the cell has at least one fictious bounding sphere as a vertex
+	bool isAlpha;
 	SimpleCellInfo (void) {isFictious=false; s=0;Point::operator= (CGAL::ORIGIN);}
 	SimpleCellInfo& setPoint(const Point &p) { Point::operator= (p); return *this; }
 	SimpleCellInfo& setScalar(const Real &scalar) { s=scalar; return *this; }
@@ -92,6 +93,7 @@ protected:
 	unsigned int i;
 	Real vol;
 public:
+	bool isAlpha;
 	bool isFictious;
 	SimpleVertexInfo& setVector(const CVector &u) { CVector::operator= (u); return *this; }
 	SimpleVertexInfo& setFloat(const float &scalar) { s=scalar; return *this; }
@@ -135,6 +137,7 @@ typedef CGAL::Triangulation_3<K>						Triangulation;
 typedef CGAL::Regular_triangulation_3<Traits, Tds>				RTriangulation;
 #ifdef ALPHASHAPES
 typedef CGAL::Alpha_shape_3<RTriangulation>  					AlphaShape;
+typedef typename AlphaShape::Alpha_iterator								Alpha_iterator;
 #endif
 typedef typename RTriangulation::Vertex_iterator                    		VertexIterator;
 typedef typename RTriangulation::Vertex_handle                      		VertexHandle;

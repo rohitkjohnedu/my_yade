@@ -336,11 +336,21 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 					/// handle fictious vertex since we can get the projected surface easily here
 					if (cell->vertex(j)->info().isFictious) {
 						//projection of facet on the boundary
-						Real projSurf=std::abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
-						tempVect=-projSurf*boundary(cell->vertex(j)->info().id()).normal;
-						cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
-						//define the cached value for later use with cache*p
-						cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+						if (!neighbourCell->info().isAlpha) { 
+							Real projSurf=std::abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
+							tempVect=-projSurf*boundary(cell->vertex(j)->info().id()).normal;
+							cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
+							//define the cached value for later use with cache*p
+							cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+							cout << "set normal fictious vertex force" << endl;
+						} else {
+ 							Real projSurf=std::abs(Surfk[alphaBoundary(cell->vertex(j)->info().id()).coordinate]);
+ 							tempVect=-projSurf*alphaBoundary(cell->vertex(j)->info().id()).normal;
+ 							cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
+ 							//define the cached value for later use with cache*p
+ 							cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+ 							cout << "set alpha fictious vertex force" << endl;
+ 						}
 					}
 					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
 					CVector facetUnitForce = -fluidSurfk*cell->info().solidSurfaces[j][3];
@@ -810,6 +820,7 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
 		if (!cell->info().Pcondition) cell->info().p() = pZero;
 		cell->info().dv()=0;
 	}
+		// cuboid bcs
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		boundingCells[bound].clear();
@@ -823,9 +834,48 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
                         for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
 				(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
 				boundingCells[bound].push_back(*it);
-			}
                 }
-        }
+			}
+		}
+		
+       if (alphaBound!=0) {// using alpha boundary functionality
+		   if (debugOut) cout << "setting alpha boundary cell values" <<endl;
+			for (unsigned int i=0; i<alphaBoundsIds.size();i++) {
+				int id = alphaBoundsIds[i];
+				//cout << "got alphaboundid "<<id<<endl;
+				alphaBoundingCells[i].clear();
+				if (id<0) continue;
+				//cout << "size of alpha boundaries" << alphaBoundaries.size() << endl;
+				Boundary& bi = alphaBoundaries[i]; //alphaBoundary(id);
+				//cout << "alpha boundary found" << endl;
+				if (!bi.flowCondition) {
+					VectorCell tmpCells;
+					tmpCells.resize(10000); // most likely only a few cells per boundary, 100 to be safe
+					VCellIterator cells_it = tmpCells.begin();
+					//cout << "asking for vertexHandle 10001" << endl;
+					//VertexHandle vh1 = T[currentTes].vertexHandles[10001];
+					//cout << "vh1 is vertex? " << Tri.is_vertex(vh1) << endl;
+					//cout << "asking for vertexHandle id " << id << endl;
+					if (T[currentTes].vertexHandles[id]==NULL) {
+						cout<<"vertex pointer null, skipping" << endl;
+						continue;
+					}
+					VertexHandle vh = T[currentTes].vertexHandles[id];
+					//cout<<"vertex handl id " << vh->info().id() << " is it vertex? " << Tri.is_vertex(vh) << endl;
+					//cout << "now finding incident cells on it"<<endl;
+					VCellIterator cells_end = Tri.incident_cells(vh,cells_it);
+					//cout << "incdent cell iterator set" << endl;
+					for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
+						(*it)->info().p() = alphaBoundValue;(*it)->info().Pcondition=true; (*it)->info().isAlpha=true;
+						alphaBoundingCells[i].push_back(*it);
+					}
+				}
+			}
+		}
+        
+        
+        
+        
         if (ppval && pxpos) applyUserDefinedPressure(Tri,*pxpos,*ppval);
         
         IPCells.clear();

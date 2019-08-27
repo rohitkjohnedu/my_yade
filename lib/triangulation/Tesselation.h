@@ -76,6 +76,7 @@ public:
 	typedef typename TT::RTriangulation							RTriangulation;
 #ifdef ALPHASHAPES
 	typedef typename TT::AlphaShape						 		AlphaShape;
+	typedef typename TT::Alpha_iterator							Alpha_iterator;
 #endif
 	typedef typename TT::Vertex_Info							VertexInfo;
 	typedef typename TT::Cell_Info								CellInfo;
@@ -114,6 +115,7 @@ public:
 	VectorVertex vertexHandles;//This is a redirection vector to get vertex pointers by spheres id
 	VectorCell cellHandles;//for speedup of global loops, iterating on this vector is faster than cellIterator++
 	VectorFacetPair facetCells; //for speedup on global loops (can be parallelized)
+	VectorVertex alphaVertexHandles; // list of vertices added to make alpha shape boundary
 	bool computed;
 
 	_Tesselation(void);

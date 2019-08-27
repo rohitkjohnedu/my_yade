@@ -476,7 +476,7 @@ void PeriodicFlowEngine::buildTriangulation ( double pZero, FlowSolver& flow)
         triangulate (flow);
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
         flow.tesselation().compute();
-        flow.defineFictiousCells();
+        flow.defineFictiousCells(alphaBound);
         //FIXME: this is already done in addBoundary(?)
         boundaryConditions ( flow );
 	if ( debug ) cout << endl << "boundaryConditions------" << endl << endl;
