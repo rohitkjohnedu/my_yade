@@ -1449,6 +1449,7 @@ try {
 	        .value("noResize", yade::Attr::noResize);
 
 	py::class_<pyOmega>("Omega")
+<<<<<<< 18aa7511517a24e39441f58e39171b5da0709e98
 	        .add_property("iter", &pyOmega::iter, "Get current step number")
 	        .add_property(
 	                "subStep",
