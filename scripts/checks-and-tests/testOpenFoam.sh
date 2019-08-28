@@ -7,6 +7,7 @@ cd /builds/yade-dev/
 git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling
 cd Yade-OpenFOAM-coupling
 git checkout yadetest
+./Allclean
 ./Allwmake
 
 cd /builds/yade-dev/trunk/examples/openfoam/example_icoFoamYade
