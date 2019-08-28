@@ -17,28 +17,60 @@ void FoamCoupling::getRank() {
 
 void FoamCoupling::setNumParticles(int np){
 
-  numParticles = np;
-  bodyList.assign(numParticles, -1);
-  particleData.assign(numParticles*10, 1e-19); //10 doubles for each sphere;
-  procList.assign(numParticles, -1);
-  hydroForce.assign(numParticles*6, 1e-19); // 3 force, 3 torque
-  castNumParticle(numParticles);
+  if (! initDone) { 
+      numParticles = np;
+      bodyList.assign(numParticles, -1);
+      particleData.assign(numParticles*10, 1e-19); //10 doubles for each sphere;
+      procList.assign(numParticles, -1);
+      hydroForce.assign(numParticles*6, 1e-19); // 3 force, 3 torque
+      castNumParticle(numParticles); 
+      initDone = true; 
+   }
+  
 }
 
-void FoamCoupling::setIdList(const boost::python::list& alist) {
-
-  for (unsigned int i=0; i != bodyList.capacity(); ++i){
-    bodyList[i] = boost::python::extract<int> (alist[i]);
+void FoamCoupling::setIdList(const std::vector<int>& alist) {
+  bodyList.clear(); bodyList.resize(alist.size()); 
+  for (unsigned int i=0; i != bodyList.size(); ++i){
+    bodyList[i] = alist[i];
   }
 
 }
 
 
+void FoamCoupling::insertBodyId(int bId){
+	bodyList.push_back(bId);
+  
+}
+
+bool FoamCoupling::eraseId(int bId){
+	auto it = std::find(bodyList.begin(), bodyList.end(), bId);
+	if (it != bodyList.end()){bodyList.erase(it); return true; }
+	else {
+		LOG_ERROR("Id not found in list of ids in coupling"); 
+		return false; 
+	}
+}
+
+
+int FoamCoupling::getNumBodies(){
+	return bodyList.size(); 
+}
+
+std::vector<int> FoamCoupling::getIdList(){
+	return bodyList; 
+}
+
 void FoamCoupling::castParticle() {
+	int sz = bodyList.size(); 
+	MPI_Bcast(&sz, 1, MPI_INT, rank, MPI_COMM_WORLD);
+	procList.resize(sz); hydroForce.resize(sz*6); 
+	std::fill(procList.begin(), procList.end(), -1); 
+	std::fill(hydroForce.begin(), hydroForce.end(), 1e-50); 
 
 #pragma omp parallel  for collapse (1)
 
-for (unsigned int i=0; i <  bodyList.capacity(); ++i)
+for (unsigned int i=0; i <  bodyList.size(); ++i)
   {
     const Body* b = (*scene -> bodies)[bodyList[i]].get();
     if ( scene-> isPeriodic){
@@ -62,16 +94,14 @@ for (unsigned int i=0; i <  bodyList.capacity(); ++i)
     particleData[i*10+9] = s->radius;
   }
 
-  MPI_Bcast(&particleData.front(), particleData.capacity(), MPI_DOUBLE, rank, MPI_COMM_WORLD);
+  MPI_Bcast(&particleData.front(), particleData.size(), MPI_DOUBLE, rank, MPI_COMM_WORLD);
 
 }
-
 
 void FoamCoupling::castNumParticle(int value) {
   MPI_Bcast(&value, 1, MPI_INT, rank, MPI_COMM_WORLD);
 
 }
-
 
 
 void FoamCoupling::castTerminate() {
@@ -80,33 +110,33 @@ void FoamCoupling::castTerminate() {
 
 }
 
-
-
 void FoamCoupling::updateProcList()
 {
-  for (unsigned int i=0; i != bodyList.capacity(); ++i)
+  for (unsigned int i=0; i != bodyList.size(); ++i)
   {
      int dummy_val = -5;
      MPI_Allreduce(&dummy_val,&procList[i],1,MPI_INT, MPI_MAX, MPI_COMM_WORLD);
      if (procList[i] < 0 )  std::cout << "Particle not found in FOAM " << std::endl;
    }
+   
+   
 }
 
 void FoamCoupling::recvHydroForce() {
-
-  for (unsigned int i=0; i!= procList.capacity(); ++i) {
+  for (unsigned int i=0; i!= procList.size(); ++i) {
     int recvFrom = procList[i];
     for (unsigned int j=0; j != 6; ++j) {
-     MPI_Recv(&hydroForce[6*i+j],1,MPI_DOUBLE,recvFrom,sendTag,MPI_COMM_WORLD,&status); }
-   }
-}
+     MPI_Recv(&hydroForce[6*i+j],1,MPI_DOUBLE,recvFrom,sendTag,MPI_COMM_WORLD,&status); 
+    }
+     
+}}
 
 void FoamCoupling::setHydroForce() {
 
   // clear hydroforce before summation
-
+  
  #pragma omp parallel for collapse(1)
-    for (unsigned int i=0; i < bodyList.capacity(); ++i) {
+    for (unsigned int i=0; i < bodyList.size(); ++i) {
        const Vector3r& fx=Vector3r(hydroForce[6*i], hydroForce[6*i+1], hydroForce[6*i+2]);
        const Vector3r& tx=Vector3r(hydroForce[6*i+3], hydroForce[6*i+4], hydroForce[6*i+5]);
        scene->forces.addForce(bodyList[i], fx);
@@ -119,7 +149,7 @@ void FoamCoupling::sumHydroForce() {
   // clear the vector
   std::fill(hydroForce.begin(), hydroForce.end(), 0.0);
   Real dummy_val = 0.0;
-  for (unsigned int i=0; i != bodyList.capacity(); ++i) {
+  for (unsigned int i=0; i != bodyList.size(); ++i) {
    for (unsigned int j=0; j != 6; ++j){
      MPI_Allreduce(&dummy_val ,&hydroForce[6*i+j],1,MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
    }
@@ -128,8 +158,7 @@ void FoamCoupling::sumHydroForce() {
 
 
 void FoamCoupling::resetProcList() {
-   int capacity = procList.capacity();
-   procList.assign(capacity, -1);
+     procList.clear(); 
 }
 
 
@@ -149,7 +178,6 @@ bool FoamCoupling::exchangeData(){
 }
 
 void FoamCoupling::exchangeDeltaT() {
-
 
   // Recv foamdt  first and broadcast;
   MPI_Recv(&foamDeltaT,1,MPI_DOUBLE,1,sendTag,MPI_COMM_WORLD,&status);

@@ -27,7 +27,7 @@ class FoamCoupling : public GlobalEngine {
     
     void getRank(); 
     void setNumParticles(int); 
-    void setIdList(const boost::python::list& );  
+    void setIdList(const std::vector<int>& );  
     void killMPI(); 
     void updateProcList();
     void castParticle();
@@ -50,7 +50,12 @@ class FoamCoupling : public GlobalEngine {
     Real foamDeltaT; 
     long int  dataExchangeInterval=1; 
     bool recvdFoamDeltaT; 
-    bool isGaussianInterp; 
+    bool isGaussianInterp;
+    bool initDone = false; 
+    void insertBodyId(int); 
+    bool eraseId(int);
+    int getNumBodies(); 
+    std::vector<int> getIdList(); 
     
     YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FoamCoupling,GlobalEngine, "An engine for coupling Yade with the finite volume fluid solver OpenFOAM in parallel." " \n Requirements : Yade compiled with MPI libs, OpenFOAM-6 (openfoam is not required for compilation)." "Yade is executed under MPI environment with OpenFOAM simultaneously, and using MPI communication  routines data is exchanged between the solvers."
    " \n \n 1. Yade broadcasts the particle data -> position, velocity, ang-velocity, radius to all the foam processes as in :yref:`castParticle <FoamCoupling::castParticle>` \n"
@@ -68,6 +73,10 @@ class FoamCoupling : public GlobalEngine {
     .def("getRank", &FoamCoupling::getRank, "Initiallize MPI communicator for coupling. Should be called at the beginning of the script. :yref: `initMPI <FoamCoupling::initMPI>` Initializes  the MPI environment. " )
     .def("killMPI", &FoamCoupling::killMPI, "Destroy MPI, to be called at the end of the simulation, from :yref:`killMPI<FoamCoupling::killMPI>`") 
     .def("setNumParticles",&FoamCoupling::setNumParticles,boost::python::arg("numparticles"),"number of particles in coupling")
+    .def("insertBodyId", &FoamCoupling::insertBodyId,boost::python::arg("newId"), "insert a new body id for hydrodynamic force coupling") 
+    .def("eraseId", &FoamCoupling::eraseId,boost::python::arg("idToErase"), "remove a body from hydrodynamic force coupling")
+    .def("getNumBodies", &FoamCoupling::getNumBodies, "get the number of bodies in the coupling") 
+    .def("getIdList", &FoamCoupling::getIdList, "get the ids of bodies in coupling")
     .def_readonly("foamDeltaT", &FoamCoupling::foamDeltaT, "timestep in openfoam solver from  :yref:`exchangeDeltaT <FoamCoupling::exchangeDeltaT>` ") 
     .def_readonly("dataExchangeInterval", &FoamCoupling::dataExchangeInterval, "Number of iterations/substepping : for stability and to be in sync with fluid solver calculated in :yref:`exchangeDeltaT <FoamCoupling::exchangeDeltaT>`")
     .def_readwrite("isGaussianInterp", &FoamCoupling::isGaussianInterp, "switch for Gaussian interpolation of field varibles in openfoam. Uses  :yref:`sumHydroForce<FoamCoupling::sumHydroForce>` to obtain hydrodynamic force ") 
