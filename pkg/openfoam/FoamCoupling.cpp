@@ -17,15 +17,10 @@ void FoamCoupling::getRank() {
 
 void FoamCoupling::setNumParticles(int np){
 
-  if (! initDone) { 
+      getRank(); 
       numParticles = np;
-      bodyList.assign(numParticles, -1);
-      particleData.assign(numParticles*10, 1e-19); //10 doubles for each sphere;
-      procList.assign(numParticles, -1);
-      hydroForce.assign(numParticles*6, 1e-19); // 3 force, 3 torque
       castNumParticle(numParticles); 
       initDone = true; 
-   }
   
 }
 
@@ -62,9 +57,11 @@ std::vector<int> FoamCoupling::getIdList(){
 }
 
 void FoamCoupling::castParticle() {
+  
 	int sz = bodyList.size(); 
 	MPI_Bcast(&sz, 1, MPI_INT, rank, MPI_COMM_WORLD);
 	procList.resize(sz); hydroForce.resize(sz*6); 
+	particleData.resize(10*sz); 
 	std::fill(procList.begin(), procList.end(), -1); 
 	std::fill(hydroForce.begin(), hydroForce.end(), 1e-50); 
 
@@ -93,8 +90,9 @@ for (unsigned int i=0; i <  bodyList.size(); ++i)
     shared_ptr<Sphere> s = YADE_PTR_DYN_CAST<Sphere>(b->shape);
     particleData[i*10+9] = s->radius;
   }
-
   MPI_Bcast(&particleData.front(), particleData.size(), MPI_DOUBLE, rank, MPI_COMM_WORLD);
+  // clear array after bcast
+  particleData.clear(); 
 
 }
 
