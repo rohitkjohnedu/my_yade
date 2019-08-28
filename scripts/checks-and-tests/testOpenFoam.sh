@@ -4,7 +4,8 @@ ls -la /root/OpenFOAM/OpenFOAM-6/etc/bashrc
 source  /root/OpenFOAM/OpenFOAM-6/etc/bashrc
 
 cd /builds/yade-dev/
-git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling
+rm -rf Yade-OpenFOAM-coupling
+git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
 cd Yade-OpenFOAM-coupling
 git checkout yadetest
 ./Allclean
