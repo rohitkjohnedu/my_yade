@@ -149,8 +149,8 @@ Point _Tesselation<TT>::circumCenter (const CellHandle& cell, const short facet,
 	Point vv=setCircumCenter(cell);
 	double h1 = ( S0.point()-vv ) *normal; //orthogonal distance from Voronoi vertex to the plane in which the spheres lie, call the intersection V
 	Point p2 = vv+ h1*normal; 
-	double sqR = ( p2-S0.point() ).squared_length(); //squared distance between V and the center of sphere 0
-	double temp = wExt + S0.weight() -sqR;
+	//double sqR = ( p2-S0.point() ).squared_length(); //squared distance between V and the center of sphere 0
+	double temp = wExt + S0.weight(); // -sqR; // why are we subtracting this weight?
 	Point OAlpha = p2+sqrt(temp)*normal;//center of the alpha sphere
 	SAlpha=Sphere(OAlpha,wExt);
 	p2=circumCenter(SAlpha,S0,S1,S2);

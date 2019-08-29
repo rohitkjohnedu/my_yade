@@ -55,16 +55,19 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	    volumeCorrection = desiredPorosity/actualPorosity;
         }	
 	setPositionsBuffer(true);
+	if (!first and alphaBound!=0) addAlphaToPositionsBuffer(true);
 	timingDeltas->checkpoint ( "Position buffer" );
         if (first) {
-	  if (multithread) setPositionsBuffer(false);
-	  buildTriangulation(pZero,*solver);
+	  buildTriangulation(pZero,*solver);  // move before set positions since we need vertex locations for proper volume estimates
+          if (alphaBound!=0) addAlphaToPositionsBuffer(true);
+          if (multithread) setPositionsBuffer(false);
 	  cout << "built tri, about to init vols" << endl;
 	  initializeVolumes(*solver);
 	  if (phiZero>0) solver->adjustCavityCompressibility(pZero);
 	  backgroundSolver=solver;
 	  backgroundCompleted=true;
 	}
+	
 	#ifdef YADE_OPENMP
 	solver->ompThreads = ompThreads>0? ompThreads : omp_get_max_threads();
 	#endif
@@ -106,7 +109,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	timingDeltas->checkpoint ( "viscous forces" );
 	if (!decoupleForces) applyForces(*solver);
         timingDeltas->checkpoint ( "Applying Forces" );
-		cout << "computed forces" << endl;
+	cout << "computed forces" << endl;
 	///End compute flow and forces
 	#ifdef LINSOLV
 	int sleeping = 0;
@@ -139,7 +142,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			backgroundSolver->imposedCavity = vector<CGT::Point>(solver->imposedCavity);
 			//backgroundSolver->equivalentCompressibility = solver->equivalentCompressibility;
 			if (debug) cerr<<"switched"<<endl;
-			setPositionsBuffer(false);//set "parallel" buffer for background calculation 
+			setPositionsBuffer(false);//set "parallel" buffer for background calculation
 			backgroundCompleted=false;
 			retriangulationLastIter=ellapsedIter;
 			if (!thermalEngine) updateTriangulation=false;// thermalEngine needs this flag for reynolds numbers updates, let thermalEngine flip this flag back to false
@@ -161,6 +164,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	 {
 	        if (updateTriangulation && !first) {
 			buildTriangulation (pZero, *solver);
+			if (alphaBound!=0) addAlphaToPositionsBuffer(true); //need to add the alpha vertices to the positions buffer
 			initializeVolumes(*solver);
 			computeViscousForces(*solver);
                		if (!thermalEngine) updateTriangulation = false; // thermalEngine needs this flag for reynolds numbers updates, let thermalEngine flip this flag back to false
@@ -334,13 +338,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         else {  flow.currentTes=!flow.currentTes; if (debug) cout << "--------RETRIANGULATION-----------" << endl;}
 	flow.resetNetwork();
 	initSolver(flow);
-        addBoundary ( flow );
+        if (alphaBound==0) addBoundary ( flow ); // these bounding planes are complicating things with alpha
         triangulate ( flow );
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
         flow.tesselation().compute();
-		if (debug ) cout<< "finished computing" << endl;
-        flow.defineFictiousCells(alphaBound);
-		if (debug ) cout<< "finished defining fictious cells" << endl;
+        if (alphaBound ==0 ) flow.defineFictiousCells(); // fictious cells only exist in cuboids
 	// For faster loops on cells define these vectors
 	flow.tesselation().cellHandles.clear();
 	flow.tesselation().cellHandles.reserve(flow.tesselation().Triangulation().number_of_finite_cells());
@@ -361,16 +363,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 				}
 			}
 		}
-
-
-
-/*		flow.tesselation().facetCells.clear();*/
-/*		flow.tesselation().facetCells.reserve(flow.tesselation().Triangulation().number_of_finite_facets());*/
-/*		FiniteFacetsIterator facet_end = flow.tesselation().Triangulation().finite_facets_end();*/
-/*		for (FiniteFacetsIterator f_it=flow.tesselation().Triangulation().finite_facets_begin(); f_it != facet_end;f_it++){*/
-/*			flow.tesselation().facetCells.push_back(std::pair<CellHandle,int> (f_it->first,f_it->second));*/
-/*			//f_it->info().id=k++;*/
-/*		}*/
 	}
 
 
@@ -381,10 +373,8 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	trickPermeability(&flow); //This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
-        boundaryConditions ( flow );
-		cout << "finished boundary conditions"<<endl;
+        if (alphaBound==0) boundaryConditions ( flow );
         flow.initializePressure ( pZero );
-		cout << "finished initializing pressure"<< endl;
 	flow.computePermeability();
 	if (thermalEngine) {
 		thermalBoundaryConditions ( flow ); 
@@ -424,6 +414,24 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		}
 		dat.exists=true;
 	}
+}
+template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
+void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::addAlphaToPositionsBuffer(bool current)
+{
+	vector<posData>& buffer = current ? positionBufferCurrent : positionBufferParallel;
+	const int oldBufferSize = buffer.size(); 	
+	buffer.resize(solver->T[solver->currentTes].maxId+1);
+	//cout << "new buffer size " << buffer.size() << endl;
+	//cout << "vertex handle size "<< solver->T[solver->currentTes].vertexHandles.size() << endl;
+ 	for (int i=oldBufferSize;i<=solver->T[solver->currentTes].maxId;i++) {
+		if (i<solver->alphaIdOffset+1) continue;
+		posData& dat = buffer[solver->T[solver->currentTes].vertexHandles[i]->info().id()];
+ 		 // we dont care about any idices less than the alphavertices
+ 		dat.id = solver->T[solver->currentTes].vertexHandles[i]->info().id();
+ 		dat.pos=Vector3r(solver->T[solver->currentTes].vertexHandles[i]->point().x(),solver->T[solver->currentTes].vertexHandles[i]->point().y(),solver->T[solver->currentTes].vertexHandles[i]->point().z());
+ 		dat.radius = sqrt(solver->T[solver->currentTes].vertexHandles[i]->point().weight());
+		dat.exists=false; // during retriangulation with current position buffer, we dont want it to add these. 
+ 	}
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::addBoundary ( Solver& flow )
@@ -505,7 +513,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	}
 	
 	if (alphaBound!=0){
-		flow.setAlphaBoundary(0,true);
+		flow.setAlphaBoundary(alphaBound);
 	}
 	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
 	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );
@@ -526,6 +534,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
 	FOREACH(CellHandle& cell, flow.tesselation().cellHandles)
 	{
+		//cout << "switching to case " << cell->info().fictious() << endl;
 		switch ( cell->info().fictious() )
 		{
 			case ( 0 ) : cell->info().volume() = volumeCell ( cell ); break;
@@ -701,9 +710,10 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                         if ( !solver->boundary ( b[j] ).useMaxMin ) Wall_coordinate[j] = wll->state->pos[coord[j]] + ( solver->boundary ( b[j] ).normal[coord[j]] ) *wallThickness/2.;
                         else Wall_coordinate[j] = solver->boundary ( b[j] ).p[coord[j]];
                         j++;
-                } else {
-                        const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
-                        A= ( sph->state->pos );
+                } else { /* if (! cell->vertex(g)->info().isAlpha) { */
+			A = positionBufferCurrent[cell->vertex(g)->info().id()].pos; // can't we just use the positionbuffer here instead of below?
+                        //const shared_ptr<Body>& sph = Body::byId ( cell->vertex ( g )->info().id(), scene );
+                        //A= ( sph->state->pos );
                 }
         }
         Real Volume = ( A[coord[0]]-Wall_coordinate[0] ) * ( A[coord[1]]-Wall_coordinate[1] ) * ( A[coord[2]]-Wall_coordinate[2] );
@@ -717,6 +727,7 @@ template<class Cellhandle>
 Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::volumeCell ( Cellhandle cell )
 {
 	static const Real inv6 = 1/6.;
+//	cout << "about to compute volume for cell " << cell->info().id() << " is alpha ? " << cell->info().isAlpha << endl;
 	const Vector3r& p0 = positionBufferCurrent[cell->vertex ( 0 )->info().id()].pos;
 	const Vector3r& p1 = positionBufferCurrent[cell->vertex ( 1 )->info().id()].pos;
 	const Vector3r& p2 = positionBufferCurrent[cell->vertex ( 2 )->info().id()].pos;

@@ -76,7 +76,7 @@ class SimpleCellInfo : public Point {
 	Real s;
 	bool isFictious;//true if the cell has at least one fictious bounding sphere as a vertex
 	bool isAlpha;
-	SimpleCellInfo (void) {isFictious=false; s=0;Point::operator= (CGAL::ORIGIN);}
+	SimpleCellInfo (void) {isAlpha=false,isFictious=false; s=0;Point::operator= (CGAL::ORIGIN);}
 	SimpleCellInfo& setPoint(const Point &p) { Point::operator= (p); return *this; }
 	SimpleCellInfo& setScalar(const Real &scalar) { s=scalar; return *this; }
 	inline Real x (void) {return Point::x();}
@@ -104,7 +104,7 @@ public:
 	inline Real& f (void) {return s;}
 	inline Real& v (void) {return vol;}
 	inline const unsigned int& id (void) const {return i;}
-	SimpleVertexInfo (void) {isFictious=false; s=0; i=0; vol=-1;}
+	SimpleVertexInfo (void) {isAlpha=false;isFictious=false; s=0; i=0; vol=-1;}
 	//virtual function that will be defined for all classes, allowing shared function (e.g. for display)
 	bool isReal (void) {return !isFictious;}
 };

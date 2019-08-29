@@ -90,9 +90,9 @@ class Network
 		void addBoundingPlanes();
 		void addBoundingPlane (CVector Normal, int id_wall);
 		void addBoundingPlane (Real center[3], double thickness, CVector Normal, int id_wall );
-		void setAlphaBoundary(double alpha, bool fixedAlpha);
+		void setAlphaBoundary(double alpha);
 
-		void defineFictiousCells(double alphaBound);
+		void defineFictiousCells();
 		int detectFacetFictiousVertices (CellHandle& cell, int& j);
 		double volumeSolidPore (const CellHandle& cell);
 		double volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, CVector& facetSurface);

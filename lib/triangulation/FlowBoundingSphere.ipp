@@ -336,26 +336,16 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 					/// handle fictious vertex since we can get the projected surface easily here
 					if (cell->vertex(j)->info().isFictious) {
 						//projection of facet on the boundary
-						if (!neighbourCell->info().isAlpha) { 
-							Real projSurf=std::abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
-							tempVect=-projSurf*boundary(cell->vertex(j)->info().id()).normal;
-							cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
+						Real projSurf=std::abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
+						tempVect=-projSurf*boundary(cell->vertex(j)->info().id()).normal;
+						cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
 							//define the cached value for later use with cache*p
-							cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
-							cout << "set normal fictious vertex force" << endl;
-						} else {
- 							Real projSurf=std::abs(Surfk[alphaBoundary(cell->vertex(j)->info().id()).coordinate]);
- 							tempVect=-projSurf*alphaBoundary(cell->vertex(j)->info().id()).normal;
- 							cell->vertex(j)->info().forces = cell->vertex(j)->info().forces+tempVect*cell->info().p();
- 							//define the cached value for later use with cache*p
- 							cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
- 							cout << "set alpha fictious vertex force" << endl;
- 						}
+						cell->info().unitForceVectors[j]=cell->info().unitForceVectors[j]+ tempVect;
+
 					}
 					/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
 					CVector facetUnitForce = -fluidSurfk*cell->info().solidSurfaces[j][3];
-					CVector facetForce = cell->info().p()*facetUnitForce;
-										
+					CVector facetForce = cell->info().p()*facetUnitForce;		
 					for (int y=0; y<3;y++) {
 						//1st the drag (viscous) force weighted by surface of spheres in the throat
 						cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces + facetForce*cell->info().solidSurfaces[j][y];
@@ -821,6 +811,7 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
 		cell->info().dv()=0;
 	}
 		// cuboid bcs
+	if (alphaBound==0) {
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		boundingCells[bound].clear();
@@ -834,44 +825,25 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
                         for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
 				(*it)->info().p() = bi.value;(*it)->info().Pcondition=true;
 				boundingCells[bound].push_back(*it);
-                }
-			}
+                	}
 		}
-		
-       if (alphaBound!=0) {// using alpha boundary functionality
-		   if (debugOut) cout << "setting alpha boundary cell values" <<endl;
-			for (unsigned int i=0; i<alphaBoundsIds.size();i++) {
-				int id = alphaBoundsIds[i];
-				//cout << "got alphaboundid "<<id<<endl;
-				alphaBoundingCells[i].clear();
-				if (id<0) continue;
-				//cout << "size of alpha boundaries" << alphaBoundaries.size() << endl;
-				Boundary& bi = alphaBoundaries[i]; //alphaBoundary(id);
-				//cout << "alpha boundary found" << endl;
-				if (!bi.flowCondition) {
-					VectorCell tmpCells;
-					tmpCells.resize(10000); // most likely only a few cells per boundary, 100 to be safe
-					VCellIterator cells_it = tmpCells.begin();
-					//cout << "asking for vertexHandle 10001" << endl;
-					//VertexHandle vh1 = T[currentTes].vertexHandles[10001];
-					//cout << "vh1 is vertex? " << Tri.is_vertex(vh1) << endl;
-					//cout << "asking for vertexHandle id " << id << endl;
-					if (T[currentTes].vertexHandles[id]==NULL) {
-						cout<<"vertex pointer null, skipping" << endl;
-						continue;
-					}
-					VertexHandle vh = T[currentTes].vertexHandles[id];
-					//cout<<"vertex handl id " << vh->info().id() << " is it vertex? " << Tri.is_vertex(vh) << endl;
-					//cout << "now finding incident cells on it"<<endl;
-					VCellIterator cells_end = Tri.incident_cells(vh,cells_it);
-					//cout << "incdent cell iterator set" << endl;
-					for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
-						(*it)->info().p() = alphaBoundValue;(*it)->info().Pcondition=true; (*it)->info().isAlpha=true;
-						alphaBoundingCells[i].push_back(*it);
-					}
-				}
-			}
+	}
+	} else {
+	// identify cells incident to alpha vertices and set BCs
+		Tesselation& Tes = T[currentTes];
+		const long sizeCells = Tes.cellHandles.size();
+		#pragma omp parallel for
+		for (long i=0; i<sizeCells; i++){
+			CellHandle& cell = Tes.cellHandles[i];
+			for (int j=0;j<4; j++){
+			//	VertexHandle vh = cell->vertex(j);
+				if (cell->vertex(j)->info().isAlpha==true){
+					cell->info().p() = alphaBoundValue;cell->info().Pcondition=true; cell->info().isAlpha=true;
+				//alphaBoundingCells[i].push_back(cell);
+				}	
+			}	
 		}
+	}
         
         
         
@@ -1514,6 +1486,20 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 			if (isDrawable){vtkWrite.write_data(cell->info().isCavity);}
 		}
 		vtkWrite.end_data();
+		
+		vtkWrite.begin_data("alpha",CELL_DATA,SCALARS,FLOAT);
+		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+			bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal() && cell->vertex(3)->info().isReal();
+			if (isDrawable){vtkWrite.write_data(cell->info().isAlpha);}
+		}
+		vtkWrite.end_data();
+		
+		vtkWrite.begin_data("Pcondition",CELL_DATA,SCALARS,FLOAT);
+		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); ++cell) {
+			bool isDrawable = cell->info().isReal() && cell->vertex(0)->info().isReal() && cell->vertex(1)->info().isReal() && cell->vertex(2)->info().isReal() && cell->vertex(3)->info().isReal();
+			if (isDrawable){vtkWrite.write_data(cell->info().Pcondition);}
+		}
+		vtkWrite.end_data();
 			
 		vtkWrite.begin_data("fictious",CELL_DATA,SCALARS,INT);
 		for (unsigned kk=0; kk<allIds.size(); kk++) vtkWrite.write_data(fictiousN[kk]);
@@ -1796,6 +1782,18 @@ void FlowBoundingSphere<Tesselation>::generateVoxelFile( )
                         voxelfile << endl;
                 }
         }
+}
+
+template<class Tesselation>
+void FlowBoundingSphere<Tesselation>::printVertices()
+{
+	RTriangulation& Tri = T[currentTes].Triangulation();
+	std::ofstream file("vertices.txt",std::ios::out);
+	file << "id x y z r alpha fictious" << endl;
+	for (FiniteVerticesIterator vIt = Tri.finite_vertices_begin(); vIt != Tri.finite_vertices_end(); vIt++) {
+		file << vIt->info().id() << " "<< vIt->point()[0] << " " << vIt->point()[1] << " " << vIt->point()[2] << " " << " " << sqrt(vIt->point().weight()) << " " << vIt->info().isAlpha << " " << vIt->info().isFictious << endl;
+	}
+	file.close();
 }
 
 template <class Tesselation>

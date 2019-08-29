@@ -59,6 +59,7 @@ double Network<Tesselation>::volumePoreVoronoiFraction (CellHandle& cell, int& j
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
   if (!reuseFacetData) facetNFictious = detectFacetFictiousVertices (cell,j);
+  //cout << "getting volume pore voronoi fraction for alpha ? "<< cell->info().isAlpha << " fictiousN " << facetNFictious << endl;
   Sphere v [3];
   VertexHandle W [3];
   for (int kk=0; kk<3; kk++) {W[kk] = cell->vertex(facetVertices[j][kk]);v[kk] = cell->vertex(facetVertices[j][kk])->point();}
@@ -575,7 +576,7 @@ void Network<Tesselation>::addBoundingPlane (Real center[3], double thickness, C
 }
 
 template<class Tesselation>
-void Network<Tesselation>::defineFictiousCells(double alphaBound)
+void Network<Tesselation>::defineFictiousCells(/*double alphaBound*/)
 {
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	FiniteCellsIterator cellEnd = Tri.finite_cells_end();
@@ -595,29 +596,29 @@ void Network<Tesselation>::defineFictiousCells(double alphaBound)
 		  cell->info().isFictious=true;
 		}
 	}
-	
-	if (alphaBound!=0) {// using alpha boundary functionality
-		if (debugOut) cout << "setting fictious number for alpha boundary cells" <<endl;
-		for (unsigned int i=0; i<alphaBoundsIds.size();i++) {
-			int id = alphaBoundsIds[i];
-			if (id<0) continue;
-			//cout << "size of alpha boundaries" << alphaBoundaries.size() << endl;
-			VectorCell tmpCells;
-			tmpCells.resize(10000); // most likely only a few cells per boundary, 100 to be safe
-			VCellIterator cells_it = tmpCells.begin();
-			if (T[currentTes].vertexHandles[id]==NULL) {
-				cout<<"vertex pointer null, skipping" << endl;
-				continue;
-			}
-			VertexHandle vh = T[currentTes].vertexHandles[id];
-			VCellIterator cells_end = Tri.incident_cells(vh,cells_it);
-			for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
-				CellHandle& cell = *it;
-				(cell->info().fictious())+=1;
-				cell->info().isFictious=true;
-			}
-		}
-	}
+
+//	if (alphaBound!=0) {// using alpha boundary functionality
+//		if (debugOut) cout << "setting fictious number for alpha boundary cells" <<endl;
+//		for (unsigned int i=0; i<alphaBoundsIds.size();i++) {
+//			int id = alphaBoundsIds[i];
+//			if (id<0) continue;
+//			//cout << "size of alpha boundaries" << alphaBoundaries.size() << endl;
+//			VectorCell tmpCells;
+//			tmpCells.resize(10000); // most likely only a few cells per boundary, 100 to be safe
+//			VCellIterator cells_it = tmpCells.begin();
+//			if (T[currentTes].vertexHandles[id]==NULL) {
+//				cout<<"vertex pointer null, skipping" << endl;
+//				continue;
+//			}
+//			VertexHandle vh = T[currentTes].vertexHandles[id];
+//			VCellIterator cells_end = Tri.incident_cells(vh,cells_it);
+//			for (VCellIterator it = tmpCells.begin(); it != cells_end; it++){
+//				CellHandle& cell = *it;
+//				(cell->info().fictious())+=1;
+//				cell->info().isFictious=false;
+//			}
+//		}
+//	}
 	
 	if(debugOut) cout << "Fictious cell defined" << endl;
 }
@@ -735,43 +736,48 @@ double Network<Tesselation>::lineSolidFacet(Sphere ST1, Sphere ST2, Sphere ST3)
 }
 
 template<class Tesselation>
-void Network<Tesselation>::setAlphaBoundary(double alpha, bool fixedAlpha)
+void Network<Tesselation>::setAlphaBoundary(double alpha)
 {
 	//std::vector<int> alphaBoundsIds;
 	std::vector<Vector3r> vSegments;
 	RTriangulation temp ( T[currentTes].Triangulation() );
 	AlphaShape as ( temp );
-	alphaIdOffset = T[currentTes].vertexHandles.size();
-	double minAlpha=as.find_alpha_solid();
-	if ( !alpha ) as.set_alpha ( minAlpha );
-	else {
+	alphaIdOffset = T[currentTes].vertexHandles.size()-1;
+	double minAlpha = as.find_alpha_solid();
+
+	if (alpha==1) {
+		alpha = minAlpha;
 		as.set_alpha ( alpha );
-		if (alpha<minAlpha) cerr<<"TesselationWrapper: Using alpha<minAlpha will not work. Consider using default alpha (=0)"<<endl;
-	}	
-	if (fixedAlpha) {//insert one sphere per regular facet, with a fixed size shrinkedAlpha
-		std::list<Facet> facets;
-		as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
-		for ( auto fp=facets.begin(); fp!=facets.end(); fp++ ) {
-			Facet f = *fp;    
-			if (as.classify(f.first)!=AlphaShape::INTERIOR) f=as.mirror_facet(f);
-			Sphere sph; bool b; CVector n;
-			T[currentTes].circumCenter(f.first,f.second,alpha,b,sph,n);
-			unsigned int id = T[currentTes].vertexHandles.size();
-			const double bigRad = FAR*(cornerMax.y()-cornerMin.y());
-			VertexHandle Vh = T[currentTes].Triangulation().insert(Sphere(sph.point(),pow(bigRad,2)));
-			Vh->info().setId(id); Vh->info().isAlpha=true;
-			//alphaVertices.push_back(Vh);
-			int Coordinate = abs(n[0])*0 + abs(n[1])*1 + abs(n[2])*2; //what is this??
-			Boundary tmpBoundary;tmpBoundary.p=sph.point();tmpBoundary.normal=n;tmpBoundary.coordinate=Coordinate;tmpBoundary.flowCondition=1;tmpBoundary.value=0;
-			alphaBoundaries.push_back(tmpBoundary);
-			//cout << "size of vertexhandles " << T[currentTes].vertexHandles.size() << endl;
-			T[currentTes].vertexHandles.push_back(Vh);
-			alphaBoundsIds.push_back(id);
-			T[currentTes].maxId = std::max ( T[currentTes].maxId, (int) id );
-			if ( Vh!=NULL ) Vh->info().isFictious = true;
-			else cerr << " : __Vh==NULL__ :(" << endl;}
-	} else { cerr << "alpha not set, bad things ensue" << endl;}
+	} else {//insert one sphere per regular facet, with a fixed size shrinkedAlpha
+		if (alpha<minAlpha){cerr<<"Using alpha<minAlpha will not work. Consider using default alpha (=1)"<<endl; alpha=minAlpha;}
+		as.set_alpha ( alpha );
+	}
+	//cout << "using alpha " << alpha << endl; 
+	std::list<Facet> facets;
+	as.get_alpha_shape_facets(std::back_inserter(facets), AlphaShape::REGULAR);
+	for ( auto fp=facets.begin(); fp!=facets.end(); fp++ ) {
+		Facet f = *fp;    
+		if (as.classify(f.first)!=AlphaShape::INTERIOR) f=as.mirror_facet(f);
+		Sphere sph; bool b; CVector n;
+		T[currentTes].circumCenter(f.first,f.second,alpha,b,sph,n);
+		if (isnan(sph.point().x()) or isnan(sph.point().y()) or isnan(sph.point().z())){ cerr << "skipping isnan point" <<endl; continue;}
+		unsigned int id = T[currentTes].vertexHandles.size();
+		//cout << " new vertex ID" << id << " with coords " << sph.point().x() << " " << sph.point().y() << " "<< sph.point().z() << " and normal " << n[0] << " " << n[1] << " " << n[2] << " and alpha " << minAlpha*0.9 << endl;
+		VertexHandle Vh = T[currentTes].Triangulation().insert(Sphere(sph.point(),alpha));
+		Vh->info().setId(id); Vh->info().isAlpha=true;
+		//alphaVertices.push_back(Vh);
+		//int Coordinate = abs(n[0])*0 + abs(n[1])*1 + abs(n[2])*2;
+		//Boundary tmpBoundary;tmpBoundary.p=sph.point();tmpBoundary.normal=n;tmpBoundary.coordinate=Coordinate;tmpBoundary.flowCondition=1;tmpBoundary.value=0;
+		//alphaBoundaries.push_back(tmpBoundary);
+		//cout << "size of vertexhandles " << T[currentTes].vertexHandles.size() << endl;
+		T[currentTes].vertexHandles.push_back(Vh);
+		alphaBoundsIds.push_back(id);
+		T[currentTes].maxId = std::max ( T[currentTes].maxId, (int) id );
+		if ( Vh!=NULL ) Vh->info().isFictious = false;
+		else cerr << " : __Vh==NULL__ :(" << endl;
+	}
 	alphaBoundingCells.resize(alphaBoundsIds.size());
+	//cout << "final maxid " << T[currentTes].maxId << endl;
 	//return alphaBoundsIds;
 }
 

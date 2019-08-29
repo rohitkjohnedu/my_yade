@@ -162,6 +162,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector<Constriction> getConstrictionsFull();
 		CVector cellBarycenter(CellHandle& cell);
 
+		void printVertices();
 		void generateVoxelFile ( );
 		
 		void computeEdgesSurfaces();
