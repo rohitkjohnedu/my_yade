@@ -198,12 +198,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
                 flow.boundary (wallIds[k]).value=bndCondValue[k];
                 flow.boundary (wallIds[k]).velocity = boundaryVelocity[k];//FIXME: needs correct implementation, maybe update the cached pos/vel?
 	}
-	
-	if (alphaBound==0) return;
-	for (unsigned int k=0;k<flow.alphaBoundsIds.size();k++) {
-		flow.alphaBoundaries[k].flowCondition=!alphaFlowCond;
-		flow.alphaBoundaries[k].value=alphaBoundValue;
-	}
 }
 
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
