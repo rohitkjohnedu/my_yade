@@ -762,9 +762,10 @@ void Network<Tesselation>::setAlphaBoundary(double alpha)
 		T[currentTes].circumCenter(f.first,f.second,alpha,b,sph,n);
 		if (std::isnan(sph.point().x()) or std::isnan(sph.point().y()) or std::isnan(sph.point().z())){ cerr << "skipping isnan point" <<endl; continue;}
 		unsigned int id = T[currentTes].vertexHandles.size();
-		//cout << " new vertex ID" << id << " with coords " << sph.point().x() << " " << sph.point().y() << " "<< sph.point().z() << " and normal " << n[0] << " " << n[1] << " " << n[2] << " and alpha " << minAlpha*0.9 << endl;
+		//cout << " new vertex ID" << id << " with coords " << sph.point().x() << " " << sph.point().y() << " "<< sph.point().z() << " and normal " << n[0] << " " << n[1] << " " << n[2] << " and alpha " << alpha << endl;
 		VertexHandle Vh = T[currentTes].Triangulation().insert(Sphere(sph.point(),alpha));
-		Vh->info().setId(id); Vh->info().isAlpha=true;
+		if ( Vh==NULL ) { cerr << " : __Vh==NULL__ :(" << endl; continue; } // in some cases, a vertex cannot be inserted due to cell locking https://doc.cgal.org/latest/Triangulation_3/classCGAL_1_1Delaunay__triangulation__3.html#a5283a16d3299df75233d954deba71600. skip these
+		Vh->info().setId(id); Vh->info().isAlpha=true;Vh->info().isFictious = false;
 		//alphaVertices.push_back(Vh);
 		//int Coordinate = abs(n[0])*0 + abs(n[1])*1 + abs(n[2])*2;
 		//Boundary tmpBoundary;tmpBoundary.p=sph.point();tmpBoundary.normal=n;tmpBoundary.coordinate=Coordinate;tmpBoundary.flowCondition=1;tmpBoundary.value=0;
@@ -773,8 +774,6 @@ void Network<Tesselation>::setAlphaBoundary(double alpha)
 		T[currentTes].vertexHandles.push_back(Vh);
 		alphaBoundsIds.push_back(id);
 		T[currentTes].maxId = std::max ( T[currentTes].maxId, (int) id );
-		if ( Vh!=NULL ) Vh->info().isFictious = false;
-		else cerr << " : __Vh==NULL__ :(" << endl;
 	}
 	alphaBoundingCells.resize(alphaBoundsIds.size());
 	//cout << "final maxid " << T[currentTes].maxId << endl;
