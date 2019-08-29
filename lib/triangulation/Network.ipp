@@ -760,7 +760,7 @@ void Network<Tesselation>::setAlphaBoundary(double alpha)
 		if (as.classify(f.first)!=AlphaShape::INTERIOR) f=as.mirror_facet(f);
 		Sphere sph; bool b; CVector n;
 		T[currentTes].circumCenter(f.first,f.second,alpha,b,sph,n);
-		if (isnan(sph.point().x()) or isnan(sph.point().y()) or isnan(sph.point().z())){ cerr << "skipping isnan point" <<endl; continue;}
+		if (std::isnan(sph.point().x()) or std::isnan(sph.point().y()) or std::isnan(sph.point().z())){ cerr << "skipping isnan point" <<endl; continue;}
 		unsigned int id = T[currentTes].vertexHandles.size();
 		//cout << " new vertex ID" << id << " with coords " << sph.point().x() << " " << sph.point().y() << " "<< sph.point().z() << " and normal " << n[0] << " " << n[1] << " " << n[2] << " and alpha " << minAlpha*0.9 << endl;
 		VertexHandle Vh = T[currentTes].Triangulation().insert(Sphere(sph.point(),alpha));
