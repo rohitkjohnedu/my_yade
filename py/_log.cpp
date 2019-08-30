@@ -18,25 +18,101 @@ CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 
 namespace py = boost::python;
 
+#ifdef YADE_BOOST_LOG
+
+int getDefaultLogLevel() {
+	return Logging::instance().getDefaultLogLevel();
+}
+
+void setDefaultLogLevel(int level) {
+	Logging::instance().setNamedLogLevel("Default",level);
+}
+
+// accepted streams: "clog", "cerr", "cout", "filename"
+// It is possible to set different levels per log file, see notes about that in Logging::setOutputStream(…)
+void setOutputStream(std::string streamName, bool reset ) {
+	Logging::instance().setOutputStream( streamName , reset );
+	if(reset) {
+		LOG_INFO("Log output stream has been set to "<< streamName <<". Other output streams were removed.");
+	} else {
+		LOG_INFO("Additional output stream has been set to "<< streamName <<".");
+	}
+}
+
+void resetOutputStream() {
+	Logging::instance().setOutputStream("clog" , true);
+	LOG_INFO("Log output stream has been reset to std::clog. File sinks are not removed.");
+}
+
+void setLevel(std::string className, int level) {
+	Logging::instance().setNamedLogLevel(className , level);
+	LOG_INFO("filter log level for " << className << " has been set to " << Logging::instance().getNamedLogLevel(className));
+}
+
+void unsetLevel(std::string className) {
+	Logging::instance().unsetNamedLogLevel(className);
+	LOG_INFO("filter log level for " << className << " has been unset to " << Logging::instance().getNamedLogLevel(className));
+}
+
+py::dict getAllLevels() {
+	py::dict ret{};
+	for(const auto& a : Logging::instance().getClassLogLevels()) {
+		ret[a.first]=a.second;
+	}
+	return ret;
+}
+
+py::dict getUsedLevels() {
+	py::dict ret{};
+	for(const auto& a : Logging::instance().getClassLogLevels()) {
+		if(a.second != -1) {
+			ret[a.first]=a.second;
+		}
+	}
+	return ret;
+}
+
+void setUseColors(bool use) {
+	Logging::instance().setUseColors(use);
+}
+
+void readConfigFile(std::string fname){
+	Logging::instance().readConfigFile(fname);
+}
+
+void saveConfigFile(std::string fname) {
+	Logging::instance().saveConfigFile(fname);
+}
+
+std::string defaultConfigFileName() {
+	return Logging::instance().defaultConfigFileName();
+}
+
+int getMaxLevel() {
+	return Logging::instance().maxLogLevel;
+}
+
+#else
+
 void printNoBoostLogWarning() {
 	std::cerr << "\nWarning: yade was compiled with cmake option -DENABLE_LOGGER=OFF, any attempts to manipulate log filter levels will not have effect.\n\n";
 }
 
-int getDefaultLogLevel() {
-#ifdef YADE_BOOST_LOG
-	return Logging::instance().getDefaultLogLevel();
-#else
-	return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL);
-#endif
-}
+int         getDefaultLogLevel   ()                  { return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL); }
+void        setDefaultLogLevel   (int)               { printNoBoostLogWarning(); }
+void        setOutputStream      (std::string, bool) { printNoBoostLogWarning(); }
+void        resetOutputStream    ()                  { printNoBoostLogWarning(); }
+void        setLevel             (std::string, int)  { printNoBoostLogWarning(); }
+void        unsetLevel           (std::string)       { printNoBoostLogWarning(); }
+py::dict    getAllLevels         ()                  { printNoBoostLogWarning(); return {}; }
+py::dict    getUsedLevels        ()                  { printNoBoostLogWarning(); return {}; }
+void        setUseColors         (bool)              { printNoBoostLogWarning(); }
+void        readConfigFile       (std::string)       { printNoBoostLogWarning(); }
+void        saveConfigFile       (std::string)       { printNoBoostLogWarning(); }
+std::string defaultConfigFileName()                  { printNoBoostLogWarning(); return ""; }
+int         getMaxLevel          ()                  { return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL); }
 
-void setDefaultLogLevel(int level) {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().setNamedLogLevel("Default",level);
-#else
-	printNoBoostLogWarning();
 #endif
-}
 
 void testAllLevels() {
 	int testInt     = 0;
@@ -63,115 +139,6 @@ void testAllLevels() {
 	TRVAR6(testInt,testStr,testReal,testVec,testMat,testComplex);
 
 	TRACE;
-}
-
-// accepted streams: "clog", "cerr", "cout", "filename"
-// It is possible to set different levels per log file, see notes about that in Logging::setOutputStream(…)
-void setOutputStream(std::string streamName, bool reset /*, int level */ ) {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().setOutputStream( streamName , reset );
-	if(reset) {
-		LOG_INFO("Log output stream has been set to "<< streamName <<". Other output streams were removed.");
-	} else {
-		LOG_INFO("Additional output stream has been set to "<< streamName <<".");
-	}
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-void resetOutputStream() {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().setOutputStream("clog" , true);
-	LOG_INFO("Log output stream has been reset to std::clog. File sinks are not removed.");
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-void setLevel(std::string className, int level) {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().setNamedLogLevel(className , level);
-	LOG_INFO("filter log level for " << className << " has been set to " << Logging::instance().getNamedLogLevel(className));
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-void unsetLevel(std::string className) {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().unsetNamedLogLevel(className);
-	LOG_INFO("filter log level for " << className << " has been unset to " << Logging::instance().getNamedLogLevel(className));
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-py::dict getAllLevels() {
-	py::dict ret{};
-#ifdef YADE_BOOST_LOG
-	for(const auto& a : Logging::instance().getClassLogLevels()) {
-		ret[a.first]=a.second;
-	}
-#else
-	printNoBoostLogWarning();
-#endif
-	return ret;
-}
-
-py::dict getUsedLevels() {
-	py::dict ret{};
-#ifdef YADE_BOOST_LOG
-	for(const auto& a : Logging::instance().getClassLogLevels()) {
-		if(a.second != -1) {
-			ret[a.first]=a.second;
-		}
-	}
-#else
-	printNoBoostLogWarning();
-#endif
-	return ret;
-}
-
-void setUseColors(bool use) {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().setUseColors(use);
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-void readConfigFile(std::string fname){
-#ifdef YADE_BOOST_LOG
-	Logging::instance().readConfigFile(fname);
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-void saveConfigFile(std::string fname) {
-#ifdef YADE_BOOST_LOG
-	Logging::instance().saveConfigFile(fname);
-#else
-	printNoBoostLogWarning();
-#endif
-}
-
-std::string defaultConfigFileName() {
-#ifdef YADE_BOOST_LOG
-	return Logging::instance().defaultConfigFileName();
-#else
-	printNoBoostLogWarning();
-	return "";
-#endif
-}
-
-int getMaxLevel() {
-#ifdef YADE_BOOST_LOG
-	return Logging::instance().maxLogLevel;
-#else
-	return std::min(MAX_LOG_LEVEL,MAX_HARDCODED_LOG_LEVEL);
-#endif
 }
 
 BOOST_PYTHON_MODULE(_log){
