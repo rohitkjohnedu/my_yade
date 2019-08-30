@@ -61,7 +61,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	  buildTriangulation(pZero,*solver);  // move before set positions since we need vertex locations for proper volume estimates
           if (alphaBound!=0) addAlphaToPositionsBuffer(true);
           if (multithread) setPositionsBuffer(false);
-	  cout << "built tri, about to init vols" << endl;
 	  initializeVolumes(*solver);
 	  if (phiZero>0) solver->adjustCavityCompressibility(pZero);
 	  backgroundSolver=solver;
@@ -95,7 +94,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if (controlCavityVolumeChange) solver->adjustCavityVolumeChange(scene->dt,1,pZero);
 		if (phiZero>0) solver->adjustCavityCompressibility(pZero);
 		cavityFluidDensity = getCavityDensity(); // keep this for carrying between remeshes
-		cout << "about to solve the linear system" <<endl;
 		solver->gaussSeidel(scene->dt);
 
 		//if (phiZero>0) solver->adjustCavityCompressibility(pZero);
@@ -109,7 +107,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	timingDeltas->checkpoint ( "viscous forces" );
 	if (!decoupleForces) applyForces(*solver);
         timingDeltas->checkpoint ( "Applying Forces" );
-	cout << "computed forces" << endl;
 	///End compute flow and forces
 	#ifdef LINSOLV
 	int sleeping = 0;
@@ -505,10 +502,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if ( !b.exists || b.id==ignoredBody ) continue;
 		if ( b.isSphere || b.isClump ) flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
 	}
-	
-	if (alphaBound!=0){
-		flow.setAlphaBoundary(alphaBound);
-	}
+
+	if (alphaBound!=0) flow.setAlphaBoundary(alphaBound);
+
 	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
 	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );
 	flow.pumpLubricationTorques.resize ( flow.tesselation().maxId+1 );
@@ -528,7 +524,6 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
 	FOREACH(CellHandle& cell, flow.tesselation().cellHandles)
 	{
-		//cout << "switching to case " << cell->info().fictious() << endl;
 		switch ( cell->info().fictious() )
 		{
 			case ( 0 ) : cell->info().volume() = volumeCell ( cell ); break;
@@ -721,7 +716,6 @@ template<class Cellhandle>
 Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::volumeCell ( Cellhandle cell )
 {
 	static const Real inv6 = 1/6.;
-//	cout << "about to compute volume for cell " << cell->info().id() << " is alpha ? " << cell->info().isAlpha << endl;
 	const Vector3r& p0 = positionBufferCurrent[cell->vertex ( 0 )->info().id()].pos;
 	const Vector3r& p1 = positionBufferCurrent[cell->vertex ( 1 )->info().id()].pos;
 	const Vector3r& p2 = positionBufferCurrent[cell->vertex ( 2 )->info().id()].pos;
