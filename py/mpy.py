@@ -41,7 +41,7 @@ this = sys.modules[__name__]
 sys.stderr.write=sys.stdout.write #so we see error messages from workers
 
 worldComm = MPI.COMM_WORLD
-color = 1; key =1; 
+color = 1; key =0; 
 comm = worldComm.Split(color, key)
 parent = comm.Get_parent()
 if parent!=MPI.COMM_NULL:
