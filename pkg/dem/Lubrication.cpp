@@ -89,9 +89,9 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_AdimExp(LubricationPhys *p
 	
 	Real d;
 	if(dichotomie)
-		d = DichoAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun*3./2., phys->delta, 3./2.*phys->nun/phys->kn/std::pow(a,2)*undot, phys->contact ? phys->ladh : 0.);
+		d = DichoAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/(phys->nun*3./2.), phys->delta, (3./2.*phys->nun)/phys->kn/std::pow(a,2)*undot, phys->contact ? phys->ladh : 0.);
 	else
-		d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/phys->nun*3./2., phys->delta, 3./2.*phys->nun/phys->kn/std::pow(a,2)*undot); // Newton-Rafson
+		d = NRAdimExp_integrate_u(-geom->penetrationDepth/a, 2.*phys->eps, 1., phys->prevDotU, scene->dt*a*phys->kn/(phys->nun*3./2.), phys->delta, (3./2.*phys->nun)/phys->kn/std::pow(a,2)*undot); // Newton-Rafson
 		
 	if(phys->contact) { // We where in contact. Contact is maintained while u'-2*eps < ladh
 		phys->contact = std::exp(d)-2.*phys->eps < phys->ladh;
@@ -231,7 +231,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trpz_adim(LubricationPhys 
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth; }
 	
-	Real uprim = trapz_integrate_u_adim(-geom->penetrationDepth/a, 2.*phys->eps, scene->dt*a*phys->kn/phys->nun*3./2., phys->u/a, phys->ladh , phys->contact, phys->prevDotU);
+	Real uprim = trapz_integrate_u_adim(-geom->penetrationDepth/a, 2.*phys->eps, scene->dt*a*phys->kn/(phys->nun*3./2.), phys->u/a, phys->ladh , phys->contact, phys->prevDotU);
 	
 	phys->u = a*uprim;
 	
@@ -280,10 +280,10 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trapezoidal(LubricationPhy
 {
 	Real a((geom->radius1+geom->radius2)/2.);
 	
-	if(isNew) { phys->prev_un= -geom->penetrationDepth-undot*scene->dt; phys->prevDotU=undot*phys->nun*3./2. ; phys->u = phys->prev_un; }
+	if(isNew) { phys->prev_un= -geom->penetrationDepth-undot*scene->dt; phys->prevDotU=undot*(phys->nun*3./2.) ; phys->u = phys->prev_un; }
 	
 	phys->normalForce = geom->normal*trapz_integrate_u(	phys->prevDotU, phys->prev_un  /*prev. un*/,
-					phys->u, -geom->penetrationDepth, phys->nun*3./2., phys->kn, phys->kn /*should be keps, currently both are equal*/, 
+					phys->u, -geom->penetrationDepth, (phys->nun*3./2.), phys->kn, phys->kn /*should be keps, currently both are equal*/, 
 					2.*phys->eps*a, scene->dt, phys->u<(2*phys->eps*a),
 					isNew?(maxSubSteps+1):0/* depth = maxSubSteps+1 will trigger backward Euler for initialization*/);
 	
