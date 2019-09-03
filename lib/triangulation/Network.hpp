@@ -64,8 +64,6 @@ class Network
 		int nOfSpheres;
 		int xMinId, xMaxId, yMinId, yMaxId, zMinId, zMaxId;
 		int* boundsIds [6];
-		vector<int> alphaBoundsIds;
-		vector<vector<CellHandle>> alphaBoundingCells;
 		
 		vector<CellHandle> boundingCells [6];
 		vector<CellHandle> thermalBoundingCells [6];
@@ -75,12 +73,9 @@ class Network
 		Real VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalPorosity;
 		Boundary boundaries [6];
 		
-		std::vector<Boundary> alphaBoundaries;
-		
 		ThermalBoundary thermalBoundaries [6];
 		ThermalBoundary conductionBoundaries [6];
 		Boundary& boundary (int b) {return boundaries[b-idOffset];}
-		Boundary& alphaBoundary (int b) {return alphaBoundaries[b-alphaIdOffset];}
 		ThermalBoundary& thermalBoundary (int b) {return thermalBoundaries[b-idOffset];}
 		ThermalBoundary& conductionBoundary (int b) {return conductionBoundaries[b-idOffset];}
 		short idOffset;
