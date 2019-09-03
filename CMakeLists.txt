@@ -249,13 +249,19 @@ ENDIF()
 #================== Use compiler warnings ==================
 if(ENABLE_USEFUL_ERRORS)
   # Enable as many warnings as possible, and treat them as errors (using -Werror flag).
-  # Three warnings are impossible to fix, because they are in external libraries:
-  #   (1) libeigen: -Wmaybe-uninitialized, -Wcomment
+  # Four warnings are impossible to fix, because they are in external libraries:
+  #   (1) libeigen: -Wmaybe-uninitialized, -Wcomment, -Wdeprecated-copy ; and only in g++ 7 or 8: -Wint-in-bool-context
   #   (2) open mpi: -Wcast-function-type
+  # Two warnings are impossible to fix, because they are in older compiler, or in older library version
+  #   (1) libeigen ver. < 3.3.4 : -Wshadow=compatible-local
+  #   (2) numpy    ver. < 1.13  : -Wunused-function
   # So depending on compiler version I need to turn these errors off.
   # They will be still printed as warnings. But they will not be an error due to -Werror flag.
   IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
     SET(USE_WARNING_ERRORS "-Wno-error=cast-function-type")
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 9.0)
+      SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wno-error=deprecated-copy")
+    ENDIF()
   ENDIF()
   IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.0)
     SET(USE_WARNING_ERRORS "${USE_WARNING_ERRORS} -Wshadow=compatible-local")
