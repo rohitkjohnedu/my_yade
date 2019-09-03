@@ -55,11 +55,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	    volumeCorrection = desiredPorosity/actualPorosity;
         }	
 	setPositionsBuffer(true);
-	if (!first and alphaBound!=0) addAlphaToPositionsBuffer(true);
+	if (!first and alphaBound>=0) addAlphaToPositionsBuffer(true);
 	timingDeltas->checkpoint ( "Position buffer" );
         if (first) {
 	  buildTriangulation(pZero,*solver);  // move before set positions since we need vertex locations for proper volume estimates
-          if (alphaBound!=0) addAlphaToPositionsBuffer(true);
+          if (alphaBound>=0) addAlphaToPositionsBuffer(true);
           if (multithread) setPositionsBuffer(false);
 	  initializeVolumes(*solver);
 	  if (phiZero>0) solver->adjustCavityCompressibility(pZero);
@@ -161,7 +161,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	 {
 	        if (updateTriangulation && !first) {
 			buildTriangulation (pZero, *solver);
-			if (alphaBound!=0) addAlphaToPositionsBuffer(true); //need to add the alpha vertices to the positions buffer
+			if (alphaBound>=0) addAlphaToPositionsBuffer(true); //need to add the alpha vertices to the positions buffer
 			initializeVolumes(*solver);
 			computeViscousForces(*solver);
                		if (!thermalEngine) updateTriangulation = false; // thermalEngine needs this flag for reynolds numbers updates, let thermalEngine flip this flag back to false
@@ -329,11 +329,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         else {  flow.currentTes=!flow.currentTes; if (debug) cout << "--------RETRIANGULATION-----------" << endl;}
 	flow.resetNetwork();
 	initSolver(flow);
-        if (alphaBound==0) addBoundary ( flow ); // these bounding planes are complicating things with alpha
+        if (alphaBound<0) addBoundary ( flow ); // these bounding planes are complicating things with alpha
         triangulate ( flow );
         if ( debug ) cout << endl << "Tesselating------" << endl << endl;
         flow.tesselation().compute();
-        if (alphaBound ==0 ) flow.defineFictiousCells(); // fictious cells only exist in cuboids
+        if (alphaBound<0) flow.defineFictiousCells(); // fictious cells only exist in cuboids
 	// For faster loops on cells define these vectors
 	flow.tesselation().cellHandles.clear();
 	flow.tesselation().cellHandles.reserve(flow.tesselation().Triangulation().number_of_finite_cells());
@@ -364,7 +364,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	trickPermeability(&flow); //This virtual function does nothing yet, derived class may overload it to make permeability different (see DFN engine)
         porosity = flow.vPoralPorosity/flow.vTotalPorosity;
 
-        if (alphaBound==0) boundaryConditions ( flow );
+        if (alphaBound<0) boundaryConditions ( flow );
         flow.initializePressure ( pZero );
 	flow.computePermeability();
 	if (thermalEngine) {
@@ -503,7 +503,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if ( b.isSphere || b.isClump ) flow.tesselation().insert ( b.pos[0], b.pos[1], b.pos[2], b.radius, b.id );
 	}
 
-	if (alphaBound!=0) flow.setAlphaBoundary(alphaBound);
+	if (alphaBound>=0) flow.setAlphaBoundary(alphaBound, fixedAlpha);
 
 	flow.shearLubricationForces.resize ( flow.tesselation().maxId+1 );
 	flow.shearLubricationTorques.resize ( flow.tesselation().maxId+1 );

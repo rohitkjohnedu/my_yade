@@ -90,7 +90,7 @@ class Network
 		void addBoundingPlanes();
 		void addBoundingPlane (CVector Normal, int id_wall);
 		void addBoundingPlane (Real center[3], double thickness, CVector Normal, int id_wall );
-		void setAlphaBoundary(double alpha);
+		void setAlphaBoundary(double alpha,bool fixed);
 
 		void defineFictiousCells();
 		int detectFacetFictiousVertices (CellHandle& cell, int& j);

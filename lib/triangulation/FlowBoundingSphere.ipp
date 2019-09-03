@@ -811,7 +811,7 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
 		cell->info().dv()=0;
 	}
 		// cuboid bcs
-	if (alphaBound==0) {
+	if (alphaBound<0) {
         for (int bound=0; bound<6;bound++) {
                 int& id = *boundsIds[bound];
 		boundingCells[bound].clear();

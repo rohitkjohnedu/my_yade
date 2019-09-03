@@ -49,8 +49,9 @@ flow.defTolerance = -1
 flow.meshUpdateInterval= -1
 flow.useSolver=4
 flow.permeabilityFactor=-1e-1
-flow.alphaBound=0.5  # using manual alpha. Selecting a value of 1 will let CGAL find the minimum alpha necessary for obtaining a solid. 
+flow.alphaBound=0.3  # using manual alpha. Selecting a value of 0 will let CGAL find the minimum alpha necessary for obtaining a solid. Any positive value will be used as a manual alpha.
 flow.alphaBoundValue=0  # the pressure to assign to the boundary
+flow.fixedAlpha=0 # if false, use logic to improve concavity cell volume.
 flow.imposePressure((0,0,0),1)
 
 O.dt=1e-6
@@ -65,6 +66,7 @@ xs = dat[7:,1]
 ys = dat[7:,2]
 zs = dat[7:,3]
 
+radii = dat[7:,4]
 alpha = dat[7:,5]
 
 fig = plt.figure()
