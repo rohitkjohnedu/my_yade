@@ -41,7 +41,7 @@ this = sys.modules[__name__]
 sys.stderr.write=sys.stdout.write #so we see error messages from workers
 
 worldComm = MPI.COMM_WORLD
-color = 1; key =0; 
+color = 3; key =0; 
 comm = worldComm.Split(color, key)
 parent = comm.Get_parent()
 if parent!=MPI.COMM_NULL:
@@ -81,7 +81,7 @@ AUTO_COLOR = True
 MINIMAL_INTERSECTIONS = False # Reduces the size of position/velocity comms (at the end of the colliding phase, we can exclude those bodies with no interactions besides body<->subdomain from intersections). 
 REALLOCATE_MINIMAL = False # if true, intersections are minimized before reallocations, hence minimizing the number of reallocated bodies
 fibreList = []
-foamCoupling = False 
+FLUID_COUPLING = False
 fluidBodies = [] 
 
 #tags for mpi messages
@@ -419,7 +419,8 @@ def unboundRemoteBodies():
 	Turn bounding boxes on/off depending on rank
 	'''
 	for b in O.bodies:# unbound the bodies assigned to workers (not interacting directly with other bodies in master scene)
-		if (not(b.isSubdomain or isinstance(b.shape, FluidDomainBbox)) and b.subdomain!=rank):
+		if (not (b.isSubdomain or isinstance(b.shape, FluidDomainBbox)) and b.subdomain!=rank):
+		
 			#if b: 
 			#	if (isinstance(b.shape,FluidDomainBbox)):continue 
 			b.bounded=False
