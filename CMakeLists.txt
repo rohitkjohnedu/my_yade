@@ -246,18 +246,26 @@ ENDIF()
 #====== *** END PYTHON/BOOST *** ======
 #======================================
 
-#================== Use compiler warnings ==================
+#======================================
+#====== **** Compiler flags **** ======
+#======================================
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(ENABLE_USEFUL_ERRORS)
   # Enable as many warnings as possible, and treat them as errors (using -Werror flag).
   # Four warnings are impossible to fix, because they are in external libraries:
   #   (1) libeigen: -Wmaybe-uninitialized, -Wcomment, -Wdeprecated-copy ; and only in g++ 7 or 8: -Wint-in-bool-context
   #   (2) open mpi: -Wcast-function-type
-  # Two warnings are impossible to fix, because they are in older compiler, or in older library version
-  #   (1) libeigen ver. < 3.3.4 : -Wshadow=compatible-local
+  # Three warnings are impossible to fix, because they are in older compiler, or in older library version
+  #   (1) libeigen ver. <=3.3.4 : -Wshadow=compatible-local -Wno-error=float-conversion
   #   (2) numpy    ver. < 1.13  : -Wunused-function
   # These impossible to fix warnings are in ${WORKAROUND_LIBRARY_WARNINGS}
   # So depending on compiler version I need to turn these errors off.
   # They will be still printed as warnings. But they will not be an error due to -Werror flag.
+
+  # Notes:
+  #  -Wfloat-conversion warning: you have to select the int(…) conversion policy: std::floor(…), std::ceil(…), std::round(…), e.g. with int(std::ceil(11.9999999999999993))
+
   SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized -Wno-error=comment")
   IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cast-function-type")
@@ -271,15 +279,19 @@ if(ENABLE_USEFUL_ERRORS)
       SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=int-in-bool-context")
     ENDIF()
     IF((${EIGEN3_MAJOR_VERSION} EQUAL 3) AND ( (${EIGEN3_MINOR_VERSION} LESS 4) OR (${EIGEN3_MINOR_VERSION} EQUAL 4)))
-      # eigen <= 3.3.4
+      # eigen <= 3.3.4, ubuntu 16.04 xenial and 18.04 bionic
       SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=shadow=compatible-local")
     ENDIF()
+  ENDIF()
+  IF((${EIGEN3_MAJOR_VERSION} LESS 2) OR (${EIGEN3_MAJOR_VERSION} EQUAL 2))
+    # eigen <= 3.2, ubuntu 16.04 xenial
+    SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=float-conversion")
   ENDIF()
   IF((${NUMPY_VERSION_MAJOR} EQUAL 1) AND (${NUMPY_VERSION_MINOR} LESS 13))
     # numpy 1.11.0 has unused-function, 1.13 does not. So we have to print warning only when it appears.
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=unused-function")
   ENDIF()
-  SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized")
+  SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized -Wfloat-conversion -Wcast-align")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -std=c++14 -fdce")
 
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow=compatible-local -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment -Wno-error=cast-function-type -Wno-error=cpp -std=c++14 -fdce")
@@ -291,6 +303,10 @@ ELSE(ENABLE_USEFUL_ERRORS)
   SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++14")
 ENDIF(ENABLE_USEFUL_ERRORS)
 #===========================================================
+MESSAGE(STATUS   "${Esc}[36mChosen compiler flags are: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS} ${Esc}[0m")
+#======================================
+#====== ** END Compiler flags ** ======
+#======================================
 
 #===========================================================
 FIND_PACKAGE(Loki REQUIRED)
