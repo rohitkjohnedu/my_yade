@@ -6,6 +6,28 @@
 #include<lib/base/Math.hpp>
 #include<lib/pyutil/doc_opts.hpp>
 
+template<typename Scalar> Eigen::Matrix<Scalar,3,3> matrixFromEulerAnglesXYZ(Scalar x, Scalar y, Scalar z){
+	Eigen::Matrix<Scalar,3,3> m;
+	m=Eigen::AngleAxis<Scalar>(x,Eigen::Matrix<Scalar,3,1>::UnitX())*Eigen::AngleAxis<Scalar>(y,Eigen::Matrix<Scalar,3,1>::UnitY())*Eigen::AngleAxis<Scalar>(z,Eigen::Matrix<Scalar,3,1>::UnitZ());
+	return m;
+}
+
+#if EIGEN_VERSION_AT_LEAST(3,3,0) // this is for ubuntu 16.04 xenial
+	// https://eigen.tuxfamily.org/dox/unsupported/index.html : contributions from various users. They are provided "as is", without any support.
+	// better to use that, than reinvent own Euler angles.
+	#include <unsupported/Eigen/EulerAngles>
+
+	inline Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
+		Matrix3r ret = Eigen::EulerAnglesXYZd( x,y,z ).toRotationMatrix();
+		assert(ret == matrixFromEulerAnglesXYZ<Real>(x,y,z));
+		return ret;
+	}
+# else
+	inline Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
+		return matrixFromEulerAnglesXYZ<Real>(x,y,z);
+	}
+#endif
+
 // compute minimum bounding for a cloud of points
 
 // returns volume
@@ -33,7 +55,7 @@ void bestFitOBB(const std::vector<Vector3r>& pts, Vector3r& center, Vector3r& ha
 		for(Real x=angle0[0]-sweep; x<=angle0[0]+sweep; x+=stepSize){
 			for(Real y=angle0[1]-sweep; y<angle0[1]+sweep; y+=stepSize){
 				for(Real z=angle0[2]-sweep; z<angle0[2]+sweep; z+=stepSize){
-					Matrix3r rot0; rot0.eulerAngles(x,y,z);
+					Matrix3r rot0( makeFromEulerAngle(x,y,z) );
 					Real volume=computeOBB(pts,rot0,center0,halfSize0);
 					if(volume<bestVolume){
 						bestVolume=volume;
