@@ -124,8 +124,8 @@ void OpenGLRenderer::drawPeriodicCell(){
 
 void OpenGLRenderer::resetSpecularEmission(){
 	glMateriali(GL_FRONT, GL_SHININESS, 80);
-	const GLfloat glutMatSpecular[4]={0.3,0.3,0.3,0.5};
-	const GLfloat glutMatEmit[4]={0.2,0.2,0.2,1.0};
+	const GLfloat glutMatSpecular[4]={0.3f,0.3f,0.3f,0.5f};
+	const GLfloat glutMatEmit[4]={0.2f,0.2f,0.2f,1.0f};
 	glMaterialfv(GL_FRONT,GL_SPECULAR,glutMatSpecular);
 	glMaterialfv(GL_FRONT,GL_EMISSION,glutMatEmit);
 }
@@ -174,7 +174,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,1); // important: do lighting calculations on both sides of polygons
 
 	const GLfloat pos[4]	= {(float) lightPos[0], (float) lightPos[1], (float) lightPos[2],1.0};
-	const GLfloat ambientColor[4]={0.2,0.2,0.2,1.0};
+	const GLfloat ambientColor[4]={0.2f,0.2f,0.2f,1.0f};
 	const GLfloat specularColor[4]={1,1,1,1.f};
 	const GLfloat diffuseLight[4] = { (float) lightColor[0], (float) lightColor[1], (float) lightColor[2], 1.0f };
 	glLightfv(GL_LIGHT0, GL_POSITION,pos);
@@ -185,7 +185,7 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene,Body::id_t selection
 
 	const GLfloat pos2[4]	= {(float) light2Pos[0], (float) light2Pos[1], (float) light2Pos[2],1.0};
 	const GLfloat ambientColor2[4]={0.0,0.0,0.0,1.0};
-	const GLfloat specularColor2[4]={1,1,0.6,1.f};
+	const GLfloat specularColor2[4]={1.f,1.f,0.6f,1.f};
 	const GLfloat diffuseLight2[4] = { (float) light2Color[0], (float) light2Color[1], (float) light2Color[2], 1.0f };
 	glLightfv(GL_LIGHT1, GL_POSITION,pos2);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specularColor2);
@@ -256,7 +256,7 @@ void OpenGLRenderer::renderDOF_ID(){
 			if(!id && b->state->blockedDOFs==0) continue;
 			if(selId==b->getId()){glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambientColorSelected);}
 			{ // write text
-				glColor3f(1.0-bgColor[0],1.0-bgColor[1],1.0-bgColor[2]);
+				glColor3(1.0-bgColor[0],1.0-bgColor[1],1.0-bgColor[2]);
 				unsigned d = b->state->blockedDOFs;
 				std::string sDof = std::string()+(((d&State::DOF_X )!=0)?"x":"")+(((d&State::DOF_Y )!=0)?"y":" ")+(((d&State::DOF_Z )!=0)?"z":"")+(((d&State::DOF_RX)!=0)?"X":"")+(((d&State::DOF_RY)!=0)?"Y":"")+(((d&State::DOF_RZ)!=0)?"Z":"");
 				std::string sId = boost::lexical_cast<std::string>(b->getId());
@@ -353,8 +353,8 @@ void OpenGLRenderer::renderShape(){
 
 		glPushMatrix();
 			AngleAxisr aa(ori);
-			glTranslatef(pos[0],pos[1],pos[2]);
-			glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
+			glTranslate(pos[0],pos[1],pos[2]);
+			glRotate(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 			if(highlight){
 				// set hightlight
 				// different color for body highlighted by selection and by the shape attribute
@@ -401,7 +401,7 @@ void OpenGLRenderer::renderShape(){
 					glLoadName(b->id);
 					glPushMatrix();
 						glTranslatev(pt);
-						glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
+						glRotate(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 						shapeDispatcher(b->shape,b->state,/*wire*/ true, viewInfo);
 					glPopMatrix();
 				}

@@ -31,12 +31,12 @@ void Gl1_Node::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wi
 
 	Real r=(static_cast<Sphere*>(cm.get()))->radius;
 	glColor3v(cm->color);
-	if (wire || wire2) glutWireSphere(r,quality*glutSlices,quality*glutStacks);
+	if (wire || wire2) glutWireSphere(r,int(std::round(quality*glutSlices)),int(std::round(quality*glutStacks)));
 	else {
 		//Check if quality has been modified or if previous lists are invalidated (e.g. by creating a new qt view), then regenerate lists
-		bool somethingChanged = (abs(quality-prevQuality)>0.001 || glIsList(glStripedSphereList)!=GL_TRUE);
+		bool somethingChanged = (std::abs(quality-prevQuality)>0.001 || glIsList(glStripedSphereList)!=GL_TRUE);
 		if (somethingChanged) {initStripedGlList(); initGlutGlList(); prevQuality=quality;}
-		glScalef(r,r,r);
+		glScale(r,r,r);
 		if(stripes) glCallList(glStripedSphereList);
 		else glCallList(glGlutSphereList);
 	}
@@ -51,15 +51,15 @@ void Gl1_Node::subdivideTriangle(Vector3r& v1,Vector3r& v2,Vector3r& v3, int dep
 		v = (v1+v2+v3)/3.0;
 		GLfloat matEmit[4];
 		if (v[1]*v[0]*v[2]>0){
-			matEmit[0] = 0.3;
-			matEmit[1] = 0.3;
-			matEmit[2] = 0.3;
+			matEmit[0] = 0.3f;
+			matEmit[1] = 0.3f;
+			matEmit[2] = 0.3f;
 			matEmit[3] = 1.f;
 		}else{
-			matEmit[0] = 0.15;
-			matEmit[1] = 0.15;
-			matEmit[2] = 0.15;
-			matEmit[3] = 0.2;
+			matEmit[0] = 0.15f;
+			matEmit[1] = 0.15f;
+			matEmit[2] = 0.15f;
+			matEmit[3] = 0.2f;
 		}
  		glMaterialfv(GL_FRONT, GL_EMISSION, matEmit);
 	}
@@ -138,7 +138,7 @@ void Gl1_Node::initGlutGlList(){
 	glNewList(glGlutSphereList,GL_COMPILE);
 		glEnable(GL_LIGHTING);
 		glShadeModel(GL_SMOOTH);
-		glutSolidSphere(1.0,max(quality*glutSlices,(Real)2.),max(quality*glutStacks,(Real)3.));
+		glutSolidSphere(1.0,int(std::max(quality*glutSlices,(Real)2.)),int(std::max(quality*glutStacks,(Real)3.)));
 	glEndList();
 }
 #endif //YADE_FEM

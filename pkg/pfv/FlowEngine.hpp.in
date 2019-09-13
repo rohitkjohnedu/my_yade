@@ -542,7 +542,9 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 		for (int k=0; k<4;k++) for (int l=0; l<3;l++) solidSurfaces[k][l]=0;
 		sphericalVertexSurface.resize(4,0);
 		rayHydr.resize(4, 0);
-		invSumK=index=volumeSign=s=volumeVariation=pression=invVoidV=fict=temperature=tempVariation=Reynolds=NutimesFluidK=stabilityCoefficient=0;
+		invSumK=0;s=0;
+		volumeVariation=pression=invVoidV=fict=index=volumeSign=0;
+		temperature=tempVariation=Reynolds=NutimesFluidK=stabilityCoefficient=0;
 		isFictious=false; Pcondition = false; isGhost = false; Tcondition= false; isAlpha=false;
 		isvisited = false; isCavity=false;
 		isGhost=false;

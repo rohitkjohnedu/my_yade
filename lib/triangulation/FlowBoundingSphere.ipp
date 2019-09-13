@@ -435,7 +435,7 @@ void FlowBoundingSphere<Tesselation>::applyUserDefinedPressure(RTriangulation& T
 		else {
 			Real frac, intg;
 			frac=modf((p1.x()-xinit)/dx,&intg);
-			cell->info().p() = pval[intg]*(1-frac) + pval[intg+1]*frac;
+			cell->info().p() = pval[size_t(intg)]*(1-frac) + pval[size_t(intg)+1]*frac;
 		}
 	}
 }

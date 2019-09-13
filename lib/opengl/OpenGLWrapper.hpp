@@ -64,6 +64,9 @@ template< typename Type > inline void glMaterial	( GLenum face, GLenum pname, Ty
 template< typename Type > inline void glMaterialv	( GLenum face, GLenum pname, Type param ){	STATIC_ASSERT(false); };
 template< typename Type > inline void glMultMatrix	(const Type*){	STATIC_ASSERT(false); };
 
+inline void glClearColor      ( double a, double b, double c,  double d ) { glClearColor(GLclampf(a),GLclampf(b),GLclampf(c),GLclampf(d)); };
+inline void glLineWidth       ( double a                                ) { glLineWidth (GLfloat(a));  };
+
 #define LDOUBL long double
 
 ///	Template Specializations
@@ -75,12 +78,12 @@ template< > inline void glRotate< LDOUBL >		(LDOUBL angle, LDOUBL x, LDOUBL y, L
 template< > inline void glRotate< float >			(float angle,float x,float y, float z )	{	glRotatef(angle,x,y,z);	};
 
 template< > inline void glScale< double >			( double x,double y, double z )		{	glScaled(x,y,z);	};
-template< > inline void glScale< LDOUBL >			( LDOUBL x,LDOUBL y, LDOUBL z )		{	glScaled(x,y,z);	};
+template< > inline void glScale< LDOUBL >			( LDOUBL x,LDOUBL y, LDOUBL z )		{	glScaled(double(x),double(y),double(z));	};
 template< > inline void glScale< float >			( float x,float y,float z )		{	glScalef(x,y,z);	};
 template< > inline void glScalev< Vector3r >		( const Vector3r v )		{	glScaled(v[0],v[1],v[2]);};
 
 template< > inline void glTranslate< double >			( double x,double y, double z )		{	glTranslated(x,y,z);	};
-template< > inline void glTranslate< LDOUBL >			( LDOUBL x, LDOUBL y, LDOUBL z )		{	glTranslated(x,y,z);	};
+template< > inline void glTranslate< LDOUBL >			( LDOUBL x, LDOUBL y, LDOUBL z )		{	glTranslated(double(x),double(y),double(z));	};
 template< > inline void glTranslate< float >			( float x,float y,float z )		{	glTranslatef(x,y,z);	};
 template< > inline void glTranslatev< Vector3r >		( const Vector3r v )		{	glTranslated(v[0],v[1],v[2]);};
 
@@ -209,7 +212,7 @@ template< > inline void glRect< float >			(float	x1,float  y1,float x2,float y2 
 template< > inline void glRect< int >				(int	x1,int	  y1,int x2, int y2 )		{	glRecti(x1,y1,x2,y2);	};
 
 template< > inline void glMaterial< float >			( GLenum face, GLenum pname, float param )			{	glMaterialf(face,pname,param);		};
-template< > inline void glMaterial< double >			( GLenum face, GLenum pname, double param )			{	glMaterialf(face,pname,param);		};
+template< > inline void glMaterial< double >			( GLenum face, GLenum pname, double param )			{	glMaterialf(face,pname,float(param));		};
 template< > inline void glMaterial< int >			( GLenum face, GLenum pname, int param )			{	glMateriali(face,pname,param);		};
 template< > inline void glMaterialv< Vector3r >	( GLenum face, GLenum pname, const Vector3r params )	{	const GLfloat _p[3]={(float) params[0], (float) params[1], (float) params[2]}; glMaterialfv(face,pname,_p);	};
 template< > inline void glMaterialv< Vector3i >		( GLenum face, GLenum pname, const Vector3i params )	{	glMaterialiv(face,pname,(int*)&params);	};

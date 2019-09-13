@@ -989,7 +989,7 @@ void TwoPhaseFlowEngine::computeMergedVolumes()
 	    if(Mergecell->info().mergedID == mergeID && Mergecell->info().isFictious == false && Mergecell->info().isGhost == false && Mergecell->info().id < solver->T[solver->currentTes].cellHandles.size()){
 	      Mergecell->info().poreBodyRadius = getChi(Mergecell->info().numberFacets)*std::pow(volume,(1./3.));
 	      Mergecell->info().mergedVolume = volume;
-      	      Mergecell->info().mergednr = summ;
+      	      Mergecell->info().mergednr = int(std::round(summ));
 	      }
 	    }
 	  }

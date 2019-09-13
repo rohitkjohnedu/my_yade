@@ -65,7 +65,7 @@ py::tuple interactionAnglesHistogram(int axis, int mask, size_t bins, py::tuple 
 		Vector3r n(geom->normal); n[axis]=0.; Real nLen=n.norm();
 		if(nLen<minProjLen) continue; // this interaction is (almost) exactly parallel to our axis; skip that one
 		Real theta=acos(n[axis2]/nLen)*(n[axis3]>0?1:-1); if(theta<0) theta+=Mathr::PI;
-		int binNo=theta/binStep;
+		int binNo=int(std::round(theta/binStep));
 		cummProj[binNo]+=nLen;
 	}
 	py::list val,binMid;

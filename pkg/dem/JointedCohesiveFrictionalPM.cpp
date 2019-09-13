@@ -446,7 +446,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::computeTemporalWindow
 	const Real velocityP1 = sqrt(elasticMat1->young/elasticMat1->density);
 	const Real velocityP2 = sqrt(elasticMat2->young/elasticMat2->density);
 
-	phys->temporalWindow = floor(spatialWindow/(max(velocityP1, velocityP2)*scene->dt));
+	phys->temporalWindow = int(std::floor(spatialWindow/(max(velocityP1, velocityP2)*scene->dt)));
 }
 	
 	

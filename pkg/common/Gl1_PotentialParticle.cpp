@@ -450,9 +450,9 @@ void PotentialParticleVTKRecorder::action() {
 			color = Vector3r(157,157,157);
 		}
 		unsigned char c[3]; //c = {color[0],color[1],color[2]};
-		c[0]=color[0];
-		c[1]=color[1];
-		c[2]=color[2];
+		c[0]=(unsigned char)(color[0]);
+		c[1]=(unsigned char)(color[1]);
+		c[2]=(unsigned char)(color[2]);
 		int nbCells=polydata->GetNumberOfPoints();
 		for (int i=0; i<nbCells; i++) {
 			pbColors->INSERT_NEXT_TYPED_TUPLE(c);
@@ -493,18 +493,18 @@ void PotentialParticleVTKRecorder::action() {
 			pbCells->InsertNextCell(1,pid);
 			const Vector3r& vel = b->state->vel;
 			float v[3]; //v = { vel[0],vel[1],vel[2] };
-			v[0]=vel[0];
-			v[1]=vel[1];
-			v[2]=vel[2];
+			v[0]=(float)(vel[0]);
+			v[1]=(float)(vel[1]);
+			v[2]=(float)(vel[2]);
 			pbLinVelVec->INSERT_NEXT_TUPLE(v);
-			pbLinVelLen->InsertNextValue(vel.norm());
+			pbLinVelLen->InsertNextValue((float)(vel.norm()));
 			const Vector3r& angVel = b->state->angVel;
 			float av[3]; //av = { angVel[0],angVel[1],angVel[2] };
-			av[0]=angVel[0];
-			av[1]=angVel[1];
-			av[2]=angVel[2];
+			av[0]=(float)(angVel[0]);
+			av[1]=(float)(angVel[1]);
+			av[2]=(float)(angVel[2]);
 			pbAngVelVec->INSERT_NEXT_TUPLE(av);
-			pbAngVelLen->InsertNextValue(angVel.norm());
+			pbAngVelLen->InsertNextValue((float)(angVel.norm()));
 		}
 		// ################ velocity ###########################
 		polydata->DeleteCells();

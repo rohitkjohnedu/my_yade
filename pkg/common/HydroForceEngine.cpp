@@ -28,7 +28,7 @@ void HydroForceEngine::action(){
 		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		if (sphere){
 			Vector3r posSphere = b->state->pos;//position vector of the sphere
-			int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+			int p = int(std::floor((posSphere[2]-zRef)/deltaZ)); //cell number in which the particle is
 			if ((p<nCell)&&(p>=0)) {
 				Vector3r liftForce = Vector3r::Zero();
 				Vector3r dragForce = Vector3r::Zero();
@@ -40,7 +40,7 @@ void HydroForceEngine::action(){
 					dragForce = 0.5*densFluid*Mathr::PI*pow(sphere->radius,2.0)*(0.44*vRel.norm()+24.4*viscoDyn/(densFluid*sphere->radius*2))*pow(1-phiPart[p],-expoRZ)*vRel;
 				}
 				//lift force calculation due to difference of fluid pressure between top and bottom of the particle
-				int intRadius = floor(sphere->radius/deltaZ);
+				int intRadius = int(std::floor(sphere->radius/deltaZ));
 				if ((p+intRadius<nCell)&&(p-intRadius>0)&&(lift==true)) {
 					double vRelTop = vxFluid[p+1+intRadius] -  b->state->vel[0]; // relative velocity of the fluid wrt the particle at the top of the particle
 					double vRelBottom = vxFluid[p+1-intRadius] -  b->state->vel[0]; // same at the bottom
@@ -89,7 +89,7 @@ void HydroForceEngine::averageProfile(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const double zPos = b->state->pos[2]-zRef;
-		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
+		int Np = int(std::floor(zPos/deltaZ));	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 //		if ((b->state->blockedDOFs==State::DOF_ALL)&&(zPos > s->radius)) continue;// to remove contribution from the fixed particles on the sidewalls.
 
 		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
@@ -100,8 +100,8 @@ void HydroForceEngine::averageProfile(){
 		}
 		else fDrag = Vector3r::Zero();
 
-		minZ= floor((zPos-s->radius)/deltaZ);
-		maxZ= floor((zPos+s->radius)/deltaZ);
+		minZ= int(std::floor((zPos-s->radius)/deltaZ));
+		maxZ= int(std::floor((zPos+s->radius)/deltaZ));
 		deltaCenter = zPos - Np*deltaZ;
 	
 		// Loop over the cell in which the particle is contained
@@ -236,7 +236,7 @@ void HydroForceEngine::averageProfilePP(){
 	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const double zPos = b->state->pos[2]-zRef;
-		int Np = floor(zPos/deltaZ);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. 
+		int Np = int(std::floor(zPos/deltaZ));	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. 
 		// Relative fluid/particle velocity using also the associated fluid vel. fluct. 
 		if ((Np>=0)&&(Np<nCell)){
 			uRel = Vector3r(vxFluid[Np+1]+vFluctX[b->id], vFluctY[b->id],vFluctZ[b->id]) - b->state->vel;
@@ -312,7 +312,7 @@ void HydroForceEngine::turbulentFluctuation(){
 		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		if (sphere){
 			Vector3r posSphere = b->state->pos;//position vector of the sphere
-			int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+			int p = int(std::floor((posSphere[2]-zRef)/deltaZ)); //cell number in which the particle is
 			// If the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
 			// The fluctuation magnitude is linked to the value of the Reynolds stress tensor at the given position, a kind of local friction velocity ustar
 			// The fluctuations along wall-normal and streamwise directions are correlated in order to be consistent with the formulation of the Reynolds stress tensor and to recover the result
@@ -367,7 +367,7 @@ void HydroForceEngine::turbulentFluctuationBIS(){
                         double uStar = 0.0;
                         if (sphere){
                                 Vector3r posSphere = b->state->pos;//position vector of the sphere
-                                int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+                                int p = int(std::floor((posSphere[2]-zRef)/deltaZ)); //cell number in which the particle is
                                 if (ReynoldStresses[p]>0.0) uStar = sqrt(ReynoldStresses[p]/densFluid);
                                 // Remove the particles outside of the flow and inside the granular bed, they are not submitted to turbulent fluctuations. 
                                 if ((p<nCell)&&(posSphere[2]-zRef>bedElevation)) {
@@ -427,7 +427,7 @@ void HydroForceEngine::turbulentFluctuationFluidizedBed(){
 		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		if (sphere){
 			Vector3r posSphere = b->state->pos;//position vector of the sphere
-			int p = floor((posSphere[2]-zRef)/deltaZ); //cell number in which the particle is
+			int p = int(std::floor((posSphere[2]-zRef)/deltaZ)); //cell number in which the particle is
 			// If the particle is inside the water and above the bed elevation, so inside the turbulent flow, evaluate a turbulent fluid velocity fluctuation which will be used to apply the drag.
 			// The fluctuation magnitude is linked to the value of the Reynolds stress tensor at the given position, a kind of local friction velocity ustar
 			if ((p<nCell)&&(posSphere[2]-zRef>0.)) {  // Remove the particles outside of the flow

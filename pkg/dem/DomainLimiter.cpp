@@ -334,7 +334,7 @@ void GlExtra_OctreeCubes::render(){
 		glColor3v(color);
 		glPushMatrix();
 			glTranslatev(ob.center);
-			glScalef(2*ob.extents[0],2*ob.extents[1],2*ob.extents[2]);
+			glScale(2*ob.extents[0],2*ob.extents[1],2*ob.extents[2]);
 		 	if (doFill) glutSolidCube(1);
 			else glutWireCube(1);
 		glPopMatrix();

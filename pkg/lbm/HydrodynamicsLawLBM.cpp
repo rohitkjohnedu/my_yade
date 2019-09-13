@@ -237,12 +237,12 @@ void HydrodynamicsLawLBM::action()
         invdx=1./dx;
 
         //Number of nodes (after-correction)
-        Ny = ceil(invdx*Ly1)+1;
+        Ny = int(std::ceil(invdx*Ly1))+1;
         dx =  Ly1 / (Real) (Ny-1);
         invdx=1./dx;
         dx2=dx*dx;
-        Nx = ceil(invdx*Lx1)+1;
-        Ny = ceil(invdx*Ly1)+1;
+        Nx = int(std::ceil(invdx*Lx1))+1;
+        Ny = int(std::ceil(invdx*Ly1))+1;
         Nz=1;
 
         cerr <<"LXYZ0= "<<Lx0<<" "<<Ly0<<" "<<Lz0<<endl;
@@ -287,8 +287,8 @@ void HydrodynamicsLawLBM::action()
             NbNodes++;
             for (int dndx=0; dndx<NbDir; dndx++){
                 nodes[nidx].links_id.push_back(-1);
-                I=nodes[nidx].i+eib[dndx].x();
-                J=nodes[nidx].j+eib[dndx].y();
+                I=nodes[nidx].i+int(std::round(eib[dndx].x())); // XXX: this is suspicious
+                J=nodes[nidx].j+int(std::round(eib[dndx].y()));
                 if(((I==i)&&(J==j)) || (I==-1) || (J==-1) || (I==Nx) || (J==Ny)  ){
                     nodes[nidx].neighbour_id.push_back(-1);
                 }
@@ -347,7 +347,7 @@ void HydrodynamicsLawLBM::action()
         ////////////////////////////////////////////////////////////////////////////////////
 
         if((ConvergenceThreshold==-1)||(ConvergenceThreshold==0)) use_ConvergenceCriterion=false;
-        else {use_ConvergenceCriterion=true;ErrorCriterion=ConvergenceThreshold;}
+        else {use_ConvergenceCriterion=true;ErrorCriterion=int(std::round(ConvergenceThreshold));}
         /*------------------------------------------------------------------*/
         /*------------------------ LBM PARAMETERS --------------------------*/
         /*------------------------------------------------------------------*/
@@ -462,8 +462,8 @@ void HydrodynamicsLawLBM::action()
             Vector3r posMin=LBbodies[id].pos- Vector3r(LBbodies[id].radius,LBbodies[id].radius,LBbodies[id].radius);
 
             Vector3r dist=Vector3r::Zero();
-            for(int ii=posMin[0]-1;ii<=posMax[0]+1;ii++)
-                for(int jj=posMin[1]-1;jj<=posMax[1]+1;jj++){
+            for(int ii=int(std::round(posMin[0]))-1;ii<=int(std::round(posMax[0]))+1;ii++)
+                for(int jj=int(std::round(posMin[1]))-1;jj<=int(std::round(posMax[1]))+1;jj++){
                     if((ii==-1)||(ii==Nx)||(jj==-1)||(jj==Ny)) continue;
                     if((ii<-1)||(ii>Nx)||(jj<-1)||(jj>Ny)) continue;
                     if (LBbodies[id].radius < Rmin) Rmin = LBbodies[id].radius;
@@ -570,7 +570,7 @@ void HydrodynamicsLawLBM::action()
         }else{newDEMdt=dt/DemIterLbmIterRatio;}
         scene->dt=newDEMdt;
         if(SaveMode==2){
-            IterSave=TimeSave/(dt);
+            IterSave=int(std::round(TimeSave/(dt)));
             if(TimeSave<dt) {cerr <<"Warning SaveMode==2 and TimeSave<dt."<<endl; exit(-1);}
         }
         writelogfile();
@@ -776,8 +776,8 @@ void HydrodynamicsLawLBM::action()
             if(links[lid].PointingOutside){
                 /// Periodicity is currently disabled until it is implemented through the link list.
 ///FIXME
-                I=nodes[nidx1].i+eib[dndx1].x();
-                J=nodes[nidx1].j+eib[dndx1].y();
+                I=nodes[nidx1].i+int(std::round(eib[dndx1].x())); // XXX: this is suspicious. Anyway, you have to select the int(…) conversion policy: std::floor, std::ceil, std::round
+                J=nodes[nidx1].j+int(std::round(eib[dndx1].y())); //      It is quite frequent that you can have e.g. 11.99999999993 and it should be int==12. But it becomes 11.
                 if(Xperiodicity){ if (I==Nx) {I=0;} else {if (I==-1) { I=Nx-1;}} }
                 if(Yperiodicity){ if (J==Ny) {J=0;} else {if (J==-1) { J=Ny-1;}} }
             }else{

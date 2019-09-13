@@ -531,7 +531,7 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 				LOG_FATAL("Body #"<<((lmax-lmin)>0.5?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
 				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
 		}
-		int period1 = floor(lmax); 
+		int period1 = int(std::floor(lmax));
 		//overlap around zero, on the "+" side
 		if ((lmin-period1) <= overlapTolerance) {periods[axis]=-period1; continue;}
 		 //overlap around 1, on the "-" side

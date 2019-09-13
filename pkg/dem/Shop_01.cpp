@@ -57,7 +57,7 @@ Matrix3r Shop::flipCell(const Matrix3r& _flip){
 		bool hasNonzero=false;
 		for(int i=0; i<3; i++) for(int j=0; j<3; j++) {
 			if(i==j){ flip(i,j)=0; continue; }
-			flip(i,j)=-floor(hSize.col(j).dot(hSize.col(i))/hSize.col(i).dot(hSize.col(i)));
+			flip(i,j)=-int(std::floor(hSize.col(j).dot(hSize.col(i))/hSize.col(i).dot(hSize.col(i))));
 			if(flip(i,j)!=0) hasNonzero=true;
 		}
 		if(!hasNonzero) {LOG_TRACE("No flip necessary."); return Matrix3r::Zero();}

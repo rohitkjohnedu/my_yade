@@ -335,7 +335,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	Matrix3r fabricTot(Matrix3r::Zero()); 
 	int q(0);
 	if(!count){ // compute only if there are some interactions
-		q=nStrong*1./count; 
+		q=int(std::round(nStrong*1./count));
 		fabricTot=(1-q)*fabricWeak+q*fabricStrong;
 	}
 }
@@ -441,7 +441,7 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 	//Dynamic contribution to the stress tensor
 	//
 	FOREACH(const shared_ptr<Body>& b,*Omega::instance().getScene()->bodies){
-		int Np = floor((b->state->pos[2]-zRef)/dz);	//Define the layer number with 0 corresponding to zRef
+		int Np = int(std::floor((b->state->pos[2]-zRef)/dz));	//Define the layer number with 0 corresponding to zRef
 		if ((Np>=0)&&(Np<nCell)){	//To avoid non defined vPartAverage
 			//Velocity fluctuation wrt the average field
 			Vector3r vFluct = b->state->vel - Vector3r(vPartAverageX[Np],vPartAverageY[Np],vPartAverageZ[Np]); 
@@ -466,8 +466,8 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 
 		if ((b1->state->blockedDOFs!=State::DOF_ALL)||(b2->state->blockedDOFs!=State::DOF_ALL)){// to remove annoying contribution from the fixed particles
 			//Layers in which the particle center is contained
-			int Np1 = floor((b1->state->pos[2] - zRef)/dz);
-			int Np2 = floor((b2->state->pos[2] - zRef)/dz);
+			int Np1 = int(std::floor((b1->state->pos[2] - zRef)/dz));
+			int Np2 = int(std::floor((b2->state->pos[2] - zRef)/dz));
 			//Vector between the two centers, from 2 to 1
 			Vector3r branch = b1->state->pos -b2->state->pos;
 			if (isPeriodic) branch -= scene->cell->hSize*I->cellDist.cast<Real>();//to handle periodicity
@@ -550,8 +550,8 @@ py::tuple Shop::getStressProfile_contact(Real volume, int nCell, Real dz, Real z
 
 		if ((b1->state->blockedDOFs!=State::DOF_ALL)||(b2->state->blockedDOFs!=State::DOF_ALL)){// to remove annoying contribution from the fixed particles
 			//Layers in which the particle center is contained
-			int Np1 = floor((b1->state->pos[2] - zRef)/dz);
-			int Np2 = floor((b2->state->pos[2] - zRef)/dz);
+			int Np1 = int(std::floor((b1->state->pos[2] - zRef)/dz));
+			int Np2 = int(std::floor((b2->state->pos[2] - zRef)/dz));
 			//Vector between the two centers, from 2 to 1
 			Vector3r branch = b1->state->pos -b2->state->pos;
 			if (isPeriodic) branch -= scene->cell->hSize*I->cellDist.cast<Real>();//to handle periodicity
@@ -637,10 +637,10 @@ py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool 
 			if (sphere->radius!=radiusPy) continue;
 		} //select diameters asked
                 const Real zPos = b->state->pos[dir]-zRef;
-		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
+		int Np = int(std::floor(zPos/dz));	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 
-		minZ= floor((zPos-s->radius)/dz);
-		maxZ= floor((zPos+s->radius)/dz);
+		minZ= int(std::floor((zPos-s->radius)/dz));
+		maxZ= int(std::floor((zPos+s->radius)/dz));
 		deltaCenter = zPos - Np*dz;
 	
 		// Loop over the cell in which the particle is contained
@@ -701,7 +701,7 @@ py::tuple Shop::getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRe
 			if (sphere->radius!=radiusPy) continue;
 		} //select diameters asked
 		const Real zPos = b->state->pos[2]-zRef;
-		int Np = floor(zPos/dz);	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
+		int Np = int(std::floor(zPos/dz));	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
 
 		if ((Np>=0)&&(Np<nCell)){
 			volPart =4./3.* Mathr::PI*pow(s->radius,3);

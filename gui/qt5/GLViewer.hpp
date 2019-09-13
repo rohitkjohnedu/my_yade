@@ -101,7 +101,7 @@ class GLViewer : public QGLViewer
 		//! Save display parameters (QGOViewer and OpenGLRenderer) to Scene::dispParams[n]
 		void saveDisplayParameters(size_t n);
 		//! Get radius of the part of scene that fits the current view
-		float displayedSceneRadius();
+		double displayedSceneRadius();
 		//! Get center of the part of scene that fits the current view
 		qglviewer::Vec displayedSceneCenter();
 

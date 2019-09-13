@@ -40,7 +40,7 @@ class BubblePhys : public IPhys {
 		((Real,fN,NaN,,"Contact normal force"))
 		((Real,rAvg,NaN,,"Average radius of the two interacting bubbles"))
 		((Real,Dmax,NaN,,"Maximum penetrationDepth of the bubbles before the force displacement curve changes to an artificial exponential curve. Setting this value will have no effect. See Law2_ScGeom_BubblePhys_Bubble::pctMaxForce for more information"))
-		((Real,newtonIter,50,,"Maximum number of force iterations allowed"))
+		((int ,newtonIter,50,,"Maximum number of force iterations allowed"))
 		((Real,newtonTol,1e-6,,"Convergence criteria for force iterations"))
 		,
 		createIndex();

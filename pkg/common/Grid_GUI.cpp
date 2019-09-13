@@ -55,11 +55,11 @@ void Gl1_GridConnection::drawCylinder(bool wireNonMember, Real radius, Real leng
    gluQuadricNormals(quadObj, (GLenum) GLU_SMOOTH);
    gluQuadricOrientation(quadObj, (GLenum) GLU_OUTSIDE);
    AngleAxisr aa(shift);
-   glRotatef(aa.angle()*180.0/Mathr::PI,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
+   glRotate(aa.angle()*180.0/Mathr::PI,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
    gluCylinder(quadObj, radius, radius, length, glutSlices,glutStacks);
    gluQuadricOrientation(quadObj, (GLenum) GLU_INSIDE);
    //glutSolidSphere(radius,glutSlices,glutStacks);
-   glTranslatef(0.0,0.0,length);
+   glTranslate(0.0,0.0,length);
 
    //glutSolidSphere(radius,glutSlices,glutStacks);
 //    gluDisk(quadObj,0.0,radius,glutSlices,_loops);

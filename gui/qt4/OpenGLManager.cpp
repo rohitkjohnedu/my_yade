@@ -60,10 +60,10 @@ void OpenGLManager::startTimerSlot(){
 	startTimer(50);
 }
 
-int OpenGLManager::waitForNewView(float timeout,bool center){
+int OpenGLManager::waitForNewView(double timeout,bool center){
 	size_t origViewCount=views.size();
 	emitCreateView();
-	float t=0;
+	double t=0;
 	while(views.size()!=origViewCount+1){
 		usleep(50000); t+=.05;
 		// wait at most 5 secs

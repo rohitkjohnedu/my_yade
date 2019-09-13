@@ -533,7 +533,7 @@ void Network<Tesselation>::addBoundingPlane (CVector Normal, int id_wall)
 {
 // 	  Tesselation& Tes = T[currentTes];
 	  //FIXME: pre-condition: the normal is axis-aligned
-	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
+	  int Coordinate = int(std::round(std::abs(Normal[0])))*0 + int(std::round(std::abs(Normal[1])))*1 + int(std::round(std::abs(Normal[2])))*2;
 	  
 	  double pivot = Normal[Coordinate]<0 ? 
 	  cornerMax.x()*abs(Normal[0])+cornerMax.y()*abs(Normal[1])+cornerMax.z()*abs(Normal[2]) : cornerMin.x()*abs(Normal[0])+cornerMin.y()*abs(Normal[1])+cornerMin.z()*abs(Normal[2]);
@@ -550,7 +550,7 @@ void Network<Tesselation>::addBoundingPlane (Real center[3], double thickness, C
 {
 	  Tesselation& Tes = T[currentTes];
 	  
-	  int Coordinate = abs(Normal[0])*0 + abs(Normal[1])*1 + abs(Normal[2])*2;
+	  int Coordinate = int(std::round(std::abs(Normal[0])))*0 + int(std::round(std::abs(Normal[1])))*1 + int(std::round(std::abs(Normal[2])))*2;
 	  
 	  Tes.insert((center[0]+Normal[0]*thickness/2)*(1-abs(Normal[0])) + (center[0]+Normal[0]*thickness/2-Normal[0]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[0]),
 		     (center[1]+Normal[1]*thickness/2)*(1-abs(Normal[1])) + (center[1]+Normal[1]*thickness/2-Normal[1]*FAR*(cornerMax.y()-cornerMin.y()))*abs(Normal[1]),

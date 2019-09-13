@@ -517,7 +517,7 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 				glTranslatev(midPt);
 				Quaternionr q; q.setFromTwoVectors(Vector3r::UnitZ(),geom->normal);
 				AngleAxisr aa(q);
-				glRotatef(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
+				glRotate(aa.angle()*Mathr::RAD_TO_DEG,aa.axis()[0],aa.axis()[1],aa.axis()[2]);
 				glBegin(GL_POLYGON);
 					glColor3v(lineColor); 
 					glVertex3d(halfSize,0.,0.);

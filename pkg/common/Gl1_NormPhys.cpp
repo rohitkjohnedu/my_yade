@@ -84,7 +84,7 @@
 
 	glDisable(GL_CULL_FACE); 
 	glPushMatrix();
-		glTranslatef(p1[0],p1[1],p1[2]);
+		glTranslate(p1[0],p1[1],p1[2]);
 		Quaternionr q(Quaternionr().setFromTwoVectors(Vector3r(0,0,1),relPos/dist /* normalized */));
 		// using Transform with OpenGL: http://eigen.tuxfamily.org/dox/TutorialGeometry.html
 		//glMultMatrixd(Eigen::Affine3d(q).data());
