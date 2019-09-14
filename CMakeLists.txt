@@ -294,10 +294,15 @@ if(ENABLE_USEFUL_ERRORS)
   SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wformat-nonliteral -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized -Wfloat-conversion -Wcast-align -Wdisabled-optimization -Wtrampolines -Wpointer-arith -Wswitch-bool -Wwrite-strings -Wnon-virtual-dtor")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -std=c++14 -fdce")
 
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow=compatible-local -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment -Wno-error=cast-function-type -Wno-error=cpp -std=c++14 -fdce")
-# Target flags, which will find every possible warning
-# https://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow                  -Wnarrowing -Wreturn-type -Wuninitialized                                                                                 -Wno-error=cpp -Werror=pedantic -Werror=conversion -Werror=sign-conversion -std=c++14 -fdce")
+#  -Wcast-qual      is useful, but too many warnings in libeigen
+#  -Wlogical-op     (1 unfixable warning in /usr/include/vtk-6.3/vtkVariantInlineOperators.h: logical ‘or’ of equal expressions )
+#  -Wswitch-default (1 unfixable warning in /usr/include/coin/CoinHelperFunctions.hpp )
+#  -Wswitch-enum    is not useful.
+# Also see: https://stackoverflow.com/questions/5088460/flags-to-enable-thorough-and-verbose-g-warnings
+# Below is the list of all still not fixed warnings `| sort | uniq`, maybe some of them are not much useful:
+# -Weffc++              (4465) -Wsign-conversion  (4176) -Wpedantic    (1744) -Wconversion         ( 755) -Wshadow         ( 527)
+# -Wfloat-equal         ( 486) -Wvla              ( 119) -Wswitch-enum (  36) -Wcast-qual          (  34) -Wswitch-default (  16)
+# -Wmaybe-uninitialized (  10) -Wcomment          (   3) -Wcpp         (   2) -Wcast-function-type (   2) -Wlogical-op     (   1)
 
 ELSE(ENABLE_USEFUL_ERRORS)
   SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++14")
