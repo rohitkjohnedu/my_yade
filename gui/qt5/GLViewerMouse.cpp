@@ -92,6 +92,7 @@ void GLViewer::mouseDoubleClickEvent(QMouseEvent *event){
 #endif
 	switch (event->button()){
 		case Qt::LeftButton:  manipulatedFrame()->alignWithFrame(NULL,true); LOG_DEBUG("Aligning cutting plane"); break;
+		// hint: enable warning -Wswitch-enum to find all other possibilities, like XButton1, ExtraButton1, MiddleButton, RightButton, ForwardButton
 		default: break; // avoid warning
 	}
 }

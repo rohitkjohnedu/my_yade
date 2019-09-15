@@ -106,6 +106,7 @@ struct WeightedAverage{
 			}
 		}
 	}
+	virtual ~WeightedAverage(){}
 };
 
 /* Class for doing template specialization of gaussian kernel average on SGDA_Scalar2d and for testing */

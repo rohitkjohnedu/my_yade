@@ -30,6 +30,7 @@ struct Predicate{
 		virtual py::tuple aabb() const = 0;
 		Vector3r dim() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return (mx-mn).eval(); }
 		Vector3r center() const { Vector3r mn,mx; ttuple2vvec(aabb(),mn,mx); return .5*(mn+mx); }
+		virtual ~Predicate(){}
 };
 
 struct PredicateWrap: Predicate, py::wrapper<Predicate>{
