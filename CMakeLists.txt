@@ -291,7 +291,7 @@ if(ENABLE_USEFUL_ERRORS)
     # numpy 1.11.0 has unused-function, 1.13 does not. So we have to print warning only when it appears.
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=unused-function")
   ENDIF()
-  SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized -Wfloat-conversion -Wcast-align")
+  SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wformat-nonliteral -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized -Wfloat-conversion -Wcast-align -Wdisabled-optimization -Wtrampolines -Wpointer-arith -Wswitch-bool -Wwrite-strings")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -std=c++14 -fdce")
 
 # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Werror -Wformat -Wformat-security -Wall -Wextra -Wshadow=compatible-local -Wnarrowing -Wreturn-type -Wuninitialized -Wno-error=maybe-uninitialized -Wno-error=comment -Wno-error=cast-function-type -Wno-error=cpp -std=c++14 -fdce")
