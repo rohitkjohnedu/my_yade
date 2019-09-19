@@ -35,7 +35,6 @@ class LubricationPhys: public ViscElPhys {
 				// Output
                 ((Real,ue,0.,Attr::readonly,"Surface deflection (ue) at t-dt [m]"))
                 ((Real,u,-1,Attr::readonly,"Interfacial distance (u) at t-dt [m]"))
-                ((Real,ladh,0.,Attr::readonly,"Adhesion relative length. If in contact, contact is maintained while u - eps < ladh. ladh<= 0 desactivate adhesion."))
 				((Real,prev_un,0,Attr::readonly,"Nondeformed distance (un) at t-dt [m]"))
 				((Real,prevDotU,0,Attr::readonly,"du/dt from previous integration - used for trapezoidal scheme (see :yref:`Law2_ScGeom_ImplicitLubricationPhys::resolution` for choosing resolution scheme)"))
                 ((Real,delta,0,Attr::readonly,"$\\log(u)$ - used for scheme with $\\delta=\\log(u)$ variable change"))
@@ -64,7 +63,6 @@ class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_FrictMat_FrictMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
                         ((Real,eps,0.001,,"Roughness: fraction of radius enlargement for contact"))
-                        ((Real,Fadh,0.,,"Adhesion force."))
                                                   ,,
                 );
 	// clang-format on
@@ -89,13 +87,13 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 							Real dt, bool withContact, int depth=0);
 		
 			Real normalForce_trpz_adim(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew);
-			Real trapz_integrate_u_adim(Real const& u_n, Real const& eps, Real const& dt, Real const& prev_d, Real const& ladh, bool const& inContact, Real & prevDotU);
+			Real trapz_integrate_u_adim(Real const& u_n, Real const& eps, Real const& dt, Real const& prev_d, bool const& inContact, Real & prevDotU);
 			
 			Real normalForce_AdimExp(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew, bool dichotomie);
 			Real NRAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot, int depth=0);
 
-			Real DichoAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& ladh);
-			Real ObjF(Real const& un, Real const& eps, Real const& alpha, Real const& prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& d, Real const& ladh);
+			Real DichoAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot);
+			Real ObjF(Real const& un, Real const& eps, Real const& alpha, Real const& prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& d);
 			
 			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
 			void shearForce_firstOrder_log(LubricationPhys *phys, ScGeom* geom);
