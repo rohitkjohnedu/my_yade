@@ -78,8 +78,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_AdimExp(LubricationPhys *p
 {
 	// Dry contact
 	if(phys->nun <= 0.) {
-		if(!warnedOnce) LOG_WARN("Can't solve with dimentionless-exponential method without fluid! using exact.");
-		warnedOnce = true;
+		LOG_DEBUG("Can't solve with dimentionless-exponential method without fluid! using exact.");
 		return normalForce_trapezoidal(phys, geom, undot, isNew); }
 	
 	Real a((geom->radius1+geom->radius2)/2.);
@@ -127,7 +126,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::NRAdimExp_integrate_u(Real const& un, 
 		if(std::abs(F) < SolutionTol)
 			break;
 		
-		if(debug) LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth);
+		LOG_DEBUG("d " << d << " ratio " << ratio << " F " << F << " i " << i << " a " << a << " depth " << depth);
 	}
 	
 	if(i < MaxIter || depth > maxSubSteps) {
@@ -162,7 +161,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::DichoAdimExp_integrate_u(Real const& u
 	}
 	
 	if((!std::isfinite(F_left) || !std::isfinite(F_right))) {
-		if(debug) LOG_WARN("Wrong direction");
+		LOG_DEBUG("Wrong direction");
 		inc = -inc; // RE-INIT
 		d_left = prev_d-1.;
 		d_right = prev_d+1.;
@@ -197,8 +196,8 @@ Real Law2_ScGeom_ImplicitLubricationPhys::DichoAdimExp_integrate_u(Real const& u
 		}
 	}
 	
-	if(debug && (i == MaxIter))
-		LOG_WARN("Max iteration reach: d_left=" << d_left << " F_left=" << F_left << " d_right=" << d_right << " F_right=" << F_right);
+	if(i == MaxIter)
+		LOG_DEBUG("Max iteration reach: d_left=" << d_left << " F_left=" << F_left << " d_right=" << d_right << " F_right=" << F_right);
 	
 	Real a = (std::exp(d) < eps) ? alpha : 0.;
 	prevDotU = -(1.+a)*std::exp(d) + a*eps + un;
@@ -221,8 +220,7 @@ template <typename T> int sign(T val) {
 Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_trpz_adim(LubricationPhys *phys, ScGeom* geom, Real undot, bool isNew) {
 		// Dry contact
 	if(phys->nun <= 0.) {
-		if(!warnedOnce) LOG_WARN("Can't solve with dimentionless-exponential method without fluid! using dimentional exact.");
-		warnedOnce = true;
+		LOG_DEBUG("Can't solve with dimentionless-exponential method without fluid! using dimentional exact.");
 		return normalForce_trapezoidal(phys, geom, undot, isNew); }
 	
 	Real a((geom->radius1+geom->radius2)/2.);
@@ -261,7 +259,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u_adim(Real const& u_n
 	
 	Real u = (b + std::sqrt(b*b+ac))/(2.*theta*(1.+a));
 	
-	if(debug) LOG_DEBUG("b " << b << " ac " << ac);
+	LOG_TRACE("b " << b << " ac " << ac);
 	
 	prevDotU = -(1.+a)*u + a*eps + u_n; // dotu/u
 	return u;
@@ -317,7 +315,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u(Real& prevDotU, Real
  			trapz_integrate_u(prevDotU, un_prev,u_prev,un_mid,nu,k,keps,eps,dt/2.,withContact, depth+1);
 			return trapz_integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt/2.,withContact, depth+1);
 		} else { // switch to backward Euler (theta = 1) by increasing depth again (see above)
-			if (!warnedOnce) {LOG_WARN("minimal sub-step reached (depth="<<maxSubSteps<<"), the result may be innacurate. Increase maxSubSteps?"); /*warnedOnce=true;*/}
+			LOG_DEBUG("minimal sub-step reached (depth="<<maxSubSteps<<"), the result may be innacurate. Increase maxSubSteps?");
 			return trapz_integrate_u(prevDotU, un_prev,u_prev,un_curr,nu,k,keps,eps,dt,withContact, depth+1);
 		}
 	} else {	// normal case, keep the positive solution closest to the previous one, and check contact status
@@ -540,7 +538,7 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(Lubricatio
 void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
 {
 	Real a((geom->radius1+geom->radius2)/2.);
-	if(resolution == 1 && debug && !warnedOnce) { LOG_DEBUG("This method use log(u/a) for shear and torque component calculation. Make sure phys->delta is set before calling this method."); warnedOnce = true; }
+	if(resolution == 1) { LOG_DEBUG("This method use log(u/a) for shear and torque component calculation. Make sure phys->delta is set before calling this method."); }
 		
 	if(activateTangencialLubrication) shearForce_firstOrder_log(phys,geom);
 	else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
