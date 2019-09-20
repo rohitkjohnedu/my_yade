@@ -27,16 +27,17 @@ class GlobalStiffnessTimeStepper;
 class BlockGen : public FileGenerator {
 	private	:
 		void createActors(shared_ptr<Scene>& scene);
-		void positionRootBody(shared_ptr<Scene>& scene); //FIXME not used: To be deleted in the future
+//		void positionRootBody(shared_ptr<Scene>& scene); //FIXME not used: To be deleted in the future
 
 		shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper;
+		std::ofstream myfile;
 
 	protected :
 //		std::ofstream output2;        // it was always creating files "BlkGen" "BlockGenFindExtreme.txt", but they are not used in the code, so I commented this out, Janek
 //		std::string myfile;
-		std::string Key;
+//		std::string Key;
 //		static std::ofstream output;
-		
+
 	public :
 		~BlockGen ();
 		bool generate(string&);
@@ -89,9 +90,9 @@ class BlockGen : public FileGenerator {
 			vector<double> b;
 			vector<double> c;
 			vector<double> d;
-			vector<bool> redundant;	
+			vector<bool> redundant;
 			vector<bool> isBoundaryPlane;
-			bool isBoundary;	
+			bool isBoundary;
 			vector<struct Block> subMembers;
 			vector<Vector3r> falseVertex;
 			vector<Vector3r> node; Real gridVol;
@@ -120,29 +121,29 @@ class BlockGen : public FileGenerator {
 
 		double getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
 		double getDet(const Eigen::MatrixXd A);
-			double getCentroidTetrahedron(const Eigen::MatrixXd A); //FIXME not used: To be deleted in the future
+//			double getCentroidTetrahedron(const Eigen::MatrixXd A); //FIXME not used: To be deleted in the future
 
 		bool createBlock(shared_ptr<Body>& body, struct BlockGen::Block block, int no);
-			bool contactDetection(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //FIXME not used: To be deleted in the future
-		
-		bool contactDetectionLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
+//			bool contactDetection(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //FIXME not used: To be deleted in the future
+
+//		bool contactDetectionLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //FIXME not used: To be deleted in the future
 		bool contactDetectionLPCLPglobal(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
-	
+
 		bool checkRedundancyLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
-			bool startingPointFeasibility(struct BlockGen::Block block, Vector3r& initialPoint); //FIXME not used: To be deleted in the future
-	
+//			bool startingPointFeasibility(struct BlockGen::Block block, Vector3r& initialPoint); //FIXME not used: To be deleted in the future
+
 		double inscribedSphereCLP(struct BlockGen::Block block, Vector3r& initialPoint, bool twoDimension);
-		
+
 		bool contactBoundaryLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
-			bool contactBoundaryLPCLPslack(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //FIXME not used: To be deleted in the future
+//			bool contactBoundaryLPCLPslack(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //FIXME not used: To be deleted in the future
 		
 
 		void calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
 		Vector3r calCentroid(struct Block block, double & blockVol);
 		bool checkCentroid(struct Block block, Vector3r presentTrial);
-			Real evaluateFNoSphere(struct Block block, Vector3r presentTrial); //FIXME not used: To be deleted in the future
-		
-	
+//			Real evaluateFNoSphere(struct Block block, Vector3r presentTrial); //FIXME not used: To be deleted in the future
+
+
 
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		BlockGen,FileGenerator,"Prepare a scene for Block Generation using the Potential Blocks. "
@@ -161,8 +162,8 @@ class BlockGen : public FileGenerator {
 		((Vector3r,globalOrigin,Vector3r(0.0,0.0,0.0),,"friction angle [°]"))
 		((Real,inertiaFactor,1.0,,"scaling of inertia"))
 		((Real,rForPP,0.1,,"r in Potential Particles"))
-		((Real,kForPP,0.01,,"k in Potential Particles")) //FIXME not actually used
-		((Real,RForPP,3.5,,"R in Potential Particles")) //FIXME not actually used
+		((Real,kForPP,0.01,,"k in Potential Particles")) //not actually used
+		((Real,RForPP,3.5,,"R in Potential Particles")) //not actually used
 			((int,numberOfGrids,1,,"not used"))  //FIXME not used: To be deleted in the future
 		((bool,probabilisticOrientation,false,,"Whether to generate rock joints randomly"))
 		((bool,Talesnick,false,,"Whether to choose the Talesnick contact law, used for validating code previously against model test"))
@@ -171,12 +172,12 @@ class BlockGen : public FileGenerator {
 		((bool,twoDimension,false,,"Whether the model is 2D"))
 		((Real,shrinkFactor,1.0,,"ratio to shrink r"))
 		((Real,viscousDamping,0.8,,"viscous damping"))
-		((bool, intactRockDegradation, false, ,"Whether to active degradation of parameters for contact"))
+		((bool,intactRockDegradation, false, ,"Whether to active degradation of parameters for contact"))
 		((Real,initialOverlap,0.0,,"initial overlap between blocks"))
 		((Vector3r,gravity,Vector3r(0.0,-9.81,0.0),,"gravity"))
 		((Real,defaultDt,-1,,"Max time-step. Used as initial value if defined. Latter adjusted by the time stepper."))
 		((int,timeStepUpdateInterval,50,,"interval for :yref:`GlobalStiffnessTimeStepper`"))
-			((bool,traceEnergy,true,,"Whether to traceEnergy - not used"))  //FIXME not used: To be deleted in the future
+			((bool,traceEnergy,true,,"Whether to traceEnergy - not used"))  // not used but is currently being developed
 		((bool,exactRotation,true,,"Whether to handle the rotational motion of aspherical bodies more accurately."))
 		((Real,minSize,50.0,,"minimum size for all blocks"))
 		((Real,minSize2,50.0,,"minimum size for blocks with joint Type=2, minSize2 is smaller than minSize"))
@@ -191,18 +192,18 @@ class BlockGen : public FileGenerator {
 		((Vector3r,directionA,Vector3r(1,0,0),,"local x-direction to check minSize"))
 		((Vector3r,directionB,Vector3r(0,1,0),,"local y-direction to check minSize"))
 		((Vector3r,directionC,Vector3r(0,0,1),,"local z-direction to check minSize"))
-		((Real,calAreaStep,10.0,,"length Z of domain"))
-		((Real,extremeDist,0.5,,"boundary to base calculation of octree algorithms"))  //FIXME remove when not needed anymore
-		((Real,subdivisionRatio,0.1,,"smallest size/boundary of octree algorithms"))
+			((Real,calAreaStep,10.0,,"length Z of domain"))
+			((Real,extremeDist,0.5,,"boundary to base calculation of octree algorithms"))  //FIXME remove when not needed anymore
+			((Real,subdivisionRatio,0.1,,"smallest size/boundary of octree algorithms"))
 		((vector<double>,joint_a,,,"list of a of plane normal"))
 		((vector<double>,joint_b,,,"list of b of plane normal"))
 		((vector<double>,joint_c,,,"list of c of plane normal"))
 		((vector<double>,joint_d,,,"list of d in plane equation"))
 		/* check for different joint types */
 		((bool, persistentPlanes,false,,"Whether to check persistence"))
-		((bool, jointProbabilistic,false,,"Whether to check for filename jointProbabilistic"))	
-		((bool, jointProbabilisticRockBridge,false,,"Whether to check for filename jointProbabilisticRockBridge"))	
-		((bool, opening,false,,"Whether to check for filename opening"))	
+		((bool, jointProbabilistic,false,,"Whether to check for filename jointProbabilistic"))
+		((bool, jointProbabilisticRockBridge,false,,"Whether to check for filename jointProbabilisticRockBridge"))
+		((bool, opening,false,,"Whether to check for filename opening"))
 		((bool, boundaries,false,,"Whether to check for filename boundaries"))
 		((bool, slopeFace,false,,"Whether to check for filename "))
 		((bool, sliceBoundaries,false,,"Whether to check for filename "))
@@ -220,12 +221,15 @@ class BlockGen : public FileGenerator {
 		((std::string,filenameSliceBoundaries,"./Tunnel/sliceBoundaries.csv",,"filename to look for joint outline of joints"))
 
 		((Vector3r,color,Vector3r(1e-15,1e-15,1e-15),,"color of generated blocks (random color will be assigned to each sub-block if a color is not specified)"))
-		//((double*, array_a,,,"a"))	
+
+		((bool,saveBlockGenData,false,,"Whether to write the data of the block generation in a text file (if true) or display on the terminal (if false)"))
+		((std::string,outputFile,"",,"Filename where the data of the block generation are saved. Leave blank if an output file is not needed"))
+		//((double*, array_a,,,"a"))
 		,
 		/* init */
 		,
 		/* constructor for private */
-		Key			="";
+//		Key			="";
 //		myfile = "./BlkGen"+Key;
 //		output2.open(myfile.c_str(), fstream::app);
 
