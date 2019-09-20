@@ -26,7 +26,7 @@ O.engines=[
 		[Law2_SCG_KnKsPhys_KnKsLaw(label='law',neverErase=False)]
 	),
 	NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,-9.81,0]),
-	PotentialParticleVTKRecorder(fileName='./vtk/cubePPscaled',label='vtkRecorder',twoDimension=False,iterPeriod=10000,sampleX=50,sampleY=50,sampleZ=50,maxDimension=0.2)
+	PotentialParticleVTKRecorder(fileName='./vtk/cubePPscaled',label='vtkRecorder',twoDimension=False,iterPeriod=5000,sampleX=50,sampleY=50,sampleZ=50,maxDimension=0.2)
 ]
 
 
@@ -52,8 +52,8 @@ for s in sp:
 	color=Vector3(random.random(),random.random(),random.random())
 	highlight=False
 	b.shape=PotentialParticle(k=0.2, r=r, R=R, a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[distanceToCentre-r,distanceToCentre-r,distanceToCentre-r,distanceToCentre-r,distanceToCentre-r,distanceToCentre-r], isBoundary=False, color=color, wire=wire, highlight=highlight, minAabb=sqrt(3)*Vector3(distanceToCentre,distanceToCentre,distanceToCentre), maxAabb=sqrt(3)*Vector3(distanceToCentre,distanceToCentre,distanceToCentre), maxAabbRotated=1.02*Vector3(distanceToCentre,distanceToCentre,distanceToCentre), minAabbRotated=1.02*Vector3(distanceToCentre,distanceToCentre,distanceToCentre), AabbMinMax=True, id=count)
-	V=distanceToCentre**3 # (approximate) Volume of cuboid
-	geomInert=(1./6.)*V*distanceToCentre**2 # (approximate) Principal inertia of cuboid to its centroid
+	V=(2*distanceToCentre)**3 # (approximate) Volume of cuboid
+	geomInert=(1./6.)*V*(2*distanceToCentre)**2 # (approximate) Principal inertia of cuboid to its centroid
 	utils._commonBodySetup(b, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=False)
 	b.state.pos = s[0] #s[0] stores center
 	b.state.ori = Quaternion((random.random(),random.random(),random.random()),random.random()) #s[2]
@@ -76,6 +76,7 @@ utils._commonBodySetup(bbb, V, Vector3(geomInert,geomInert,geomInert), material=
 bbb.state.pos = [0,0,0]
 lidID = O.bodies.append(bbb)
 count=count+1
+
 
 b1=Body()
 b1.mask=3
