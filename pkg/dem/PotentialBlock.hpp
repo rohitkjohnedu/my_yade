@@ -8,89 +8,90 @@
 #include <Eigen/LU> 
 #include <Eigen/QR>
 #include <lib/base/openmp-accu.hpp>
+
 namespace yade{
-class PotentialBlock : public Shape
-{
-
+class PotentialBlock : public Shape {
 	public:
-
-		struct Planes{
-			vector<int> vertexID;
-		};
-		struct Vertices{
-			vector<int> edgeID;
-			vector<int> planeID;
-		};
-		struct Edges{
-			vector<int> vertexID;
-		};
+		struct Planes{ vector<int> vertexID; };
+//		struct Vertices{ vector<int> edgeID;  vector<int> planeID; };
+//		struct Edges{ vector<int> vertexID; };
 		
 		void addPlaneStruct();
-		void addVertexStruct();
-		void addEdgeStruct();
+//		void addVertexStruct();
+//		void addEdgeStruct();
 		
-		vector<Planes> planeStruct;	
-		vector<Vertices> vertexStruct;	
-		vector<Edges> edgeStruct;
+		vector<Planes> planeStruct;
+//		vector<Vertices> vertexStruct;
+//		vector<Edges> edgeStruct;
 	
-		Eigen::MatrixXd Amatrix;
-		Eigen::MatrixXd Dmatrix;
+//		Eigen::MatrixXd Amatrix;
+//		Eigen::MatrixXd Dmatrix;
 		virtual ~PotentialBlock ();
 		void postLoad(PotentialBlock&);
-	
+
+		double getDet(const Eigen::MatrixXd A);
+		double getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
+		void calculateVertices();
+		void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
+
+
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialBlock,Shape,"Geometry of PotentialBlock.",
-		((bool, isLining, false,, "boolean whether particle is part of tunnel lining (used in the RockLining.cpp script)"))
-		((double, liningStiffness, pow(10.0,8),, "lining stiffness"))
-		((double, liningFriction, 20.0,, "lining friction"))
-		((double, liningLength, 0.0,, "lining spacing between nodes"))
-		((double, liningTensionGap, 0.0,, "numerical gap between lining and block to allowing tension to be calculated"))
-		((Vector3r, liningNormalPressure, Vector3r(0,0,0),, "normal pressure acting on lining"))
-		((Vector3r, liningTotalPressure, Vector3r(0,0,0),, "total pressure acting on lining"))
-		((bool, isBoundary, false,, "boolean whether the particle is part of a boundary block"))
-			((bool, isEastBoundary, false,Attr::hidden, "boolean used for a case history"))
-		((bool, isBolt, false,, "boolean whether a block is part of a bolt (used in the Rockbolt.cpp script)"))
-		((bool, fixedNormal, false,, "boolean whether to fix the contact normal at a boundary"))
-		((Vector3r, boundaryNormal, Vector3r::Zero(),,"normal direction of boundary"))
-		((bool, AabbMinMax, false,, "aabb"))
-		((Vector3r, minAabb, Vector3r::Zero(),,"min from box centre: Used for visualisation"))
-		((Vector3r, maxAabb, Vector3r::Zero(),,"max from box centre: Used for visualisation"))
-		((Vector3r, minAabbRotated, Vector3r::Zero(),,"updated aabb from box centre"))
-		((Vector3r, maxAabbRotated, Vector3r::Zero(),,"updated aabb from box centre"))
-			((Vector3r, halfSize, Vector3r::Zero(),Attr::hidden,"max from box centre"))
-			((vector<Vector3r>, node, ,Attr::hidden, "(not used)"))
-			((Real, gridVol, ,Attr::hidden, "(not used)"))
-		((Quaternionr, oriAabb, Quaternionr::Identity(),, "original aabb "))
-		((Real, r, 0.1,, "r in Potential Particles"))
-		((Real, R, 1.0,, "R in Potential Particles"))
-		((Real, k, ,, "k in Potential Particles (not used)"))
-		((Real, volume, ,, "volume"))
-		((int, id, -1,, " for graphics"))
-		((bool, erase, false,, " for excavation"))
-		((vector<bool>, intactRock, false,, " property for plane"))
-		((vector<bool>, isBoundaryPlane, ,, "property for plane"))
-			((vector<double>, hwater, ,Attr::hidden, "property for plane (not used), height of pore water"))
-			((vector<double>, JRC, ,Attr::hidden, "property for plane (not used), rock joint"))
-			((vector<double>, JCS, ,Attr::hidden, "property for plane (not used), rock joint"))
-			((vector<double>, asperity, ,Attr::hidden, "property for plane (not used), rock joint"))
-			((vector<double>, sigmaC, ,Attr::hidden,"property for plane (not used), rock joint"))
-		((vector<double>, phi_b, ,, "property for plane, rock joint"))
-		((vector<double>, phi_r, ,, "property for plane, rock joint"))
-		((vector<double>, cohesion, ,, "property for plane, rock joint"))
-		((vector<double>, tension, ,, "property for plane, rock joint"))
-			((vector<double>, lambda0, ,Attr::hidden, "property for plane (not used), heat"))
-		((vector<double>, kn, ,, "property for plane, rock joint"))
-		((vector<double>, ks, ,, "property for plane, rock joint"))
-			((vector<double>, heatCapacity, ,Attr::hidden, "property for plane, rock joint"))
-			((vector<double>, rFactor, ,Attr::hidden, "(not used), individual factor for r"))
-		((vector<Vector3r>, vertices,,,"vertices"))
+		((bool, isLining, false,, "Whether particle is part of tunnel lining (used in the RockLining.cpp script)"))
+		((double, liningStiffness, pow(10.0,8),, "Lining stiffness"))
+		((double, liningFriction, 20.0,, "Lining friction"))
+		((double, liningLength, 0.0,, "Lining spacing between nodes"))
+		((double, liningTensionGap, 0.0,, "Numerical gap between lining and block to allowing tension to be calculated"))
+		((Vector3r, liningNormalPressure, Vector3r(0,0,0),, "Normal pressure acting on lining"))
+		((Vector3r, liningTotalPressure, Vector3r(0,0,0),, "Total pressure acting on lining"))
+		((bool, isBoundary, false,, "Whether the particle is part of a boundary block"))
+			((bool, isEastBoundary, false,Attr::hidden, "Boolean used for a case history"))
+		((bool, isBolt, false,, "Whether a block is part of a bolt (used in the Rockbolt.cpp script)"))
+		((bool, fixedNormal, false,, "Whether to fix the contact normal at a boundary"))
+		((Vector3r, boundaryNormal, Vector3r::Zero(),,"Normal direction of boundary if fixedNormal=True"))
+		((bool, AabbMinMax, false,, "Whether the exact Aabb should be calculated. If false, an approximate cubic Aabb is defined with edges of ``2R``"))
+		((Vector3r, minAabb, Vector3r::Zero(),,"Min from box centre: Used for visualisation in vtk"))
+		((Vector3r, maxAabb, Vector3r::Zero(),,"Max from box centre: Used for visualisation in vtk"))
+//			((Vector3r, minAabbRotated, Vector3r::Zero(),,"(not used: Actually used in the BlockGen, but not needed!) min from box centre"))
+//			((Vector3r, maxAabbRotated, Vector3r::Zero(),,"(not used: Actually used in the BlockGen, but not needed!) max from box centre"))
+//			((Vector3r, halfSize, Vector3r::Zero(),Attr::hidden,"max from box centre"))
+//			((vector<Vector3r>, node, ,Attr::hidden, "(not used)"))
+//			((Real, gridVol, ,Attr::hidden, "(not used)"))
+//			((Quaternionr, oriAabb, Quaternionr::Identity(),, "(not used) original aabb "))
+		((Real, r, 0.0,, "r in Potential Particles"))
+		((Real, R, 0.0,, "R in Potential Particles. If the user does not set a value for R, a default value is calculated as half the distance of the farthest vertices"))
+		((Real, k, 0.0,, "k in Potential Particles (not used)"))
+
+		((Real, volume, ,, "Volume"))
+		((Vector3r, inertia, Vector3r::Zero(),, "Principal inertia tensor"))
+		((Quaternionr, orientation, Quaternionr::Identity(),, "Principal orientation"))
+
+		((int, id, -1,, "Particle id (for graphics in vtk output)"))
+		((bool, erase, false,, "Parameter to mark particles to be removed (for excavation)"))
+		((vector<bool>, intactRock, false,, "Property for plane"))
+			((vector<bool>, isBoundaryPlane, ,Attr::hidden, "Property for plane (not used)"))
+			((vector<double>, hwater, ,Attr::hidden, "Property for plane (not used), height of pore water"))
+			((vector<double>, JRC, ,Attr::hidden, "Property for plane (not used), rock joint"))
+			((vector<double>, JCS, ,Attr::hidden, "Property for plane (not used), rock joint"))
+			((vector<double>, asperity, ,Attr::hidden, "Property for plane (not used), rock joint"))
+			((vector<double>, sigmaC, ,Attr::hidden,"Property for plane (not used), rock joint"))
+		((vector<double>, phi_b, ,, "Property for plane, rock joint"))
+		((vector<double>, phi_r, ,, "Property for plane, rock joint"))
+		((vector<double>, cohesion, ,, "Property for plane, rock joint"))
+		((vector<double>, tension, ,, "Property for plane, rock joint"))
+			((vector<double>, lambda0, ,Attr::hidden, "Property for plane (not used), heat"))
+			((vector<double>, kn, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
+			((vector<double>, ks, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
+			((vector<double>, heatCapacity, ,Attr::hidden, "Property for plane, rock joint"))
+//			((vector<double>, rFactor, ,Attr::hidden, "(not used), individual factor for r"))
+		((vector<Vector3r>, vertices,,,"Vertices"))
 		//((Eigen::MatrixXd , Amatrix, ,, "a "))
 		//((Eigen::MatrixXd , Dmatrix, ,, "b "))
-		((double, waterVolume, ,, "volume of body submerged in water"))
-		((vector<Vector3r>, verticesCD, ,, "vertices"))
-		((vector<double>, a, ,, "list of a of plane normal"))
-		((vector<double>, b, ,, "list of b of plane normal"))
-		((vector<double>, c, ,, "list of c of plane normal"))
-		((vector<double>, d, ,, "list of d of plane normal"))
+//			((double, waterVolume, ,, "volume of body submerged in water"))
+			((vector<Vector3r>, verticesCD, ,, "vertices"))
+		((vector<double>, a, ,, "List of a coefficients of plane normals"))
+		((vector<double>, b, ,, "List of b coefficients of plane normals"))
+		((vector<double>, c, ,, "List of c coefficients of plane normals"))
+		((vector<double>, d, ,, "List of d coefficients of plane equations"))
 		((vector<int>, jointType, ,, "jointType"))
 		,
 		createIndex(); /*ctor*/
@@ -115,7 +116,7 @@ REGISTER_SERIALIZABLE(PotentialBlock);
 #ifdef __cplusplus
 extern "C" {
 #endif
-	 void dgesv_(const int *N, const int *nrhs, double *Hessian, const int *lda, int *ipiv, double *gradient, const int *ldb, int *info);
+	void dgesv_(const int *N, const int *nrhs, double *Hessian, const int *lda, int *ipiv, double *gradient, const int *ldb, int *info);
 	void dsyev_(const char *jobz, const char *uplo, const int *N, double *A, const int *lda, double *W, double *work, int *lwork, int *info);
 #ifdef __cplusplus
 };
