@@ -26,37 +26,33 @@ except OSError as exc:
       raise
    pass
 
-name ='BlockGeneration' # PLEASE CHECK THIS  
+name ='BlockGeneration'
 
 p=BlockGen()
 p.maxRatio = 10000.0;
-p.minSize =7.0;
+p.minSize = 7.0;
 p.density = 2700 # 23.6/9.81*1000.0 	#kg/m3
 p.dampingMomentum = 0.8
-p.damp3DEC = 0.0
 p.viscousDamping = 0.0
-p.Kn = 2.0e8  	#1GPa
-p.Ks= 0.1e8 	#1GPa
+p.Kn = 2.0e8  	#
+p.Ks = 0.1e8 	#
 p.frictionDeg = 50.0 #degrees
 p.traceEnergy = False
 p.defaultDt = 1e-4
-p.rForPP = 0.4 #0.04
-p.kForPP = 0.55
+p.rForPP = 0.2 #0.04
+p.kForPP = 0.0
 p.RForPP = 1800.0
 p.gravity = [0,0,9.81]
-p.inertiaFactor = 1.0
+#p.inertiaFactor = 1.0
 p.initialOverlap = 1e-6 
-p.numberOfGrids = 100
 p.exactRotation = True
-p.shrinkFactor = 1.0
+#p.shrinkFactor = 1.0
 p.boundarySizeXmin = 20.0; #South
 p.boundarySizeXmax = 20.0; #North
 p.boundarySizeYmin = 20.0; #West
 p.boundarySizeYmax = 20; #East 4100
 p.boundarySizeZmin = 0.0; #Up
 p.boundarySizeZmax = 40.0; #Down
-p.extremeDist = 50.5;
-p.subdivisionRatio = 0.05;
 p.persistentPlanes = False
 p.jointProbabilistic = True
 p.opening = False
@@ -66,12 +62,8 @@ p.calJointLength = False
 p.twoDimension = False
 p.unitWidth2D = 9.0
 p.intactRockDegradation = True
-p.calAreaStep = 20.0
-p.useFaceProperties = False
+#p.useFaceProperties = False
 p.neverErase = False # Must be used when tension is on
-p.peakDisplacement = 0.1
-p.brittleLength = 1.0
-p.maxClosure = 0.0003 
 p.sliceBoundaries = True
 p.filenamePersistentPlanes = ''
 p.filenameProbabilistic = './joints/jointC.csv'  #  PLEASE CHEK THIS  
@@ -82,12 +74,16 @@ p.filenameSliceBoundaries = ''
 p.directionA=Vector3(1,0,0)
 p.directionB=Vector3(0,1,0)
 p.directionC=Vector3(0,0,1)
+
+p.saveBlockGenData=True #if True, data of the BlockGen are written in a file; if False, they are displayed on the terminal
+p.outputFile="BlockGen_Output.txt" #if empty, the block generation data are not written at all
+
 p.load()
 O.engines[2].lawDispatcher.functors[0].initialOverlapDistance = p.initialOverlap - 1e-6
 O.engines[2].lawDispatcher.functors[0].allowBreakage = False
 
-O.engines[2].physDispatcher.functors[0].ks_i = 0.1e9
 O.engines[2].physDispatcher.functors[0].kn_i = 2e9
+O.engines[2].physDispatcher.functors[0].ks_i = 0.1e9
 
 from yade import plot
 
@@ -105,6 +101,9 @@ originalPositionE = O.bodies[eastBodyId].state.pos
 originalPositionM = O.bodies[midBodyId].state.pos
 velocityDependency = False
 
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Engines
 O.engines[3].label='integration'
 O.dt = 10.0e-5 #10e-4
 O.engines = O.engines + [PotentialBlockVTKRecorderTunnel(fileName='./vtk/Wedge', iterPeriod=2000, twoDimension=False, sampleX=70, sampleY=70, sampleZ=70, maxDimension=100.0, REC_INTERACTION=True, REC_VELOCITY=True, label='vtkRecorder')]
@@ -113,154 +112,95 @@ O.engines=O.engines+[PyRunner(iterPeriod=200,command='myAddPlotData()')]
 O.engines = O.engines+ [PyRunner(iterPeriod=200,command='goToNextStage2()',label='dispChecker')] 
 
 
-O.step()
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Material
+O.materials.append(FrictMat(young=-1,poisson=-1,density=p.density,frictionAngle=radians(0.0), label='frictionless'))
 
 
-idCountBegin = len(O.bodies)
-count = idCountBegin
-
-# material
-young = 600.0e6 # [N/m^2]
-poisson = 0.6 
-frictionAngle=radians(60.0) # [rad]
-# append geometry and material
-O.materials.append(FrictMat(young=young,poisson=poisson,density=p.density,frictionAngle=frictionAngle, label='frictionless'))
-
-#Bottom Boundary
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Boundary Plates
 thickness = 0.1*p.boundarySizeZmax
-
-bBottom = Body()
 wire=False
-color=[0,0.5,1]
 highlight=False
 kPP = p.kForPP
 rPP = p.rForPP
-length = 2.0*thickness+2*rPP
-RPP = 0.5*p.boundarySizeXmax
-aPP = [1,-1,0,0,0,0]
-bPP = [0,0,1,-1,0,0]
-cPP = [0,0,0,0,1,-1]
-dPP = [p.boundarySizeXmax , p.boundarySizeXmax, p.boundarySizeYmax, p.boundarySizeYmax, thickness, thickness]
-minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
-bBottom.shape=PotentialBlock(k=kPP, r=rPP, R=RPP, a=aPP, b=bPP, c=cPP, d=dPP, id=count, isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(0,0,-1))	
-V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert_X = 1/12*V*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Y = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Z = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
-utils._commonBodySetup(bBottom,V,Vector3(geomInert_X,geomInert_Y,geomInert_Z), material='frictionless',pos= [0,0,p.boundarySizeZmax+rPP+thickness+rPP], fixed=True) 
-bBottom.state.pos = [0,0,p.boundarySizeZmax+rPP+thickness+rPP]
-bBottom.shape.isBoundary=True
-bBottom.shape.volume=V
-O.bodies.append(bBottom)
-count=count+1
 
-
-#Vertical Boundaries
-thickness = 0.1*p.boundarySizeZmax
-
-bSideA = Body()
-wire=False
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Bottom plate
+bbb = Body()
 color=[0,0.5,1]
-highlight=False
-kPP = p.kForPP
-rPP = p.rForPP
-length = 2.0*thickness+2*rPP
-RPP = 0.5*p.boundarySizeXmax
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
 cPP = [0,0,0,0,1,-1]
-dPP = [p.boundarySizeXmax , p.boundarySizeXmax, thickness, thickness, 0.5*p.boundarySizeZmax, 0.5*p.boundarySizeZmax]
-minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
-bSideA.shape=PotentialBlock(k=kPP, r=rPP, R=RPP, a=aPP, b=bPP, c=cPP, d=dPP, id=count, isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(0,-1,0))	
-V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert_X = 1/12*V*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Y = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Z = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
-utils._commonBodySetup(bSideA,V,Vector3(geomInert_X,geomInert_Y,geomInert_Z), material='frictionless',pos= [0,0,p.boundarySizeZmax+rPP+thickness+rPP], fixed=True) 
-bSideA.state.pos = [0,p.boundarySizeYmax+rPP+thickness+rPP,0.5*p.boundarySizeZmax]
-bSideA.shape.isBoundary=True
-bSideA.shape.volume=V
-O.bodies.append(bSideA)
-count=count+1
+dPP = [p.boundarySizeXmax-rPP , p.boundarySizeXmax-rPP, p.boundarySizeYmax-rPP, p.boundarySizeYmax-rPP, thickness-rPP, thickness-rPP]
+minmaxAabb = 1.05*Vector3( dPP[0], dPP[2], dPP[4] )
+bbb.shape=PotentialBlock(k=kPP, r=rPP, R=0.0, a=aPP, b=bPP, c=cPP, d=dPP, id=len(O.bodies), isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(0,0,-1))
+utils._commonBodySetup(bbb,bbb.shape.volume,bbb.shape.inertia,material='frictionless',pos= [0,0,p.boundarySizeZmax+thickness], fixed=True) 
+bbb.state.ori = bbb.shape.orientation
+O.bodies.append(bbb)
 
 
-bSideB = Body()
-wire=False
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Lateral plate A
+bA = Body()
 color=[0,0.5,1]
-highlight=False
-kPP = p.kForPP
-rPP = p.rForPP
-length = 2.0*thickness+2*rPP
-RPP = 0.5*p.boundarySizeXmax
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
 cPP = [0,0,0,0,1,-1]
-dPP = [p.boundarySizeXmax, p.boundarySizeXmax, thickness, thickness, 0.5*p.boundarySizeZmax, 0.5*p.boundarySizeZmax]
-minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
-bSideB.shape=PotentialBlock(k=kPP, r=rPP, R=RPP, a=aPP, b=bPP, c=cPP, d=dPP, id=count, isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(0,1,0))
-V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert_X = 1/12*V*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Y = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Z = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
-utils._commonBodySetup(bSideB,V,Vector3(geomInert_X,geomInert_Y,geomInert_Z), material='frictionless',pos= [0,0,p.boundarySizeZmax+rPP+thickness+rPP], fixed=True) 
-bSideB.state.pos = [0,-p.boundarySizeYmax-rPP-thickness-rPP,0.5*p.boundarySizeZmax]
-bSideB.shape.isBoundary=True
-bSideB.shape.volume=V
-O.bodies.append(bSideB)
-count=count+1
+dPP = [p.boundarySizeXmax-rPP , p.boundarySizeXmax-rPP, thickness-rPP, thickness-rPP, 0.5*p.boundarySizeZmax-rPP, 0.5*p.boundarySizeZmax-rPP]
+minmaxAabb = 1.05*Vector3( dPP[0], dPP[2], dPP[4] )
+bA.shape=PotentialBlock(k=kPP, r=rPP, R=0.0, a=aPP, b=bPP, c=cPP, d=dPP, id=len(O.bodies), isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(0,-1,0))
+utils._commonBodySetup(bA,bA.shape.volume,bA.shape.inertia,material='frictionless',pos= [0,p.boundarySizeYmax+thickness,0.5*p.boundarySizeZmax], fixed=True) 
+bA.state.ori = bA.shape.orientation
+O.bodies.append(bA)
 
 
-bSideC = Body()
-wire=False
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Lateral plate B
+bB = Body()
 color=[0,0.5,1]
-highlight=False
-kPP = p.kForPP
-rPP = p.rForPP
-length = 2.0*thickness+2*rPP
-RPP = 0.5*p.boundarySizeXmax
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
 cPP = [0,0,0,0,1,-1]
-dPP = [thickness, thickness, p.boundarySizeYmax, p.boundarySizeYmax, 0.5*p.boundarySizeZmax, 0.5*p.boundarySizeZmax]
-minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
-bSideC.shape=PotentialBlock(k=kPP, r=rPP, R=RPP, a=aPP, b=bPP, c=cPP, d=dPP, id=count, isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(1,0,0))	
-V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert_X = 1/12*V*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Y = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Z = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
-utils._commonBodySetup(bSideC,V,Vector3(geomInert_X,geomInert_Y,geomInert_Z), material='frictionless',pos= [0,0,p.boundarySizeZmax+rPP+thickness+rPP], fixed=True) 
-bSideC.state.pos = [-p.boundarySizeXmax-rPP-thickness-rPP,0,0.5*p.boundarySizeZmax]
-bSideC.shape.isBoundary=True
-bSideC.shape.volume=V
-O.bodies.append(bSideC)
-count=count+1
+dPP = [p.boundarySizeXmax-rPP, p.boundarySizeXmax-rPP, thickness-rPP, thickness-rPP, 0.5*p.boundarySizeZmax-rPP, 0.5*p.boundarySizeZmax-rPP]
+minmaxAabb = 1.05*Vector3( dPP[0], dPP[2], dPP[4] )
+bB.shape=PotentialBlock(k=kPP, r=rPP, R=0.0, a=aPP, b=bPP, c=cPP, d=dPP, id=len(O.bodies), isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(0,1,0))
+utils._commonBodySetup(bB,bB.shape.volume,bB.shape.inertia,material='frictionless',pos= [0,-p.boundarySizeYmax-thickness,0.5*p.boundarySizeZmax], fixed=True) 
+bB.state.ori = bB.shape.orientation
+O.bodies.append(bB)
 
 
-bSideD = Body()
-wire=False
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Lateral plate C
+bC = Body()
 color=[0,0.5,1]
-highlight=False
-kPP = p.kForPP
-rPP = p.rForPP
-length = 2.0*thickness+2*rPP
-RPP = 0.5*p.boundarySizeXmax
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
 cPP = [0,0,0,0,1,-1]
-dPP = [thickness, thickness, p.boundarySizeYmax, p.boundarySizeYmax, 0.5*p.boundarySizeZmax, 0.5*p.boundarySizeZmax]
-minmaxAabb = Vector3(1.05*(dPP[0]+rPP),1.05*(dPP[2]-rPP),1.05*(dPP[4]+rPP))
-bSideD.shape=PotentialBlock(k=kPP, r=rPP, R=RPP, a=aPP, b=bPP, c=cPP, d=dPP, id=count, isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(-1,0,0))
-V = (2*(thickness+rPP))*(p.boundarySizeXmax+rPP)*(p.boundarySizeYmax)
-geomInert_X = 1/12*V*(p.boundarySizeYmax**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Y = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + (2.0*thickness+2.0*rPP)**2 ) 
-geomInert_Z = 1/12*V*((2.0*p.boundarySizeXmax+2.0*rPP)**2 + p.boundarySizeYmax**2) 
-utils._commonBodySetup(bSideD,V,Vector3(geomInert_X,geomInert_Y,geomInert_Z), material='frictionless',pos= [0,0,p.boundarySizeZmax+rPP+thickness+rPP], fixed=True) 
-bSideD.state.pos = [p.boundarySizeXmax+rPP+thickness+rPP,0,0.5*p.boundarySizeZmax]
-bSideD.shape.isBoundary=True
-bSideD.shape.volume=V
-O.bodies.append(bSideD)
+dPP = [thickness-rPP, thickness-rPP, p.boundarySizeYmax-rPP, p.boundarySizeYmax-rPP, 0.5*p.boundarySizeZmax-rPP, 0.5*p.boundarySizeZmax-rPP]
+minmaxAabb = 1.05*Vector3( dPP[0], dPP[2], dPP[4] )
+bC.shape=PotentialBlock(k=kPP, r=rPP, R=0.0, a=aPP, b=bPP, c=cPP, d=dPP, id=len(O.bodies), isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(1,0,0))
+utils._commonBodySetup(bC,bC.shape.volume,bC.shape.inertia,material='frictionless',pos= [-p.boundarySizeXmax-thickness,0,0.5*p.boundarySizeZmax], fixed=True) 
+bC.state.ori = bC.shape.orientation
+O.bodies.append(bC)
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+# Lateral plate D
+bD = Body()
+color=[0,0.5,1]
+aPP = [1,-1,0,0,0,0]
+bPP = [0,0,1,-1,0,0]
+cPP = [0,0,0,0,1,-1]
+dPP = [thickness-rPP, thickness-rPP, p.boundarySizeYmax-rPP, p.boundarySizeYmax-rPP, 0.5*p.boundarySizeZmax-rPP, 0.5*p.boundarySizeZmax-rPP]
+minmaxAabb = 1.05*Vector3( dPP[0], dPP[2], dPP[4] )
+bD.shape=PotentialBlock(k=kPP, r=rPP, R=0.0, a=aPP, b=bPP, c=cPP, d=dPP, id=len(O.bodies), isBoundary=True, color=color, wire=wire, highlight=highlight, AabbMinMax=True, minAabb=minmaxAabb, maxAabb=minmaxAabb, fixedNormal=True, boundaryNormal=Vector3(-1,0,0))
+utils._commonBodySetup(bD,bD.shape.volume,bD.shape.inertia,material='frictionless',pos= [p.boundarySizeXmax+thickness,0,0.5*p.boundarySizeZmax], fixed=True) 
+bD.state.ori = bD.shape.orientation
+O.bodies.append(bD)
+
+
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def calTimeStep():
 	global minTimeStep
 	mkratio = 99999999.9
@@ -282,6 +222,7 @@ def calTimeStep():
 					O.dt = minTimeStep
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def excavate():
 	for b in O.bodies:
 		if NorthWall(b.state.pos[0],b.state.pos[1],b.state.pos[2]) <0.001:
@@ -290,8 +231,8 @@ def excavate():
 			elif b.isClump == False and b.shape.isBoundary==False:
 				O.bodies.erase(b.id)
 				continue
-	O.bodies.erase(bSideA.id)
-	O.bodies.erase(bSideC.id)
+	O.bodies.erase(bA.id)
+	O.bodies.erase(bC.id)
 
 
 prevDistance = O.bodies[westBodyId].state.pos[0]
@@ -308,19 +249,20 @@ initDispRate = -1.0
 prevDispRate = 0
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def changeKE(newKE):
 	global tolKE
 	tolKE = newKE
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def changeTolDist(newTol):
 	global tolDistance
 	tolDistance = newTol
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 removeDampingBool = False
-
-
 def goToNextStage2():
 	global startCountingBrokenBonds
 	global velocityDependency
@@ -347,7 +289,7 @@ def goToNextStage2():
 	uf = utils.unbalancedForce()
 	if O.iter>500 and removeDampingBool == False:
 		removeDamping()
-		removeDampingBool=True	
+		removeDampingBool=True
 	if O.iter>2000 and SRcounter == 0: # and uf<0.005:
 		print(O.iter)
 		O.pause()
@@ -358,13 +300,14 @@ def goToNextStage2():
 		calTimeStep()
 		excavate()
 		dispChecker.iterPeriod=1
-		SRcounter = 1		
-		O.step()	
-		vtkRecorder.iterPeriod=500		
-		O.run(20000)		
+		SRcounter = 1
+		O.step()
+		vtkRecorder.iterPeriod=500
+		O.run(20000)
 		return
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def SouthWall(x,y,z):
 	Xcentre1 = 0.0 	
 	Ycentre1 = 0.0
@@ -393,6 +336,7 @@ def SouthWall(x,y,z):
 	return plane
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def NorthWall(x,y,z):
 	Xcentre1 = 0.0 	
 	Ycentre1 = 0.0
@@ -421,6 +365,7 @@ def NorthWall(x,y,z):
 	return plane
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def removeDamping():
 	for i in O.interactions:
 		i.phys.viscousDamping = 0.5
@@ -429,6 +374,7 @@ def removeDamping():
 	integration.damping= 0.0
 
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 def myAddPlotData():
 	global westBodyId
 	global midBodyId
@@ -445,14 +391,14 @@ def myAddPlotData():
 	displacementM = (O.bodies[midBodyId].state.pos - originalPositionM).norm()
 	displacementEx = O.bodies[eastBodyId].state.pos[0] - originalPositionE[0]
 	displacementE = (O.bodies[eastBodyId].state.pos - originalPositionE).norm()
-	plot.addData(timeStep=O.iter,timeStep1=O.iter,timeStep2=O.iter,timeStep3=O.iter,timeStep4=O.iter,timeStep5=O.iter,kineticEn=KE,unbalancedForce=uf,waterLevel=waterHeight,boundary_phi=boundaryFriction,displacement=displacementW,displacementWest=displacementW,dispWx=displacementWx,displacementMid=displacementM,dispMx=displacementMx,displacementEast=displacementE,dispEx=displacementEx)
-	
+	plot.addData(timeStep=O.iter,timeStep1=O.iter,timeStep2=O.iter,timeStep3=O.iter,timeStep4=O.iter,timeStep5=O.iter,kineticEn=KE,unbalancedForce=uf, waterLevel=waterHeight,boundary_phi=boundaryFriction,displacement=displacementW,displacementWest=displacementW,dispWx=displacementWx,displacementMid=displacementM, dispMx=displacementMx,displacementEast=displacementE,dispEx=displacementEx)
 
 plot.plots={'timeStep2':('kineticEn'),'timeStep3':(('displacementWest','ro-'),('dispWx','go-')),'timeStep1':(('displacementMid','ro-'),('dispMx','go-')),'timeStep5':(('displacementEast','ro-'),('dispEx','go-')),'timeStep4':('unbalancedForce')} #PLEASE CHECK
 plot.plot() #Uncomment to view plots
 
-from yade import qt
 
+# ----------------------------------------------------------------------------------------------------------------------------------------------- #
+from yade import qt
 try: 
 	v=qt.View()
 	vaxes=True
@@ -471,5 +417,5 @@ O.step()
 #excavate()
 O.step()
 calTimeStep()
-O.run(20000)
+#O.run(20000)
 
