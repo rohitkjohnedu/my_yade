@@ -163,7 +163,7 @@ Since this topic is more involved, it is explained in the *User's manual*.
 Running simulation
 ------------------
 
-As explained below, the loop consists in running defined sequence of engines. Step number can be queried by ``O.iter`` and advancing by one step is done by ``O.step()``. Every step advances *virtual time* by current timestep, ``O.dt``:
+As explained below, the loop consists in running defined sequence of engines. Step number can be queried by ``O.iter`` and advancing by one step is done by ``O.step()``. Every step advances *virtual time* by current timestep, ``O.dt`` that can be directly assigned or, which is usually better, automatically determined by a :yref:`GlobalStiffnessTimeStepper`, if present:
 
 .. ipython::
 
@@ -184,7 +184,7 @@ As explained below, the loop consists in running defined sequence of engines. St
 	1e-4
 
 Normal simulations, however, are run continuously. Starting/stopping the loop is done by ``O.run()`` and ``O.pause()``; note that ``O.run()`` returns control to Python and the simulation runs in background; if you want to wait for it to finish, use ``O.wait()``. Fixed number of steps can be run with ``O.run(1000)``, ``O.run(1000,True)`` will run and wait. To stop at absolute step number, ``O.stopAtIter`` can be set and ``O.run()`` called normally.
-In many cases it is better to let ``O.dt`` be determined automaticaly by a :yref:`GlobalStiffnessTimeStepper`.
+
 .. ipython::
 
 	In [1]: O.run()
@@ -492,7 +492,7 @@ Each of these actions is represented by an :yref:`Engine<Engine>`, functional el
 Engines
 """""""""
 
-Simulation loop, shown at fig. img-yade-iter-loop_, can be described as follows in Python (details will be explained later); each of the ``O.engine`` items is instance of a type deriving from :yref:`Engine`:
+Simulation loop, shown at fig. img-yade-iter-loop_, can be described as follows in Python (details will be explained later); each of the ``O.engines`` items is instance of a type deriving from :yref:`Engine`:
 
 .. code-block:: python
  

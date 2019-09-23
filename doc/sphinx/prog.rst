@@ -968,7 +968,7 @@ Expected parameters are indicated by macro name components separated with unders
 	List of deprecated attribute names. The syntax is ::
 
 		((oldName1,newName1,"Explanation why renamed etc."))
-		((oldName2,newName2,"! Explanation why removed and what to do instaed."))
+		((oldName2,newName2,"! Explanation why removed and what to do instead."))
 
 	This will make accessing ``oldName1`` attribute *from Python* return value of ``newName``, but displaying warning message about the attribute name change, displaying provided explanation. This happens whether the access is read or write.
 
@@ -1010,7 +1010,7 @@ Expected parameters are indicated by macro name components separated with unders
 
 Special python constructors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The Python wrapper automatically create constructor that takes keyword (named) arguments corresponding to instance attributes; those attributes are set to values provided in the constructor. In some cases, more flexibility is desired (such as :yref:`InteractionLoop`, which takes 3 lists of functors). For such cases, you can override the function ``Serializable::pyHandleCustomCtorArgs``, which can arbitrarily modify the new (already existing) instance. It should modify in-place arguments given to it, as they will be passed further down to the routine which sets attribute values. In such cases, you should document the constructor::
+The Python wrapper automatically creates constructor that takes keyword (named) arguments corresponding to instance attributes; those attributes are set to values provided in the constructor. In some cases, more flexibility is desired (such as :yref:`InteractionLoop`, which takes 3 lists of functors). For such cases, you can override the function ``Serializable::pyHandleCustomCtorArgs``, which can arbitrarily modify the new (already existing) instance. It should modify in-place arguments given to it, as they will be passed further down to the routine which sets attribute values. In such cases, you should document the constructor::
 
 	.. admonition:: Special constructor
 
@@ -1996,7 +1996,7 @@ This has the following effects:
 
 #. If file or directory has basename ``OldClassName`` (plus extension), it will be renamed using ``bzr``.
 #. All occurences of whole word ``OldClassName`` will be replaced by ``NewClassName`` in c++ sources.
-#. An extry is added to :ysrc:`py/system.py`, which contains map of deprecated class names. At yade startup, proxy class with ``OldClassName`` will be created, which issues a ``DeprecationWarning`` when being instantiated, informing you of the new name you should use; it creates an instance of ``NewClassName``, hence not disruting your script's functioning::
+#. An entry is added to :ysrc:`py/system.py`, which contains map of deprecated class names. At yade startup, proxy class with ``OldClassName`` will be created, which issues a ``DeprecationWarning`` when being instantiated, informing you of the new name you should use; it creates an instance of ``NewClassName``, hence not disruting your script's functioning::
 
 	Yade [3]: SimpleViscoelasticMat()
 	/usr/local/lib/yade-trunk/py/yade/__init__.py:1: DeprecationWarning: Class `SimpleViscoelasticMat' was renamed to (or replaced by) `ViscElMat', update your code! (you can run 'yade --update script.py' to do that automatically)
