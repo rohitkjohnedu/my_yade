@@ -43,13 +43,14 @@ if (vertices.size()==0) { // i.e. if the particle is not initialised
 	/* Add a structure containing the vertices associated with each plane*/
 	for (int i=0; i<planeNo; i++){ addPlaneStruct(); }
 
+
 	// Calculate vertices
 	calculateVertices();
 
 	/* Calculate R as half the distance of the farthest vertices, if user hasn't set a positive value for R. */
 	/* A reminder that R in the Potential Blocks is meant to represent a reference length, used to calculate the initial bisection search employed to identify points on the particle surfaces. Here, R does not affect the curvature of the faces, like in the Potetial Particles code. The faces of a Potential Block are always flat. */
 	/* Although half the distance of the farthest particles is in no case the circumradius, we just need a value around this order of magnitude for the bisection search code to run smoothly */
-	if (R==0.0) {
+	if (R==0.0 and vertices.size()>0) {
 		Real maxDistance=0.0;
 		for (unsigned int i=0; i<vertices.size()-1;i++){
 			for (unsigned int j=i+1; i<vertices.size();i++){
@@ -60,7 +61,12 @@ if (vertices.size()==0) { // i.e. if the particle is not initialised
 		if (maxDistance>0.0) {
 			R = maxDistance/2.;
 		}
+		if (R==0) { std::cout<<"R must be positive. Incorrect automatic calculation from the vertices."<<endl;}
+
 	}
+
+	assert(R>0.0);
+
 
 	// Calculate geometric properties: volume, centroid, inertia, principal orientation (inertia is calculated after the particle is centered to its centroid)
 	Vector3r centr = Vector3r::Zero();
