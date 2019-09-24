@@ -22,7 +22,7 @@ void PotentialBlock::addPlaneStruct()    { planeStruct.push_back(Planes());    }
 void PotentialBlock::postLoad(PotentialBlock& )
 {
 
-if (vertices.size()==0) { // i.e. if the particle is not initialised
+if (vertices.empty()) { // i.e. if the particle is not initialised
 
 	int planeNo = a.size();
 
@@ -43,14 +43,13 @@ if (vertices.size()==0) { // i.e. if the particle is not initialised
 	/* Add a structure containing the vertices associated with each plane*/
 	for (int i=0; i<planeNo; i++){ addPlaneStruct(); }
 
-
 	// Calculate vertices
 	calculateVertices();
 
 	/* Calculate R as half the distance of the farthest vertices, if user hasn't set a positive value for R. */
 	/* A reminder that R in the Potential Blocks is meant to represent a reference length, used to calculate the initial bisection search employed to identify points on the particle surfaces. Here, R does not affect the curvature of the faces, like in the Potetial Particles code. The faces of a Potential Block are always flat. */
 	/* Although half the distance of the farthest particles is in no case the circumradius, we just need a value around this order of magnitude for the bisection search code to run smoothly */
-	if (R==0.0 and vertices.size()>0) {
+	if (R==0.0 and ( not vertices.empty() )) {
 		Real maxDistance=0.0;
 		for (unsigned int i=0; i<vertices.size()-1;i++){
 			for (unsigned int j=i+1; i<vertices.size();i++){
@@ -62,7 +61,6 @@ if (vertices.size()==0) { // i.e. if the particle is not initialised
 			R = maxDistance/2.;
 		}
 		if (R==0) { std::cout<<"R must be positive. Incorrect automatic calculation from the vertices."<<endl;}
-
 	}
 
 	assert(R>0.0);
@@ -101,7 +99,7 @@ if (vertices.size()==0) { // i.e. if the particle is not initialised
 		if( fabs(Iyz) < pow(10,-15) ){Iyz = 0.0;}
 		if( fabs(Ixz) < pow(10,-15) ){Ixz = 0.0;}
 
-		char jobz = 'V'; char uplo = 'L'; int N=3; double A[9]; int lda=3; double eigenValues[3]; double work[102]; int lwork = 102; int info = 0; 
+		char jobz = 'V'; char uplo = 'L'; int N=3; std::vector<double> A (9); int lda=3; std::vector<double> eigenValues (3); std::vector<double> work (102); int lwork = 102; int info = 0; 
 		A[0] = Ixx; A[1] =-Ixy; A[2] =-Ixz;
 		A[3] =-Ixy; A[4] = Iyy; A[5] =-Iyz;
 		A[6] =-Ixz; A[7] =-Iyz; A[8] = Izz;
@@ -182,7 +180,7 @@ double PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, con
 
 
 void PotentialBlock::calculateVertices() {
-	double D[3]; double Ax[9]; Eigen::Matrix3d Aplanes;
+	std::vector<double> D (3); std::vector<double> Ax (9); Eigen::Matrix3d Aplanes;
 	double Distance;
 	Real vertCount=0; Real minDistance;
 	int planeNo = a.size();
@@ -211,8 +209,8 @@ void PotentialBlock::calculateVertices() {
 
 				if(fabs(detAplanes)>pow(10,-15) ){ //if (parallel == false) {
 
-					int ipiv[3];  int bColNo=1; int info=0; /* LU */ int three =3;
-					dgesv_( &three, &bColNo, Ax, &three, ipiv, D, &three, &info);
+					std::vector<int> ipiv (3);  int bColNo=1; int info=0; /* LU */ int three =3;
+					dgesv_( &three, &bColNo, Ax.data(), &three, ipiv.data(), D.data(), &three, &info);
 
 					if (info!=0){
 						//std::cout<<"linear algebra error"<<endl;
@@ -270,7 +268,7 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 
 	vector<Vector3r> verticesOnPlane; vector<Vector3r> oriVerticesOnPlane;
 	for (unsigned int j=0; j<a.size(); j++){
-		if(verticesOnPlane.size()>0){ verticesOnPlane.clear(); oriVerticesOnPlane.clear(); }
+		if(not verticesOnPlane.empty()){ verticesOnPlane.clear(); oriVerticesOnPlane.clear(); }
 		for (unsigned int i=0; i<vertices.size();i++){
 			Vector3r vertex = vertices[i]; /*local coordinates*/
 			double plane = a[j]*vertex.x() + b[j]*vertex.y() + c[j]*vertex.z() - d[j] - r;
@@ -288,7 +286,7 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 				oriVerticesOnPlane.push_back(vertex);
 			}
 		}
-		if(verticesOnPlane.size() == 0 ){continue;}
+		if(verticesOnPlane.empty()){continue;}
 
 		/* REORDER VERTICES counterclockwise positive*/
 		vector<Vector3r> orderedVerticesOnPlane; vector<Vector3r> oriOrderedVerticesOnPlane;
