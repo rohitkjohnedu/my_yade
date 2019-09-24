@@ -266,21 +266,28 @@ if(ENABLE_USEFUL_ERRORS)
   # Notes:
   #  -Wfloat-conversion warning: you have to select the int(…) conversion policy: std::floor(…), std::ceil(…), std::round(…), e.g. with int(std::ceil(11.9999999999999993))
 
-  SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized -Wno-error=comment")
-  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
-    SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cast-function-type")
-    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 9.0)
-      SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=deprecated-copy")
+  # g++ ver < 10 ; all workarounds are for g++ < ver.10; When version 10 appears I hope that there will be fewer warnigs to disable. This 'IF' is to trigger the re-evealuation when g++ v.10 appears.
+  IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10.0 )
+    SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized -Wno-error=comment")
+    # g++ ver >= 8
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
+      SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cast-function-type")
+      # g++ ver >= 9
+      IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 9.0)
+        SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=deprecated-copy")
+      ENDIF()
     ENDIF()
-  ENDIF()
-  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.0)
-    SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wshadow=compatible-local")
-    IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
-      SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=int-in-bool-context")
-    ENDIF()
-    IF((${EIGEN3_MAJOR_VERSION} EQUAL 3) AND ( (${EIGEN3_MINOR_VERSION} LESS 4) OR (${EIGEN3_MINOR_VERSION} EQUAL 4)))
-      # eigen <= 3.3.4, ubuntu 16.04 xenial and 18.04 bionic
-      SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=shadow=compatible-local")
+    # g++ ver >= 7
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.0)
+      # g++ ver < 8
+      IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
+        SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=int-in-bool-context")
+      ENDIF()
+      # g++ ver >= 7 and eigen > 3.3.4
+      IF(NOT ((${EIGEN3_MAJOR_VERSION} EQUAL 3) AND ( (${EIGEN3_MINOR_VERSION} LESS 4) OR (${EIGEN3_MINOR_VERSION} EQUAL 4))))
+        # eigen > 3.3.4, (newer than ubuntu 16.04 xenial or 18.04 bionic)
+        SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wshadow=compatible-local")
+      ENDIF()
     ENDIF()
   ENDIF()
   IF((${EIGEN3_MAJOR_VERSION} LESS 2) OR (${EIGEN3_MAJOR_VERSION} EQUAL 2))
