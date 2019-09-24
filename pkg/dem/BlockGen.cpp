@@ -1302,7 +1302,7 @@ bool BlockGen::generate(string& /*message*/)
 			std::cout << "Redundancy progress.... block no: " << i+1 << "/"<<blk.size() << endl;
 		}
 
-		if(blk[i].subMembers.size()>0){
+		if(not blk[i].subMembers.empty()){
 			for(unsigned int j=0; j<blk[i].subMembers.size();j++){
 				/* Adjust block centroid, after every discontinuity is introduced */
 					Vector3r startingPt = blk[i].subMembers[j].centre; //centroid
@@ -1510,7 +1510,7 @@ bool BlockGen::generate(string& /*message*/)
 			std::cout << "Generating progress.... block no: " << i+1 << "/" << blk.size() << endl;
 		}
 		
-		if(blk[i].subMembers.size()>0){
+		if(not blk[i].subMembers.empty()){
 			//#if 0
 			shared_ptr<Body> clumpBody=shared_ptr<Body>(new Body());
 			shared_ptr<Clump> clump=shared_ptr<Clump>(new Clump());
@@ -1716,7 +1716,7 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 	body->state->mass = blockVol*density;  //blockVol
 	pBlock->volume = blockVol;
 
-	char jobz = 'V'; char uplo = 'L'; int N=3; double A[9]; int lda=3; double eigenValues[3]; double work[102]; int lwork = 102; int info = 0; 
+	char jobz = 'V'; char uplo = 'L'; int N=3; std::vector<double> A (9); int lda=3; std::vector<double> eigenValues (3); std::vector<double> work(102); int lwork = 102; int info = 0; 
 	A[0] = Ixx; A[1] =-Ixy; A[2] =-Ixz;
 	A[3] =-Ixy; A[4] = Iyy; A[5] =-Iyz;
 	A[6] =-Ixz; A[7] =-Iyz; A[8] = Izz;
@@ -1900,7 +1900,7 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 //std::cout<<"beforeVertices"<<endl;
 
 	/* find vertices */
-	double D[3]; double Ax[9]; Eigen::Matrix3d Aplanes;
+	std::vector<double> D (3); std::vector<double> Ax (9); Eigen::Matrix3d Aplanes;
 	double Distance;
 	Real vertCount=0; Real minDistance;
 
@@ -1931,8 +1931,8 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 
 				if(fabs(det)>pow(10,-15) ){
 
-					int ipiv[3];  int bColNo=1; int info2=0; /* LU */ int three =3;
-					dgesv_( &three, &bColNo, Ax, &three, ipiv, D, &three, &info2);
+					std::vector<int> ipiv (3);  int bColNo=1; int info2=0; /* LU */ int three =3;
+					dgesv_( &three, &bColNo, Ax.data(), &three, ipiv.data(), D.data(), &three, &info2);
 					if (info2!=0){
 						//std::cout<<"linear algebra error"<<endl;
 					}else{
@@ -2169,7 +2169,7 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 	vector<Vector3r> vertices;
 	Vector3r pointInside = Vector3r(0,0,0);
 	double totalVolume=0;
-	double D[3]; double Ax[9]; Eigen::Matrix3d Aplanes; Vector3r centroid(0,0,0);
+	std::vector<double> D (3); std::vector<double> Ax (9); Eigen::Matrix3d Aplanes; Vector3r centroid(0,0,0);
 	double Distance;
 	Real vertCount=0; Real minDistance;
 	int planeNo = block.a.size();
@@ -2199,8 +2199,8 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 
 				if(fabs(det)>pow(10,-15) ){
 				//if (parallel == false){
-					int ipiv[3];  int bColNo=1; int info=0; /* LU */ int three =3;
-					dgesv_( &three, &bColNo, Ax, &three, ipiv, D, &three, &info);
+					std::vector<int> ipiv(3);  int bColNo=1; int info=0; /* LU */ int three =3;
+					dgesv_( &three, &bColNo, Ax.data(), &three, ipiv.data(), D.data(), &three, &info);
 					if (info!=0){
 						//std::cout<<"linear algebra error"<<endl;
 					}else{
@@ -2237,7 +2237,7 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 
 	  vector<Vector3r> verticesOnPlane; vector<Vector3r> oriVerticesOnPlane;
 	  for (unsigned int j=0; j<block.a.size(); j++){
-		if(verticesOnPlane.size()>0){
+		if(not verticesOnPlane.empty()){
 			verticesOnPlane.clear(); oriVerticesOnPlane.clear();
 		}
 		for (unsigned int i=0; i<vertices.size();i++){
@@ -2260,7 +2260,7 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 				oriVerticesOnPlane.push_back(vertex);
 			}
 		}
-		if(verticesOnPlane.size() == 0 ){continue;}
+		if(verticesOnPlane.empty()){continue;}
 		/* REORDER VERTICES counterclockwise positive*/
 		vector<Vector3r> orderedVerticesOnPlane; vector<Vector3r> oriOrderedVerticesOnPlane;
 		unsigned int h = 0; unsigned int k = 1; unsigned int m =2;
@@ -2271,7 +2271,6 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 		unsigned int counter = 1;
 
 		while(counter<verticesOnPlane.size()){
-				
 				while (m<verticesOnPlane.size()){
 					pt1 = verticesOnPlane[h];
 				 	pt2 = verticesOnPlane[k];
@@ -2284,7 +2283,6 @@ void BlockGen::calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& 
 					/* advance m */
 					m=m+1;
 					while(m==h || m==k){ m=m+1; }
-
 				}
 				//std::cout<<"h: "<<h<<", k :"<<k<<", m: "<<m<<endl;
 				orderedVerticesOnPlane.push_back(pt2);
@@ -2424,7 +2422,7 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 	vector<Vector3r> vertices;
 	Vector3r pointInside = Vector3r(0,0,0);
 	double totalVolume=0;
-	double D[3]; double Ax[9]; Eigen::Matrix3d Aplanes; Vector3r centroid(0,0,0);
+	std::vector<double> D (3); std::vector<double> Ax (9); Eigen::Matrix3d Aplanes; Vector3r centroid(0,0,0);
 	double Distance;
 	Real vertCount=0; Real minDistance;
 	int planeNo = block.a.size();
@@ -2454,8 +2452,8 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 
 				if(fabs(det)>pow(10,-15) ){
 				//if (parallel == false){
-					int ipiv[3];  int bColNo=1; int info=0; /* LU */ int three =3;
-					dgesv_( &three, &bColNo, Ax, &three, ipiv, D, &three, &info);
+					std::vector<int> ipiv (3);  int bColNo=1; int info=0; /* LU */ int three =3;
+					dgesv_( &three, &bColNo, Ax.data(), &three, ipiv.data(), D.data(), &three, &info);
 					if (info!=0){
 						//std::cout<<"linear algebra error"<<endl;
 					}else{
@@ -2493,7 +2491,7 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 
 	  vector<Vector3r> verticesOnPlane; vector<Vector3r> oriVerticesOnPlane;
 	  for (unsigned int j=0; j<block.a.size(); j++){
-		if(verticesOnPlane.size()>0){
+		if(not verticesOnPlane.empty()){
 			verticesOnPlane.clear(); oriVerticesOnPlane.clear();
 		}
 		for (unsigned int i=0; i<vertices.size();i++){
@@ -2516,7 +2514,7 @@ Vector3r BlockGen::calCentroid(struct Block block, double & blockVol){
 				oriVerticesOnPlane.push_back(vertex);
 			}
 		}
-		if(verticesOnPlane.size() == 0 ){continue;}
+		if(verticesOnPlane.empty()){continue;}
 		/* REORDER VERTICES counterclockwise positive*/
 		vector<Vector3r> orderedVerticesOnPlane; vector<Vector3r> oriOrderedVerticesOnPlane;
 		unsigned int h = 0; unsigned int k = 1; unsigned int m =2;
@@ -2656,8 +2654,8 @@ bool BlockGen::contactDetectionLPCLPglobal(struct Discontinuity joint, struct Bl
 	model2.setColumnUpper(2, COIN_DBL_MAX);
 	model2.setColumnUpper(3, COIN_DBL_MAX);
 
-	double rowLower[numberRows];
-	double rowUpper[numberRows];
+	double rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	double rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
 
 	// Rows
 	rowLower[0] = joint.a*joint.centre.x() + joint.b*joint.centre.y() + joint.c*joint.centre.z() + joint.d; //3 plane = 0
@@ -2760,8 +2758,8 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 	model2.setColumnUpper(1, COIN_DBL_MAX);
 	model2.setColumnUpper(2, COIN_DBL_MAX);
 
-	double rowLower[numberRows];
-	double rowUpper[numberRows];
+	double rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	double rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
 
 	// Rows
 	for(int i=0; i<planeNoA; i++  ){
@@ -2963,10 +2961,10 @@ bool BlockGen::checkRedundancyLPCLP(struct Discontinuity joint, struct Block blo
 		       int numberElements = numberRows * numberColumns;
 		       // Arrays will be set to default values
 		      model2.resize(numberRows, numberColumns);
-		      double * elements = new double [numberElements];
+		      double * elements = new double [numberElements]; //TODO: Check whether to replace C array with std::vector<>
 		      CoinBigIndex * starts = new CoinBigIndex [numberColumns+1];
-		      int * rows = new int [numberElements];;
-		      int * lengths = new int[numberColumns];
+		      int * rows = new int [numberElements]; //TODO: Check whether to replace C array with std::vector<>
+		      int * lengths = new int[numberColumns]; //TODO: Check whether to replace C array with std::vector<>
 		       // Now fill in - totally unsafe but ....
 		       double * columnLower = model2.columnLower();
 		       double * columnUpper = model2.columnUpper();
@@ -3074,7 +3072,7 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 	}
 
 	  int NUMCON = planeNoA; 
-	  int NUMVAR = 3/*3D*/ +1;  double xlocalA=0.0; double ylocalA = 0.0; double zlocalA =0.0; Vector3r localA(0,0,0);
+	  int NUMVAR = 3/*3D*/ +1;  double xlocalA = 0.0; double ylocalA = 0.0; double zlocalA = 0.0; Vector3r localA(0,0,0);
 
 	ClpSimplex  model2;
 	  
@@ -3098,11 +3096,11 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 	model2.setColumnUpper(2, COIN_DBL_MAX);
 	model2.setColumnUpper(3, COIN_DBL_MAX);
 
-	double rowLower[numberRows];
-	double rowUpper[numberRows];
+	double rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	double rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
 	if(twoDimension == true){ model2.setColumnLower(1, 0.0);model2.setColumnUpper(1, 0.0);}
 
-	int planeIndex[planeNoA];     
+	int planeIndex[planeNoA]; //TODO: Check whether to replace C array with std::vector<>
 			// Rows
 			int counter = 0;
 			for(unsigned int i=0; i<block.a.size(); i++  ){
