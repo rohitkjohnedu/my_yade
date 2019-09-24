@@ -49,7 +49,7 @@ class PeriodicEngine:  public GlobalEngine {
 		will have been already reached, no action will be called even if an active period has elapsed. \n\n\
 		\
 		If initRun is set (false by default), the engine will run when called for the first time; otherwise it will only \
-		start counting period (realLast etc interal variables) from that point, but without actually running, and will run \
+		start counting period (realLast, etc, interval variables) from that point, but without actually running, and will run \
 		only once a period has elapsed since the initial run. \n\n\
 		\
 		This class should not be used directly; rather, derive your own engine which you want to be run periodically. \n\n\
@@ -62,10 +62,10 @@ class PeriodicEngine:  public GlobalEngine {
 		\
 			PyRunner(realPeriod=5,iterPeriod=10000,command='print O.iter')	\n\n\
 		\
-		will print iteration number every 10000 iterations or every 5 seconds of wall clock time, whiever comes first since it was \
+		will print iteration number every 10000 iterations or every 5 seconds of wall clock time, whichever comes first since it was \
 		last run.",
 		((Real,virtPeriod,((void)"deactivated",0),,"Periodicity criterion using virtual (simulation) time (deactivated if <= 0)"))
-		((Real,realPeriod,((void)"deactivated",0),,"Periodicity criterion using real (wall clock, computation, human) time (deactivated if <=0)"))
+		((Real,realPeriod,((void)"deactivated",0),,"Periodicity criterion using real (wall clock, computation, human) time in seconds (deactivated if <=0)"))
 		((long,iterPeriod,((void)"deactivated",0),,"Periodicity criterion using step number (deactivated if <= 0)"))
 		((long,nDo,((void)"deactivated",-1),,"Limit number of executions by this number (deactivated if negative)"))
 		((bool,initRun,false,,"Run the first time we are called as well."))
