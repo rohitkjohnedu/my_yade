@@ -324,6 +324,8 @@ pages:
     paths:
       - ./deb
     expire_in: 5 day
+  tags:
+    - fast
 
 deb_bullseye:
   <<: *deb_definition
