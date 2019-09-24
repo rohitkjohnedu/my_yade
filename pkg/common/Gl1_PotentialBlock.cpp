@@ -60,8 +60,8 @@
 
 /* New script to visualise the PBs using OPENGL and CGAL */
 
-#ifdef YADE_OPENGL
-
+#ifdef YADE_CGAL
+	#ifdef YADE_OPENGL
 	bool Gl1_PotentialBlock::wire;
 
 	bool initialized;
@@ -73,7 +73,6 @@
 
 	void Gl1_PotentialBlock::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)	{
 
-	#ifdef YADE_CGAL
 		PotentialBlock* pp = static_cast<PotentialBlock*>(cm.get());
 			int shapeId = pp->id;
 
@@ -128,9 +127,9 @@
 			}
 		}
 
-	const vector<Vector3i>& triangles = TM[shapeId].triangles;
-	const vector<Vector3r>& v = VM[shapeId].v;
-	Vector3r centroid = CM[shapeId].c;
+		const vector<Vector3i>& triangles = TM[shapeId].triangles;
+		const vector<Vector3r>& v = VM[shapeId].v;
+		Vector3r centroid = CM[shapeId].c;
 
 		glMaterialv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,Vector3r(pp->color[0],pp->color[1],pp->color[2]));
 		glColor3v(pp->color);
@@ -158,7 +157,7 @@
 			//// Turn off wireframe mode
 			// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-//			glDisable(GL_CULL_FACE);  //FIXME TO BE REVISITED. CULLING FACES CAN SAVE MEMORY.
+			//glDisable(GL_CULL_FACE);  //FIXME TO BE REVISITED. CULLING FACES CAN SAVE MEMORY.
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_LIGHTING);
 
@@ -181,13 +180,10 @@
 			}
 			glEnd();
 		}
-	#endif  // YADE_CGAL
 	}
-
-YADE_PLUGIN((Gl1_PotentialBlock));
-
-#endif  // YADE_OPENGL
-
+	YADE_PLUGIN((Gl1_PotentialBlock));
+	#endif  // YADE_OPENGL
+#endif  // YADE_CGAL
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
