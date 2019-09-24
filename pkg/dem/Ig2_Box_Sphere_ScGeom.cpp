@@ -101,7 +101,7 @@ bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Sh
 		Vector3r cOnBox_box = boxAxisT*cOnBox_boxLocal; // projection of sphere's center on closest box surface - relative to box's origin, but GLOBAL orientation!
 		Vector3r cOnBox_sphere = cOnBox_box-relPos21; // same, but origin in sphere's center
 		depth=s->radius-cOnBox_sphere.norm();
-		if (depth<0 && !c->isReal() && !force) return false;
+		if (-depth>s->radius*(interactionDetectionFactor-1.) && !c->isReal() && !force) return false;
 
 		/*
 		 *  +-----------------------------------+
