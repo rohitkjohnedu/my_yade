@@ -345,7 +345,7 @@ double Ig2_PB_PB_ScGeom::evaluatePhys(const shared_ptr<Shape>& cm1,  const State
 	Real y = localP1.y();
 	Real z = localP1.z();
 	int planeNo = s1->a.size();
-	if (s1->phi_b.size() == 0){ return 0.0; }
+	if (s1->phi_b.empty()){ return 0.0; }
 	Real pSum2 = 0.0; int activeNo = 0;  intactRock = true;
 	for (int i=0; i<planeNo; i++){
 		Real plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z - s1->d[i]; 
