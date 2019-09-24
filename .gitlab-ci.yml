@@ -156,36 +156,42 @@ test_16_04:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
   dependencies:
     - make_16_04
+  needs: ["make_16_04"]
 
 test_18_04:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   dependencies:
     - make_18_04
+  needs: ["make_18_04"]
 
 test_stretch:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
   dependencies:
     - make_stretch
+  needs: ["make_stretch"]
 
 test_buster:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
   dependencies:
     - make_buster
+  needs: ["make_buster"]
 
 test_bullseye:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_bullseye
+  needs: ["make_bullseye"]
 
 test_suse15:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
   dependencies:
     - make_suse15
+  needs: ["make_suse15"]
 
 test_18_foam:
   stage: test
@@ -195,6 +201,7 @@ test_18_foam:
     - merge_request
   dependencies:
     - make_18_04
+  needs: ["make_18_04"]
   script:
     - cat /etc/os-release
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
@@ -205,6 +212,7 @@ test_18_04_nogui:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_nogui
   dependencies:
     - make_18_04_nogui
+  needs: ["make_18_04_nogui"]
 
 
 # 3.2. check stage
@@ -223,18 +231,21 @@ check_16_04:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu16.04
   dependencies:
     - make_16_04
+  needs: ["make_16_04"]
 
 check_18_04:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   dependencies:
     - make_18_04
+  needs: ["make_18_04"]
 
 check_stretch:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-stretch
   dependencies:
     - make_stretch
+  needs: ["make_stretch"]
 
 check_buster:
   <<: *check_definition
@@ -245,6 +256,7 @@ check_buster:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
   dependencies:
     - make_buster
+  needs: ["make_buster"]
 
 check_bullseye:
   <<: *check_definition
@@ -252,12 +264,14 @@ check_bullseye:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_bullseye
+  needs: ["make_bullseye"]
 
 check_suse15:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
   dependencies:
     - make_suse15
+  needs: ["make_suse15"]
 
 
 # currently doc is build only on ubuntu 18.04. Without .doc_template. We may fix this later.
@@ -273,6 +287,7 @@ doc_18_04:
     - xvfb-run -s "-screen 0 1600x1200x24" make doc
   dependencies:
     - make_18_04
+  needs: ["make_18_04"]
   artifacts:
     paths:
       - install
@@ -290,6 +305,7 @@ pages:
     - mv install/share/doc/yade-ci/Yade.epub public
   dependencies:
     - doc_18_04
+  needs: ["doc_18_04"]
   artifacts:
     paths:
       - public
