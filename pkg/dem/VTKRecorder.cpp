@@ -41,6 +41,7 @@
 #include<pkg/dem/WirePM.hpp>
 #include<pkg/dem/JointedCohesiveFrictionalPM.hpp>
 #include<pkg/dem/Shop.hpp>
+#include<pkg/dem/Lubrication.hpp>
 #ifdef YADE_LIQMIGRATION
 	#include<pkg/dem/ViscoelasticCapillarPM.hpp>
 #endif
@@ -102,9 +103,10 @@ void VTKRecorder::action(){
 		else if(rec=="liquidcontrol") recActive[REC_LIQ]=true;
 		else if(rec=="bstresses") recActive[REC_BSTRESS]=true;
 		else if(rec=="coordNumber") recActive[REC_COORDNUMBER]=true;
-                else if(rec=="SPH") recActive[REC_SPH]=true;
-                else if(rec=="deform") recActive[REC_DEFORM]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, moments, pericell, liquidcontrol, bstresses). Ignored.");
+        else if(rec=="SPH") recActive[REC_SPH]=true;
+        else if(rec=="deform") recActive[REC_DEFORM]=true;
+        else if(rec=="lubrication") recActive[REC_LUBRICATION]=true;
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, moments, pericell, liquidcontrol, bstresses, lubrication). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -239,7 +241,23 @@ void VTKRecorder::action(){
 	vtkSmartPointer<vtkDoubleArray> spheresNormalStressNorm = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresNormalStressNorm->SetNumberOfComponents(1);
 	spheresNormalStressNorm->SetName("normalStressNorm");
-
+	
+	vtkSmartPointer<vtkDoubleArray> spheresLubricationNormalContactStress = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresLubricationNormalContactStress->SetNumberOfComponents(9);
+	spheresLubricationNormalContactStress->SetName("lubrication_NormalContactStress");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresLubricationShearContactStress = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresLubricationShearContactStress->SetNumberOfComponents(9);
+	spheresLubricationShearContactStress->SetName("lubrication_ShearContactStress");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresLubricationNormalLubricationStress = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresLubricationNormalLubricationStress->SetNumberOfComponents(9);
+	spheresLubricationNormalLubricationStress->SetName("lubrication_NormalLubricationStress");
+	
+	vtkSmartPointer<vtkDoubleArray> spheresLubricationShearLubricationStress = vtkSmartPointer<vtkDoubleArray>::New();
+	spheresLubricationShearLubricationStress->SetNumberOfComponents(9);
+	spheresLubricationShearLubricationStress->SetName("lubrication_ShearLubricationStress");
+    
 	vtkSmartPointer<vtkDoubleArray> spheresMaterialId = vtkSmartPointer<vtkDoubleArray>::New();
 	spheresMaterialId->SetNumberOfComponents(1);
 	spheresMaterialId->SetName("materialId");
@@ -573,7 +591,12 @@ void VTKRecorder::action(){
 	{
 	  Shop::getStressLWForEachBody(bStresses);
 	}
-
+	
+	vector<Matrix3r> NCStresses, SCStresses, NLStresses, SLStresses;
+    if(recActive[REC_LUBRICATION]) {
+        Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(NCStresses, SCStresses, NLStresses, SLStresses);
+    }
+	
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 		if(mask!=0 && !b->maskCompatible(mask)) continue;
@@ -602,9 +625,9 @@ void VTKRecorder::action(){
 				spheresDirI->INSERT_NEXT_TUPLE(dirI);
 				spheresDirII->INSERT_NEXT_TUPLE(dirII);
 				spheresDirIII->INSERT_NEXT_TUPLE(dirIII);
-}
-
-				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId());
+                }
+				
+				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
 			#ifdef THERMAL
@@ -635,10 +658,26 @@ void VTKRecorder::action(){
 					const Vector3r& shear = bodyStates[b->getId()].shearStress;
 					Real n[3] = { (Real)  stress[0], (Real) stress[1], (Real) stress[2] };
 					Real s[3] = { (Real)  shear [0], (Real) shear [1], (Real) shear [2] };
-				spheresNormalStressVec->INSERT_NEXT_TUPLE(n);
-				spheresShearStressVec->INSERT_NEXT_TUPLE(s);
+                    spheresNormalStressVec->INSERT_NEXT_TUPLE(n);
+                    spheresShearStressVec->INSERT_NEXT_TUPLE(s);
 					spheresNormalStressNorm->InsertNextValue(stress.norm());
 				}
+				if(recActive[REC_LUBRICATION]){
+                    const Matrix3r& ncs = NCStresses[b->getId()];
+                    const Matrix3r& scs = SCStresses[b->getId()];
+                    const Matrix3r& nls = NLStresses[b->getId()];
+                    const Matrix3r& sls = SLStresses[b->getId()];
+                    
+                    Real nc[9]={ (Real) ncs(0,0), (Real) ncs(0,1), (Real) ncs(0,2), (Real) ncs(1,0), (Real) ncs(1,1), (Real) ncs(1,2), (Real) ncs(2,0), (Real) ncs(2,1), (Real) ncs(2,2)};
+                    Real sc[9]={ (Real) scs(0,0), (Real) scs(0,1), (Real) scs(0,2), (Real) scs(1,0), (Real) scs(1,1), (Real) scs(1,2), (Real) scs(2,0), (Real) scs(2,1), (Real) scs(2,2)};
+                    Real nl[9]={ (Real) nls(0,0), (Real) nls(0,1), (Real) nls(0,2), (Real) nls(1,0), (Real) nls(1,1), (Real) nls(1,2), (Real) nls(2,0), (Real) nls(2,1), (Real) nls(2,2)};
+                    Real sl[9]={ (Real) sls(0,0), (Real) sls(0,1), (Real) sls(0,2), (Real) sls(1,0), (Real) sls(1,1), (Real) sls(1,2), (Real) sls(2,0), (Real) sls(2,1), (Real) sls(2,2)};
+                    
+                    spheresLubricationNormalContactStress->INSERT_NEXT_TUPLE(nc);
+                    spheresLubricationShearContactStress->INSERT_NEXT_TUPLE(sc);
+                    spheresLubricationNormalLubricationStress->INSERT_NEXT_TUPLE(nl);
+                    spheresLubricationShearLubricationStress->INSERT_NEXT_TUPLE(sl);
+                }				
 				if(recActive[REC_FORCE]){
 					scene->forces.sync();
 					const Vector3r& f = scene->forces.getForce(b->getId());
@@ -896,6 +935,12 @@ void VTKRecorder::action(){
 			spheresUg->GetPointData()->AddArray(spheresShearStressVec);
 			spheresUg->GetPointData()->AddArray(spheresNormalStressNorm);
 		}
+		if(recActive[REC_LUBRICATION]){
+            spheresUg->GetPointData()->AddArray(spheresLubricationNormalContactStress);
+            spheresUg->GetPointData()->AddArray(spheresLubricationShearContactStress);
+            spheresUg->GetPointData()->AddArray(spheresLubricationNormalLubricationStress);
+            spheresUg->GetPointData()->AddArray(spheresLubricationShearLubricationStress);
+        }		
 		if (recActive[REC_FORCE]){
 			spheresUg->GetPointData()->AddArray(spheresForceVec);
 			spheresUg->GetPointData()->AddArray(spheresForceLen);
