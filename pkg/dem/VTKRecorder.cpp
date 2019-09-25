@@ -595,7 +595,7 @@ void VTKRecorder::action(){
     if(recActive[REC_LUBRICATION]) {
         Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(NCStresses, SCStresses, NLStresses, SLStresses);
     }
-	
+    
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
 		if (!b) continue;
 		if(mask!=0 && !b->maskCompatible(mask)) continue;
@@ -626,7 +626,7 @@ void VTKRecorder::action(){
 				spheresDirIII->INSERT_NEXT_TUPLE(dirIII);
                 }
 				
-				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId()); 
+				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId());
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
 			#ifdef THERMAL
