@@ -106,7 +106,7 @@ void VTKRecorder::action(){
         else if(rec=="SPH") recActive[REC_SPH]=true;
         else if(rec=="deform") recActive[REC_DEFORM]=true;
         else if(rec=="lubrication") recActive[REC_LUBRICATION]=true;
-		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, moments, pericell, liquidcontrol, bstresses, lubrication). Ignored.");
+		else LOG_ERROR("Unknown recorder named `"<<rec<<"' (supported are: all, spheres, velocity, facets, boxes, color, stress, cpm, wpm, intr, id, clumpId, materialId, jcfpm, cracks, moments, pericell, liquidcontrol, bstresses). Ignored.");
 	}
 	// cpm needs interactions
 	if(recActive[REC_CPM]) recActive[REC_INTR]=true;
@@ -625,7 +625,7 @@ void VTKRecorder::action(){
 				spheresDirII->INSERT_NEXT_TUPLE(dirII);
 				spheresDirIII->INSERT_NEXT_TUPLE(dirIII);
                 }
-				
+                
 				if (recActive[REC_ID]) spheresId->InsertNextValue(b->getId());
 				if (recActive[REC_MASK]) spheresMask->InsertNextValue(GET_MASK(b));
 				if (recActive[REC_MASS]) spheresMass->InsertNextValue(b->state->mass);
