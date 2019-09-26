@@ -13,6 +13,7 @@
   #include<omp.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
@@ -571,3 +572,6 @@ void InsertionSortCollider::VecBounds::updatePeriodicity(Scene* scene) {
 	assert(axis>=0 && axis <=2);
 	cellDim=scene->cell->getSize()[axis];
 }
+
+} // namespace yade
+

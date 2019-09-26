@@ -22,6 +22,8 @@
 #include <lib/pyutil/numpy_boost.hpp>
 #pragma GCC diagnostic pop
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((TesselationWrapper));
 CREATE_LOGGER(TesselationWrapper);
 
@@ -421,5 +423,7 @@ boost::python::list TesselationWrapper::getAlphaVertices(double alpha)
 	return ret;
 }
 #endif //ALPHASHAPE
+
+} // namespace yade
 
 #endif /* YADE_CGAL */

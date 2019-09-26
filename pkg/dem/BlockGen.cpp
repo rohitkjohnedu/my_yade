@@ -51,6 +51,7 @@
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 CREATE_LOGGER(BlockGen);
 YADE_PLUGIN((BlockGen));
@@ -3158,4 +3159,7 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 //void BlockGen::positionRootBody(shared_ptr<Scene>& /*scene*/)
 //{
 //}
+
+} // namespace yade
+
 #endif // YADE_POTENTIAL_BLOCKS

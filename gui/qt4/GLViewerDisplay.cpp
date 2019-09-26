@@ -30,6 +30,8 @@
 	#include<gl2ps.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 void GLViewer::useDisplayParameters(size_t n){
 	LOG_DEBUG("Loading display parameters from #"<<n);
 	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;
@@ -284,4 +286,5 @@ void GLViewer::postDraw(){
 	}
 }
 
+} // namespace yade
 

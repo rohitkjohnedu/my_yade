@@ -8,6 +8,8 @@
 #include<QObject>
 #include<boost/thread/mutex.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*
 Singleton class managing OpenGL views,
 a renderer instance and timer to refresh the display.
@@ -45,3 +47,6 @@ class OpenGLManager: public QObject{
 	private:
 		boost::mutex viewsMutex;
 };
+
+} // namespace yade
+

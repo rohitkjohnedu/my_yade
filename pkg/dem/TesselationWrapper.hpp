@@ -15,6 +15,8 @@
 #include<lib/triangulation/Tesselation.h>
 #include<pkg/dem/MicroMacroAnalyser.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! \class TesselationWrapper
  * \brief Handle the triangulation of spheres in a scene, build tesselation on request, and give access to computed quantities : currently volume and porosity of each Voronoï sphere.
  * More accessors in course of implementation. Feel free to suggest new ones.
@@ -159,5 +161,7 @@ public:
 };
 REGISTER_SERIALIZABLE(TesselationWrapper);
 //} // namespace CGT
+
+} // namespace yade
 
 #endif /* YADE_CGAL */

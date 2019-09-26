@@ -4,8 +4,10 @@
 #include<pkg/common/Collider.hpp>
 #include<core/Scene.hpp>
 #include<pkg/dem/NewtonIntegrator.hpp>
-class InteractionContainer;
 
+namespace yade { // Cannot have #include directive inside.
+
+class InteractionContainer;
 
 /*! Periodic collider notes.
 
@@ -234,3 +236,6 @@ class InsertionSortCollider: public Collider{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InsertionSortCollider);
+
+} // namespace yade
+

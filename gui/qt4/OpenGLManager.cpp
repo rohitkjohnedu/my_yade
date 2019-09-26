@@ -1,5 +1,7 @@
 #include"OpenGLManager.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(OpenGLManager);
 
 OpenGLManager* OpenGLManager::self=NULL;
@@ -74,3 +76,6 @@ int OpenGLManager::waitForNewView(double timeout,bool center){
 	if(center)(*views.rbegin())->centerScene();
 	return (*views.rbegin())->viewId; 
 }
+
+} // namespace yade
+

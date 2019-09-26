@@ -30,6 +30,8 @@
 	#include<gl2ps.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 void GLViewer::mouseMovesCamera(){
   setWheelBinding(Qt::ShiftModifier , FRAME, ZOOM);
   setWheelBinding(Qt::NoModifier, CAMERA, ZOOM);
@@ -110,4 +112,6 @@ void GLViewer::wheelEvent(QWheelEvent* event){
 	updateGLViewer();
 	/* in draw, bound cutting planes will be moved as well */
 }
+
+} // namespace yade
 

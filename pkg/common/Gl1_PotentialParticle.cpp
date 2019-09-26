@@ -222,6 +222,7 @@ Real Gl1_PotentialParticle::evaluateF(const PotentialParticle& pp, Real x, Real 
 }
 
 YADE_PLUGIN((Gl1_PotentialParticle));
+
 #endif // YADE_OPENGL
 
 

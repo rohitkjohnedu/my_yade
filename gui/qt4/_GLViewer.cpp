@@ -2,11 +2,12 @@
 #include"OpenGLManager.hpp"
 #include<pkg/common/OpenGLRenderer.hpp>
 #include<lib/pyutil/doc_opts.hpp>
+#include<lib/base/Namespaces.hpp>
 
 #include<QApplication>
 #include<QCloseEvent>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
 
 qglviewer::Vec tuple2vec(py::tuple t){ qglviewer::Vec ret; for(int i=0;i<3;i++){py::extract<Real> e(t[i]); if(!e.check()) throw invalid_argument("Element #"+boost::lexical_cast<string>(i)+" is not a number"); ret[i]=e();} return ret;};
 py::tuple vec2tuple(qglviewer::Vec v){return py::make_tuple(v[0],v[1],v[2]);};
