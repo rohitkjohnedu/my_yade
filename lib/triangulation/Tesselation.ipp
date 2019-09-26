@@ -40,12 +40,17 @@ _Tesselation<TT>::_Tesselation ( RTriangulation &T ) : Tri ( &T ), Tes ( &T ), c
 template<class TT>
 _Tesselation<TT>::~_Tesselation ( void )
 {
-	if ( Tri ) Tri->~RTriangulation();
+	if ( Tri ) delete Tri;
 }
 template<class TT>
 void _Tesselation<TT>::Clear ( void )
 {
-	Tri->clear();
+	if (Tri) {
+		delete Tri; 
+		Tri = new RTriangulation; 
+		Tes = Tri;
+	}
+	//Tri->clear();
 	vertexHandles.clear();
 	maxId=0;
 }

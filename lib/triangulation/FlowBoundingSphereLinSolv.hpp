@@ -8,6 +8,7 @@
 #ifdef FLOW_ENGINE
 #pragma once
 
+
 //#define LINSOLV // should be defined at cmake step
 // #define TAUCS_LIB //comment this if TAUCS lib is not available, it will disable PARDISO lib as well
 
@@ -80,7 +81,7 @@ public:
 	bool areCellsOrdered;//true when orderedCells is filled, turn it false after retriangulation
 	bool updatedRHS;
 	struct timeval start, end;
-	
+
 	#ifdef LINSOLV
 	//Eigen's sparse matrix and solver
 	Eigen::SparseMatrix<double> A;
@@ -102,20 +103,34 @@ public:
 	// cholmod direct solver (useSolver=4)
 
 	cholmod_triplet* cholT;
-	cholmod_factor* L; 
-	cholmod_factor* M; 
+	cholmod_factor* L;
+	cholmod_factor* M;
 	cholmod_factor* N;
 	cholmod_sparse* Achol;
 	cholmod_common com;
 	bool factorExists;
-	void add_T_entry(cholmod_triplet* T, long r, long c, double x)
-	{
-		size_t k = T->nnz;
-		((long*)T->i)[k] = r;
-		((long*)T->j)[k] = c;
-		((double*)T->x)[k] = x;
-		T->nnz++;
-	}
+	#ifdef PFV_GPU
+		#define CHOLMOD(name) cholmod_l_ ## name
+		void add_T_entry(cholmod_triplet* T, long r, long c, double x)
+		{
+			size_t k = T->nnz;
+			((long*)T->i)[k] = r;
+			((long*)T->j)[k] = c;
+			((double*)T->x)[k] = x;
+			T->nnz++;
+		}
+	#else
+		#define CHOLMOD(name) cholmod_ ## name
+		void add_T_entry(cholmod_triplet* T, int r, int c, double x)
+		{
+			size_t k = T->nnz;
+			((int*)T->i)[k] = r;
+			((int*)T->j)[k] = c;
+			((double*)T->x)[k] = x;
+			T->nnz++;
+		}
+	#endif
+	void CHOLMOD(wildcard)() {cout << "using cholmod in form of " << __func__ << endl;};
 	#endif
 
 	#ifdef TAUCS_LIB
@@ -125,7 +140,7 @@ public:
 	void* F;//The taucs factor
 	#endif
 
-	
+
 	int T_nnz;
 	int ncols;
 	int T_size;
@@ -190,19 +205,19 @@ public:
 	void augmentConductivityMatrix(Real dt);
 	void setNewCellTemps(bool addToDeltaTemp);
 	void initializeInternalEnergy();
-	
+
 	int taucsSolveTest();
 	int taucsSolve(Real dt);
 	int pardisoSolveTest();
 	int pardisoSolve(Real dt);
 	int eigenSolve(Real dt);
 	int cholmodSolve(Real dt);
-	
+
 	void copyGsToCells();
 	void copyCellsToGs(Real dt);
-	
+
 	void copyLinToCells();
-	void copyCellsToLin(Real dt);
+	virtual void copyCellsToLin(Real dt);
 	void swapFwd (double* v, int i);
 	void swapFwd (int* v, int i);
 	void sortV(int k1, int k2, int* is, double* ds);

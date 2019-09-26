@@ -34,6 +34,7 @@
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 #  USE_QT5: use QT5 for GUI (ON by default)
 #  CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
+#  SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
 #  ENABLE_PYTHON3: enable python 3 compilation instead of python2.7 (OFF by default)
 #  PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system. (-1 by default)
 
@@ -465,7 +466,7 @@ ELSE(ENABLE_GUI)
 ENDIF(ENABLE_GUI)
 #===========================================================
 # This one will cry on attempts to build CGAL-based packages without cgal
-IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL))
+IF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_BLOCKS))
   MESSAGE(STATUS "PFVFLOW, TWOPHASEFLOW and THERMAL depends on CGAL, but CGAL is disabled (not found or turned OFF)")
 ENDIF(NOT ENABLE_CGAL AND (ENABLE_PFVFLOW OR ENABLE_TWOPHASEFLOW OR ENABLE_THERMAL OR ENABLE_POTENTIAL_BLOCKS))
 #===========================================================
@@ -519,6 +520,13 @@ ENDIF(ENABLE_PFVFLOW)
 
 #===========================================================
 IF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
+  IF(DEFINED SUITESPARSEPATH) 
+    set(SUITESPARSE_PREFIX_PATH ${SUITESPARSEPATH})
+    MESSAGE(STATUS "Using custom suitsparse path " ${SUITESPARSE_PREFIX_PATH})
+  ELSE(DEFINED SUITESPARSEPATH)
+    set(SUITESPARSE_PREFIX_PATH /usr)
+    MESSAGE(STATUS "Using typical suitesparse path " ${SUITESPARSE_PREFIX_PATH})
+  ENDIF(DEFINED SUITESPARSEPATH)
   FIND_PACKAGE(Cholmod)
   FIND_PACKAGE(OpenBlas)
   FIND_PACKAGE(Metis)
@@ -526,7 +534,7 @@ IF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
   IF(CHOLMOD_FOUND AND OPENBLAS_FOUND AND METIS_FOUND AND CGAL_FOUND)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CGAL_DEFINITIONS} -DLINSOLV")
 
-    SET(LINKLIBS  "${LINKLIBS};${CHOLMOD_LIBRARIES};${AMD_LIBRARY};${CAMD_LIBRARY};${COLAMD_LIBRARY};${CCOLAMD_LIBRARY};${OPENBLAS_LIBRARY};${METIS_LIBRARY};${SUITESPARSE_LIBRARY}")
+    SET(LINKLIBS  "${LINKLIBS};${CHOLMOD_LIBRARIES};${AMD_LIBRARY};${CAMD_LIBRARY};${COLAMD_LIBRARY};${CCOLAMD_LIBRARY};${OPENBLAS_LIBRARY};${METIS_LIBRARY};${SUITESPARSE_LIBRARY};${SUITESPARSECONFIG_LIBRARY}")
     INCLUDE_DIRECTORIES(${METIS_INCLUDE_DIR} ${CHOLMOD_INCLUDE_DIR} ${BLAS_INCLUDE_DIR})
     MESSAGE(STATUS "Found Cholmod in " ${CHOLMOD_LIBRARIES})
     MESSAGE(STATUS "Found OpenBlas in " ${OPENBLAS_LIBRARY})
