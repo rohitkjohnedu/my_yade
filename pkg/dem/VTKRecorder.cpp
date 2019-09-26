@@ -643,7 +643,14 @@ void VTKRecorder::action(){
 					spheresColors->INSERT_NEXT_TUPLE(c);
 				}
 				if(recActive[REC_VELOCITY]){
-					const Vector3r& vel = b->state->vel;
+					Vector3r vel = Vector3r::Zero();
+                    
+                    if(scene->isPeriodic) { // Take care of cell deformation
+                        vel = scene->cell->bodyFluctuationVel(b->state->pos, b->state->vel, scene->cell->prevVelGrad) + scene->cell->prevVelGrad*scene->cell->wrapShearedPt(b->state->pos);
+                    } else {
+                        vel = b->state->vel;
+                    }
+                    
 					Real v[3] = { (Real) vel[0], (Real) vel[1], (Real) vel[2] };
 				spheresLinVelVec->INSERT_NEXT_TUPLE(v);
 					spheresLinVelLen->InsertNextValue(vel.norm());
