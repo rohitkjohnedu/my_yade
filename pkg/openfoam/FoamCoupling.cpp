@@ -65,7 +65,9 @@ void FoamCoupling::castParticle() {
 	std::fill(procList.begin(), procList.end(), -1); 
 	std::fill(hydroForce.begin(), hydroForce.end(), 1e-50); 
 
+#ifdef YADE_OPENMP
 #pragma omp parallel  for collapse (1)
+#endif
 
 for (unsigned int i=0; i <  bodyList.size(); ++i)
   {
@@ -133,7 +135,9 @@ void FoamCoupling::setHydroForce() {
 
   // clear hydroforce before summation
   
+ #ifdef YADE_OPENMP
  #pragma omp parallel for collapse(1)
+ #endif
     for (unsigned int i=0; i < bodyList.size(); ++i) {
        const Vector3r& fx=Vector3r(hydroForce[6*i], hydroForce[6*i+1], hydroForce[6*i+2]);
        const Vector3r& tx=Vector3r(hydroForce[6*i+3], hydroForce[6*i+4], hydroForce[6*i+5]);

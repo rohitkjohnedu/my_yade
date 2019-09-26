@@ -16,6 +16,7 @@ Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of therma
 
 //#define THERMAL
 #ifdef THERMAL
+#ifdef YADE_OPENMP  
 #pragma once 
 
 #include<core/PartialEngine.hpp>
@@ -150,4 +151,5 @@ class ThermalEngine : public PartialEngine
 REGISTER_SERIALIZABLE(ThermalEngine);
 
 #endif//THERMAL
+#endif//YADE_OPENMP
 

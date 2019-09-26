@@ -57,8 +57,8 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 
 
 //Periodic version, only for non-periodic case at the moment (feel free to implement for the periodic case...)
-void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 #ifdef YADE_OPENMP
+void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide){
 	assert(!periodic);	
 	//assert(v.size()==v.vec.size());
 	if (ompThreads<=1) return insertionSort(v,interactions, scene, doCollide);
@@ -152,8 +152,12 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 			else interactions->insert(shared_ptr<Interaction>(new Interaction(newInteractions[n][k].second,newInteractions[n][k].first)));
 	/// If some bounds traversed more than a half-chunk, we complete colliding with the sequential sort
 	if (parallelFailed) return insertionSort(v,interactions, scene, doCollide);
-#endif
 }
+#else
+void InsertionSortCollider::insertionSortParallel(VecBounds&  , InteractionContainer* , Scene*, bool ){
+	LOG_ERROR("insertionSortParallel does not work without YADE_OPENMP, you need to compile yade with cmake option -DENABLE_OPENMP=ON");
+}
+#endif
 
 
 vector<Body::id_t> InsertionSortCollider::probeBoundingVolume(const Bound& bv){
@@ -299,7 +303,9 @@ void InsertionSortCollider::action(){
 	ISC_CHECKPOINT("bound");
 
 	// copy bounds along given axis into our arrays 
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for schedule(guided) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
+	#endif
 	for(size_t i=0; i<2*nBodies; i++){
 // 		const long cacheIter = scene->iter;
 		for(int j=0; j<3; j++){

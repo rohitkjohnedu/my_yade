@@ -394,7 +394,9 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::copyCellsToLin (Real dt)
 
 
 	// update T_b for cells abutting Pconditions since our Pcondition value might want to change sub remesh
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
 	for (int ii=1;ii<=ncols;ii++){
 		if (controlCavityPressure){
 			T_b[ii-1]=0;
@@ -708,7 +710,9 @@ template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::initializeInternalEnergy() {
    	Tesselation& Tes = T[currentTes];
 	const long sizeCells = Tes.cellHandles.size();
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isFictious && !cell->info().blocked && !cell->info().isCavity){
@@ -772,7 +776,9 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setNewCellTemps(bool addT
 	const long sizeCells = Tes.cellHandles.size();
 	double cavityInternalEnergy = 0;
 	double cavityVolume = 0;
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isFictious && !cell->info().blocked) {
@@ -795,7 +801,9 @@ void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setNewCellTemps(bool addT
 	double cavityTemp;
 	if (controlCavityPressure) {
 		cavityTemp = cavityInternalEnergy/(cavityVolume*fluidCp*fluidRho); //use cavityFluidDensity?
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity) continue;

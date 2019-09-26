@@ -16,7 +16,7 @@ Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of therma
 
 //#define THERMAL
 #ifdef THERMAL
-#ifdef YADE_OPENMP  
+#ifdef YADE_OPENMP
 #include<pkg/pfv/Thermal.hpp>
 #include<core/Scene.hpp>
 #include<core/Omega.hpp>

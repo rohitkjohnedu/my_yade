@@ -125,6 +125,10 @@ void ForceContainer::sync() {
   return;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+// this is to remove warning about manipulating raw memory
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 void ForceContainer::reset(long iter, bool resetAll) {
   memset(&_force [0],0,sizeof(Vector3r)*size);
   memset(&_torque[0],0,sizeof(Vector3r)*size);
@@ -140,6 +144,7 @@ void ForceContainer::reset(long iter, bool resetAll) {
   }
   lastReset=iter;
 }
+#pragma GCC diagnostic pop
 
 void ForceContainer::resize(size_t newSize) {
   _force.resize(newSize,Vector3r::Zero());
@@ -151,7 +156,7 @@ void ForceContainer::resize(size_t newSize) {
   size=newSize;
 }
 
-const int ForceContainer::getNumAllocatedThreads() const {return 1;}
-const bool ForceContainer::getMoveRotUsed() const {return moveRotUsed;}
-const bool ForceContainer::getPermForceUsed() const {return permForceUsed;}
+int ForceContainer::getNumAllocatedThreads() const {return 1;}
+bool ForceContainer::getMoveRotUsed() const {return moveRotUsed;}
+bool ForceContainer::getPermForceUsed() const {return permForceUsed;}
 #endif

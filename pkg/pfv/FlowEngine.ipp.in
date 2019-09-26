@@ -603,9 +603,13 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		else cell->info().dv() += dVol*invDeltaT; // thermalEngine resets dv() to zero and starts adding to it before this.
                 cell->info().volume() = newVol;
 		if (defTolerance>0) { //if the criterion is not used, then we skip these updates a save a LOT of time when Nthreads > 1
+			#ifdef YADE_OPENMP
 			#pragma omp atomic
+			#endif
 			totVol+=cell->info().volumeSign*newVol;
+			#ifdef YADE_OPENMP
 			#pragma omp atomic
+			#endif
                 	totDVol+=dVol;}
         }
 	if (defTolerance>0)  epsVolMax = totDVol/totVol;

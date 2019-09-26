@@ -374,7 +374,9 @@ void FlowBoundingSphere<Tesselation>::computeFacetForcesWithCache(bool onlyCache
 			for (int yy=0;yy<4;yy++) cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy]*cell->info().p();}
 
 		#else
+		#ifdef YADE_OPENMP
 		#pragma omp parallel for num_threads(ompThreads)
+		#endif
 		for (int vn=0; vn<= T[currentTes].maxId; vn++) {
 			if (T[currentTes].vertexHandles[vn]==NULL) continue;
 			VertexHandle& v = T[currentTes].vertexHandles[vn];
@@ -833,7 +835,9 @@ void FlowBoundingSphere<Tesselation>::initializePressure( double pZero )
 	// identify cells incident to alpha vertices and set BCs
 		Tesselation& Tes = T[currentTes];
 		const long sizeCells = Tes.cellHandles.size();
+		#ifdef YADE_OPENMP
 		#pragma omp parallel for
+		#endif
 		for (long i=0; i<sizeCells; i++){
 			CellHandle& cell = Tes.cellHandles[i];
 			for (int j=0;j<4; j++){
@@ -1181,7 +1185,9 @@ double FlowBoundingSphere<Tesselation>::getCavityFlux()
 	//double cavityVolume = 0;
    	Tesselation& Tes = T[currentTes];
 	const long sizeCells = Tes.cellHandles.size();
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity || cell->info().isFictious || cell->info().blocked) continue;  // only measuring cavity flux
@@ -1204,7 +1210,9 @@ void FlowBoundingSphere<Tesselation>::adjustCavityVolumeChange(double dt, int st
 	//double cavityVolume = 0;
    	Tesselation& Tes = T[currentTes];
 	const long sizeCells = Tes.cellHandles.size();
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity || cell->info().isFictious || cell->info().blocked) continue;  // only measuring cavity flux
@@ -1230,7 +1238,9 @@ void FlowBoundingSphere<Tesselation>::adjustCavityPressure(double dt, int stepsS
 	double cavityVolume = 0;
    	Tesselation& Tes = T[currentTes];
 	const long sizeCells = Tes.cellHandles.size();
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity || cell->info().isFictious || cell->info().blocked) continue;  // only measuring cavity flux
@@ -1253,7 +1263,9 @@ void FlowBoundingSphere<Tesselation>::adjustCavityPressure(double dt, int stepsS
 		delP = -(cavityFluidDensity/cavityFluidDensityNew - 1) * 1./equivalentCompressibility;
 		cavityFluidDensity=cavityFluidDensityNew;
 	}
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity || cell->info().isFictious || cell->info().blocked) continue;  // only measuring cavity flux
@@ -1273,7 +1285,9 @@ void FlowBoundingSphere<Tesselation>::adjustCavityCompressibility(double pZero)
 	netCavityFlux = 0;
    	Tesselation& Tes = T[currentTes];
 	const long sizeCells = Tes.cellHandles.size();
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity || cell->info().isFictious || cell->info().blocked) continue;
@@ -1295,7 +1309,9 @@ void FlowBoundingSphere<Tesselation>::adjustCavityCompressibility(double pZero)
 	if (debugOut) cout << "Equivalent compressibility " << equivalentCompressibility << endl;
 
 	if (averageCavityPressure){
+	#ifdef YADE_OPENMP
 	#pragma omp parallel for
+	#endif
     	for (long i=0; i<sizeCells; i++){
 		CellHandle& cell = Tes.cellHandles[i];
 		if (!cell->info().isCavity || cell->info().isFictious || cell->info().blocked) continue;

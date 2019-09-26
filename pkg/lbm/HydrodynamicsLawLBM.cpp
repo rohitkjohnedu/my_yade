@@ -385,7 +385,9 @@ void HydrodynamicsLawLBM::action()
     State* sWallZm=Body::byId(WallZm_id,scene)->state.get();
 
     timingDeltas->checkpoint("Reinit:Nodes0");
+    #ifdef YADE_OPENMP
     #pragma omp parallel for
+    #endif
     for (int nidx=0; nidx<Nx*Ny; nidx++){
         /*------------------------------------------*/
         /* Reinitialization:                        */
@@ -511,7 +513,9 @@ void HydrodynamicsLawLBM::action()
     /*------------------------------------------------------------------*/
     /*------------------ detection of boundary nodes -------------------*/
     /*------------------------------------------------------------------*/
+    #ifdef YADE_OPENMP
     #pragma omp parallel for
+    #endif
     for (int nidx=0; nidx<Nx*Ny; nidx++)
         if(nodes[nidx].isObstacle){
             for(unsigned int n=0;n<nodes[nidx].neighbour_id.size();n++){
@@ -539,7 +543,9 @@ void HydrodynamicsLawLBM::action()
                 }
             }
         }
+     #ifdef YADE_OPENMP
      #pragma omp parallel for
+     #endif
      for (int nidx=0; nidx<Nx*Ny; nidx++)
         if((nodes[nidx].isObstacle)&&(!nodes[nidx].isObstacleBoundary)){
                 nodes[nidx].setAsFluid();
@@ -624,7 +630,9 @@ void HydrodynamicsLawLBM::action()
         /*------------------------------------------------------------------*/
         /*                          Loop on nodes                           */
         /*------------------------------------------------------------------*/
+	#ifdef YADE_OPENMP
         #pragma omp parallel for
+	#endif
         for (int nidx=0; nidx<Nx*Ny; nidx++){
             if(nodes[nidx].checkIsNewObstacle()) {newObstacleCells_couter++;}
             else{if(nodes[nidx].checkIsNewFluid()) {newFluidCells_couter++;}}
@@ -749,7 +757,9 @@ void HydrodynamicsLawLBM::action()
             if(!nodes[nidx].isObstacle)         VmeanFluidC+=c*nodes[nidx].velb.norm();
         }
 
+	#ifdef YADE_OPENMP
         #pragma omp parallel for
+	#endif
         for(unsigned int lid=0;lid<links.size();lid++){
             int nidx1 = links[lid].nid1;
             int nidx2 = links[lid].nid2;
