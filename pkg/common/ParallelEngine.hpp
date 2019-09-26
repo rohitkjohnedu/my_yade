@@ -1,6 +1,8 @@
 #pragma once
 #include<core/GlobalEngine.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class ParallelEngine;
 shared_ptr<ParallelEngine> ParallelEngine_ctor_list(const boost::python::list& slaves);
 
@@ -25,4 +27,5 @@ class ParallelEngine: public Engine {
 };
 REGISTER_SERIALIZABLE(ParallelEngine);
 
+} // namespace yade
 

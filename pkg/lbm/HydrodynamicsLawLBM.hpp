@@ -29,6 +29,7 @@
 #include<pkg/lbm/LBMbody.hpp>
 #include<core/GlobalEngine.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class HydrodynamicsLawLBM : public GlobalEngine
 {
@@ -297,6 +298,8 @@ class HydrodynamicsLawLBM : public GlobalEngine
 
 
 REGISTER_SERIALIZABLE(HydrodynamicsLawLBM);
+
+} // namespace yade
 
 #endif //LBM_ENGINE
 

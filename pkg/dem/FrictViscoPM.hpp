@@ -26,6 +26,8 @@ Remarks:
 #include<pkg/dem/ScGeom.hpp>
 #include<lib/base/openmp-accu.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /** This class holds information associated with each body */
 class FrictViscoMat: public FrictMat {
 	public:
@@ -115,4 +117,5 @@ class Law2_ScGeom_FrictViscoPhys_CundallStrackVisco: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_FrictViscoPhys_CundallStrackVisco);
 
+} // namespace yade
 

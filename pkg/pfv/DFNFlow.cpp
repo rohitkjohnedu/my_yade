@@ -19,6 +19,8 @@
 #ifdef DFNFLOW
 #include "FlowEngine_DFNFlowEngineT.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 class DFNCellInfo : public FlowCellInfo_DFNFlowEngineT
 {
 	public:
@@ -358,6 +360,8 @@ void DFNFlowEngine::trickPermeability(Solver* flow)
 // 		cout<< " The total fracture area computed from the Network is: " << totalFractureArea <<endl;
 // 	 }
 // }
+
+} // namespace yade
 
 #endif //DFNFLOW
 #endif //FLOWENGINE

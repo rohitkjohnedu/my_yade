@@ -26,6 +26,9 @@ its members that are node shaped bodies.
 
 //class NewtonIntegrator;
 
+namespace yade { // Cannot have #include directive inside.
+
+
 class DeformableCohesiveElement: public DeformableElement {
 	public:
 
@@ -79,6 +82,7 @@ class DeformableCohesiveElement: public DeformableElement {
 
 };
 
-// necessary
-using namespace yade;
 REGISTER_SERIALIZABLE(DeformableCohesiveElement);
+
+} // namespace yade
+

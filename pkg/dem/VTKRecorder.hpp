@@ -9,6 +9,7 @@
 	#define YADE_VTK_MULTIBLOCK
 #endif
 
+namespace yade { // Cannot have #include directive inside.
 
 class VTKRecorder: public PeriodicEngine {
 	public:
@@ -104,3 +105,6 @@ class VTKRecorder: public PeriodicEngine {
 };
 
 REGISTER_SERIALIZABLE(VTKRecorder);
+
+} // namespace yade
+

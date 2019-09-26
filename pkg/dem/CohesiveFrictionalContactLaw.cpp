@@ -11,6 +11,8 @@
 #include<core/Omega.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((CohesiveFrictionalContactLaw)(Law2_ScGeom6D_CohFrictPhys_CohesionMoment)(CohFrictMat)(CohFrictPhys)(Ip2_CohFrictMat_CohFrictMat_CohFrictPhys));
 CREATE_LOGGER(Law2_ScGeom6D_CohFrictPhys_CohesionMoment);
 
@@ -309,4 +311,6 @@ void Ip2_CohFrictMat_CohFrictMat_CohFrictPhys::go(const shared_ptr<Material>& b1
 		}
 	}
 };
+
+} // namespace yade
 

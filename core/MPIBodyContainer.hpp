@@ -9,6 +9,8 @@
 #include <lib/base/Logging.hpp>
 #include <mpi.h>
 
+namespace yade { // Cannot have #include directive inside.
+
 class MPIBodyContainer :  public Serializable{
 
   public:
@@ -88,3 +90,6 @@ class MPIBodyContainer :  public Serializable{
   DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(MPIBodyContainer);
+
+} // namespace yade
+

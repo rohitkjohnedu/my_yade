@@ -9,6 +9,8 @@
 //FIXME: handle that a better way
 #define MAX_ID 200000
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT {
 
 using std::cerr;
@@ -1117,3 +1119,6 @@ typename Tesselation::VertexHandle PeriodicTesselation<Tesselation>::insert(Real
 }
 
 } //namespace CGT
+
+} // namespace yade
+

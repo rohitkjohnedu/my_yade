@@ -25,6 +25,7 @@
 #include <ctime>
 #include <cstdlib>
 
+namespace yade { // Cannot have #include directive inside.
 
 
 YADE_PLUGIN((Ig2_PP_PP_ScGeom)
@@ -1301,5 +1302,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 	return ( true );
 }
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

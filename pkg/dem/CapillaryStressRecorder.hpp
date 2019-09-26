@@ -12,6 +12,8 @@
 #include <string>
 #include <fstream>
 
+namespace yade { // Cannot have #include directive inside.
+
 class TriaxialCompressionEngine;
 
 class CapillaryStressRecorder : public Recorder
@@ -27,3 +29,6 @@ class CapillaryStressRecorder : public Recorder
 
 };
 REGISTER_SERIALIZABLE(CapillaryStressRecorder);
+
+} // namespace yade
+

@@ -3,6 +3,7 @@
 #pragma once
 #include<pkg/dem/ScGeom.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class CylScGeom: public ScGeom {
 public:
@@ -55,4 +56,6 @@ public:
     REGISTER_CLASS_INDEX(CylScGeom6D,ScGeom6D);
 };
 REGISTER_SERIALIZABLE(CylScGeom6D);
+
+} // namespace yade
 

@@ -11,6 +11,8 @@
 #include <pkg/common/Dispatching.hpp>
 #include <pkg/fem/DeformableElement.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Bo1_DeformableElement_Aabb : public BoundFunctor
 {
 	public :
@@ -23,4 +25,5 @@ class Bo1_DeformableElement_Aabb : public BoundFunctor
 
 REGISTER_SERIALIZABLE(Bo1_DeformableElement_Aabb);
 
+} // namespace yade
 

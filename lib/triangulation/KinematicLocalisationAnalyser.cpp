@@ -17,6 +17,7 @@
 #include "basicVTKwritter.hpp"
 //#include <utility>
 
+namespace yade { // Cannot have #include directive inside.
 namespace CGT
 {
 
@@ -845,3 +846,5 @@ Real KinematicLocalisationAnalyser::computeMacroPorosity(void)
 }
 
 } // namespace CGT
+} // namespace yade
+

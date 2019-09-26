@@ -9,6 +9,9 @@
 #ifdef YADE_FEM
 #include <pkg/fem/Lin4NodeTetra_Lin4NodeTetra_InteractionElement.hpp>
 #include <pkg/fem/If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat));
 If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat::~If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat(){};
 
@@ -61,4 +64,7 @@ void If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat::go(const shared_ptr<S
 
 	return;
 }
+
+} // namespace yade
+
 #endif //YADE_FEM

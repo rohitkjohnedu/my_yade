@@ -7,6 +7,7 @@
 #include <pkg/common/PeriodicEngines.hpp>
 #include <pkg/common/NormShearPhys.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class PDFEngine : public PeriodicEngine {
 
@@ -115,3 +116,6 @@ private:
 	Real m_P;
     bool (*m_accepter)(shared_ptr<Interaction> const&);
 };
+
+} // namespace yade
+

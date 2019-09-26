@@ -1,6 +1,8 @@
 #include "Tenseur3.h"
 #include "RegularTriangulation.h" 
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT {
 
 Real Tens::Norme2(void)
@@ -306,3 +308,6 @@ operator<<(std::ostream& os, const Tenseur_anti3& T)
 }
 
 } // namespace CGT
+
+} // namespace yade
+

@@ -23,6 +23,8 @@
 #include <iomanip>
 #include <cassert>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Ig2_PB_PB_ScGeom: public IGeomFunctor
 {
 
@@ -111,6 +113,8 @@ extern "C" {
 };
 #endif
 
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS
 

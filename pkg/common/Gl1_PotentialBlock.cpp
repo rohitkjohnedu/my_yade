@@ -58,6 +58,8 @@
 #include <vtkIntArray.h>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 /* New script to visualise the PBs using OPENGL and CGAL */
 
 #ifdef YADE_CGAL
@@ -1271,7 +1273,7 @@ void PotentialBlockVTKRecorder::action(){
 YADE_PLUGIN((PotentialBlockVTKRecorder)(PotentialBlockVTKRecorderTunnel));
 
 
-//YADE_REQUIRE_FEATURE(OPENGL)
+} // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS
 

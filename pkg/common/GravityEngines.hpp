@@ -5,6 +5,8 @@
 #include<core/Interaction.hpp>
 #include<core/Body.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Homogeneous gravity field; applies gravity×mass force on all bodies. */
 class GravityEngine: public FieldApplier{
 	public:
@@ -69,4 +71,6 @@ class HdapsGravityEngine: public GravityEngine{
 	);
 };
 REGISTER_SERIALIZABLE(HdapsGravityEngine);
+
+} // namespace yade
 

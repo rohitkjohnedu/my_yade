@@ -10,6 +10,8 @@
 
 #include<core/FileGenerator.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class ForceRecorder;
 class AveragePositionRecorder;
 class VelocityRecorder;
@@ -123,3 +125,6 @@ class TriaxialTest : public FileGenerator
 };
 
 REGISTER_SERIALIZABLE(TriaxialTest);
+
+} // namespace yade
+

@@ -12,6 +12,8 @@
 
 #include <core/GlobalEngine.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /**
 This law allows one to take into account capillary forces/effects between spheres coming from the presence of interparticular liquid bridges (menisci).
 refs:
@@ -143,5 +145,5 @@ class capillarylaw // class for a whole set of capillary files M(r=..)
 
 REGISTER_SERIALIZABLE(Law2_ScGeom_CapillaryPhys_Capillarity);
 
-
+} // namespace yade
 

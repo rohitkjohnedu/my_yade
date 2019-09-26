@@ -12,6 +12,8 @@
 #include<lib/base/Math.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((NewtonIntegrator));
 CREATE_LOGGER(NewtonIntegrator);
 
@@ -299,3 +301,6 @@ Quaternionr NewtonIntegrator::DotQ(const Vector3r& angVel, const Quaternionr& Q)
 	dotQ.z() = (-Q.y()*angVel[0]+Q.x()*angVel[1]+Q.w()*angVel[2])/2;
 	return dotQ;
 }
+
+} // namespace yade
+

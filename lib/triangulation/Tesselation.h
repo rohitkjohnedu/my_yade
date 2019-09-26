@@ -8,6 +8,8 @@
 #pragma once
 #include "RegularTriangulation.h"
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT {
 	
 //Since template inheritance does not automatically give access to the members of the base class, this macro can be used to declare all members at once. 
@@ -194,10 +196,14 @@ class PeriodicTesselation : public Tesselation
 
 } // namespace CGT
 
+} // namespace yade
+
 #include "Tesselation.ipp"
+
+namespace yade { // Cannot have #include directive inside.
 
 //Explicit instanciation
 typedef CGT::_Tesselation<CGT::SimpleTriangulationTypes>		SimpleTesselation;
 
-
+} // namespace yade
 

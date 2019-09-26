@@ -10,6 +10,8 @@
 
 #include "ThreadWorker.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 class SimulationFlow : public ThreadWorker
 {
 	public:
@@ -17,5 +19,5 @@ class SimulationFlow : public ThreadWorker
 	DECLARE_LOGGER;
 };
 
-
+} // namespace yade
 

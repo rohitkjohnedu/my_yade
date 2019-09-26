@@ -14,6 +14,8 @@
 	#include<pkg/common/GLDrawFunctors.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 /*
 
 L3Geom Ig2 functor cooperation:
@@ -184,4 +186,6 @@ struct Law2_L6Geom_FrictPhys_Linear: public Law2_L3Geom_FrictPhys_ElPerfPl{
 	);
 };
 REGISTER_SERIALIZABLE(Law2_L6Geom_FrictPhys_Linear);
+
+} // namespace yade
 

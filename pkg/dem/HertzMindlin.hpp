@@ -22,6 +22,8 @@ The DMT formulation is also considered (for adhesive particles, rigid and small 
 #include<lib/base/openmp-accu.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 /******************** MindlinPhys *********************************/
 class MindlinPhys: public FrictPhys{
 	public:
@@ -214,3 +216,6 @@ class Ip2_FrictMat_FrictMat_MindlinCapillaryPhys : public IPhysFunctor
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinCapillaryPhys);
+
+} // namespace yade
+

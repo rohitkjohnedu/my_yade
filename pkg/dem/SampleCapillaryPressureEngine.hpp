@@ -15,6 +15,8 @@
 #include<pkg/dem/TriaxialStressController.hpp>
 #include <string>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! \brief Isotropic compression + suction variation test */
 
 class Law2_ScGeom_CapillaryPhys_Capillarity;
@@ -51,6 +53,8 @@ class SampleCapillaryPressureEngine : public TriaxialStressController
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(SampleCapillaryPressureEngine);
+
+} // namespace yade
 
 #endif //  SAMPLECAPILLARYPRESSUREENGINE_HPP
 

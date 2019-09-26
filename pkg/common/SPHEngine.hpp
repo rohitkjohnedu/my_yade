@@ -4,6 +4,8 @@
 #include<core/PartialEngine.hpp>
 #include<pkg/dem/ScGeom.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 typedef Real (* KernelFunction)(const double & r, const double & h);
 
 enum KernFunctions {Lucy=1,BSpline1=2,BSpline2=3};
@@ -37,5 +39,8 @@ KernelFunction returnKernelFunction(const int a, const int b, const typeKernFunc
 KernelFunction returnKernelFunction(const int a, const typeKernFunctions typeF);
 
 bool computeForceSPH(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I, Vector3r & force);
+
+} // namespace yade
+
 #endif
 

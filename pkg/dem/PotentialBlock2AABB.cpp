@@ -5,6 +5,8 @@
 #include<pkg/dem/PotentialBlock.hpp>
 #include<pkg/common/Aabb.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 void PotentialBlock2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*){
 	PotentialBlock* pp = static_cast<PotentialBlock*>(cm.get());
 	if(!bv){ bv=shared_ptr<Bound>(new Aabb); }
@@ -31,4 +33,7 @@ void PotentialBlock2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv,
 }
 
 YADE_PLUGIN((PotentialBlock2AABB));
+
+} // namespace yade
+
 #endif // YADE_POTENTIAL_BLOCKS

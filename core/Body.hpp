@@ -18,6 +18,8 @@
 #include <lib/serialization/Serializable.hpp>
 #include <lib/multimethods/Indexable.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Scene;
 class Interaction;
 
@@ -117,3 +119,6 @@ class Body: public Serializable{
 	);
 };
 REGISTER_SERIALIZABLE(Body);
+
+} // namespace yade
+

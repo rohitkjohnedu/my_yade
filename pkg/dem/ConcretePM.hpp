@@ -54,8 +54,10 @@ There are other classes, which are not strictly necessary:
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
+
 
 /*********************************************************************************
 *
@@ -351,4 +353,6 @@ class CpmStateUpdater: public PeriodicEngine {
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(CpmStateUpdater);
+
+} // namespace yade
 

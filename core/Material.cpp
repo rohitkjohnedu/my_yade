@@ -2,6 +2,8 @@
 #include<core/Material.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 const shared_ptr<Material> Material::byId(int id, Scene* w_){
 	Scene* w=w_?w_:Omega::instance().getScene().get();
 	assert(id>=0 && (size_t)id<w->materials.size());
@@ -24,3 +26,6 @@ int Material::byLabelIndex(const std::string& label, Scene* w_){
 	}
 	throw std::runtime_error(("No material labeled `"+label+"'.").c_str());
 }
+
+} // namespace yade
+

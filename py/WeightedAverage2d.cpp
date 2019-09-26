@@ -1,5 +1,7 @@
 #include<lib/smoothing/WeightedAverage2d.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /* Tell whether point is inside polygon
  *
  * See _utils.cpp: pointInsidePolygon for docs and license.

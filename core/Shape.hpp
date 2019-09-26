@@ -14,6 +14,8 @@
 
 #define BV_FUNCTOR_CACHE
 
+namespace yade { // Cannot have #include directive inside.
+
 class BoundFunctor;
 
 class InternalForceFunctor;
@@ -37,4 +39,6 @@ class Shape: public Serializable, public Indexable {
 	REGISTER_INDEX_COUNTER(Shape);
 };
 REGISTER_SERIALIZABLE(Shape);
+
+} // namespace yade
 

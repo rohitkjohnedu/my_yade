@@ -10,6 +10,8 @@
 
 #include<core/Bound.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Representation of bound by min and max points.
 
 This class is redundant, since it has no data members; don't delete it, though,
@@ -24,3 +26,6 @@ class Aabb : public Bound{
 	REGISTER_CLASS_INDEX(Aabb,Bound);
 };
 REGISTER_SERIALIZABLE(Aabb);
+
+} // namespace yade
+

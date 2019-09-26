@@ -14,6 +14,8 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((OpenGLRenderer)(GlExtraDrawer));
 CREATE_LOGGER(OpenGLRenderer);
 
@@ -410,5 +412,7 @@ void OpenGLRenderer::renderShape(){
 		glPopName();
 	}
 }
+
+} // namespace yade
 
 #endif /* YADE_OPENGL */

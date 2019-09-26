@@ -11,6 +11,8 @@
 #include <cmath>
 #include <algorithm>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((SpatialQuickSortCollider));
 
 void SpatialQuickSortCollider::action()
@@ -79,4 +81,6 @@ void SpatialQuickSortCollider::action()
 		}
 	}
 }
+
+} // namespace yade
 

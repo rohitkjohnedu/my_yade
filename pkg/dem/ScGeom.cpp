@@ -7,6 +7,8 @@
 #include<core/Omega.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((ScGeom)(ScGeom6D)(ChCylGeom6D));
 ScGeom::~ScGeom(){};
 ScGeom6D::~ScGeom6D(){};
@@ -146,3 +148,6 @@ void ScGeom6D::initRotations(const State& state1, const State& state2)
 	bending=Vector3r::Zero();
 	twistCreep=Quaternionr(1.0,0.0,0.0,0.0);
 }
+
+} // namespace yade
+

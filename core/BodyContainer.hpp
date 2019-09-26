@@ -7,6 +7,8 @@
 #include <lib/serialization/Serializable.hpp>
 #include <boost/tuple/tuple.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Body;
 class InteractionContainer;
 
@@ -83,3 +85,6 @@ class BodyContainer: public Serializable{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(BodyContainer);
+
+} // namespace yade
+

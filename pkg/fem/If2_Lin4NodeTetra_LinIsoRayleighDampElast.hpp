@@ -24,6 +24,8 @@
 
 
 
+namespace yade { // Cannot have #include directive inside.
+
 class If2_Lin4NodeTetra_LinIsoRayleighDampElast : public InternalForceFunctor
 {
 	public :
@@ -38,4 +40,5 @@ class If2_Lin4NodeTetra_LinIsoRayleighDampElast : public InternalForceFunctor
 };
 REGISTER_SERIALIZABLE(If2_Lin4NodeTetra_LinIsoRayleighDampElast);
 
+} // namespace yade
 

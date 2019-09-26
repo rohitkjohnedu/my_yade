@@ -5,6 +5,8 @@
 #include<core/InteractionContainer.hpp>
 #include<pkg/common/Aabb.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((UniaxialStrainer));
 /************************ UniaxialStrainer **********************/
 CREATE_LOGGER(UniaxialStrainer);
@@ -138,3 +140,6 @@ void UniaxialStrainer::computeAxialForce(){
 	FOREACH(Body::id_t id, negIds) sumNegForces+=scene->forces.getForce(id)[axis];
 	FOREACH(Body::id_t id, posIds) sumPosForces-=scene->forces.getForce(id)[axis];
 }
+
+} // namespace yade
+

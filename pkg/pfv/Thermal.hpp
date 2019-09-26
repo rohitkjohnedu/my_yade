@@ -34,6 +34,8 @@ Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of therma
 #include<lib/triangulation/Network.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 class ThermalEngine : public PartialEngine
 {
 	public:
@@ -149,6 +151,8 @@ class ThermalEngine : public PartialEngine
 	
 };
 REGISTER_SERIALIZABLE(ThermalEngine);
+
+} // namespace yade
 
 #endif//THERMAL
 #endif//YADE_OPENMP

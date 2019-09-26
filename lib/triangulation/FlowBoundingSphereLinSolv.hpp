@@ -34,6 +34,8 @@ extern "C" {
 
 ///_____ Declaration ____
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT {
 
 template<class _Tesselation, class FlowType=FlowBoundingSphere<_Tesselation> >
@@ -247,6 +249,8 @@ public:
 };
 
 } //namespace CGT
+
+} // namespace yade
 
 
 ///_____ Implementation ____

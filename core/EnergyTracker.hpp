@@ -1,8 +1,9 @@
 #pragma once
 #include<lib/base/openmp-accu.hpp>
 #include<lib/serialization/Serializable.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
 
 class EnergyTracker: public Serializable{
 	public:
@@ -67,3 +68,6 @@ class EnergyTracker: public Serializable{
 	)
 };
 REGISTER_SERIALIZABLE(EnergyTracker);
+
+} // namespace yade
+

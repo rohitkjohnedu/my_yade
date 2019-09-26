@@ -16,6 +16,7 @@
 #include <core/PartialEngine.hpp>
 #include <pkg/fem/DeformableCohesiveElement.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 
 class Lin4NodeTetra_Lin4NodeTetra_InteractionElement: public DeformableCohesiveElement {
@@ -39,6 +40,8 @@ class Lin4NodeTetra_Lin4NodeTetra_InteractionElement: public DeformableCohesiveE
 		REGISTER_CLASS_INDEX(Lin4NodeTetra_Lin4NodeTetra_InteractionElement,DeformableCohesiveElement);
 
 };
-// necessary
-using namespace yade;
+
 REGISTER_SERIALIZABLE(Lin4NodeTetra_Lin4NodeTetra_InteractionElement);
+
+}; // namespace yade
+

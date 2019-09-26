@@ -14,7 +14,7 @@
 #include <core/MPIBodyContainer.hpp>
 #include <mpi4py/mpi4py.h> // for passing MPI_Comm from python to c++
 
-
+namespace yade { // Cannot have #include directive inside.
 
 class Subdomain: public Shape {
 	public:
@@ -304,4 +304,6 @@ class Bo1_Subdomain_Aabb : public BoundFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Bo1_Subdomain_Aabb);
+
+} // namespace yade
 

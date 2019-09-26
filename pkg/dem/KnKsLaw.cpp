@@ -5,6 +5,8 @@
 #include <core/Omega.hpp>
 #include <pkg/dem/PotentialParticle.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Law2_SCG_KnKsPhys_KnKsLaw)(Ip2_FrictMat_FrictMat_KnKsPhys)(KnKsPhys)
 
            );
@@ -307,5 +309,7 @@ void Ip2_FrictMat_FrictMat_KnKsPhys::go(const shared_ptr<Material>& b1, const sh
 CREATE_LOGGER(KnKsPhys);
 /* KnKsPhys */
 KnKsPhys::~KnKsPhys() {}
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

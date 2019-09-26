@@ -11,6 +11,8 @@ Yade Technical Archive. DOI: 10.5281/zenodo.1202039 */
 #include<core/Omega.hpp>
 #include<pkg/common/Sphere.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((JCFpmMat)(JCFpmState)(JCFpmPhys)(Ip2_JCFpmMat_JCFpmMat_JCFpmPhys)(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM));
 
 /********************** Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM ****************************/
@@ -613,3 +615,6 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::distributeCrossSectionsWeibull(shared_ptr<
 }
 
 JCFpmPhys::~JCFpmPhys(){}
+
+} // namespace yade
+

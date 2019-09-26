@@ -7,10 +7,15 @@
 *************************************************************************/
 #ifdef YADE_FEM
 #include <pkg/fem/LinElastMat.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((DeformableElementMaterial)(LinIsoElastMat)(LinIsoRayleighDampElastMat));
 
 DeformableElementMaterial::~DeformableElementMaterial(void){}
 LinIsoElastMat::~LinIsoElastMat(void){}
 LinIsoRayleighDampElastMat::~LinIsoRayleighDampElastMat(void){}
+
+} // namespace yade
 
 #endif //YADE_FEM

@@ -21,6 +21,7 @@ The same data structure is used with different template parameters for periodic 
 Two triangulations are in fact contained in the network, so that a simulation can switch between them and pass data from one to the other. Otherwise, some info would be lost when the problem is retriangulated.
 */
 
+namespace yade { // Cannot have #include directive inside.
 namespace CGT {
 /// Representation of a boundary condition along an axis aligned plane.
 struct Boundary
@@ -121,6 +122,9 @@ class Network
 };
 
 } //namespaceCGT
+
+}; // namespace yade
+
 
 #include "Network.ipp"
 

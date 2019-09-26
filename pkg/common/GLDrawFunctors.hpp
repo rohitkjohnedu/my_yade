@@ -14,6 +14,8 @@
 #include<core/Interaction.hpp>
 #include<core/IPhys.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 #define RENDERS(name) public: virtual string renders() const { return #name;}; FUNCTOR1D(name);
 
 struct GLViewInfo{
@@ -47,4 +49,6 @@ GL_DISPATCHER(GlIPhysDispatcher,GlIPhysFunctor);
 GL_DISPATCHER(GlStateDispatcher,GlStateFunctor);
 #undef GL_FUNCTOR
 #undef GL_DISPATCHER
+
+} // namespace yade
 

@@ -2,6 +2,8 @@
 #pragma once
 #include<core/Material.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Elastic material */
 class ElastMat: public Material{
 	public:
@@ -26,3 +28,6 @@ class FrictMat: public ElastMat{
 	REGISTER_CLASS_INDEX(FrictMat,ElastMat);
 };
 REGISTER_SERIALIZABLE(FrictMat);
+
+} // namespace yade
+

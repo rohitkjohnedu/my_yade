@@ -7,6 +7,8 @@
 #include <core/Body.hpp>
 #include <pkg/common/GLDrawFunctors.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 struct GlExtraDrawer: public Serializable{
 	Scene* scene;
 	virtual void render();
@@ -124,5 +126,5 @@ class OpenGLRenderer : public Serializable
 };
 REGISTER_SERIALIZABLE(OpenGLRenderer);
 
-
+} // namespace yade
 

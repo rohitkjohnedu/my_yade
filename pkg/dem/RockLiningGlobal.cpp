@@ -49,7 +49,7 @@
 
 #include <vtkLineSource.h>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 void RockLiningGlobal::action(){
 	const double PI = 3.14159;
@@ -770,4 +770,7 @@ double f = evaluateFNoSphereVol(s1,state1,intersectionPt);
 }
 
 YADE_PLUGIN((RockLiningGlobal));
+
+} // namespace yade
+
 #endif // YADE_POTENTIAL_BLOCKS

@@ -15,6 +15,8 @@
 // it is necessary for FacetTopologyAnalyzer
 // #define FACET_TOPO
 
+namespace yade { // Cannot have #include directive inside.
+
 class Facet : public Shape {
     public:
 	
@@ -53,4 +55,6 @@ class Facet : public Shape {
 	REGISTER_CLASS_INDEX(Facet,Shape);
 };
 REGISTER_SERIALIZABLE(Facet);
+
+} // namespace yade
 

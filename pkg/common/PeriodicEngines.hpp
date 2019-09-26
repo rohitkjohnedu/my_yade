@@ -6,6 +6,8 @@
 #include<core/Omega.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class PeriodicEngine:  public GlobalEngine {
 	public:
 		static Real getClock(){ timeval tp; gettimeofday(&tp,NULL); return tp.tv_sec+tp.tv_usec/1e6; }
@@ -78,3 +80,6 @@ class PeriodicEngine:  public GlobalEngine {
 	);
 };
 REGISTER_SERIALIZABLE(PeriodicEngine);
+
+} // namespace yade
+

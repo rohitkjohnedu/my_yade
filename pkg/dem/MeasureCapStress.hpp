@@ -4,6 +4,8 @@
 
 #include <pkg/common/PeriodicEngines.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class MeasureCapStress : public PeriodicEngine {
   protected:
     Matrix3r matA_BodyGlob(Real, Real, Vector3r); // particle-scale matrix A (see (3.48) p.65 [Khosravani2014]) describing the orientation of wetted surface, expressed in global axis
@@ -30,3 +32,6 @@ class MeasureCapStress : public PeriodicEngine {
 };
 
 REGISTER_SERIALIZABLE(MeasureCapStress);
+
+} // namespace yade
+

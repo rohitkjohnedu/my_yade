@@ -11,6 +11,8 @@
 #include <core/InteractionContainer.hpp>
 #include <vector>
 
+namespace yade { // Cannot have #include directive inside.
+
 class SpatialQuickSortCollider : public Collider {
     protected:
 
@@ -36,4 +38,5 @@ class SpatialQuickSortCollider : public Collider {
 };
 REGISTER_SERIALIZABLE(SpatialQuickSortCollider);
 
+} // namespace yade
 

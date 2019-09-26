@@ -5,6 +5,8 @@
 #include<pkg/common/PeriodicEngines.hpp>
 #include<lib/pyutil/gil.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class PyRunner: public PeriodicEngine {
 	public :
 		/* virtual bool isActivated: not overridden, PeriodicEngine handles that */
@@ -15,3 +17,6 @@ class PyRunner: public PeriodicEngine {
 	);
 };
 REGISTER_SERIALIZABLE(PyRunner);
+
+} // namespace yade
+

@@ -12,6 +12,8 @@
 #include<lib/serialization/Serializable.hpp>
 #include<lib/multimethods/Indexable.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class LBMlink: public Serializable{
     public:
         void ReinitDynamicalProperties() {
@@ -40,5 +42,7 @@ class LBMlink: public Serializable{
         );
 };
 REGISTER_SERIALIZABLE(LBMlink);
+
+} // namespace yade
 
 #endif //LBM_ENGINE

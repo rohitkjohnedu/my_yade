@@ -14,6 +14,8 @@ Yade Technical Archive. DOI: 10.5281/zenodo.1202039 */
 #include <boost/thread/mutex.hpp>
 #include <random>
 
+namespace yade { // Cannot have #include directive inside.
+
 /** This class holds information associated with each body state*/
 class JCFpmState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(JCFpmState,State,"JCFpm state information about each body.",
@@ -166,3 +168,6 @@ class Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM: public LawFunctor{
 		DECLARE_LOGGER;	
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM);
+
+} // namespace yade
+

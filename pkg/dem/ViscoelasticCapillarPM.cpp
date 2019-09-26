@@ -5,6 +5,8 @@
 #include <core/Scene.hpp>
 #include <pkg/common/Sphere.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((ViscElCapMat)(ViscElCapPhys)(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys)(Law2_ScGeom_ViscElCapPhys_Basic));
 
 /* ViscElCapMat */
@@ -655,3 +657,6 @@ bool LiqControl::addLiqInter(id_t id1, id_t id2, Real liq) {
   return false;
 }
 #endif
+
+} // namespace yade
+

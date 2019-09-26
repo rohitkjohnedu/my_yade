@@ -3,6 +3,8 @@
 
 #include<lib/serialization/Serializable.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Interaction;
 class Body;
 class Scene;
@@ -35,3 +37,6 @@ REGISTER_SERIALIZABLE(IntrCallback);
 	};
 	REGISTER_SERIALIZABLE(BodyCallback);
 #endif
+
+} // namespace yade
+

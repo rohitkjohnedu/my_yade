@@ -5,7 +5,7 @@
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((SpheresFactory)(CircularFactory)(BoxFactory));
 CREATE_LOGGER(SpheresFactory);
@@ -219,3 +219,6 @@ void BoxFactory::pickRandomPosition(Vector3r& c, Real /*r*/){
 	//c=center+q*Vector3r((randomUnit()-.5)*2*(extents[0]-r),(randomUnit()-.5)*2*(extents[1]-r),(randomUnit()-.5)*2*(extents[2]-r));
 	c=center+q*Vector3r((randomUnit()-.5)*2*(extents[0]),(randomUnit()-.5)*2*(extents[1]),(randomUnit()-.5)*2*(extents[2]));
 }
+
+} // namespace yade
+

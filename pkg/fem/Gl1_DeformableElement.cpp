@@ -12,6 +12,8 @@
 #include <pkg/fem/DeformableElement.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 typedef DeformableElement::NodeMap NodeMap;
 void Gl1_DeformableElement::go(const shared_ptr<Shape>& cm, const shared_ptr<State>& ,bool wire,const GLViewInfo&)
 {   
@@ -95,5 +97,8 @@ void Gl1_DeformableElement::go(const shared_ptr<Shape>& cm, const shared_ptr<Sta
 }
 
 YADE_PLUGIN((Gl1_DeformableElement));
+
+} // namespace yade
+
 #endif //YADE_FEM
 #endif /* YADE_OPENGL */

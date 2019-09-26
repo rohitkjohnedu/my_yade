@@ -19,6 +19,8 @@
 #include <lib/opengl/OpenGLWrapper.hpp>
 #include <core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Gl1_Aabb)(Gl1_Box)(Gl1_Facet));
 YADE_PLUGIN((GlBoundFunctor)(GlShapeFunctor)(GlIGeomFunctor)(GlIPhysFunctor)(GlStateFunctor)
             (GlBoundDispatcher)(GlShapeDispatcher)(GlIGeomDispatcher)(GlIPhysDispatcher)
@@ -258,4 +260,7 @@ void Gl1_Sphere::initGlutGlList(){
 		glutSolidSphere(1.0,int(std::round(std::max(quality*glutSlices,(Real)2.))),int(std::round(std::max(quality*glutStacks,(Real)3.))));
 	glEndList();
 }
+
+} // namespace yade
+
 #endif /* YADE_OPENGL */

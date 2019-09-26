@@ -13,6 +13,8 @@
 
 #include <pkg/common/Recorder.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! \brief Record the stress-strain state of a sample in simulations using TriaxialCompressionEngine
 
 	The output is a text file where each line is a record, with the format 
@@ -38,3 +40,6 @@ class TriaxialStateRecorder : public Recorder
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(TriaxialStateRecorder);
+
+} // namespace yade
+

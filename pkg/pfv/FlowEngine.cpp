@@ -13,6 +13,9 @@
 // To register properly, we need to first instantiate an intermediate class, then inherit from it with correct class names in YADE_CLASS macro
 // The intermediate one would be seen with the name "TemplateFlowEngine" by python, thus it would not work when more than one class are derived, they would all
 // be named "TemplateFlowEngine" ...
+
+namespace yade { // Cannot have #include directive inside.
+
 typedef TemplateFlowEngine_FlowEngineT<FlowCellInfo_FlowEngineT,FlowVertexInfo_FlowEngineT> FlowEngineT;
 REGISTER_SERIALIZABLE(FlowEngineT);
 
@@ -32,6 +35,8 @@ REGISTER_SERIALIZABLE(FlowEngine);
 YADE_PLUGIN((FlowEngineT));
 CREATE_LOGGER(FlowEngine );
 YADE_PLUGIN((FlowEngine));
+
+} // namespace yade
 
 #endif //FLOW_ENGINE
 

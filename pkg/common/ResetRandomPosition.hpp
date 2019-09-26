@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+namespace yade { // Cannot have #include directive inside.
+
 /// @brief Produces spheres over the course of a simulation. 
 class ResetRandomPosition : public PeriodicEngine {
 public:
@@ -59,4 +61,5 @@ private:
 };
 REGISTER_SERIALIZABLE(ResetRandomPosition);
 
+} // namespace yade
 

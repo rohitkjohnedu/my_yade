@@ -3,6 +3,8 @@
 #include<core/GlobalEngine.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Scene;
 class ForceResetter: public GlobalEngine{
 	public:
@@ -14,4 +16,5 @@ class ForceResetter: public GlobalEngine{
 };
 REGISTER_SERIALIZABLE(ForceResetter);
 
+} // namespace yade
 

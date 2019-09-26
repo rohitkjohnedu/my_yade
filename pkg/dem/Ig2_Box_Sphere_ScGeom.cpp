@@ -17,7 +17,7 @@
 #include<core/Scene.hpp>
 #include<lib/base/Math.hpp>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 bool Ig2_Box_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c)
 {
@@ -176,3 +176,6 @@ bool Ig2_Box_Sphere_ScGeom6D::goReverse(const shared_ptr<Shape>& cm1, const shar
 }
 
 YADE_PLUGIN((Ig2_Box_Sphere_ScGeom6D));
+
+} // namespace yade
+

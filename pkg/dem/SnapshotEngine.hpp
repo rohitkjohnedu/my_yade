@@ -10,6 +10,8 @@
 #include<gui/qt5/OpenGLManager.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 class SnapshotEngine: public PeriodicEngine {
 	public:
 	virtual void action();
@@ -27,3 +29,6 @@ class SnapshotEngine: public PeriodicEngine {
 };
 
 REGISTER_SERIALIZABLE(SnapshotEngine);
+
+} // namespace yade
+

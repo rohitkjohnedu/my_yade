@@ -10,6 +10,8 @@
 #include<pkg/common/ElastMat.hpp>
 #include<pkg/common/Dispatching.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class CapillaryPhys : public FrictPhys
 {
 	public :
@@ -49,4 +51,6 @@ class Ip2_FrictMat_FrictMat_CapillaryPhys : public IPhysFunctor
 	
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_CapillaryPhys);
+
+} // namespace yade
 

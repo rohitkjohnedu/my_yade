@@ -7,6 +7,7 @@
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/dem/Shop.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 	YADE_PLUGIN((Gl1_NormPhys));
 
@@ -93,5 +94,7 @@
 		gluCylinder(gluQuadric,radius,radius,dist,slices,stacks);
 	glPopMatrix();
 }
+
+} // namespace yade
 
 #endif /* YADE_OPENGL */

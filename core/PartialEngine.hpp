@@ -11,6 +11,8 @@
 #include<core/Engine.hpp>
 #include<core/Body.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class PartialEngine: public Engine{
 	public:
 		virtual ~PartialEngine() {};
@@ -20,4 +22,5 @@ class PartialEngine: public Engine{
 };
 REGISTER_SERIALIZABLE(PartialEngine);
 
+} // namespace yade
 

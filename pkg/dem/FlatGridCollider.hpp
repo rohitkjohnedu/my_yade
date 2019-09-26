@@ -1,5 +1,8 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 #include<pkg/common/Collider.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 class NewtonIntegrator;
 class FlatGridCollider: public Collider{
 	struct Grid{
@@ -43,3 +46,6 @@ class FlatGridCollider: public Collider{
 	);
 };
 REGISTER_SERIALIZABLE(FlatGridCollider);
+
+} // namespace yade
+

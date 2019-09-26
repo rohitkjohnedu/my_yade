@@ -9,6 +9,8 @@
 #include <pkg/common/PeriodicEngines.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 //*********************************************************************************
 /* Polyhedra Splitter */
 class PolyhedraSplitter : public PeriodicEngine{
@@ -58,5 +60,7 @@ class SplitPolyMohrCoulomb : public PolyhedraSplitter{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(SplitPolyMohrCoulomb);
+
+} // namespace yade
 
 #endif // YADE_CGAL

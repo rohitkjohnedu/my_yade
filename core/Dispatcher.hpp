@@ -14,6 +14,7 @@
 #include <core/Omega.hpp>
 #include <lib/multimethods/DynLibDispatcher.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 // real base class for all dispatchers (the other one are templates)
 class Dispatcher: public Engine{
@@ -196,3 +197,7 @@ class Dispatcher2D : public Dispatcher,
 	REGISTER_ATTRIBUTES(Dispatcher,);
 	REGISTER_CLASS_AND_BASE(Dispatcher2D,Dispatcher DynLibDispatcher);
 };
+
+} // namespace yade
+
+

@@ -8,6 +8,8 @@
 #endif
 #include<pkg/common/Aabb.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 Cylinder::~Cylinder(){}
 ChainedCylinder::~ChainedCylinder(){}
 ChainedState::~ChainedState(){}
@@ -877,6 +879,5 @@ bool Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment::go(shared_ptr<IGeom>& ig, sha
     return true;
 }
 
-
-
+} // namespace yade
 

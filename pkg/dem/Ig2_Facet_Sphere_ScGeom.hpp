@@ -14,6 +14,8 @@
 #include<pkg/common/Sphere.hpp>
 #include<pkg/common/Wall.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Ig2_Facet_Sphere_ScGeom : public IGeomFunctor
 {
 	public :
@@ -75,5 +77,5 @@ class Ig2_Wall_Sphere_ScGeom: public IGeomFunctor{
 };
 REGISTER_SERIALIZABLE(Ig2_Wall_Sphere_ScGeom);
 
-
+} // namespace yade
 

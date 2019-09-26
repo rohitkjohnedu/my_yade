@@ -2,8 +2,9 @@
 
 #include<core/TimeStepper.hpp>
 
-class Integrator;
+namespace yade { // Cannot have #include directive inside.
 
+class Integrator;
 
 typedef std::vector<Real> stateVector;// Currently, we are unable to use Eigen library within odeint
 
@@ -109,4 +110,5 @@ class Integrator: public TimeStepper {
 };
 REGISTER_SERIALIZABLE(Integrator);
 
+} // namespace yade
 

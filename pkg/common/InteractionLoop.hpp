@@ -12,6 +12,8 @@
 	#define TIMING_DELTAS_START()
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 class InteractionLoop: public GlobalEngine {
 	bool alreadyWarnedNoCollider;
 	using idPair = std::pair<Body::id_t, Body::id_t>;
@@ -43,3 +45,6 @@ class InteractionLoop: public GlobalEngine {
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InteractionLoop);
+
+} // namespace yade
+

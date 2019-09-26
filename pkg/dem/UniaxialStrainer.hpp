@@ -4,6 +4,8 @@
 #include<pkg/dem/Shop.hpp>
 #include<pkg/common/BoundaryController.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Axial displacing two groups of bodies in the opposite direction with given strain rate.
  *
  * Takes two groups of body IDs (in posIds and negIds) and displaces them at each timestep in the direction given by axis∈{0,1,2} (for axes x,y,z respectively). These bodies automatically have Body::isDynamic==false.
@@ -53,4 +55,5 @@ class UniaxialStrainer: public BoundaryController {
 };
 REGISTER_SERIALIZABLE(UniaxialStrainer);
 
+} // namespace yade
 

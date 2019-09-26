@@ -12,6 +12,8 @@
 #include<core/GlobalEngine.hpp>
 #include<lib/triangulation/KinematicLocalisationAnalyser.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! \brief compute fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing.
 	
  */
@@ -64,5 +66,7 @@ class MicroMacroAnalyser : public GlobalEngine
 };
 
 REGISTER_SERIALIZABLE(MicroMacroAnalyser);
+
+} // namespace yade
 
 #endif /* YADE_CGAL */

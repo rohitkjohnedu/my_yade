@@ -7,6 +7,9 @@
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
+
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(InteractionContainer);
 // begin internal functions
 
@@ -178,3 +181,6 @@ void InteractionContainer::postLoad__calledFromScene(const shared_ptr<BodyContai
 	}
 	interaction.clear();
 }
+
+} // namespace yade
+

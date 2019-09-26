@@ -21,6 +21,8 @@
 #include<pkg/common/Facet.hpp>
 #include<pkg/common/Sphere.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Gl1_Aabb: public GlBoundFunctor{
 	public:
 		virtual void go(const shared_ptr<Bound>&, Scene*);
@@ -86,3 +88,6 @@ class Gl1_Sphere : public GlShapeFunctor{
 };
 
 REGISTER_SERIALIZABLE(Gl1_Sphere);
+
+} // namespace yade
+

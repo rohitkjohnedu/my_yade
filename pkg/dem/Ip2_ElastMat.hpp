@@ -3,6 +3,8 @@
 #include<pkg/common/MatchMaker.hpp>
 #include<pkg/common/ElastMat.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Ip2_ElastMat_ElastMat_NormPhys: public IPhysFunctor{
 	public:
 		virtual void go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction);
@@ -21,4 +23,6 @@ class Ip2_ElastMat_ElastMat_NormShearPhys: public IPhysFunctor{
 	);
 };
 REGISTER_SERIALIZABLE(Ip2_ElastMat_ElastMat_NormShearPhys);
+
+} // namespace yade
 

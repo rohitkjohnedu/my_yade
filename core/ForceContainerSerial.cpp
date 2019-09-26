@@ -1,5 +1,8 @@
 #ifndef YADE_OPENMP
 #include <core/ForceContainer.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 ForceContainer::ForceContainer() {};
 void ForceContainer::ensureSize(Body::id_t id) {
   const Body::id_t idMaxTmp = max(id, _maxId);
@@ -159,4 +162,7 @@ void ForceContainer::resize(size_t newSize) {
 int ForceContainer::getNumAllocatedThreads() const {return 1;}
 bool ForceContainer::getMoveRotUsed() const {return moveRotUsed;}
 bool ForceContainer::getPermForceUsed() const {return permForceUsed;}
+
+} // namespace yade
+
 #endif

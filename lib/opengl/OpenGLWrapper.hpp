@@ -24,6 +24,10 @@
 
 struct OpenGLWrapper {}; // for ctags
 
+//namespace yade { // Does not work with ABI format of freeglut, possibly due to extern "C". OpenGLWrapper must be in top namespace.
+using yade::Vector3r; // FIXME - these casts from Vector3r to double will be wrong when boost::multiprecision and float128 support is added
+using yade::Vector3i;
+
 ///	Primary Templates
 
 template< typename Type > inline void glRotate		( Type, Type, Type,  Type  )	{	STATIC_ASSERT(false);  };
@@ -232,3 +236,6 @@ template< typename Type > inline void glOneFace(Type & t, unsigned int a, unsign
 }
 
 #undef LDOUBL
+
+//} // namespace yade
+

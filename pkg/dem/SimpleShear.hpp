@@ -10,6 +10,7 @@
 
 #include<core/FileGenerator.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 typedef pair<Vector3r, Real> BasicSphere;
 //! make a list of spheres non-overlapping sphere
@@ -49,5 +50,5 @@ class SimpleShear : public FileGenerator
 
 REGISTER_SERIALIZABLE(SimpleShear);
 
-
+} // namespace yade
 

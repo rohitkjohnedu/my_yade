@@ -13,6 +13,8 @@
 #include<lib/multimethods/Indexable.hpp>
 #include<core/Dispatcher.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class IPhys : public Serializable, public Indexable
 {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(IPhys,Serializable,"Physical (material) properties of :yref:`interaction<Interaction>`.",
@@ -24,4 +26,5 @@ class IPhys : public Serializable, public Indexable
 };
 REGISTER_SERIALIZABLE(IPhys);
 
+} // namespace yade
 

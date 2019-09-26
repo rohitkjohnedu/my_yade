@@ -17,6 +17,8 @@
 #include <lib/base/Math.hpp>
 #include <pkg/common/Sphere.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Law2_ScGeom_CapillaryPhys_Capillarity));
 
 CREATE_CPP_LOCAL_LOGGER("Law2_ScGeom_CapillaryPhys_Capillarity.cpp");
@@ -645,4 +647,6 @@ BodiesMenisciiList::BodiesMenisciiList()
 {
 	initialized=false;
 }
+
+} // namespace yade
 

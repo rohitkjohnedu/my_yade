@@ -14,6 +14,8 @@
 #include<boost/iostreams/filter/bzip2.hpp>
 #include<boost/iostreams/device/file.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT {
 
 TriaxialState::TriaxialState(void) : NO_ZERO_ID(false), filter_distance(-0.1), tesselated(false) {}
@@ -320,3 +322,6 @@ bool TriaxialState::to_file(const char* filename, bool bz2)
 }
 
 } // namespace CGT
+
+} // namespace yade
+

@@ -12,8 +12,10 @@
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/dem/ElasticContactLaw.hpp>
 #include<pkg/dem/Lubrication.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
+
 
 class ElectrostaticPhys: public LubricationPhys {
         public:
@@ -72,3 +74,6 @@ class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom_ImplicitLubricationPhys{
 
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ElectrostaticPhys);
+
+} // namespace yade
+

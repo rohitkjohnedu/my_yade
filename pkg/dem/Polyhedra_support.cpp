@@ -9,6 +9,8 @@
 
 #include "Polyhedra.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_CPP_LOCAL_LOGGER("Polyhedra_support.cpp");
 
 //EMPRIRICAL CONSTANTS - ADJUST IF SEGMENTATION FAULT OCCUR, IT IS A PROBLEM OF CGAL. THESE ARE USED TO CHECK CGAL IMPUTS
@@ -809,5 +811,7 @@ shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, const Vector3r dir
 	BP->state->angVel = OrigAngVel;
 	return BP;
 }
+
+} // namespace yade
 
 #endif // YADE_CGAL

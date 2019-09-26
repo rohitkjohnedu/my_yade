@@ -28,6 +28,8 @@
 # define FOREACH BOOST_FOREACH
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 class Scene;
 class ThreadRunner;
 
@@ -111,4 +113,5 @@ class Omega: public Singleton<Omega>{
 	friend class pyOmega;
 };
 
+} // namespace yade
 

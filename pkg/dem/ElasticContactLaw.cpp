@@ -12,6 +12,8 @@
 #include<core/Omega.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Law2_ScGeom_FrictPhys_CundallStrack)(Law2_ScGeom_ViscoFrictPhys_CundallStrack)(ElasticContactLaw));
 
 #if 1
@@ -109,3 +111,6 @@ bool Law2_ScGeom_ViscoFrictPhys_CundallStrack::go(shared_ptr<IGeom>& ig, shared_
 			phys->shearForce -= phys->ks*((phys->shearForce-phys->creepedShear)*dt/viscosity);}
 	return Law2_ScGeom_FrictPhys_CundallStrack::go(ig,ip,contact);
 }
+
+} // namespace yade
+

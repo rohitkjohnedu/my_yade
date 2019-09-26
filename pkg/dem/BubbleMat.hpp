@@ -4,8 +4,10 @@
 #include<core/IPhys.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/common/Dispatching.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
+
 
 
 /********************** BubbleMat ****************************/
@@ -85,3 +87,6 @@ class Law2_ScGeom_BubblePhys_Bubble : public LawFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_BubblePhys_Bubble);
+
+} // namespace yade
+

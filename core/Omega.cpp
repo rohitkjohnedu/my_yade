@@ -22,6 +22,7 @@
 #include <boost/filesystem.hpp>
 #include <cxxabi.h>
 
+namespace yade { // Cannot have #include directive inside.
 
 class RenderMutexLock: public boost::mutex::scoped_lock{
 	public:
@@ -278,3 +279,6 @@ void Omega::saveSimulation(const string& f, bool quiet){
 	}
 	sceneFile=f;
 }
+
+} // namespace yade
+

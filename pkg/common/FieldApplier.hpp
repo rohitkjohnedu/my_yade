@@ -2,6 +2,8 @@
 #include <core/GlobalEngine.hpp>
 #include <stdexcept>
 
+namespace yade { // Cannot have #include directive inside.
+
 class FieldApplier: public GlobalEngine{
 	virtual void action() {
 		throw std::runtime_error("FieldApplier must not be used in simulations directly (FieldApplier::action called).");
@@ -11,4 +13,6 @@ class FieldApplier: public GlobalEngine{
 	);
 };
 REGISTER_SERIALIZABLE(FieldApplier);
+
+} // namespace yade
 

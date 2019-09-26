@@ -22,6 +22,8 @@
 #include "FlowEngine_FlowEngineT.hpp"
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(TriaxialStressController);
 YADE_PLUGIN((TriaxialStressController));
 
@@ -280,4 +282,5 @@ void TriaxialStressController::controlInternalStress ( Real multiplier )
  */
 Real TriaxialStressController::ComputeUnbalancedForce( bool maxUnbalanced) {return Shop::unbalancedForce(maxUnbalanced,scene);}
 
+} // namespace yade
 

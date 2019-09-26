@@ -22,7 +22,7 @@
 #include <pkg/fem/Lin4NodeTetra_Lin4NodeTetra_InteractionElement.hpp>
 #include <pkg/fem/CohesiveMat.hpp>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 class If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat : public InternalForceFunctor
 {
@@ -38,4 +38,5 @@ class If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat : public InternalForc
 };
 REGISTER_SERIALIZABLE(If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat);
 
+} // namespace yade
 

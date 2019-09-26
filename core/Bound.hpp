@@ -12,6 +12,8 @@
 #include<lib/multimethods/Indexable.hpp>
 #include<core/Dispatcher.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Interface for approximate body locations in space
 
 	Note: the min and max members refer to shear coordinates, in periodic
@@ -37,3 +39,6 @@ class Bound: public Serializable, public Indexable{
 	REGISTER_INDEX_COUNTER(Bound);
 };
 REGISTER_SERIALIZABLE(Bound);
+
+} // namespace yade
+

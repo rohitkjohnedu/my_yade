@@ -2,8 +2,9 @@
 #pragma once
 #include <lib/serialization/Serializable.hpp>
 #include <boost/unordered_map.hpp>
+#include <lib/base/Namespaces.hpp>
 
-namespace py = boost::python;
+namespace yade { // Cannot have #include directive inside.
 
 /* Future optimizations, in postLoad:
 
@@ -46,3 +47,6 @@ class MatchMaker: public Serializable {
 		);
 };
 REGISTER_SERIALIZABLE(MatchMaker);
+
+} // namespace yade
+

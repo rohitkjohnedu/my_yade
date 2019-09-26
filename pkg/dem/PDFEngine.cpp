@@ -1,5 +1,7 @@
 #include "PDFEngine.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 void PDFEngine::getSpectrums(vector<PDFEngine::PDF> & pdfs)
 {
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
@@ -233,3 +235,6 @@ bool PDFSpheresIntrsCalculator::addData(const shared_ptr<Interaction>& I, Real c
 	
 	return true;
 }
+
+} // namespace yade
+

@@ -1,5 +1,7 @@
 #include <core/ForceContainer.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(ForceContainer);
 
 void ForceContainer::ensureSynced() {
@@ -258,3 +260,6 @@ void ForceContainer::syncSizesOfContainers() {
   syncedSizes=true;
 }
 #endif
+
+} // namespace yade
+

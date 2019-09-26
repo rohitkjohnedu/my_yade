@@ -12,9 +12,6 @@
 
 #include <boost/math/special_functions/nonfinite_num_facets.hpp>
 
-
-
-
 namespace yade{
 /* Utility template functions for (de)serializing objects using boost::serialization from/to streams or files.
 
@@ -68,4 +65,5 @@ struct ObjectIO{
 	}
 };
 
-}
+} // namespace yade
+

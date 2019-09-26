@@ -8,6 +8,9 @@
 #include<core/State.hpp>
 #include<lib/base/Math.hpp>
 #include<pkg/dem/DemXDofGeom.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 /*! Class representing geometry of two bodies in contact.
  *
  * The code under SCG_SHEAR is experimental and is used only if ElasticContactLaw::useShear is explicitly true
@@ -134,25 +137,5 @@ class ChCylGeom6D: public ScGeom6D {
 };
 REGISTER_SERIALIZABLE(ChCylGeom6D);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+} // namespace yade
 

@@ -11,6 +11,8 @@
 #include<pkg/common/Dispatching.hpp>
 #include<pkg/common/ElastMat.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class MeniscusPhysicalData {
 public:
     double R;
@@ -96,4 +98,6 @@ class Ip2_FrictMat_FrictMat_CapillaryPhys1 : public IPhysFunctor
 	
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_CapillaryPhys1);
+
+} // namespace yade
  

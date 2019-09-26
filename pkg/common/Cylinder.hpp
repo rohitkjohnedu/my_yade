@@ -13,6 +13,8 @@
 #include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
 #include<pkg/common/CylScGeom6D.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Cylinder: public Sphere{
 	public:
 // 		Cylinder(Real _radius, Real _length): length(_length) { /*segment=Vector3r(0,0,1)*_length;*/ radius=_radius; createIndex(); }
@@ -300,3 +302,6 @@ REGISTER_SERIALIZABLE(Law2_ChCylGeom6D_CohFrictPhys_CohesionMoment);
 REGISTER_SERIALIZABLE(Gl1_Cylinder);
 REGISTER_SERIALIZABLE(Gl1_ChainedCylinder);
 #endif
+
+} // namespace yade
+

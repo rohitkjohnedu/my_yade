@@ -4,6 +4,8 @@
 #include<pkg/common/Collider.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 class SpheresFactory: public GlobalEngine {
 	shared_ptr<Collider> collider;
 	protected:
@@ -78,3 +80,6 @@ class BoxFactory: public SpheresFactory {
 	);
 };
 REGISTER_SERIALIZABLE(BoxFactory);
+
+} // namespace yade
+

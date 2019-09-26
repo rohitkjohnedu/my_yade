@@ -5,6 +5,7 @@
 #include<core/State.hpp>
 #include<core/Dispatcher.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class Scene;
 /*! Material properties associated with a body.
@@ -47,3 +48,6 @@ class Material: public Serializable, public Indexable{
 	REGISTER_INDEX_COUNTER(Material);
 };
 REGISTER_SERIALIZABLE(Material);
+
+} // namespace yade
+

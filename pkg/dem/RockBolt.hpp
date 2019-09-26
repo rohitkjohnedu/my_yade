@@ -44,6 +44,8 @@
 #include <CoinBuild.hpp>
 #include <CoinModel.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class RockBolt: public PeriodicEngine{	
 
   	public:
@@ -108,5 +110,7 @@ class RockBolt: public PeriodicEngine{
 
 };
 REGISTER_SERIALIZABLE(RockBolt);
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS

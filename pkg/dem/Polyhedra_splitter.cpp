@@ -11,6 +11,8 @@
 #include <pkg/dem/Polyhedra_splitter.hpp>
 #include <sys/stat.h>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((PolyhedraSplitter)(SplitPolyTauMax)(SplitPolyMohrCoulomb));
 
 CREATE_LOGGER(PolyhedraSplitter);
@@ -339,5 +341,7 @@ void SplitPolyMohrCoulomb::action() {
 		shared_ptr<Body> B2 = SplitPolyhedra(b, vec, b->state->pos);
 	}
 }
+
+} // namespace yade
 
 #endif // YADE_CGAL

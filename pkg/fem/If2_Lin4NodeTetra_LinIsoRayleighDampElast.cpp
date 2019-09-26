@@ -9,6 +9,9 @@
 #ifdef YADE_FEM
 #include <pkg/fem/DeformableElement.hpp>
 #include <pkg/fem/If2_Lin4NodeTetra_LinIsoRayleighDampElast.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((If2_Lin4NodeTetra_LinIsoRayleighDampElast));
 If2_Lin4NodeTetra_LinIsoRayleighDampElast::~If2_Lin4NodeTetra_LinIsoRayleighDampElast(){};
 
@@ -82,4 +85,7 @@ void If2_Lin4NodeTetra_LinIsoRayleighDampElast::go(const shared_ptr<Shape>& elem
 
 	return;
 }
+
+} // namespace yade
+
 #endif //YADE_FEM

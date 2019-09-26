@@ -10,6 +10,7 @@
 
 #include<core/Shape.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class Box: public Shape{
 	public:
@@ -23,4 +24,5 @@ class Box: public Shape{
 };
 REGISTER_SERIALIZABLE(Box);
 
+} // namespace yade
 

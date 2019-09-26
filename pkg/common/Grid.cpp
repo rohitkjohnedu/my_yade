@@ -7,6 +7,8 @@
 
 #include "Grid.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 //!##################	SHAPES   #####################
 
 GridNode::~GridNode(){}
@@ -642,3 +644,6 @@ void Bo1_GridConnection_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>&
 }
 
 YADE_PLUGIN((Bo1_GridConnection_Aabb));
+
+} // namespace yade
+

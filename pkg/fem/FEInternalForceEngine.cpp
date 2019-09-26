@@ -11,6 +11,8 @@
 #include <pkg/fem/FEInternalForceDispatchers.hpp>
 #include <pkg/fem/FEInternalForceEngine.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((FEInternalForceEngine));
 CREATE_LOGGER(FEInternalForceEngine);
 
@@ -89,4 +91,8 @@ void FEInternalForceEngine::action(){
 
 	}
 }
+
+} // namespace yade
+
 #endif //YADE_FEM
+

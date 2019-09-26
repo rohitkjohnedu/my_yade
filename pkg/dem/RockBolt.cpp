@@ -51,7 +51,7 @@
 
 #include <vtkLineSource.h>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 void RockBolt::action(){
 
@@ -609,4 +609,7 @@ double f = evaluateFNoSphereVol(s1,state1,intersectionPt);
 }
 
 YADE_PLUGIN((RockBolt));
+
+} // namespace yade
+
 #endif // YADE_POTENTIAL_BLOCKS

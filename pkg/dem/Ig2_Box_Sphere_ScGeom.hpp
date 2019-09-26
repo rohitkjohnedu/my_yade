@@ -15,6 +15,7 @@
 #include<pkg/common/Box.hpp>
 #include<pkg/common/Dispatching.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class Ig2_Box_Sphere_ScGeom : public IGeomFunctor
 {
@@ -42,4 +43,6 @@ class Ig2_Box_Sphere_ScGeom6D : public Ig2_Box_Sphere_ScGeom
 	DEFINE_FUNCTOR_ORDER_2D(Box,Sphere);
 };
 REGISTER_SERIALIZABLE(Ig2_Box_Sphere_ScGeom6D);
+
+} // namespace yade
 

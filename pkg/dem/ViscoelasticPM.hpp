@@ -19,6 +19,8 @@
 #include <core/PartialEngine.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 /* Simple viscoelastic model */
 
 /// Material
@@ -161,3 +163,6 @@ class DeformControl: public PartialEngine{
 
 REGISTER_SERIALIZABLE(DeformControl);
 #endif
+
+} // namespace yade
+

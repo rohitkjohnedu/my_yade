@@ -15,6 +15,8 @@
 #include "basicVTKwritter.hpp"
 #include "Timer.h"
 
+namespace yade { // Cannot have #include directive inside.
+
 typedef pair<pair<int,int>, vector<double> > Constriction;
 
 namespace CGT {
@@ -208,6 +210,9 @@ class FlowBoundingSphere : public Network<_Tesselation>
 };
 
 } //namespace CGT
+
+}; // namespace yade
+
 #include <lib/triangulation/FlowBoundingSphere.ipp>
 #ifdef LINSOLV
 #include "lib/triangulation/FlowBoundingSphereLinSolv.hpp"

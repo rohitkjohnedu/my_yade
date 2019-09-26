@@ -16,6 +16,8 @@
 #include<lib/pyutil/gil.hpp>
 #include<pkg/dem/JointedCohesiveFrictionalPM.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::~TemplateFlowEngine_@TEMPLATE_FLOW_NAME@() {}
 
@@ -972,6 +974,8 @@ bool TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
   }
   return neighbor;
 }
+
+} // namespace yade
 
 #endif //FLOW_ENGINE
 

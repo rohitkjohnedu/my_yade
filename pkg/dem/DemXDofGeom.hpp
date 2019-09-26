@@ -2,6 +2,8 @@
 #pragma once
 #include<core/IGeom.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Abstract class that unites ScGeom and L3Geom,
 	created for the purposes of GlobalStiffnessTimeStepper.
 	It might be removed in the future. */
@@ -19,3 +21,6 @@ class GenericSpheresContact: public IGeom{
 	virtual ~GenericSpheresContact() {};
 };
 REGISTER_SERIALIZABLE(GenericSpheresContact);
+
+} // namespace yade
+

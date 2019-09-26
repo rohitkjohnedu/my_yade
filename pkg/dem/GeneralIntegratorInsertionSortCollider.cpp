@@ -12,6 +12,8 @@
 #include<vector>
 #include<boost/static_assert.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((GeneralIntegratorInsertionSortCollider))
 CREATE_LOGGER(GeneralIntegratorInsertionSortCollider);
 
@@ -220,3 +222,6 @@ void GeneralIntegratorInsertionSortCollider::action(){
 		}
 	ISC_CHECKPOINT("sort&collide");
 }
+
+} // namespace yade
+

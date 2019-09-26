@@ -6,6 +6,8 @@
 #include <pkg/common/Dispatching.hpp>
 #include <pkg/dem/PotentialParticle.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class PotentialParticle2AABB : public BoundFunctor {
 	public :
 
@@ -21,5 +23,7 @@ class PotentialParticle2AABB : public BoundFunctor {
 };
 
 REGISTER_SERIALIZABLE(PotentialParticle2AABB);
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

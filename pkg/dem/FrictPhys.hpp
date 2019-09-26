@@ -12,6 +12,8 @@
 #include<pkg/common/ElastMat.hpp>
 #include<pkg/common/Dispatching.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class FrictPhys: public NormShearPhys
 {
 	public :
@@ -62,3 +64,6 @@ class Ip2_FrictMat_FrictMat_ViscoFrictPhys: public Ip2_FrictMat_FrictMat_FrictPh
 	);
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_ViscoFrictPhys);
+
+} // namespace yade
+

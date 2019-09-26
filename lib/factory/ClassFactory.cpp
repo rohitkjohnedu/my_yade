@@ -13,6 +13,8 @@
 #include<boost/algorithm/string/regex.hpp>
 #include<lib/base/Logging.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(ClassFactory);
 SINGLETON_SELF(ClassFactory);
 
@@ -107,4 +109,6 @@ void ClassFactory::registerPluginClasses(const char* fileAndClasses[]){
 		}
 	}
 }
+
+} // namespace yade
 

@@ -12,7 +12,7 @@
 #include<pkg/common/BoundaryController.hpp>
 #include<core/Body.hpp>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 class Disp2DPropLoadEngine : public BoundaryController
 {
@@ -75,4 +75,6 @@ class Disp2DPropLoadEngine : public BoundaryController
 };
 
 REGISTER_SERIALIZABLE(Disp2DPropLoadEngine);
+
+} // namespace yade
 

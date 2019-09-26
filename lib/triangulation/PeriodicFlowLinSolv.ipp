@@ -25,6 +25,8 @@
   #include <omp.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT
 {
 
@@ -252,5 +254,6 @@ int PeriodicFlowLinSolv<_Tesselation>::setLinearSystemFullGS(Real dt)
 }
 
 } //namespace CGT
+}; // namespace yade
 
 #endif //FLOW_ENGINE

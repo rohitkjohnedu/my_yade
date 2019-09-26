@@ -15,6 +15,8 @@
 #include<core/Timing.hpp>
 #include<lib/base/Logging.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Body;
 class Scene;
 
@@ -61,4 +63,6 @@ class Engine: public Serializable{
 };
 
 REGISTER_SERIALIZABLE(Engine);
+
+} // namespace yade
 

@@ -24,6 +24,8 @@
       #include <cholmod.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 /// We can add data to the Info types by inheritance
 class TwoPhaseCellInfo : public FlowCellInfo_TwoPhaseFlowEngineT
 {
@@ -629,6 +631,8 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(TwoPhaseFlowEngine);
+
+} // namespace yade
 
 #endif //TwoPhaseFLOW
 

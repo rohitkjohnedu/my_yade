@@ -30,6 +30,8 @@
 
 // #define USE_FAST_MATH 1
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT
 {
 
@@ -1969,5 +1971,7 @@ double FlowBoundingSphere<Tesselation>::fractionalSolidArea(CellHandle cell, int
 
 
 } //namespace CGT
+
+} // namespace yade
 
 #endif //FLOW_ENGINE

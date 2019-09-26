@@ -9,6 +9,8 @@
 #include <set>
 #include <boost/tuple/tuple.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class KnKsPBPhys: public FrictPhys {
 	
 	public:
@@ -189,5 +191,6 @@ class Law2_SCG_KnKsPBPhys_KnKsPBLaw: public LawFunctor{
 };
 REGISTER_SERIALIZABLE(Law2_SCG_KnKsPBPhys_KnKsPBLaw);
 
+} // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS

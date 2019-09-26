@@ -23,6 +23,8 @@
 #include <pkg/dem/TriaxialCompressionEngine.hpp>
 #include "MicroMacroAnalyser.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((MicroMacroAnalyser));
 CREATE_LOGGER(MicroMacroAnalyser);
 
@@ -224,5 +226,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 // {
 // 	return analyser->computeParticlesDeformation(state_file1, state_file0);
 // }
+
+} // namespace yade
 
 #endif /* YADE_CGAL */

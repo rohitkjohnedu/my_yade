@@ -6,6 +6,8 @@
 #include<core/State.hpp>
 #include<pkg/common/Sphere.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Clump));
 CREATE_LOGGER(Clump);
 
@@ -493,3 +495,6 @@ Matrix3r Clump::inertiaTensorRotate(const Matrix3r& I, const Quaternionr& rot){
 	Matrix3r T=rot.toRotationMatrix();
 	return inertiaTensorRotate(I,T);
 }
+
+} // namespace yade
+

@@ -2,6 +2,8 @@
 #include <pkg/common/Recorder.hpp>
 #include <core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class ForceRecorder: public Recorder {
 	public:
 		virtual void action();
@@ -30,4 +32,6 @@ class TorqueRecorder: public Recorder {
 };
 
 REGISTER_SERIALIZABLE(TorqueRecorder);
+
+} // namespace yade
 

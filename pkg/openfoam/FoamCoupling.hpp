@@ -12,6 +12,8 @@
 #include <core/InteractionContainer.hpp> // for pairwise hydro interaction (to be implemented) 
 #include <lib/serialization/Serializable.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Scene; 
 class FoamCoupling : public GlobalEngine {
 
@@ -84,5 +86,7 @@ class FoamCoupling : public GlobalEngine {
     DECLARE_LOGGER; 
 }; 
 REGISTER_SERIALIZABLE(FoamCoupling); 
+
+} // namespace yade
 
 #endif  

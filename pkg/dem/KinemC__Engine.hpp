@@ -10,6 +10,8 @@
 
 #include<pkg/dem/KinemSimpleShearBox.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class KinemCTDEngine : public KinemSimpleShearBox
 {
 	private :
@@ -105,3 +107,6 @@ class KinemCNSEngine : public KinemSimpleShearBox
 };
 
 REGISTER_SERIALIZABLE(KinemCNSEngine);
+
+} // namespace yade
+

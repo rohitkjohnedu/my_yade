@@ -12,6 +12,8 @@
 #include <Eigen/Core>
 #include <stdio.h>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 
 	public :
@@ -84,5 +86,7 @@ extern "C" {
 #ifdef __cplusplus
 };
 #endif
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

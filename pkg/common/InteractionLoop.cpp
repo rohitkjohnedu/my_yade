@@ -1,5 +1,7 @@
 #include"InteractionLoop.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((InteractionLoop));
 CREATE_LOGGER(InteractionLoop);
 
@@ -173,3 +175,6 @@ void InteractionLoop::action(){
 		}
 	}
 }
+
+} // namespace yade
+

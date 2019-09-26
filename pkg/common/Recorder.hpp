@@ -1,6 +1,9 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 #pragma once 
 #include<pkg/common/PeriodicEngines.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 class Recorder: public PeriodicEngine{
 	void openAndCheck() {
 		assert(!out.is_open());
@@ -31,3 +34,6 @@ class Recorder: public PeriodicEngine{
 	);
 };
 REGISTER_SERIALIZABLE(Recorder);
+
+} // namespace yade
+

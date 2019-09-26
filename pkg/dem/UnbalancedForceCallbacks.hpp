@@ -3,6 +3,8 @@
 #include<pkg/common/Callbacks.hpp>
 #include<lib/base/openmp-accu.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class SumIntrForcesCb: public IntrCallback{
 	public:
 		OpenMPAccumulator<int> numIntr;
@@ -25,3 +27,6 @@ class SumBodyForcesCb: public BodyCallback{
 };
 REGISTER_SERIALIZABLE(SumBodyForcesCb);
 #endif
+
+} // namespace yade
+

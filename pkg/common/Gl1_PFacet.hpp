@@ -4,6 +4,8 @@
 #include<pkg/common/Facet.hpp>
 #include<core/Shape.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 #ifdef YADE_OPENGL
 class Gl1_PFacet : public GlShapeFunctor
 {	
@@ -18,4 +20,5 @@ class Gl1_PFacet : public GlShapeFunctor
 REGISTER_SERIALIZABLE(Gl1_PFacet);
 #endif
 
+} // namespace yade
 

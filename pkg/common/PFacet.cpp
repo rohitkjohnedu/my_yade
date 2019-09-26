@@ -10,6 +10,8 @@
 	#include<lib/opengl/OpenGLWrapper.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 //!##################	IGeom Functors   #####################
 // Function used in order to calculate the projection of the sphere on the PFacet element. The function returns if the the porjection is on the inside the triangle and the barycentric coordinates of the projection P on PFacet the element.
 boost::tuple<Vector3r,bool, double, double,double> Ig2_Sphere_PFacet_ScGridCoGeom::projection(
@@ -836,3 +838,6 @@ void Bo1_PFacet_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, con
 }
 
 YADE_PLUGIN((Bo1_PFacet_Aabb));
+
+} // namespace yade
+

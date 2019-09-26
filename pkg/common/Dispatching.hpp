@@ -11,6 +11,8 @@
 #include<core/Dispatcher.hpp>
 #include<pkg/common/Aabb.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /********
 	functors
 *********************/
@@ -129,4 +131,5 @@ class LawDispatcher: public Dispatcher2D<
 };
 REGISTER_SERIALIZABLE(LawDispatcher);
 
+} // namespace yade
 

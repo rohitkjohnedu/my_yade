@@ -48,6 +48,9 @@
 //#include<pkg/dem/MicroMacroAnalyser.hpp>
 
 #include "TriaxialTest.hpp"
+
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(TriaxialTest);
 YADE_PLUGIN((TriaxialTest));
 
@@ -322,3 +325,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 void TriaxialTest::positionRootBody(shared_ptr<Scene>& /*scene*/)
 {
 }
+
+} // namespace yade
+

@@ -8,6 +8,8 @@
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<lib/pyutil/gil.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((PeriIsoCompressor)(PeriTriaxController)(Peri3dController))
 
 CREATE_LOGGER(PeriIsoCompressor);
@@ -413,3 +415,6 @@ void Peri3dController::action(){
 		else{ LOG_INFO("Running doneHook: "<<doneHook);	pyRunString(doneHook);}
 	}
 }
+
+} // namespace yade
+

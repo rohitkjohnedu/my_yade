@@ -8,6 +8,9 @@
 #pragma once
 #include <core/Material.hpp>
 #include <limits>
+
+namespace yade { // Cannot have #include directive inside.
+
 /*! Elastic material */
 class CohesiveDeformableElementMaterial: public Material{
 	public:
@@ -46,3 +49,6 @@ class LinCohesiveStiffPropDampElastMat: public LinCohesiveElasticMaterial{
 	REGISTER_CLASS_INDEX(LinCohesiveStiffPropDampElastMat,LinCohesiveElasticMaterial);
 };
 REGISTER_SERIALIZABLE(LinCohesiveStiffPropDampElastMat);
+
+} // namespace yade
+

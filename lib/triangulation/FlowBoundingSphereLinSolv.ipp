@@ -37,6 +37,7 @@
 extern "C" { void openblas_set_num_threads(int num_threads); }
 #endif
 
+namespace yade { // Cannot have #include directive inside.
 namespace CGT
 {
 
@@ -1262,5 +1263,6 @@ double t4 = taucs_ctime();
 
 
 } //namespace CGT
+} // namespace yade
 
 #endif //FLOW_ENGINE

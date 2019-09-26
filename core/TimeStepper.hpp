@@ -12,6 +12,8 @@
 #include "GlobalEngine.hpp"
 #include "Scene.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 class Body;
 
 class TimeStepper: public GlobalEngine{
@@ -29,4 +31,5 @@ class TimeStepper: public GlobalEngine{
 
 REGISTER_SERIALIZABLE(TimeStepper);
 
+} // namespace yade
 

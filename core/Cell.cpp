@@ -1,6 +1,8 @@
 
 #include<core/Cell.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(Cell);
 
 void Cell::integrateAndUpdate(Real dt){
@@ -43,4 +45,5 @@ void Cell::fillGlShearTrsfMatrix(double m[16]){
 	m[3]=0;               m[7]=0;               m[11]=0;              m[15]=1;
 }
 
+} // namespace yade
 

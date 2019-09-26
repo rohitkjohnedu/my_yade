@@ -10,6 +10,8 @@
 #include <pkg/common/GLDrawFunctors.hpp>
 #include <pkg/fem/DeformableElement.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Gl1_DeformableElement : public GlShapeFunctor
 {	
 	public:
@@ -21,4 +23,5 @@ class Gl1_DeformableElement : public GlShapeFunctor
 
 REGISTER_SERIALIZABLE(Gl1_DeformableElement);
 
+} // namespace yade
 

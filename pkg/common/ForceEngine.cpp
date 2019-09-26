@@ -14,6 +14,8 @@
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine)(RadialForceEngine)(DragEngine)(LinearDragEngine));
 
 void ForceEngine::action(){
@@ -93,3 +95,6 @@ void LinearDragEngine::action(){
 		}
 	}
 }
+
+} // namespace yade
+

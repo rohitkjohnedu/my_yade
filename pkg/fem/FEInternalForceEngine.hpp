@@ -10,6 +10,8 @@
 #include <pkg/common/Callbacks.hpp>
 #include <pkg/fem/FEInternalForceDispatchers.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 #ifdef USE_TIMING_DELTAS
 	#define TIMING_DELTAS_CHECKPOINT(cpt) timingDeltas->checkpoint(cpt)
 	#define TIMING_DELTAS_START() timingDeltas->start()
@@ -40,3 +42,6 @@ class FEInternalForceEngine: public GlobalEngine {
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(FEInternalForceEngine);
+
+} // namespace yade
+

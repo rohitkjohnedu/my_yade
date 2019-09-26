@@ -7,6 +7,7 @@
 #include<lib/base/Math.hpp>
 #include<core/PartialEngine.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 /*! Body representing clump (rigid aggregate) composed by other existing bodies.
 
@@ -108,3 +109,6 @@ class Clump: public Shape {
 	REGISTER_CLASS_INDEX(Clump,Shape);
 };
 REGISTER_SERIALIZABLE(Clump);
+
+} // namespace yade
+

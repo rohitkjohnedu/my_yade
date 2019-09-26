@@ -4,6 +4,8 @@
 #include <fstream>
 #include "RegularTriangulation.h"
 
+namespace yade { // Cannot have #include directive inside.
+
 namespace CGT {
 
 using std::endl;
@@ -115,4 +117,7 @@ class Tenseur_anti3 : public Tens
 
 static const Tenseur3 NULL_TENSEUR3 ( 0,0,0,0,0,0,0,0,0 );
 
-}
+} // namespace CGT
+
+} // namespace yade
+

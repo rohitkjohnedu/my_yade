@@ -22,6 +22,8 @@
 	#include<pkg/common/GLDrawFunctors.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 
 //!##################	IGeom Functors   ##################
 //!			O/
@@ -137,4 +139,6 @@ class Bo1_PFacet_Aabb : public BoundFunctor
 	);
 };
 REGISTER_SERIALIZABLE(Bo1_PFacet_Aabb);
+
+} // namespace yade
 

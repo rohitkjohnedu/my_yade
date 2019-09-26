@@ -5,13 +5,16 @@
 #include <core/Body.hpp>
 
 #include <boost/static_assert.hpp>
-// make sure that (void*)&vec[0]==(void*)&vec
-BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
-
 
 #ifdef YADE_OPENMP
 #include <omp.h>
 #endif
+
+namespace yade { // Cannot have #include directive inside.
+
+// make sure that (void*)&vec[0]==(void*)&vec
+BOOST_STATIC_ASSERT(sizeof(Vector3r)==3*sizeof(Real));
+
 
 /*! Container for Body External Variables (forces), typically forces and torques from interactions.
  * Values should be reset at every iteration by calling ForceContainer::reset();
@@ -131,3 +134,6 @@ class ForceContainer {
 
 	DECLARE_LOGGER;
 };
+
+} // namespace yade
+

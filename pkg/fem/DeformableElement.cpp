@@ -16,6 +16,8 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 DeformableElement::~DeformableElement(){
 
 }
@@ -101,5 +103,7 @@ void DeformableElement::delNode(const shared_ptr<Body>& subBody){
 	if(this->localmap.erase(subBody)!=1) throw std::invalid_argument(("Node #"+boost::lexical_cast<string>(subBody->id)+" not a part of the deformable element, not removing...").c_str());
 	LOG_DEBUG("Removed node #"<<subBody->id);
 }
+
+} // namespace yade
 
 #endif //YADE_FEM

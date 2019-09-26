@@ -14,6 +14,8 @@
 
 #include<boost/array.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Scene;
 class State;
 
@@ -148,3 +150,6 @@ class TriaxialStressController : public BoundaryController
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(TriaxialStressController);
+
+} // namespace yade
+

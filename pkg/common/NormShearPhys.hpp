@@ -4,6 +4,8 @@
 
 #include<core/IPhys.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class NormPhys:public IPhys {
 	public:
 		virtual ~NormPhys() {};
@@ -29,3 +31,6 @@ class NormShearPhys: public NormPhys{
 	REGISTER_CLASS_INDEX(NormShearPhys,NormPhys);
 };
 REGISTER_SERIALIZABLE(NormShearPhys);
+
+} // namespace yade
+

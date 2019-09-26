@@ -9,7 +9,10 @@
 #include <Eigen/LU>
 #include <Eigen/QR>
 #include <lib/base/openmp-accu.hpp>
-namespace yade {
+
+namespace yade { // Cannot have #include directive inside.
+
+
 class PotentialParticle : public Shape {
 
 	public:
@@ -53,10 +56,10 @@ class PotentialParticle : public Shape {
 		REGISTER_CLASS_INDEX(PotentialParticle,Shape);
 
 };
-}
-using namespace yade;
 
 REGISTER_SERIALIZABLE(PotentialParticle);
+
+}; // namespace yade
 
 #ifdef __cplusplus
 extern "C" {

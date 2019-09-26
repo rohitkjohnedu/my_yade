@@ -7,6 +7,8 @@
 #include<GL/glu.h>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 class Gl1_NormPhys: public GlIPhysFunctor{	
 		static GLUquadric* gluQuadric; // needed for gluCylinder, initialized by ::go if no initialized yet
 	public:
@@ -27,4 +29,6 @@ class Gl1_NormPhys: public GlIPhysFunctor{
 	RENDERS(NormPhys);
 };
 REGISTER_SERIALIZABLE(Gl1_NormPhys);
+
+} // namespace yade
 

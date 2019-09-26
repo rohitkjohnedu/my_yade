@@ -13,6 +13,8 @@
 #include <pkg/dem/FrictPhys.hpp>
 #include "CohesiveFrictionalContactLaw.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 class InelastCohFrictMat : public FrictMat
 {
 	public :
@@ -147,3 +149,6 @@ class Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment: public LawFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment);
+
+} // namespace yade
+

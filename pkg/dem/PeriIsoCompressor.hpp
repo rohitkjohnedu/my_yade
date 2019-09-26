@@ -4,6 +4,8 @@
 
 #include<pkg/common/BoundaryController.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class PeriIsoCompressor: public BoundaryController{
 	Real avgStiffness; Real maxDisplPerStep; Vector3r sumForces, sigma; 
 	Real currUnbalanced;
@@ -119,3 +121,6 @@ class Peri3dController: public BoundaryController{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Peri3dController);
+
+} // namespace yade
+

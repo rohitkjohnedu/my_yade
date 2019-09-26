@@ -6,6 +6,8 @@
 #include<pkg/dem/NewtonIntegrator.hpp>
 //#include<pkg/common/Facet.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((FlatGridCollider));
 CREATE_LOGGER(FlatGridCollider);
 
@@ -107,3 +109,6 @@ void FlatGridCollider::updateCollisions(){
 		}
 	}
 }
+
+} // namespace yade
+

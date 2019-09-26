@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <cassert>
 
+namespace yade { // Cannot have #include directive inside.
+
 class GlobalStiffnessTimeStepper;
 
 class BlockGen : public FileGenerator {
@@ -239,6 +241,10 @@ class BlockGen : public FileGenerator {
 	DECLARE_LOGGER;
 };
 
+REGISTER_SERIALIZABLE(BlockGen);
+
+} // namespace yade
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -248,5 +254,4 @@ extern "C" {
 };
 #endif
 
-REGISTER_SERIALIZABLE(BlockGen);
 #endif // YADE_POTENTIAL_BLOCKS

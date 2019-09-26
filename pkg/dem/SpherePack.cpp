@@ -12,12 +12,13 @@
 #include <boost/random/variate_generator.hpp>
 
 #include<core/Timing.hpp>
+#include<lib/base/Namespaces.hpp>
+
+namespace yade { // Cannot have #include directive inside.
 
 // not a serializable in the sense of YADE_PLUGIN
 
 CREATE_LOGGER(SpherePack);
-
-namespace py=boost::python;
 
 
 void SpherePack::fromList(const py::list& l){
@@ -439,4 +440,6 @@ py::tuple SpherePack::getClumps() const{
 	FOREACH(const intListPair& c, clumps) clumpList.append(c.second);
 	return py::make_tuple(standalone,clumpList); 
 }
+
+} // namespace yade
 

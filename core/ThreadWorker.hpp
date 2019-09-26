@@ -11,6 +11,8 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/any.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class ThreadRunner;
 
 /*! 
@@ -60,4 +62,5 @@ class ThreadWorker	//         perhaps simulation steps, or stage? as it is a sin
 		boost::any	getReturnValue();
 };
 
+} // namespace yade
 

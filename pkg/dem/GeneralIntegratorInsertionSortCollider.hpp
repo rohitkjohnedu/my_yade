@@ -3,6 +3,7 @@
 #pragma once
 #include<pkg/common/InsertionSortCollider.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 /*!
 	Adaptive Integration Sort Collider:
@@ -37,3 +38,6 @@ class GeneralIntegratorInsertionSortCollider: public InsertionSortCollider{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(GeneralIntegratorInsertionSortCollider);
+
+} // namespace yade
+

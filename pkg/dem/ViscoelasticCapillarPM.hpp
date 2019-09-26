@@ -4,6 +4,8 @@
 #include <core/PartialEngine.hpp>
 #include <functional>
 
+namespace yade { // Cannot have #include directive inside.
+
 class ViscElCapMat : public ViscElMat {
 	public:
 		virtual ~ViscElCapMat();
@@ -129,3 +131,6 @@ class LiqControl: public PartialEngine{
 Real liqVolIterBody (shared_ptr<Body> b);
 REGISTER_SERIALIZABLE(LiqControl);
 #endif
+
+} // namespace yade
+

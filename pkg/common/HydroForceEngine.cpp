@@ -15,6 +15,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/optional.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((HydroForceEngine));
 
 void HydroForceEngine::action(){
@@ -695,3 +697,6 @@ void HydroForceEngine::fluidResolution(double tfin,double dt)
 	vxFluid[nCell] = ufn[nCell];
 }
 ///////////////////////////////////////////////////////////////////////// END OF HydroForceEngine::fluidResolution
+
+} // namespace yade
+

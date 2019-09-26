@@ -10,9 +10,9 @@
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace py=boost::python;
-
+namespace yade { // Cannot have #include directive inside.
 
 
 class MortarMat: public FrictMat {
@@ -90,3 +90,6 @@ class Law2_ScGeom_MortarPhys_Lourenco: public LawFunctor{
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_MortarPhys_Lourenco);
+
+} // namespace yade
+

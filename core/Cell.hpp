@@ -18,6 +18,8 @@ The transformation is split between "normal" part and "rotation/shear" part for 
 
 //#include<pkg/dem/Shop.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Cell: public Serializable{
 	public:
 	//! Get/set sizes of cell base vectors
@@ -196,3 +198,6 @@ class Cell: public Serializable{
 	);
 };
 REGISTER_SERIALIZABLE(Cell);
+
+} // namespace yade
+

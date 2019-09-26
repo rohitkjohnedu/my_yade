@@ -21,6 +21,8 @@
 #include <pkg/fem/DeformableElement.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 /*Functor of Internal Force Calculation*/
 
 class InternalForceFunctor: public Functor2D<
@@ -47,4 +49,6 @@ class InternalForceDispatcher: public Dispatcher2D<
 	YADE_DISPATCHER2D_FUNCTOR_DOC_ATTRS_CTOR_PY(InternalForceDispatcher,InternalForceFunctor,/*doc is optional*/,/*attrs*/,/*ctor*/,/*py*/);
 };
 REGISTER_SERIALIZABLE(InternalForceDispatcher);
+
+} // namespace yade
 

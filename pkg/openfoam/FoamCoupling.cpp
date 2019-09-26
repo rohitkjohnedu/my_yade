@@ -5,6 +5,8 @@
 #include "FoamCoupling.hpp"
 #include <iostream>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(FoamCoupling);
 YADE_PLUGIN((FoamCoupling));
 
@@ -217,5 +219,7 @@ void FoamCoupling::killMPI() {
   castTerminate(); 
   MPI_Finalize();
 }
+
+} // namespace yade
 
 #endif

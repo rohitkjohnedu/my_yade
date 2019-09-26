@@ -5,6 +5,7 @@
 #include<core/IPhys.hpp>
 #include<core/Body.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class IGeomFunctor;
 class IPhysFunctor;
@@ -68,3 +69,6 @@ class Interaction: public Serializable{
 };
 
 REGISTER_SERIALIZABLE(Interaction);
+
+} // namespace yade
+

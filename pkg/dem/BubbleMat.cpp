@@ -1,6 +1,8 @@
 #include "BubbleMat.hpp"
 
 
+namespace yade { // Cannot have #include directive inside.
+
 
 YADE_PLUGIN((BubbleMat)(Ip2_BubbleMat_BubbleMat_BubblePhys)(BubblePhys)(Law2_ScGeom_BubblePhys_Bubble));
 
@@ -93,3 +95,6 @@ bool Law2_ScGeom_BubblePhys_Bubble::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhy
 	}
 	return true;
 }
+
+} // namespace yade
+

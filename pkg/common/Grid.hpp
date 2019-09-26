@@ -31,7 +31,7 @@
 	#include<pkg/common/GLDrawFunctors.hpp>
 #endif
 
-
+namespace yade { // Cannot have #include directive inside.
 
 //!##################	SHAPES   #####################
 
@@ -289,11 +289,5 @@ class Gl1_GridConnection : public GlShapeFunctor{
 REGISTER_SERIALIZABLE(Gl1_GridConnection);
 #endif
 
-
-
-
-
-
-
-
+} // namespace yade
 

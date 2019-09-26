@@ -7,7 +7,10 @@
 *************************************************************************/
 #include<pkg/common/Collider.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Collider));
+
 
 bool Collider::mayCollide(const Body* b1, const Body* b2
 		#ifdef YADE_MPI
@@ -45,3 +48,6 @@ void Collider::pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::di
 	FOREACH(shared_ptr<BoundFunctor> bf, vb) this->boundDispatcher->add(bf);
 	t=boost::python::tuple(); // empty the args
 }
+
+} // namespace yade
+

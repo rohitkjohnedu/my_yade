@@ -44,6 +44,7 @@
 #include <CoinBuild.hpp>
 #include <CoinModel.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class RockLiningGlobal: public PeriodicEngine{	
 	protected:
@@ -124,6 +125,8 @@ class RockLiningGlobal: public PeriodicEngine{
 
 };
 REGISTER_SERIALIZABLE(RockLiningGlobal);
+
+} // namespace yade
 
 #ifdef __cplusplus
 extern "C" {

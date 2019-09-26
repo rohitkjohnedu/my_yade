@@ -6,6 +6,8 @@
 #include <pkg/dem/PotentialParticle.hpp>
 #include <pkg/common/Aabb.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 void PotentialParticle2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*) {
 	PotentialParticle* pp = static_cast<PotentialParticle*>(cm.get());
 	if(!bv) {
@@ -58,5 +60,7 @@ void PotentialParticle2AABB::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& 
 }
 
 YADE_PLUGIN((PotentialParticle2AABB));
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

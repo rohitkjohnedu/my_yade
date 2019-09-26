@@ -2,6 +2,9 @@
 #pragma once
 #include<core/GlobalEngine.hpp>
 #include<core/Interaction.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 /*! Initializer for filling adjacency geometry data for facets.
  *
  * Common vertices and common edges are identified and mutual angle between facet faces
@@ -59,5 +62,5 @@ class FacetTopologyAnalyzer: public GlobalEngine{
 };
 REGISTER_SERIALIZABLE(FacetTopologyAnalyzer);
 
-
+} // namespace yade
 

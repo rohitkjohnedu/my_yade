@@ -14,6 +14,8 @@
 #include "Scene.hpp"
 #include "ThreadWorker.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 class FileGenerator: public Serializable
 {
 	protected:
@@ -38,4 +40,5 @@ class FileGenerator: public Serializable
 };
 REGISTER_SERIALIZABLE(FileGenerator);
 
+} // namespace yade
 

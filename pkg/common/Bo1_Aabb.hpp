@@ -14,6 +14,8 @@
 #include <pkg/common/Facet.hpp>
 #include <pkg/common/Box.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Bo1_Sphere_Aabb : public BoundFunctor
 {
 	public :
@@ -62,5 +64,5 @@ class Bo1_Box_Aabb : public BoundFunctor{
 
 REGISTER_SERIALIZABLE(Bo1_Box_Aabb);
 
-
+} // namespace yade
 

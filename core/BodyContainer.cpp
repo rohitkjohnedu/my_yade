@@ -8,6 +8,8 @@
 	#include<omp.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(BodyContainer);
 
 void BodyContainer::clear(){
@@ -74,3 +76,6 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 	body[id].reset();
 	return true;
 }
+
+} // namespace yade
+

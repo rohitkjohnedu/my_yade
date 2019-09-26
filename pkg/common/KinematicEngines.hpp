@@ -4,6 +4,8 @@
 #include<core/PartialEngine.hpp>
 #include<lib/base/Math.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 struct KinematicEngine;
 
 struct CombinedKinematicEngine: public PartialEngine{
@@ -128,3 +130,6 @@ struct BicyclePedalEngine: public KinematicEngine{
 	);
 };
 REGISTER_SERIALIZABLE(BicyclePedalEngine);
+
+} // namespace yade
+

@@ -2,6 +2,7 @@
 
 #include"ElectrostaticMat.hpp"
 
+namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((Ip2_FrictMat_FrictMat_ElectrostaticPhys)(ElectrostaticPhys)(Law2_ScGeom_ElectrostaticPhys))
 
@@ -279,3 +280,6 @@ py::tuple Law2_ScGeom_ElectrostaticPhys::PyGetTotalStresses()
 }
 
 CREATE_LOGGER(Law2_ScGeom_ElectrostaticPhys);
+
+} // namespace yade
+

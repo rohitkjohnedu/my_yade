@@ -9,7 +9,9 @@
 #include <Eigen/QR>
 #include <lib/base/openmp-accu.hpp>
 
-namespace yade{
+namespace yade { // Cannot have #include directive inside.
+
+
 class PotentialBlock : public Shape {
 	public:
 		struct Planes{ vector<int> vertexID; };
@@ -108,10 +110,10 @@ class PotentialBlock : public Shape {
 	REGISTER_CLASS_INDEX(PotentialBlock,Shape);
 	
 };
-}
-using namespace yade; 
 
 REGISTER_SERIALIZABLE(PotentialBlock);
+
+} // namespace yade
 
 #ifdef __cplusplus
 extern "C" {

@@ -43,6 +43,8 @@ The files are
 #include<core/Clump.hpp>
 #include<pkg/dem/Shop.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=DEFAULTSOLVER >
 class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 {	
@@ -586,6 +588,8 @@ public:
 	inline Real& volCells (void) {return volumeIncidentCells;}
 	inline const CVector ghostShift (void) const {return CGAL::NULL_VECTOR;}
 };
+
+} // namespace yade
 
 // Implementation of functions in this separate file for clarity 
 #include "FlowEngine_@TEMPLATE_FLOW_NAME@.ipp"

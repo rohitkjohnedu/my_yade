@@ -15,6 +15,8 @@
 #include <pkg/fem/Node.hpp>
 #include <lib/base/Math.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 DeformableCohesiveElement::~DeformableCohesiveElement(){
 
 }
@@ -53,4 +55,7 @@ void DeformableCohesiveElement::delPair(const shared_ptr<Body>& /*node1*/,const 
 //	if(this->localmap.erase(subBody)!=1) throw std::invalid_argument(("Node #"+boost::lexical_cast<string>(subBody->id)+" not a part of the deformable element, not removing...").c_str());
 //	LOG_DEBUG("Removed node #"<<subBody->id);
 }
+
+} // namespace yade
+
 #endif //YADE_FEM

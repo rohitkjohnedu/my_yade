@@ -31,6 +31,8 @@
 #include <lib/base/Math.hpp>
 #include <type_traits>
 
+namespace yade { // Cannot have #include directive inside.
+
 const unsigned facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 //return the opposite edge (e.g. the opposite of {0,2} is {1,3}) 
 inline void revertEdge (unsigned &i,unsigned &j){
@@ -169,3 +171,6 @@ inline CVector makeCgVect ( const Vector3r& yv ) {return CVector ( yv[0],yv[1],y
 inline Point makeCgPoint ( const Vector3r& yv ) {return Point ( yv[0],yv[1],yv[2] );}
 inline Vector3r makeVector3r ( const Point& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
 inline Vector3r makeVector3r ( const CVector& yv ) {return Vector3r ( yv[0],yv[1],yv[2] );}
+
+} // namespace yade
+

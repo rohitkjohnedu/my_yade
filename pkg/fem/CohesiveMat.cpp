@@ -7,10 +7,15 @@
 *************************************************************************/
 #ifdef YADE_FEM
 #include <pkg/fem/CohesiveMat.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((CohesiveDeformableElementMaterial)(LinCohesiveElasticMaterial)(LinCohesiveStiffPropDampElastMat));
 
 CohesiveDeformableElementMaterial::~CohesiveDeformableElementMaterial(void){}
 LinCohesiveElasticMaterial::~LinCohesiveElasticMaterial(void){}
 LinCohesiveStiffPropDampElastMat::~LinCohesiveStiffPropDampElastMat(void){}
+
+} // namespace yade
 
 #endif //YADE_FEM

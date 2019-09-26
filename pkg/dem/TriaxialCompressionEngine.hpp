@@ -12,6 +12,8 @@
 #include<lib/base/Math.hpp>
 #include<pkg/dem/TriaxialStressController.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /** \brief Class for controlling optional initial isotropic compaction and subsequent triaxial test with constant lateral stress and constant axial strain rate. The algorithms used have been developed initialy for simulations reported in [Chareyre2002a] and [Chareyre2005]. They have been ported to Yade in a second step and used in e.g. [Kozicki2008],[Scholtes2009b],[Jerier2010b].
  *
  * The engine is a state machine with the following states; transitions may be automatic, see below.
@@ -132,3 +134,6 @@ class TriaxialCompressionEngine : public TriaxialStressController
 };
 
 REGISTER_SERIALIZABLE(TriaxialCompressionEngine);
+
+} // namespace yade
+

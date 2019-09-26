@@ -18,6 +18,8 @@
 #include <pkg/common/MatchMaker.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 // The following code was moved from CohFrictMat.hpp
 class CohFrictMat : public FrictMat
 {
@@ -157,3 +159,6 @@ class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys : public IPhysFunctor
 };
 
 REGISTER_SERIALIZABLE(Ip2_CohFrictMat_CohFrictMat_CohFrictPhys);
+
+} // namespace yade
+

@@ -8,6 +8,8 @@
 #include"STLImporter.hpp"
 #include<pkg/dem/Shop.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(STLImporter);
 
 vector<shared_ptr<Body> > STLImporter::import(const char* filename)
@@ -46,4 +48,6 @@ vector<shared_ptr<Body> > STLImporter::import(const char* filename)
 	}
 	return imported;
 }
+
+} // namespace yade
 

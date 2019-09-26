@@ -46,6 +46,8 @@
 #include "py/_utils.hpp"
 
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(Shop);
 
 /*! Flip periodic cell for shearing indefinitely.*/
@@ -446,3 +448,6 @@ Real Shop::PWaveTimeStep(const shared_ptr<Scene> _rb){
 	}
 	return dt;
 }
+
+} // namespace yade
+

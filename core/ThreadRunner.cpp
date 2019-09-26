@@ -14,6 +14,8 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(ThreadRunner);
 
 void ThreadRunner::run()
@@ -95,4 +97,6 @@ ThreadRunner::~ThreadRunner()
 	boost::mutex::scoped_lock runlock(m_runmutex);
 	boost::mutex::scoped_lock calllock(m_callmutex);
 }
+
+} // namespace yade
 

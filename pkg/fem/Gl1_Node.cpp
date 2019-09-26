@@ -13,6 +13,9 @@
 #include <pkg/fem/Gl1_Node.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 #include <pkg/common/Sphere.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 bool Gl1_Node::wire;
 bool Gl1_Node::stripes;
 int  Gl1_Node::glutSlices;
@@ -141,6 +144,9 @@ void Gl1_Node::initGlutGlList(){
 		glutSolidSphere(1.0,int(std::max(quality*glutSlices,(Real)2.)),int(std::max(quality*glutStacks,(Real)3.)));
 	glEndList();
 }
+
+} // namespace yade
+
 #endif //YADE_FEM
 #endif /* YADE_OPENGL */
 

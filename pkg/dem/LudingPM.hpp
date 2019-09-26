@@ -5,6 +5,7 @@
 #include<pkg/common/Dispatching.hpp>
 #include<pkg/dem/ScGeom.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class LudingMat : public Material {
   public:
@@ -67,3 +68,6 @@ class Law2_ScGeom_LudingPhys_Basic: public LawFunctor {
   YADE_CLASS_BASE_DOC(Law2_ScGeom_LudingPhys_Basic,LawFunctor,"Linear viscoelastic model operating on :yref:`ScGeom` and :yref:`LudingPhys`. See [Luding2008]_ ,[Singh2013]_ for more details.");
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_LudingPhys_Basic);
+
+} // namespace yade
+

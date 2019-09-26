@@ -14,6 +14,8 @@
 #include<lib/multimethods/FunctorWrapper.hpp>
 #include<core/Timing.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class TimingDeltas;
 class Scene;
 
@@ -79,5 +81,5 @@ class Functor2D:	public Functor,
 	/* do not REGISTER_ATTRIBUTES here, since we are template; derived classes should call REGISTER_ATTRIBUTES(Functor,(their)(own)(attributes)), bypassing Functor2D */
 };
 
-
+} // namespace yade
 

@@ -4,7 +4,7 @@
 
 #include<core/PartialEngine.hpp>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 class HydroForceEngine: public PartialEngine{
 	private:
@@ -98,3 +98,6 @@ class HydroForceEngine: public PartialEngine{
 	);
 };
 REGISTER_SERIALIZABLE(HydroForceEngine);
+
+} // namespace yade
+

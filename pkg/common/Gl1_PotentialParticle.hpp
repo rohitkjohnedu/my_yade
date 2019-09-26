@@ -49,7 +49,7 @@
 #include <vtkTextActor3D.h>
 #include <vtkCylinderSource.h>
 
-
+namespace yade { // Cannot have #include directive inside.
 
 class ImpFunc : public vtkImplicitFunction {
 	public:
@@ -170,5 +170,7 @@ class PotentialParticleVTKRecorder: public PeriodicEngine {
 		);
 };
 REGISTER_SERIALIZABLE(PotentialParticleVTKRecorder);
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

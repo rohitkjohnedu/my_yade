@@ -55,6 +55,8 @@
 #include <vtkImplicitBoolean.h>
 #include <vtkIntArray.h>
 
+namespace yade { // Cannot have #include directive inside.
+
 #ifdef YADE_OPENGL
 
 void Gl1_PotentialParticle::calcMinMax(const PotentialParticle& pp) {
@@ -631,7 +633,6 @@ void PotentialParticleVTKRecorder::action() {
 
 YADE_PLUGIN((PotentialParticleVTKRecorder));
 
-
-//YADE_REQUIRE_FEATURE(OPENGL)
+} // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

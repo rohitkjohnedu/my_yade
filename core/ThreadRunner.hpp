@@ -10,6 +10,8 @@
 
 #include <boost/thread/mutex.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! 
 \brief	ThreadRunner takes care of starting/stopping (executing) the
 	ThreadWorker in the separate thread. 
@@ -75,4 +77,5 @@ class ThreadRunner
 		std::exception workerException;
 };
 
+} // namespace yade
 

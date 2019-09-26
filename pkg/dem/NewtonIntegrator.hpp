@@ -17,6 +17,8 @@
 	#include<omp.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! An engine that can replace the usual series of engines used for integrating the laws of motion.
 
  */
@@ -90,4 +92,6 @@ class NewtonIntegrator : public FieldApplier{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(NewtonIntegrator);
+
+} // namespace yade
 

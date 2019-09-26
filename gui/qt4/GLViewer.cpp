@@ -30,6 +30,8 @@
 	#include<gl2ps.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 static unsigned initBlocked(State::DOF_NONE);
 
 CREATE_LOGGER(GLViewer);
@@ -493,4 +495,6 @@ QString GLViewer::helpString() const
 	//text += "Visit <a href=\"https://yade-dem.org/\">https://yade-dem.org</a> for complete documentation.";
 	return text;
 }
+
+} // namespace yade
 

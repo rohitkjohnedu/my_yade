@@ -8,6 +8,8 @@
 
 #include "ThreadWorker.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 void ThreadWorker::setTerminate(bool b)
 {
 	boost::mutex::scoped_lock lock(m_mutex);
@@ -74,4 +76,6 @@ void ThreadWorker::callSingleAction()
 		m_done = true;
 	}
 };
+
+} // namespace yade
 

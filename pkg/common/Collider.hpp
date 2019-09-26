@@ -14,6 +14,7 @@
 
 #include<pkg/common/Dispatching.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class Collider: public GlobalEngine {
 	public:
@@ -45,3 +46,6 @@ class Collider: public GlobalEngine {
 	);
 };
 REGISTER_SERIALIZABLE(Collider);
+
+} // namespace yade
+

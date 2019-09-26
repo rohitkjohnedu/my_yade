@@ -11,6 +11,8 @@
 #include "TwoPhaseFlowEngine.hpp"
 #include <boost/range/algorithm_ext/erase.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((TwoPhaseFlowEngineT)(TwoPhaseFlowEngine)(PhaseCluster));
 
 CREATE_LOGGER(TwoPhaseFlowEngine);
@@ -3387,6 +3389,8 @@ double TwoPhaseFlowEngine::getPoreThroatRadius(unsigned int cell1, unsigned int 
     }
     return r;
 }
+
+} // namespace yade
 
 #endif //TwoPhaseFLOW
 

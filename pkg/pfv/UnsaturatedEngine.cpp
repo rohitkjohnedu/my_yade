@@ -13,6 +13,7 @@
 #ifdef TWOPHASEFLOW
 
 
+namespace yade { // Cannot have #include directive inside.
 
 
 class UnsaturatedEngine : public TwoPhaseFlowEngine
@@ -352,6 +353,8 @@ double UnsaturatedEngine::getSphericalSubdomainSaturation(Vector3r pos, double r
 }
 
 //--------------end of comparison with experiment----------------------------
+
+} // namespace yade
 
 #endif //TWOPHASEFLOW
 #endif //FLOW_ENGINE

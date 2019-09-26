@@ -8,6 +8,9 @@
 #ifdef YADE_FEM
 #include <pkg/fem/DeformableElement.hpp>
 #include <pkg/fem/FEInternalForceDispatchers.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((InternalForceFunctor)(InternalForceDispatcher));
 InternalForceFunctor::~InternalForceFunctor(){};
 
@@ -33,5 +36,7 @@ void InternalForceDispatcher::action()
 //
 //
 //}
+
+} // namespace yade
 
 #endif //YADE_FEM

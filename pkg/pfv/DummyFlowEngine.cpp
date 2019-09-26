@@ -16,6 +16,8 @@
 
 #include "FlowEngine_DummyFlowEngineT.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 /// We can add data to the Info types by inheritance
 class DummyCellInfo : public FlowCellInfo_DummyFlowEngineT
 {
@@ -56,4 +58,7 @@ REGISTER_SERIALIZABLE(DummyFlowEngine);
 YADE_PLUGIN((DummyFlowEngine));
 
 void DummyFlowEngine::fancyFunction(Real what) {std::cerr<<"yes, I'm a new function"<<std::endl;}
+
+} // namespace yade
+
 #endif //DummyFLOW

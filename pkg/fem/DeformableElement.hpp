@@ -24,9 +24,11 @@ its members that are node shaped bodies.
 
 */
 
+namespace yade { // Cannot have #include directive inside.
+
+
 class NewtonIntegrator;
 class InternalForceFunctor;
-namespace yade{
 typedef Eigen::MatrixXd Matrix;
 
 class DeformableElement: public Shape {
@@ -86,7 +88,8 @@ class DeformableElement: public Shape {
 	REGISTER_CLASS_INDEX(DeformableElement,Shape);
 	DECLARE_LOGGER;
 };
-}
-// necessary
-using namespace yade;
+
 REGISTER_SERIALIZABLE(DeformableElement);
+
+} // namespace yade
+

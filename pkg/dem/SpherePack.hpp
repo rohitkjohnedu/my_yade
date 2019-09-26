@@ -5,6 +5,8 @@
 #include<lib/base/Logging.hpp>
 #include<lib/base/Math.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! Class representing geometry of spherical packing, with some utility functions. */
 class SpherePack{
 	// return coordinate wrapped to x0…x1, relative to x0; don't care about period
@@ -127,4 +129,6 @@ public:
 	SpherePack::_iterator getIterator() const{ return SpherePack::_iterator(*this);};
 	DECLARE_LOGGER;
 };
+
+} // namespace yade
 

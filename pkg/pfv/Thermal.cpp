@@ -26,6 +26,8 @@ Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of therma
 //YADE_PLUGIN((ThermalState));
 //ThermalState::~ThermalState(){};
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(ThermalEngine);
 YADE_PLUGIN((ThermalEngine));
 
@@ -783,6 +785,8 @@ void ThermalEngine::resetFlowBoundaryTemps()
 //         double ratio = detM/ (pv12N*pv13N*pv14N+cp12*pv14N+cp13*pv13N+cp23*pv12N);
 //         return abs(2*atan(ratio));
 // }
+
+} // namespace yade
 
 #endif//YADE_OPENMP
 #endif//THERMAL

@@ -30,6 +30,8 @@ Features of the interaction law:
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/dem/ScGeom.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /** This class holds information associated with each body state*/
 class WireState: public State {
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(WireState,State,"Wire state information of each body.\n\nNone of that is used for computation (at least not now), only for post-processing.",
@@ -126,3 +128,6 @@ class Law2_ScGeom_WirePhys_WirePM: public LawFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_WirePhys_WirePM);
+
+} // namespace yade
+

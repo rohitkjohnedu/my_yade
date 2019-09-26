@@ -16,6 +16,8 @@
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((CapillaryStressRecorder));
 CREATE_LOGGER(CapillaryStressRecorder);
 
@@ -153,4 +155,6 @@ void CapillaryStressRecorder::action()
 		<< endl;
 	
 }
+
+} // namespace yade
 

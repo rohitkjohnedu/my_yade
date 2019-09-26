@@ -13,9 +13,10 @@
 #include<pkg/dem/ElasticContactLaw.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 #include<pkg/dem/PDFEngine.hpp>
+#include<lib/base/Namespaces.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
-namespace py=boost::python;
 
 
 class LubricationPhys: public ViscElPhys {
@@ -137,4 +138,6 @@ class LubricationPDFEngine: public PDFEngine {
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(LubricationPDFEngine);
+
+} // namespace yade
 

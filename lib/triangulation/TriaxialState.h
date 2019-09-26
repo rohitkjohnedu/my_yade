@@ -15,6 +15,8 @@
 #include <vector>
 #include<boost/iostreams/filtering_stream.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*! \class TriaxialState
  * \brief A storage class with ascii input/output for bodies, contacts, and macro-variables. Yade packings are first converted to this object type, before being processed in KinematicLocalisationAnalyser.
  * 
@@ -108,3 +110,6 @@ private :
 };
 
 } // namespace CGT
+
+} // namespace yade
+

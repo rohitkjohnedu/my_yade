@@ -28,8 +28,7 @@
 #include <ctime>
 #include <cstdlib>
 
-
-
+namespace yade { // Cannot have #include directive inside.
 
 
 YADE_PLUGIN((Ig2_PB_PB_ScGeom) 
@@ -2101,6 +2100,8 @@ while(totalIter<500){
   return ( true );
 }
 
+
+} // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS
 

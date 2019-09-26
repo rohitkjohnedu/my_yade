@@ -17,6 +17,8 @@
 #include<pkg/dem/Shop.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN((GlobalStiffnessTimeStepper));
 
@@ -226,3 +228,6 @@ void GlobalStiffnessTimeStepper::computeStiffnesses(Scene* rb){
 
 	}
 }
+
+} // namespace yade
+

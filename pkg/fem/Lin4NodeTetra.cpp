@@ -15,6 +15,8 @@
 #include <pkg/fem/Node.hpp>
 #include <lib/base/Math.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Lin4NodeTetra));
 CREATE_LOGGER(Lin4NodeTetra);
 
@@ -123,6 +125,8 @@ Matrix Lin4NodeTetra::calculateStiffness(Real E, Real v,Vector3r pos0,Vector3r p
 	   return stiffness;
 
 }
+
+} // namespace yade
 
 #endif //YADE_FEM
 

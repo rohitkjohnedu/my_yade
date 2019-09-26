@@ -4,6 +4,8 @@
 #ifdef YADE_CGAL
 #include "Polyhedra.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 //***************************************************************************
 /*! Create Polyhedra (collision geometry) from colliding Polyhedras. */
 class Ig2_Polyhedra_Polyhedra_PolyhedraGeom: public IGeomFunctor
@@ -112,4 +114,7 @@ class Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom: public IGeomFunctor
 REGISTER_SERIALIZABLE(Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom);
 
 //***************************************************************************
+
+} // namespace yade
+
 #endif // YADE_CGAL

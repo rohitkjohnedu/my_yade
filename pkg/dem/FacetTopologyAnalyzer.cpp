@@ -3,6 +3,8 @@
 #include<core/Scene.hpp>
 #include<core/Body.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(FacetTopologyAnalyzer);
 YADE_PLUGIN((FacetTopologyAnalyzer));
 #ifndef FACET_TOPO
@@ -139,4 +141,5 @@ void FacetTopologyAnalyzer::action(){
 }
 #endif
 
+} // namespace yade
 

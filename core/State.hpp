@@ -4,6 +4,8 @@
 #include<lib/multimethods/Indexable.hpp>
 #include<core/Dispatcher.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class State: public Serializable, public Indexable{
 	public:
 		/// linear motion (references to inside se3)
@@ -107,3 +109,6 @@ class State: public Serializable, public Indexable{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(State);
+
+} // namespace yade
+

@@ -6,6 +6,8 @@
 
 #include<core/PartialEngine.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class ForceEngine: public PartialEngine{
 	public:
 		virtual void action();
@@ -68,3 +70,6 @@ class LinearDragEngine: public PartialEngine{
 	);
 };
 REGISTER_SERIALIZABLE(LinearDragEngine);
+
+} // namespace yade
+

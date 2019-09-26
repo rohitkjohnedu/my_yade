@@ -8,6 +8,8 @@
 #endif
 #include "Polyhedra_Ig2.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) 
 	(Ig2_Polyhedra_Polyhedra_ScGeom) (Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom)
 );
@@ -520,5 +522,6 @@ bool Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom::goReverse(const shared_ptr<S
 	return go(shape1,shape2,state2,state1,-shift2,force,interaction);
 }
 
+} // namespace yade
 
 #endif // YADE_CGAL

@@ -15,6 +15,8 @@
 
 #include "FlowEngine_FlowEngine_PeriodicInfo.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 class PeriodicCellInfo : public FlowCellInfo_FlowEngine_PeriodicInfo
 {	
 	public:
@@ -529,6 +531,9 @@ void PeriodicFlowEngine::preparePShifts()
 
 
 YADE_PLUGIN((PeriodicFlowEngine));
+
+} // namespace yade
+
 #endif //FLOW_ENGINE
 
 #endif /* YADE_CGAL */

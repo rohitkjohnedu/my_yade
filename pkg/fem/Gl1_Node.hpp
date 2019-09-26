@@ -10,6 +10,7 @@
 #include <pkg/common/GLDrawFunctors.hpp>
 #include <pkg/fem/Node.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class Gl1_Node : public GlShapeFunctor{
 	private:
@@ -38,3 +39,6 @@ class Gl1_Node : public GlShapeFunctor{
 	RENDERS(Node);
 };
 REGISTER_SERIALIZABLE(Gl1_Node);
+
+} // namespace yade
+

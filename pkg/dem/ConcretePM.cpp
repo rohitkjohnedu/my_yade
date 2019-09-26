@@ -9,6 +9,8 @@
 #include<pkg/common/Box.hpp>
 
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((CpmState)(CpmMat)(Ip2_CpmMat_CpmMat_CpmPhys)(Ip2_FrictMat_CpmMat_FrictPhys)(CpmPhys)(Law2_ScGeom_CpmPhys_Cpm)
 	#ifdef YADE_OPENGL
 		(Gl1_CpmPhys)
@@ -642,3 +644,6 @@ void CpmStateUpdater::update(Scene* _scene){
 #undef YADE_VERIFY
 #undef NNAN
 #undef NNANV
+
+} // namespace yade
+

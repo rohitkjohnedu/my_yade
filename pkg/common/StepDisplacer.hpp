@@ -4,6 +4,8 @@
 #include<core/State.hpp>
 #include<core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class StepDisplacer: public PartialEngine {
 	public:
 		virtual void action() {
@@ -29,3 +31,6 @@ class StepDisplacer: public PartialEngine {
 	);
 };
 REGISTER_SERIALIZABLE(StepDisplacer);
+
+} // namespace yade
+

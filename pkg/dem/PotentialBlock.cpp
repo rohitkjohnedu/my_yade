@@ -3,8 +3,9 @@
 //Polyhedral blocks formulated as in Boon et al (2012) using an inner potential particle (Houlsby, 2009) to calculate the contact normal.
 #include "PotentialBlock.hpp"
 
-YADE_PLUGIN((PotentialBlock));
+namespace yade { // Cannot have #include directive inside.
 
+YADE_PLUGIN((PotentialBlock));
 
 PotentialBlock::~PotentialBlock()
 {
@@ -432,5 +433,6 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 	verticesOnPlane.clear(); oriVerticesOnPlane.clear();
 }
 
+} // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS

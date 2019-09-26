@@ -13,8 +13,7 @@
 #include<lib/base/Math.hpp>
 #include <core/Scene.hpp>
 
-
-
+namespace yade { // Cannot have #include directive inside.
 
 class KinemSimpleShearBox : public BoundaryController
 {
@@ -76,4 +75,5 @@ class KinemSimpleShearBox : public BoundaryController
 
 REGISTER_SERIALIZABLE(KinemSimpleShearBox);
 
+} // namespace yade
 

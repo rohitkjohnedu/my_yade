@@ -12,6 +12,8 @@
 #include<lib/serialization/Serializable.hpp>
 #include<lib/multimethods/Indexable.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class LBMbody:  public Serializable{
     public:
         virtual ~LBMbody() {};
@@ -42,5 +44,7 @@ class LBMbody:  public Serializable{
         );
 };
 REGISTER_SERIALIZABLE(LBMbody);
+
+} // namespace yade
 
 #endif //LBM_ENGINE

@@ -14,6 +14,8 @@
 #include<core/Interaction.hpp>
 #include<core/BodyContainer.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /* This InteractionContainer implementation has reference to the body container and
 stores interactions in 2 places:
 
@@ -169,3 +171,6 @@ class InteractionContainer: public Serializable{
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InteractionContainer);
+
+} // namespace yade
+

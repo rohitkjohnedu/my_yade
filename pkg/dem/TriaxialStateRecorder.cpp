@@ -18,6 +18,8 @@
 #include <pkg/dem/FrictPhys.hpp>
 #include <pkg/dem/Shop.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_LOGGER(TriaxialStateRecorder);
 TriaxialStateRecorder::~TriaxialStateRecorder() {};
 
@@ -70,3 +72,6 @@ void TriaxialStateRecorder::action ()
 }
 
 YADE_PLUGIN((TriaxialStateRecorder));
+
+} // namespace yade
+

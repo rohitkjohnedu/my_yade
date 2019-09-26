@@ -1,6 +1,8 @@
 
 #include "Lubrication.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys)(LubricationPDFEngine)(PDFEngine))
 
 LubricationPhys::~LubricationPhys()
@@ -701,3 +703,6 @@ void LubricationPDFEngine::action()
 }
 
 CREATE_LOGGER(LubricationPDFEngine);
+
+} // namespace yade
+

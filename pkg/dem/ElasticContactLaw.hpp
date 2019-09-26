@@ -13,6 +13,8 @@
 #include<pkg/dem/ScGeom.hpp>
 #include<lib/base/openmp-accu.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Law2_ScGeom_FrictPhys_CundallStrack: public LawFunctor{
 	public:
 		OpenMPAccumulator<Real> plasticDissipation;
@@ -60,5 +62,5 @@ class ElasticContactLaw : public GlobalEngine{
 };
 REGISTER_SERIALIZABLE(ElasticContactLaw);
 
-
+} // namespace yade
 

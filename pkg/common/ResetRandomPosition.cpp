@@ -19,6 +19,8 @@
 //#include<pkg/dem/BodyMacroParameters.hpp>
 #include"ResetRandomPosition.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((ResetRandomPosition));
 CREATE_LOGGER(ResetRandomPosition);
 
@@ -150,4 +152,6 @@ Vector3r ResetRandomPosition::generatePositionInVolume()
     return p1+t*(p2-p1);
     
 }
+
+} // namespace yade
 

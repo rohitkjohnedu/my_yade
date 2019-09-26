@@ -16,6 +16,8 @@
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((Subdomain));
 CREATE_LOGGER(Subdomain);
 
@@ -469,5 +471,7 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 	  }
 	if (subdomainRank != master){ rcharBuff.clear(); } // assuming master alwasy recieves from workers, hence the size of this vector for master is fixed.
 }
+
+} // namespace yade
 
 #endif

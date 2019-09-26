@@ -24,6 +24,8 @@
 	#include<omp.h>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 class Bound;
 #ifdef YADE_OPENGL
 	class OpenGLRenderer;
@@ -114,3 +116,7 @@ class Scene: public Serializable{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Scene);
+
+} // namespace yade
+
+

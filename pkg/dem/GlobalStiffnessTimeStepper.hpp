@@ -10,6 +10,7 @@
 
 #include<core/TimeStepper.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 /*! \brief Compute the critical timestep of the leap-frog scheme based on global stiffness of bodies
 	See usage details in TriaxialTest documentation (TriaxialTest is also a good example of how to use this class)
@@ -53,4 +54,5 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 
 REGISTER_SERIALIZABLE(GlobalStiffnessTimeStepper);
 
+} // namespace yade
 

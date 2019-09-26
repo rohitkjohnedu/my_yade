@@ -1,5 +1,7 @@
 #include<pkg/common/Dispatching.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((BoundFunctor)(IGeomFunctor)(IPhysFunctor)(LawFunctor)(BoundDispatcher)(IGeomDispatcher)(IPhysDispatcher)(LawDispatcher));
 BoundFunctor::~BoundFunctor(){};
 IGeomFunctor::~IGeomFunctor(){};
@@ -200,4 +202,6 @@ void LawDispatcher::action(){
 		}
 	}
 }
+
+} // namespace yade
 

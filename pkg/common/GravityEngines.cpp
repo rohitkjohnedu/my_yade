@@ -12,6 +12,8 @@
 #include<core/Scene.hpp>
 #include<boost/regex.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((GravityEngine)(CentralGravityEngine)(AxialGravityEngine)(HdapsGravityEngine));
 CREATE_LOGGER(GravityEngine);
 
@@ -84,3 +86,6 @@ void HdapsGravityEngine::action(){
 	}
 	GravityEngine::action();
 }
+
+} // namespace yade
+

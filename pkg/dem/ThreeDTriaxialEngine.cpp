@@ -18,6 +18,8 @@
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/common/ElastMat.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys;
 
 CREATE_LOGGER(ThreeDTriaxialEngine);
@@ -141,4 +143,5 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 	}
 }
 
+} // namespace yade
 

@@ -11,6 +11,8 @@
 #include <core/PartialEngine.hpp>
 #include <core/Scene.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 class TorqueEngine: public PartialEngine{
 	public:
 		virtual void action() {
@@ -25,4 +27,5 @@ class TorqueEngine: public PartialEngine{
 };
 REGISTER_SERIALIZABLE(TorqueEngine);
 
+} // namespace yade
 

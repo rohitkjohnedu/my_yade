@@ -13,6 +13,8 @@
 #include<lib/base/Math.hpp>
 #include<pkg/dem/TriaxialStressController.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /** \brief Class for controlling in stress or in strain with respect to each spatial direction a cubical assembly of particles.
  *
  * The engine perform a triaxial compression with a control in direction "i" in stress "if (stressControl_i)" else in strain.
@@ -79,4 +81,5 @@ class ThreeDTriaxialEngine : public TriaxialStressController
 
 REGISTER_SERIALIZABLE(ThreeDTriaxialEngine);
 
+} // namespace yade
 

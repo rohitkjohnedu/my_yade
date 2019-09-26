@@ -10,6 +10,8 @@
 #include<core/Omega.hpp>
 #include<pkg/common/InteractionLoop.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 bool Ig2_Sphere_Sphere_ScGeom::go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2,
                                   const State& state1, const State& state2,
                                   const Vector3r& shift2, const bool& force,
@@ -77,3 +79,6 @@ bool Ig2_Sphere_Sphere_ScGeom6D::goReverse( const shared_ptr<Shape>& cm1, const 
 }
 
 YADE_PLUGIN((Ig2_Sphere_Sphere_ScGeom6D));
+
+} // namespace yade
+

@@ -10,6 +10,7 @@
 #include<core/Body.hpp>
 #include<core/BodyContainer.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class STLImporter {
     public:
@@ -258,3 +259,6 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
     }
     return true;
 }
+
+} // namespace yade
+

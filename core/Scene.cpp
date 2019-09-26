@@ -17,12 +17,13 @@
 #include <core/BodyContainer.hpp>
 #include <core/InteractionContainer.hpp>
 #include <core/TimeStepper.hpp>
+#include <lib/base/Namespaces.hpp>
 
 #include <pwd.h>
 #include <unistd.h>
 #include <time.h>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((Scene));
 CREATE_LOGGER(Scene);
@@ -201,3 +202,6 @@ void Scene::updateBound(){
 	bound->min=mn; 
 	bound->max=mx;
 }
+
+} // namespace yade
+
