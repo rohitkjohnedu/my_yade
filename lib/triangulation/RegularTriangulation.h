@@ -29,6 +29,7 @@
 
 //This include from yade let us use Eigen types
 #include <lib/base/Math.hpp>
+#include <type_traits>
 
 const unsigned facetVertices [4][3] = {{1,2,3},{0,2,3},{0,1,3},{0,1,2}};
 //return the opposite edge (e.g. the opposite of {0,2} is {1,3}) 
@@ -55,7 +56,7 @@ typedef Traits::Vector_3 								CVector;
 typedef Traits::Segment_3								Segment;
 #ifndef NO_REAL_CHECK
 /** compilation inside yade: check that Real in yade is the same as Real we will define; otherwise it might make things go wrong badly (perhaps) **/
-BOOST_STATIC_ASSERT(sizeof(Traits::RT)==sizeof(Real));
+BOOST_STATIC_ASSERT( std::is_same< Traits::RT , Real >::value == true );
 #endif
 #if CGAL_VERSION_NR < CGAL_VERSION_NUMBER(4,11,0)
 typedef Traits::RT									Real; //Dans cartesian, RT = FT
