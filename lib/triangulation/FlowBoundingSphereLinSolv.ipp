@@ -170,7 +170,6 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 {
 	#ifdef SUITESPARSE_VERSION_4
 	if (!multithread && factorExists && useSolver==4){
-		cout << "trying to free some memory" << endl;
 		if (getCHOLMODPerfTimings) gettimeofday (&start, NULL);
 		CHOLMOD(free_sparse)(&Achol, &com);
 		//cholmod_l_free_triplet(&cholT, &com);
