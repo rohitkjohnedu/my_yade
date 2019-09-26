@@ -263,6 +263,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
 	* USE_QT5: use QT5 for GUI (ON by default)
 	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
+	* SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
 	* PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system (-1 by default)
 
 For using more extended parameters of cmake, please follow the corresponding
