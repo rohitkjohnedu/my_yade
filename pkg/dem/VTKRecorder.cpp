@@ -585,7 +585,6 @@ void VTKRecorder::action(){
 	vector<Shop::bodyState> bodyStates;
 	if(recActive[REC_STRESS]) Shop::getStressForEachBody(bodyStates);
 
-
 	vector<Matrix3r> bStresses;
 	if (recActive[REC_BSTRESS])
 	{

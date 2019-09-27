@@ -94,7 +94,6 @@ class VTKRecorder: public PeriodicEngine {
 		Saves interaction information associated with Yade's deformation module.
     ``lubrication``
         Saves lubrications stress from :yref:`LubricationPhys`. ``spheres`` must be active.
-
 )"""))
 		((string,Key,"",,"Necessary if :yref:`recorders<VTKRecorder.recorders>` contains 'cracks' or 'moments'. A string specifying the name of file 'cracks___.txt' that is considered in this case (see :yref:`corresponding attribute<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.Key>`)."))
 		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be exported. If 0, all bodies will be exported.")),
