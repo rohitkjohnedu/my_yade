@@ -77,6 +77,7 @@ void VTKRecorder::action(){
 			recActive[REC_FORCE]=true;
 			recActive[REC_COORDNUMBER]=true;
 			if (scene->isPeriodic) { recActive[REC_PERICELL]=true; }
+			recActive[REC_BSTRESS]=true;
 		}
 		else if(rec=="spheres") recActive[REC_SPHERES]=true;
 		else if(rec=="velocity") recActive[REC_VELOCITY]=true;
