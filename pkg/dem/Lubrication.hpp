@@ -41,6 +41,7 @@ class LubricationPhys: public ViscElPhys {
                 ((bool,contact,false,Attr::readonly,"The spheres are in contact"))
                 ((bool,slip,false,Attr::readonly,"The contact is slipping"))
 				((Vector3r,normalContactForce,Vector3r::Zero(),Attr::readonly,"Normal contact force [N]"))
+				((Vector3r,normalPotentialForce,Vector3r::Zero(),Attr::readonly,"Normal force from potential other than contact [N]"))
 				((Vector3r,shearContactForce,Vector3r::Zero(),Attr::readonly,"Frictional contact force [N]"))
 				((Vector3r,normalLubricationForce,Vector3r::Zero(),Attr::readonly,"Normal lubrication force [N]"))
 				((Vector3r,shearLubricationForce,Vector3r::Zero(),Attr::readonly,"Shear lubrication force [N]"))
@@ -70,14 +71,45 @@ class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_LubricationPhys);
 
 
-class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
+class Law2_ScGeom_VirtualLubricationPhys: public LawFunctor{
         public:
-		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
-                FUNCTOR2D(GenericSpheresContact,LubricationPhys);
-                static void getStressForEachBody(vector<Matrix3r>& NCStresses, vector<Matrix3r>& SCStresses, vector<Matrix3r>& NLStresses, vector<Matrix3r>& SLStresses );
-                static py::tuple PyGetStressForEachBody();
-                static void getTotalStresses(Matrix3r& NCStresses, Matrix3r& SCStresses, Matrix3r& NLStresses, Matrix3r& SLStresses);
-                static py::tuple PyGetTotalStresses();
+            virtual bool go(shared_ptr<IGeom>&, shared_ptr<IPhys>&, Interaction*) { LOG_ERROR("Do not use this class. This is virtual one!"); return false; }
+            FUNCTOR2D(GenericSpheresContact,LubricationPhys);
+            
+            static void getStressForEachBody(vector<Matrix3r>& NCStresses, vector<Matrix3r>& SCStresses, vector<Matrix3r>& NLStresses, vector<Matrix3r>& SLStresses, vector<Matrix3r> & NPStresses);
+            static py::tuple PyGetStressForEachBody();
+            static void getTotalStresses(Matrix3r& NCStresses, Matrix3r& SCStresses, Matrix3r& NLStresses, Matrix3r& SLStresses , Matrix3r& NPStresses);
+            static py::tuple PyGetTotalStresses();
+		
+			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
+			void shearForce_firstOrder_log(LubricationPhys *phys, ScGeom* geom);
+			
+			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
+			void computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
+		
+                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_VirtualLubricationPhys,
+			LawFunctor,
+			"Virtual class for sheared lubrication functions. This don't do any computation and shouldn't be used directly!",
+			// ATTR
+			((bool,activateNormalLubrication,true,,"Activate normal lubrication (default: true)"))
+			((bool,activateTangencialLubrication,true,,"Activate tangencial lubrication (default: true)"))
+			((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
+			((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
+			,// CTOR
+			,// PY
+			.def("getStressForEachBody",&Law2_ScGeom_VirtualLubricationPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress.")
+			.staticmethod("getStressForEachBody")
+			.def("getTotalStresses",&Law2_ScGeom_VirtualLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
+			.staticmethod("getTotalStresses")
+                );
+                DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(Law2_ScGeom_VirtualLubricationPhys);
+
+class Law2_ScGeom_ImplicitLubricationPhys: public Law2_ScGeom_VirtualLubricationPhys{
+        public:
+            bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
+            FUNCTOR2D(GenericSpheresContact,LubricationPhys);
 		
 		// integration of the gap by implicit theta method, adaptative sub-stepping is used if solutionless, the normal force is returned
 		// prevDotU, un_prev, and u_prev are modified after execution (and ready for next step)
@@ -94,22 +126,11 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 
 			Real DichoAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot);
 			Real ObjF(Real const& un, Real const& eps, Real const& alpha, Real const& prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& d);
-			
-			void shearForce_firstOrder(LubricationPhys *phys, ScGeom* geom);
-			void shearForce_firstOrder_log(LubricationPhys *phys, ScGeom* geom);
-			
-			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
-			void computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
-		
-	// clang-format off
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
-			LawFunctor,
-			"Material law for lubrication and contact between two spheres, resolved implicitly. Several resolution methods are available. Iterative exact, solving the 2nd order polynomia. Other resolutions methods are numerical (Newton-Rafson and Dichotomy) with a variable change $\\delta=\\log(u)$, solved in dimentionless coordinates.",
+
+            YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
+			Law2_ScGeom_VirtualLubricationPhys,
+			"Material law for lubrication and contact between two spheres, solved using implicit method. Several resolution methods are available. Iterative exact, solving the 2nd order polynomia. Other resolutions methods are numerical (Newton-Rafson and Dichotomy) with a variable change $\\delta=\\log(u)$, solved in dimentionless coordinates.",
 			// ATTR
-			((bool,activateNormalLubrication,true,,"Activate normal lubrication (default: true)"))
-			((bool,activateTangencialLubrication,true,,"Activate tangencial lubrication (default: true)"))
-			((bool,activateTwistLubrication,true,,"Activate twist lubrication (default: true)"))
-			((bool,activateRollLubrication,true,,"Activate roll lubrication (default: true)"))
 			((int,maxSubSteps,4,,"max recursion depth of adaptative timestepping in the theta-method, the minimal time interval is thus :yref:`Omega::dt<O.dt>`$/2^{depth}$. If still not converged the integrator will switch to backward Euler."))
 			((Real,theta,0.55,,"parameter of the 'theta'-method, 1: backward Euler, 0.5: trapezoidal rule, 0: not used,  0.55: suggested optimum)"))
 			((int,resolution,2,,"Change normal component resolution method, 0: Iterative exact resolution with substepping (theta method, linear contact), 1: Newton-Rafson dimensionless resolution (theta method, linear contact), 2: (default) Dichotomy dimensionless resolution (theta method, linear contact), 3: Exact dimensionless solution with contact prediction (theta method, linear contact). Method 3 is better if the volumic fraction is not too high. Use 2 otherwise."))
@@ -118,10 +139,6 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			((Real, MaxDist, 2.,,"Maximum distance (d/a) for the interaction"))
 			,// CTOR
 			,// PY
-			.def("getStressForEachBody",&Law2_ScGeom_ImplicitLubricationPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress.")
-			.staticmethod("getStressForEachBody")
-			.def("getTotalStresses",&Law2_ScGeom_ImplicitLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
-			.staticmethod("getTotalStresses")
                 );
 	// clang-format on
                 DECLARE_LOGGER;

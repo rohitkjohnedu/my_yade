@@ -3,7 +3,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys)(LubricationPDFEngine)(PDFEngine))
+YADE_PLUGIN((Ip2_FrictMat_FrictMat_LubricationPhys)(LubricationPhys)(Law2_ScGeom_ImplicitLubricationPhys)(Law2_ScGeom_VirtualLubricationPhys)(LubricationPDFEngine)(PDFEngine))
 
 LubricationPhys::~LubricationPhys()
 {
@@ -344,7 +344,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::trapz_integrate_u(Real& prevDotU, Real
 }
 
 // Compute shear force from exact resolution
-void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firstOrder(LubricationPhys* phys, ScGeom* geom)
+void Law2_ScGeom_VirtualLubricationPhys::shearForce_firstOrder(LubricationPhys* phys, ScGeom* geom)
 {
 	Vector3r Ft(Vector3r::Zero());
     Vector3r Ft_ = geom->rotate(phys->shearForce);
@@ -383,7 +383,7 @@ void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firstOrder(LubricationPhys*
 }
 
 // Compute shearforce from adim-log resolution
-void Law2_ScGeom_ImplicitLubricationPhys::shearForce_firstOrder_log(LubricationPhys* phys, ScGeom* geom)
+void Law2_ScGeom_VirtualLubricationPhys::shearForce_firstOrder_log(LubricationPhys* phys, ScGeom* geom)
 {
 	Vector3r Ft(Vector3r::Zero());
     Vector3r Ft_ = geom->rotate(phys->shearForce);
@@ -470,6 +470,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 	phys->normalForce = Vector3r::Zero();
     phys->normalContactForce = Vector3r::Zero();
     phys->normalLubricationForce = Vector3r::Zero();
+    phys->normalPotentialForce = Vector3r::Zero();
 	
     if(activateNormalLubrication) {
 		switch(resolution) {
@@ -505,7 +506,7 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
 }
 
 // Compute shear force and torques from linear
-void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
+void Law2_ScGeom_VirtualLubricationPhys::computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
 {
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(phys->eta <= 0. || phys->u > 0.) {
@@ -535,10 +536,10 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques(Lubricatio
 }
 
 // Compute shear force and torques from adim-log
-void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
+void Law2_ScGeom_VirtualLubricationPhys::computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & C1, Vector3r & C2)
 {
 	Real a((geom->radius1+geom->radius2)/2.);
-	if(resolution == 1) { LOG_DEBUG("This method use log(u/a) for shear and torque component calculation. Make sure phys->delta is set before calling this method."); }
+	LOG_TRACE("This method use log(u/a) for shear and torque component calculation. Make sure phys->delta is set before calling this method.");
 		
 	if(activateTangencialLubrication) shearForce_firstOrder_log(phys,geom);
 	else {phys->shearForce = Vector3r::Zero(); phys->shearContactForce = Vector3r::Zero(); phys->shearLubricationForce = Vector3r::Zero();}
@@ -563,20 +564,23 @@ void Law2_ScGeom_ImplicitLubricationPhys::computeShearForceAndTorques_log(Lubric
 }
 
 CREATE_LOGGER(Law2_ScGeom_ImplicitLubricationPhys);
+CREATE_LOGGER(Law2_ScGeom_VirtualLubricationPhys);
 
-void Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(vector<Matrix3r>& NCStresses, vector<Matrix3r>& SCStresses, vector<Matrix3r>& NLStresses, vector<Matrix3r>& SLStresses)
+void Law2_ScGeom_VirtualLubricationPhys::getStressForEachBody(vector<Matrix3r>& NCStresses, vector<Matrix3r>& SCStresses, vector<Matrix3r>& NLStresses, vector<Matrix3r>& SLStresses, vector<Matrix3r>& NPStresses)
 {
 	const shared_ptr<Scene>& scene=Omega::instance().getScene();
 	NCStresses.resize(scene->bodies->size());
 	SCStresses.resize(scene->bodies->size());
 	NLStresses.resize(scene->bodies->size());
 	SLStresses.resize(scene->bodies->size());
+	NPStresses.resize(scene->bodies->size());
 	
 	for (size_t k=0;k<scene->bodies->size();k++) {
 		NCStresses[k]=Matrix3r::Zero();
 		SCStresses[k]=Matrix3r::Zero();
 		NLStresses[k]=Matrix3r::Zero();
 		SLStresses[k]=Matrix3r::Zero();
+		NPStresses[k]=Matrix3r::Zero();
 	}
 	
 	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions) {
@@ -600,26 +604,29 @@ void Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(vector<Matrix3r>&
 			NLStresses[I->getId2()] -= phys->normalLubricationForce*lV2.transpose();
 			SLStresses[I->getId1()] += phys->shearLubricationForce*lV1.transpose();
 			SLStresses[I->getId2()] -= phys->shearLubricationForce*lV2.transpose();
+			NPStresses[I->getId1()] += phys->normalPotentialForce*lV1.transpose();
+			NPStresses[I->getId2()] -= phys->normalPotentialForce*lV2.transpose();
 		}
 	}
 }
 
-py::tuple Law2_ScGeom_ImplicitLubricationPhys::PyGetStressForEachBody()
+py::tuple Law2_ScGeom_VirtualLubricationPhys::PyGetStressForEachBody()
 {
-	py::list nc, sc, nl, sl;
-	vector<Matrix3r> NCs, SCs, NLs, SLs;
-	getStressForEachBody(NCs, SCs, NLs, SLs);
+	py::list nc, sc, nl, sl, np;
+	vector<Matrix3r> NCs, SCs, NLs, SLs, NPs;
+	getStressForEachBody(NCs, SCs, NLs, SLs, NPs);
 	FOREACH(const Matrix3r& m, NCs) nc.append(m);
 	FOREACH(const Matrix3r& m, SCs) sc.append(m);
 	FOREACH(const Matrix3r& m, NLs) nl.append(m);
 	FOREACH(const Matrix3r& m, SLs) sl.append(m);
+	FOREACH(const Matrix3r& m, NPs) np.append(m);
 	return py::make_tuple(nc, sc, nl, sl);
 }
 
-void Law2_ScGeom_ImplicitLubricationPhys::getTotalStresses(Matrix3r& NCStresses, Matrix3r& SCStresses, Matrix3r& NLStresses, Matrix3r& SLStresses)
+void Law2_ScGeom_VirtualLubricationPhys::getTotalStresses(Matrix3r& NCStresses, Matrix3r& SCStresses, Matrix3r& NLStresses, Matrix3r& SLStresses, Matrix3r& NPStresses)
 {
-	vector<Matrix3r> NCs, SCs, NLs, SLs;
-	getStressForEachBody(NCs, SCs, NLs, SLs);
+	vector<Matrix3r> NCs, SCs, NLs, SLs, NPs;
+	getStressForEachBody(NCs, SCs, NLs, SLs, NPs);
     
   	const shared_ptr<Scene>& scene=Omega::instance().getScene();
     
@@ -638,6 +645,7 @@ void Law2_ScGeom_ImplicitLubricationPhys::getTotalStresses(Matrix3r& NCStresses,
             SCStresses += SCs[i]*vol;
             NLStresses += NLs[i]*vol;
             SLStresses += SLs[i]*vol;
+            NPStresses += NPs[i]*vol;
         }
     }
     
@@ -645,14 +653,15 @@ void Law2_ScGeom_ImplicitLubricationPhys::getTotalStresses(Matrix3r& NCStresses,
     SCStresses /= scene->cell->getVolume();
     NLStresses /= scene->cell->getVolume();
     SLStresses /= scene->cell->getVolume();
+    NPStresses /= scene->cell->getVolume();
 }
 
-py::tuple Law2_ScGeom_ImplicitLubricationPhys::PyGetTotalStresses()
+py::tuple Law2_ScGeom_VirtualLubricationPhys::PyGetTotalStresses()
 {
-	Matrix3r nc(Matrix3r::Zero()), sc(Matrix3r::Zero()), nl(Matrix3r::Zero()), sl(Matrix3r::Zero());
+	Matrix3r nc(Matrix3r::Zero()), sc(Matrix3r::Zero()), nl(Matrix3r::Zero()), sl(Matrix3r::Zero()), np(Matrix3r::Zero());
 
-    getTotalStresses(nc, sc, nl, sl);
-	return py::make_tuple(nc, sc, nl, sl);
+    getTotalStresses(nc, sc, nl, sl, np);
+	return py::make_tuple(nc, sc, nl, sl, np);
 }
 
 void LubricationPDFEngine::action()
@@ -670,10 +679,11 @@ void LubricationPDFEngine::action()
 		pdfs[1][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::shearContactForce, "SC"));
 		pdfs[2][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::normalLubricationForce, "NL"));
 		pdfs[3][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::shearLubricationForce, "SL"));
-		pdfs[4][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresDistanceCalculator("h"));
-		pdfs[5][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresVelocityCalculator("v"));
-		pdfs[6][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("P"));
-		pdfs[7][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("Pc", [](shared_ptr<Interaction> const& I) -> bool {
+        pdfs[4][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresStressCalculator<LubricationPhys>(&LubricationPhys::normalPotentialForce, "NP"));
+		pdfs[5][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresDistanceCalculator("h"));
+		pdfs[6][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresVelocityCalculator("v"));
+		pdfs[7][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("P"));
+		pdfs[8][t][p] = shared_ptr<PDFCalculator>(new PDFSpheresIntrsCalculator("Pc", [](shared_ptr<Interaction> const& I) -> bool {
             
         ScGeom* geom=dynamic_cast<ScGeom*>(I->geom.get());                      
         LubricationPhys *ph = dynamic_cast<LubricationPhys*>(I->phys.get());
