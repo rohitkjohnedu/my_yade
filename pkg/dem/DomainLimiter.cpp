@@ -2,6 +2,23 @@
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/dem/Shop.hpp>
 
+#include<pkg/dem/DemXDofGeom.hpp>
+#include<pkg/dem/ScGeom.hpp>
+#include<pkg/dem/L3Geom.hpp>
+#include<pkg/common/NormShearPhys.hpp>
+#include<lib/smoothing/LinearInterpolate.hpp>
+#include<lib/pyutil/gil.hpp>
+
+#ifdef YADE_OPENGL
+#include<lib/opengl/OpenGLWrapper.hpp>
+#include<lib/opengl/GLUtils.hpp>
+#include<pkg/common/GLDrawFunctors.hpp>
+#include<pkg/common/OpenGLRenderer.hpp>
+#include<GL/glu.h>
+#endif
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((DomainLimiter)(LawTester)
 	#ifdef YADE_OPENGL
 		(GlExtra_LawTester)(GlExtra_OctreeCubes)
@@ -27,13 +44,6 @@ void DomainLimiter::action(){
 		scene->bodies->erase(id,true /*delete clump members*/);
 	}
 }
-
-#include<pkg/dem/DemXDofGeom.hpp>
-#include<pkg/dem/ScGeom.hpp>
-#include<pkg/dem/L3Geom.hpp>
-#include<pkg/common/NormShearPhys.hpp>
-#include<lib/smoothing/LinearInterpolate.hpp>
-#include<lib/pyutil/gil.hpp>
 
 CREATE_LOGGER(LawTester);
 
@@ -226,11 +236,6 @@ void LawTester::action(){
 }
 
 #ifdef YADE_OPENGL
-#include<lib/opengl/OpenGLWrapper.hpp>
-#include<lib/opengl/GLUtils.hpp>
-#include<pkg/common/GLDrawFunctors.hpp>
-#include<pkg/common/OpenGLRenderer.hpp>
-#include<GL/glu.h>
 
 CREATE_LOGGER(GlExtra_LawTester);
 
@@ -342,3 +347,6 @@ void GlExtra_OctreeCubes::render(){
 }
 
 #endif /* YADE_OPENGL */
+
+} // namespace yade
+

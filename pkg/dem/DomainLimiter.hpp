@@ -2,6 +2,11 @@
 #include<pkg/common/PeriodicEngines.hpp>
 #include<core/PartialEngine.hpp>
 #include<pkg/common/Sphere.hpp>
+#ifdef YADE_OPENGL
+#include<pkg/common/OpenGLRenderer.hpp>
+#endif
+
+namespace yade { // Cannot have #include directive inside.
 
 class DomainLimiter: public PeriodicEngine{
 	public:
@@ -66,7 +71,6 @@ class LawTester: public PartialEngine{
 REGISTER_SERIALIZABLE(LawTester);
 
 #ifdef YADE_OPENGL
-#include<pkg/common/OpenGLRenderer.hpp>
 
 class GlExtra_LawTester: public GlExtraDrawer{
 	public:
@@ -94,4 +98,6 @@ class GlExtra_OctreeCubes: public GlExtraDrawer{
 };
 REGISTER_SERIALIZABLE(GlExtra_OctreeCubes);
 #endif
+
+} // namespace yade
 

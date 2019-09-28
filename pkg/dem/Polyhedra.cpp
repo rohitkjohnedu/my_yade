@@ -7,6 +7,11 @@
 	#undef NDEBUG
 #endif
 #include "Polyhedra.hpp"
+#ifdef YADE_OPENGL
+	#include <lib/opengl/OpenGLWrapper.hpp>
+#endif
+
+namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN(/* self-contained in hpp: */ (Polyhedra) (PolyhedraGeom) (Bo1_Polyhedra_Aabb) (PolyhedraPhys) (PolyhedraMat) (Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys) (Ip2_FrictMat_PolyhedraMat_FrictPhys) (Law2_PolyhedraGeom_PolyhedraPhys_Volumetric)
 	/* some code in cpp (this file): */ 
@@ -345,7 +350,6 @@ void Bo1_Polyhedra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, 
 /* Plotting */
 
 #ifdef YADE_OPENGL
-	#include <lib/opengl/OpenGLWrapper.hpp>
 	bool Gl1_Polyhedra::wire;
 	
 	void Gl1_Polyhedra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
@@ -616,5 +620,7 @@ bool Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::go(shared_ptr<IGeom>& /*ig*/, 
 		phys->shearForce = shearForce;
 		return true;
 }
+
+} // namespace yade
 
 #endif // YADE_CGAL

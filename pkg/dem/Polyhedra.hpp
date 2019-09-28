@@ -35,9 +35,21 @@
 #include <CGAL/AABB_triangle_primitive.h>
 #include <CGAL/squared_distance_3.h>
 
+#ifdef YADE_OPENGL
+	#include<pkg/common/GLDrawFunctors.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/GLUtils.hpp>
+	#include<GL/glu.h>
+	#include<pkg/dem/Shop.hpp>
+#endif
+
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
 
+namespace yade { // Cannot have #include directive inside.
+
+// FIXME - these 'using' directives are polluting namespace, better to put them inside another namespace
+//namespace CGpoly {
 //CGAL definitions - does not work with another kernel!! Why???
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Polyhedron = CGAL::Polyhedron_3<K>;
@@ -52,7 +64,7 @@ using Plane = CGAL::Plane_3<K>;
 using Line = CGAL::Line_3<K>;
 using CGAL_ORIGIN = CGAL::Origin;
 using CGAL_AABB_tree = CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_primitive<K,std::vector<Triangle>::iterator>>>;
-
+//}
 
 //**********************************************************************************
 class Polyhedra: public Shape{
@@ -205,12 +217,6 @@ REGISTER_SERIALIZABLE(PolyhedraPhys);
 
 //***************************************************************************
 #ifdef YADE_OPENGL
-	#include<pkg/common/GLDrawFunctors.hpp>
-	#include<lib/opengl/OpenGLWrapper.hpp>
-	#include<lib/opengl/GLUtils.hpp>
-	#include<GL/glu.h>
-	#include<pkg/dem/Shop.hpp>
-	
 	/*! Draw Polyhedra using OpenGL */
 	class Gl1_Polyhedra: public GlShapeFunctor{	
 		public:
@@ -342,5 +348,7 @@ Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB);
 shared_ptr<Body> SplitPolyhedra(const shared_ptr<Body>& body, Vector3r direction, Vector3r point);
 //new polyhedra
 shared_ptr<Body> NewPolyhedra(vector<Vector3r> v, shared_ptr<Material> mat);
+
+} // namespace yade
 
 #endif // YADE_CGAL

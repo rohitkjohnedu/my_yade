@@ -16,6 +16,11 @@
 	//#include <CGAL/intersections.h>
 #endif
 
+#ifdef YADE_OPENGL
+	#include<pkg/common/GLDrawFunctors.hpp>
+#endif
+
+namespace yade { // Cannot have #include directive inside.
 
 /* Our mold of tetrahedron: just 4 vertices.
  *
@@ -84,7 +89,6 @@ class Bo1_Tetra_Aabb: public BoundFunctor{
 REGISTER_SERIALIZABLE(Bo1_Tetra_Aabb);
 
 #ifdef YADE_OPENGL
-	#include<pkg/common/GLDrawFunctors.hpp>
 	/*! Draw Tetra using OpenGL */
 	class Gl1_Tetra: public GlShapeFunctor{	
 		public:
@@ -197,4 +201,5 @@ Matrix3r TetrahedronCentralInertiaTensor(const vector<Vector3r>& v);
 //Matrix3r TetrahedronCentralInertiaTensor(const Vector3r v[4]);
 Quaternionr TetrahedronWithLocalAxesPrincipal(shared_ptr<Body>& tetraBody);
 
+} // namespace yade
 

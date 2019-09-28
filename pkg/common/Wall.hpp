@@ -3,6 +3,11 @@
 #include<core/Shape.hpp>
 #include<pkg/common/Dispatching.hpp>
 
+#ifdef YADE_OPENGL
+	#include<pkg/common/GLDrawFunctors.hpp>
+#endif
+
+namespace yade { // Cannot have #include directive inside.
 
 /*! Object representing infinite plane aligned with the coordinate system (axis-aligned wall). */
 class Wall: public Shape{
@@ -27,7 +32,6 @@ class Bo1_Wall_Aabb: public BoundFunctor{
 };
 REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 #ifdef YADE_OPENGL
-	#include<pkg/common/GLDrawFunctors.hpp>
 	class Gl1_Wall: public GlShapeFunctor{	
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
@@ -38,4 +42,6 @@ REGISTER_SERIALIZABLE(Bo1_Wall_Aabb);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Wall);
 #endif
+
+} // namespace yade
 

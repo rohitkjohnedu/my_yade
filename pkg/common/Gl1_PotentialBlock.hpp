@@ -87,8 +87,17 @@
 #include <CGAL/AABB_triangle_primitive.h>
 #include <CGAL/squared_distance_3.h>
 
+#ifdef YADE_OPENGL
+	#include<pkg/common/GLDrawFunctors.hpp>
+	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/GLUtils.hpp>
+	#include<GL/glu.h>
+	#include<pkg/dem/Shop.hpp>
+#endif
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+namespace yade { // Cannot have #include directive inside.
 
 /* NEW SCRIPT USING FACETS*/
 
@@ -96,6 +105,8 @@
 #define unlikely(x)     __builtin_expect((x),0)
 
 //CGAL definitions - does not work with another kernel!! Why???
+// FIXME - this should be collected in single place. It's in three different places already!
+
 using K = CGAL::Exact_predicates_inexact_constructions_kernel;
 using Polyhedron = CGAL::Polyhedron_3<K>;
 
@@ -117,11 +128,6 @@ using CGAL_AABB_tree = CGAL::AABB_tree<CGAL::AABB_traits<K,CGAL::AABB_triangle_p
 
 
 #ifdef YADE_OPENGL
-	#include<pkg/common/GLDrawFunctors.hpp>
-	#include<lib/opengl/OpenGLWrapper.hpp>
-	#include<lib/opengl/GLUtils.hpp>
-	#include<GL/glu.h>
-	#include<pkg/dem/Shop.hpp>
 	
 	/* Draw PotentialBlocks using OpenGL */
 	class Gl1_PotentialBlock: public GlShapeFunctor{
@@ -163,6 +169,9 @@ bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 //Polyhedron Simplify(Polyhedron P, Real lim);
 
 #endif // YADE_OPENGL
+
+} // namespace yade
+
 #endif // YADE_CGAL
 
 
@@ -225,6 +234,7 @@ bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 //#endif // YADE_OPENGL
 
 
+namespace yade { // Cannot have #include directive inside.
 
 
 	class ImpFuncPB : public vtkImplicitFunction {
@@ -316,6 +326,8 @@ bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 	  );
 	};
 	REGISTER_SERIALIZABLE(PotentialBlockVTKRecorderTunnel);
+
+} // namespace yade
 
 
 #endif // YADE_POTENTIAL_BLOCKS

@@ -56,6 +56,10 @@ There are other classes, which are not strictly necessary:
 #include<pkg/dem/FrictPhys.hpp>
 #include<lib/base/Namespaces.hpp>
 
+#ifdef YADE_OPENGL
+	#include<pkg/common/GLDrawFunctors.hpp>
+#endif
+
 namespace yade { // Cannot have #include directive inside.
 
 
@@ -308,7 +312,6 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_CpmPhys_Cpm);
 *********************************************************************************/
 
 #ifdef YADE_OPENGL
-	#include<pkg/common/GLDrawFunctors.hpp>
 	class Gl1_CpmPhys: public GlIPhysFunctor {
 		public: virtual void go(const shared_ptr<IPhys>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
 		virtual ~Gl1_CpmPhys() {};

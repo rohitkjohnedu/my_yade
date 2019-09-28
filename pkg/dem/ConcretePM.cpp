@@ -8,6 +8,10 @@
 #include<pkg/common/Wall.hpp>
 #include<pkg/common/Box.hpp>
 
+#ifdef YADE_OPENGL
+	#include<lib/opengl/OpenGLWrapper.hpp>
+	#include<lib/opengl/GLUtils.hpp>
+#endif
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -463,8 +467,6 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 
 #ifdef YADE_OPENGL
 	/********************** Gl1_CpmPhys ****************************/
-	#include<lib/opengl/OpenGLWrapper.hpp>
-	#include<lib/opengl/GLUtils.hpp>
 
 	CREATE_LOGGER(Gl1_CpmPhys);
 

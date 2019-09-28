@@ -14,6 +14,9 @@
 #ifdef YADE_CGAL
 	#include <CGAL/intersections.h>
 #endif
+#ifdef YADE_OPENGL
+	#include <lib/opengl/OpenGLWrapper.hpp>
+#endif
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -983,7 +986,6 @@ void TetraVolumetricLaw::action()
 }
 
 #ifdef YADE_OPENGL
-	#include <lib/opengl/OpenGLWrapper.hpp>
 	
 	bool Gl1_Tetra::wire;
 	void Gl1_Tetra::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
