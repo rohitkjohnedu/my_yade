@@ -53,7 +53,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         if (desiredPorosity != 0){
 	    Real actualPorosity = Shop::getPorosityAlt();
 	    volumeCorrection = desiredPorosity/actualPorosity;
-        }	
+        }
 	setPositionsBuffer(true);
 	if (!first and alphaBound>=0) addAlphaToPositionsBuffer(true);
 	timingDeltas->checkpoint ( "Position buffer" );
@@ -66,14 +66,14 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	  backgroundSolver=solver;
 	  backgroundCompleted=true;
 	}
-	
+
 	#ifdef YADE_OPENMP
 	solver->ompThreads = ompThreads>0? ompThreads : omp_get_max_threads();
 	#endif
         timingDeltas->checkpoint ( "Triangulating" );
 	updateVolumes ( *solver );
         timingDeltas->checkpoint ( "Update_Volumes" );
-	
+
         epsVolCumulative += epsVolMax;
 	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
@@ -89,7 +89,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 		if (fixTriUpdatePermInt>0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
 	#endif
 		//
-		
+
 		if (controlCavityPressure) solver->adjustCavityPressure(scene->dt,1,pZero);
 		if (controlCavityVolumeChange) solver->adjustCavityVolumeChange(scene->dt,1,pZero);
 		if (phiZero>0) solver->adjustCavityCompressibility(pZero);
@@ -131,7 +131,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
 				fluxChanged=false;
 			}
-			
+
 			backgroundSolver = shared_ptr<FlowSolver> (new FlowSolver);
 			if (metisForced) {backgroundSolver->eSolver.cholmod().nmethods=1; backgroundSolver->eSolver.cholmod().method[0].ordering=CHOLMOD_METIS;}
 			backgroundSolver->imposedP = vector<pair<CGT::Point,Real> >(solver->imposedP);
@@ -300,6 +300,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.xMin = 1000.0, flow.xMax = -10000.0, flow.yMin = 1000.0, flow.yMax = -10000.0, flow.zMin = 1000.0, flow.zMax = -10000.0;
 	flow.tesselation().vertexHandles.clear();
 	flow.tesselation().vertexHandles.resize(scene->bodies->size()+6,NULL);
+	flow.tesselation().vertexHandles.shrink_to_fit();
 	flow.alphaBound = alphaBound;
 	flow.alphaBoundValue = alphaBoundValue;
 }
@@ -342,7 +343,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	for ( FiniteCellsIterator cell = flow.tesselation().Triangulation().finite_cells_begin(); cell != cell_end; cell++ ){
 		flow.tesselation().cellHandles.push_back(cell);
 		cell->info().id=k++;}//define unique numbering now, corresponds to position in cellHandles
-
+	flow.tesselation().cellHandles.shrink_to_fit();
 // for fast loop on facets ( useful in thermal engine only)
 	if (thermalEngine){
 		flow.tesselation().facetCells.clear();
@@ -354,6 +355,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 				}
 			}
 		}
+		flow.tesselation().facetCells.shrink_to_fit();
 	}
 
 
@@ -368,12 +370,12 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         flow.initializePressure ( pZero );
 	flow.computePermeability();
 	if (thermalEngine) {
-		thermalBoundaryConditions ( flow ); 
+		thermalBoundaryConditions ( flow );
 		flow.initializeTemperatures ( tZero );
 		flow.sphericalVertexAreaCalculated=false;
 	}
 
-	
+
         if ( !first && !multithread && (useSolver==0 || fluidBulkModulus>0 || doInterpolate || thermalEngine)){
 		flow.interpolate ( flow.T[!flow.currentTes], flow.tesselation() );
 		if (phiZero>0) flow.adjustCavityCompressibility(pZero); // consider compressibility of air in cavity
@@ -388,6 +390,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	vector<posData>& buffer = current? positionBufferCurrent : positionBufferParallel;
 	buffer.clear();
 	buffer.resize(scene->bodies->size());
+	buffer.shrink_to_fit();
 	shared_ptr<Sphere> sph ( new Sphere );
 	const int Sph_Index = sph->getClassIndexStatic();
 	FOREACH ( const shared_ptr<Body>& b, *scene->bodies ) {
@@ -410,10 +413,8 @@ template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT 
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::addAlphaToPositionsBuffer(bool current)
 {
 	vector<posData>& buffer = current ? positionBufferCurrent : positionBufferParallel;
-	const int oldBufferSize = buffer.size(); 	
+	const int oldBufferSize = buffer.size();
 	buffer.resize(solver->T[solver->currentTes].maxId+1);
-	//cout << "new buffer size " << buffer.size() << endl;
-	//cout << "vertex handle size "<< solver->T[solver->currentTes].vertexHandles.size() << endl;
  	for (int i=oldBufferSize;i<=solver->T[solver->currentTes].maxId;i++) {
 		if (i<solver->alphaIdOffset+1) continue;
 		posData& dat = buffer[solver->T[solver->currentTes].vertexHandles[i]->info().id()];
@@ -421,7 +422,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
  		dat.id = solver->T[solver->currentTes].vertexHandles[i]->info().id();
  		dat.pos=Vector3r(solver->T[solver->currentTes].vertexHandles[i]->point().x(),solver->T[solver->currentTes].vertexHandles[i]->point().y(),solver->T[solver->currentTes].vertexHandles[i]->point().z());
  		dat.radius = sqrt(solver->T[solver->currentTes].vertexHandles[i]->point().weight());
-		dat.exists=false; // during retriangulation with current position buffer, we dont want it to add these. 
+		dat.exists=false; // during retriangulation with current position buffer, we dont want it to add these.
  	}
 }
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
@@ -472,7 +473,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 
         flow.cornerMin = CGT::Point ( flow.xMin, flow.yMin, flow.zMin );
         flow.cornerMax = CGT::Point ( flow.xMax, flow.yMax, flow.zMax );
- 
+
         //assign BCs types and values
         boundaryConditions ( flow );
 	if (thermalEngine) thermalBoundaryConditions ( flow );
@@ -517,7 +518,7 @@ template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT 
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::initializeVolumes ( Solver& flow )
 {
 	//typedef typename Solver::FiniteVerticesIterator FiniteVerticesIterator;
-	
+
 	FiniteVerticesIterator vertices_end = flow.tesselation().Triangulation().finite_vertices_end();
 	CGT::CVector Zero(0,0,0);
 	for (FiniteVerticesIterator V_it = flow.tesselation().Triangulation().finite_vertices_begin(); V_it!= vertices_end; V_it++) V_it->info().forces=Zero;
@@ -530,11 +531,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			case ( 1 ) : cell->info().volume() = volumeCellSingleFictious ( cell ); break;
 			case ( 2 ) : cell->info().volume() = volumeCellDoubleFictious ( cell ); break;
 			case ( 3 ) : cell->info().volume() = volumeCellTripleFictious ( cell ); break;
-			default: break; 
+			default: break;
 		}
 
 	if (flatThreshold>=0 && cell->info().volume() <= flatThreshold) cell->info().blocked = true;
-	if ((flow.fluidBulkModulus>0 || thermalEngine) && desiredPorosity>0 && !cell->info().blocked) { 
+	if ((flow.fluidBulkModulus>0 || thermalEngine) && desiredPorosity>0 && !cell->info().blocked) {
 		cell->info().invVoidVolume() = 1. / cell->info().volume();
 	} else if ((flow.fluidBulkModulus>0 || thermalEngine || iniVoidVolumes) && desiredPorosity == 0 && !cell->info().blocked) {
 		cell->info().invVoidVolume() = 1. / ( std::abs(cell->info().volume()) - flow.volumeSolidPore(cell) );
@@ -721,7 +722,7 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	const Vector3r& p2 = positionBufferCurrent[cell->vertex ( 2 )->info().id()].pos;
 	const Vector3r& p3 = positionBufferCurrent[cell->vertex ( 3 )->info().id()].pos;
 	Real volume = -inv6 * ((p0-p1).cross(p0-p2)).dot(p0-p3);
-	if (/*debug && */volume<0) cerr<<"negative volume for an ordinary pore (temp warning, should still be safe)"<<endl; 
+	if (/*debug && */volume<0) cerr<<"negative volume for an ordinary pore (temp warning, should still be safe)"<<endl;
         if ( ! ( cell->info().volumeSign ) ) cell->info().volumeSign= ( volume>0 ) ?1:-1;
 	Real retVol;
 	if (cell->info().isCavity) retVol = volume; // don't factor volume if it is a cavity cell
@@ -753,7 +754,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			const VertexInfo& vi2 = *flow.edgeIds[i].second;
 			const int& id1 = vi1.id();
 			const int& id2 = vi2.id();
-			
+
 			int hasFictious= Tes.vertex ( id1 )->info().isFictious +  Tes.vertex ( id2 )->info().isFictious;
 			if (hasFictious>0 or id1==id2) continue;
 			const shared_ptr<Body>& sph1 = Body::byId ( id1, scene );
@@ -764,11 +765,11 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			const Real& r2 = s2->radius;
 			Vector3r deltaV; Real deltaNormV; Vector3r deltaShearV;
 			Vector3r O1O2Vector; Real O1O2; Vector3r normal; Real surfaceDist; Vector3r O1CVector; Vector3r O2CVector;Real meanRad ;Real Rh; Vector3r deltaAngVel; Vector3r deltaShearAngVel;
-			Vector3r shearLubF; Vector3r normaLubF; Vector3r pumpT; Vector3r deltaAngNormVel; Vector3r twistT; Vector3r angVel1; Vector3r angVel2; 
+			Vector3r shearLubF; Vector3r normaLubF; Vector3r pumpT; Vector3r deltaAngNormVel; Vector3r twistT; Vector3r angVel1; Vector3r angVel2;
 		//FIXME: if periodic and velGrad!=0, then deltaV should account for velGrad, not the case currently
 			if ( !hasFictious ){
 				O1O2Vector = sph2->state->pos + makeVector3r(vi2.ghostShift()) - sph1->state->pos - makeVector3r(vi1.ghostShift());
-				O1O2 = O1O2Vector.norm(); 
+				O1O2 = O1O2Vector.norm();
 				normal= (O1O2Vector/O1O2);
 				surfaceDist = O1O2 - r2 - r1;
 				//FIXME: what is that?
@@ -801,7 +802,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 					else{
 						O1CVector =  O1O2Vector;
 						O2CVector = Vector3r::Zero();}
-				
+
 					Rh = surfaceDist + 0.45 * meanRad;
 					Vector3r v1 = ( Tes.vertex ( id1 )->info().isFictious ) ? flow.boundary ( id1 ).velocity:sph1->state->vel + sph1->state->angVel.cross(r1 * normal);
 					Vector3r v2 = ( Tes.vertex ( id2 )->info().isFictious ) ? flow.boundary ( id2 ).velocity:sph2->state->vel + sph2->state->angVel.cross(-r2 * (normal));
@@ -818,37 +819,37 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			flow.surfaceDistance.push_back(max(surfaceDist, 0.) + eps*meanRad);
 
 			/// Compute the  shear Lubrication force and torque on each particle
-			
+
 			if (shearLubrication)
 				shearLubF = flow.computeShearLubricationForce(deltaShearV,surfaceDist,i,eps,O1O2,meanRad);
-			else if (viscousShear) 
+			else if (viscousShear)
 				shearLubF = flow.computeViscousShearForce ( deltaShearV, i , Rh);
-				
+
 			if (viscousShear || shearLubrication){
 
 				flow.shearLubricationForces[id1]+=shearLubF;
 				flow.shearLubricationForces[id2]+=(-shearLubF);
 				flow.shearLubricationTorques[id1]+=O1CVector.cross(shearLubF);
 				flow.shearLubricationTorques[id2]+=O2CVector.cross(-shearLubF);
-				
+
 				/// Compute the  pump Lubrication torque on each particle
-				
+
 				if (pumpTorque){
 					pumpT = flow.computePumpTorque(deltaShearAngVel, surfaceDist, i, eps, meanRad );
 					flow.pumpLubricationTorques[id1]+=(-pumpT);
 					flow.pumpLubricationTorques[id2]+=pumpT;}
-				
+
 				/// Compute the  twist Lubrication torque on each particle
-				
+
 				if (twistTorque){
 					deltaAngNormVel = (normal.dot(deltaAngVel))*normal ;
 					twistT = flow.computeTwistTorque(deltaAngNormVel, surfaceDist, i, eps, meanRad );
 					flow.twistLubricationTorques[id1]+=(-twistT);
 					flow.twistLubricationTorques[id2]+=twistT;
 				}
-			}		
+			}
 			/// Compute the viscous shear stress on each particle
-			
+
 			if (viscousShearBodyStress){
 				flow.shearLubricationBodyStress[id1] += shearLubF * O1CVector.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
 				flow.shearLubricationBodyStress[id2] += (-shearLubF) * O2CVector.transpose()/ (4.0/3.0 *3.14* pow(r2,3));
@@ -856,7 +857,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 				}
 
 			/// Compute the normal lubrication force applied on each particle
-			
+
 			if (normalLubrication){
 				deltaNormV = normal.dot(deltaV);
 				flow.deltaNormVel.push_back(deltaNormV * normal);
@@ -865,17 +866,17 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 				flow.normalLubricationForce[id2]+=(-normaLubF);
 
 				/// Compute the normal lubrication stress on each particle
-				
+
 				if (viscousNormalBodyStress){
 					flow.normalLubricationBodyStress[id1] += normaLubF * O1CVector.transpose()/ (4.0/3.0 *3.14* pow(r1,3));
 					flow.normalLubricationBodyStress[id2] += (-normaLubF) *O2CVector.transpose() / (4.0/3.0 *3.14* pow(r2,3));
 					flow.normalStressInteraction.push_back(normaLubF * O1O2Vector.transpose()/(4.0/3.0 *3.14* pow(r1,3)));
 				}
 			}
-			
+
 			if (!hasFictious)
 				flow.onlySpheresInteractions.push_back(i);
-				
+
 		}
 	}
 }
@@ -907,9 +908,9 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	flow.factorizedEigenSolver = false;
 	if (!first) flow.reuseOrdering = true;
 	meshUpdateInterval = -1;
-	defTolerance = -1; 
+	defTolerance = -1;
 	permUpdateIters = 0;
-	
+
 }
 #endif
 
@@ -938,7 +939,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	Vector3r torque;
         FiniteVerticesIterator verticesEnd = solver->T[solver->currentTes].Triangulation().finite_vertices_end();
 	size_t bodiesLength = scene->bodies->size();
-        for ( FiniteVerticesIterator vIt = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); vIt !=  verticesEnd; vIt++ ) 
+        for ( FiniteVerticesIterator vIt = solver->T[solver->currentTes].Triangulation().finite_vertices_begin(); vIt !=  verticesEnd; vIt++ )
 	{
 		int vId = vIt->info().id();
 		force = pressureForce ? Vector3r ( vIt->info().forces[0],vIt->info().forces[1],vIt->info().forces[2] ): Vector3r(0,0,0);
@@ -971,4 +972,3 @@ bool TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 #endif //FLOW_ENGINE
 
 #endif /* YADE_CGAL */
-

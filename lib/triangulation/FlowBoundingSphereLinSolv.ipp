@@ -101,7 +101,7 @@ FlowBoundingSphereLinSolv<_Tesselation,FlowType>::FlowBoundingSphereLinSolv(): F
 	#endif
 	#ifdef SUITESPARSE_VERSION_4
 	CHOLMOD(start)(&com);
-	//CHOLMOD(wildcard)(); 
+	//CHOLMOD(wildcard)();
 	factorExists=false;
 	com.nmethods= 1; // nOrderingMethods; //1;
 	com.method[0].ordering = CHOLMOD_METIS; // orderingMethod; //CHOLMOD_METIS;
@@ -206,6 +206,7 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
 			orderedCells.push_back(cell); cell->info().index=0;
 			if (!cell->info().Pcondition && !cell->info().blocked) ++ncols;}
+		orderedCells.shrink_to_fit();
 //		//Segfault on 14.10, and useless overall since SuiteSparse has preconditionners (including metis)
 // 		spatial_sort(orderedCells.begin(),orderedCells.end(), CellTraits_for_spatial_sort<RTriangulation>());
 		T_cells.clear();
@@ -222,12 +223,16 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		js.resize(n);
 		vs.resize(n);
 		T_x.resize(ncols);
+		T_x.shrink_to_fit();
 		T_b.resize(ncols);
+		T_b.shrink_to_fit();
 		T_bv.resize(ncols);
+		T_bv.shrink_to_fit();
 		bodv.resize(ncols);
 		xodv.resize(ncols);
 		//gsB.resize(ncols+1);
 		T_cells.resize(ncols+1);
+		T_cells.shrink_to_fit();
 		T_nnz=0;}
 	for (int kk=0; kk<ncols;kk++) T_b[kk]=0;
 	///Ordered cells
@@ -327,10 +332,10 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystem(Real dt)
 		#endif //TAUCS_LIB
 		#ifdef LINSOLV
 		} else if (useSolver==3){
-			tripletList.clear(); tripletList.resize(T_nnz);
+			tripletList.clear(); tripletList.resize(T_nnz); tripletList.shrink_to_fit();
 			for(int k=0;k<T_nnz;k++) tripletList[k]=ETriplet(is[k]-1,js[k]-1,vs[k]);
-			A.data().squeeze();
  			A.resize(ncols,ncols);
+			A.data().squeeze();
 			A.setFromTriplets(tripletList.begin(), tripletList.end());
 		#endif
 		#ifdef SUITESPARSE_VERSION_4
