@@ -42,10 +42,11 @@
 #include <csignal>
 
 #include <pkg/common/KinematicEngines.hpp>
+#include <lib/base/Namespaces.hpp>
+
+namespace yade { // Cannot have #include directive inside.
 
 CREATE_CPP_LOCAL_LOGGER("yadeWrapper.cpp");
-
-namespace py = boost::python;
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
@@ -828,12 +829,18 @@ class pyOmega{
 	std::string tmpFilename(){ return OMEGA.tmpFilename(); }
 };
 
+} // namespace yade
+
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(wrapper)
 {
+	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
+	namespace py = ::boost::python;
 	py::scope().attr("__doc__")="Wrapper for c++ internals of yade.";
 
 	YADE_SET_DOCSTRING_OPTS;
 
+	// keep in sync with lib/serialization/Serializable.hpp !
 	py::enum_<yade::Attr::flags>("AttrFlags")
 		.value("noSave",yade::Attr::noSave)
 		.value("readonly",yade::Attr::readonly)

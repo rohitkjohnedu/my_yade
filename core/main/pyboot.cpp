@@ -9,8 +9,8 @@
 		case SIGABRT:
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
-			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<Omega::instance().gdbCrashBatch<<"'"<<endl;
-			int ret = std::system((string("gdb -x ")+Omega::instance().gdbCrashBatch).c_str());
+			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<yade::Omega::instance().gdbCrashBatch<<"'"<<endl;
+			int ret = std::system((string("gdb -x ")+yade::Omega::instance().gdbCrashBatch).c_str());
 			if (ret!=0) cerr << "unable to execute gdb" << endl;
 			raise(sig); // reemit signal after exiting gdb
 			break;
@@ -23,7 +23,7 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 
 	PyEval_InitThreads();
 
-	Omega& O(Omega::instance());
+	yade::Omega& O(yade::Omega::instance());
 	O.init();
 	O.origArgv=NULL; O.origArgc=0; // not needed, anyway
 	O.confDir=confDir;
@@ -31,19 +31,25 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 	#ifdef YADE_DEBUG
 		ofstream gdbBatch;
 		O.gdbCrashBatch=O.tmpFilename();
-		gdbBatch.open(O.gdbCrashBatch.c_str()); gdbBatch<<"attach "<<boost::lexical_cast<string>(getpid())<<"\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n"; gdbBatch.close();
+		gdbBatch.open(O.gdbCrashBatch.c_str());
+		gdbBatch << "attach " <<boost::lexical_cast<string>(getpid()) << "\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n";
+		gdbBatch.close();
 		signal(SIGABRT,crashHandler);
 		signal(SIGSEGV,crashHandler);
 	#endif
 
-	vector<string> ppp; for(int i=0; i<boost::python::len(pp); i++) ppp.push_back(boost::python::extract<string>(pp[i]));
-	Omega::instance().loadPlugins(ppp);
+	std::vector<std::string> ppp;
+	for( int i=0 ; i<boost::python::len(pp) ; i++ ) {
+		ppp.push_back(boost::python::extract<std::string>(pp[i]));
+	}
+	yade::Omega::instance().loadPlugins(ppp);
 }
 void yadeFinalize(){
-	Omega::instance().cleanupTemps();
+	yade::Omega::instance().cleanupTemps();
 }
 
 BOOST_PYTHON_MODULE(boot){
 	boost::python::scope().attr("initialize")=&yadeInitialize;
 	boost::python::scope().attr("finalize")=&yadeFinalize; //,"Finalize yade (only to be used internally).")
 }
+

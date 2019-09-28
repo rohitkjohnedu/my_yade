@@ -10,13 +10,14 @@
 #include <pkg/common/Sphere.hpp>
 #include <pkg/common/ElastMat.hpp>
 #include <lib/pyutil/doc_opts.hpp>
+#include <lib/base/Namespaces.hpp>
 #include <cmath>
 
 #include <numpy/ndarraytypes.h>
 
-CREATE_CPP_LOCAL_LOGGER("_polyhedra_utils.cpp");
+namespace yade { // Cannot have #include directive inside.
 
-namespace py = boost::python;
+CREATE_CPP_LOCAL_LOGGER("_polyhedra_utils.cpp");
 
 //**********************************************************************************
 //print polyhedron in basic position
@@ -519,7 +520,12 @@ bool convexHull(vector<Vector3r> points){
 	return true;
 } 
 
+} // namespace yade
+
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_polyhedra_utils){
+	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
+	namespace py = ::boost::python;
 	YADE_SET_DOCSTRING_OPTS;
 	py::def("PrintPolyhedra",PrintPolyhedra,"Print list of vertices sorted according to polyhedrons facets.");
 	py::def("PrintPolyhedraActualPos",PrintPolyhedraActualPos,"Print list of vertices sorted according to polyhedrons facets.");
@@ -538,3 +544,4 @@ BOOST_PYTHON_MODULE(_polyhedra_utils){
 }
 
 #endif // YADE_CGAL
+

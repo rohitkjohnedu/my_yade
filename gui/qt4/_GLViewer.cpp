@@ -67,18 +67,25 @@ void centerViews(void){ OpenGLManager::self->centerAllViews(); }
 
 shared_ptr<OpenGLRenderer> getRenderer(){ return OpenGLManager::self->renderer; }
 
+} // namespace yade
+
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_GLViewer){
+	namespace y  = ::yade;
+	namespace py = ::boost::python;
+
 	YADE_SET_DOCSTRING_OPTS;
 	
-	OpenGLManager* glm=new OpenGLManager(); // keep this singleton object forever
+	y::OpenGLManager* glm=new y::OpenGLManager(); // keep this singleton object forever
 	glm->emitStartTimer();
 
-	py::def("View",createView,"Create a new 3d view.");
-	py::def("center",centerViews,"Center all views.");
-	py::def("views",getAllViews,"Return list of all open :yref:`yade.qt.GLViewer` objects");
+	py::def("View"     , y::createView   , "Create a new 3d view.");
+	py::def("center"   , y::centerViews  , "Center all views.");
+	py::def("views"    , y::getAllViews  , "Return list of all open :yref:`yade.qt.GLViewer` objects");
 	
-	py::def("Renderer",&getRenderer,"Return the active :yref:`OpenGLRenderer` object.");
+	py::def("Renderer" , &y::getRenderer , "Return the active :yref:`OpenGLRenderer` object.");
 
+	using pyGLViewer = yade::pyGLViewer;
 	py::class_<pyGLViewer>("GLViewer",py::no_init)
 		.add_property("upVector",&pyGLViewer::get_upVector,&pyGLViewer::set_upVector,"Vector that will be shown oriented up on the screen.")
 		.add_property("lookAt",&pyGLViewer::get_lookAt,&pyGLViewer::set_lookAt,"Point at which camera is directed.")

@@ -11,7 +11,7 @@ CREATE_CPP_LOCAL_LOGGER("_libVersions.cpp")
 py::tuple extractNumbers(std::string verStr, std::string what) {
 	std::stringstream ss(verStr);
 	std::vector<int> verNum{};
-	string temp;
+	std::string temp;
 	int found;
 	while (!ss.eof()) {
 		ss >> temp;

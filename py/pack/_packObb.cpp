@@ -17,16 +17,18 @@ template<typename Scalar> Eigen::Matrix<Scalar,3,3> matrixFromEulerAnglesXYZ(Sca
 	// better to use that, than reinvent own Euler angles.
 	#include <unsupported/Eigen/EulerAngles>
 
-	inline Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
-		Matrix3r ret = Eigen::EulerAnglesXYZd( x,y,z ).toRotationMatrix();
+	inline yade::Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
+		yade::Matrix3r ret = Eigen::EulerAnglesXYZd( x,y,z ).toRotationMatrix();
 		assert(ret == matrixFromEulerAnglesXYZ<Real>(x,y,z));
 		return ret;
 	}
 # else
-	inline Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
+	inline yade::Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
 		return matrixFromEulerAnglesXYZ<Real>(x,y,z);
 	}
 #endif
+
+namespace yade { // Cannot have #include directive inside.
 
 // compute minimum bounding for a cloud of points
 
@@ -84,9 +86,12 @@ boost::python::tuple bestFitOBB_py(const boost::python::tuple& _pts){
 	return boost::python::make_tuple(center,halfSize,rot);
 }
 
+} // namespace yade
+
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_packObb){
 	YADE_SET_DOCSTRING_OPTS;
 	boost::python::scope().attr("__doc__")="Computation of oriented bounding box for cloud of points.";
-	boost::python::def("cloudBestFitOBB",bestFitOBB_py,"Return (Vector3 center, Vector3 halfSize, Quaternion orientation) of\nbest-fit oriented bounding-box for given tuple of points\n(uses brute-force velome minimization, do not use for very large clouds).");
+	boost::python::def("cloudBestFitOBB",yade::bestFitOBB_py,"Return (Vector3 center, Vector3 halfSize, Quaternion orientation) of\nbest-fit oriented bounding-box for given tuple of points\n(uses brute-force velome minimization, do not use for very large clouds).");
 };
 

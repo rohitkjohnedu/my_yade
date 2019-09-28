@@ -12,11 +12,12 @@
 #include<core/Omega.hpp>
 #include<lib/pyutil/doc_opts.hpp>
 #include<lib/base/Logging.hpp>
+#include<lib/base/Namespaces.hpp>
 #include<string>
 
-CREATE_CPP_LOCAL_LOGGER("_log.cpp");
+namespace yade { // Cannot have #include directive inside.
 
-namespace py = boost::python;
+CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 
 #ifdef YADE_BOOST_LOG
 
@@ -141,7 +142,12 @@ void testAllLevels() {
 	TRACE;
 }
 
+} // namespace yade
+
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_log){
+	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
+	namespace py = ::boost::python;
 	YADE_SET_DOCSTRING_OPTS;
 // We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 // The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
@@ -231,3 +237,4 @@ BOOST_PYTHON_MODULE(log){
 }
 
 */
+

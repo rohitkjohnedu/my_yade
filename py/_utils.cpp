@@ -8,6 +8,8 @@
 #include <numpy/arrayobject.h>
 #pragma GCC diagnostic pop
 
+namespace yade { // Cannot have #include directive inside.
+
 CREATE_CPP_LOCAL_LOGGER("_utils.cpp");
 
 py::tuple negPosExtremeIds(int axis, Real distFactor){
@@ -460,7 +462,12 @@ void setBodyColor(int id, Vector3r newColor){
 	b->shape->color=newColor;
 }
 
+} // namespace yade
+
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_utils){
+	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
+	namespace py = ::boost::python;
 	YADE_SET_DOCSTRING_OPTS;
 	py::def("initMPI", initMPI, "Initialize MPI communicator, for Foam Coupling"); 
 	py::def("PWaveTimeStep",PWaveTimeStep,"Get timestep accoring to the velocity of P-Wave propagation; computed from sphere radii, rigidities and masses.");
@@ -534,3 +541,4 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("setBodyAngularVelocity",setBodyAngularVelocity,(py::args("id"),py::args("angVel")),"Set a body angular velocity from its id and a new Vector3r.\n\n:param int id: the body id.\n:param Vector3 angVel: the desired updated angular velocity.");
 	py::def("setBodyColor",setBodyColor,(py::args("id"),py::args("color")),"Set a body color from its id and a new Vector3r.\n\n:param int id: the body id.\n:param Vector3 color: the desired updated color.");
 }
+

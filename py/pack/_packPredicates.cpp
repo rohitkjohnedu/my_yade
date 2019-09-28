@@ -2,8 +2,9 @@
 #include<lib/base/Logging.hpp>
 #include<lib/base/Math.hpp>
 #include<lib/pyutil/doc_opts.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace py=boost::python;
+namespace yade { // Cannot have #include directive inside.
 
 CREATE_CPP_LOCAL_LOGGER("_packPredicates.cpp");
 
@@ -279,6 +280,9 @@ public:
 	}
 };
 
+} // namespace yade
+
+
 #ifdef YADE_GTS
 
 #if PY_MAJOR_VERSION < 3
@@ -289,6 +293,9 @@ extern "C" {
 #if PY_MAJOR_VERSION < 3
 }
 #endif
+
+namespace yade { // Cannot have #include directive inside.
+
 /* Helper function for inGtsSurface::aabb() */
 static void vertex_aabb(GtsVertex *vertex, std::pair<Vector3r,Vector3r> *bb)
 {
@@ -341,9 +348,15 @@ public:
 	py::object surface() const {return pySurf;}
 };
 
+
+} // namespace yade
+
 #endif
 
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_packPredicates){
+	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
+	namespace py = ::boost::python;
 	py::scope().attr("__doc__")="Spatial predicates for volumes (defined analytically or by triangulation).";
 	YADE_SET_DOCSTRING_OPTS;
 	// base predicate class
@@ -373,3 +386,4 @@ BOOST_PYTHON_MODULE(_packPredicates){
 			.add_property("surf",&inGtsSurface::surface,"The associated gts.Surface object.");
 	#endif
 }
+
