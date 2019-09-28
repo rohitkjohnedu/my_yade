@@ -1,5 +1,7 @@
 #include"GLUtils.hpp"
 
+namespace yade { // Cannot have #include directive inside.
+
 void GLUtils::Parallelepiped(const Vector3r& a, const Vector3r& b, const Vector3r& c){
    glBegin(GL_LINE_STRIP);
 	 	glVertex3v(b); glVertex3v(Vector3r(Vector3r::Zero())); glVertex3v(a); glVertex3v(Vector3r(a+b)); glVertex3v(Vector3r(a+b+c)); glVertex3v(Vector3r(b+c)); glVertex3v(b); glVertex3v(Vector3r(a+b));
@@ -57,4 +59,6 @@ void GLUtils::QGLViewer::drawArrow(const Vector3r& from, const Vector3r& to, dou
 	drawArrow((to-from).norm(), radius, nbSubdivisions);
 	glPopMatrix();
 }
+
+} // namespace yade
 

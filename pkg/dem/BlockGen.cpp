@@ -56,10 +56,6 @@ namespace yade { // Cannot have #include directive inside.
 CREATE_LOGGER(BlockGen);
 YADE_PLUGIN((BlockGen));
 
-//using namespace boost;
-//using namespace std;
-
-
 
 BlockGen::~BlockGen () {}
 //std::ofstream BlockGen::output("BlockGenFindExtreme.txt", fstream::trunc); // it was always creating files "BlkGen" "BlockGenFindExtreme.txt", but they are not used in the code, so I commented this out, Janek

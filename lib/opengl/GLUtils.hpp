@@ -9,6 +9,8 @@
 #include<iomanip>
 #include<string>
 
+namespace yade { // Cannot have #include directive inside.
+
 struct GLUtils{
 	// code copied from qglviewer
 	struct QGLViewer{
@@ -44,3 +46,6 @@ struct GLUtils{
 		glPopMatrix();
 	}
 };
+
+} // namespace yade
+

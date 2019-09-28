@@ -1,10 +1,9 @@
 #pragma once
 #include<core/Shape.hpp>
 
-// work around (old site, fixed bug) https://bugs.launchpad.net/yade/+bug/528509
-// XXX: we need to think more about introducing yade namespace, to avoid such name conflicts, see https://gitlab.com/yade-dev/trunk/issues/57
-// see comments there for explanation
-namespace yade{
+// FIXED: add namespace yade, see https://gitlab.com/yade-dev/trunk/issues/57 and (old site, fixed bug) https://bugs.launchpad.net/yade/+bug/528509
+
+namespace yade {
 
 class Sphere: public Shape{
 	public:
@@ -17,9 +16,7 @@ class Sphere: public Shape{
 	REGISTER_CLASS_INDEX(Sphere,Shape);
 };
 
-}
-// necessary
-using namespace yade; 
-
-// must be outside yade namespace
 REGISTER_SERIALIZABLE(Sphere);
+
+}; // namespace yade
+

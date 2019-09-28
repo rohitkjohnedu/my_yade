@@ -5,9 +5,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include "Grid.hpp"
 #ifdef YADE_OPENGL
-	#include<lib/opengl/OpenGLWrapper.hpp>
+
+#include "Grid.hpp"
+#include<lib/opengl/OpenGLWrapper.hpp>
+
+namespace yade { // Cannot have #include directive inside.
 
 //!##################	Rendering   #####################
 
@@ -67,4 +70,7 @@ void Gl1_GridConnection::drawCylinder(bool wireNonMember, Real radius, Real leng
    glPopMatrix();
 }
 YADE_PLUGIN((Gl1_GridConnection));
+
+} // namespace yade
+
 #endif

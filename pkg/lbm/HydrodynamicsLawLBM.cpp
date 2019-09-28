@@ -29,9 +29,10 @@
 #include<pkg/common/Box.hpp>
 #include<pkg/common/Sphere.hpp>
 #include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
-#include <boost/filesystem.hpp>
+#include<boost/filesystem.hpp>
+#include<lib/base/Namespaces.hpp>
 
-namespace bfs=boost::filesystem;
+namespace yade { // Cannot have #include directive inside.
 
 inline Vector3i vect3rToVect3i(Vector3r vect){Vector3i newvect((int)vect[0],(int)vect[1],(int)vect[2]);return(newvect);}
 
@@ -1372,6 +1373,8 @@ void HydrodynamicsLawLBM::CalculateAndApplyForcesAndTorquesOnBodies(bool mean,bo
     return;
 }
 YADE_PLUGIN((HydrodynamicsLawLBM));
+
+} // namespace yade
 
 #endif //LBM_ENGINE
 
