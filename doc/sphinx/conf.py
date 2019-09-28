@@ -67,7 +67,7 @@ def yadesrc_role(role,rawtext,lineno,inliner,options={},content=[]):
 	id=rawtext.split(':',2)[2][1:-1]
 	txt=id
 	if( "#L" in id):
-		msg = "\n\n\033[93m"+(80*'=')+"\nYADE :ysrc: ERROR processing: '"+id+"'\033[0m\n\033[92mIf you want to link to a line number in source, you should use :ysrccommit:\ninstead of :ysrc: otherwise the link will break when someone changes the file.\nThe :ysrccommit: allows to link to a specific git commit hash and a line number.\033[0m\n\033[93m"+(80*'=')+"\033[0m\n\n"
+		msg = "\n\n\033[93m"+(80*'=')+"\nYADE :ysrc: ERROR processing: '"+id+"'\033[0m\n\033[92mIf you want to link to a line number in source, you should use :ysrccommit:\ninstead of :ysrc: otherwise the link will break when someone changes the file.\nThe :ysrccommit: allows to link to a specific git commit hash and a line number.\033[0m\n\033[93mSee https://yade-dem.org/doc/prog.html#sphinx-documentation for details\n"+(80*'=')+"\033[0m\n\n"
 		import sys
 		sys.__stderr__.write(msg)
 		sys.__stderr__.flush()
