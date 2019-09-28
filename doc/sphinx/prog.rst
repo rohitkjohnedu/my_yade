@@ -413,7 +413,8 @@ The following coding rules should be respected; documentation is treated separat
 
   * C++ source files have ``.hpp`` and ``.cpp`` extensions (for headers and implementation, respectively). In rare cases ``.ipp`` is used for pure template code.
   * All header files should have the ``#pragma once`` multiple-inclusion guard.
-  * Avoid ``using namespace …`` in header files.
+  * Do not type ``using namespace …`` in header files, this can lead to obscure bugs due to namespace pollution.
+  * Avoid ``using std::something`` in ``.hpp`` files. Feel free to use them as much as you like inside ``.cpp`` files.
   * Use tabs for indentation. While this is merely visual in ``C++``, it has semantic meaning in python; inadvertently mixing tabs and spaces can result in syntax errors.
 
 * capitalization style
@@ -502,6 +503,13 @@ Syntax of documentation is `ReST <http://docutils.sourceforge.net/rst.html>`__ (
 * Documentation of c++ classes exposed to python is given as 3rd argument to :ref:`YADE_CLASS_BASE_DOC` introduced below.
 
 * Python classes/functions are documented using regular python docstrings. Besides explaining functionality, meaning and types of all arguments should also be documented. Short pieces of code might be very helpful. See the :yref:`yade.utils` module for an example.
+
+
+.. note::
+	Use C++ `string literal <https://en.cppreference.com/w/cpp/language/string_literal>`__ when writing docstrings in C++. By convention the ``R"""(raw text)"""`` is used. For example see :ysrccommit:`here<c5993a086/pkg/dem/VTKRecorder.hpp#L27>`.
+
+.. note::
+	Remember that inside C++ docstrings it is possible to invoke python commands which are executed by yade when documentation is being compiled. For example compare this :ysrccommit:`source docstring<c5993a086/py/_libVersions.cpp#L364>` with the :yref:`final effect<yade._libVersions.getAllVersionsCpp>`.
 
 
 In addition to standard ReST syntax, yade provides several shorthand macros:
