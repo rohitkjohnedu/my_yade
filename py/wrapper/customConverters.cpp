@@ -17,6 +17,8 @@
 #endif
 #include<pkg/common/MatchMaker.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 // move this to the miniEigen wrapper later
 
 /* two-way se3 handling */
@@ -175,35 +177,40 @@ struct custom_mask_from_long{
 };
 #endif
 
+} // namespace yade
 
+// BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_customConverters){
+	namespace y  = ::yade;
 
-	custom_Se3r_from_seq(); boost::python::to_python_converter<Se3r,custom_se3_to_tuple>();
+	y::custom_Se3r_from_seq(); boost::python::to_python_converter<y::Se3r,y::custom_se3_to_tuple>();
 
-	custom_OpenMPAccumulator_from_float(); boost::python::to_python_converter<OpenMPAccumulator<Real>, custom_OpenMPAccumulator_to_float>(); 
-	custom_OpenMPAccumulator_from_int(); boost::python::to_python_converter<OpenMPAccumulator<int>, custom_OpenMPAccumulator_to_int>(); 
+	y::custom_OpenMPAccumulator_from_float(); boost::python::to_python_converter<y::OpenMPAccumulator<Real>, y::custom_OpenMPAccumulator_to_float>(); 
+	y::custom_OpenMPAccumulator_from_int();   boost::python::to_python_converter<y::OpenMPAccumulator<int >, y::custom_OpenMPAccumulator_to_int  >(); 
 	// todo: OpenMPAccumulator<int>
 
-	custom_ptrMatchMaker_from_float();
+	y::custom_ptrMatchMaker_from_float();
 
 	// StrArrayMap (typedef for std::map<std::string,numpy_boost>) → python dictionary
 	//custom_StrArrayMap_to_dict();
 	// register from-python converter and to-python converter
 
-	boost::python::to_python_converter<std::vector<std::vector<std::string> >,custom_vvector_to_list<std::string> >();
-	boost::python::to_python_converter<std::vector<std::vector<Matrix3r> >,custom_vvector_to_list<Matrix3r> >();
-	boost::python::to_python_converter<std::vector<std::vector<int> >,custom_vvector_to_list<int> >();
-	boost::python::to_python_converter<std::vector<std::vector<double> >,custom_vvector_to_list<double> >();
-	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
-	//boost::python::to_python_converter<std::list<shared_ptr<Functor> >, custom_list_to_list<shared_ptr<Functor> > >();
+	boost::python::to_python_converter<std::vector<std::vector<std::string> >, y::custom_vvector_to_list<std::string> >();
+	boost::python::to_python_converter<std::vector<std::vector<y::Matrix3r> >, y::custom_vvector_to_list<y::Matrix3r> >();
+	boost::python::to_python_converter<std::vector<std::vector<int        > >, y::custom_vvector_to_list<int        > >();
+	boost::python::to_python_converter<std::vector<std::vector<double     > >, y::custom_vvector_to_list<double     > >();
+	//boost::python::to_python_converter<std::list<shared_ptr<Functor     > >, y::custom_list_to_list<shared_ptr<Functor> > >();
+	//boost::python::to_python_converter<std::list<shared_ptr<Functor     > >, y::custom_list_to_list<shared_ptr<Functor> > >();
 
 #ifdef YADE_MASK_ARBITRARY
-	custom_mask_from_long();
-	boost::python::to_python_converter<mask_t,custom_mask_to_long>();
+	y::custom_mask_from_long();
+	boost::python::to_python_converter<y::mask_t,y::custom_mask_to_long>();
 #endif
 
 	// register 2-way conversion between c++ vector and python homogeneous sequence (list/tuple) of corresponding type
-	#define VECTOR_SEQ_CONV(Type) custom_vector_from_seq<Type>();  boost::python::to_python_converter<std::vector<Type>, custom_vector_to_list<Type> >();
+	#define VECTOR_SEQ_CONV(Type) y::custom_vector_from_seq<Type>();  boost::python::to_python_converter<std::vector<Type>, y::custom_vector_to_list<Type> >();
+	{
+		using namespace yade; // but only inside this { … } block. Keep pollution under control. Make it convenient.
 		VECTOR_SEQ_CONV(int);
 		VECTOR_SEQ_CONV(bool);
 		VECTOR_SEQ_CONV(Real);
@@ -240,10 +247,7 @@ BOOST_PYTHON_MODULE(_customConverters){
 			VECTOR_SEQ_CONV(shared_ptr<GlIPhysFunctor>);
 			VECTOR_SEQ_CONV(shared_ptr<GlExtraDrawer>);
 		#endif
+	}
 	#undef VECTOR_SEQ_CONV
 }
-
-
-
-
 
