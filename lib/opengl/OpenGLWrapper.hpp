@@ -22,7 +22,9 @@
 #include<GL/gl.h>
 #include<GL/glut.h>
 
+namespace forCtags {
 struct OpenGLWrapper {}; // for ctags
+}
 
 //namespace yade { // Does not work with ABI format of freeglut, possibly due to extern "C". OpenGLWrapper must be in top namespace.
 using yade::Vector3r; // FIXME - these casts from Vector3r to double will be wrong when boost::multiprecision and float128 support is added

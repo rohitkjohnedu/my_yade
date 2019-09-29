@@ -14,6 +14,14 @@
 #include<core/Interaction.hpp>
 #include<core/IPhys.hpp>
 
+namespace forCtags { // for ctags, it can't find class inside these macros.
+	struct GlBoundFunctor {};
+	struct GlShapeFunctor {};
+	struct GlIGeomFunctor {};
+	struct GlIPhysFunctor {};
+	struct GlStateFunctor {};
+}
+
 namespace yade { // Cannot have #include directive inside.
 
 #define RENDERS(name) public: virtual string renders() const { return #name;}; FUNCTOR1D(name);
