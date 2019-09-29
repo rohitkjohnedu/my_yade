@@ -1,4 +1,7 @@
 // © 2010 Václav Šmilauer <eudoxos@arcig.cz>
+//   2012 Anton Gladky
+//   2019 Janek Kozicki
+
 #pragma once
 
 #ifdef QUAD_PRECISION
@@ -14,6 +17,7 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <limits>
 #include <list>
 #include <map>
@@ -23,32 +27,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-
-using std::endl;
-using std::cout;
-using std::cerr;
-using std::vector;
-using std::string;
-using std::list;
-using std::pair;
-using std::min;
-using std::max;
-using std::set;
-using std::map;
-using std::type_info;
-using std::ifstream;
-using std::ofstream;
-using std::runtime_error;
-using std::logic_error;
-using std::invalid_argument;
-using std::ios;
-using std::ios_base;
-using std::fstream;
-using std::ostream;
-using std::ostringstream;
-using std::istringstream;
-using std::swap;
-using std::make_pair;
 
 #include <boost/lexical_cast.hpp>
 #include <boost/python.hpp>
@@ -62,7 +40,6 @@ using std::make_pair;
 #include <boost/tuple/tuple.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 
-using boost::shared_ptr;
 
 #ifndef FOREACH
 	#define FOREACH BOOST_FOREACH
@@ -70,7 +47,7 @@ using boost::shared_ptr;
 
 // TODO: they no longer expand to dynamic/static pointer casts depending on DEBUG=ON/OFF build. They are in wrong file. Think about either fixing this or removing them, https://gitlab.com/yade-dev/trunk/issues/97
 #ifndef YADE_PTR_CAST
-	#define YADE_PTR_CAST boost::static_pointer_cast
+	#define YADE_PTR_CAST ::boost::static_pointer_cast
 #endif
 
 #ifndef YADE_CAST
@@ -78,7 +55,7 @@ using boost::shared_ptr;
 #endif
 
 #ifndef YADE_PTR_DYN_CAST
-	#define YADE_PTR_DYN_CAST boost::dynamic_pointer_cast
+	#define YADE_PTR_DYN_CAST ::boost::dynamic_pointer_cast
 #endif
 
 #define EIGEN_DONT_PARALLELIZE
@@ -92,6 +69,44 @@ using boost::shared_ptr;
 #include <Eigen/Eigenvalues>
 #include <float.h>
 
+#include<boost/serialization/nvp.hpp>
+#include<boost/serialization/is_bitwise_serializable.hpp>
+
+// https://en.cppreference.com/w/cpp/language/unqualified_lookup
+// https://en.cppreference.com/w/cpp/language/qualified_lookup
+// https://en.cppreference.com/w/cpp/language/namespace
+namespace yade { // Cannot have #include directive inside.
+
+
+using std::cerr;
+using std::cout;
+using std::endl;
+using std::fstream;
+using std::ifstream;
+using std::invalid_argument;
+using std::ios;
+using std::ios_base;
+using std::istringstream;
+using std::list;
+using std::logic_error;
+using std::make_pair;
+using std::map;
+using std::max;
+using std::min;
+using std::ofstream;
+using std::ostream;
+using std::ostringstream;
+using std::pair;
+using std::runtime_error;
+using std::set;
+using std::setfill;
+using std::setprecision;
+using std::setw;
+using std::string;
+using std::swap;
+using std::type_info;
+using std::vector;
+using boost::shared_ptr;
 
 template<typename Scalar> using Vector2 = Eigen::Matrix<Scalar,2,1>;
 using Vector2i = Vector2<int>;
@@ -276,81 +291,81 @@ using mask_t = int;
 
 using Se3r = Se3<Real>;
 
+} // namespace yade
+
 /*
  * Serialization of math classes
  */
 
-#include<boost/serialization/nvp.hpp>
-#include<boost/serialization/is_bitwise_serializable.hpp>
-
-// fast serialization (no version infor and no tracking) for basic math types
+// fast serialization (no version info and no tracking) for basic math types
 // http://www.boost.org/doc/libs/1_42_0/libs/serialization/doc/traits.html#bitwise
-BOOST_IS_BITWISE_SERIALIZABLE(Vector2r);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector2i);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector3r);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector3i);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector6r);
-BOOST_IS_BITWISE_SERIALIZABLE(Vector6i);
-BOOST_IS_BITWISE_SERIALIZABLE(Quaternionr);
-BOOST_IS_BITWISE_SERIALIZABLE(Se3r);
-BOOST_IS_BITWISE_SERIALIZABLE(Matrix3r);
-BOOST_IS_BITWISE_SERIALIZABLE(Matrix6r);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Vector2r);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Vector2i);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Vector3r);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Vector3i);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Vector6r);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Vector6i);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Quaternionr);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Se3r);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Matrix3r);
+BOOST_IS_BITWISE_SERIALIZABLE(yade::Matrix6r);
+
 
 namespace boost {
 namespace serialization {
 
 template<class Archive>
-void serialize(Archive & ar, Vector2r & g, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Vector2r & g, const unsigned int /*version*/){
 	Real &x=g[0], &y=g[1];
 	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector2i & g, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Vector2i & g, const unsigned int /*version*/){
 	int &x=g[0], &y=g[1];
 	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector3r & g, const unsigned int /*version*/)
+void serialize(Archive & ar, yade::Vector3r & g, const unsigned int /*version*/)
 {
 	Real &x=g[0], &y=g[1], &z=g[2];
 	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector3i & g, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Vector3i & g, const unsigned int /*version*/){
 	int &x=g[0], &y=g[1], &z=g[2];
 	ar & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector6r & g, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Vector6r & g, const unsigned int /*version*/){
 	Real &v0=g[0], &v1=g[1], &v2=g[2], &v3=g[3], &v4=g[4], &v5=g[5];
 	ar & BOOST_SERIALIZATION_NVP(v0) & BOOST_SERIALIZATION_NVP(v1) & BOOST_SERIALIZATION_NVP(v2) & BOOST_SERIALIZATION_NVP(v3) & BOOST_SERIALIZATION_NVP(v4) & BOOST_SERIALIZATION_NVP(v5);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Vector6i & g, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Vector6i & g, const unsigned int /*version*/){
 	int &v0=g[0], &v1=g[1], &v2=g[2], &v3=g[3], &v4=g[4], &v5=g[5];
 	ar & BOOST_SERIALIZATION_NVP(v0) & BOOST_SERIALIZATION_NVP(v1) & BOOST_SERIALIZATION_NVP(v2) & BOOST_SERIALIZATION_NVP(v3) & BOOST_SERIALIZATION_NVP(v4) & BOOST_SERIALIZATION_NVP(v5);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Quaternionr & g, const unsigned int /*version*/)
+void serialize(Archive & ar, yade::Quaternionr & g, const unsigned int /*version*/)
 {
 	Real &w=g.w(), &x=g.x(), &y=g.y(), &z=g.z();
 	ar & BOOST_SERIALIZATION_NVP(w) & BOOST_SERIALIZATION_NVP(x) & BOOST_SERIALIZATION_NVP(y) & BOOST_SERIALIZATION_NVP(z);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Se3r & g, const unsigned int /*version*/){
-	Vector3r& position=g.position; Quaternionr& orientation=g.orientation;
+void serialize(Archive & ar, yade::Se3r & g, const unsigned int /*version*/){
+	yade::Vector3r& position=g.position; yade::Quaternionr& orientation=g.orientation;
 	ar & BOOST_SERIALIZATION_NVP(position) & BOOST_SERIALIZATION_NVP(orientation);
 }
 
 template<class Archive>
-void serialize(Archive & ar, Matrix3r & m, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Matrix3r & m, const unsigned int /*version*/){
 	Real &m00=m(0,0), &m01=m(0,1), &m02=m(0,2), &m10=m(1,0), &m11=m(1,1), &m12=m(1,2), &m20=m(2,0), &m21=m(2,1), &m22=m(2,2);
 	ar & BOOST_SERIALIZATION_NVP(m00) & BOOST_SERIALIZATION_NVP(m01) & BOOST_SERIALIZATION_NVP(m02) &
 		BOOST_SERIALIZATION_NVP(m10) & BOOST_SERIALIZATION_NVP(m11) & BOOST_SERIALIZATION_NVP(m12) &
@@ -358,7 +373,7 @@ void serialize(Archive & ar, Matrix3r & m, const unsigned int /*version*/){
 }
 
 template<class Archive>
-void serialize(Archive & ar, Matrix6r & m, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::Matrix6r & m, const unsigned int /*version*/){
 	Real &m00=m(0,0), &m01=m(0,1), &m02=m(0,2), &m03=m(0,3), &m04=m(0,4), &m05=m(0,5);
 	Real &m10=m(1,0), &m11=m(1,1), &m12=m(1,2), &m13=m(1,3), &m14=m(1,4), &m15=m(1,5);
 	Real &m20=m(2,0), &m21=m(2,1), &m22=m(2,2), &m23=m(2,3), &m24=m(2,4), &m25=m(2,5);
@@ -375,12 +390,13 @@ void serialize(Archive & ar, Matrix6r & m, const unsigned int /*version*/){
 
 #ifdef YADE_MASK_ARBITRARY
 template<class Archive>
-void serialize(Archive & ar, mask_t& v, const unsigned int /*version*/){
+void serialize(Archive & ar, yade::mask_t& v, const unsigned int /*version*/){
 	std::string str = v.to_string();
 	ar & BOOST_SERIALIZATION_NVP(str);
-	v = mask_t(str);
+	v = yade::mask_t(str);
 }
 #endif
 
 } // namespace serialization
 } // namespace boost
+
