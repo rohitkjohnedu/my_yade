@@ -14,6 +14,8 @@
 #include<boost/math/tools/roots.hpp>
 #endif
 
+namespace yade { // Cannot have #include directive inside.
+
 using std::isfinite;
 YADE_PLUGIN((ViscElMat)(ViscElPhys)(Ip2_ViscElMat_ViscElMat_ViscElPhys)(Law2_ScGeom_ViscElPhys_Basic));
 
@@ -448,3 +450,6 @@ void DeformControl::action()
   }
 }
 #endif
+
+} // namespace yade
+

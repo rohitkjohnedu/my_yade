@@ -1,6 +1,9 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
 
-#include <cmath>
+#include<lib/base/Math.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 
 /*! Computing convex hull of a 2d cloud of points passed to the constructor,
 	using Graham scan algorithm.
@@ -69,4 +72,5 @@ Real simplePolygonArea2d(vector<Vector2r> P){
 	return std::abs(ret/2.);
 }
 
+}; // namespace yade
 

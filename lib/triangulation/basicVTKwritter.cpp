@@ -1,11 +1,13 @@
 #include "basicVTKwritter.hpp"
 
+using std::endl;
+
 bool basicVTKwritter::open(const char * filename, const char * comment)
 {
-  file.open(filename,ios_base::out);
+  file.open(filename,std::ios_base::out);
   if (!file)
   {
-	cerr << "Cannot open file [" << filename << "]" << endl;
+	std::cerr << "Cannot open file [" << filename << "]" << endl;
 	return false;
   }
 

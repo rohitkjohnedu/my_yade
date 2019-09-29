@@ -14,7 +14,7 @@
 #include <sys/types.h>
 
 
-#define FAST
+namespace yade { // Cannot have #include directive inside.
 
 namespace CGT {
 	
@@ -753,5 +753,7 @@ void Network<Tesselation>::setAlphaBoundary(double alpha,bool fixed)
 }
 
 } //namespace CGT
+
+}; // namespace yade
 
 #endif //FLOW_ENGINE

@@ -12,10 +12,13 @@
 #include<lib/computational-geometry/Hull2d.hpp>
 #include<lib/pyutil/doc_opts.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
+#include<lib/base/Namespaces.hpp>
 #ifdef YADE_MPI
 	#include <mpi.h>
 #endif 
 
+
+namespace yade { // Cannot have #include directive inside.
 
 #ifdef YADE_MPI
 
@@ -36,8 +39,6 @@
   	void initMPI() { return; }
 
 #endif 
-
-namespace py = boost::python;
 
 py::tuple negPosExtremeIds(int axis, Real distFactor=1.1);
 
@@ -203,3 +204,6 @@ void setBodyAngularVelocity(int id, Vector3r newAngVel);
  *  @param newColor is the desired rgb color
 */
 void setBodyColor(int id, Vector3r newColor);
+
+} // namespace yade
+

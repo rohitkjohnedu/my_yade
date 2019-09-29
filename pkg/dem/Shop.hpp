@@ -9,7 +9,9 @@
 #include "core/Body.hpp"
 
 #include<boost/function.hpp>
+#include<lib/base/Namespaces.hpp>
 
+namespace yade { // Cannot have #include directive inside.
 
 class Scene;
 class Body;
@@ -17,9 +19,6 @@ class SimpleViscoelasticBodyParameters;
 class ViscElMat;
 class FrictMat;
 class Interaction;
-
-using boost::shared_ptr;
-namespace py = boost::python;
 
 /*! Miscillaneous utility functions which are believed to be generally useful.
  *
@@ -173,4 +172,6 @@ class Shop{
 		//! tests whether p lies in the (bbMin,bbMax) axis-aligned bounding box
 		static bool isInBB(Vector3r p, Vector3r bbMin, Vector3r bbMax);
 };
+
+} // namespace yade
 

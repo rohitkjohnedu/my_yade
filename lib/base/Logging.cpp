@@ -171,7 +171,7 @@ void Logging::saveConfigFile(const std::string& fname) {
 }
 
 std::string Logging::defaultConfigFileName() {
-	return Omega::instance().confDir+"/logging.conf";
+	return yade::Omega::instance().confDir+"/logging.conf";
 }
 
 void Logging::setDefaultLogLevel(short int level) {

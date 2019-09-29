@@ -46,6 +46,12 @@
 	#include<pkg/dem/ViscoelasticCapillarPM.hpp>
 #endif
 
+#include <boost/unordered_map.hpp>
+#include <boost/fusion/support/pair.hpp>
+#include <boost/fusion/include/pair.hpp>
+
+namespace yade { // Cannot have #include directive inside.
+
 YADE_PLUGIN((VTKRecorder));
 CREATE_LOGGER(VTKRecorder);
 
@@ -54,10 +60,6 @@ CREATE_LOGGER(VTKRecorder);
 #else
 #define GET_MASK(b) b->groupMask
 #endif
-
-#include <boost/unordered_map.hpp>
-#include <boost/fusion/support/pair.hpp>
-#include <boost/fusion/include/pair.hpp>
 
 void VTKRecorder::action(){
 	vector<bool> recActive(REC_SENTINEL,false);
@@ -1252,6 +1254,9 @@ void VTKRecorder::addWallVTK (vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<v
 	boxesPos->InsertNextPoint(W4[0], W4[1], W4[2]);
 	boxes->GetPointIds()->SetId(3,nbPoints+3);
 };
+#undef GET_MASK
+
+} // namespace yade
 
 #endif /* YADE_VTK */
-#undef GET_MASK
+

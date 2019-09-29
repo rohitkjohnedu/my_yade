@@ -108,6 +108,8 @@ getIncidentVtxWeights(const Dt& dt,
 
 } //END NAMESPACE CGAL
 
+namespace yade { // Cannot have #include directive inside.
+
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Delaunay_triangulation_3<K>::Geom_traits		Traits;
 typedef CGAL::Triangulation_vertex_base_with_id_3<Traits>	Vb;
@@ -146,4 +148,6 @@ typename DataOwner::Data interpolate2 (const Dt& dt, const typename Dt::Geom_tra
     if (!data.ending) return data*(1./result.second);
     else return typename DataOwner::Data();
 }
+
+} // namespace yade
 

@@ -13,9 +13,7 @@
 #include <QGLViewer/manipulatedFrame.h>
 #include <QGLViewer/constraint.h>
 
-using std::setw;
-using std::setfill;
-using std::setprecision;
+namespace yade { // Cannot have #include directive inside.
 
 /*! Class handling user interaction with the openGL rendering of simulation.
  *
@@ -166,5 +164,5 @@ class YadeCamera : public qglviewer::Camera
 		virtual void setCuttingDistance(float s){cuttingDistance=s;};
 };
 
-
+} // namespace yade
 

@@ -6,8 +6,7 @@
 
 #include<boost/math/distributions/normal.hpp>
 
-using std::vector;
-using std::string;
+namespace yade { // Cannot have #include directive inside.
 
 template<typename T>
 struct GridContainer{
@@ -220,4 +219,6 @@ class pyGaussAverage{
 	Real cellArea(){ Vector2r sz=sgda->grid->getCellSize(); return sz[0]*sz[1]; }
 	Vector2r cellDim(){ return sgda->grid->getCellSize(); }
 };
+
+}; // namespace yade
 
