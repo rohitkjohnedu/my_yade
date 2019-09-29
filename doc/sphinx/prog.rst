@@ -735,20 +735,27 @@ This functionality is provided by 3 macros and 4 optional methods; details are p
 	Prepare attributes before serialization (saving) or deserialization (loading) or process them after serialization or deserialization.
 	
 	See :ref:`attributeregistration`.
+
 ``YADE_CLASS_BASE_DOC_*``
 	Inside the class declaration (i.e. in the ``.hpp`` file within the ``class Foo { /* … */};`` block). See :ref:`attributeregistration`.
 
 	Enumerate class attributes that should be saved and loaded; associate each attribute with its literal name, which can be used to retrieve it. See :ref:`YADE_CLASS_BASE_DOC`.                    
 
 	Additionally documents the class in python, adds methods for attribute access from python, and documents each attribute.
+
 ``REGISTER_SERIALIZABLE``
 	In header file, but *after* the class declaration block. See :ref:`classfactory`.
 	
 	Associate literal name of the class with functions that will create its new instance (``ClassFactory``).
+
+	Must be declared inside ``namespace yade``.
+
 ``YADE_PLUGIN``
 	In the implementation ``.cpp`` file. See :ref:`plugins`.
 
 	Declare what classes are declared inside a particular plugin at time the plugin is being loaded (yade startup).
+
+	Must be declared inside ``namespace yade``.
 
 .. _attributeregistration:
 
@@ -787,17 +794,20 @@ Class factory
 ^^^^^^^^^^^^^^
 Each serializable class must use ``REGISTER_SERIALIZABLE``, which defines function to create that class by ``ClassFactory``. ``ClassFactory`` is able to instantiate a class given its name (as string), which is necessary for deserialization.
 
-Although mostly used internally by the serialization framework, programmer can ask for a class instantiation using ``shared_ptr<Factorable> f=ClassFactory::instance().createShared("ClassName");``, casting the returned ``shared_ptr<Factorable>`` to desired type afterwards. :yref:`Serializable` itself derives from ``Factorable``, i.e. all serializable types are also factorable (It is possible that different mechanism will be in place if boost::serialization is used, though.)
+Although mostly used internally by the serialization framework, programmer can ask for a class instantiation using ``shared_ptr<Factorable> f=ClassFactory::instance().createShared("ClassName");``, casting the returned ``shared_ptr<Factorable>`` to desired type afterwards. :yref:`Serializable` itself derives from ``Factorable``, i.e. all serializable types are also factorable.
+
+.. note::
+	Both macros ``REGISTER_SERIALIZABLE`` and ``YADE_PLUGIN`` have to be declared inside yade namespace.
 
 .. _plugins:
 
 Plugin registration
 ^^^^^^^^^^^^^^^^^^^
-Yade loads dynamic libraries containing all its functionality at startup. ClassFactory must be taught about classes each particular file provides. ``YADE_PLUGIN`` serves this purpose and, contrary to :ref:`YADE_CLASS_BASE_DOC`, must be place in the implementation (.cpp) file. It simple enumerates classes that are provided by this file::
+Yade loads dynamic libraries containing all its functionality at startup. ClassFactory must be taught about classes each particular file provides. ``YADE_PLUGIN`` serves this purpose and, contrary to :ref:`YADE_CLASS_BASE_DOC`, must be placed in the implementation (.cpp) file, inside yade namespace. It simply enumerates classes that are provided by this file::
 
 	YADE_PLUGIN((ClassFoo)(ClassBar));
 
-.. note:: You must use parentheses around the class name even if there is only one (preprocessor limitation): ``YADE_PLUGIN((classFoo));``. If there is no class in this file, do not use this macro at all.
+.. note:: You must use parentheses around the class name even if there is only one class (preprocessor limitation): ``YADE_PLUGIN((classFoo));``. If there is no class in this file, do not use this macro at all.
 
 Internally, this macro creates function ``registerThisPluginClasses_`` declared specially as ``__attribute__((constructor))`` (see `GCC Function Attributes <http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html>`_); this attributes makes the function being executed when the plugin is loaded via ``dlopen`` from ``ClassFactory::load(...)``. It registers all factorable classes from that file in the :ref:`classfactory`.
 
@@ -810,6 +820,7 @@ This is an example of a serializable class header:
 
 .. code-block:: c++
 
+	namespace yade {
 	/*! Homogeneous gravity field; applies gravity×mass force on all bodies. */
 	class GravityEngine: public GlobalEngine{
 		public:
@@ -824,6 +835,7 @@ This is an example of a serializable class header:
 	};
 	// registration function for ClassFactory
 	REGISTER_SERIALIZABLE(GravityEngine);
+	} // namespace yade
 
 and this is the implementation:
 
@@ -832,12 +844,14 @@ and this is the implementation:
 	#include<pkg-common/GravityEngine.hpp>
 	#include<core/Scene.hpp>
 
+	namespace yade {
 	// registering the plugin
 	YADE_PLUGIN((GravityEngine));
 
 	void GravityEngine::action(){
 		/* do the work here */
 	}
+	} // namespace yade
 
 We can create a mini-simulation (with only one GravityEngine):
 
@@ -1321,6 +1335,7 @@ OpenGL rendering is being done also by 1D functors (dispatched for the type to b
 
 .. code-block:: c++
 
+	namespace yade { // Cannot have #include directive inside.
 	class Gl1_Sphere: public GlShapeFunctor {
 	   public :
 	      virtual void go(const shared_ptr<Shape>&,
@@ -1335,6 +1350,7 @@ OpenGL rendering is being done also by 1D functors (dispatched for the type to b
 	   );
 	};
 	REGISTER_SERIALIZABLE(Gl1_Sphere);
+	} // namespace yade
 
 You can list available functors of a particular type by querying child classes of the base functor:
 
