@@ -414,7 +414,7 @@ The following coding rules should be respected; documentation is treated separat
   * C++ source files have ``.hpp`` and ``.cpp`` extensions (for headers and implementation, respectively). In rare cases ``.ipp`` is used for pure template code.
   * All header files should have the ``#pragma once`` multiple-inclusion guard.
   * Do not type ``using namespace …`` in header files, this can lead to obscure bugs due to namespace pollution.
-  * Avoid ``using std::something`` in ``.hpp`` files. Feel free to use them as much as you like inside ``.cpp`` files.
+  * Avoid ``using std::something`` in ``.hpp`` files. Feel free to use them as much as you like inside ``.cpp`` files. But remember that the usual problems with this practice still apply: wrong type or function might be used instead of the one that you would expect. But since it's limited to a single ``.cpp`` file, it will be easier to debug and the convenience might outweight the associated dangers.
   * Use tabs for indentation. While this is merely visual in ``C++``, it has semantic meaning in python; inadvertently mixing tabs and spaces can result in syntax errors.
 
 * capitalization style
