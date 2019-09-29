@@ -41,6 +41,7 @@ inline void revertEdge (unsigned &i,unsigned &j){
 	else {j=facetVertices[i][1]; i=facetVertices[i][0];}
 }
 
+// FIXME - consider moving these into lib/base/AliasCGAL.hpp
 namespace CGT {
 //Robust kernel
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;

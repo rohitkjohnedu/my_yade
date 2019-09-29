@@ -54,7 +54,7 @@ There are other classes, which are not strictly necessary:
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 #ifdef YADE_OPENGL
 	#include<pkg/common/GLDrawFunctors.hpp>

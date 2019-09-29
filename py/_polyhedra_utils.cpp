@@ -10,7 +10,7 @@
 #include <pkg/common/Sphere.hpp>
 #include <pkg/common/ElastMat.hpp>
 #include <lib/pyutil/doc_opts.hpp>
-#include <lib/base/Namespaces.hpp>
+#include <lib/base/AliasNamespaces.hpp>
 #include <cmath>
 
 #include <numpy/ndarraytypes.h>

@@ -2,7 +2,7 @@
 #pragma once
 #include <lib/serialization/Serializable.hpp>
 #include <boost/unordered_map.hpp>
-#include <lib/base/Namespaces.hpp>
+#include <lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

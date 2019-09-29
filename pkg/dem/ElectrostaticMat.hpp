@@ -12,7 +12,7 @@
 #include<pkg/dem/FrictPhys.hpp>
 #include<pkg/dem/ElasticContactLaw.hpp>
 #include<pkg/dem/Lubrication.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

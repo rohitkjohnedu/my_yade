@@ -10,7 +10,7 @@
 #include<pkg/dem/DemXDofGeom.hpp>
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/dem/FrictPhys.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

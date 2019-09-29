@@ -12,7 +12,7 @@
 
 #include <boost/type_traits/integral_constant.hpp>
 
-#include <lib/base/Namespaces.hpp>
+#include <lib/base/AliasNamespaces.hpp>
 #include <lib/base/Math.hpp>
 #include <lib/factory/Factorable.hpp>
 #include <lib/pyutil/raw_constructor.hpp>

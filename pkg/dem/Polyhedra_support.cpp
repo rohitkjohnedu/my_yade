@@ -9,6 +9,9 @@
 
 #include "Polyhedra.hpp"
 
+#define likely(x)       __builtin_expect((x),1)
+#define unlikely(x)     __builtin_expect((x),0)
+
 namespace yade { // Cannot have #include directive inside.
 
 CREATE_CPP_LOCAL_LOGGER("Polyhedra_support.cpp");

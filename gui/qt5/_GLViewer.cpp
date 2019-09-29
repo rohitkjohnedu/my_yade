@@ -2,7 +2,7 @@
 #include"OpenGLManager.hpp"
 #include<pkg/common/OpenGLRenderer.hpp>
 #include<lib/pyutil/doc_opts.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 #include<QApplication>
 #include<QCloseEvent>

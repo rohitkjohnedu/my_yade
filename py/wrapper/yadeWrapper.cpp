@@ -42,7 +42,7 @@
 #include <csignal>
 
 #include <pkg/common/KinematicEngines.hpp>
-#include <lib/base/Namespaces.hpp>
+#include <lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

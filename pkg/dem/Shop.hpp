@@ -9,7 +9,7 @@
 #include "core/Body.hpp"
 
 #include<boost/function.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

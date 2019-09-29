@@ -2,7 +2,7 @@
 #include<lib/base/Logging.hpp>
 #include<lib/base/Math.hpp>
 #include<lib/pyutil/doc_opts.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

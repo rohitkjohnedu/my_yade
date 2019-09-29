@@ -12,7 +12,7 @@
 #include<lib/computational-geometry/Hull2d.hpp>
 #include<lib/pyutil/doc_opts.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 #ifdef YADE_MPI
 	#include <mpi.h>
 #endif 

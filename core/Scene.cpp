@@ -17,7 +17,7 @@
 #include <core/BodyContainer.hpp>
 #include <core/InteractionContainer.hpp>
 #include <core/TimeStepper.hpp>
-#include <lib/base/Namespaces.hpp>
+#include <lib/base/AliasNamespaces.hpp>
 
 #include <pwd.h>
 #include <unistd.h>

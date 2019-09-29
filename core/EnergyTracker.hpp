@@ -1,7 +1,7 @@
 #pragma once
 #include<lib/base/openmp-accu.hpp>
 #include<lib/serialization/Serializable.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

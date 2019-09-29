@@ -30,7 +30,7 @@
 #include<pkg/common/Sphere.hpp>
 #include<pkg/dem/CohesiveFrictionalContactLaw.hpp>
 #include<boost/filesystem.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

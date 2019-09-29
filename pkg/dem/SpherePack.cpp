@@ -12,7 +12,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include<core/Timing.hpp>
-#include<lib/base/Namespaces.hpp>
+#include<lib/base/AliasNamespaces.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 
