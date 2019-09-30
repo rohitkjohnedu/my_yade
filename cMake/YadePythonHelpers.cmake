@@ -134,6 +134,7 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	MESSAGE("--   Boost_LIB_VERSION: " ${Boost_LIB_VERSION})
 	MESSAGE("--   Boost_INCLUDE_DIRS: " ${Boost_INCLUDE_DIRS})
 	MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
+	# FIXME - this soon will be wrong when boost::multiprecision and float128 support is added
 	ADD_DEFINITIONS(-DBOOST_MATH_DISABLE_FLOAT128=1)
 	
 ENDFUNCTION(FIND_PYTHON_PACKAGES)

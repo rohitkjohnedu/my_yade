@@ -22,6 +22,8 @@
 #include <boost/filesystem.hpp>
 #include <cxxabi.h>
 
+SINGLETON_SELF(yade::Omega);
+
 namespace yade { // Cannot have #include directive inside.
 
 class RenderMutexLock: public boost::mutex::scoped_lock{
@@ -31,7 +33,6 @@ class RenderMutexLock: public boost::mutex::scoped_lock{
 };
 
 CREATE_LOGGER(Omega);
-SINGLETON_SELF(Omega);
 
 const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 

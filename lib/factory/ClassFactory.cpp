@@ -13,10 +13,11 @@
 #include<boost/algorithm/string/regex.hpp>
 #include<lib/base/Logging.hpp>
 
+SINGLETON_SELF(yade::ClassFactory);
+
 namespace yade { // Cannot have #include directive inside.
 
 CREATE_LOGGER(ClassFactory);
-SINGLETON_SELF(ClassFactory);
 
 class Factorable;
 
