@@ -46,7 +46,7 @@ class pyGLViewer{
 		void saveState(string filename){GLV;  QString origStateFileName=glv->stateFileName(); glv->setStateFileName(QString(filename.c_str())); glv->saveStateToFile(); glv->setStateFileName(origStateFileName);}
 		string get_timeDisp(){GLV;  const int& m(glv->timeDispMask); string ret; if(m&GLViewer::TIME_REAL) ret+='r'; if(m&GLViewer::TIME_VIRT) ret+="v"; if(m&GLViewer::TIME_ITER) ret+="i"; return ret;}
 		void set_timeDisp(string s){GLV;  int& m(glv->timeDispMask); m=0; FOREACH(char c, s){switch(c){case 'r': m|=GLViewer::TIME_REAL; break; case 'v': m|=GLViewer::TIME_VIRT; break; case 'i': m|=GLViewer::TIME_ITER; break; default: throw invalid_argument(string("Invalid flag for timeDisp: `")+c+"'");}}}
-		void set_bgColor(const Vector3r& c){ QColor cc(255*c[0],255*c[1],255*c[2]); GLV;  glv->setBackgroundColor(cc);} Vector3r get_bgColor(){ GLV;  QColor c(glv->backgroundColor()); return Vector3r(c.red()/255.,c.green()/255.,c.blue()/255.);}
+		void set_bgColor(const Vector3r& c){ QColor cc(int(std::round(255*c[0])),int(std::round(255*c[1])),int(std::round(255*c[2]))); GLV;  glv->setBackgroundColor(cc);} Vector3r get_bgColor(){ GLV;  QColor c(glv->backgroundColor()); return Vector3r(c.red()/255.,c.green()/255.,c.blue()/255.);}
 		void saveSnapshot(string filename) {GLV; glv->nextFrameSnapshotFilename = filename;}
 		#undef GLV
 		#undef VEC_GET_SET

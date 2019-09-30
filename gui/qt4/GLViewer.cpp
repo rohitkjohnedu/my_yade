@@ -302,7 +302,7 @@ void GLViewer::centerPeriodic(){
 	assert(scene->isPeriodic);
 	Vector3r center=.5*scene->cell->getSize();
 	Vector3r halfSize=.5*scene->cell->getSize();
-	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2]));
+	Real radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2]));
 	LOG_DEBUG("Periodic scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
 	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
 	setSceneRadius(radius*1.5);
@@ -369,7 +369,7 @@ void GLViewer::centerScene(){
 	LOG_DEBUG("Got scene box min="<<min<<" and max="<<max);
 	Vector3r center = (max+min)*0.5;
 	Vector3r halfSize = (max-min)*0.5;
-	float radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2])); if(radius<=0) radius=1;
+	Real radius=std::max(halfSize[0],std::max(halfSize[1],halfSize[2])); if(radius<=0) radius=1;
 	LOG_DEBUG("Scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
 	setSceneCenter(qglviewer::Vec(center[0],center[1],center[2]));
 	setSceneRadius(radius*1.5);
@@ -378,7 +378,7 @@ void GLViewer::centerScene(){
 
 // new object selected.
 // set frame coordinates, and isDynamic=false;
-void GLViewer::postSelection(const QPoint& point) 
+void GLViewer::postSelection(const QPoint& /*point*/)
 {
 	LOG_DEBUG("Selection is "<<selectedName());
 	int selection = selectedName();
@@ -472,10 +472,10 @@ qreal YadeCamera::zNear() const
 float YadeCamera::zNear() const
 #endif
 {
-  float z = distanceToSceneCenter() - zClippingCoefficient()*sceneRadius()*(1.f-2*cuttingDistance);
+  double z = distanceToSceneCenter() - zClippingCoefficient()*sceneRadius()*(1.f-2*cuttingDistance);
 
   // Prevents negative or null zNear values.
-  const float zMin = zNearCoefficient() * zClippingCoefficient() * sceneRadius();
+  const double zMin = zNearCoefficient() * zClippingCoefficient() * sceneRadius();
   if (z < zMin)
 /*    switch (type())
       {

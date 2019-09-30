@@ -101,8 +101,8 @@ void GLViewer::wheelEvent(QWheelEvent* event){
 
 	if(manipulatedClipPlane<0){ QGLViewer::wheelEvent(event); return; }
 	assert(manipulatedClipPlane<renderer->numClipPlanes);
-	float distStep=1e-3*sceneRadius();
-	float dist=event->delta()*manipulatedFrame()->wheelSensitivity()*distStep;
+	Real distStep=1e-3*sceneRadius();
+	Real dist=event->delta()*manipulatedFrame()->wheelSensitivity()*distStep;
 	Vector3r normal=renderer->clipPlaneSe3[manipulatedClipPlane].orientation*Vector3r(0,0,1);
 	qglviewer::Vec newPos=manipulatedFrame()->position()+qglviewer::Vec(normal[0],normal[1],normal[2])*dist;
 	manipulatedFrame()->setPosition(newPos);
