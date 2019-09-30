@@ -42,23 +42,26 @@ all the newly added features.
 To install the daily-version you need to add the repository to your
 /etc/apt/sources.list, add the PGP-key AA915EEB as trusted and install ``yadedaily``::
 
-	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial/" >> /etc/apt/sources.list'
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial main" >> /etc/apt/sources.list'
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
 	sudo apt-get update
 	sudo apt-get install yadedaily
 
-Be sure to use the
-correct name of your Ubuntu/Debian distribution in the first line (xenial for Ubuntu 16.04 LTS, whereas stretch would be required for Debian 9, for instance). For the list
-of currently supported distributions, please visit `yade-dem.org/packages <http://yade-dem.org/packages/>`_.
+Be sure to use the correct name of your Ubuntu/Debian distribution in the first line (xenial, stretch etc).
+Supported distributions and corresponding names for the /etc/apt/sources.list are:
+
+- Debian 9 Stretch: **stretch**
+- Debian 10 Bullseye: **bullseye**
+- Ubuntu 16.04 Xenial: **xenial**
+- Ubuntu 18.04 Bionic: **bionic**
 
 After that you can normally start Yade using the command ``yadedaily`` or ``yadedaily-batch``.
 ``yadedaily`` on older distributions can have some disabled features due to older library
 versions, shipped with particular distribution.
 
-The Git-repository for packaging stuff is available on `GitLab <https://gitlab.com/yade-dev/yadedaily/>`_.
-Each branch corresponds to one distribution, e.g., xenial, stretch etc.
-The scripts for building all of this stuff are `here <https://gitlab.com/yade-dev/trunk/tree/master/scripts/ppa>`__.
-It uses "pbuilder" to build packages, so all packages are built in a clean environment.
+
+The Git-repository for packaging stuff is available on `GitLab <https://gitlab.com/yade-dev/trunk/tree/master/scripts/ppa_ci>`_.
+
 
 If you do not need ``yadedaily``-package anymore, just remove the
 corresponding line in /etc/apt/sources.list and the package itself::
