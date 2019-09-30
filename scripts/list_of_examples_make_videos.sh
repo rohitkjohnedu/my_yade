@@ -23,18 +23,29 @@ the_examples=("${(@f)$(grep -E "[Oo][Kk].│...│...│...│" ../examples/list
 #the_examples=("${(@f)$(grep -E "...│...│...│no │" ../examples/list_of_examples.txt | sed -e "s/.* \([A-Za-z_0-9-]\+\>\.py\>\).*/\1/")}")
 
 mkdir -p /tmp/video
-mkdir -p /tmp/run
-cp ../examples/yade /tmp/run
+mkdir -p /tmp/testEx
+cp ../examples/yade /tmp/testEx
+
+# sane default for small resolution screens
+#XTERM1_POS=102x37+0+0
+#XTERM2_POS=102x37+0+720
+
+XTERM1_POS=102x37+2680+2094
+XTERM2_POS=102x37+2680+2854
+
+echo "If you can't see any terminals oppened then change \${XTERM1_POS} and \${XTERM2_POS} in this script.\n"
 
 for example in $the_examples; do
 	file_location=("${(@f)$(find ../ -name "${example}" -type f)}")
-	print "Working on ${example} in ${file_location}"
-	cp ${file_location} /tmp/run/${example}
+	print "Working on ${example} in ${file_location}."
+	DIRPLACE=`dirname ${file_location}`
+	PARENT=`basename ${DIRPLACE}`
+	cp -a ${DIRPLACE} /tmp/testEx/${PARENT}
 	SUCCESS=$?
 	if [ ${SUCCESS} -eq 0 ]; then
 		BASENAME=`basename ${example} .py`
-		xterm -en UTF-8 -b 0 -bg black -fg darkgray -geometry 102x37+0+0 -fn "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO10646-1" -e bash -c "cd /tmp/run ; ./yade ./${example}" &!
-		xterm -en UTF-8 -b 0 -bg black -fg darkgray -geometry 102x37+1000+1000 -fn "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO10646-1" -e /usr/bin/zsh -c "\
+		xterm -en UTF-8 -b 0 -bg black -fg darkgray -geometry ${XTERM1_POS} -fn "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO10646-1" -e bash -c "cd /tmp/testEx/${PARENT} ; ../yade ./${example}" &!
+		xterm -en UTF-8 -b 0 -bg black -fg darkgray -geometry ${XTERM2_POS} -fn "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO10646-1" -e /usr/bin/zsh -c "\
 		cd /tmp/video;\
 		echo \"working on ${example} as ${BASENAME}\";\
 		REPLY=\"n\";\
@@ -47,7 +58,7 @@ for example in $the_examples; do
 			recordmydesktop -x 0 -y 0 --width 1024 --height 768 -o ${BASENAME}.ogv --no-sound
 		fi;
 		"
-		rm /tmp/run/${example}
+		rm -rf /tmp/testEx/${PARENT}
 	else
 		echo "Error copying file ${example}"
 		sleep 1
