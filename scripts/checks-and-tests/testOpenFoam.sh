@@ -3,7 +3,7 @@
 ls -la /root/OpenFOAM/OpenFOAM-6/etc/bashrc
 source  /root/OpenFOAM/OpenFOAM-6/etc/bashrc
 
-cd /builds/yade-dev/
+cd ..
 rm -rf Yade-OpenFOAM-coupling
 git clone https://github.com/dpkn31/Yade-OpenFOAM-coupling.git
 cd Yade-OpenFOAM-coupling
@@ -11,8 +11,11 @@ git checkout yadetest
 ./Allclean
 ./Allwmake
 
-cd /builds/yade-dev/trunk/examples/openfoam/example_icoFoamYade
-ln -s /builds/yade-dev/trunk/install/bin/yade-ci ./yadeimport.py
+cd ../trunk/examples/openfoam/example_icoFoamYade
+echo `pwd`
+echo "---------- creating symlink yadeimport.py ----------"
+ln -s ../../../install/bin/yade-ci ./yadeimport.py
+ls -la ./yadeimport.py
 blockMesh
 decomposePar
 mkdir yadep
