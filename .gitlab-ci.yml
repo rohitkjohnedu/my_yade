@@ -136,8 +136,8 @@ make_clang:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
-    - export CC="/usr/bin/clang-9"
-    - export CXX="/usr/bin/clang++-9"
+    - export CC="/usr/bin/clang-10"
+    - export CXX="/usr/bin/clang++-10"
     # We should escape disabling features for the clang-build. Clang should work exactly like gcc.
     - export EXTRA_CMAKE_ARGS="-DENABLE_THERMAL=0 -DENABLE_TWOPHASEFLOW=0 -DENABLE_USEFUL_ERRORS=0 $EXTRA_CMAKE_ARGS"
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
