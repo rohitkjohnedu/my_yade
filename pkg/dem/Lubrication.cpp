@@ -472,20 +472,16 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     phys->normalLubricationForce = Vector3r::Zero();
     phys->normalPotentialForce = Vector3r::Zero();
 	
-    if(activateNormalLubrication) {
-		switch(resolution) {
-			case 0: normalForce_trapezoidal(phys,geom, undot, isNew); break;
-			case 1: normalForce_AdimExp(phys, geom, undot, isNew, false); break;
-			case 2: normalForce_AdimExp(phys, geom, undot, isNew, true); break;
-			case 3: normalForce_trpz_adim(phys, geom, undot, isNew); break;
-			default:
-				LOG_WARN("Nonexistant resolution method. Using exact (0).");
-				normalForce_trapezoidal(phys,geom, undot, isNew);
-				resolution = 0; break;
-		}
-	} else {
-		phys->u = -geom->penetrationDepth;
-	}
+    switch(resolution) {
+        case 0: normalForce_trapezoidal(phys,geom, undot, isNew); break;
+        case 1: normalForce_AdimExp(phys, geom, undot, isNew, false); break;
+        case 2: normalForce_AdimExp(phys, geom, undot, isNew, true); break;
+        case 3: normalForce_trpz_adim(phys, geom, undot, isNew); break;
+        default:
+            LOG_WARN("Nonexistant resolution method. Using exact (0).");
+            normalForce_trapezoidal(phys,geom, undot, isNew);
+            resolution = 0; break;
+    }
 	
 	Vector3r C1 = Vector3r::Zero();
 	Vector3r C2 = Vector3r::Zero();
