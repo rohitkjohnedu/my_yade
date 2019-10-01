@@ -35,9 +35,13 @@ XTERM2_POS=102x37+2680+2854
 
 echo "If you can't see any terminals oppened then change \${XTERM1_POS} and \${XTERM2_POS} in this script.\n"
 
+total_size=${#the_examples[*]}
+count=0
+
 for example in $the_examples; do
 	file_location=("${(@f)$(find ../ -name "${example}" -type f)}")
-	print "Working on ${example} in ${file_location}."
+	print "Working on ${example} in ${file_location}, ${count}/${total_size}"
+	count=$((${count}+1))
 	DIRPLACE=`dirname ${file_location}`
 	PARENT=`basename ${DIRPLACE}`
 	cp -a ${DIRPLACE} /tmp/testEx/${PARENT}
@@ -47,9 +51,14 @@ for example in $the_examples; do
 		xterm -en UTF-8 -b 0 -bg black -fg darkgray -geometry ${XTERM1_POS} -fn "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO10646-1" -e bash -c "cd /tmp/testEx/${PARENT} ; ../yade ./${example}" &!
 		xterm -en UTF-8 -b 0 -bg black -fg darkgray -geometry ${XTERM2_POS} -fn "-Misc-Fixed-Medium-R-Normal--20-200-75-75-C-100-ISO10646-1" -e /usr/bin/zsh -c "\
 		cd /tmp/video;\
-		echo \"working on ${example} as ${BASENAME}\";\
+		echo \"working on ${example} as ${BASENAME}. ${count}/${total_size}\";\
+		echo \"\";\
 		REPLY=\"n\";\
-		read -q REPLY\\?\"(Press Ctrl-C when recording is complete) Ready? [y/n] :\";\
+		read -q REPLY\\?\"1. Video is recorded in top left corner with size 1024x768
+2. Press 'y' and when recording is complete press Ctrl-C
+3. Press 'n' to not record video and launch next example
+
+Ready? [y/n] :\";\
 		echo \$REPLY;\
 		if test \$REPLY = \"y\" ; then;\
 			echo OK, recording ${example};\
@@ -58,10 +67,13 @@ for example in $the_examples; do
 			recordmydesktop -x 0 -y 0 --width 1024 --height 768 -o ${BASENAME}.ogv --no-sound
 		fi;
 		"
-		rm -rf /tmp/testEx/${PARENT}
 	else
 		echo "Error copying file ${example}"
 		sleep 1
 	fi
 done
+
+rm -rf /tmp/testEx
+
+echo "\nRecorded videos are in /tmp/video"
 
