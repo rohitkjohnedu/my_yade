@@ -180,7 +180,7 @@ class HttpStatsServer(BaseHTTPRequestHandler):
 				if not self.__class__.favicon:
 					import base64
 					self.__class__.favicon=base64.b64decode(yade.remote.b64favicon)
-				self.sendHttp(self.__class__.favicon,contentType='image/vnd.microsoft.icon')
+				self.sendRawHttp(self.__class__.favicon,contentType='image/vnd.microsoft.icon')
 				return
 			elif self.path=='/log' and opts.globalLog:
 				self.sendTextFile(opts.globalLog,refresh=opts.refresh)
