@@ -37,23 +37,35 @@ versions and available on `yade-dem.org/packages <http://yade-dem.org/packages/>
 These are "daily" versions of the packages which are being updated regularly and, hence, include
 all the newly added features.
 
-.. warning:: yade-daily packages are currently out of date, this `issue <https://gitlab.com/yade-dev/trunk/issues/58>`_ is being worked on. Yade can be installed from :ref:`source code <install-from-source-code>`.
-
 To install the daily-version you need to add the repository to your
-/etc/apt/sources.list, add the PGP-key AA915EEB as trusted and install ``yadedaily``::
+/etc/apt/sources.list.
+
+- Debian 9 Stretch: **stretch**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ stretch main" >> /etc/apt/sources.list'
+
+
+- Debian 10 Bullseye: **bullseye**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bullseye main" >> /etc/apt/sources.list'
+
+
+- Ubuntu 16.04 Xenial: **xenial**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial main" >> /etc/apt/sources.list'
+
+
+- Ubuntu 18.04 Bionic: **bionic**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bionic main" >> /etc/apt/sources.list'
+
+
+Add the PGP-key AA915EEB as trusted and install ``yadedaily``::
+
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
 	sudo apt-get update
 	sudo apt-get install yadedaily
 
-Be sure to use the correct name of your Ubuntu/Debian distribution in the first line (xenial, stretch etc).
-Supported distributions and corresponding names for the /etc/apt/sources.list are:
-
-- Debian 9 Stretch: **stretch**
-- Debian 10 Bullseye: **bullseye**
-- Ubuntu 16.04 Xenial: **xenial**
-- Ubuntu 18.04 Bionic: **bionic**
 
 After that you can normally start Yade using the command ``yadedaily`` or ``yadedaily-batch``.
 ``yadedaily`` on older distributions can have some disabled features due to older library
