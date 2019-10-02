@@ -60,6 +60,7 @@ void Ip2_FrictMat_FrictMat_LubricationPhys::go(const shared_ptr<Material> &mater
 	
 	/* Fluid (lubrication) */
     Real a = (Da+Db)/2.;
+    phys->a = a;
     phys->nun = M_PI*eta*a*a;
     phys->eta = eta;
     phys->eps = eps;

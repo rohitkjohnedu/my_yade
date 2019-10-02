@@ -33,6 +33,7 @@ class LubricationPhys: public ViscElPhys {
                 ((Real,nun,0.0,,"Coefficient for normal lubrication [N.s]"))
                 ((Real,mum,0.3,,"Friction coefficient [-]"))
 				// Output
+                ((Real,a,0.,Attr::readonly,"Mean radius [m]"))
                 ((Real,ue,0.,Attr::readonly,"Surface deflection (ue) at t-dt [m]"))
                 ((Real,u,-1,Attr::readonly,"Interfacial distance (u) at t-dt [m]"))
 				((Real,prev_un,0,Attr::readonly,"Nondeformed distance (un) at t-dt [m]"))
