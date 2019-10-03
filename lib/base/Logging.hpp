@@ -13,6 +13,10 @@
  *
  * Yade has the logging config file by default in ~/.yade-$VERSION/logging.conf.
  *
+ * Note: The Logging.[hc]pp files and Singleton.hpp are competely independent. They can be used in unrelated projects under license GNU GPL v2 or later,
+ * you only need to add  -DBOOST_LOG_DYN_LINK -lboost_log -lboost_log_setup to your compilation options.
+ * Don't use -DBOOST_LOG_DYN_LINK if you use -static linking, which normally you shouldn't unless there is a really good reason.
+ *
  */
 
 // boost::log inspired by git show 014b11496
