@@ -40,22 +40,27 @@ all the newly added features.
 To install the daily-version you need to add the repository to your
 /etc/apt/sources.list.
 
-- Debian 9 Stretch: **stretch**::
+- Debian 9 **stretch**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ stretch main" >> /etc/apt/sources.list'
 
 
-- Debian 10 Bullseye: **bullseye**::
+- Debian 10 **buster**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ buster main" >> /etc/apt/sources.list'
+
+
+- Debian 11 **bullseye**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bullseye main" >> /etc/apt/sources.list'
 
 
-- Ubuntu 16.04 Xenial: **xenial**::
+- Ubuntu 16.04 **xenial**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ xenial main" >> /etc/apt/sources.list'
 
 
-- Ubuntu 18.04 Bionic: **bionic**::
+- Ubuntu 18.04 **bionic**::
 
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bionic main" >> /etc/apt/sources.list'
 
