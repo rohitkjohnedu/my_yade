@@ -1,6 +1,7 @@
 // 2019 © William Chèvremont <william.chevremont@univ-grenoble-alpes.fr>
 
 #include "LubricationWithPotential.hpp"
+#include <boost/python/call_method.hpp>
 
 YADE_PLUGIN((Law2_ScGeom_PotentialLubricationPhys)(GenericPotential)(CundallStrackPotential))
 
@@ -141,7 +142,7 @@ bool Law2_ScGeom_PotentialLubricationPhys::solve_normalForce(Real const& un, Rea
     return true;
 }
 
-Real GenericPotential::potential(Real const& , LubricationPhys const&)
+Real GenericPotential::potential(Real const& , LubricationPhys const&) const
 {
     return 0;
 }
@@ -155,7 +156,7 @@ void GenericPotential::applyPotential(Real const&, LubricationPhys& phys, Vector
 
 CREATE_LOGGER(GenericPotential);
 
-Real CundallStrackPotential::potential(Real const& u, LubricationPhys const& phys)
+Real CundallStrackPotential::potential(Real const& u, LubricationPhys const& phys) const
 {
     return std::min(0.,-alpha*phys.kn*phys.a*(phys.eps*phys.a-u));
 }

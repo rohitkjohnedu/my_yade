@@ -11,14 +11,15 @@ class GenericPotential : public Serializable {
          * @param phys Actual physics on which potential is computed
          * @return The total force from potential (contact + potential)
          */
-        virtual Real potential(Real const& u, LubricationPhys const& phys);
+        virtual Real potential(Real const& u, LubricationPhys const& phys) const;
         virtual void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const& n);
-        YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GenericPotential,Serializable,
-                                          "Generic class for potential representation in PotentialLubrication law. Don't do anything. If set as potential, the result will be a lubrication-only simulation.",
-                                          // ATTRS
-                                          , // CTOR
-                                          , // PY
-        );
+//         YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GenericPotential,Serializable,
+//                                           "Generic class for potential representation in PotentialLubrication law. Don't do anything. If set as potential, the result will be a lubrication-only simulation.",
+//                                           // ATTRS
+//                                           , // CTOR
+//                                           , // PY
+//         );
+        REGISTER_CLASS_AND_BASE(GenericPotential,Serializable);
         DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(GenericPotential);
@@ -56,7 +57,7 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_PotentialLubricationPhys);
 
 class CundallStrackPotential : public GenericPotential {
     public:
-        Real potential(Real const& u, LubricationPhys const& phys);
+        Real potential(Real const& u, LubricationPhys const& phys) const;
         void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const& n);
         YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CundallStrackPotential,GenericPotential,
                                           "Potential with only Cundall-and-Strack-like contact.",
@@ -68,3 +69,4 @@ class CundallStrackPotential : public GenericPotential {
         DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(CundallStrackPotential)
+

@@ -24,6 +24,7 @@
 #include <pkg/common/Collider.hpp>
 
 #include <pkg/common/InteractionLoop.hpp>
+#include <pkg/dem/LubricationWithPotential.hpp>
 
 #include <core/Clump.hpp>
 #include <pkg/common/Sphere.hpp>
@@ -852,9 +853,69 @@ class pyOmega{
 	std::string tmpFilename(){ return OMEGA.tmpFilename(); }
 };
 
-} // namespace yade
 
+class pyGenericPotential : public GenericPotential {
+public:
+    
+    pyGenericPotential(PyObject*p) : GenericPotential(), self(p) {
+        TRACE;
+        LOG_TRACE(p);
+    }
+    pyGenericPotential(PyObject*p, GenericPotential const& o) : GenericPotential(o), self(p) {
+        TRACE;
+    }
+    
+    Real potential(Real const& u, LubricationPhys const&) const {
+        TRACE;
+        return contactForce(u) + potentialForce(u);
+    }
+
+    void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const&n) {
+        TRACE;
+        phys.normalContactForce = contactForce(u)*n;
+        phys.normalPotentialForce = potentialForce(u)*n;
+        phys.contact = hasContact(u);
+    }
+
+    Real contactForce(Real const& u) const {
+        TRACE;
+        return py::call_method<Real>(self, "contactForce", u);
+    }
+
+    Real potentialForce(Real const& u) const {
+        TRACE;
+        return py::call_method<Real>(self, "potentialForce", u);
+    }
+
+    bool hasContact(Real const& u) const {
+        TRACE;
+        return py::call_method<bool>(self, "hasContact", u);
+    }
+    
+    static Real default_contactForce(GenericPotential const&, Real const&) {
+        TRACE;
+        return 0;
+    }
+
+    static Real default_potentialForce(GenericPotential const&, Real const&) {
+        TRACE;
+        return 0;
+    }
+
+    static bool default_hasContact(GenericPotential const&, Real const&) {
+        TRACE;
+        return false;
+    }
+        
+private:
+    PyObject* self;
+        
+};
+
+} // namespace yade
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
+
+
 BOOST_PYTHON_MODULE(wrapper)
 {
 	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
@@ -1013,7 +1074,12 @@ BOOST_PYTHON_MODULE(wrapper)
 		.def("__len__",&pyMaterialContainer::len);
 
 	py::class_<STLImporter>("STLImporter").def("ymport",&STLImporter::import);
-
+    
+    py::class_<GenericPotential, pyGenericPotential, boost::noncopyable>("GenericPotential")
+        .def("contactForce",&pyGenericPotential::default_contactForce,(py::arg("u")),"Return contact force norm.")
+        .def("potentialForce",&pyGenericPotential::default_potentialForce,(py::arg("u")),"Return potential force norm.")
+        .def("hasContact",&pyGenericPotential::default_hasContact,(py::arg("u")),"Return true if there are contact.");
+        
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
 	Serializable().pyRegisterClass(py::scope());
