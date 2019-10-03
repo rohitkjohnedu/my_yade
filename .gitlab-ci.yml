@@ -122,6 +122,14 @@ make_bullseye:
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
+make_no_mpi:
+  <<: *make_definition
+  <<: *artifacts_definition
+  before_script:
+    - export EXTRA_CMAKE_ARGS="-DENABLE_MPI=OFF $EXTRA_CMAKE_ARGS"
+    - echo $EXTRA_CMAKE_ARGS
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+
 make_suse15:
   <<: *make_definition
   <<: *artifacts_definition
@@ -191,6 +199,13 @@ test_bullseye:
   dependencies:
     - make_bullseye
   needs: ["make_bullseye"]
+
+test_no_mpi:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_no_mpi
+  needs: ["make_no_mpi"]
 
 test_suse15:
   <<: *test_definition
@@ -274,6 +289,14 @@ check_bullseye:
   dependencies:
     - make_bullseye
   needs: ["make_bullseye"]
+
+check_no_mpi:
+  <<: *check_definition
+  before_script:
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_no_mpi
+  needs: ["make_no_mpi"]
 
 check_suse15:
   <<: *check_definition
