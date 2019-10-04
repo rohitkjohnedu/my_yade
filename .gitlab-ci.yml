@@ -61,18 +61,18 @@ stages:
     - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
     - ld --version
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y4pak") echo "43" ;;
-        "c4pak") echo "43" ;;
-        "y6pak") echo "46" ;;
-        "c6pak") echo "46" ;;
-        "y7pak") echo "46" ;;
-        "c7pak") echo "46" ;;
+        "y4pak") echo "14" ;;
+        "c4pak") echo "14" ;;
+        "y6pak") echo "15" ;;
+        "c6pak") echo "15" ;;
+        "y7pak") echo "16" ;;
+        "c7pak") echo "16" ;;
         "yade-runner") echo "12" ;;
         "yade-runner-01") echo "1" ;;
         *) echo "8";;
         esac)
     - echo $JOBSNUM
-    - echo "max_size = 100.0G" > ~/.ccache/ccache.conf
+    - echo "max_size = 200.0G" > ~/.ccache/ccache.conf
     - make -j $JOBSNUM
     - make install
     - make clean
@@ -320,12 +320,12 @@ pages:
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y4pak") echo "43" ;;
-        "c4pak") echo "43" ;;
-        "y6pak") echo "46" ;;
-        "c6pak") echo "46" ;;
-        "y7pak") echo "46" ;;
-        "c7pak") echo "46" ;;
+        "y4pak") echo "14" ;;
+        "c4pak") echo "14" ;;
+        "y6pak") echo "15" ;;
+        "c6pak") echo "15" ;;
+        "y7pak") echo "16" ;;
+        "c7pak") echo "16" ;;
         "yade-runner") echo "12" ;;
         "yade-runner-01") echo "1" ;;
         *) echo "8";;
