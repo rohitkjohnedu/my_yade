@@ -22,7 +22,7 @@ void PotentialBlock::addPlaneStruct()    { planeStruct.push_back(Planes());    }
 void PotentialBlock::postLoad(PotentialBlock& )
 {
 
-if (vertices.empty()) { // i.e. if the particle is not initialised
+if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initialised
 
 	int planeNo = a.size();
 
