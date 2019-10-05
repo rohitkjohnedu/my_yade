@@ -60,11 +60,17 @@ stages:
     - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" $LINK_GOLD
     - update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" $LINK_REGULAR
     - ld --version
+    # 4pak has 64cores 256GB RAM, and has concurrent = 5 ← amount of simultaneous gitlab jobs
+    # 6pak has 48cores 128GB RAM, and has concurrent = 3 , but 6pak must have a little smaller load than the maximum
+    # 7pak has 48cores 128GB RAM, and has concurrent = 4
+    # The goal is to maximize effciency while at the same time the occasionall very heavy jobs (recompilation where ccache can't help) must not bring down the server to halt.
+    # So let's assume that JOBSUM*concurrent < 1.3*cores and examine how this works out.
+    # Current measurements indicate that non-ccached recompilation full CI job is 34 minutes, while ccached one can be as low as 10 minutes.
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y4pak") echo "14" ;;
-        "c4pak") echo "14" ;;
-        "y6pak") echo "15" ;;
-        "c6pak") echo "15" ;;
+        "y4pak") echo "17" ;;
+        "c4pak") echo "17" ;;
+        "y6pak") echo "19" ;;
+        "c6pak") echo "19" ;;
         "y7pak") echo "16" ;;
         "c7pak") echo "16" ;;
         "yade-runner") echo "12" ;;
@@ -319,13 +325,14 @@ pages:
     - master
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
+    # see comments in make_template, but here give smaller JOBSNUM because this runs on master only, so the cores can be better utilized on merge_request
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y4pak") echo "14" ;;
-        "c4pak") echo "14" ;;
-        "y6pak") echo "15" ;;
-        "c6pak") echo "15" ;;
-        "y7pak") echo "16" ;;
-        "c7pak") echo "16" ;;
+        "y4pak") echo "11" ;;
+        "c4pak") echo "11" ;;
+        "y6pak") echo "12" ;;
+        "c6pak") echo "12" ;;
+        "y7pak") echo "10" ;;
+        "c7pak") echo "10" ;;
         "yade-runner") echo "12" ;;
         "yade-runner-01") echo "1" ;;
         *) echo "8";;
