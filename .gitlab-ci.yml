@@ -79,8 +79,8 @@ stages:
         esac)
     - echo $JOBSNUM
     - echo "max_size = 200.0G" > ~/.ccache/ccache.conf
-    - make -j $JOBSNUM
-    - make install
+    - echo $SKIP_TEST
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this build, because it's a WIP merge request.\n===\e[0m\n"; else make install -j $JOBSNUM; fi
     - make clean
     - ccache -s
   tags:
@@ -126,6 +126,8 @@ make_no_mpi:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DENABLE_MPI=OFF $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
@@ -134,6 +136,8 @@ make_debug:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DDEBUG=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
@@ -142,6 +146,8 @@ make_minimal:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DENABLE_VTK=OFF -DENABLE_MPI=OFF -DENABLE_GUI=OFF -DENABLE_GTS=OFF -DENABLE_TWOPHASEFLOW=OFF -DENABLE_CGAL=OFF -DENABLE_FEMLIKE=OFF -DENABLE_LBMFLOW=OFF -DENABLE_POTENTIAL_BLOCKS=OFF -DENABLE_POTENTIAL_PARTICLES=OFF -DENABLE_GL2PS=OFF -DENABLE_LOGGER=OFF -DENABLE_OPENMP=OFF $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
@@ -151,6 +157,8 @@ make_opposite:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DENABLE_LOGGER=OFF -DENABLE_MASK_ARBITRARY=ON -DENABLE_OPENMP=OFF -DLIQMIGRATION=ON -DPROFILING=ON -DSPH=ON -DDEFORM=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
@@ -186,9 +194,15 @@ make_clang:
   <<: *platforms_definition
   stage: test
   script:
-    - install/bin/yade-ci --test
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this test, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci --test; fi
     - cat /etc/os-release
   timeout: 15 minutes
+
+.skip_wip_test_template: &skip_wip_test_definition
+  before_script:
+    # there can be only one before_script: it is in a template here. Buy if you need a before_script: for something else (e.g. MPI), this line has to
+    # be copied into 'before_script:' there, and the template removed
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
 
 test_16_04:
   <<: *test_definition
@@ -227,6 +241,7 @@ test_bullseye:
 
 test_no_mpi:
   <<: *test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_no_mpi
@@ -234,6 +249,7 @@ test_no_mpi:
 
 test_debug:
   <<: *test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_debug
@@ -241,6 +257,7 @@ test_debug:
 
 test_minimal:
   <<: *test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_minimal
@@ -248,6 +265,7 @@ test_minimal:
 
 test_opposite:
   <<: *test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_opposite
@@ -293,7 +311,7 @@ test_18_04_nogui:
 #    - export OMPI_MCA_btl_vader_single_copy_mechanism=none
 #    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org/faq/?category=running#oversubscribing)
   script:
-    - install/bin/yade-ci --checks
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this check, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci --checks; fi
   timeout: 15 minutes
 
 check_16_04:
@@ -338,7 +356,7 @@ check_bullseye:
 
 check_no_mpi:
   <<: *check_definition
-  before_script:
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_no_mpi
@@ -346,7 +364,7 @@ check_no_mpi:
 
 check_debug:
   <<: *check_definition
-  before_script:
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_debug
@@ -354,7 +372,7 @@ check_debug:
 
 check_minimal:
   <<: *check_definition
-  before_script:
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_minimal
@@ -362,7 +380,7 @@ check_minimal:
 
 check_opposite:
   <<: *check_definition
-  before_script:
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
     - make_opposite
