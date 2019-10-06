@@ -340,7 +340,7 @@ pages:
     - echo $JOBSNUM
     - export CCACHE_DIR=/root/.ccache
     - ccache -s
-    - dpkg-buildpackage -j$JOBSNUM
+    - DEB_BUILD_OPTIONS=noddebs dpkg-buildpackage -j$JOBSNUM
     - rm -rf $CI_PROJECT_DIR/deb/yadedaily
     - ls -l $CI_PROJECT_DIR/deb
     - ccache -s
