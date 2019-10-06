@@ -146,7 +146,8 @@ make_minimal:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
-make_other:
+# _opposite means that all non-minimal options (options that do not reduce significantly amount of compiled code) are set to the setting opposite to the default one
+make_opposite:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -245,12 +246,12 @@ test_minimal:
     - make_minimal
   needs: ["make_minimal"]
 
-test_other:
+test_opposite:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - make_other
-  needs: ["make_other"]
+    - make_opposite
+  needs: ["make_opposite"]
 
 test_suse15:
   <<: *test_definition
@@ -359,13 +360,13 @@ check_minimal:
     - make_minimal
   needs: ["make_minimal"]
 
-check_other:
+check_opposite:
   <<: *check_definition
   before_script:
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - make_other
-  needs: ["make_other"]
+    - make_opposite
+  needs: ["make_opposite"]
 
 check_suse15:
   <<: *check_definition
