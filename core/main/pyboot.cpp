@@ -9,9 +9,9 @@
 		case SIGABRT:
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
-			cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<yade::Omega::instance().gdbCrashBatch<<"'"<<endl;
-			int ret = std::system((string("gdb -x ")+yade::Omega::instance().gdbCrashBatch).c_str());
-			if (ret!=0) cerr << "unable to execute gdb" << endl;
+			std::cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<yade::Omega::instance().gdbCrashBatch<<"'"<<endl;
+			int ret = std::system((std::string("gdb -x ")+yade::Omega::instance().gdbCrashBatch).c_str());
+			if (ret!=0) std::cerr << "unable to execute gdb" << endl;
 			raise(sig); // reemit signal after exiting gdb
 			break;
 		}
@@ -29,10 +29,10 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 	O.confDir=confDir;
 	O.initTemps();
 	#ifdef YADE_DEBUG
-		ofstream gdbBatch;
+		std::ofstream gdbBatch;
 		O.gdbCrashBatch=O.tmpFilename();
 		gdbBatch.open(O.gdbCrashBatch.c_str());
-		gdbBatch << "attach " <<boost::lexical_cast<string>(getpid()) << "\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n";
+		gdbBatch << "attach " <<boost::lexical_cast<std::string>(getpid()) << "\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n";
 		gdbBatch.close();
 		signal(SIGABRT,crashHandler);
 		signal(SIGSEGV,crashHandler);
