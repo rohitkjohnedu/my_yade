@@ -134,7 +134,11 @@ make_no_mpi:
 
 make_debug:
   <<: *make_definition
-  <<: *artifacts_definition
+  artifacts:
+    paths:
+      - install
+      - build
+    expire_in: 6 days
   before_script:
     # there can be only one before_script:, so the line below cannot be in a separate template
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
@@ -394,23 +398,33 @@ check_suse15:
   needs: ["make_suse15"]
 
 
-# currently doc is build only on ubuntu 18.04. Without .doc_template. We may fix this later.
-# 4. doc stage
-doc_18_04:
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
-  stage: test
-  only:
-    - master
-    - merge_request
+.doc_template: &doc_definition
+  <<: *platforms_definition
   script:
     - cd build
-    - xvfb-run -s "-screen 0 1600x1200x24" make doc
-  dependencies:
-    - make_18_04
-  needs: ["make_18_04"]
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping DOC, because it's a WIP merge request.\n===\e[0m\n"; else xvfb-run -s "-screen 0 1600x1200x24" make doc; fi
+  stage: test
+  timeout: 40 minutes
   artifacts:
     paths:
       - install
+
+# 4. doc stage
+doc_18_04:
+  <<: *doc_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
+  dependencies:
+    - make_18_04
+  needs: ["make_18_04"]
+
+doc_debug:
+  <<: *doc_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  before_script:
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
+  dependencies:
+    - make_debug
+  needs: ["make_debug"]
 
 
 # 5. pages stage; uploads documentation to the website
