@@ -196,7 +196,7 @@ make_clang:
   script:
     - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this test, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci --test; fi
     - cat /etc/os-release
-  timeout: 15 minutes
+  timeout: 25 minutes
 
 .skip_wip_test_template: &skip_wip_test_definition
   before_script:
@@ -287,7 +287,7 @@ test_18_foam:
   dependencies:
     - make_18_04
   needs: ["make_18_04"]
-  timeout: 15 minutes
+  timeout: 25 minutes
   script:
     - cat /etc/os-release
     - export OMPI_MCA_btl_vader_single_copy_mechanism=none
@@ -312,7 +312,7 @@ test_18_04_nogui:
 #    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org/faq/?category=running#oversubscribing)
   script:
     - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this check, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci --checks; fi
-  timeout: 15 minutes
+  timeout: 25 minutes
 
 check_16_04:
   <<: *check_definition
