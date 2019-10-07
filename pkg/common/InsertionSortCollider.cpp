@@ -231,7 +231,7 @@ void InsertionSortCollider::action(){
 			LOG_DEBUG("Resize bounds containers from "<<BBsize<<" to "<<nBodies*2<<", will std::sort.");
 			// bodies deleted; clear the container completely, and do as if all bodies were added (rather slow…)
 			// future possibility: insertion sort with such operator that deleted bodies would all go to the end, then just trim bounds
-			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].clear(); }
+			if(2*nBodies<BBsize){ for(int i=0; i<3; i++) BB[i].clear(); BBsize=)0; }
 			// more than 100 bodies was added, do initial sort again
 			// maybe: should rather depend on ratio of added bodies to those already present...?
 			if(2*nBodies-BBsize>200 || BBsize==0) doInitSort=true;
