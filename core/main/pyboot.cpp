@@ -9,9 +9,9 @@
 		case SIGABRT:
 		case SIGSEGV:
 			signal(SIGSEGV,SIG_DFL); signal(SIGABRT,SIG_DFL); // prevent loops - default handlers
-			std::cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<yade::Omega::instance().gdbCrashBatch<<"'"<<endl;
+			std::cerr<<"SIGSEGV/SIGABRT handler called; gdb batch file is `"<<yade::Omega::instance().gdbCrashBatch<<"'"<<std::endl;
 			int ret = std::system((std::string("gdb -x ")+yade::Omega::instance().gdbCrashBatch).c_str());
-			if (ret!=0) std::cerr << "unable to execute gdb" << endl;
+			if (ret!=0) std::cerr << "unable to execute gdb" << std::endl;
 			raise(sig); // reemit signal after exiting gdb
 			break;
 		}
