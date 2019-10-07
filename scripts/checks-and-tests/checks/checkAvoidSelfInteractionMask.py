@@ -23,7 +23,7 @@ for mask in maskTest:
 	# avoid errors about InsertionSortCollider.verletDist>0, but unable to locate NewtonIntegrator within O.engines by setting some default engines
 	O.engines=[
 		ForceResetter(),
-		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()]),
+		InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb()], label="collider"),
 		InteractionLoop(
 			[Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
 			[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
