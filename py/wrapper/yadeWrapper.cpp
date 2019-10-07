@@ -853,17 +853,8 @@ class pyOmega{
 	std::string tmpFilename(){ return OMEGA.tmpFilename(); }
 };
 
-
-class pyGenericPotential : public GenericPotential {
+class pyGenericPotential : public GenericPotential, public py::wrapper<GenericPotential> {
 public:
-    
-    pyGenericPotential(PyObject*p) : GenericPotential(), self(p) {
-        TRACE;
-        LOG_TRACE(p);
-    }
-    pyGenericPotential(PyObject*p, GenericPotential const& o) : GenericPotential(o), self(p) {
-        TRACE;
-    }
     
     Real potential(Real const& u, LubricationPhys const&) const {
         TRACE;
@@ -879,32 +870,17 @@ public:
 
     Real contactForce(Real const& u) const {
         TRACE;
-        return py::call_method<Real>(self, "contactForce", u);
+        return get_override("contactForce")(u);
     }
 
     Real potentialForce(Real const& u) const {
         TRACE;
-        return py::call_method<Real>(self, "potentialForce", u);
+        return get_override("potentialForce")(u);
     }
 
     bool hasContact(Real const& u) const {
         TRACE;
-        return py::call_method<bool>(self, "hasContact", u);
-    }
-    
-    static Real default_contactForce(GenericPotential const&, Real const&) {
-        TRACE;
-        return 0;
-    }
-
-    static Real default_potentialForce(GenericPotential const&, Real const&) {
-        TRACE;
-        return 0;
-    }
-
-    static bool default_hasContact(GenericPotential const&, Real const&) {
-        TRACE;
-        return false;
+        return get_override("hasContact")(u);
     }
         
 private:
@@ -1075,10 +1051,10 @@ BOOST_PYTHON_MODULE(wrapper)
 
 	py::class_<STLImporter>("STLImporter").def("ymport",&STLImporter::import);
     
-    py::class_<GenericPotential, pyGenericPotential, boost::noncopyable>("GenericPotential")
-        .def("contactForce",&pyGenericPotential::default_contactForce,(py::arg("u")),"Return contact force norm.")
-        .def("potentialForce",&pyGenericPotential::default_potentialForce,(py::arg("u")),"Return potential force norm.")
-        .def("hasContact",&pyGenericPotential::default_hasContact,(py::arg("u")),"Return true if there are contact.");
+    py::class_<pyGenericPotential, boost::noncopyable>("GenericPotential")
+        .def("contactForce",py::pure_virtual(&pyGenericPotential::contactForce),"This function should return contact force norm.")
+        .def("potentialForce",py::pure_virtual(&pyGenericPotential::potentialForce),"This function should return potential force norm.")
+        .def("hasContact",py::pure_virtual(&pyGenericPotential::hasContact),"This function should return true if there are contact.");
         
 //////////////////////////////////////////////////////////////
 ///////////// proxyless wrappers 
