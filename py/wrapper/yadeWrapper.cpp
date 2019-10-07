@@ -868,24 +868,20 @@ public:
         phys.contact = hasContact(u);
     }
 
-    Real contactForce(Real const& u) const {
+    virtual Real contactForce(Real const& u) const {
         TRACE;
         return get_override("contactForce")(u);
     }
 
-    Real potentialForce(Real const& u) const {
+    virtual Real potentialForce(Real const& u) const {
         TRACE;
         return get_override("potentialForce")(u);
     }
 
-    bool hasContact(Real const& u) const {
+    virtual bool hasContact(Real const& u) const {
         TRACE;
         return get_override("hasContact")(u);
-    }
-        
-private:
-    PyObject* self;
-        
+    }        
 };
 
 } // namespace yade
