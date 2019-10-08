@@ -9,9 +9,6 @@
 
 YADE_PLUGIN((Collider));
 
-
-int Collider::avoidSelfInteractionMask = 0 ;
-
 bool Collider::mayCollide(const Body* b1, const Body* b2
 		#ifdef YADE_MPI
 		,Body::id_t subdomain
