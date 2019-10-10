@@ -302,7 +302,10 @@ void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MP
 			shared_ptr<Body>& b = (*bodyContainer)[idx];
 			if (!b) newBody->intrs.clear();//we can clear here, interactions are stored in intrsToSet and will be reinserted
 			else newBody->intrs=b->intrs;
-			if (ifMerge) newBody->material=scene->materials[newBody->material->id];
+			if (ifMerge) {
+				newBody->material=scene->materials[newBody->material->id];
+			}
+//			if (ifMerge) {
 				/* FIXME: this switcheroo of material for existing bodies is done to avoid "RuntimeError: Scene::postLoad: Internal inconsistency,*/ 
 				/*shared materials not preserved when loaded; please report bug." during global merge, splits.*/
 // 				newBody->material=materials[newBody->material->id];

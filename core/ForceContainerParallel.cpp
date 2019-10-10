@@ -23,12 +23,13 @@ void ForceContainer::addTorqueUnsynced(Body::id_t id, const Vector3r& m) {
 
 void ForceContainer::resizePerm(size_t newSize) {
   if (newSize<_permForce.size()) LOG_WARN("permForce may have been assigned to an id larger than maxId, and will be ignored in that case");
-  if (newSize>_permForce.size()){
+  if (newSize>_permForce.size()) {
     _permForce.reserve(size_t(1.5*newSize));
     _permTorque.reserve(size_t(1.5*newSize));
     _permForce.resize(newSize,Vector3r::Zero());
     _permTorque.resize(newSize,Vector3r::Zero());
-    syncedSizes=false;}
+    syncedSizes=false;
+   }
 }
 
 #ifdef YADE_OPENMP
@@ -265,7 +266,8 @@ void ForceContainer::resize(size_t newSize, int threadN) {
     _moveData[threadN].reserve(size_t(newSize*1.5));
     _rotData[threadN].reserve(size_t(newSize*1.5));
     _moveData[threadN].resize(newSize,Vector3r::Zero());
-    _rotData[threadN].resize(newSize,Vector3r::Zero());}
+    _rotData[threadN].resize(newSize,Vector3r::Zero());
+  }
   sizeOfThreads[threadN] = newSize;
   _maxId[threadN]=newSize-1;
   syncedSizes=false;
@@ -290,13 +292,15 @@ void ForceContainer::syncSizesOfContainers() {
 	  _force.reserve(size_t(newSize*1.3));
 	  _torque.reserve(size_t(newSize*1.3));
 	  _force.resize(newSize,Vector3r::Zero());
-	  _torque.resize(newSize,Vector3r::Zero());}
+	  _torque.resize(newSize,Vector3r::Zero());
+  }
   if (permForceUsed) resizePerm(newSize);
   if (moveRotUsed and _move.size()<newSize) {
 	  _move.reserve(size_t(newSize*1.3));
 	  _rot.reserve(size_t(newSize*1.3));
 	  _move.resize(size,Vector3r::Zero());
-	  _rot.resize(size,Vector3r::Zero());}
+	  _rot.resize(size,Vector3r::Zero());
+  }
   syncedSizes=true;
   size=newSize;
 }
