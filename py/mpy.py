@@ -727,22 +727,20 @@ def splitScene():
 			if rank == 0:
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain(fibreList) 
-		
 		maxid = len(O.bodies)-1
 		if DISTRIBUTED_INSERT: #find max id before inserting subdomains
 			maxid = timing_comm.allreduce("splitScene",maxid,op=MPI.MAX)
 			wprint("Splitting with maxId=",maxid)
-			
 		if rank == 0 or DISTRIBUTED_INSERT:
 			subdomains=[] #list subdomains by body ids
 			#insert "meta"-bodies
 			for k in range(1,numThreads):
 				domainBody=Body(shape=Subdomain(ids=[b.id for b in O.bodies if b.subdomain==k]),subdomain=k) #note: not clear yet how shape.subDomainIndex and body.subdomain should interact, currently equal values
 				domainBody.isSubdomain=True
-				if rank==k: O.subD=domainBody.shape
+				if rank==k: O._sceneObj.subD=domainBody.shape
 				subdomains.append(O.bodies.insertAtId(domainBody,maxid+k))
 				
-			if rank==0:  O.subD = Subdomain()  # make sure it's initialized here
+			if rank==0:  O._sceneObj.subD = Subdomain()  # make sure it's initialized here
 			O.subD.subdomains = subdomains
 			subD= O.subD #alias
 			subD.comm=comm #make sure the c++ uses the merged intracommunicator
@@ -778,7 +776,8 @@ def splitScene():
 						subdomains.append(b.id)
 						if b.subdomain==rank: domainBody=b
 				if domainBody==None: wprint("SUBDOMAIN NOT FOUND FOR RANK=",rank)
-				O.subD = domainBody.shape
+				O._sceneObj.subD = domainBody.shape
+				O.subD = O._sceneObj.subD
 				O.subD.subdomains = subdomains
 				
 		O._sceneObj.subdomain = rank
