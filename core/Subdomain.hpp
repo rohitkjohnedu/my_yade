@@ -207,7 +207,7 @@ class Subdomain: public Shape {
 	void receiveBodies(const int sender);
         void setCommunicationContainers(); 
 	void completeSendBodies(); 
-	void setBodiesToBodyContainer(Scene* , std::vector<shared_ptr<MPIBodyContainer> >&, bool, bool); //scene, vector of mpibodycontainers, set deleted bodies ?
+	void setBodiesToBodyContainer(Scene* , std::vector<shared_ptr<MPIBodyContainer> >&, bool, bool overwriteBodies=false); //scene, vector of mpibodycontainers, set deleted bodies ?
         
         //communications util functions 
         
@@ -255,7 +255,10 @@ class Subdomain: public Shape {
         std::vector<int> remoteCount; 
 	bool ranksSet=false; 
 	bool bodiesSet = false;  // flag 
-         
+	
+	// Geometry
+	Real boundOnAxis(Bound& b, Vector3r direction, bool min); //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
+
 		
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain",
@@ -265,7 +268,7 @@ class Subdomain: public Shape {
 		((Vector3r,boundsMax,Vector3r(NaN,NaN,NaN),,"max corner of all bboxes of members; differs from effective domain bounds by the extra length (sweepLength)"))
 		((IntersectionMap,intersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
 		((IntersectionMap,mirrorIntersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
-		((vector<Body::id_t>,ids,vector<Body::id_t>(),Attr::hidden,"Ids of owned particles.")) //FIXME
+		((vector<Body::id_t>,ids,vector<Body::id_t>(),,"Ids of owned particles."))
 		((vector<vector<Real> >,stateBuffer,vector<vector<Real> >(),(Attr::noSave | Attr::hidden),"container storing data from other subdomains")) 
 		,/*ctor*/ createIndex(); myComm_p=NULL;
 		,/*py*/ /*.add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")*/

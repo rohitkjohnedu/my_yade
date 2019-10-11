@@ -250,7 +250,7 @@ void Subdomain::receiveBodies(const int sender){
 // 	cout<<mpiBC->bContainer.size()<<" bodies"<<endl;
 	std::vector<shared_ptr<MPIBodyContainer> > mpiBCVect(1,mpiBC); //setBodiesToBodyContainer needs a vector of MPIBodyContainer, so create one of size 1.
 	Scene* scene = Omega::instance().getScene().get();
-	setBodiesToBodyContainer(scene,mpiBCVect,false, true);
+	setBodiesToBodyContainer(scene,mpiBCVect,false, /*overwriteBodies?*/ true);
 	delete[] cbuf; 
 }
 
@@ -288,7 +288,7 @@ void Subdomain::recvBodyContainersFromWorkers() {
 
 
 // set all body properties from the recvd MPIBodyContainer
-void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MPIBodyContainer> >& containers, bool ifMerge, bool /*resetInteractions*/) {
+void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MPIBodyContainer> >& containers, bool ifMerge, bool overwriteBodies) {
 	// to be used when deserializing a recieved container.
 	shared_ptr<BodyContainer>& bodyContainer = scene->bodies;
 	for (unsigned int i=0; i != containers.size(); ++i){
@@ -301,29 +301,18 @@ void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MP
 			std::map<Body::id_t, shared_ptr<Interaction> > intrsToSet = newBody->intrs;
 			shared_ptr<Body>& b = (*bodyContainer)[idx];
 			if (!b) newBody->intrs.clear();//we can clear here, interactions are stored in intrsToSet and will be reinserted
-			else newBody->intrs=b->intrs;
-			if (ifMerge) {
-				newBody->material=scene->materials[newBody->material->id];
-			}
-//			if (ifMerge) {
-				/* FIXME: this switcheroo of material for existing bodies is done to avoid "RuntimeError: Scene::postLoad: Internal inconsistency,*/ 
-				/*shared materials not preserved when loaded; please report bug." during global merge, splits.*/
-// 				newBody->material=materials[newBody->material->id];
-				
-// 				b = newBody; //NOTE: this breaks new collider logic if insertAtId is not used, the merged scene can be ran further in non-mpi after that (if it is of any interest... Bruno). 
-// 				b->material = tmpMat; 
-// 				b->intrs.clear();
-// 			}else{
-				 //we can clear here, interactions are stored in intrsToSet
-// 				else newBody->intrs=b->intrs;
-				//b = newBody; 
-// 				bodyContainer->insertAtId(newBody, newBody->id);  
-// 			}
-			bodyContainer->insertAtId(newBody, newBody->id);
+			else newBody->intrs=b->intrs; //keep interactions generated in current subdomain as they may not exist on the sender's side
+
+			if (ifMerge) newBody->material=scene->materials[newBody->material->id];
+			
+			if (!b) bodyContainer->insertAtId(newBody, newBody->id);
+			else if (overwriteBodies) {
+				b=newBody;
+				bodyContainer->dirty=true; bodyContainer->checkedByCollider=false;}
 	//if(!resetInteractions)
 			for (auto mapIter = intrsToSet.begin(); mapIter != intrsToSet.end(); ++mapIter){
 				const Body::id_t& id1 = mapIter->second->id1; const Body::id_t& id2 = mapIter->second->id2;
-				if ((*bodyContainer)[id1] and (*bodyContainer)[id2] ) {// we will insert interactions only when both bodies are inserted
+				if ((*bodyContainer)[id1] and (*bodyContainer)[id2] and ((*bodyContainer)[id1]->subdomain==scene->subdomain or (*bodyContainer)[id2]->subdomain==scene->subdomain)) {// we will insert interactions only when both bodies are inserted
 					/* FIXME: we should make really sure that we are not overwriting a live interaction with a deprecated one (possible solution: make all interactions between remote bodies virtual)*/
 					scene->interactions->insertInteractionMPI(mapIter->second);
 				}
@@ -476,6 +465,17 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 	  }
 	if (subdomainRank != master){ rcharBuff.clear(); } // assuming master alwasy recieves from workers, hence the size of this vector for master is fixed.
 }
+
+Real Subdomain::boundOnAxis(Bound& b, Vector3r direction, bool min) //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
+{
+	Vector3r size = b.max-b.min;
+	Real extremum = 0;
+	for (unsigned k=0; k<3; k++) extremum += std::abs(size[k]*direction[k]);// this is equivalent to taking the vertex maximizing projected length
+	if (min) extremum = -extremum; 
+	extremum+= (b.max+b.min).dot(direction);// should be *0.5 to be center of the box, but since we use 'size' instead of half-size everything is doubled, neutral in terms of ordering the boxes
+	return extremum;
+}
+
 
 } // namespace yade
 

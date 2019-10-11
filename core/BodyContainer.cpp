@@ -10,6 +10,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+
 CREATE_LOGGER(BodyContainer);
 
 void BodyContainer::clear(){
@@ -86,7 +87,6 @@ bool BodyContainer::erase(Body::id_t id, bool eraseClumpMembers){//default is fa
 	return true;
 }
 
-
 void BodyContainer::updateShortLists(){
 	if (not useRedirection) {
 		#ifdef YADE_MPI
@@ -96,11 +96,10 @@ void BodyContainer::updateShortLists(){
 		return;}
 	if (not dirty) return; //already ok
 	unsigned long size1=realBodies.size();
-	realBodies.clear();	
-	realBodies.reserve((long unsigned)(size1*1.3));	
-	#ifdef YADE_MPI
-	subdomainBodies.clear();
 	unsigned long size2=subdomainBodies.size();
+	realBodies.clear();
+	subdomainBodies.clear();
+	realBodies.reserve((long unsigned)(size1*1.3));
 	subdomainBodies.reserve((long unsigned)(size2*1.3));
 	const int& subdomain = Omega::instance().getScene()->subdomain;
 	#endif
@@ -108,11 +107,11 @@ void BodyContainer::updateShortLists(){
 		if (not b) continue;
 		realBodies.push_back(b->getId());
 	#ifdef YADE_MPI
+		// clumps are taken as bounded bodies since their member are bounded, otherwise things would fail with clumps as they would be ignored
 		if (b->subdomain == subdomain and not b->getIsSubdomain()) subdomainBodies.push_back(b->id);
 	#endif
 	}
 	dirty=false;
 }
 
-	
 } // namespace yade

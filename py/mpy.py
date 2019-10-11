@@ -77,6 +77,7 @@ _POS_VEL_ = 17
 _BOUNDS_ = 18
 _MASTER_COMMAND_ = 19
 _RETURN_VALUE_ = 20
+_ASSIGNED_IDS_ = 21
 
 #for coloring processes outputs differently
 bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033[95m','\033[93m','\033[91m','\033[1m','\033[4m','\033[0m']
@@ -161,35 +162,46 @@ def spawnedProcessWaitCommand():
 	waitingCommands = True
 	sys.stderr.write=sys.stdout.write
 	mprint("I'm now waiting")
+	s=MPI.Status()
 	while 1:
-		while not comm.Iprobe(source=0, tag=_MASTER_COMMAND_):
+		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
 			time.sleep(0.001)
-		command = comm.recv(source=0,tag=_MASTER_COMMAND_)
+		command = comm.recv(source=s.source,tag=_MASTER_COMMAND_)
 		mprint("I will now execute ",command)
 		try:
 			exec(command)
 		except:
+			O.subD.comm.send(None,dest=s.source,tag=_RETURN_VALUE_)
 			mprint(sys.exc_info())
 		
 def sendCommand(executors,command,wait=True):
 	'''
-	Send a command to a worker (or list of) from master or from another worker
+	Send a command to a worker (or list of) from master or from another worker. executors="all" is accepted, then even master will execute the command.
 	'''
 	start=time.time()
-	if not mit_mode: mprint("sendCommand in interactive mode only"); return
+	if not mit_mode: mprint("sendCommand in interactive mode only"); return	
+	if (executors=="all"): executors=list(range(numThreads))
 	argIsList=isinstance(executors,list)
+	toMaster = (argIsList and 0 in executors) or executors==0
+	if (toMaster and rank>0): mprint("workers cannot sendCommand to master (only master to itself)")
+	
 	if not argIsList: executors = [executors]
-	if 0 in executors: mprint("master does not accept mpi commands"); return
-	if len(executors)>=numThreads: mprint("executors > numThreads"); return
+	#if 0 in executors: mprint("master does not accept mpi commands"); return
+	if len(executors)>numThreads: mprint("executors > numThreads"); return
 	
 	if wait:
-		command="resCommand="+command+";O.subD.comm.send(resCommand,dest="+str(rank)+",tag=_RETURN_VALUE_)"
+		commandSent="resCommand="+command+";O.subD.comm.send(resCommand,dest="+str(rank)+",tag=_RETURN_VALUE_)"
+	else: commandSent=command
+	
+	resCommand=[]
 	for w in executors:
-		O.subD.comm.isend(command,dest=w,tag=_MASTER_COMMAND_)
+		if (w>0): O.subD.comm.isend(commandSent,dest=w,tag=_MASTER_COMMAND_)
+	if toMaster: resCommand = [exec(command)]+resCommand
+	
 	if wait:
-		resCommand= [O.subD.comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors]
+		resCommand=resCommand+ [O.subD.comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors if w>0]
 		mprint("sendCommand returned in "+str(time.time()-start)+" s")
-		return (resCommand if argIsList else res[0])
+		return (resCommand if argIsList else resCommand[0])
 	else:
 		return None
 
@@ -284,7 +296,7 @@ def receiveForces(subdomains):
 				O.forces.addF(ft[0],ft[1])
 				O.forces.addT(ft[0],ft[2])
 				
-def checkNeedCollide():
+def checkAndCollide():
 	'''
 	return true if collision detection needs activation in at least one SD, else false. If COPY_MIRROR_BODIES_WHEN_COLLIDE run collider when needed, and in that case return False.
 	'''
@@ -294,7 +306,7 @@ def checkNeedCollide():
 	needsCollide = timing_comm.allreduce("checkcollider",needsCollide,op=MPI.SUM)
 	if needsCollide:
 		if(COPY_MIRROR_BODIES_WHEN_COLLIDE):
-			updateMirrorIntersections()
+			parallelCollide()
 			return False
 		else: return True
 	return False
@@ -579,7 +591,10 @@ def mergeScene():
 			if(rank==0): #master
 				for worker_id in range(1, numThreads):
 					# generate corresponding ids (order is the same for both master and worker)
-					ids = [b.id for b in O.bodies if b.subdomain==worker_id]
+					#ids = [b.id for b in O.bodies if b.subdomain==worker_id]
+					ids = O.bodies[O.subD.subdomains[worker_id-1]].shape.ids+[O.subD.subdomains[worker_id-1]] #faster than looping on all bodies
+					#if (O.bodies[O.subD.subdomains[worker_id-1]].shape.ids+[O.subD.subdomains[worker_id-1]] != ids):
+						#print("______________INCONSISTENCY!______________",ids," vs. ",O.bodies[O.subD.subdomains[worker_id-1]].shape.ids+[O.subD.subdomains[worker_id-1]])
 					shift = dspl[worker_id];
 					if (worker_id != numThreads-1):
 						shift_plus_one = dspl[worker_id+1];
@@ -651,7 +666,7 @@ def splitScene():
 		
 		O.subD.init()
 		
-		updateMirrorIntersections()
+		parallelCollide()
 		
 		idx = O.engines.index(utils.typedEngine("NewtonIntegrator"))
 		O.engines=O.engines[:idx+1]+[PyRunner(iterPeriod=1,initRun=True,command="sys.modules['yade.mpy'].sendRecvStates()",label="sendRecvStatesRunner")]+O.engines[idx+1:]
@@ -661,7 +676,7 @@ def splitScene():
 		
 		# append engine waiting until forces are effectively sent to master
 		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="pass",label="waitForcesRunner")]
-		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="if sys.modules['yade.mpy'].checkNeedCollide(): O.pause()",label="collisionChecker")]
+		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="if sys.modules['yade.mpy'].checkAndCollide(): O.pause()",label="collisionChecker")]
 		
 		O.splitted=True
 		O.splittedOnce = True
@@ -672,7 +687,7 @@ def splitScene():
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain() 
 			O.subD.splitBodiesToWorkers(RESET_SUBDOMAINS_WHEN_COLLIDE)
-			updateMirrorIntersections()
+			parallelCollide()
 		if rank == 0 :
 			O.interactions.clear()
 			unboundRemoteBodies()
@@ -680,21 +695,8 @@ def splitScene():
 		sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = collisionChecker.dead = False
 		O.splitted = True
 		
-		
-bodiesToImport=[]
-
-def updateMirrorIntersections():
-	global bodiesToImport
+def updateAllIntersections():
 	subD=O.subD
-	start = time.time()
-	if (not O.splitted):
-		unboundRemoteBodies()
-		eraseRemote()
-	collider.boundDispatcher.__call__()
-	updateDomainBounds(subD.subdomains) #triggers communications
-	collider.__call__() #see [1]
-	unboundRemoteBodies() #in splitted stage we exploit bounds to detect bodies which are no longer part of intersections (they will be left with no bounds after what follows)
-
 	subD.intersections=genLocalIntersections(subD.subdomains)
 	#update mirror intersections so we know message sizes in advance
 	subD.mirrorIntersections=[[] for n in range(numThreads)]
@@ -717,7 +719,7 @@ def updateMirrorIntersections():
 			else:
 				subD.mirrorIntersections= [b_ids]+subD.mirrorIntersections[1:]
 
-			reboundRemoteBodies(b_ids)
+			#reboundRemoteBodies(b_ids)
 			# since interaction with 0-bodies couldn't be detected before, mirror intersections from master will
 			# tell if we need to wait messages from master (and this is declared via intersections) 
 			if not 0 in subD.intersections[rank]:
@@ -750,6 +752,76 @@ def updateMirrorIntersections():
 			else:
 				subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
 			#reboundRemoteBodies(intrs)
+
+bodiesToImport=[]
+
+def parallelCollide():
+	global bodiesToImport
+	subD=O.subD
+	start = time.time()
+	if (not O.splitted):
+		unboundRemoteBodies()
+		eraseRemote()
+	collider.boundDispatcher.__call__()
+	updateDomainBounds(subD.subdomains) #triggers communications
+	collider.__call__() #see [1]
+	unboundRemoteBodies() #in splitted stage we exploit bounds to detect bodies which are no longer part of intersections (they will be left with no bounds after what follows)
+	updateAllIntersections()
+	#subD.intersections=genLocalIntersections(subD.subdomains)
+	##update mirror intersections so we know message sizes in advance
+	#subD.mirrorIntersections=[[] for n in range(numThreads)]
+	#if rank==0:#master domain
+		#for worker in range(1,numThreads):#FIXME: we actually don't need so much data since at this stage the states are unchanged and the list is used to re-bound intersecting bodies, this is only done in the initialization phase, though
+			##wprint("sending mirror intersections to "+str(worker)+" ("+str(len(subD.intersections[worker]))+" bodies), "+str(subD.intersections[worker]))
+			#m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
+			#timing_comm.send("sendIntersections",m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
+	#else:
+		## from master
+		#b_ids=comm.recv(source=0, tag=_MIRROR_INTERSECTIONS_)
+		#wprint("Received mirrors from master: ",b_ids)
+		##FIXME: we are assuming that Body::id_t is 4 bytes here, not that portable...
+		#numInts0= int(len(b_ids)/4) if SEND_BYTEARRAYS else len(b_ids)  #ints = 4 bytes
+		
+		#if numInts0>0:
+			#if SEND_BYTEARRAYS:
+				#O.bufferFromIntrsct(subD,0,numInts0,True)[:]=b_ids
+				#b_ids=np.frombuffer(b_ids,dtype=np.int32)
+			#else:
+				#subD.mirrorIntersections= [b_ids]+subD.mirrorIntersections[1:]
+
+			#reboundRemoteBodies(b_ids)
+			## since interaction with 0-bodies couldn't be detected before, mirror intersections from master will
+			## tell if we need to wait messages from master (and this is declared via intersections) 
+			#if not 0 in subD.intersections[rank]:
+				#temp=subD.intersections[rank]
+				#temp+=[0]
+				#subD.intersections=subD.intersections[:rank]+[temp]+subD.intersections[rank+1:]
+			#else:
+				#if not O.splittedOnce: mprint("0 already in intersections (should not happen)")
+		#reqs=[]
+		
+		##from workers
+		#for worker in subD.intersections[rank]:
+			#if worker==0: continue #already received above
+			##wprint("subD.intersections["+str(rank)+"]: "+str(subD.intersections[rank]))
+			##buf = bytearray(1<<22) #CRITICAL
+			#reqs.append([worker,comm.irecv(None, worker, tag=_MIRROR_INTERSECTIONS_)])
+
+		#for worker in subD.intersections[rank]:
+			#if worker==0: continue #we do not send positions to master, only forces
+			##wprint("sending "+str(len(subD.intersections[worker]))+" states to "+str(worker))
+			#wprint("Send mirrors to: ", worker)
+			#m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
+			#timing_comm.send("splitScene_intersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
+		#for req in reqs:
+			#intrs=req[1].wait()
+			#wprint("Received mirrors from: ", req[0], " : ",np.frombuffer(intrs,dtype=np.int32))
+			#if SEND_BYTEARRAYS:
+				#O.bufferFromIntrsct(subD,req[0],int(len(intrs)/4),True)[:]=intrs
+				#intrs=np.frombuffer(intrs,dtype=np.int32)
+			#else:
+				#subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
+			##reboundRemoteBodies(intrs)
 			
 	if rank!=0:
 		for l in subD.mirrorIntersections:
@@ -826,6 +898,35 @@ def eraseRemote():
 				if not connected:
 					O.bodies.erase(b.id)
 
+def migrateBodies(ids,origin,destination):
+	'''
+	Note: subD.completeSendBodies() will have to be called after a series of reassignement since subD.sendBodies() is non-blocking
+	'''
+	if rank==origin:
+		for id in ids:
+			if not O.bodies[id]: mprint("reassignBodies failed,",id," is not in subdomain ",rank)
+			O.bodies[id].subdomain = destination
+		O.subD.sendBodies(destination,ids)
+	elif rank==destination:
+		O.subD.receiveBodies(origin)
+	
+	
+def reassignBodies():
+	for worker in [2]:
+		candidates = O.subD.intersections[worker]
+		migrateBodies(candidates,1,worker)
+	O.subD.completeSendBodies()
+	O.subD.ids = [b.id for b in O.bodies if (b.subdomain==rank and not b.isSubdomain)]
+	
+	reqs=[]
+		
+	if rank>0: req = comm.send(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
+	else: #master will update subdomains for correct display (besides, keeping 'ids' updated for remote subdomains may not be a strict requirement)
+		for k in range(1,numThreads):
+			ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
+			O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
+			for i in ids: O.bodies[i].subdomain=k
+
 
 ##### RUN MPI #########
 def mpirun(nSteps,np=numThreads,withMerge=False):
@@ -867,7 +968,7 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		collisionChecker.dead=True
 		while (O.iter-initStep)<nSteps:
 			O.step()
-			if checkNeedCollide():
+			if checkAndCollide():
 				mergeScene()
 				splitScene()
 		mergeScene()
