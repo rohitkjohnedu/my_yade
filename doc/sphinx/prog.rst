@@ -2003,6 +2003,33 @@ When an object is crossing c++/python boundary, boost::python's global "converte
 	Math classes (Vector3, Matrix3, Quaternion) are wrapped in minieigen, which is available as a separate package. Use your package manager to install it.
 
 
+Adding a new python/C++ module
+============================
+
+Modules are placed in ``py/`` directory, the ``C++`` parts of the modules begin their name with an underscore ``_``. The procedure to add a new module is following:
+
+.. comment:  git show d067b0696
+.. comment:  git show 8cb6ab91a
+
+#. Create your new files:
+
+	#. The  ``yourNewModule.py``  file :ysrccommit:`like this<d067b0696/py/libVersions.py.in>`.
+	#. The ``_yourNewModule.cpp`` file :ysrccommit:`like this<bf906f74a6/py/_log.cpp>`, if part of your module will be written in ``C++``.
+
+#. Update the module redirection map in these two places:
+
+	#. ``mods`` in :ysrccommit:`doc/sphinx/yadeSphinx.py<bf906f74a6/doc/sphinx/yadeSphinx.py#L48>`.
+	#. ``moduleMap`` in  :ysrccommit:`doc/sphinx/conf.py<bf906f74a6/doc/sphinx/conf.py#L91>`, if the new module has a ``C++`` part (this duplication of data will hopefully be soon removed).
+
+#. Add the ``C++`` file into ``py/CMakeLists.txt`` :ysrccommit:`like this<bf906f74a6/py/CMakeLists.txt#L38>`.
+
+#. Modify the ``CMakeLists.txt`` but only if the file will depend on cmake compilation variables, eg. :ysrccommit:`like this<bf906f74a6/py/libVersions.py.in#L107>`. The file then needs an additional extension ``.in`` and be put in two places:
+
+	#. The cmake command to generate the file from ``.in`` input: :ysrccommit:`like this<bf906f74a6/CMakeLists.txt#L875>`.
+	#. The cmake command to install it: :ysrccommit:`like this<bf906f74a6/CMakeLists.txt#L897>`.
+
+.. hint:: The last step regarding ``yourNewModule.py.in`` (or ``_yourNewModule.cpp.in``) is needed only on very rare occasions, and is included here only for the sake of completeness.
+
 Maintaining compatibility
 ==========================
 
