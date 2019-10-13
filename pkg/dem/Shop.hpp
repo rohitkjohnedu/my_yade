@@ -88,7 +88,7 @@ class Shop{
 
 
 		//! create transientInteraction between 2 bodies, using existing Dispatcher in Omega
-		static shared_ptr<Interaction> createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool force);
+		static shared_ptr<Interaction> createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool force, bool virtualI);
 
 		//! apply force on contact point on both bodies (reversed on body 2)
 		static void applyForceAtContactPoint(const Vector3r& force, const Vector3r& contPt, Body::id_t id1, const Vector3r& pos1, Body::id_t id2, const Vector3r& pos2, Scene* scene);

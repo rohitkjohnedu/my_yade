@@ -323,7 +323,7 @@ py::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis, Real perio
 	return py::make_tuple(py::make_tuple(r,h),theta);
 }
 
-shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id_t id2){ return Shop::createExplicitInteraction(id1,id2,/*force*/true);}
+shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool virtualI){ return Shop::createExplicitInteraction(id1,id2,/*force*/true,virtualI);}
 
 Real Shop__unbalancedForce(bool useMaxForce /*false by default*/){return Shop::unbalancedForce(useMaxForce);}
 py::tuple Shop__totalForceInVolume(){Real stiff; Vector3r ret=Shop::totalForceInVolume(stiff); return py::make_tuple(ret,stiff); }
@@ -493,7 +493,7 @@ BOOST_PYTHON_MODULE(_utils){
 	py::def("forcesOnPlane",forcesOnPlane,(py::arg("planePt"),py::arg("normal")),"Find all interactions deriving from :yref:`NormShearPhys` that cross given plane and sum forces (both normal and shear) on them.\n\n:param Vector3 planePt: a point on the plane\n:param Vector3 normal: plane normal (will be normalized).\n");
 	py::def("forcesOnCoordPlane",forcesOnCoordPlane);
 	py::def("totalForceInVolume",Shop__totalForceInVolume,"Return summed forces on all interactions and average isotropic stiffness, as tuple (Vector3,float)");
-	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2")),"Create interaction between given bodies by hand.\n\nCurrent engines are searched for :yref:`IGeomDispatcher` and :yref:`IPhysDispatcher` (might be both hidden in :yref:`InteractionLoop`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<IGeomDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances. \n\n.. warning:: This function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
+	py::def("createInteraction",Shop__createExplicitInteraction,(py::arg("id1"),py::arg("id2"),py::arg("virtualI")=false),"Create interaction between given bodies by hand.\n\nIf *virtualI=False*, current engines are searched for :yref:`IGeomDispatcher` and :yref:`IPhysDispatcher` (might be both hidden in :yref:`InteractionLoop`). Geometry is created using ``force`` parameter of the :yref:`geometry dispatcher<IGeomDispatcher>`, wherefore the interaction will exist even if bodies do not spatially overlap and the functor would return ``false`` under normal circumstances.\n\n If *virtualI=True* the interaction is left in a virtual state.\n\n.. warning:: This function will very likely behave incorrectly for periodic simulations (though it could be extended it to handle it farily easily).");
 	py::def("spiralProject",spiralProject,(py::arg("pt"),py::arg("dH_dTheta"),py::arg("axis")=2,py::arg("periodStart")=std::numeric_limits<Real>::quiet_NaN(),py::arg("theta0")=0));
 	py::def("pointInsidePolygon",pointInsidePolygon);
 	py::def("scalarOnColorScale",Shop::scalarOnColorScale,(py::arg("x"),py::arg("xmin")=0,py::arg("xmax")=1),"Map scalar variable to color scale.\n\n:param float x: scalar value which the function applies to.\n:param float xmin: minimum value for the color scale, with a return value of (0,0,1) for *x* $\\leq$ *xmin*, i.e. blue color in RGB.\n:param float xmax: maximum value, with a return value of (1,0,0) for *x* $\\geq$ *xmax*, i.e. red color in RGB.\n:return: a Vector3 depending on the relative position of *x* on a [*xmin*;*xmax*] scale.");

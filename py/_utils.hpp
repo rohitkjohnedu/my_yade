@@ -135,7 +135,7 @@ Vector3r forcesOnCoordPlane(Real coord, int axis);
 
 py::tuple spiralProject(const Vector3r& pt, Real dH_dTheta, int axis=2, Real periodStart=std::numeric_limits<Real>::quiet_NaN(), Real theta0=0);
 
-shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id_t id2);
+shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id_t id2, bool virtualI);
 
 Real Shop__unbalancedForce(bool useMaxForce /*false by default*/);
 py::tuple Shop__totalForceInVolume();
