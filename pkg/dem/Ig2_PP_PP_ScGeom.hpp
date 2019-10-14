@@ -15,33 +15,28 @@
 namespace yade { // Cannot have #include directive inside.
 
 class Ig2_PP_PP_ScGeom: public IGeomFunctor {
-
 	public :
-		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& se32, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-
-		Real evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial);
-		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
-
-		bool customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPt, bool warmstart);
-
-		Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial);
-
-		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////
-
+		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		virtual bool goReverse(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
+		Real evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
+		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
+		bool customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPt, bool warmstart);
+		Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
+		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
 
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PP_PP_ScGeom,IGeomFunctor,"EXPERIMENTAL. IGeom functor for PotentialParticle - PotentialParticle pair",
 			((Real, accuracyTol, pow(10,-7),, "accuracy desired, tolerance criteria for SOCP"))
-			((Real,interactionDetectionFactor,1.0,,"")),
+//			((Real, interactionDetectionFactor, 1.0,,"")) //FIXME: Not used but may be useful in the future for distant interactions
+			((Vector3r, twoDdir, Vector3r(0,1,0),, "Direction of 2D"))
+			((bool, twoDimension, false,,"Whether the contact is 2-D"))
+			((Real, unitWidth2D, 1.0, ,"Unit width in 2D"))
+			, /* ctor */
 		);
-
 
 		FUNCTOR2D(PotentialParticle,PotentialParticle);
 		// needed for the dispatcher, even if it is symmetric
 		DEFINE_FUNCTOR_ORDER_2D(PotentialParticle,PotentialParticle);
 		DECLARE_LOGGER;
-
 };
 
 REGISTER_SERIALIZABLE(Ig2_PP_PP_ScGeom);
@@ -79,9 +74,7 @@ extern "C" {
 
 	extern void dscal_(const int *N, const Real *alpha, Real *x, const int *incx);
 
-
 	void dsyev_(const char *jobz, const char *uplo, const int *N, Real *A, const int *lda, Real *W, Real *work, int *lwork, int *info);
-
 
 #ifdef __cplusplus
 };
