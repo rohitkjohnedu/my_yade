@@ -1,25 +1,24 @@
 #ifdef YADE_POTENTIAL_PARTICLES
 #include "KnKsLaw.hpp"
 #include <core/Scene.hpp>
-#include <pkg/dem/ScGeom.hpp>
+//#include <pkg/dem/ScGeom.hpp>
 #include <core/Omega.hpp>
 #include <pkg/dem/PotentialParticle.hpp>
 
+
 namespace yade { // Cannot have #include directive inside.
 
-YADE_PLUGIN((Law2_SCG_KnKsPhys_KnKsLaw)(Ip2_FrictMat_FrictMat_KnKsPhys)(KnKsPhys)
 
-           );
+YADE_PLUGIN( (Law2_SCG_KnKsPhys_KnKsLaw) (Ip2_FrictMat_FrictMat_KnKsPhys) (KnKsPhys)
+);
 
 
-
-/********************** Law2_Dem3DofGeom_RockPMPhys_Rpm ****************************/
+/* ***************************************************************************************************************************** */
+/** Law2_SCG_KnKsPhys_KnKsLaw */
 CREATE_LOGGER(Law2_SCG_KnKsPhys_KnKsLaw);
 
-
-
 bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact) {
-	//const Real& dt = scene->dt;
+	const Real& dt = scene->dt;
 	int id1 = contact->getId1();
 	int id2 = contact->getId2();
 	ScGeom*    geom= static_cast<ScGeom*>(ig.get());
@@ -51,22 +50,38 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	}
 
 	//Vector3r shearForceBeforeRotate = shearForce;
-	Vector3r shiftVel = Vector3r(0,0,0); //scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
+//	Vector3r shiftVel = Vector3r(0,0,0); //scene->isPeriodic ? (Vector3r)((scene->cell->velGrad*scene->cell->Hsize)*Vector3r((Real) contact->cellDist[0],(Real) contact->cellDist[1],(Real) contact->cellDist[2])) : Vector3r::Zero();
 	geom->rotate(shearForce); //AndGetShear(shearForce,phys->prevNormal,de1,de2,dt,shiftVel,/*avoid ratcheting*/false);
 	//Vector3r shearForceAfterRotate = shearForce;
 	//Linear elasticity giving "trial" shear force
-	Vector3r shift2(0,0,0);
-	Vector3r incidentV = geom->getIncidentVel(de1, de2, scene->dt, shift2, shiftVel, /*preventGranularRatcheting*/false );
+
+	Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
+	Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*contact->cellDist.cast<Real>()): Vector3r::Zero();
+
+	const shared_ptr<Body>& b1=Body::byId(id1,scene), b2=Body::byId(id2,scene);
+	//erase the interaction when aAbB shows separation, otherwise keep it to be able to store previous separating plane for fast detection of separation
+//	Vector3r shift2=scene->cell->hSize*I->cellDist.cast<Real>();
+	if (	b1->bound->min[0] >= b2->bound->max[0]+shift2[0] ||
+		b1->bound->min[1] >= b2->bound->max[1]+shift2[1] ||
+		b1->bound->min[2] >= b2->bound->max[2]+shift2[2] ||
+		b2->bound->min[0]+shift2[0] >= b1->bound->max[0] ||
+		b2->bound->min[1]+shift2[1] >= b1->bound->max[1] ||
+		b2->bound->min[2]+shift2[2] >= b1->bound->max[2]) {
+		return false;
+	}
+
+//	Vector3r shift2(0,0,0);
+	Vector3r incidentV = geom->getIncidentVel(de1, de2, dt, shift2, shiftVel, /*preventGranularRatcheting*/false );
 	Vector3r incidentVn = geom->normal.dot(incidentV)*geom->normal; // contact normal velocity
 	Vector3r incidentVs = incidentV-incidentVn; // contact shear velocity
-	Vector3r shearIncrement=incidentVs*scene->dt;
+	Vector3r shearIncrement=incidentVs*dt;
 	phys->shearDir = shearIncrement;
 	phys->shearIncrementForCD += shearIncrement.norm();
 	double du = 0.0;
 	//double debugFn = 0.0;
 	//double u_prev = fabs(phys->u_cumulative);
 	if(phys->shearDir.norm() > pow(10,-15)) {
-		phys->shearDir.normalize();
+		phys->shearDir.normalize(); // FIXME: Maybe normalise the shearDir regardless of its magnitude?
 	}
 	double degradeLength = phys->brittleLength;  /*jointLength = 100u_peak */
 	/* Elastic and plastic displacement can have negative signs but must be consistent throughout the simulation */
@@ -95,9 +110,9 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 
 
 	/* Original */
-	if(phys->twoDimension) {
-		phys->contactArea = phys->unitWidth2D*phys->jointLength;
-	}
+//	if(phys->twoDimension) { //moved this to Ig2_PP_PP_ScGeom.cpp @vsangelidakis
+//		phys->contactArea = phys->unitWidth2D*phys->jointLength;
+//	}
 	if(s1->isBoundary == true || s2->isBoundary==true) {
 		phys->tensionBroken = true;
 		phys->cohesionBroken = true;
@@ -108,13 +123,13 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 		if (phys->jointType==3) {
 			phys->prevSigma  = un*phys->kn_i/(1.0-un/phys->maxClosure);
 		} else {
-			phys->prevSigma = phys->kn*un;
+			phys->prevSigma = phys->knVol*un;
 		}
 		//}
 		phys->normalForce = phys->prevSigma*std::max(pow(10,-15),phys->contactArea)*geom->normal;
 	}
 
-	phys->Knormal_area = phys->kn*std::max(pow(10,-8),phys->contactArea);
+	phys->kn = phys->knVol*std::max(pow(10,-8),phys->contactArea);
 
 	if((un <0.0 && fabs(phys->prevSigma)>phys->tension && phys->tensionBroken == false /* first time tension is broken */) || (un<0.0 && phys->tensionBroken==true)) {
 		if (neverErase) {
@@ -130,32 +145,30 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	}
 
 
-
-
 	/*ORIGINAL */
 	Vector3r c1x = geom->contactPoint - de1->pos;
 	Vector3r c2x = geom->contactPoint - de2->pos;
 	incidentV = (de2->vel+de2->angVel.cross(c2x)) - (de1->vel+de1->angVel.cross(c1x));
 	incidentVn = geom->normal.dot(incidentV)*geom->normal; // contact normal velocity
 	incidentVs = incidentV-incidentVn; // contact shear velocity
-	shearIncrement=incidentVs*scene->dt;
+	shearIncrement=incidentVs*dt;
 	if(!Talesnick) {
 		double Ks=0.0;
 		if(phys->jointType == 3) {
 			Ks = phys->ks_i*pow(phys->prevSigma,0.6);
 		} else {
-			Ks = phys->ks;
+			Ks = phys->ksVol;
 		}
 		shearForce -= Ks*shearIncrement*std::max(pow(10,-11),phys->contactArea);
 	}
-	phys->Kshear_area = phys->ks*std::max(pow(10,-11),phys->contactArea);
+	phys->ks = phys->ksVol*std::max(pow(10,-11),phys->contactArea);
 
 
-	const shared_ptr<Body>& b1=Body::byId(id1,scene);
-	const shared_ptr<Body>& b2=Body::byId(id2,scene);
+//	const shared_ptr<Body>& b1=Body::byId(id1,scene);
+//	const shared_ptr<Body>& b2=Body::byId(id2,scene);
 	Real mbar = (!b1->isDynamic() && b2->isDynamic()) ? de2->mass : ((!b2->isDynamic() && b1->isDynamic()) ? de1->mass : (de1->mass*de2->mass / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
-	Real Cn_crit = 2.*sqrt(mbar*phys->Knormal_area); // Knormal_area Critical damping coefficient (normal direction)
-	Real Cs_crit = 2.*sqrt(mbar*phys->Kshear_area); // Kshear_area Critical damping coefficient (shear direction)
+	Real Cn_crit = 2.*sqrt(mbar*phys->kn); // Critical damping coefficient (normal direction)
+	Real Cs_crit = 2.*sqrt(mbar*phys->ks); // Critical damping coefficient (shear direction)
 	// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
 	double cn = Cn_crit*phys->viscousDamping; // Damping normal coefficient
 	double cs = Cs_crit*phys->viscousDamping; // Damping tangential coefficient
@@ -166,54 +179,49 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	//if(phys->normalViscous.norm() > maxFnViscous){
 	//	phys->normalViscous = phys->normalViscous * maxFnViscous/phys->normalViscous.norm();
 	//}
-	phys->normalForce -= phys->normalViscous;
+	phys->normalForce -= phys->normalViscous; //FIXME: Here we need to create a check whether the viscous force is attractive
 	//double baseElevation =  geom->contactPoint.z();
 
 	/* Water pressure, heat effect */
 
 	/* strength degradation */
-	const double PI = std::atan(1.0)*4;
+//	const double PI = std::atan(1.0)*4;
 	double tan_effective_phi = 0.0;
 
 
 
 	if(s1->isBoundary==true || s2->isBoundary == true || phys->jointType==2 ) { // clay layer at boundary;
 		phys->effective_phi = phys->phi_b; // - 3.25*(1.0-exp(-fabs(phys->cumulative_us)/0.4));
-		tan_effective_phi = tan(phys->effective_phi/180.0*PI);
+		tan_effective_phi = tan(phys->effective_phi/180.0*Mathr::PI);
 	} else if(phys->intactRock == true) {
-
 		phys->effective_phi = phys->phi_r +  (phys->phi_b-phys->phi_r)*(exp(-fabs(phys->u_cumulative)/degradeLength));
-		tan_effective_phi = tan(phys->effective_phi/180.0*PI);
+		tan_effective_phi = tan(phys->effective_phi/180.0*Mathr::PI);
 	} else {
 		phys->effective_phi = phys->phi_b;
-		tan_effective_phi = tan(phys->effective_phi/180.0*PI);
+		tan_effective_phi = tan(phys->effective_phi/180.0*Mathr::PI);
 	}
 
 
 
 	/* shear loss */
 	Vector3r dampedShearForce = shearForce;
-	double cohesiveForce = phys->cohesion*std::max(pow(10,-11),phys->contactArea);
-	Real maxFs = cohesiveForce;
+	Real maxFs=0.0;
 	if (un>0.0 /*compression*/) {
 		double fN = phys->normalForce.norm();
 		if(phys->intactRock == true) {
 			if (phys->cohesionBroken == true && allowBreakage == true) {
 				maxFs = std::max( fN,0.0)*tan_effective_phi;
 			} else {
+				double cohesiveForce = phys->cohesion*std::max(pow(10,-11),phys->contactArea);
 				maxFs = cohesiveForce+std::max( fN,0.0)*tan_effective_phi;
 			}
-		} else {
-			maxFs = std::max( fN,0.0)*tan_effective_phi;
-		}
+		} else {	maxFs = std::max( fN,0.0)*tan_effective_phi; }
 	}
 	if( shearForce.norm() > maxFs ) {
 		Real ratio = maxFs / shearForce.norm();
 		shearForce *= ratio;
 		dampedShearForce = shearForce;
-		if(allowBreakage == true) {
-			phys->cohesionBroken = true;
-		}
+		if(allowBreakage == true) { phys->cohesionBroken = true; }
 		phys->shearViscous = Vector3r(0,0,0);
 	} else { /* no damping when it slides */
 		phys->shearViscous = cs*incidentVs;
@@ -225,8 +233,6 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	else {
 		phys->mobilizedShear = shearForce.norm()/maxFs;
 	}
-
-
 
 	//we need to use correct branches in the periodic case, the following apply for spheres only
 	Vector3r force = -phys->normalForce-dampedShearForce;
@@ -240,26 +246,20 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	scene->forces.addTorque(id2,-(c2x).cross(force));
 
 	phys->prevNormal = geom->normal;
-
 	return true;
-
 }
 
 
-
+/* ***************************************************************************************************************************** */
+/** Ip2_FrictMat_FrictMat_KnKsPhys */
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_KnKsPhys);
-
-
-
 
 void Ip2_FrictMat_FrictMat_KnKsPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
 
-	const double PI = 3.14159265358979323846;
+//	const double PI = 3.14159265358979323846;
 	if(interaction->phys) return;
 
-	ScGeom* scg=YADE_CAST<ScGeom*>(interaction->geom.get());
-
-	assert(scg);
+	ScGeom* scg=YADE_CAST<ScGeom*>(interaction->geom.get()); assert(scg);
 
 	const shared_ptr<FrictMat>& sdec1 = YADE_PTR_CAST<FrictMat>(b1);
 	const shared_ptr<FrictMat>& sdec2 = YADE_PTR_CAST<FrictMat>(b2);
@@ -272,40 +272,41 @@ void Ip2_FrictMat_FrictMat_KnKsPhys::go(const shared_ptr<Material>& b1, const sh
 	Real fa 	= sdec1->frictionAngle;
 	Real fb 	= sdec2->frictionAngle;
 
-
-	/* calculate stiffness */
-	Real Kn= Knormal;
-	Real Ks= Kshear;
+//	/* calculate stiffness */
+//	Real Kn= Knormal;
+//	Real Ks= Kshear;
 
 	/* Pass values calculated from above to CSPhys */
 	contactPhysics->viscousDamping = viscousDamping;
-	contactPhysics->useOverlapVol = useOverlapVol;
-	contactPhysics->kn = Kn;
-	contactPhysics->ks = Ks;
-	contactPhysics->kn_i = Kn;
-	contactPhysics->ks_i = Ks;
-	contactPhysics->u_peak = u_peak;
+//	contactPhysics->useOverlapVol = useOverlapVol;
+	contactPhysics->knVol = Knormal; //Kn
+	contactPhysics->ksVol = Kshear; //Ks
+	contactPhysics->kn_i = Knormal;
+	contactPhysics->ks_i = Kshear;
+//	contactPhysics->u_peak = u_peak;
 	contactPhysics->maxClosure = maxClosure;
 	contactPhysics->cohesionBroken = cohesionBroken;
 	contactPhysics->tensionBroken = tensionBroken;
-	contactPhysics->unitWidth2D = unitWidth2D;
+//	contactPhysics->unitWidth2D = unitWidth2D;
 	contactPhysics->frictionAngle		= std::min(fa,fb);
 	if(!useFaceProperties) {
-		contactPhysics->phi_r = std::min(fa,fb)/PI*180.0;
+		contactPhysics->phi_r = std::min(fa,fb)/Mathr::PI*180.0;
 		contactPhysics->phi_b = contactPhysics->phi_r;
 	}
-	contactPhysics->tanFrictionAngle	= std::tan(contactPhysics->frictionAngle);
+//	contactPhysics->tanFrictionAngle	= std::tan(contactPhysics->frictionAngle);
 	//contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
 	//contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 	contactPhysics->prevNormal 		= scg->normal; //This is also done in the Contact Law.  It is not redundant because this class is only called ONCE!
 	contactPhysics->calJointLength = calJointLength;
-	contactPhysics->twoDimension = twoDimension;
+//	contactPhysics->twoDimension = twoDimension;
 	contactPhysics->useFaceProperties = useFaceProperties;
 	contactPhysics->brittleLength = brittleLength;
 	interaction->phys = contactPhysics;
 
 }
 
+/* ***************************************************************************************************************************** */
+/** KnKsPhys */
 CREATE_LOGGER(KnKsPhys);
 /* KnKsPhys */
 KnKsPhys::~KnKsPhys() {}
