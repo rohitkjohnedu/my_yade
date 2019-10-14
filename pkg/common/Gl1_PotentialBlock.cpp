@@ -165,13 +165,14 @@ namespace yade { // Cannot have #include directive inside.
 
 			glEnable(GL_NORMALIZE);
 			glBegin(GL_TRIANGLES);
+			Vector3r n, faceCenter;
 			for(unsigned int i=0; i<triangles.size(); ++i) {
 				const auto a = triangles[i].x();
 				const auto b = triangles[i].y();
 				const auto c = triangles[i].z();
 
-				Vector3r n=(v[b]-v[a]).cross(v[c]-v[a]); 
-				Vector3r faceCenter=(v[a]+v[b]+v[c])/3.;
+				n = (v[b]-v[a]).cross(v[c]-v[a]); 
+				faceCenter = (v[a]+v[b]+v[c])/3.;
 				if((faceCenter-centroid).dot(n)<0) n=-n;
 				n.normalize();
 
@@ -1051,9 +1052,9 @@ void PotentialBlockVTKRecorder::action(){
 		Real xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x());
 		Real xmax = -xmin;
 		Real ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y());
-		Real ymax=-ymin;
-		Real zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z());
-		Real zmax=-zmin;
+		Real ymax = -ymin;
+		Real zmin = -std::max(pb->minAabb.z(),pb->maxAabb.z());
+		Real zmax = -zmin;
 
 		//double xmin = -value; double xmax = value; double ymin = -value; double ymax=value; double zmin=-value; double zmax=value;
 		//double xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); double xmax = -xmin; double ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); double ymax=-ymin; double zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); double zmax=-zmin;
