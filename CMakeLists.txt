@@ -39,7 +39,8 @@
 #  PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system. (-1 by default)
 
 project(Yade C CXX)
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.5.0)
+set (CMAKE_CXX_STANDARD 14)
 
 # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake , use ${Esc} for printing colors
