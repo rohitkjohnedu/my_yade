@@ -127,12 +127,9 @@ void TriaxialStressController::action()
 
 	boxVolume = height * width * depth;
 	if ( (first) || (updatePorosity) ) {
-		BodyContainer::iterator bi = scene->bodies->begin();
-		BodyContainer::iterator biEnd = scene->bodies->end();
 
 		particlesVolume = 0;
-		for ( ; bi!=biEnd; ++bi ) {
-			const shared_ptr<Body>& b = *bi;
+		for ( const auto b : *scene->bodies) {
 			if (b->isClump()) {
 				const shared_ptr<Clump>& clump = YADE_PTR_CAST<Clump>(b->shape);
 				const shared_ptr<Body>& member = Body::byId(clump->members.begin()->first,scene);

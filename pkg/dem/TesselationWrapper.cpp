@@ -75,10 +75,6 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	Tes.vertexHandles.clear();
 	Tes.vertexHandles.resize(bodies->size()+6,NULL);//+6 extra slots in case boundaries will be added latter as additional vertices
 
-	BodyContainer::iterator biBegin    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	BodyContainer::iterator bi = biBegin;
-
 	Body::id_t Ng = 0;
 	Body::id_t& MaxId=Tes.maxId;
 	TW.mean_radius = 0;
@@ -86,20 +82,20 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();
 	Scene* scene = Omega::instance().getScene().get();
-	for (; bi!=biEnd ; ++bi) {
-		if ( (*bi)->shape->getClassIndex() ==  Sph_Index ) {
-			const Sphere* s = YADE_CAST<Sphere*> ((*bi)->shape.get());
-//FIXME: is the scene periodicity verification useful in the next line ? Tesselation seems to work in both periodic and non-periodic conditions with "scene->cell->wrapShearedPt((*bi)->state->pos)". I keep the verification to be consistent with all other uses of "wrapShearedPt" function.
-			const Vector3r& pos = scene->isPeriodic	? scene->cell->wrapShearedPt((*bi)->state->pos)
-								: (*bi)->state->pos;
+	for ( const auto bi : *bodies) {
+		if ( bi->shape->getClassIndex() ==  Sph_Index ) {
+			const Sphere* s = YADE_CAST<Sphere*> (bi->shape.get());
+//FIXME: is the scene periodicity verification useful in the next line ? Tesselation seems to work in both periodic and non-periodic conditions with "scene->cell->wrapShearedPt(bi->state->pos)". I keep the verification to be consistent with all other uses of "wrapShearedPt" function.
+			const Vector3r& pos = scene->isPeriodic	? scene->cell->wrapShearedPt(bi->state->pos)
+								: bi->state->pos;
 			const Real rad = s->radius;
 			CGT::Sphere sp(CGT::Point(pos[0],pos[1],pos[2]),rad*rad);
 			spheres.push_back(sp);
-			pointsPtrs.push_back(std::make_pair(&(spheres[Ng]/*.point()*/),(*bi)->getId()));
+			pointsPtrs.push_back(std::make_pair(&(spheres[Ng]/*.point()*/),bi->getId()));
 			TW.Pmin = CGT::Point(min(TW.Pmin.x(),pos.x()-rad),min(TW.Pmin.y(), pos.y()-rad),min(TW.Pmin.z(), pos.z()-rad));
 			TW.Pmax = CGT::Point(max(TW.Pmax.x(),pos.x()+rad),max(TW.Pmax.y(),pos.y()+rad),max(TW.Pmax.z(),pos.z()+rad));
 			Ng++; TW.mean_radius += rad;
-			MaxId = max(MaxId,(*bi)->getId());
+			MaxId = max(MaxId,bi->getId());
 		} else ++nonSpheres;
 	}
 	TW.mean_radius /= Ng; TW.rad_divided = true;

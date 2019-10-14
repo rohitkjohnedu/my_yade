@@ -563,11 +563,10 @@ bool BodiesMenisciiList::prepare(Scene * scene, bool hertzOn)
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 
 	Body::id_t MaxId = -1;
-	BodyContainer::iterator bi    = bodies->begin();
-	BodyContainer::iterator biEnd = bodies->end();
-	for(  ; bi!=biEnd ; ++bi )
+	
+	for ( const auto b : *bodies)
 	{
-		MaxId=max(MaxId, (*bi)->getId());
+		MaxId=max(MaxId, b->getId());
 	}
 	interactionsOnBody.resize(MaxId+1);
 	for ( unsigned int i=0; i<interactionsOnBody.size(); ++i )

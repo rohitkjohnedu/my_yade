@@ -46,11 +46,9 @@ void TriaxialStateRecorder::action ()
 	/// Compute porosity :
 	Real Vs=0;
 	Real V = ( triaxialStressController->height ) * ( triaxialStressController->width ) * ( triaxialStressController->depth );
-	BodyContainer::iterator bi = scene->bodies->begin();
-	BodyContainer::iterator biEnd = scene->bodies->end();
-	for ( ; bi!=biEnd; ++bi ){
-		if(!(*bi) || (*bi)->isClump()) continue;
-		const shared_ptr<Body>& b = *bi;
+	
+	for ( const auto b : *scene->bodies) {
+		if(!(b) || b->isClump()) continue;
 		if ( b->isDynamic() ){
 			//Sorry, the next string was commented, because it gave a Warning "unused variable v". Anton Gladky
 			//const Vector3r& v = b->state->vel;

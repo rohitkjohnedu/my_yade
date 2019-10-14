@@ -803,7 +803,7 @@ class pyOmega{
 	py::list plugins_get(){
 		const map<string,DynlibDescriptor>& plugins=Omega::instance().getDynlibsDescriptor();
 		std::pair<string,DynlibDescriptor> p; py::list ret;
-		FOREACH(p, plugins) ret.append(p.first);
+		for (const auto &p : plugins) ret.append(p.first);
 		return ret;
 	}
 
