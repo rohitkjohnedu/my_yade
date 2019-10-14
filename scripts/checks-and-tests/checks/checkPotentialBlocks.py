@@ -18,9 +18,9 @@ if ('PotentialBlocks' in features):
 		ForceResetter(),
 		InsertionSortCollider([PotentialBlock2AABB()],verletDist=verletDistance),
 		InteractionLoop(
-			[Ig2_PB_PB_ScGeom()],
-			[Ip2_FrictMat_FrictMat_KnKsPBPhys( kn_i=Kn, ks_i=Ks, Knormal=Kn, Kshear=Ks, useFaceProperties=False, calJointLength=False, twoDimension=False, unitWidth2D=1.0, viscousDamping=0.1)], 
-			[Law2_SCG_KnKsPBPhys_KnKsPBLaw(label='law',neverErase=False)] # In this example, we do NOT use Talesnick
+			[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0)],
+			[Ip2_FrictMat_FrictMat_KnKsPBPhys( kn_i=Kn, ks_i=Ks, Knormal=Kn, Kshear=Ks, useFaceProperties=False, calJointLength=False,  viscousDamping=0.1)], 
+			[Law2_SCG_KnKsPBPhys_KnKsPBLaw(label='law',neverErase=False, allowViscousAttraction=True)] # In this example, we do NOT use Talesnick
 		),
 		NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,0,0]), # Here we deactivate gravity
 	]
@@ -149,7 +149,7 @@ targetMin) +" , "+str(targetMax) +"\n" )
 		errors += 1
 
 	# Check normal contact force
-	target=c.phys.Knormal_area*c.geom.penetrationDepth
+	target=c.phys.kn*c.geom.penetrationDepth
 	tol=1e-6
 	if (abs((c.phys.normalForce).norm()-target)/abs(target)>tol):
 		errMsg+=str( "Wrong normal contact force: "+ str((c.phys.normalForce).norm()) +" , instead of: "+ str(target) +"\n" )
