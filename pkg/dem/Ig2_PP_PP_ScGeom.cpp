@@ -1,11 +1,11 @@
-/*CWBoon 2015 */
+/* CWBoon 2015 */
 /* C.W. Boon, G.T. Houlsby, S. Utili (2013).  A new contact detection algorithm for three-dimensional non-spherical particles.  Powder Technology, 248, pp 94-102. */
 /* A code for calling MOSEK (ver 6) exists in a previous version of this script. MOSEK can be used to solve the second order cone programme of equations (SOCP), alternativelly to the code used here.*/
 
 #ifdef YADE_POTENTIAL_PARTICLES
 #include "Ig2_PP_PP_ScGeom.hpp"
 #include <pkg/dem/ScGeom.hpp>
-#include <pkg/dem/PotentialParticle.hpp>
+//#include <pkg/dem/PotentialParticle.hpp>
 //#include <yade/lib-base/yadeWm3Extra.hpp>
 #include <pkg/dem/KnKsLaw.hpp>
 
@@ -27,35 +27,33 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-
-YADE_PLUGIN((Ig2_PP_PP_ScGeom)
+YADE_PLUGIN( (Ig2_PP_PP_ScGeom)
 //#ifdef YADE_OPENGL
 //		(Gl1_Ig2_PP_PP_ScGeom)
 //	#endif
-           );
+);
 
 
 CREATE_LOGGER(Ig2_PP_PP_ScGeom);
 
-
-bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1, const State& state2, const Vector3r& /*shift2*/, const bool& force,const shared_ptr<Interaction>& c) {
-
+/* ***************************************************************************************************************************** */
+bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& cm2,const State& state1, const State& state2, const Vector3r& shift2, const bool& force,const shared_ptr<Interaction>& c) {
 	PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	PotentialParticle *s2=static_cast<PotentialParticle*>(cm2.get());
 
 	/* Short circuit if both particles are boundary particles */
-	if((s1->isBoundary==true)&&(s2->isBoundary==true)) {return false;}
+	if( (s1->isBoundary == true) && (s2->isBoundary == true) ) {return false;}
 
+	/* Short circuit if both particles are fixed */
+	if ( (state1.blockedDOFs==State::DOF_ALL) && (state2.blockedDOFs==State::DOF_ALL) ) { return false;}
 
 	bool hasGeom = false;
 	Vector3r contactPt(0,0,0);
 	shared_ptr<ScGeom> scm;
-
+	shared_ptr<KnKsPhys> phys;
 
 	Real stepBisection = 0.001*std::min(s1->R,s2->R);
-	if(stepBisection<pow(10,-6)) {
-		//std::cout<<"R1: "<<s1->R<<", R2: "<<s2->R<<", stepBisection: "<<stepBisection<<", id1: "<<c->getId1()<<", id2: "<<c->getId2()<<endl;
-	}
+	if(stepBisection<pow(10,-6)) { /*std::cout<<"R1: "<<s1->R<<", R2: "<<s2->R<<", stepBisection: "<<stepBisection<<", id1: "<<c->getId1()<<", id2: "<<c->getId2()<<endl;*/ } //FIXME: Check whether we need this check. It is commented in the PBs
 
 	bool contact = false;
 
@@ -68,44 +66,40 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 	Vector3r ptOnP2(0.0,0.0,0.0);
 	bool converge = false;
 
-
 	if(c->geom) {
 		hasGeom = true;
 		scm=YADE_PTR_CAST<ScGeom>(c->geom);
-		if (scm->penetrationDepth>stepBisection ) {
-			stepBisection = 0.5*scm->penetrationDepth;
-		}
-		if(stepBisection<pow(10,-6)) {
-			//std::cout<<"stepBisection: "<<stepBisection<<", penetrationDepth: "<<scm->penetrationDepth<<endl;
-		}
+		if (scm->penetrationDepth>stepBisection ) { stepBisection = 0.5*scm->penetrationDepth; }
+		if(stepBisection<pow(10,-6)) { /*std::cout<<"stepBisection: "<<stepBisection<<", penetrationDepth: "<<scm->penetrationDepth<<endl;*/ }
 		contactPt = scm->contactPoint;
 	} else {
 		scm=shared_ptr<ScGeom>(new ScGeom());
 		c->geom=scm;
-		contactPt = 0.5*(state1.pos+state2.pos);
+		contactPt = 0.5*(state1.pos+state2.pos+shift2);
+	}
 
+	bool hasPhys=false;
+	if(c->phys){
+		phys=YADE_PTR_CAST<KnKsPhys>(c->phys);	hasPhys=true; //shearDir = phys->shearDir; //normalization should take place in the Contact Law
 	}
 
 	converge = true;
-	fA= evaluatePP(cm1,state1, contactPt);
-	fB = evaluatePP(cm2,state2, contactPt);
+//	fA = evaluatePP(cm1,state1,contactPt);
+//	fB = evaluatePP(cm2,state2,contactPt);
 
-//Default does not have warmstart
+	//Default does not have warmstart
 	//if(fA < 0.0 && fB <0.0){
 	//	converge = customSolve(cm1,state1,cm2,state2,contactPt,true);
 	//}else{
-	converge = customSolve(cm1,state1,cm2,state2,contactPt,false);
+		converge = customSolve(cm1,state1,cm2,state2,shift2,contactPt,false /* c->phys->warmstart */);
 	//}
 
+	fA = evaluatePP(cm1,state1,Vector3r::Zero(),contactPt);
+	fB = evaluatePP(cm2,state2,shift2,         contactPt);
 
-	fA= evaluatePP(cm1,state1, contactPt);
-	fB = evaluatePP(cm2,state2, contactPt);
+//	if (fA*fB<0.0) {/* std::cout<<"fA: "<<fA<<", fB: "<<fB<<endl; */ } //FIXME: Check whether we need to output a message here
 
-	if (fA*fB<0.0) {
-		//std::cout<<"fA: "<<fA<<", fB: "<<fB<<endl;
-	}
-
-//std::cout<<"converge: "<<converge<<", fA: "<<fA<<", fB: "<<fB<<endl;
+	//std::cout<<"converge: "<<converge<<", fA: "<<fA<<", fB: "<<fB<<endl;
 
 	//timingDeltas->start();
 
@@ -116,53 +110,53 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 		contactPt = 0.5*(state1.pos+state2.pos);
 	}
 	//////////////////////////////////////////////////////////* PASS VARIABLES TO ScGeom Functor */////////////////////////////////////////////////////////////
-	//* 1. Get overlap												 						 *//
-	//* 2. Get information on active planes.
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//* 1. Get overlap *//
+	//* 2. Get information on active planes. *//
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (contact == true || c->isReal() || force) {
 		if (contact == true) {
-			normalP1 = getNormal(cm1,state1,contactPt);
-			normalP1.normalize();
-			normalP2 = getNormal(cm2,state2,contactPt);
-			normalP2.normalize();
+			normalP1 = getNormal(cm1,state1,Vector3r(0,0,0),contactPt); normalP1.normalize();
+			normalP2 = getNormal(cm2,state2,shift2,         contactPt); normalP2.normalize();
 			//if(s1->isBoundary==true){avgNormal=normalP1;}else if(s2->isBoundary==true){avgNormal=-normalP2;}else{avgNormal = (normalP1 - normalP2);}
-			avgNormal = (normalP1 - normalP2);
-			avgNormal.normalize();
+			avgNormal = (normalP1 - normalP2); avgNormal.normalize();
 
-			if(s1->fixedNormal==true) {
-				avgNormal = s1->boundaryNormal;
-			}
-			if(s2->fixedNormal==true) {
-				avgNormal = -s2->boundaryNormal;
-			}
+			if(s1->fixedNormal==true) { avgNormal =  s1->boundaryNormal; }
+			if(s2->fixedNormal==true) { avgNormal = -s2->boundaryNormal; }
 
 			Vector3r step = avgNormal*stepBisection;
 			//int locationStuck = 2;
-			getPtOnParticle2(cm1,state1,contactPt, step, ptOnP1);
-			getPtOnParticle2(cm2,state2,contactPt, -1.0*step, ptOnP2);
+			getPtOnParticle2(cm1, state1, Vector3r::Zero(), contactPt,      step, ptOnP1);
+			getPtOnParticle2(cm2, state2, shift2,           contactPt, -1.0*step, ptOnP2);
 
-			vector<Vector3r> points;
+//			vector<Vector3r> points;
 			Real penetrationDepth = (ptOnP2-ptOnP1).norm();// overlap;
 			//std::cout<<"contactpoint: "<<contactPt<<", penetrationDepth: "<<penetrationDepth<<", avgNormal: "<<avgNormal<<endl;
 
-			scm->precompute(state1,state2,scene,c,avgNormal,!(hasGeom),Vector3r(0,0,0)/*shift 2 */, false /* avoidGranularRatcheting */); //Assign contact point and normal after precompute!!!!
+			if(hasPhys){
+//				phys->normal= avgNormal;
+				phys->ptOnP1 = ptOnP1; phys->ptOnP2 = ptOnP2;
+//				bool calJointLength = phys->calJointLength; double jointLength = phys->jointLength; /*int smallerID = 1*/;
+//				phys->contactArea = getAreaPolygon2(cm1, state1, cm2, state2, contactPt, avgNormal, smallerID, calJointLength, shearDir, jointLength, twoD); //TODO: Currently,the contact area of 3D contacts or the jointLength of 2D contacts is not calculated for the PotentialParticle class. So, what we have now is a linear stiffness model
+//				if(jointLength < pow(10,-11) || std::isnan(jointLength)  || calJointLength == false ) {jointLength = 1.0; /*std::min(s1->R,s2->R);*/}
+//				phys->jointLength = jointLength;
+				/* phys->smallerID = smallerID; */
+				if(twoDimension) { // moved this from KnKsLaw.cpp
+					phys->contactArea = unitWidth2D*phys->jointLength;
+				}
+			}
+
+			scm->precompute(state1,state2,scene,c,avgNormal,!(hasGeom),shift2,false /* avoidGranularRatcheting */); //Assign contact point and normal after precompute!!!!
 			scm->contactPoint = contactPt;
 			scm->penetrationDepth=penetrationDepth;
-			if(std::isnan(avgNormal.norm())) {
-				//std::cout<<"avgNormal: "<<avgNormal<<endl;
-			}
+			if(std::isnan(avgNormal.norm())) { /* std::cout<<"avgNormal: "<<avgNormal<<endl; */ }
 			scm->normal = avgNormal;
 
-
-
 		} else {
-
 			//scm->normal = Vector3r(0,0,0);
-			scm->precompute(state1,state2,scene,c,avgNormal,!(hasGeom),Vector3r(0,0,0)/*shift 2 */, false /* avoidGranularRatcheting */); //Assign contact point and normal after precompute!!!!
+			scm->precompute(state1,state2,scene,c,avgNormal,!(hasGeom),shift2,false /* avoidGranularRatcheting */); //Assign contact point and normal after precompute!!!!
 			scm->contactPoint = contactPt;
-			scm->penetrationDepth=-1.0; //scm->normal = Vector3r(0,0,0);
+			scm->penetrationDepth = -1.0; //scm->normal = Vector3r(0,0,0);
 		}
-
 		return true;
 	} else {
 		scm->contactPoint = contactPt;
@@ -170,13 +164,27 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 		scm->normal = Vector3r(0,0,0);
 		return false;
 	}
-
 	return false;
 }
 
 
+/* ***************************************************************************************************************************** */
+bool Ig2_PP_PP_ScGeom::goReverse(
+		const shared_ptr<Shape>& cm1,
+		const shared_ptr<Shape>& cm2,
+		const State& state1,
+		const State& state2,
+		const Vector3r& shift2,
+		const bool& force,
+		const shared_ptr<Interaction>& c) {
+			c->swapOrder();
+			return go(cm2,cm1,state2,state1,-shift2,force,c); // This works with c->swapOrder()
+//			return go(cm1,cm2,state2,state1,-shift2,force,c); // Alternativelly, this works without c->swapOrder()
+}
 
-void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero) {
+
+/* ***************************************************************************************************************************** */
+void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2,  const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero) {
 
 	Real a = 0.0;
 	Real b = 1.0;
@@ -189,12 +197,12 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 	Real c = 0.0;
 	Real d = 0.0;
 	Real e = 0.0;
+	Real h;
 	Vector3r bracketRange = bracketB- bracketA;
-	Real fa = evaluatePP(cm1,state1, bracketA); //evaluateFNoSphere(cm1,state1, bracketA); //
+	Real fa = evaluatePP(cm1,state1,shift2,bracketA); //evaluateFNoSphere(cm1,state1, bracketA); //
+	Real fb = evaluatePP(cm1,state1,shift2,bracketB); //evaluateFNoSphere(cm1,state1, bracketB); //
 
-	Real fb = evaluatePP(cm1,state1, bracketB); //evaluateFNoSphere(cm1,state1, bracketB); //
-
-	if(fa*fb > 0.00001) {
+	if(fa*fb > 0.00001) { //FIXME: Check whether I need to output a warning here, or else comment this statement
 		//std::cout<<"fa: "<<fa<<", fb: "<<fb<<endl;
 	}
 	//if(fabs(fa)<fabs(fb)){bracketRange *= -1.0; Vector3r temp = bracketA; bracketA= bracketB; bracketB = temp;}
@@ -269,7 +277,7 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 
 			a = b;
 			fa = fb;
-			Real h = 0.0;
+			h = 0.0;
 			if(fabs(d) >tol) {
 				h = d;
 			} else if(m > 0.0) {
@@ -280,7 +288,7 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 			b = b + h; // h*m_unitVec;
 
 			zero = bracketA + b*bracketRange;
-			fb = evaluatePP(cm1,state1, zero); //evaluateFNoSphere(cm1,state1, zero); //
+			fb = evaluatePP(cm1,state1,shift2,zero); //evaluateFNoSphere(cm1,state1, zero); //
 
 
 		} else {
@@ -290,7 +298,7 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 		}
 
 		counter++;
-		if(counter==10000) {
+		if(counter==10000) { //FIXME: Check whether I need to output a warning here, or else comment this statement
 			//std::cout<<"counter: "<<counter<<", m.norm: "<<m<<", fb: "<<fb<<endl;
 		}
 	} while(1);
@@ -299,12 +307,13 @@ void Ig2_PP_PP_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 }
 
 
+/* ***************************************************************************************************************************** */
 /* Routine to get value of function (constraint) at a particular position */
-Real Ig2_PP_PP_ScGeom::evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial) {
+Real Ig2_PP_PP_ScGeom::evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial) {
 
 	PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	///////////////////Transforming trial values to local frame of particles//////////////////
-	Vector3r tempP1 = newTrial - state1.pos;
+	Vector3r tempP1 = newTrial - state1.pos - shift2;
 	/* Direction cosines */
 	//state1.ori.normalize();
 	Vector3r localP1 = state1.ori.conjugate()*tempP1;
@@ -312,9 +321,9 @@ Real Ig2_PP_PP_ScGeom::evaluatePP(const shared_ptr<Shape>& cm1, const State& sta
 	Real y = localP1.y();
 	Real z = localP1.z();
 	int planeNo = s1->a.size();
-	Real pSum2 = 0.0;
+	Real pSum2 = 0.0, plane;
 	for (int i=0; i<planeNo; i++) {
-		Real plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z - s1->d[i];
+		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z - s1->d[i];
 		if (plane<pow(10,-15)) {
 			plane = 0.0;
 		}
@@ -331,12 +340,12 @@ Real Ig2_PP_PP_ScGeom::evaluatePP(const shared_ptr<Shape>& cm1, const State& sta
 }
 
 
-
-Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r newTrial) {
+/* ***************************************************************************************************************************** */
+Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial) {
 
 	PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	///////////////////Transforming trial values to local frame of particles//////////////////
-	Vector3r tempP1 = newTrial - state1.pos;
+	Vector3r tempP1 = newTrial - state1.pos - shift2;
 
 	/* Direction cosines */
 	Vector3r localP1(0,0,0);
@@ -348,9 +357,9 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 ////////////////////////////// assembling potential planes particle 1//////////////////////////////
 	int planeNo = s1->a.size();
 	vector<Real>p;
-	Real pSum2 = 0.0;
+	Real pSum2 = 0.0, plane;
 	for (int i=0; i<planeNo; i++) {
-		Real plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z -s1-> d[i];
+		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z -s1-> d[i];
 		if (plane<pow(10,-15)) {
 			plane = 0.0;
 		}
@@ -408,31 +417,29 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 	Real Fdy = fdx * Q1(0,1) + fdy*Q1(1,1) + fdz*Q1(2,1);
 	Real Fdz = fdx * Q1(0,2) + fdy*Q1(1,2) + fdz*Q1(2,2);
 
-	if (std::isnan(Fdx) == true || std::isnan(Fdy) == true || std::isnan(Fdz)==true) {
-		//std::cout<<"Q1(0,0): "<<Q1(0,0)<<","<<Q1(0,1)<<","<<Q1(0,2)<<","<<Q1(1,0)<<","<<Q1(1,1)<<","<<Q1(1,2)<<","<<Q1(2,0)<<","<<Q1(2,1)<<","<<Q1(2,2)<<", q:"<<q0<<","<<q1<<","<<q2<<","<<q3<<", fd: "<<fdx<<","<<fdy<<","<<fdz<<endl;
-	}
+//	if (std::isnan(Fdx) == true || std::isnan(Fdy) == true || std::isnan(Fdz)==true) { //FIXME: Check whether I need a warning here, if the derivatives cannot be calculated
+//		//std::cout<<"Q1(0,0): "<<Q1(0,0)<<","<<Q1(0,1)<<","<<Q1(0,2)<<","<<Q1(1,0)<<","<<Q1(1,1)<<","<<Q1(1,2)<<","<<Q1(2,0)<<","<<Q1(2,1)<<","<<Q1(2,2)<<", q:"<<q0<<","<<q1<<","<<q2<<","<<q3<<", fd: "<<fdx<<","<<fdy<<","<<fdz<<endl;
+//	}
 
 	return Vector3r(Fdx,Fdy,Fdz);
 }
 
 
-
-
-void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, Vector3r midPoint, Vector3r normal, Vector3r& ptOnParticle) {
+/* ***************************************************************************************************************************** */
+void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r midPoint, Vector3r normal, Vector3r& ptOnParticle) {
 	//PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	ptOnParticle = midPoint;
-	Real f = evaluatePP(cm1,state1, ptOnParticle);//evaluateFNoSphere(cm1,state1, ptOnParticle); //
+	Real f = evaluatePP(cm1,state1,shift2,ptOnParticle);//evaluateFNoSphere(cm1,state1, ptOnParticle); //
 	Real fprevious = f;
 	int counter = 0;
 	//normal.normalize();
 	Vector3r step = normal*Mathr::Sign(f) *-1.0;
-	Vector3r bracketA(0,0,0);
-	Vector3r bracketB(0,0,0);
+	Vector3r bracketA(0,0,0), bracketB(0,0,0);
 
 	do {
 		ptOnParticle += step;
 		fprevious = f;
-		f = evaluatePP(cm1,state1, ptOnParticle); //evaluateFNoSphere(cm1,state1, ptOnParticle); //
+		f = evaluatePP(cm1,state1,shift2,ptOnParticle); //evaluateFNoSphere(cm1,state1, ptOnParticle); //
 		counter++;
 		if (counter == 50000 ) {
 			//LOG_WARN("Initial point searching exceeded 500 iterations!");
@@ -443,14 +450,14 @@ void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const Stat
 	bracketA = ptOnParticle;
 	bracketB = ptOnParticle -step;
 	Vector3r zero(0,0,0);
-	BrentZeroSurf(cm1,state1,bracketA, bracketB, zero);
+	BrentZeroSurf(cm1,state1,shift2,bracketA, bracketB, zero);
 	ptOnParticle = zero;
 	//if( fabs(f)>0.1){std::cout<<"getInitial point f:"<<f<<endl;}
 }
 
 
-
-bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, Vector3r &contactPt, bool warmstart) {
+/* ***************************************************************************************************************************** */
+bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPt, bool warmstart) {
 	//timingDeltas->start();
 	PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	PotentialParticle *s2=static_cast<PotentialParticle*>(cm2.get());
@@ -471,11 +478,10 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	int planeNoAB = planeNoA + planeNoB;
 	int varNo2 = varNo*varNo;
 	int planeNoA3 = 3+planeNoA;
-	int planeNoB3=3+planeNoB;
+	int planeNoB3 = 3+planeNoB;
 	//int planeNoA2 =planeNoA*planeNoA;
 	//int planeNoB2=planeNoB*planeNoB;
 	Matrix3r QA = state1.ori.conjugate().toRotationMatrix(); /*direction cosine */
-
 	Matrix3r QB = state2.ori.conjugate().toRotationMatrix(); /*direction cosine */
 
 	int blas3 = 3;
@@ -499,6 +505,9 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	}
 	blasC[3]=  1.0;
 	int blasCount = 0;
+
+	contactPt+=shift2;
+
 	for(int i=0; i<3; i++) {
 		for(int j=0; j<3; j++) {
 			blasQA[blasCount]=QA(j,i);
@@ -506,7 +515,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 			blasCount++;
 		}
 		blasPosA[i]=state1.pos[i];
-		blasPosB[i]=state2.pos[i];
+		blasPosB[i]=state2.pos[i]+shift2[i];
 		blasContactPt[i]=contactPt[i];
 	}
 //std::cout<<"QA: "<<QA<<endl;std::cout<<"blasQA: "<<endl;
@@ -523,7 +532,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 	/* penalty */
 	Real t = 1.0;
-	Real mu=10.0;
+	Real mu = 10.0;
 	Real planePert = 0.1*rA;
 	Real sPert = 1.0; //+ 10.0*planePert*(planeNoA+planeNoB)/(rA*rA);
 	if (warmstart == true) {
@@ -534,7 +543,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	}
 	/* s */
 	Real s = 0.0;
-	Real m=2.0;
+	Real m = 2.0;
 	Real NTTOL = pow(10,-8);
 	Real tol = accuracyTol/*pow(10,-4)* RA*pow(10,-6)*/;
 	Real gap =0.0;
@@ -657,7 +666,7 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	//Eigen::MatrixXd A1(3+planeNoA,varNo);
 	//Matrix3r QAs=kAs*QA; //cwise()
 	Real blasQAs[9];
-	int noElements=9;
+	int noElements = 9;
 	Real scaleFactor = kAs;
 	dcopy_(&noElements, &blasQA[0], &incx, &blasQAs[0], &incx);
 	dscal_(&noElements, &scaleFactor, &blasQAs[0], &incx);
@@ -1265,15 +1274,18 @@ bool Ig2_PP_PP_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 			gap = 2.0*m/t;
 			//if (warmstart == true){break;}
 			if (gap < tol) {
-				contactPt[0] = blasX[0];
+				contactPt[0]=blasX[0];
 				contactPt[1]=blasX[1];
 				contactPt[2]=blasX[2];
 				//if(warmstart==true){std::cout<<" totalIter : "<<totalIter<<endl;}
-				Real fA = evaluatePP(cm1,state1,contactPt);
-				Real fB = evaluatePP(cm2,state2,contactPt);
-				if(fabs(fA-fB)>0.001 ) {
-					//std::cout<<"inside fA-fB: "<<fA-fB<<endl;
-				}
+
+					//FIXME: check whether we need to output a warning here or else comment the indented 4 lines below
+					Real fA = evaluatePP(cm1,state1,Vector3r(0,0,0),contactPt);
+					Real fB = evaluatePP(cm2,state2,Vector3r(0,0,0),contactPt);
+					if(fabs(fA-fB)>0.001 ) {
+						//std::cout<<"inside fA-fB: "<<fA-fB<<endl;
+					}
+
 				//timingDeltas->checkpoint("newton");
 				return true;
 			}
