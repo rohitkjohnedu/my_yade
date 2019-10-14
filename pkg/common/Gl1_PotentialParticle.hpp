@@ -133,12 +133,12 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
 		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialParticle,GlShapeFunctor,"Renders :yref:`PotentialParticle` object",
-			((int,sizeX,20,,"Number of divisions in the x direction for triangulation"))
-			((int,sizeY,20,,"Number of divisions in the y direction for triangulation"))
-			((int,sizeZ,20,,"Number of divisions in the z direction for triangulation"))
-			((bool,store,true,,"store computed triangulation or not"))
-			((bool,initialized,false,,"if triangulation is initialized"))
-			((Real,aabbEnlargeFactor,1.3,,"some factor for displaying algorithm, try different value if you have problems with displaying"))
+			((int,sizeX,20,,"Number of divisions in the X direction for triangulation"))
+			((int,sizeY,20,,"Number of divisions in the Y direction for triangulation"))
+			((int,sizeZ,20,,"Number of divisions in the Z direction for triangulation"))
+			((bool,store,true,,"Whether to store computed triangulation or not"))
+			((bool,initialized,false,,"Whether the triangulation is initialized"))
+			((Real,aabbEnlargeFactor,1.3,,"Enlargement factor of the Marching Cubes drawing grid, used for displaying purposes. Try different value if the particles are not displayed properly"))
 			((bool,wire,false,,"Only show wireframe"))
 		);
 		RENDERS(PotentialParticle);
@@ -154,15 +154,15 @@ class PotentialParticleVTKRecorder: public PeriodicEngine {
 		virtual void action(void);
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialParticleVTKRecorder,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 			((string,fileName,,,"File prefix to save to"))
-			((int,sampleX,30,,"Number of divisions in the x direction for triangulation"))
-			((int,sampleY,30,,"Number of divisions in the y direction for triangulation"))
-			((int,sampleZ,30,,"Number of divisions in the z direction for triangulation"))
-			((Real,maxDimension,30,,"max dimension"))
-			((bool,twoDimension,false,,"2D or not"))
-			((bool,REC_INTERACTION,false,,"contact point and forces"))
-			((bool,REC_COLORS,false,,"colors"))
-			((bool,REC_VELOCITY,false,,"velocity"))
-			((bool,REC_ID,true,,"id"))
+			((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
+			((int,sampleY,30,,"Number of divisions in the Y direction for triangulation"))
+			((int,sampleZ,30,,"Number of divisions in the Z direction for triangulation"))
+			((Real,maxDimension,30,,"Maximum allowed distance between consecutive grid lines"))
+			((bool,twoDimension,false,,"Whether to render the particles as 2-D"))
+			((bool,REC_INTERACTION,false,,"Whether to record contact point and forces"))
+			((bool,REC_COLORS,false,,"Whether to record colors"))
+			((bool,REC_VELOCITY,false,,"Whether to record velocity"))
+			((bool,REC_ID,true,,"Whether to record id"))
 			,
 			function = ImpFunc::New();
 			,
