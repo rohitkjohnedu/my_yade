@@ -89,29 +89,15 @@ namespace yade { // Cannot have #include directive inside.
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
 #ifdef YADE_OPENGL
 	
 	/* Draw PotentialBlocks using OpenGL */
 	class Gl1_PotentialBlock: public GlShapeFunctor{
 
 		public:
-			struct TriangulationMatrix{
-				vector<Vector3i> triangles;
-			};
-			static vector<TriangulationMatrix> TM ;
-
-
-			struct VerticesMatrix{
-				vector<Vector3r> v; 	
-			};
-			static vector<VerticesMatrix> VM ;
-
-
-			struct CentroidMatrix{      
-				Vector3r c;  
-			};	
-			static vector<CentroidMatrix> CM ;
+			struct TriangulationMatrix{ vector<Vector3i> triangles; }; 	static vector<TriangulationMatrix> TM ;
+			struct VerticesMatrix{ vector<Vector3r> v; }; 			static vector<VerticesMatrix> VM ;
+			struct CentroidMatrix{ Vector3r c; };				static vector<CentroidMatrix> CM ;
 
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
@@ -136,13 +122,6 @@ bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 } // namespace yade
 
 #endif // YADE_CGAL
-
-
-
-
-
-
-
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -247,15 +226,15 @@ namespace yade { // Cannot have #include directive inside.
 	  virtual void action(void);
 	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorder,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((string,fileName,,,"File prefix to save to"))
-		((int,sampleX,30,,"size of contact point"))
-		((int,sampleY,30,,"size of contact point"))
-		((int,sampleZ,30,,"size of contact point"))
-		((double,maxDimension,30,,"size of contact point"))
-		((bool,twoDimension,false,,"size of contact point"))
-		((bool,REC_INTERACTION,false,,"contact point and forces"))
-		((bool,REC_COLORS,false,,"colors"))
-		((bool,REC_VELOCITY,false,,"velocity"))
-		((bool,REC_ID,true,,"id"))
+		((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
+		((int,sampleY,30,,"Number of divisions in the Y direction for triangulation"))
+		((int,sampleZ,30,,"Number of divisions in the Z direction for triangulation"))
+		((double,maxDimension,30,,"Maximum allowed distance between consecutive grid lines"))
+		((bool,twoDimension,false,,"Whether to render the particles as 2-D"))
+		((bool,REC_INTERACTION,false,,"Whether to record contact point and forces"))
+		((bool,REC_COLORS,false,,"Whether to record colors"))
+		((bool,REC_VELOCITY,false,,"Whether to record velocity"))
+		((bool,REC_ID,true,,"Whether to record id"))
 		,
 		function = ImpFuncPB::New();
 		,
@@ -273,15 +252,15 @@ namespace yade { // Cannot have #include directive inside.
 	  virtual void action(void);
 	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorderTunnel,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((string,fileName,,,"File prefix to save to"))
-		((int,sampleX,30,,"size of contact point"))
-		((int,sampleY,30,,"size of contact point"))
-		((int,sampleZ,30,,"size of contact point"))
-		((double,maxDimension,30,,"size of contact point"))
-		((bool,twoDimension,false,,"size of contact point"))
-		((bool,REC_INTERACTION,false,,"contact point and forces"))
-		((bool,REC_COLORS,false,,"colors"))
-		((bool,REC_VELOCITY,false,,"velocity"))
-		((bool,REC_ID,true,,"id"))
+		((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
+		((int,sampleY,30,,"Number of divisions in the Y direction for triangulation"))
+		((int,sampleZ,30,,"Number of divisions in the Z direction for triangulation"))
+		((double,maxDimension,30,,"Maximum allowed distance between consecutive grid lines"))
+		((bool,twoDimension,false,,"Whether to render the particles as 2-D"))
+		((bool,REC_INTERACTION,false,,"Whether to record contact point and forces"))
+		((bool,REC_COLORS,false,,"Whether to record colors"))
+		((bool,REC_VELOCITY,false,,"Whether to record velocity"))
+		((bool,REC_ID,true,,"Whether to record id"))
 		,
 		function = ImpFuncPB::New();
 		,
