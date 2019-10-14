@@ -1631,12 +1631,12 @@ Bodies are deleted only rarely:
 
 Iteration
 ^^^^^^^^^^
-The container can be iterated over using ``FOREACH`` macro (shorthand for ``BOOST_FOREACH``):
+The container can be iterated over using ``FOREACH`` macro:
 
 .. code-block:: c++
 
 	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
-	   if(!b) continue;                      // skip deleted bodies
+	   if(!b) continue;                      // skip deleted bodies, nullptr-check
 	   /* do something here */              
 	}
 

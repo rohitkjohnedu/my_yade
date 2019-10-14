@@ -36,14 +36,14 @@
 #include <boost/python/module.hpp>
 #include <boost/python/class.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/foreach.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 
 
 #ifndef FOREACH
-	#define FOREACH BOOST_FOREACH
+ #define FOREACH(i_,arr_) for (i_ : arr_)
 #endif
+
 
 // TODO: they no longer expand to dynamic/static pointer casts depending on DEBUG=ON/OFF build. They are in wrong file. Think about either fixing this or removing them, https://gitlab.com/yade-dev/trunk/issues/97
 #ifndef YADE_PTR_CAST
