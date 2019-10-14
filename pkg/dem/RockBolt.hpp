@@ -46,15 +46,14 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-class RockBolt: public PeriodicEngine{	
-
-  	public:
+class RockBolt: public PeriodicEngine{
+	public:
 		#if 0
 		struct Bolts{
 			Bolts(Vector3r pt1, Vector3r  pt2){startingPoint = pt1; endPoint=pt2; }
 			Vector3r startingPoint;
 			Vector3r endPoint;
-			
+
 			/* variables stored in sequence starting from the block closest to the opening */
 			vector<int> blockIDs; /*blocks intersected */
 			vector<Vector3r> localCoordinates; /*local coordinates inside blocks */
@@ -67,8 +66,8 @@ class RockBolt: public PeriodicEngine{
 		bool installBolts(const PotentialBlock* cm1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt);
 		double evaluateFNoSphereVol(const PotentialBlock* s1,const State* state1, const Vector3r newTrial);
 		bool intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt, const Vector3r plane, const double planeD);
-  		virtual void action(void);
-  	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RockBolt,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
+		virtual void action(void);
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RockBolt,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((double,normalStiffness,0.0 ,,"EA/L"))
 		((double,shearStiffness,0.0 ,,"stiffness"))
 		((double,axialStiffness,0.0 ,,"EA"))
@@ -81,7 +80,7 @@ class RockBolt: public PeriodicEngine{
 		((vector<int>,blockIDs, ,,"ids"))
 		((double,displacements, ,,"ids"))
 		((vector<Vector3r>,localCoordinates, ,,"local coordinates of intersection"))
-		((vector<double>,initialLength, ,,"initial length"))	
+		((vector<double>,initialLength, ,,"initial length"))
 		((vector<Vector3r>,initialDirection, ,,"initial length"))
 		((vector<Vector3r>,nodeDistanceVec, ,,"nodeDistance"))
 		((vector<Vector3r>,nodePosition, ,,"nodePosition"))
@@ -98,14 +97,13 @@ class RockBolt: public PeriodicEngine{
 		((vector<bool>,ruptured, ,,"ruptured"))
 		((Real,axialMax,1000000000 ,,"maximum axial force"))
 		((Real,shearMax,1000000000 ,,"maximum shear force"))
-		((int,vtkIteratorInterval,10000 ,,"how often to print vtk"))	
-		((int,vtkRefTimeStep,1 ,,"first timestep to print vtk"))	
-		((string,fileName,,,"File prefix to save to"))	
+		((int,vtkIteratorInterval,10000 ,,"how often to print vtk"))
+		((int,vtkRefTimeStep,1 ,,"first timestep to print vtk"))
+		((string,fileName,,,"File prefix to save to"))
 		((string,name,,,"File prefix to save to"))
 		,
-			
 		,
-  	);
+	);
 
 
 };
