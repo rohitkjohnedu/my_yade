@@ -17,8 +17,6 @@ class PotentialParticle2AABB : public BoundFunctor {
 		//REGISTER_ATTRIBUTES(BoundFunctor,(aabbEnlargeFactor));
 		YADE_CLASS_BASE_DOC_ATTRS(PotentialParticle2AABB,BoundFunctor,"EXPERIMENTAL. Functor creating :yref:`Aabb` from :yref:`PotentialParticle`.",
 			((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"see :yref:`Sphere2AABB`."))
-			((Vector3r, halfSize, Vector3r::Zero(),,"halfSize"))
-
 		);
 };
 
