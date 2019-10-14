@@ -30,7 +30,8 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 	/* Normalize the coefficients of the planes defining the particle faces */
 	for (int i=0; i<planeNo; i++){
 		Vector3r planeNormVec = Vector3r(a[i],b[i],c[i]);
-		if (planeNormVec.norm() > 1+1e-3) { /* Normalize only if the normal vectors are not normalized already */
+		if ( std::abs(planeNormVec.norm() - 1.0 ) > 1e-3) { /* Normalize only if the normal vectors are not normalized already */
+//		if (planeNormVec.norm() > 1+1e-3) { /* Normalize only if the normal vectors are not normalized already */
 			a[i] /= planeNormVec.norm();
 			b[i] /= planeNormVec.norm();
 			c[i] /= planeNormVec.norm();
@@ -49,7 +50,7 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 
 	/* Calculate R as half the distance of the farthest vertices, if user hasn't set a positive value for R. */
 	/* A reminder that R in the Potential Blocks is meant to represent a reference length, used to calculate the initial bisection search employed to identify points on the particle surfaces. Here, R does not affect the curvature of the faces, like in the Potetial Particles code. The faces of a Potential Block are always flat. */
-	/* Although half the distance of the farthest particles is in no case the circumradius, we just need a value around this order of magnitude for the bisection search code to run smoothly */
+	/* Although half the distance of the farthest vertices is in no case the circumradius, we just need a value around this order of magnitude for the bisection search code to run smoothly */
 	if (R==0.0 and ( not vertices.empty() )) {
 		Real maxDistance=0.0;
 		for (unsigned int i=0; i<vertices.size()-1;i++){
@@ -63,9 +64,7 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 		}
 		if (R==0) { std::cout<<"R must be positive. Incorrect automatic calculation from the vertices."<<endl;}
 	}
-
 	assert(R>0.0);
-
 
 	// Calculate geometric properties: volume, centroid, inertia, principal orientation (inertia is calculated after the particle is centered to its centroid)
 	Vector3r centr = Vector3r::Zero();
@@ -84,7 +83,6 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 			d[i] = -(a[i]*centr.x() + b[i]*centr.y() + c[i]*centr.z() - d[i]);
 			if (d[i]<0) { a[i] *= -1; b[i] *= -1; c[i] *= -1; d[i] *= -1; }
 		}
-
 		calculateVertices(); // Recalculate vertices for the centered particle faces
 		calculateInertia(centr, Ixx, Iyy, Izz, Ixy, Ixz, Iyz); // Calculate inertia for the centered particle
 	}
@@ -94,18 +92,18 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 		inertia = Vector3r(Ixx,Iyy,Izz);
 	} else { //rotate the planes to the principal axes if they are not already rotated
 		if( fabs(Ixx) < pow(10,-15) ){Ixx = 0.0;} //TODO: Check whether I should keep/modify these or if there is a case where they introduce bugs
-		if( fabs(Iyy) < pow(10,-15) ){Iyy = 0.0;}
-		if( fabs(Izz) < pow(10,-15) ){Izz = 0.0;}
+		if( fabs(Iyy) < pow(10,-15) ){Iyy = 0.0;} // TODO: Maybe I could just check only the non-diagonal terms Ixy, Iyz, Ixz?
+		if( fabs(Izz) < pow(10,-15) ){Izz = 0.0;} // Or I could normalise the checked inertia values to make them dimensionless, by dividing with pow(R,5) or V*pow(R,3) or something similar
 		if( fabs(Ixy) < pow(10,-15) ){Ixy = 0.0;}
 		if( fabs(Iyz) < pow(10,-15) ){Iyz = 0.0;}
 		if( fabs(Ixz) < pow(10,-15) ){Ixz = 0.0;}
 
-		char jobz = 'V'; char uplo = 'L'; int N=3; std::vector<double> A (9); int lda=3; std::vector<double> eigenValues (3); std::vector<double> work (102); int lwork = 102; int info = 0; 
+		char jobz = 'V'; char uplo = 'L'; int N=3; std::vector<double> A (9); int lda=3; std::vector<double> eigenValues (3); std::vector<double> work (102); int lwork = 102; int info = 0; //FIXME: jobz, uplo, N, lda, lwork could be defined as "const" variables
 		A[0] = Ixx; A[1] =-Ixy; A[2] =-Ixz;
 		A[3] =-Ixy; A[4] = Iyy; A[5] =-Iyz;
 		A[6] =-Ixz; A[7] =-Iyz; A[8] = Izz;
 		dsyev_(&jobz, &uplo, &N, &A[0], &lda, &eigenValues[0], &work[0], &lwork, &info);
- 
+
 		Vector3r eigenVec1 (A[0],A[1],A[2]); eigenVec1.normalize();
 		Vector3r eigenVec2 (A[3],A[4],A[5]); eigenVec2.normalize();
 		Vector3r eigenVec3 (A[6],A[7],A[8]); eigenVec3.normalize();
@@ -139,9 +137,9 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 		orientation = q.conjugate();
 
 		/* Orient faces & vertices to the principal directions */
+		Vector3r plane4;
 		for (unsigned int i=0; i<a.size(); i++){
-			Vector3r plane4(a[i],b[i],c[i]);
-			plane4 = q * plane4;
+			plane4 = q * Vector3r(a[i],b[i],c[i]);
 			a[i] = plane4.x();
 			b[i] = plane4.y();
 			c[i] = plane4.z();
@@ -169,7 +167,7 @@ double PotentialBlock::getDet(const Eigen::MatrixXd A){
 
 double PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3){
 	/* if positive, counter clockwise, 2nd point makes a larger angle */
-	/* if negative, clockwise, 3rd point makes a larger angle */ 
+	/* if negative, clockwise, 3rd point makes a larger angle */
 	Eigen::MatrixXd triangle(4,2);
 	triangle(0,0) = pt1.x();  triangle(0,1) = pt1.y(); // triangle(0,2) = pt1.z();
 	triangle(1,0) = pt2.x();  triangle(1,1) = pt2.y(); // triangle(1,2) = pt2.z();
@@ -185,19 +183,28 @@ void PotentialBlock::calculateVertices() {
 	double Distance;
 	Real vertCount=0; Real minDistance;
 	int planeNo = a.size();
+
+	Vector3r plane1, plane2, plane3;
+	double d1, d2, d3, detAplanes;
+
+	std::vector<int> ipiv (3); int bColNo; int info, three; //FIXME: bColNo, three could be defined as "const int", instead of "int"
+	bool inside; Vector3r vertex;
+	Real plane;
+	int vertexID;
+
 	vertices.clear();
 
 	for (int i=0; i<planeNo-2; i++){
 		for (int j=i+1; j<planeNo-1; j++){
 			for(int k=j+1; k<planeNo; k++){
 
-				Vector3r plane1 = Vector3r(a[i],b[i],c[i]);
-				Vector3r plane2 = Vector3r(a[j],b[j],c[j]);
-				Vector3r plane3 = Vector3r(a[k],b[k],c[k]);
+				plane1 = Vector3r(a[i],b[i],c[i]);
+				plane2 = Vector3r(a[j],b[j],c[j]);
+				plane3 = Vector3r(a[k],b[k],c[k]);
 
-				double d1 = d[i]+r;
-				double d2 = d[j]+r;
-				double d3 = d[k]+r;
+				d1 = d[i]+r;
+				d2 = d[j]+r;
+				d3 = d[k]+r;
 
 				D[0]=d1;
 				D[1]=d2;
@@ -206,20 +213,20 @@ void PotentialBlock::calculateVertices() {
 				Ax[1]=plane2.x(); Ax[4]=plane2.y(); Ax[7]=plane2.z();   Aplanes(1,0) = Ax[1]; Aplanes(1,1) = Ax[4]; Aplanes(1,2) = Ax[7];
 				Ax[2]=plane3.x(); Ax[5]=plane3.y(); Ax[8]=plane3.z();   Aplanes(2,0) = Ax[2]; Aplanes(2,1) = Ax[5]; Aplanes(2,2) = Ax[8];
 
-				double detAplanes = Aplanes.determinant();
+				detAplanes = Aplanes.determinant();
 
 				if(fabs(detAplanes)>pow(10,-15) ){ //if (parallel == false) {
 
-					std::vector<int> ipiv (3);  int bColNo=1; int info=0; /* LU */ int three =3;
+					bColNo=1; info=0; /* LU */ three =3;
 					dgesv_( &three, &bColNo, Ax.data(), &three, ipiv.data(), D.data(), &three, &info);
 
 					if (info!=0){
 						//std::cout<<"linear algebra error"<<endl;
 					}else{
-						bool inside = true; Vector3r vertex(D[0],D[1],D[2]);
+						inside = true; vertex = Vector3r(D[0],D[1],D[2]);
 
 						for (int m=0; m<planeNo; m++){
-							Real plane = a[m]*vertex.x() + b[m]*vertex.y() + c[m]*vertex.z() - d[m]- r; if (plane>pow(10,-3)){inside = false;}
+							plane = a[m]*vertex.x() + b[m]*vertex.y() + c[m]*vertex.z() - d[m]- r; if (plane>pow(10,-3)){inside = false;}
 						}
 						if (inside == true){
 
@@ -240,7 +247,7 @@ void PotentialBlock::calculateVertices() {
 								}
 							}
 
-							int vertexID = vertices.size()-1;
+							vertexID = vertices.size()-1;
 //							addVertexStruct();
 //							int vertexID = vertexStruct.size()-1;
 //							vertexStruct[vertexID].planeID.push_back(i);   /* Note that the planeIDs are arranged from small to large! */
@@ -262,52 +269,58 @@ void PotentialBlock::calculateVertices() {
 
 void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz){
 
-	Vector3r pointInside = Vector3r(0,0,0);
-	double totalVolume=0.0;
+	Vector3r pointInside(0,0,0), vertex, planeNormal, oriNormal(0,0,1), crossProd, rotatedCoord;
+	Vector3r pt1, pt2, pt3, baseOnPolygon, oriBaseOnPolygon, centroidPyramid, centroidTetra, tempVert1, tempVert2, tempVert3, tempVert4;;
+	double totalVolume=0.0, plane, det, area, height, vol, areaPyramid, volumePyramid, heightTetra, tempArea, areaTri, tetraVol;
+	double detJ, x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
+	Quaternionr Qp;
+	unsigned int h, k, m, counter;
+	int lastEntry;
+	Eigen::MatrixXd B(4,2), vertexOnPlane;
+	vector<Vector3r> verticesOnPlane, oriVerticesOnPlane, orderedVerticesOnPlane, oriOrderedVerticesOnPlane; //vector<int> oriOrderedVerticesOnplaneID;
+
 	centroid = Vector3r::Zero();
 	Ixx = 0.0; Iyy = 0.0; Izz= 0.0; Ixy = 0.0; Ixz= 0.0; Iyz=0.0;
 
-	vector<Vector3r> verticesOnPlane; vector<Vector3r> oriVerticesOnPlane;
 	for (unsigned int j=0; j<a.size(); j++){
 		if(not verticesOnPlane.empty()){ verticesOnPlane.clear(); oriVerticesOnPlane.clear(); }
 		for (unsigned int i=0; i<vertices.size();i++){
-			Vector3r vertex = vertices[i]; /*local coordinates*/
-			double plane = a[j]*vertex.x() + b[j]*vertex.y() + c[j]*vertex.z() - d[j] - r;
+			vertex = vertices[i]; /*local coordinates*/
+			plane = a[j]*vertex.x() + b[j]*vertex.y() + c[j]*vertex.z() - d[j] - r;
 			if( fabs(plane) < pow(10,-3) ){
-				Vector3r planeNormal = Vector3r(a[j],b[j],c[j]);
-				Vector3r oriNormal(0,0,1); //normal vector of x-y plane
-				Vector3r crossProd = oriNormal.cross(planeNormal);
-				Quaternionr Qp;
+				planeNormal = Vector3r(a[j],b[j],c[j]);
+//				Vector3r oriNormal(0,0,1); //normal vector of x-y plane
+				crossProd = oriNormal.cross(planeNormal);
 				Qp.w() = 1.0 + oriNormal.dot(planeNormal);
 				Qp.x() = crossProd.x(); Qp.y() = crossProd.y();  Qp.z() = crossProd.z();
 				Qp.normalize();
 				if(crossProd.norm() < pow(10,-7)){ Qp = Quaternionr::Identity(); }
-				Vector3r rotatedCoord = Qp.conjugate()*vertex;
+				rotatedCoord = Qp.conjugate()*vertex;
 				verticesOnPlane.push_back(rotatedCoord);
 				oriVerticesOnPlane.push_back(vertex);
+//				oriOrderedVerticesOnPlaneID.pushback(i); //Here I store the ID of the first vertex on plane, to use it for visualisation purposes
 			}
 		}
 		if(verticesOnPlane.empty()){continue;}
 
 		/* REORDER VERTICES counterclockwise positive*/
-		vector<Vector3r> orderedVerticesOnPlane; vector<Vector3r> oriOrderedVerticesOnPlane;
-		unsigned int h = 0; unsigned int k = 1; unsigned int m = 2;
-		Vector3r pt1 = verticesOnPlane[h];
-		Vector3r pt2 = verticesOnPlane[k];
-		Vector3r pt3 = verticesOnPlane[m];
+		h = 0; k = 1; m = 2;
+		pt1 = verticesOnPlane[h];
+		pt2 = verticesOnPlane[k];
+		pt3 = verticesOnPlane[m];
 		orderedVerticesOnPlane.push_back(pt1); oriOrderedVerticesOnPlane.push_back(oriVerticesOnPlane[0]);
-		unsigned int counter = 1;
+		counter = 1;
 
 		while(counter<verticesOnPlane.size()){
 			while (m<verticesOnPlane.size()){
 				pt1 = verticesOnPlane[h];
-			 	pt2 = verticesOnPlane[k];
+				pt2 = verticesOnPlane[k];
 				pt3 = verticesOnPlane[m];
 				if (getSignedArea(pt1,pt2,pt3) < 0.0){
-					/* clockwise means 3rd point is better than 2nd */ 
+					/* clockwise means 3rd point is better than 2nd */
 					k=m; /*3rd point becomes 2nd point */
-				 	pt2 = verticesOnPlane[k];
-					
+					pt2 = verticesOnPlane[k];
+
 				}/* else counterclockwise is good.  We need to find and see whether there is a point(3rd point) better than the 2nd point */
 				/* advance m */
 				m=m+1;
@@ -326,8 +339,8 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 			counter++;
 		}
 
-		Eigen::MatrixXd vertexOnPlane(orderedVerticesOnPlane.size()+1,2);
-		Vector3r baseOnPolygon (0,0,0); Vector3r oriBaseOnPolygon (0,0,0);
+		vertexOnPlane = Eigen::MatrixXd(orderedVerticesOnPlane.size()+1,2);
+		baseOnPolygon = Vector3r(0,0,0); oriBaseOnPolygon = Vector3r(0,0,0);
 
 		for(unsigned int i=0; i< orderedVerticesOnPlane.size(); i++){
 			vertexOnPlane(i,0)=orderedVerticesOnPlane[i].x(); vertexOnPlane(i,1)=orderedVerticesOnPlane[i].y(); //vertexOnPlane(i,2)=orderedVerticesOnPlane[i].z();
@@ -338,39 +351,32 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 
 		baseOnPolygon = baseOnPolygon/static_cast<double>(orderedVerticesOnPlane.size());
 		oriBaseOnPolygon = oriBaseOnPolygon/static_cast<double>(oriOrderedVerticesOnPlane.size());
-		int lastEntry = orderedVerticesOnPlane.size();
+		lastEntry = orderedVerticesOnPlane.size();
 		vertexOnPlane(lastEntry,0)=orderedVerticesOnPlane[0].x(); vertexOnPlane(lastEntry,1)=orderedVerticesOnPlane[0].y(); //vertexOnPlane(lastEntry,2)=orderedVerticesOnPlane[0].z();
 		//std::cout<<"vertexOnPlane0: "<<vertexOnPlane(lastEntry,0)<<", vertexOnPlane1: "<<vertexOnPlane(lastEntry,1)<<endl;
 
-		double det    =  getDet(vertexOnPlane);
-		double area   =  0.5*det; //(vertexOnPlane.determinant());
-		double height = -1.0*( a[j]*pointInside.x() + b[j]*pointInside.y() + c[j]*pointInside.z() - d[j] - r );
-		double vol    =  1.0/3.0*area*height;
+		det    =  getDet(vertexOnPlane);
+		area   =  0.5*det; //(vertexOnPlane.determinant());
+		height = -1.0*( a[j]*pointInside.x() + b[j]*pointInside.y() + c[j]*pointInside.z() - d[j] - r );
+		vol    =  1.0/3.0*area*height;
 		totalVolume  += vol;
 		//std::cout<<"orderedVerticesOnPlane.size(): "<<orderedVerticesOnPlane.size()<<", volume: "<<volume<<", area: "<<area<<", height: "<<height<<endl;
 
-		double areaPyramid = 0.0;
-		Vector3r centroidPyramid(0,0,0);
-		double volumePyramid = 0.0;
-		double heightTetra = 0.0;
-
-		Vector3r tempVert1, tempVert2, tempVert3, tempVert4;
-		double x1, x2, x3, x4;
-		double y1, y2, y3, y4;
-		double z1, z2, z3, z4;
-		double detJ;
+		areaPyramid = 0.0;
+		centroidPyramid = Vector3r(0,0,0);
+		volumePyramid = 0.0;
+		heightTetra = 0.0;
 
 		for(int i=0; i<vertexOnPlane.rows()-1; i++){
-			Eigen::MatrixXd B(4,2);
 			B(0,0)=vertexOnPlane(i,0);   B(0,1)=vertexOnPlane(i,1);
 			B(1,0)=vertexOnPlane(i+1,0); B(1,1)=vertexOnPlane(i+1,1);
 			B(2,0)=baseOnPolygon.x();    B(2,1)=baseOnPolygon.y();
 			B(3,0)=vertexOnPlane(i,0);   B(3,1)=vertexOnPlane(i,1);
-			double tempArea = getDet(B);
-			double areaTri = 0.5*tempArea;
+			tempArea = getDet(B);
+			areaTri = 0.5*tempArea;
 			areaPyramid += areaTri;
 			heightTetra = fabs(orderedVerticesOnPlane[i].z());
-			double tetraVol = 1.0/3.0*areaTri*heightTetra;
+			tetraVol = 1.0/3.0*areaTri*heightTetra;
 			volumePyramid += tetraVol;
 
 			// tempVert1,2,3,4: vertices of the tetrahedron
@@ -384,7 +390,7 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 				tempVert2 = oriOrderedVerticesOnPlane[i+1];
 			}
 
-			Vector3r centroidTetra = 0.25 * (tempVert1 + tempVert2 + tempVert3 + tempVert4);
+			centroidTetra = 0.25 * (tempVert1 + tempVert2 + tempVert3 + tempVert4);
 			centroidPyramid += (tetraVol*centroidTetra);
 
 			// Calculation of the inertia tensor for each tetrahedron.
