@@ -85,7 +85,7 @@ Real Law2_ScGeom_ImplicitLubricationPhys::normalForce_AdimExp(LubricationPhys *p
 	Real a((geom->radius1+geom->radius2)/2.);
 	if(isNew) { phys->u = -geom->penetrationDepth; 
 		if(phys->u < 0.)
-			LOG_ERROR("phys->u < 0 at starting point!!! Increase interaction detection distance.");
+			LOG_ERROR("phys->u < 0 at starting point!!! Increase interaction detection distance." << phys->u);
 		phys->delta = std::log(phys->u/a); }
 	
 	Real d;

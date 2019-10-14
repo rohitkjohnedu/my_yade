@@ -870,16 +870,20 @@ public:
 
     virtual Real contactForce(Real const& u) const {
         TRACE;
+        gilLock lock;
+        LOG_TRACE("GIL State: " << PyGILState_Check());
         return get_override("contactForce")(u);
     }
 
     virtual Real potentialForce(Real const& u) const {
         TRACE;
+        gilLock lock;
         return get_override("potentialForce")(u);
     }
 
     virtual bool hasContact(Real const& u) const {
         TRACE;
+        gilLock lock;
         return get_override("hasContact")(u);
     }        
 };
