@@ -21,8 +21,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([PotentialParticle2AABB()],verletDist=0.01),
 	InteractionLoop(
-		[Ig2_PP_PP_ScGeom()],
-		[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=1e8, ks_i=1e7, Knormal = 1e8, Kshear = 1e7, useFaceProperties=False, calJointLength=False, twoDimension=True, unitWidth2D=1.0, viscousDamping=0.05)],
+		[Ig2_PP_PP_ScGeom(twoDimension=True, unitWidth2D=1.0)],
+		[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=1e8, ks_i=1e7, Knormal = 1e8, Kshear = 1e7, useFaceProperties=False, calJointLength=False, viscousDamping=0.05)],
 		[Law2_SCG_KnKsPhys_KnKsLaw(label='law',neverErase=False)]
 	),
 	NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,-9.81,0]),
@@ -68,11 +68,13 @@ bbb.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-bbb.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(bbb, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+bbb.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(bbb, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 bbb.state.pos = [0,0,0]
 lidID = O.bodies.append(bbb)
 count=count+1
@@ -83,11 +85,13 @@ b1.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b1.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b1, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b1.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b1, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b1.state.pos = [lengthOfBase/3.0,0,lengthOfBase/3.0]
 O.bodies.append(b1)
 count=count+1
@@ -98,11 +102,13 @@ b2.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b2.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b2, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b2.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b2, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b2.state.pos = [-lengthOfBase/3.0,0,lengthOfBase/3.0]
 O.bodies.append(b2)
 count=count+1
@@ -113,11 +119,13 @@ b3.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b3.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b3, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b3.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b3, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b3.state.pos = [0,0,lengthOfBase/3.0]
 O.bodies.append(b3)
 count=count+1
@@ -128,11 +136,13 @@ b4.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b4.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b4, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b4.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b4, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b4.state.pos = [lengthOfBase/3.0,0,-lengthOfBase/3.0]
 O.bodies.append(b4)
 count=count+1
@@ -143,11 +153,13 @@ b5.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b5.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b5, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b5.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b5, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b5.state.pos = [0,0,-lengthOfBase/3.0]
 O.bodies.append(b5)
 count=count+1
@@ -158,11 +170,13 @@ b6.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b6.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b6, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b6.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b6, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b6.state.pos = [-lengthOfBase/3.0,0,-lengthOfBase/3.0]
 O.bodies.append(b6)
 count=count+1
@@ -173,11 +187,13 @@ b7.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b7.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b7, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b7.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b7, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b7.state.pos = [-lengthOfBase/3.0,0,0]
 O.bodies.append(b7)
 count=count+1
@@ -188,11 +204,13 @@ b8.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-b8.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(b8, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+b8.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.2*lengthOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[lengthOfBase/6.0-r,lengthOfBase/6.0-r,0.5*wallThickness-r,0.5*wallThickness-r,lengthOfBase/6.0-r,lengthOfBase/6.0-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabb=1.02*Vector3(lengthOfBase/6.0,0.4*wallThickness,lengthOfBase/6.0),maxAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),minAabbRotated=1.02*Vector3(lengthOfBase/6.0,0.5*wallThickness,lengthOfBase/6.0),fixedNormal=False)
+length=lengthOfBase/3.
+V=length*length*wallThickness
+geomInertX=(1./12.)*V*(length**2+wallThickness**2)
+geomInertY=(1./12.)*V*(length**2+length**2)
+geomInertZ=(1./12.)*V*(length**2+wallThickness**2)
+utils._commonBodySetup(b8, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 b8.state.pos = [lengthOfBase/3.0,0,0]
 O.bodies.append(b8)
 count=count+1
@@ -204,11 +222,13 @@ bA.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-bA.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*wallThickness-r,0.5*wallThickness-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*lengthOfBase-r,0.5*lengthOfBase-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),minAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(bA, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+bA.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*wallThickness-r,0.5*wallThickness-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*lengthOfBase-r,0.5*lengthOfBase-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),minAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),fixedNormal=False)
+#length=lengthOfBase
+V=lengthOfBase*heightOfBase*wallThickness
+geomInertX=(1./12.)*V*(heightOfBase**2  + lengthOfBase**2)
+geomInertY=(1./12.)*V*(wallThickness**2 + lengthOfBase**2)
+geomInertZ=(1./12.)*V*(wallThickness**2 + heightOfBase**2)
+utils._commonBodySetup(bA, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 bA.state.pos = [0.5*lengthOfBase,0.5*heightOfBase,0]
 O.bodies.append(bA)
 count=count+1
@@ -219,11 +239,13 @@ bB.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-bB.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*wallThickness-r,0.5*wallThickness-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*lengthOfBase-r,0.5*lengthOfBase-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),minAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(bB, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+bB.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*wallThickness-r,0.5*wallThickness-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*lengthOfBase-r,0.5*lengthOfBase-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabb=1.02*Vector3(0.4*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),maxAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),minAabbRotated=1.02*Vector3(0.5*wallThickness,0.5*heightOfBase,0.5*lengthOfBase),fixedNormal=False)
+#length=lengthOfBase
+V=lengthOfBase*heightOfBase*wallThickness
+geomInertX=(1./12.)*V*(heightOfBase**2  + lengthOfBase**2)
+geomInertY=(1./12.)*V*(wallThickness**2 + lengthOfBase**2)
+geomInertZ=(1./12.)*V*(wallThickness**2 + heightOfBase**2)
+utils._commonBodySetup(bB, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 bB.state.pos = [-0.5*lengthOfBase,0.5*heightOfBase,0]
 O.bodies.append(bB)
 count=count+1
@@ -234,11 +256,13 @@ bC.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-bC.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*lengthOfBase-r,0.5*lengthOfBase-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*wallThickness-r,0.5*wallThickness-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),minAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(bC, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+bC.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*lengthOfBase-r,0.5*lengthOfBase-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*wallThickness-r,0.5*wallThickness-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),minAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),fixedNormal=False)
+#length=lengthOfBase
+V=lengthOfBase*heightOfBase*wallThickness
+geomInertX=(1./12.)*V*(heightOfBase**2  + lengthOfBase**2)
+geomInertY=(1./12.)*V*(wallThickness**2 + lengthOfBase**2)
+geomInertZ=(1./12.)*V*(wallThickness**2 + heightOfBase**2)
+utils._commonBodySetup(bC, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 bC.state.pos = [0,0.5*heightOfBase,0.5*lengthOfBase]
 O.bodies.append(bC)
 count=count+1
@@ -249,11 +273,13 @@ bD.mask=3
 wire=False
 color=[0,0.5,1]
 highlight=False
-bD.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*lengthOfBase-r,0.5*lengthOfBase-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*wallThickness-r,0.5*wallThickness-r], id=count,isBoundary=True,isBoundaryPlane=[True,True,True,True,True,True],color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),minAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),fixedNormal=False)
-length=lengthOfBase
-V=lengthOfBase*lengthOfBase*wallThickness
-geomInert=(1./6.)*V*length*wallThickness
-utils._commonBodySetup(bD, V, Vector3(geomInert,geomInert,geomInert), material='frictionless', pos=[0,0,0], fixed=True)
+bD.shape=PotentialParticle(k=0.1, r=0.1*wallThickness, R=0.5*heightOfBase,a=[1,-1,0,0,0,0], b=[0,0,1,-1,0,0], c=[0,0,0,0,1,-1], d=[0.5*lengthOfBase-r,0.5*lengthOfBase-r,0.5*heightOfBase-r,0.5*heightOfBase-r,0.5*wallThickness-r,0.5*wallThickness-r], id=count,isBoundary=True,color=color,wire=wire,highlight=highlight,AabbMinMax=True, minAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabb=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.4*wallThickness),maxAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),minAabbRotated=1.02*Vector3(0.5*lengthOfBase,0.5*heightOfBase,0.5*wallThickness),fixedNormal=False)
+#length=lengthOfBase
+V=lengthOfBase*heightOfBase*wallThickness
+geomInertX=(1./12.)*V*(heightOfBase**2  + lengthOfBase**2)
+geomInertY=(1./12.)*V*(wallThickness**2 + lengthOfBase**2)
+geomInertZ=(1./12.)*V*(wallThickness**2 + heightOfBase**2)
+utils._commonBodySetup(bD, V, Vector3(geomInertX,geomInertY,geomInertZ), material='frictionless', pos=[0,0,0], fixed=True)
 bD.state.pos = [0,0.5*heightOfBase,-0.5*lengthOfBase]
 O.bodies.append(bD)
 
