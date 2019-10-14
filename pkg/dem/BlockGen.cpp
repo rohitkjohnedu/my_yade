@@ -545,7 +545,7 @@ bool BlockGen::generate(string& /*message*/)
 					Vector3r rotatedPersistence(1,0,0); //if(count == 6)
 //				} else {
 				if(count == 7) {
-					Vector3r rotatedPersistence(0,1,0); //if(count == 7)
+					rotatedPersistence(0,1,0); //if(count == 7)
 				}
 				Vector3r oriNormal(0,0,1); //normal vector of x-y plane
 				Vector3r crossProd = oriNormal.cross(planeNormal);
@@ -607,7 +607,7 @@ bool BlockGen::generate(string& /*message*/)
 					Vector3r rotatedPersistence(1,0,0); //if(count == 5)
 //				} else {
 				if(count == 6) {
-					Vector3r rotatedPersistence(0,1,0); //if(count == 6)
+					rotatedPersistence(0,1,0); //if(count == 6)
 				}
 				Vector3r oriNormal(0,0,1); //normal vector of x-y plane
 				Vector3r crossProd = oriNormal.cross(planeNormal);
