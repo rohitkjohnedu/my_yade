@@ -44,8 +44,8 @@ if ('PotentialBlocks' in features):
 	p.boundaries = True
 	p.slopeFace = False
 	p.twoDimension = False
-	p.unitWidth2D = 9.0
-	p.calJointLength = False
+#	p.unitWidth2D = 9.0
+#	p.calJointLength = False
 	p.intactRockDegradation = True
 	#p.useFaceProperties = False
 	p.neverErase = False # Must be used when tension is on
