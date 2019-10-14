@@ -81,6 +81,8 @@ p.outputFile="BlockGen_Output.txt" #if empty, the block generation data are not 
 p.load()
 O.engines[2].lawDispatcher.functors[0].initialOverlapDistance = p.initialOverlap - 1e-6
 O.engines[2].lawDispatcher.functors[0].allowBreakage = False
+O.engines[2].lawDispatcher.functors[0].allowViscousAttraction=True
+O.engines[2].lawDispatcher.functors[0].traceEnergy=False
 
 O.engines[2].physDispatcher.functors[0].kn_i = 2e9
 O.engines[2].physDispatcher.functors[0].ks_i = 0.1e9
@@ -208,8 +210,8 @@ def calTimeStep():
 	minMass = 1.0e15
 	for i in O.interactions:
 		if i.isReal==True:
-			dt1 = O.bodies[i.id1].state.mass/i.phys.Knormal_area
-			dt2 = O.bodies[i.id2].state.mass/i.phys.Knormal_area
+			dt1 = O.bodies[i.id1].state.mass/i.phys.kn
+			dt2 = O.bodies[i.id2].state.mass/i.phys.kn
 			if dt1 < dt2:
 				presentDt = 0.15*sqrt(dt1)
 				if minTimeStep > presentDt:
