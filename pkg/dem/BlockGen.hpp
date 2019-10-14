@@ -155,7 +155,7 @@ class BlockGen : public FileGenerator {
 		((Real, density,2600,,"Density of blocks"))
 		((Real, Kn,pow(10,9),,"Volumetric contact normal stiffness"))
 		((Real, Ks,pow(10,8),,"Volumetric contact shear stiffness"))
-		((Real, frictionDeg,30.0,,"Driction angle [°]"))
+		((Real, frictionDeg,30.0,,"Friction angle [°]"))
 		((Vector3r, globalOrigin,Vector3r::Zero(),,"Global origin (reference point) for the discontinuities to be imposed"))
 		((Real, inertiaFactor,1.0,,"Scaling of inertia")) //FIXME: This parameter is used, but we need to revise if it is actually useful
 		((Real, rForPP,0.1,,"r in Potential Particles"))
