@@ -111,7 +111,7 @@ CGT::TriaxialState& MicroMacroAnalyser::makeState(unsigned int state, const char
 	TS.grains.resize(Ng);
 	Ng = 0;
 	vector<Body::id_t> fictiousVtx;
-	for ( const auto bi : *bodies) {
+	for ( const auto & bi : *bodies) {
 		const Body::id_t Idg = bi->getId();
 		TS.grains[Idg].id = Idg;
 		if (!bi->isDynamic()) {

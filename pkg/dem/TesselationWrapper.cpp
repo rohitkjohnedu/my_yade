@@ -82,7 +82,7 @@ void build_triangulation_with_ids(const shared_ptr<BodyContainer>& bodies, Tesse
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();
 	Scene* scene = Omega::instance().getScene().get();
-	for ( const auto bi : *bodies) {
+	for ( const auto & bi : *bodies) {
 		if ( bi->shape->getClassIndex() ==  Sph_Index ) {
 			const Sphere* s = YADE_CAST<Sphere*> (bi->shape.get());
 //FIXME: is the scene periodicity verification useful in the next line ? Tesselation seems to work in both periodic and non-periodic conditions with "scene->cell->wrapShearedPt(bi->state->pos)". I keep the verification to be consistent with all other uses of "wrapShearedPt" function.
