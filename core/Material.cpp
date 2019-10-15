@@ -13,7 +13,7 @@ const shared_ptr<Material> Material::byId(int id, Scene* w_){
 
 const shared_ptr<Material> Material::byLabel(const std::string& label, Scene* w_){
 	Scene* w=w_?w_:Omega::instance().getScene().get();
-	FOREACH(const shared_ptr<Material>& m, w->materials){
+	for (const auto & m : w->materials){
 		if(m->label == label) return m;
 	}
 	throw std::runtime_error(("No material labeled `"+label+"'.").c_str());

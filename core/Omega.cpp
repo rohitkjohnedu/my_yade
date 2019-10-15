@@ -137,7 +137,7 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 	LOG_DEBUG("called with "<<dynlibsList.size()<<" plugins.");
 	boost::python::object wrapperScope=boost::python::import("yade.wrapper");
 	std::list<string> pythonables;
-	FOREACH(string name, dynlibsList){
+	for(const auto & name : dynlibsList){
 		shared_ptr<Factorable> f;
 		try {
 			LOG_DEBUG("Factoring plugin "<<name);
@@ -203,14 +203,14 @@ bool Omega::isInheritingFrom(const string& className, const string& baseClassNam
 
 bool Omega::isInheritingFrom_recursive(const string& className, const string& baseClassName){
 	if (dynlibs[className].baseClasses.find(baseClassName)!=dynlibs[className].baseClasses.end()) return true;
-	FOREACH(const string& parent,dynlibs[className].baseClasses){
+	for (const auto & parent : dynlibs[className].baseClasses){
 		if(isInheritingFrom_recursive(parent,baseClassName)) return true;
 	}
 	return false;
 }
 
 void Omega::loadPlugins(vector<string> pluginFiles){
-	FOREACH(const string& plugin, pluginFiles){
+	for (const auto & plugin : pluginFiles){
 		LOG_DEBUG("Loading plugin "<<plugin);
 		if(!ClassFactory::instance().load(plugin)){
 			string err=ClassFactory::instance().lastError();

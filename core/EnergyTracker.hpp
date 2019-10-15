@@ -40,12 +40,12 @@ class EnergyTracker: public Serializable{
 	void resetResettables(){ size_t sz=energies.size(); for(size_t id=0; id<sz; id++){ if(resetStep[id]) energies.reset(id); } }
 
 	Real total() const { Real ret=0; size_t sz=energies.size(); for(size_t id=0; id<sz; id++) ret+=energies.get(id); return ret; };
-	py::list keys_py() const { py::list ret; FOREACH(pairStringInt p, names) ret.append(p.first); return ret; };
-	py::list items_py() const { py::list ret; FOREACH(pairStringInt p, names) ret.append(py::make_tuple(p.first,energies.get(p.second))); return ret; };
+	py::list keys_py() const { py::list ret; for (const auto & p : names) ret.append(p.first); return ret; };
+	py::list items_py() const { py::list ret; for (const auto & p : names) ret.append(py::make_tuple(p.first,energies.get(p.second))); return ret; };
 	py::dict perThreadData() const {
 		py::dict ret;
 		std::vector<std::vector<Real> > dta=energies.getPerThreadData();
-		FOREACH(pairStringInt p,names) ret[p.first]=dta[p.second];
+		for (const auto & p :names) ret[p.first]=dta[p.second];
 		return ret;
   };
 

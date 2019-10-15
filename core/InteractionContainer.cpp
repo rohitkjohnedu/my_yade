@@ -61,7 +61,7 @@ bool InteractionContainer::insertInteractionMPI(shared_ptr<Interaction>& i){
 void InteractionContainer::clear(){
 	assert(bodies);
 	boost::mutex::scoped_lock lock(drawloopmutex);
-	FOREACH(const shared_ptr<Body>& b, *bodies) {
+	for (const auto & b : *bodies) {
 		if (b) b->intrs.clear();
 	}
 	linIntrs.clear();
@@ -141,7 +141,7 @@ void InteractionContainer::requestErase(Interaction* I){
 }
 
 void InteractionContainer::eraseNonReal(){
-	FOREACH(const shared_ptr<Interaction>& i, *this) if(!i->isReal()) this->erase(i->getId1(),i->getId2(),i->linIx);
+	for(const auto & i : *this) if(!i->isReal()) this->erase(i->getId1(),i->getId2(),i->linIx);
 }
 
 // compare interaction based on their first id
@@ -171,7 +171,7 @@ void InteractionContainer::preLoad(InteractionContainer&){ interaction.clear(); 
 void InteractionContainer::postLoad__calledFromScene(const shared_ptr<BodyContainer>& bb){
 	bodies=&bb->body;
 	clear();
-	FOREACH(const shared_ptr<Interaction>& I, interaction){
+	for(const auto & I : interaction){
 		Body::id_t id1=I->getId1(), id2=I->getId2();
 		if (!(*bodies)[id1] || !(*bodies)[id2]) {
 			return;

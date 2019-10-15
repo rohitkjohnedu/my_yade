@@ -38,13 +38,13 @@ Because we need literal functor and class names for registration in python, we p
 
 #define _YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(Dim,DispatcherT,FunctorT,doc,attrs,ctor,py) \
 	typedef FunctorT FunctorType; \
-	void updateScenePtr(){ FOREACH(shared_ptr<FunctorT> f, functors){ f->scene=scene; }} \
-	void postLoad(DispatcherT&){ clearMatrix(); FOREACH(shared_ptr<FunctorT> f, functors) add(YADE_PTR_CAST<FunctorT>(f)); } \
+	void updateScenePtr(){ for(auto & f : functors){ f->scene=scene; }} \
+	void postLoad(DispatcherT&){ clearMatrix(); for (auto & f : functors) add(YADE_PTR_CAST<FunctorT>(f)); } \
 	virtual void add(FunctorT* f){ add(shared_ptr<FunctorT>(f)); } \
-	virtual void add(shared_ptr<FunctorT> f){ bool dupe=false; string fn=f->getClassName(); FOREACH(const shared_ptr<FunctorT>& fScan, functors) { if(fn==fScan->getClassName()) dupe=true; } if(!dupe) functors.push_back(f); addFunctor(f); } \
+	virtual void add(shared_ptr<FunctorT> f){ bool dupe=false; string fn=f->getClassName(); for (const auto & fScan : functors) { if(fn==fScan->getClassName()) dupe=true; } if(!dupe) functors.push_back(f); addFunctor(f); } \
 	BOOST_PP_CAT(_YADE_DISPATCHER,BOOST_PP_CAT(Dim,D_FUNCTOR_ADD))(FunctorT,f) \
-	boost::python::list functors_get(void) const { boost::python::list ret; FOREACH(const shared_ptr<FunctorT>& f, functors){ ret.append(f); } return ret; } \
-	void functors_set(const vector<shared_ptr<FunctorT> >& ff){ functors.clear(); FOREACH(const shared_ptr<FunctorT>& f, ff) add(f); postLoad(*this); } \
+	boost::python::list functors_get(void) const { boost::python::list ret; for (const auto & f : functors){ ret.append(f); } return ret; } \
+	void functors_set(const vector<shared_ptr<FunctorT> >& ff){ functors.clear(); for (const auto & f : ff) add(f); postLoad(*this); } \
 	void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& /*d*/){ if(boost::python::len(t)==0)return; if(boost::python::len(t)!=1) throw invalid_argument("Exactly one list of " BOOST_PP_STRINGIZE(FunctorT) " must be given."); typedef std::vector<shared_ptr<FunctorT> > vecF; vecF vf=boost::python::extract<vecF>(t[0])(); functors_set(vf); t=boost::python::tuple(); } \
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(DispatcherT,Dispatcher,"Dispatcher calling :yref:`functors<" BOOST_PP_STRINGIZE(FunctorT) ">` based on received argument type(s).\n\n" doc, \
 		((vector<shared_ptr<FunctorT> >,functors,,,"Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs, \
@@ -66,8 +66,7 @@ template<class topIndexable>
 std::string Dispatcher_indexToClassName(int idx){
   boost::scoped_ptr<topIndexable> top(new topIndexable);
 	std::string topName=top->getClassName();
-	typedef std::pair<string,DynlibDescriptor> classItemType;
-	FOREACH(classItemType clss, Omega::instance().getDynlibsDescriptor()){
+	for (auto clss : Omega::instance().getDynlibsDescriptor()){
 		if(Omega::instance().isInheritingFrom_recursive(clss.first,topName) || clss.first==topName){
 			// create instance, to ask for index
 			shared_ptr<topIndexable> inst=YADE_PTR_DYN_CAST<topIndexable>(ClassFactory::instance().createShared(clss.first));
@@ -123,7 +122,7 @@ class Dispatcher1D : public Dispatcher,
 		shared_ptr<FunctorType> getFunctor(shared_ptr<baseClass> arg){ return dispatcherBase::getExecutor(arg); }
     boost::python::dict dump(bool convertIndicesToNames){
       boost::python::dict ret;
-			FOREACH(const DynLibDispatcher_Item1D& item, dispatcherBase::dataDispatchMatrix1D()){
+			for (const auto & item : dispatcherBase::dataDispatchMatrix1D()){
 				if(convertIndicesToNames){
 					string arg1=Dispatcher_indexToClassName<argType1>(item.ix1);
 					ret[boost::python::make_tuple(arg1)]=item.functorName;
@@ -173,7 +172,7 @@ class Dispatcher2D : public Dispatcher,
 		
 		boost::python::dict dump (bool convertIndicesToNames) {
 			boost::python::dict ret;
-			FOREACH(const DynLibDispatcher_Item2D& item, dispatcherBase::dataDispatchMatrix2D()){
+			for (const auto & item : dispatcherBase::dataDispatchMatrix2D()){
 				if(convertIndicesToNames){
 					string arg1=Dispatcher_indexToClassName<argType1>(item.ix1), arg2=Dispatcher_indexToClassName<argType2>(item.ix2);
 					ret[boost::python::make_tuple(arg1,arg2)]=item.functorName;

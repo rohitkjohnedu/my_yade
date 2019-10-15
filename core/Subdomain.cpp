@@ -32,7 +32,7 @@ void Subdomain::setMinMax()
 	boundsMin=Vector3r(inf,inf,inf); boundsMax=Vector3r(-inf,-inf,-inf);
 	if (ids.size()==0) LOG_WARN("empty subdomain!");
 	if (ids.size()>0 and Body::byId(ids[0],scene)->subdomain != scene->subdomain) LOG_WARN("setMinMax executed with deprecated data (body->subdomain != scene->subdomain)");
-	FOREACH(const Body::id_t& id, ids){
+	for (const auto & id : ids){
 		const shared_ptr<Body>& b = Body::byId(id,scene);
 		if(!b or !b->bound) continue;
 		boundsMax=boundsMax.cwiseMax(b->bound->max);
@@ -67,7 +67,7 @@ void Subdomain::mIntrs_set(const boost::python::list& source){
 
 boost::python::list Subdomain::intrs_get(){
 	boost::python::list ret;
-	FOREACH(vector<Body::id_t >& grp, intersections){
+	for (const auto & grp : intersections){
 		ret.append(boost::python::list(grp));
 	}
 	return ret;
@@ -75,7 +75,7 @@ boost::python::list Subdomain::intrs_get(){
 
 boost::python::list Subdomain::mIntrs_get(){
 	boost::python::list ret;
-	FOREACH(vector<Body::id_t >& grp, mirrorIntersections){
+	for (const auto & grp : mirrorIntersections){
 		ret.append(boost::python::list(grp));
 	}
 	return ret;
