@@ -13,21 +13,21 @@ FUNCTION(FIND_PYTHON_MODULE module)
   #Reset result value as this function can be called multiple times while testing different python versions:
   UNSET(PY_${module} CACHE)
   STRING(TOUPPER ${module} module_upper)
-  
+
   IF(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
     SET(${module}_FIND_REQUIRED TRUE)
   ENDIF(ARGC GREATER 1 AND ARGV1 STREQUAL "REQUIRED")
-  
+
   EXECUTE_PROCESS(COMMAND "${PYTHON_EXECUTABLE}" "-c" 
     "from __future__ import print_function ; import re, ${module} ; print (re.compile('/__init__.py.*').sub('',${module}.__file__))" #NOTE: from __future__ imports MUST be at the beginning of command.
     RESULT_VARIABLE _${module}_status 
     OUTPUT_VARIABLE _${module}_location
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    
+
     IF(_${module}_status MATCHES 0)
       SET(PY_${module} ${_${module}_location} CACHE STRING "Location of Python module ${module}")
     ENDIF(_${module}_status MATCHES 0)
-    
+
   FIND_PACKAGE_HANDLE_STANDARD_ARGS(${module} DEFAULT_MSG PY_${module})
   #We are in a function, make the result available in the parent scope which is the main CMakeLists.txt:
   IF(${module}_FOUND)
@@ -58,9 +58,9 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	# Next loop is due to libboost-pythonXXX naming mismatch between ubuntu versions and debian versions, so try three possibilities that cover all distros.
 	FOREACH(PYTHON_PREFIX python python-py python${PYTHON_VERSION_MAJOR}-py) #boost>1.67 should pick-up the first one.
 		IF(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time log)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} filesystem iostreams regex serialization system date_time log)
 		ELSE(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} thread filesystem iostreams regex serialization system date_time)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS ${PYTHON_PREFIX}${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
 		IF(Boost_FOUND)
 			# for some reason boost_python37 is found but not linked with boost 1.71, we add it here (is it a specific issue within NIX?)
@@ -72,28 +72,28 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 			BREAK()
 		ENDIF()
 	ENDFOREACH()
-	
+
 	IF(NOT Boost_FOUND) # for opensuze
 		IF(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time log)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} filesystem iostreams regex serialization system date_time log)
 		ELSE(ENABLE_LOGGER)
-			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} thread filesystem iostreams regex serialization system date_time)
+			FIND_PACKAGE(Boost ${LocalBoost}  QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR} filesystem iostreams regex serialization system date_time)
 		ENDIF(ENABLE_LOGGER)
 	ENDIF()
-	
+
 	IF(NOT Boost_FOUND) #as we try multiple python prefixes we have to handle manually the required behavior: fail if we didn't found boost
 		MESSAGE(${fail_message} libboost-python)
 		RETURN()
 	ENDIF()
 	# END find Boost for py_version
-	
+
 	# find Python modules. WARNING: each FindXXX.cmake MUST unset XXX_FOUND or set XXX_FOUND to FALSE [PARENT_SCOPE] if the module was not found.
 	FIND_PACKAGE(NumPy QUIET)
 	IF(NOT NUMPY_FOUND)
 		MESSAGE(${fail_message} numpy)
 		RETURN()
 	ENDIF(NOT NUMPY_FOUND)
-	
+
 	FOREACH(PYTHON_MODULE IPython matplotlib pygraphviz Xlib minieigen future past)
 		FIND_PYTHON_MODULE(${PYTHON_MODULE} QUIET)
 		IF( NOT ${PYTHON_MODULE}_FOUND )
@@ -114,7 +114,7 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 			RETURN()
 		ENDIF()
 	ENDIF()
-	
+
 	# NOTE: If we are here, we found a suitable Python version with all packages needed.
 	SET(ALL_PYTHON_DEPENDENCIES_FOUND TRUE PARENT_SCOPE)
 	#Export findpythonlibs vars to global parent scope:
@@ -136,7 +136,7 @@ FUNCTION(FIND_PYTHON_PACKAGES)
 	MESSAGE("--   Boost_LIBRARIES: " ${Boost_LIBRARIES})
 	# FIXME - this soon will be wrong when boost::multiprecision and float128 support is added
 	ADD_DEFINITIONS(-DBOOST_MATH_DISABLE_FLOAT128=1)
-	
+
 ENDFUNCTION(FIND_PYTHON_PACKAGES)
 
 # Did findpythoninterp found the python version we want ? Output in PYTHON_VERSION_MATCH.
@@ -144,12 +144,12 @@ FUNCTION(PYTHON_VERSION_MATCHES version_number)
 	SET(PYTHON_VERSION_MATCH FALSE PARENT_SCOPE)
 	STRING(REGEX MATCHALL "[^\\.]" numbers_list ${version_number})
 	list(LENGTH numbers_list numbers_list_len)
-	
+
 	LIST(GET numbers_list 0 major)
 	IF(NOT (${PYTHON_VERSION_MAJOR} EQUAL ${major}))
 		RETURN()
 	ENDIF()
-	
+
 	IF(${numbers_list_len} GREATER 1)
 		LIST(GET numbers_list 1 minor)
 		IF(NOT(${PYTHON_VERSION_MINOR} EQUAL ${minor}))

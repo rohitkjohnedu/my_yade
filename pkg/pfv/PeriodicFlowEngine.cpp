@@ -180,7 +180,7 @@ void PeriodicFlowEngine:: action()
         ///End Compute flow and forces
 	timingDeltas->checkpoint("Applying Forces");
 	if (multithread && !first) {
-		while (updateTriangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 	boost::this_thread::sleep(boost::posix_time::microseconds(1000));}
+		while (updateTriangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/ 	std::this_thread::sleep_for(std::chrono::microseconds(1000));}
 		if (updateTriangulation || (meshUpdateInterval>0 && ellapsedIter>(0.5*meshUpdateInterval))) {
 			if (useSolver==0) LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (fluidBulkModulus>0 || doInterpolate) solver->interpolate (solver->T[solver->currentTes], backgroundSolver->T[backgroundSolver->currentTes]);
@@ -195,7 +195,7 @@ void PeriodicFlowEngine:: action()
 			retriangulationLastIter=ellapsedIter;
 			ellapsedIter=0;
 			epsVolCumulative=0;
-			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
+			std::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			initializeVolumes(*solver);
 			computeViscousForces(*solver);
