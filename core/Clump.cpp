@@ -13,7 +13,7 @@ CREATE_LOGGER(Clump);
 
 boost::python::dict Clump::members_get(){
   boost::python::dict ret;
-	FOREACH(MemberMap::value_type& b, members){
+	for(const auto & b : members){
 		ret[b.first]=boost::python::make_tuple(b.second.position,b.second.orientation);
 	}
 	return ret;
@@ -26,7 +26,7 @@ void Clump::add(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 	if(subBody->isClumpMember()) throw std::invalid_argument(("Body #"+boost::lexical_cast<string>(subId)+" is already a clump member of #"+boost::lexical_cast<string>(subBody->clumpId)).c_str());
 	else if(subBody->isClump()){
 		const shared_ptr<Clump> subClump=YADE_PTR_CAST<Clump>(subBody->shape);
-		FOREACH(const MemberMap::value_type& mm, subClump->members){
+		for (const auto & mm : subClump->members){
 			const Body::id_t& memberId=mm.first;
 			Scene* scene(Omega::instance().getScene().get());	// get scene
 			const shared_ptr<Body>& member=Body::byId(memberId,scene);
@@ -55,7 +55,7 @@ void Clump::del(const shared_ptr<Body>& clumpBody, const shared_ptr<Body>& subBo
 }
 
 void Clump::addForceTorqueFromMembers(const State* clumpState, Scene* scene, Vector3r& F, Vector3r& T){
-	FOREACH(const MemberMap::value_type& mm, members){
+	for (const auto & mm : members){
 		const Body::id_t& memberId=mm.first; 
 		const shared_ptr<Body>& member=Body::byId(memberId,scene); 
 		assert(member->isClumpMember()); 
@@ -116,9 +116,9 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	shared_ptr<Sphere> sph (new Sphere);
 	int Sph_Index = sph->getClassIndexStatic();		// get sphere index for checking if bodies are spheres
 	if (discretization>0){
-		FOREACH(MemberMap::value_type& mm, clump->members){
+		for (const auto & mm : clump->members){
 			const shared_ptr<Body> subBody1=Body::byId(mm.first);
-			FOREACH(MemberMap::value_type& mmm, clump->members){
+			for (const auto & mmm : clump->members){
 				const shared_ptr<Body> subBody2=Body::byId(mmm.first);
 				if ((subBody1->shape->getClassIndex() ==  Sph_Index) && (subBody2->shape->getClassIndex() ==  Sph_Index) && (subBody1!=subBody2)){//clump members should be spheres
 					Vector3r dist = subBody1->state->pos - subBody2->state->pos;
@@ -148,7 +148,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	if(intersecting){	
 		//get boundaries of clump:
 		AlignedBox3r aabb;
-		FOREACH(MemberMap::value_type& mm, clump->members){
+		for ( const  auto & mm : clump->members){
 			const shared_ptr<Body> subBody = Body::byId(mm.first);
 			if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
 				const Sphere* sphere = YADE_CAST<Sphere*> (subBody->shape.get());
@@ -167,7 +167,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 		for(x.x()=aabb.min().x()+dx/2.; x.x()<aabb.max().x(); x.x()+=dx){
 			for(x.y()=aabb.min().y()+dx/2.; x.y()<aabb.max().y(); x.y()+=dx){
 				for(x.z()=aabb.min().z()+dx/2.; x.z()<aabb.max().z(); x.z()+=dx){
-					FOREACH(MemberMap::value_type& mm, clump->members){
+					for ( const  auto & mm : clump->members){
 						const shared_ptr<Body> subBody = Body::byId(mm.first);
 						if (subBody->shape->getClassIndex() == Sph_Index){//clump member should be a sphere
 							dens = subBody->material->density;
@@ -186,7 +186,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 			}
 		}
 	} else {//not intersecting
-		FOREACH(MemberMap::value_type& mm, clump->members){
+		for ( const  auto & mm : clump->members){
 			// mm.first is Body::id_t, mm.second is Se3r of that body
 			const shared_ptr<Body> subBody=Body::byId(mm.first);
 			dens = subBody->material->density;
@@ -231,7 +231,7 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 	clumpBody->setAspherical(state->inertia[0]!=state->inertia[1] || state->inertia[0]!=state->inertia[2]);
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
-	FOREACH(MemberMap::value_type& I, clump->members){
+	for (auto & I : clump->members){
 		shared_ptr<Body> subBody=Body::byId(I.first);
 		State* subState=subBody->state.get();
 		I.second.orientation=state->ori.conjugate()*subState->ori;
@@ -283,7 +283,7 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 
 	// begin non-intersecting loop here
 	if(!intersecting){
-		FOREACH(MemberMap::value_type& I, clump->members){
+		for (const auto & I : clump->members){
 			// I.first is Body::id_t, I.second is Se3r of that body
 			shared_ptr<Body> subBody=Body::byId(I.first,rb);
 			State* subState=subBody->state.get();
@@ -335,7 +335,7 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 	clumpBody->setAspherical(state->inertia[0]!=state->inertia[1] || state->inertia[0]!=state->inertia[2]);
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
-	FOREACH(MemberMap::value_type& I, clump->members){
+	for (auto & I : clump->members){
 		// now, I->first is Body::id_t, I->second is Se3r of that body
 		shared_ptr<Body> subBody=Body::byId(I.first,rb);
 		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));
@@ -387,7 +387,7 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 
 	// begin non-intersecting loop here
 	if(!intersecting){
-		FOREACH(MemberMap::value_type& I, clump->members){
+		for (const auto & I : clump->members){
 			// I.first is Body::id_t, I.second is Se3r of that body
 			shared_ptr<Body> subBody=Body::byId(I.first);
 			State* subState=subBody->state.get();
@@ -439,7 +439,7 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 	clumpBody->setAspherical(state->inertia[0]!=state->inertia[1] || state->inertia[0]!=state->inertia[2]);
 
 	// update subBodySe3s; subtract clump orientation (=apply its inverse first) to subBody's orientation
-	FOREACH(MemberMap::value_type& I, clump->members){
+	for (auto & I : clump->members){
 		// now, I->first is Body::id_t, I->second is Se3r of that body
 		shared_ptr<Body> subBody=Body::byId(I.first);
 		//const shared_ptr<RigidBodyParameters>& subRBP(YADE_PTR_CAST<RigidBodyParameters>(subBody->physicalParameters));

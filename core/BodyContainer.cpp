@@ -104,7 +104,7 @@ void BodyContainer::updateShortLists(){
 	subdomainBodies.reserve((long unsigned)(size2*1.3));
 	const int& subdomain = Omega::instance().getScene()->subdomain;
 	#endif
-	FOREACH(const shared_ptr<Body>& b, *(Omega::instance().getScene()->bodies)){
+	for(const auto & b : *(Omega::instance().getScene()->bodies)){
 		if (not b) continue;
 		realBodies.push_back(b->getId());
 	#ifdef YADE_MPI

@@ -68,7 +68,7 @@ class Clump: public Shape {
 		static void moveMembers(const shared_ptr<Body>& clumpBody, Scene* scene, IntegratorT* integrator=NULL){
 			const shared_ptr<Clump>& clump=YADE_PTR_CAST<Clump>(clumpBody->shape);
 			const shared_ptr<State>& clumpState=clumpBody->state;
-			FOREACH(MemberMap::value_type& B, clump->members){
+			for (const auto & B : clump->members){
 				// B.first is Body::id_t, B.second is local Se3r of that body in the clump
 				const shared_ptr<Body>& b = Body::byId(B.first,scene);
 				const shared_ptr<State>& subState=b->state; const Vector3r& subPos(B.second.position); const Quaternionr& subOri(B.second.orientation);
