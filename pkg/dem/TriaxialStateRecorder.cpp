@@ -47,7 +47,7 @@ void TriaxialStateRecorder::action ()
 	Real Vs=0;
 	Real V = ( triaxialStressController->height ) * ( triaxialStressController->width ) * ( triaxialStressController->depth );
 	
-	for ( const auto b : *scene->bodies) {
+	for (const auto & b : *scene->bodies) {
 		if(!(b) || b->isClump()) continue;
 		if ( b->isDynamic() ){
 			//Sorry, the next string was commented, because it gave a Warning "unused variable v". Anton Gladky

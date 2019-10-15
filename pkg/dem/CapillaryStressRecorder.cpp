@@ -110,8 +110,7 @@ void CapillaryStressRecorder::action()
 	/// Solid volume
 	Real Vs = 0, Rbody = 0, SR = 0;
 
-	for ( const auto b : *bodies) {
-	  
+	for (const auto & b : *bodies) {
 	  if (b->shape->getClassIndex()!=Sphere::getClassIndexStatic()) continue;
 	  Sphere* sphere = static_cast<Sphere*>(b->shape.get());
 

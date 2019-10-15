@@ -129,7 +129,7 @@ void TriaxialStressController::action()
 	if ( (first) || (updatePorosity) ) {
 
 		particlesVolume = 0;
-		for ( const auto b : *scene->bodies) {
+		for (const auto & b : *scene->bodies) {
 			if (b->isClump()) {
 				const shared_ptr<Clump>& clump = YADE_PTR_CAST<Clump>(b->shape);
 				const shared_ptr<Body>& member = Body::byId(clump->members.begin()->first,scene);

@@ -128,7 +128,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 	shared_ptr<BodyContainer>& bodies = ncb->bodies;
 	newDt = Mathr::MAX_REAL;
 	computedSomething=false;
-	for ( const auto b : *bodies) {
+	for (const auto &b : *bodies) {
 		if (b->isDynamic() && !b->isClumpMember()) findTimeStepFromBody(b, ncb);
 	}
 	if(densityScaling) (newDt=targetDt);

@@ -564,7 +564,7 @@ bool BodiesMenisciiList::prepare(Scene * scene, bool hertzOn)
 
 	Body::id_t MaxId = -1;
 	
-	for ( const auto b : *bodies)
+	for (const auto &b : *bodies)
 	{
 		MaxId=max(MaxId, b->getId());
 	}

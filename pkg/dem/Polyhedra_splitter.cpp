@@ -96,7 +96,7 @@ void PolyhedraSplitter::action()
 	vector<Matrix3r> bStresses (scene->bodies->size(), Matrix3r::Zero());
 	getStressForEachBody(bStresses);
 
-	for(const auto b : *(rb->bodies)) {
+	for(const auto & b : *(rb->bodies)) {
 		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		shared_ptr<PolyhedraMat> m=YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
@@ -237,7 +237,7 @@ void SplitPolyMohrCoulomb::action() {
 
 	fileS.open (fileName, ios::out | ios::app);
 
-	for(const auto b : *(scene->bodies)) {
+	for(const auto & b : *(scene->bodies)) {
 		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		shared_ptr<PolyhedraMat> m=YADE_PTR_DYN_CAST<PolyhedraMat>(b->material);
