@@ -96,10 +96,11 @@ void BodyContainer::updateShortLists(){
 		return;}
 	if (not dirty) return; //already ok
 	unsigned long size1=realBodies.size();
-	unsigned long size2=subdomainBodies.size();
 	realBodies.clear();
+	realBodies.reserve((long unsigned)(size1*1.3));	
+	#ifdef YADE_MPI
+	unsigned long size2=subdomainBodies.size();
 	subdomainBodies.clear();
-	realBodies.reserve((long unsigned)(size1*1.3));
 	subdomainBodies.reserve((long unsigned)(size2*1.3));
 	const int& subdomain = Omega::instance().getScene()->subdomain;
 	#endif
