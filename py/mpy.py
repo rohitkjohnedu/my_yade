@@ -66,6 +66,7 @@ ENABLE_PFACETS = False    #PFacets need special (and expensive) tricks, if PFace
 DISTRIBUTED_INSERT = False  #if True each worker is supposed to "O.bodies.insertAtId" its own bodies
 REALLOCATE_FREQUENCY = 0  # if >0 checkAndCollide() will automatically reallocate bodies to subdomains, if =1 realloc. happens each time collider is triggered, if >1 it happens every N trigger
 REALLOCATE_FILTER = None # pointer to filtering function, will be set to 'medianFilter' hereafter, could point to other ones if implemented
+AUTO_COLOR = True
 
 #tags for mpi messages
 _SCENE_=11
@@ -79,6 +80,7 @@ _BOUNDS_ = 18
 _MASTER_COMMAND_ = 19
 _RETURN_VALUE_ = 20
 _ASSIGNED_IDS_ = 21
+_GET_CONNEXION_= 22
 
 #local vars
 _REALLOC_COUNT=0
@@ -86,18 +88,11 @@ _REALLOC_COUNT=0
 #for coloring processes outputs differently
 bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033[95m','\033[93m','\033[91m','\033[1m','\033[4m','\033[0m']
 
-#def mprint(m): #this one will print regardless of VERBOSE_OUTPUT
-	#if 1:
-		#if rank>0:
-			#print (bcolors.WARNING if rank==1 else bcolors.OKBLUE) +"worker"+str(rank)+": "+m+bcolors.ENDC
-		#else: print bcolors.HEADER+"master:" +m+bcolors.ENDC
-
-##for coloring processes outputs differently
-#red = [255]*256 + range(255,-1,-1) + [0]*256*2 + range(0,256) + [255]*256
-#green = red[256*2:] + red[0:256*2]
-#blue = green[256*2:] + green[0:256*2]
-#rank_color_id = int(len(red)/numThreads*rank)
-#rank_color = [str(red[rank_color_id]),str(green[rank_color_id]),str(blue[rank_color_id])]
+def colorDomains():
+	import colorsys
+	colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
+	for b in O.bodies:
+		b.shape.color=colorScale[b.subdomain]
 
 def mprint(*args): #this one will print regardless of VERBOSE_OUTPUT
 	if NO_OUTPUT or rank>MAX_RANK_OUTPUT: return
@@ -200,7 +195,7 @@ def sendCommand(executors,command,wait=True):
 	resCommand=[]
 	for w in executors:
 		if (w>0): O.subD.comm.isend(commandSent,dest=w,tag=_MASTER_COMMAND_)
-	if toMaster: resCommand = [exec(command)]+resCommand
+	if toMaster: resCommand = [eval(command)]+resCommand
 	
 	if wait:
 		resCommand=resCommand+ [O.subD.comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors if w>0]
@@ -615,7 +610,8 @@ def mergeScene():
 			# turn mpi engines off
 			sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = collisionChecker.dead = True
 			O.splitted=False
-			collider.doSort = True
+			collider.doSort = True			
+			if (AUTO_COLOR): colorDomains()
 
 def splitScene(): 
 
@@ -776,62 +772,7 @@ def parallelCollide():
 	collider.__call__() #see [1]
 	unboundRemoteBodies() #in splitted stage we exploit bounds to detect bodies which are no longer part of intersections (they will be left with no bounds after what follows)
 	updateAllIntersections()  #triggers communications
-	#subD.intersections=genLocalIntersections(subD.subdomains)
-	##update mirror intersections so we know message sizes in advance
-	#subD.mirrorIntersections=[[] for n in range(numThreads)]
-	#if rank==0:#master domain
-		#for worker in range(1,numThreads):#FIXME: we actually don't need so much data since at this stage the states are unchanged and the list is used to re-bound intersecting bodies, this is only done in the initialization phase, though
-			##wprint("sending mirror intersections to "+str(worker)+" ("+str(len(subD.intersections[worker]))+" bodies), "+str(subD.intersections[worker]))
-			#m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
-			#timing_comm.send("sendIntersections",m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
-	#else:
-		## from master
-		#b_ids=comm.recv(source=0, tag=_MIRROR_INTERSECTIONS_)
-		#wprint("Received mirrors from master: ",b_ids)
-		##FIXME: we are assuming that Body::id_t is 4 bytes here, not that portable...
-		#numInts0= int(len(b_ids)/4) if SEND_BYTEARRAYS else len(b_ids)  #ints = 4 bytes
-		
-		#if numInts0>0:
-			#if SEND_BYTEARRAYS:
-				#O.bufferFromIntrsct(subD,0,numInts0,True)[:]=b_ids
-				#b_ids=np.frombuffer(b_ids,dtype=np.int32)
-			#else:
-				#subD.mirrorIntersections= [b_ids]+subD.mirrorIntersections[1:]
-
-			#reboundRemoteBodies(b_ids)
-			## since interaction with 0-bodies couldn't be detected before, mirror intersections from master will
-			## tell if we need to wait messages from master (and this is declared via intersections) 
-			#if not 0 in subD.intersections[rank]:
-				#temp=subD.intersections[rank]
-				#temp+=[0]
-				#subD.intersections=subD.intersections[:rank]+[temp]+subD.intersections[rank+1:]
-			#else:
-				#if not O.splittedOnce: mprint("0 already in intersections (should not happen)")
-		#reqs=[]
-		
-		##from workers
-		#for worker in subD.intersections[rank]:
-			#if worker==0: continue #already received above
-			##wprint("subD.intersections["+str(rank)+"]: "+str(subD.intersections[rank]))
-			##buf = bytearray(1<<22) #CRITICAL
-			#reqs.append([worker,comm.irecv(None, worker, tag=_MIRROR_INTERSECTIONS_)])
-
-		#for worker in subD.intersections[rank]:
-			#if worker==0: continue #we do not send positions to master, only forces
-			##wprint("sending "+str(len(subD.intersections[worker]))+" states to "+str(worker))
-			#wprint("Send mirrors to: ", worker)
-			#m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
-			#timing_comm.send("splitScene_intersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
-		#for req in reqs:
-			#intrs=req[1].wait()
-			#wprint("Received mirrors from: ", req[0], " : ",np.frombuffer(intrs,dtype=np.int32))
-			#if SEND_BYTEARRAYS:
-				#O.bufferFromIntrsct(subD,req[0],int(len(intrs)/4),True)[:]=intrs
-				#intrs=np.frombuffer(intrs,dtype=np.int32)
-			#else:
-				#subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
-			##reboundRemoteBodies(intrs)
-			
+	
 	if rank!=0:
 		for l in subD.mirrorIntersections:
 			if len(l)>0:
@@ -922,6 +863,8 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
         withMerge : bool
             wether subdomains should be merged into master at the end of the run (default False). If True the scene in the master process is exactly in the same state as after O.run(nSteps,True). The merge can be time consumming, it is recommended to activate only if post-processing or other similar tasks require it.
 	'''
+	
+	# Detect evironment (interactive or not, initialized or not...)
 	stack=inspect.stack()
 	global userScriptInCheckList
 	if len(stack[3][1])>12 and stack[3][1][-12:]=="checkList.py":
@@ -934,6 +877,8 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		for w in range(1,numThreads):
 			comm.send("yade.mpy.mpirun(nSteps="+str(nSteps)+",withMerge="+str(withMerge)+")",dest=w,tag=_MASTER_COMMAND_)
 			wprint("Command sent to ",w)
+			
+	# split if needed
 	initStep = O.iter
 	if not O.splitted:
 		wprint("splitting")
@@ -941,8 +886,10 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		wprint("splitted")
 	if YADE_TIMING:
 		O.timingEnabled=True
+		
+	# run iterations
 	if not (MERGE_SPLIT):
-		O.run(nSteps,True) #a pyrunner will pause, or trigger collider and continue, depending on WITH_BODY_COPY flag
+		O.run(nSteps,True) 
 		if withMerge: mergeScene() #will be useful to see evolution in QGLViewer, for instance
 	else: #merge/split or body_copy for each collider update
 		collisionChecker.dead=True
@@ -953,6 +900,7 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 				splitScene()
 		mergeScene()
 	
+	# report performance
 	if YADE_TIMING and rank<=MAX_RANK_OUTPUT:
 		timing_comm.print_all()
 		from yade import timing
@@ -960,8 +908,77 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		mprint( "#####  Worker "+str(rank)+"  ######")
 		timing.stats() #specific numbers for -n4 and gabion.py
 
+#######################################
+#######  Bodies re-allocation  ########
+#######################################
 
-#######  Bodies re-allocation
+def runOnSynchronouslPairs(workers,command):
+	'''
+	Locally (from one worker POV), this function runs mpi tasks defined by 'command' on the list of other workers (typically the list of interacting subdomains)
+	Globaly, it establish peer-to-peer connexions so that 'command' is executed symmetrically and simultaneously on both sides of each worker pair.
+	
+	In many cases a similar series of data exchanges can be obtained more simply (and fastly) with asynchronous irecv+send like below.
+
+	for w in workers:
+		m=comm.irecv(w)
+		comm.send(data,dest=w)
+	
+	However, it only works if the messages are all known in advance locally, before any communication. If the interaction with workers[1] depends on the result of a previous interaction with workers[0] OTOH, it needs synchronous execution. Synchronicity is also required if more than one blocking call is present in 'command', else an obvious deadlock as if 'irecv' was replaced by 'recv' in that naive loop.
+	Both cases occur with the 'medianFilter' algorithm, hence why we need this synchronous method.
+	
+	In this function pair connexions are established by the workers in a non-supervized and non-deterministic manner. Each time an interactive communication (i,j) is established 'command' is executed simultaneously by i and j. It is guaranted that all possible pairs are visited.
+	
+	The function can be used for all-to-all operations (N^2 pairs), but more interestingly it works with workers=intersections[rank] (O(N) pairs). It can be tested with with the dummy funtion 'pairOp': runOnSynchronouslPairs(range(numThreads),pairOp)
+	
+	command:
+		a function taking index of another worker as argument, can include blocking communications with the other worker since runOnSynchronouslPairs guarantee that the other worker will be running the command symmetrically. 
+	'''
+	global t1
+	t1=time.time()
+	workersTemp = list(workers) #we will remove elements from this copy as we proceed
+	if rank in workersTemp: workersTemp.remove(rank) #don't talk to yourself
+	#skip master (master is useless typically if we are reallocating bodies, we skip it here although the function would work with master to)
+	if True:
+		if 0 in workersTemp: workersTemp.remove(0) #don't talk to master
+		if rank==0: return #don't talk if you are master
+	s=MPI.Status();
+	sentTo=-1  #last worker to which connexion request was sent
+
+	while len(workersTemp)>0:
+		other=workersTemp[-1]
+		connected=False
+		if rank>other and other!=sentTo:
+			rs = comm.issend(None,dest=other,tag=_GET_CONNEXION_)
+			sentTo = other
+		
+		while not (connected):
+			if comm.Iprobe(source=MPI.ANY_SOURCE, status=s,tag=_GET_CONNEXION_):
+				data = comm.recv(None,s.source,tag=_GET_CONNEXION_)
+				talkTo = s.source
+				connected = True
+			elif rank>other:
+				if rs.test()[0]:
+					talkTo = other
+					rs.wait()
+					connected=True
+		
+		command(talkTo)
+		workersTemp.remove(talkTo)
+	#mprint("TOTAL TIME(",rank,"):",time.time()-t1)
+
+# a dummy test function for runOnSynchronouslPairs(range(numThreads,pairOp)
+def pairOp(talkTo):
+	global t1
+	# send/recv data 
+	message="haha"
+	comm.isend(message,talkTo,tag=_PAIR_OP_)
+	feedback = comm.recv(None,talkTo,tag=_PAIR_OP_)
+	# crunch feedback and numbers...
+	time.sleep(0.01)
+	# send/recv result
+	comm.isend(message,talkTo,tag=_PAIR_OP_)
+	feedback = comm.recv(None,talkTo,tag=_PAIR_OP_)
+	print("(",rank,talkTo,") done in",time.time()-t1,"s")
 
 def migrateBodies(ids,origin,destination):
 	'''
@@ -974,43 +991,78 @@ def migrateBodies(ids,origin,destination):
 			if not O.bodies[id]: mprint("reassignBodies failed,",id," is not in subdomain ",rank)
 			O.bodies[id].subdomain = destination
 			createInteraction(thisSubD,id,virtualI=True) # link translated body to subdomain, since there is initially no interaction with local bodies
+			#for k in O.subD.intersections[rank]:
+				#if k==0: continue
+				#if id in O.subD.intersections[k]:
+					#O.subD.intersections[k].remove(id) # so we don't send the same body to multiple domains...
 		O.subD.sendBodies(destination,ids)
 	elif rank==destination:
 		O.subD.receiveBodies(origin)
+
+def projectedBounds(i,j):
+	'''
+	Returns sorted list of projections of bounds on a given axis, with bounds taken in i->j and j->i intersections
+	'''
+	useAABB=False #using center of subdomain AABB is a bit unstable since the movement of on single body can change it greatly
+	if (useAABB):
+		pt1 = 0.5*(O.bodies[O.subD.subdomains[i-1]].bound.min+O.bodies[O.subD.subdomains[i-1]].bound.max)
+		pt2 = 0.5*(O.bodies[O.subD.subdomains[j-1]].bound.min+O.bodies[O.subD.subdomains[j-1]].bound.max)
+	else: #use center of mass
+		pt1 = O.subD._centers_of_mass[i]
+		pt2 = O.subD._centers_of_mass[j]
+	axis=pt2-pt1
+	axis.normalize()
+	pos = [[O.subD.boundOnAxis(O.bodies[k].bound,axis,True),i,k] for k in O.subD.intersections[j]]+[[O.subD.boundOnAxis(O.bodies[k].bound,axis,False),j,k] for k in O.subD.mirrorIntersections[j]]
+	pos.sort(key= lambda x: x[0])
+	return pos
 
 def medianFilter(i,j):
 	'''
 	Rsys.modules['yade.mpy'].eturns bodies in "i" to be assigned to "j" based on median split between the center points of subdomain's AABBs
 	'''
 	bodiesToSend=[]
+	bodiesToRecv=[]
 	pos = projectedBounds(i,j)
-	#mprint(pos)
+	# we will start from first and last elements and converge to middle, to check possible inversions of bboxes along the axis
 	xminus=0; xplus=len(pos)-1
 	while (xminus<xplus):
 		while (pos[xminus][1]==i and xminus<xplus): xminus+=1
 		while (pos[xplus][1]==j and xminus<xplus): xplus-=1
 		if xminus<xplus:
 			bodiesToSend.append(pos[xplus][2])
+			bodiesToRecv.append(pos[xminus][2])
 			pos[xminus][1]=i
 			pos[xplus][1]=j
-	return bodiesToSend
+			xminus+=1; xplus-=1
+	#if len(bodiesToSend)>0: mprint("will send ",len(bodiesToSend)," to ",j," (and recv ",len(bodiesToRecv),")")
+	return bodiesToSend,bodiesToRecv
 
 REALLOCATE_FILTER=medianFilter #that's currently default and only option
 
-def reallocateBodiesToSubdomains(_filter=medianFilter):
+def reallocateBodiesToSubdomains(_filter=medianFilter,blocking=True):
 	'''
 	Re-assign bodies to subdomains based on '_filter' argument.
 	Requirement: '_filter' is a function taking ranks of origin and destination and returning the list of bodies (by index) to be moved. That's where the decomposition strategy is defined. See example medianFilter (used by default).
 	This function must be called in parallel, hence if ran interactively the command needs to be sent explicitely:
 	mp.sendCommand("all","reallocateBodiesToSubdomains(medianFilter)",True)
 	'''
-	if rank>0:
-		for worker in O.subD.intersections[rank]:
-			if worker==0: continue
-			candidates = _filter(rank,worker)
-			wprint("sending to ",worker,": ",candidates)
-			migrateBodies(candidates,rank,worker) #send
-			migrateBodies(None,worker,rank)       #recv
+	
+	O.subD._centers_of_mass=[Vector3(0,0,0) for k in range(numThreads)]
+	O.subD._centers_of_mass[rank]=O.subD.centerOfMass()
+	
+	if blocking: # the filter will be applied sequentially to each other domain. It can include blocking communications in subdomain pairs
+		_functor = lambda x : reallocateBodiesPairWiseBlocking(medianFilter,x)
+		runOnSynchronouslPairs(O.subD.intersections[rank],_functor)
+	else: 	# non-blocking method, migrated bodies are decided unilateraly by each subdomain
+		# if using medianFilter it leads to non-constant bodies per subdomain
+		if rank>0:
+			for worker in O.subD.intersections[rank]:
+				if worker==0: continue
+				candidates = _filter(rank,worker)
+				wprint("sending to ",worker,": ",len(candidates))
+				migrateBodies(candidates,rank,worker) #send
+				migrateBodies(None,worker,rank)       #recv
+				
 	O.subD.completeSendBodies()
 	O.subD.ids = [b.id for b in O.bodies if (b.subdomain==rank and not b.isSubdomain)] #update local ids
 	
@@ -1022,18 +1074,70 @@ def reallocateBodiesToSubdomains(_filter=medianFilter):
 				ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
 				O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
 				for i in ids: O.bodies[i].subdomain=k
+			if (AUTO_COLOR): colorDomains()
 		# update intersections and mirror
 		updateAllIntersections() #triggers communication
 		if rank>0: req.wait()
+		
+def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
+	'''
+	Re-assign bodies from/to otherDomain based on '_filter' argument.
+	Requirement: '_filter' is a function taking ranks of origin and destination and returning the list of bodies (by index) to be moved. That's where the decomposition strategy is defined. See example medianFilter (used by default).
+	'''
+	#if rank==0: return
 	
-def projectedBounds(i,j):
-	'''
-	Returns sorted list of projections of bounds on a given axis, with bounds taken in i->j and j->i intersections
-	'''
-	pt1 = 0.5*(O.bodies[O.subD.subdomains[i-1]].bound.min+O.bodies[O.subD.subdomains[i-1]].bound.max)
-	pt2 = 0.5*(O.bodies[O.subD.subdomains[j-1]].bound.min+O.bodies[O.subD.subdomains[j-1]].bound.max)
-	axis=pt2-pt1
-	axis.normalize()
-	pos = [[O.subD.boundOnAxis(O.bodies[k].bound,axis,True),O.bodies[k].subdomain,k] for k in O.subD.intersections[j]] + [[O.subD.boundOnAxis(O.bodies[k].bound,axis,False),O.bodies[k].subdomain,k] for k in O.subD.mirrorIntersections[j]]
-	pos.sort(key= lambda x: x[0])
-	return pos
+	if True: #clean intersections, remove bodies already moved to other domain
+		ints = [ii for ii in O.subD.intersections[otherDomain] if O.bodies[ii].subdomain==rank] #make sure we don't send ids of already moved bodies
+		O.subD.intersections=O.subD.intersections[:otherDomain]+[ints]+O.subD.intersections[otherDomain+1:]
+	
+	req = comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	comm.send([O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank]],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	newMirror = req.wait()
+	O.subD.mirrorIntersections=O.subD.mirrorIntersections[:otherDomain]+[newMirror[0]]+O.subD.mirrorIntersections[otherDomain+1:]
+	O.subD._centers_of_mass[otherDomain]=newMirror[1]
+	
+	candidates,mirror = _filter(rank,otherDomain)
+	#mprint("Will send ",candidates)
+	#req2=comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	#comm.send(candidates,dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	#mirrorCandidates2 = req2.wait()
+	#req2.wait()
+	##mirrorCandidates2=req2.wait()
+	#mprint("mirrorCandidates2 ",mirrorCandidates2)
+	#if mirrorCandidates2==None: mirrorCandidates2=[] #sending empty list results in 'None' received... fix it here
+	#if len(mirrorCandidates2)!=len(candidates):
+		#mprint("UNBALANCED: will send",len(candidates)," and receive ",len(mirrorCandidates2))
+	#if mirrorCandidates2!=mirror:
+		#mprint("different contents:", mirror," ", mirrorCandidates2)
+	
+	#mprint("sending to ",otherDomain,": ",len(candidates))
+	migrateBodies(candidates,rank,otherDomain) #send
+	migrateBodies(None,otherDomain,rank)       #recv
+			
+#def reallocateBodiesSynchronous(_filter=medianFilter):
+	#'''
+	#Re-assign bodies to subdomains based on '_filter' argument.
+	#Requirement: '_filter' is a function taking ranks of origin and destination and returning the list of bodies (by index) to be moved. That's where the decomposition strategy is defined. See example medianFilter (used by default).
+	#This function must be called in parallel, hence if ran interactively the command needs to be sent explicitely:
+	#mp.sendCommand("all","reallocateBodiesToSubdomains(medianFilter)",True)
+	#'''
+	
+	#_functor = lambda x : reallocateBodiesPairWiseBlocking(medianFilter,x)
+	#runOnSynchronouslPairs(O.subD.intersections[rank],_functor)
+	
+	#O.subD.completeSendBodies()
+	#O.subD.ids = [b.id for b in O.bodies if (b.subdomain==rank and not b.isSubdomain)] #update local ids
+	
+	#if not ERASE_REMOTE_MASTER:
+		## update remote ids in master
+		#if rank>0: req = comm.isend(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
+		#else: #master will update subdomains for correct display (besides, keeping 'ids' updated for remote subdomains may not be a strict requirement)
+			#for k in range(1,numThreads):
+				#ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
+				#O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
+				#for i in ids: O.bodies[i].subdomain=k
+			#if (AUTO_COLOR): colorDomains()
+		## update intersections and mirror
+		#updateAllIntersections() #triggers communication
+		#if rank>0: req.wait()
+	

@@ -473,7 +473,7 @@ Real Subdomain::boundOnAxis(Bound& b, Vector3r direction, bool min) //return pro
 	for (unsigned k=0; k<3; k++) extremum += std::abs(size[k]*direction[k]);// this is equivalent to taking the vertex maximizing projected length
 	if (min) extremum = -extremum; 
 	extremum+= (b.max+b.min).dot(direction);// should be *0.5 to be center of the box, but since we use 'size' instead of half-size everything is doubled, neutral in terms of ordering the boxes
-	return extremum;
+	return 0.5*extremum;
 }
 
 

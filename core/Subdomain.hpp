@@ -258,7 +258,17 @@ class Subdomain: public Shape {
 	
 	// Geometry
 	Real boundOnAxis(Bound& b, Vector3r direction, bool min); //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
-
+	
+	Vector3r centerOfMass() {
+		Vector3r center(0,0,0); Real mass=0;
+		const shared_ptr<Scene>& scene= Omega::instance().getScene();
+		for (unsigned k=0; k<ids.size(); k++) {
+			const shared_ptr<Body>& b=Body::byId(ids[k],scene);
+			if (!b or b->getIsSubdomain()) continue;
+			center+=b->state->mass*b->state->pos;
+			mass+=b->state->mass;}
+		return center*(1/mass);
+	}
 		
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain",
@@ -295,6 +305,7 @@ class Subdomain: public Shape {
 		.add_property("comm",&Subdomain::getMyComm,&Subdomain::setMyComm,"Communicator to be used for MPI (converts mpi4py comm <-> c++ comm)")
 		.def("splitBodiesToWorkers", &Subdomain::splitBodiesToWorkers,(boost::python::arg("eraseWorkerBodies")), "of true bodies in workers are erased and reassigned.")
 		.def("boundOnAxis", &Subdomain::boundOnAxis,(boost::python::arg("bound"),boost::python::arg("axis"),boost::python::arg("min")), "computes projected position of a bound in a certain direction")
+		.def("centerOfMass", &Subdomain::centerOfMass, "returns center of mass of assigned bodies")
 	);
 	// clang-format on
 	DECLARE_LOGGER;

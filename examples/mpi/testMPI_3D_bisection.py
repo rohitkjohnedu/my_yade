@@ -4,7 +4,7 @@
 # ./yadempi script.py #interactive will spawn 3 additional workers
 # mpiexec -n 4 ./yadempi script.py #non interactive
 
-NSTEPS=1000 #turn it >0 to see time iterations, else only initilization TODO!HACK
+NSTEPS=100 #turn it >0 to see time iterations, else only initilization TODO!HACK
 #NSTEPS=50 #turn it >0 to see time iterations, else only initilization
 N=50; M=50; #(columns, rows) per thread
 
@@ -19,7 +19,7 @@ compFricDegree = 0.0
 O.materials.append(FrictMat(young=young, poisson=0.5, frictionAngle = radians(compFricDegree), density= 2600, label='sphereMat'))
 O.materials.append(FrictMat(young=young*100, poisson = 0.5, frictionAngle = compFricDegree, density =2600, label='wallMat'))
 
-mn,mx=Vector3(0,0,0),Vector3(90,180,90)
+mn,mx=Vector3(0,0,0),Vector3(70,150,70)
 pred = pack.inAlignedBox(mn,mx)
 O.bodies.append(pack.regularHexa(pred,radius=2.80,gap=0, material='sphereMat'))
 
@@ -27,14 +27,11 @@ O.bodies.append(pack.regularHexa(pred,radius=2.80,gap=0, material='sphereMat'))
 wallIds=aabbWalls([Vector3(-360,-1,-360),Vector3(360,360,360)],thickness=10.0, material='wallMat')
 O.bodies.append(wallIds)
 
-collider.verletDist = 1.5
-newton.gravity=(0,-10,0) #else nothing would move
+collider.verletDist = 2
+newton.gravity=(0.05,-0.5,0.05) #else nothing would move
 tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper. Very important: we don't want subdomains to use many different timesteps...
 O.engines=O.engines[0:tsIdx]+O.engines[tsIdx+1:]
-O.dt=0.01 #this very small timestep will make it possible to run 2000 iter without merging
-#O.dt=0.1*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
-newton.gravity=0.05*newton.gravity
-
+O.dt=0.01
 
 #########  RUN  ##########
 
@@ -49,10 +46,22 @@ def collectTiming():
 # customize mpy
 
 mp.VERBOSE_OUTPUT=False
+mp.YADE_TIMING=True
 mp.DOMAIN_DECOMPOSITION= True
-mp.mpirun(NSTEPS,4)
-mp.mergeScene() 
-if mp.rank == 0: O.save('mergedScene.yade')
+mp.MERGE_W_INTERACTIONS=False
+mp.ERASE_REMOTE_MASTER=False
+mp.REALLOCATE_FREQUENCY=5
+#mp.mpirun(NSTEPS,4,True)
+
+if mp.rank == 0:
+	from yade import export
+	v=export.VTKExporter("mpi3d")
+	
+for k in range(300):
+	mp.mpirun(30,4,True)
+	if mp.rank == 0:
+		v.exportSpheres(what=dict(subdomain='b.subdomain'))
+	#O.save('mergedScene.yade')
 
 #demonstrate getting stuff from workers
 if mp.rank==0:
