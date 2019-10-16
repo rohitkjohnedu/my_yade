@@ -11,7 +11,6 @@ Yade Technical Archive. DOI: 10.5281/zenodo.1202039 */
 #include<pkg/common/Dispatching.hpp>
 #include<pkg/common/NormShearPhys.hpp>
 #include<pkg/dem/ScGeom.hpp>
-#include <boost/thread/mutex.hpp>
 #include <random>
 
 namespace yade { // Cannot have #include directive inside.

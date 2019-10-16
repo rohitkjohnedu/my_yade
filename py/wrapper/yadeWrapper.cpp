@@ -3,8 +3,6 @@
 #include <boost/python/raw_function.hpp>
 #include <boost/bind.hpp>
 #include <boost/lambda/bind.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <lib/base/Logging.hpp>
