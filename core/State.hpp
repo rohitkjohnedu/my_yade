@@ -15,7 +15,7 @@ class State: public Serializable, public Indexable{
 
 		//! mutex for updating the parameters from within the interaction loop (only used rarely)
 		boost::mutex updateMutex;
-		
+
 		// bits for blockedDOFs
 		enum {DOF_NONE=0,DOF_X=1,DOF_Y=2,DOF_Z=4,DOF_RX=8,DOF_RY=16,DOF_RZ=32};
 		//! shorthand for all DOFs blocked
@@ -23,10 +23,10 @@ class State: public Serializable, public Indexable{
 		//! shorthand for all displacements blocked
 		static const unsigned DOF_XYZ=DOF_X|DOF_Y|DOF_Z;
 		//! shorthand for all rotations blocked
-		static const unsigned DOF_RXRYRZ=DOF_RX|DOF_RY|DOF_RZ; 
+		static const unsigned DOF_RXRYRZ=DOF_RX|DOF_RY|DOF_RZ;
 
 		//! Return DOF_* constant for given axis∈{0,1,2} and rotationalDOF∈{false(default),true}; e.g. axisDOF(0,true)==DOF_RX
-		static unsigned axisDOF(int axis, bool rotationalDOF=false){return 1<<(axis+(rotationalDOF?3:0));}		
+		static unsigned axisDOF(int axis, bool rotationalDOF=false){return 1<<(axis+(rotationalDOF?3:0));}
 		//! set DOFs according to two Vector3r arguments (blocked is when disp[i]==1.0 or rot[i]==1.0)
 		void setDOFfromVector3r(Vector3r disp,Vector3r rot=Vector3r::Zero());
 		//! Getter of blockedDOFs for list of strings (e.g. DOF_X | DOR_RX | DOF_RZ → 'xXZ')
@@ -84,7 +84,7 @@ class State: public Serializable, public Indexable{
 		((int,boundaryId,-1,,"identifies if a particle is associated with constant temperature thrermal boundary condition"))
         	((Real,stabilityCoefficient,0,,"sum of solid and fluid thermal resistivities for use in automatic timestep estimation"))
         	((Real,delRadius,0,,"radius change due to thermal expansion"))
-		((bool,isCavity,true,,"flag used for unbounding cavity bodies"))
+		((bool,isCavity,false,,"flag used for unbounding cavity bodies"))
 #endif
 		,
 		/* additional initializers */
@@ -111,4 +111,3 @@ class State: public Serializable, public Indexable{
 REGISTER_SERIALIZABLE(State);
 
 } // namespace yade
-
