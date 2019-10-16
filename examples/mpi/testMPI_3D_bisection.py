@@ -46,23 +46,20 @@ def collectTiming():
 # customize mpy
 
 mp.VERBOSE_OUTPUT=False
-mp.YADE_TIMING=True
+mp.YADE_TIMING=False
 mp.DOMAIN_DECOMPOSITION= True
 mp.MERGE_W_INTERACTIONS=False
 mp.ERASE_REMOTE_MASTER=False
 mp.REALLOCATE_FREQUENCY=5
-#mp.mpirun(NSTEPS,4,True)
+mp.mpirun(NSTEPS,4,True)
 
-if mp.rank == 0:
-	from yade import export
-	v=export.VTKExporter("mpi3d")
+## single-thread vtk output from merged scene
+#if mp.rank == 0:
+	#from yade import export
+	#v=export.VTKExporter("mpi3d")
 	
-for k in range(300):
-	mp.mpirun(30,4,True)
-	if mp.rank == 0:
-		v.exportSpheres(what=dict(subdomain='b.subdomain'))
-	#O.save('mergedScene.yade')
+#for k in range(300):
+	#mp.mpirun(30,4,True)
+	#if mp.rank == 0:
+		#v.exportSpheres(what=dict(subdomain='b.subdomain'))
 
-#demonstrate getting stuff from workers
-if mp.rank==0:
-	print("kinetic energy from workers: "+str(mp.sendCommand([1,2],"kineticEnergy()",True)))
