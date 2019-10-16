@@ -10,7 +10,7 @@
 #include "ThreadRunner.hpp"
 #include "ThreadWorker.hpp"
 
-#include <thread>
+#include <boost/thread/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 
@@ -66,7 +66,7 @@ void ThreadRunner::spawnSingleAction()
 	boost::mutex::scoped_lock calllock(m_callmutex);
 	if(m_looping) return;
 	boost::function0<void> call( boost::bind( &ThreadRunner::call , this ) );
-	std::thread th(call);
+	boost::thread th(call);
 }
 
 void ThreadRunner::start()
@@ -75,7 +75,7 @@ void ThreadRunner::start()
 	if(m_looping) return;
 	m_looping=true;
 	boost::function0<void> run( boost::bind( &ThreadRunner::run , this ) );
-	std::thread th(run);
+	boost::thread th(run);
 }
 
 void ThreadRunner::stop()
