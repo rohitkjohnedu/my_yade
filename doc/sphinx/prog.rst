@@ -1637,7 +1637,16 @@ The container can be iterated over using ``for(const auto& …… : …… )`` C
 
 	for(const auto& b : *scene->bodies){
 	   if(!b) continue;                      // skip deleted bodies, nullptr-check
-	   /* do something here */              
+	   /* do something here */
+	}
+
+The same loop can be also written by using the type ``const shared_ptr<Body>&`` explicitly:
+
+.. code-block:: c++
+
+	for(const shared_ptr<Body>& b : *scene->bodies){
+	   if(!b) continue;                      // skip deleted bodies, nullptr-check
+	   /* do something here */
 	}
 
 .. warning:: The previously used macro ``FOREACH`` is now deprecated.
