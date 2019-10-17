@@ -157,9 +157,9 @@ void Subdomain::mergeOp() {
 	recvBodyContainersFromWorkers();
 	if (subdomainRank==master){
 	  Scene* scene = Omega::instance().getScene().get();
-	  bool ifMerge = true;
+	  bool ifMerge = true; bool overWriteBodies = true; 
 	  processContainerStrings();
-	  setBodiesToBodyContainer(scene, recvdBodyContainers, ifMerge,false ); 
+	  setBodiesToBodyContainer(scene, recvdBodyContainers, ifMerge, overWriteBodies); 
 	  recvdBodyContainers.clear(); 
 	  bodiesSet = false; // reset flag for next merge op.
 	  containersRecvd = false;
@@ -308,13 +308,22 @@ void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MP
 			if (!b) bodyContainer->insertAtId(newBody, newBody->id);
 			else if (overwriteBodies) {
 				b=newBody;
-				bodyContainer->dirty=true; bodyContainer->checkedByCollider=false;}
-	//if(!resetInteractions)
+				bodyContainer->dirty=true; bodyContainer->checkedByCollider=false;
+			}
+			
 			for (auto mapIter = intrsToSet.begin(); mapIter != intrsToSet.end(); ++mapIter){
 				const Body::id_t& id1 = mapIter->second->id1; const Body::id_t& id2 = mapIter->second->id2;
-				if ((*bodyContainer)[id1] and (*bodyContainer)[id2] and ((*bodyContainer)[id1]->subdomain==scene->subdomain or (*bodyContainer)[id2]->subdomain==scene->subdomain)) {// we will insert interactions only when both bodies are inserted
+				if (ifMerge){
+					if ((*bodyContainer)[id1] and (*bodyContainer)[id2] ) {// we will insert interactions only when both bodies are inserted
+					  /* FIXME: we should make really sure that we are not overwriting a live interaction with a deprecated one (possible solution: make all interactions between remote bodies virtual)*/
+					  scene->interactions->insertInteractionMPI(mapIter->second);
+					}
+				}
+				else {
+					if ((*bodyContainer)[id1] and (*bodyContainer)[id2] and ((*bodyContainer)[id1]->subdomain==scene->subdomain or (*bodyContainer)[id2]->subdomain==scene->subdomain)) {
+					  // we will insert interactions only when both bodies are inserted
 					/* FIXME: we should make really sure that we are not overwriting a live interaction with a deprecated one (possible solution: make all interactions between remote bodies virtual)*/
-					scene->interactions->insertInteractionMPI(mapIter->second);
+					scene->interactions->insertInteractionMPI(mapIter->second);}
 				}
 			}
 		}
