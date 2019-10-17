@@ -117,7 +117,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if (multithread && !first) {
 		while (updateTriangulation && !backgroundCompleted) { /*cout<<"sleeping..."<<sleeping++<<endl;*/
 		  sleeping++;
-		std::this_thread::sleep_for(std::chrono::microseconds(1000));}
+		boost::this_thread::sleep_for(std::chrono::microseconds(1000));}
 		if (debug && sleeping) cerr<<"sleeping..."<<sleeping<<endl;
 		if (updateTriangulation || ((meshUpdateInterval>0  && ellapsedIter>(0.5*meshUpdateInterval)) && backgroundCompleted)) {
 			if (debug) cerr<<"switch flow solver"<<endl;
@@ -149,7 +149,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 			if (!thermalEngine) updateTriangulation=false;// thermalEngine needs this flag for reynolds numbers updates, let thermalEngine flip this flag back to false
 			epsVolCumulative=0;
 			ellapsedIter=0;
-			std::thread workerThread(&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::backgroundAction,this);
+			boost::thread workerThread(&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::backgroundAction,this);
 			workerThread.detach();
 			if (debug) cerr<<"backgrounded"<<endl;
 			initializeVolumes(*solver);

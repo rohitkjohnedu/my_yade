@@ -195,7 +195,7 @@ void PeriodicFlowEngine:: action()
 			retriangulationLastIter=ellapsedIter;
 			ellapsedIter=0;
 			epsVolCumulative=0;
-			std::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
+			boost::thread workerThread(&PeriodicFlowEngine::backgroundAction,this);
 			workerThread.detach();
 			initializeVolumes(*solver);
 			computeViscousForces(*solver);
