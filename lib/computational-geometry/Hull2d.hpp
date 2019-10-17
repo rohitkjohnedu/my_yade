@@ -27,7 +27,7 @@ class ConvexHull2d{
 		raw_points.sort(Vector2r_xComparator());
 		left=raw_points.front(); raw_points.pop_front();
 		right=raw_points.back(); raw_points.pop_back();
-		FOREACH(const Vector2r& p, raw_points){
+		for(const Vector2r& p : raw_points){
 			if(direction(left,right,p)<0) upper_partition_points.push_back(p);
 			else lower_partition_points.push_back(p);
 		}

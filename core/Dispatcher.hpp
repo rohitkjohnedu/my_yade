@@ -66,7 +66,7 @@ template<class topIndexable>
 std::string Dispatcher_indexToClassName(int idx){
   boost::scoped_ptr<topIndexable> top(new topIndexable);
 	std::string topName=top->getClassName();
-	for (auto clss : Omega::instance().getDynlibsDescriptor()){
+	for (const auto& clss : Omega::instance().getDynlibsDescriptor()){
 		if(Omega::instance().isInheritingFrom_recursive(clss.first,topName) || clss.first==topName){
 			// create instance, to ask for index
 			shared_ptr<topIndexable> inst=YADE_PTR_DYN_CAST<topIndexable>(ClassFactory::instance().createShared(clss.first));
