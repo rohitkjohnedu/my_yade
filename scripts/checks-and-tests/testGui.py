@@ -39,6 +39,8 @@ O.materials.append(CohFrictMat(
 law=Law2_ScGeom6D_CohFrictPhys_CohesionMoment(always_use_moment_law=False)
 g=9.81
 
+guiIterPeriod=500000
+
 O.trackEnergy=True
 O.engines=[
 	ForceResetter(),
@@ -51,7 +53,7 @@ O.engines=[
 	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=50,timestepSafetyCoefficient=.0001),
 	NewtonIntegrator(damping=damping,kinSplit=True,gravity=(0,0,-g)),
 	PyRunner(iterPeriod=20,command='myAddPlotData()')
-	,PyRunner(iterPeriod=10000,command='nextGuiTest()')
+	,PyRunner(iterPeriod=guiIterPeriod,command='nextGuiTest()')
 ]
 
 O.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0],material='granular_material'))
@@ -157,40 +159,99 @@ plot.liveInterval=0
 def makeNextScreenshot():
 	import subprocess,time
 	global scrNum
-	if( (scrNum < 9) or (scrNum == 19)):
-		#time.sleep(2)
-		#subprocess.run(["scrot", "-m" , "-z" , "scr"+str(scrNum)+".png"])
-		#time.sleep(2)
-		pass
+	time.sleep(1)
+	subprocess.run(["scrot", "-m" , "-z" , "scr"+str(scrNum)+".png"])
+	time.sleep(1)
 
 def nextGuiTest():
+	from yade import qt
 	import time
 	global scrNum
 	scrNum += 1
 	intro = "="*20+" "+"stage:"+str(scrNum)+" iter:"+str(O.iter)
 	if(scrNum == 0):
-		print(intro)
 		makeNextScreenshot();
+		print(intro)
 		return
 	if(scrNum == 1):
+		makeNextScreenshot();
 		print(intro+" opening yade.qt.View()")
 		yade.qt.View();
-		makeNextScreenshot();
+		vv=yade.qt.views()[0]
+		vv.axes=True
+		vv.eyePosition=(2.8717367257539266,-3.2498802823394684,11.986065750108025)
+		vv.upVector  =(-0.786154130840315,-0.2651054185084529,0.558283798475441)
+		vv.center()
 		return
 	if(scrNum == 2):
-		print(intro+" opening yade.qt.Generator()")
-		yade.qt.Generator()
 		makeNextScreenshot();
+		print(intro+" opening yade.qt.Inspector()")
+		yade.qt.Inspector()
+		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
+		yade.qt.controller.inspector.show()
 		return
 	if(scrNum == 3):
-		print(intro+" opening yade.qt.Controller()")
-		yade.qt.Controller()
 		makeNextScreenshot();
+		print(intro+" changing tab to bodies")
+		yade.qt.controller.inspector.close()
+		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
+		yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
+		yade.qt.controller.inspector.show()
 		return
 	if(scrNum == 4):
+		makeNextScreenshot();
+		print(intro+" changing tab to interactions")
+		yade.qt.controller.inspector.close()
+		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
+		yade.qt.controller.inspector.tabWidget.setCurrentIndex(2)
+		yade.qt.controller.inspector.show()
+		return
+	if(scrNum == 5):
+		makeNextScreenshot();
+		print(intro+" changing tab to cell")
+		yade.qt.controller.inspector.close()
+		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
+		yade.qt.controller.inspector.tabWidget.setCurrentIndex(3)
+		yade.qt.controller.inspector.show()
+		return
+	if(scrNum == 6):
+		makeNextScreenshot();
+		print(intro+" changing tab to bodies")
+		yade.qt.controller.inspector.close()
+		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
+		yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
+		yade.qt.controller.inspector.show()
+		print(intro+" moving yade.qt.Controller()")
+		yade.qt.Controller()
+		yade.qt.controller.setGeometry(550,5,500,1100)
+		return
+	if(scrNum == 7):
+		makeNextScreenshot();
+		print(intro+" changing tab to display")
+		yade.qt.controller.setTabActive('display')
+		return
+	if(scrNum == 8):
+		makeNextScreenshot();
+		print(intro+" changing tab to generator")
+		yade.qt.controller.setTabActive('generator')
+		return
+	if(scrNum == 9):
+		makeNextScreenshot();
+		print(intro+" changing tab to python")
+		yade.qt.controller.setTabActive('python')
+		return
+	if(scrNum == 10):
+		makeNextScreenshot();
+		print(intro+" changing tab to simulation")
+		yade.qt.controller.setTabActive('simulation')
+		return
+	if(scrNum == 11):
+		makeNextScreenshot();
 		# FIXME: I couldn't get matplotlib to draw the plot, while screenshotting is going on.
-
+		# makeNextScreenshot();
+		# O.pause()
 		# print(intro+" opening yade.plot.plot()")
+		# plot.liveInterval=0
 		# plot.plot(subPlots=False)
 		# fig=yade.plot.plot();
 		# time.sleep(5)
@@ -199,20 +260,20 @@ def nextGuiTest():
 		# makeNextScreenshot();
 		# matplotlib.pyplot.close(fig)
 		return
-	if(scrNum == 5):
-		# FIXME: now yade is crashing with this one.
-		print(intro+" opening yade.qt.Inspector()")
-		yade.qt.Inspector()
+	if(scrNum == 12):
 		makeNextScreenshot();
-		return
-	if(scrNum == 20):
-#		import sys
 		print(intro+" exiting")
 		O.pause()
 		makeNextScreenshot();
+		vv=yade.qt.views()[0]
+		vv.close()
+		yade.qt.controller.inspector.close()
+		yade.qt.controller.close()
 #		sys.exit(0)
+		os._exit(0)
 #		quit()
 		return
 
-O.run(200001)
+O.dt = O.dt*0.0001
+O.run(guiIterPeriod*12+1)
 
