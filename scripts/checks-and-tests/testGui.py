@@ -273,8 +273,12 @@ def nextGuiTest():
 		vv.close()
 		yade.qt.controller.inspector.close()
 		yade.qt.controller.close()
+		yade.runtime.opts.exitAfter=True
 #		sys.exit(0)
 		os._exit(0)
+#		ip = get_ipython()
+#		ip.ask_exit()
+#		ip.pt_cli.exit()
 #		quit()
 		return
 

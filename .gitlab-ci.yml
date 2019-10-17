@@ -260,6 +260,7 @@ test_debug:
   needs: ["make_debug"]
 
 test_GUI:
+  # FIXME - possibly move this into test_debug
   <<: *platforms_definition
   <<: *skip_wip_test_definition
   stage: test
@@ -272,6 +273,7 @@ test_GUI:
     - make_debug
   needs: ["make_debug"]
   artifacts:
+    when: always
     paths:
       - screenshots
 
