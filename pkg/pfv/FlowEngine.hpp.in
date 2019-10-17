@@ -11,7 +11,7 @@
 FlowEngine is an interface between Yade and the fluid solvers defined in lib/triangulation and using the PFV scheme.
 There are also a few non-trivial functions defined here, such has building triangulation and computating elements volumes.
 The code strongly relies on CGAL library for building triangulations on the top of sphere packings.
-CGAL's trangulations introduce the data associated to each element of the triangulation through template parameters (Cell_info and Vertex_info).  
+CGAL's trangulations introduce the data associated to each element of the triangulation through template parameters (Cell_info and Vertex_info).
 FlowEngine is thus defined via the template class TemplateFlowEngine(Cellinfo,VertexInfo), for easier addition of variables in various couplings.
 PeriodicFlowEngine is a variant for periodic boundary conditions.
 
@@ -47,7 +47,7 @@ namespace yade { // Cannot have #include directive inside.
 
 template<class _CellInfo, class _VertexInfo, class _Tesselation=CGT::_Tesselation<CGT::TriangulationTypes<_VertexInfo,_CellInfo> >, class solverT=DEFAULTSOLVER >
 class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
-{	
+{
 	public :
 		typedef solverT									FlowSolver;
 		typedef FlowSolver								Solver;//FIXME: useless alias, search/replace then remove
@@ -64,7 +64,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		typedef typename RTriangulation::Triangulation_data_structure::Vertex::Info     VertexInfo;
 		typedef typename FlowSolver::AlphaShape											AlphaShape;
 		//typedef typename FlowSolver::Alpha_iterator										Alpha_iterator;
-		
+
 // 	protected:
 		shared_ptr<FlowSolver> solver;
 		shared_ptr<FlowSolver> backgroundSolver;
@@ -107,18 +107,18 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		void remeshForFreshlyBrokenBonds ();
 		void pyInitializeVolumes () {if (solver) initializeVolumes(*solver); else LOG_WARN("Solver not initialized");}
 		void pyUpdateVolumes () {if (solver) updateVolumes(*solver); else LOG_WARN("Solver not initialized");}
-		
+
 		void updateBCs () {
 			if (solver->tesselation().maxId>0) boundaryConditions(*solver);//avoids crash at iteration 0, when the packing is not bounded yet
 			else LOG_ERROR("updateBCs not applied");
 			solver->pressureChanged=true;}
-			
+
 		bool checkMaxId(unsigned id) {//used in other functions
 			if (id>=solver->T[solver->currentTes].cellHandles.size()) {
 				LOG_ERROR("id out of range, max value is "<<solver->T[solver->currentTes].cellHandles.size());
 				return false;}
 			return true;}
-			
+
 		boost::python::list getIncidentCells(unsigned vertexId) {
 			RTriangulation& Tri = solver->tesselation().Triangulation();
 			unsigned& id = vertexId;
@@ -131,7 +131,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			for (typename FlowSolver::VCellIterator it = tmpCells.begin(); it != cells_end; it++) incidentCells.append((*it)->info().id);
 			return incidentCells;
 		}
-		
+
 
 		void imposeFlux(Vector3r pos, Real flux);
 		unsigned int imposePressure(Vector3r pos, Real p);
@@ -151,7 +151,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Vector3r fluidForce(unsigned int idSph) {
 			const CGT::CVector& f=solver->T[solver->currentTes].vertex(idSph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		Vector3r averageVelocity();
-			
+
 		Vector3r shearLubForce(unsigned int id_sph) {
 			return (solver->shearLubricationForces.size()>id_sph)?solver->shearLubricationForces[id_sph]:Vector3r::Zero();}
 		Vector3r shearLubTorque(unsigned int id_sph) {
@@ -165,7 +165,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Matrix3r bodyShearLubStress(unsigned int id_sph) {
 			return (solver->shearLubricationBodyStress.size()>id_sph)?solver->shearLubricationBodyStress[id_sph]:Matrix3r::Zero();}
 		Matrix3r bodyNormalLubStress(unsigned int id_sph) {
-			return (solver->normalLubricationBodyStress.size()>id_sph)?solver->normalLubricationBodyStress[id_sph]:Matrix3r::Zero();}	
+			return (solver->normalLubricationBodyStress.size()>id_sph)?solver->normalLubricationBodyStress[id_sph]:Matrix3r::Zero();}
 		Vector3r shearVelocity(unsigned int interaction) {
 			return (solver->deltaShearVel[interaction]);}
 		Vector3r normalVelocity(unsigned int interaction) {
@@ -210,7 +210,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			        const CellHandle& neighbourCell = solver->tesselation().cellHandles[id]->neighbor(i);
 			        if (!Tri.is_infinite(neighbourCell)) ids.append(neighbourCell->info().id);}
 		        return ids;}
-		
+
 		template<class Cellhandle>
 		Real volumeCellSingleFictious (Cellhandle cell);
 		template<class Cellhandle>
@@ -259,7 +259,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			if (not checkMaxId(id)) return;
 			solver->T[solver->currentTes].cellHandles[id]->info().blocked=true;
 			solver->T[solver->currentTes].cellHandles[id]->info().Pcondition=blockPressure;
-		}		
+		}
 		Real getDiffusionCoeff(unsigned cellId, unsigned throat){
 			if (not checkMaxId(cellId))  return 0;
 			const CellHandle& cell = solver->tesselation().cellHandles[cellId];
@@ -271,12 +271,12 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			const CellHandle& pore1 = solver->tesselation().cellHandles[cell1];
 			return pore1->info().kNorm()[facetIdx];
 		}
-		
+
 		Vector3r getBoundaryNormal(int index) {
 		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); return normal[max(0,min(5,index))];}
 		void setBoundaryNormal(int index, Vector3r v) {
 		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); normal[max(0,min(5,index))]=v;}
-		
+
 		double averageSlicePressure(double posY){return solver->averageSlicePressure(posY);}
 		double averagePressure(){return solver->averagePressure();}
 
@@ -298,7 +298,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		virtual ~TemplateFlowEngine_@TEMPLATE_FLOW_NAME@();
 		virtual void action();
 		virtual void backgroundAction();
-		
+
 		//commodities
 		void compTessVolumes() {
 			solver->T[solver->currentTes].compute();
@@ -398,6 +398,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		((double, alphaBound,-1,,"if 0, use an alphaBoundary condition where CGAL finds minimum alpha necessary for a single solid object. Any positive value will be used for the alpha. All negative values deactivate the functionality."))
 		((double, alphaBoundValue, 0,,"value of alpha constant pressure condition"))
 		((bool, fixedAlpha, false,,"If true, a constant-sized alpha vertex will be placed exactly above each facet. If false, logic is used to improve cell sizes in concave regions."))
+		((double, minimumPorosity, 0,,"value used to limit the allowable minimum porosity for pore volume calculations. Particularly useful if very small volumes are impacting stability"))
 		,
 		/*deprec*/
 		((meanK_opt,clampKValues,"the name changed"))
@@ -510,7 +511,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	CVector averageCellVelocity;
 	// Surface vectors of facets, pointing from outside toward inside the cell
 	std::vector<CVector> facetSurfaces;
-	//Ratio between fluid surface and facet surface 
+	//Ratio between fluid surface and facet surface
 	std::vector<Real> facetFluidSurfacesRatio;
 	// Reflects the geometrical property of the cell, so that the force by cell fluid on grain "i" is pressure*unitForceVectors[i]
 	std::vector<CVector> unitForceVectors;
@@ -530,7 +531,7 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 	double Reynolds;
 	double NutimesFluidK;
 	double stabilityCoefficient;
-	
+
 
 	FlowCellInfo_@TEMPLATE_FLOW_NAME@ (void)
 	{
@@ -551,11 +552,11 @@ class FlowCellInfo_@TEMPLATE_FLOW_NAME@ : public CGT::SimpleCellInfo {
 		isvisited = false; isCavity=false;
 		isGhost=false;
 		blocked=false;
-	}	
+	}
 	bool isGhost;
 	double invSumK;
 	bool isvisited;
-	
+
 	inline Real& volume (void) {return t;}
 	inline const Real& invVoidVolume (void) const {return invVoidV;}
 	inline Real& invVoidVolume (void) {return invVoidV;}
@@ -591,5 +592,5 @@ public:
 
 } // namespace yade
 
-// Implementation of functions in this separate file for clarity 
+// Implementation of functions in this separate file for clarity
 #include "FlowEngine_@TEMPLATE_FLOW_NAME@.ipp"

@@ -540,7 +540,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	if ((flow.fluidBulkModulus>0 || thermalEngine) && desiredPorosity>0 && !cell->info().blocked) {
 		cell->info().invVoidVolume() = 1. / cell->info().volume();
 	} else if ((flow.fluidBulkModulus>0 || thermalEngine || iniVoidVolumes) && desiredPorosity == 0 && !cell->info().blocked) {
-		cell->info().invVoidVolume() = 1. / max(0.001*abs(cell->info().volume()),(abs(cell->info().volume()) - flow.volumeSolidPore(cell) ));
+		cell->info().invVoidVolume() = 1. / max(minimumPorosity*abs(cell->info().volume()),(abs(cell->info().volume()) - flow.volumeSolidPore(cell) ));
 	}
 	}
 	if (debug) cout << "Volumes initialised." << endl;
