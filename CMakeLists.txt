@@ -41,6 +41,7 @@
 project(Yade C CXX)
 cmake_minimum_required(VERSION 3.5.0)
 set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # https://stackoverflow.com/questions/18968979/how-to-get-colorized-output-with-cmake , use ${Esc} for printing colors
@@ -251,8 +252,6 @@ ENDIF()
 #======================================
 #====== **** Compiler flags **** ======
 #======================================
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(ENABLE_USEFUL_ERRORS)
   # Enable as many warnings as possible, and treat them as errors (using -Werror flag).
   # Four warnings are impossible to fix, because they are in external libraries:
@@ -302,7 +301,7 @@ if(ENABLE_USEFUL_ERRORS)
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-unused-function")
   ENDIF()
   SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wformat-nonliteral -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized -Wfloat-conversion -Wcast-align -Wdisabled-optimization -Wtrampolines -Wpointer-arith -Wswitch-bool -Wwrite-strings -Wnon-virtual-dtor")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -std=c++14 -fdce")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -fdce")
 
 #  -Wcast-qual      is useful, but too many warnings in libeigen
 #  -Wlogical-op     (1 unfixable warning in /usr/include/vtk-6.3/vtkVariantInlineOperators.h: logical ‘or’ of equal expressions )
@@ -315,7 +314,7 @@ if(ENABLE_USEFUL_ERRORS)
 # -Wmaybe-uninitialized (  10) -Wcomment          (   3) -Wcpp         (   2) -Wcast-function-type (   2) -Wlogical-op     (   1)
 
 ELSE(ENABLE_USEFUL_ERRORS)
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall -std=c++14")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall")
 ENDIF(ENABLE_USEFUL_ERRORS)
 #===========================================================
 MESSAGE(STATUS   "${Esc}[36mChosen compiler flags are: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS} ${Esc}[0m")
