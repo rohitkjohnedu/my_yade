@@ -18,6 +18,10 @@
 	}		
 #endif
 
+namespace forCtags {
+struct pyboot{}; // for ctags
+}
+
 /* Initialize yade, loading given plugins */
 void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 
@@ -32,7 +36,7 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir){
 		std::ofstream gdbBatch;
 		O.gdbCrashBatch=O.tmpFilename();
 		gdbBatch.open(O.gdbCrashBatch.c_str());
-		gdbBatch << "attach " <<boost::lexical_cast<std::string>(getpid()) << "\nset pagination off\nthread info\nthread apply all backtrace\ndetach\nquit\n";
+		gdbBatch << "attach " <<boost::lexical_cast<std::string>(getpid()) << "\nset pagination off\nthread apply all backtrace\ndetach\nquit\n";
 		gdbBatch.close();
 		signal(SIGABRT,crashHandler);
 		signal(SIGSEGV,crashHandler);
