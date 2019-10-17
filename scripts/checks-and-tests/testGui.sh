@@ -8,3 +8,10 @@ mkdir -p screenshots
 
 install/bin/yade-ci scripts/checks-and-tests/testGui.py
 
+mv scr*.png screenshots
+
+if [[ ! -f screenshots/scr12.png ]] ; then
+    echo 'File "screenshots/scr12.png" is missing, aborting.'
+    exit 1
+fi
+

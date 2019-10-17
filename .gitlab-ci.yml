@@ -264,7 +264,7 @@ test_GUI:
   <<: *skip_wip_test_definition
   stage: test
   script:
-    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping GUI test, because it's a WIP merge request.\n===\e[0m\n"; else xvfb-run -s "-screen 0 1600x1200x24" scripts/checks-and-tests/testGui.sh; fi
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping GUI test, because it's a WIP merge request.\n===\e[0m\n"; else xvfb-run -a -s "-screen 0 1600x1200x16" scripts/checks-and-tests/testGui.sh; fi
     - cat /etc/os-release
   timeout: 25 minutes
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye

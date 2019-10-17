@@ -160,7 +160,7 @@ def makeNextScreenshot():
 	import subprocess,time
 	global scrNum
 	time.sleep(1)
-	subprocess.run(["scrot", "-m" , "-z" , "scr"+str(scrNum)+".png"])
+	subprocess.run(["scrot", "-z" , "scr"+str(scrNum).zfill(2)+".png"])
 	time.sleep(1)
 
 def nextGuiTest():
@@ -261,10 +261,14 @@ def nextGuiTest():
 		# matplotlib.pyplot.close(fig)
 		return
 	if(scrNum == 12):
+		# FIXME: this number '12' appears in three places:
+		# * here
+		# * in function makeNextScreenshot
+		# * bash script scripts/checks-and-tests/testGui.sh
+		# if more stages are added to this test, it has to be updated in three places.
 		makeNextScreenshot();
 		print(intro+" exiting")
 		O.pause()
-		makeNextScreenshot();
 		vv=yade.qt.views()[0]
 		vv.close()
 		yade.qt.controller.inspector.close()
