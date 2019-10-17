@@ -1631,14 +1631,16 @@ Bodies are deleted only rarely:
 
 Iteration
 ^^^^^^^^^^
-The container can be iterated over using ``FOREACH`` macro:
+The container can be iterated over using ``for(const auto& …… : …… )`` C++ syntax:
 
 .. code-block:: c++
 
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto& b : *scene->bodies){
 	   if(!b) continue;                      // skip deleted bodies, nullptr-check
 	   /* do something here */              
 	}
+
+.. warning:: The previously used macro ``FOREACH`` is now deprecated.
 
 Note a few important things:
 
@@ -1700,14 +1702,16 @@ Creating new interactions and deleting them is delicate topic, since many eleent
 
 Iteration
 ^^^^^^^^^
-As with BodyContainer, iteration over interactions should use the ``FOREACH`` macro:
+As with BodyContainer, iteration over interactions should use the ``for(const auto& …… : …… )`` C++ syntax, also ``const shared_ptr<Interaction>&`` can be used instead of ``auto&``:
 
 .. code-block:: c++
 
-	FOREACH(const shared_ptr<Interaction>& i, *scene->interactions){
+	for(const shared_ptr<Interaction>& i : *scene->interactions){
 	   if(!i->isReal()) continue;
 	   /* … */
 	}
+
+.. warning:: The previously used macro ``FOREACH`` is now deprecated.
 
 Again, note the usage const reference for ``i``. The check ``if(!i->isReal())`` filters away interactions that exist only *potentially*, i.e. there is only :yref:`Bound` overlap of the two bodies, but not (yet) overlap of bodies themselves. The ``i->isReal()`` function is equivalent to ``i->geom && i->phys``. Details are again explained in :ref:`interaction-flow`.
 
