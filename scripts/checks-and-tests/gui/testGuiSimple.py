@@ -162,5 +162,5 @@ def myAddPlotData():
 # The test runs also on debug build, so anyway we should get a useful backtrace from gitlab-CI
 
 O.dt = O.dt*0.0001
-O.run(guiIterPeriod*12+1)
+O.run(guiIterPeriod*scr.getTestNum()+1)
 
