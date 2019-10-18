@@ -287,8 +287,6 @@ test_opposite:
 
 test_suse15:
   <<: *test_definition
-  before_script:
-    - export NO_GUI="NO_GUI"
   image: registry.gitlab.com/yade-dev/docker-yade:suse15
   dependencies:
     - make_suse15
