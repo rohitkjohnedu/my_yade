@@ -8,7 +8,12 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 
 mkdir -p screenshots
 
-xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui.py"
+# FIXME: this should be deduced automatically from the files matching pattern testGui*.py, see also testGui.py
+TESTS=( "Simple" )
+
+for TestFile in ${TESTS}; do
+
+xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui${TestFile}.py"
 
 # FIXME: the idea is to have a screenshot from outside of yade. But taking a screenshot after it finished (crashed, or by normal exit)
 #        will just produce an empty screenshot. It has to be done in a different way.
@@ -16,8 +21,10 @@ xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and
 
 mv scr*.png screenshots
 
-if [[ ! -f screenshots/scr12.png ]] ; then
-    echo 'File "screenshots/scr12.png" is missing, aborting.'
+if [[ ! -f screenshots/scr12_${TestFile}.png ]] ; then
+    echo "File screenshots/scr12_${TestFile}.png is missing, aborting."
     exit 1
 fi
+
+done
 

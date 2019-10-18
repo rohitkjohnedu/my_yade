@@ -7,11 +7,11 @@
 #  GNU General Public License v2 or later. See file LICENSE for details. #
 ##########################################################################
 
-import subprocess,time
+import subprocess,time,os
 import yade
 from yade import qt
 
-class MakeScreenshot:
+class TestGUIHelper:
 	"""
 	This simple class makes screenshots.
 	"""
@@ -24,7 +24,7 @@ class MakeScreenshot:
 
 	def makeNextScreenshot(self):
 		time.sleep(1)
-		subprocess.run(["scrot", "-z" , "scr"+str(self.scrNum).zfill(2)+self.name+".png"])
+		subprocess.run(["scrot", "-z" , "scr"+str(self.scrNum).zfill(2)+"_"+self.name+".png"])
 		time.sleep(1)
 
 	def screenshotEngine(self):

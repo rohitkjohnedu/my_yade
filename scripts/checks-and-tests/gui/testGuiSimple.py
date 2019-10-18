@@ -5,8 +5,9 @@ from __future__ import print_function
 ############################################
 ##### the screenshot parameters       #####
 ############################################
-from makeScreenshot import MakeScreenshot
-scr = MakeScreenshot("simple")
+from testGuiHelper import TestGUIHelper
+# FIXME: it should deduce the name automatically, it's the end of the filename. See also testGui.sh
+scr = TestGUIHelper("Simple")
 
 ############################################
 ##### interesting parameters          #####
