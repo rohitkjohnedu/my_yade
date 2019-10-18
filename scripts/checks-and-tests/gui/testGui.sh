@@ -10,6 +10,14 @@ echo -e "=== is xterm   present? We found this: "`which xterm`  ; ls -la /usr/bi
 echo -e "=== is scrot   present? We found this: "`which scrot`  ; ls -la /usr/bin/scrot
 echo -e "=== is xdotool present? We found this: "`which xdotool`; ls -la /usr/bin/xdotool
 
+YADE_EXECUTABLE=install/bin/yade-ci
+# You can test locally using this script, just change YADE_EXECUTABLE into something that works for you:
+#   YADE_EXECUTABLE=./examples/yade
+# then launch this command:
+#   xvfb-run -a -s "-screen 0 1600x1200x16" scripts/checks-and-tests/gui/testGui.sh
+# or just this command:
+#   scripts/checks-and-tests/gui/testGui.sh
+
 mkdir -p screenshots
 
 # FIXME: this should be deduced automatically from the files matching pattern testGui*.py, see also testGui.py
@@ -23,7 +31,7 @@ echo -e "=== Testing file testGui${TestFile}.py, also see ${LOGFILE} ===\n"
 
 tail -F ${LOGFILE} &
 
-/usr/bin/xterm -l -xrm "XTerm*logFile:${LOGFILE}" -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui${TestFile}.py"
+/usr/bin/xterm -l -xrm "XTerm*logFile:${LOGFILE}" -geometry 100x48+5+560  -e bash -c "${YADE_EXECUTABLE} scripts/checks-and-tests/gui/testGui${TestFile}.py"
 
 # FIXME: the idea is to have a screenshot from outside of yade. But taking a screenshot after it finished (crashed, or by normal exit)
 #        will just produce an empty screenshot. It has to be done in a different way.
