@@ -13,9 +13,13 @@ declare -a TESTS=( "Empty" "Simple" )
 
 for TestFile in ${TESTS[@]}; do
 
-echo -e "=== Testing file testGui${TestFile}.py ===\n"
+LOGFILE="screenshots/testGui_${TestFile}.log"
 
-/usr/bin/xterm -l -xrm "XTerm*logFile:-" -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui${TestFile}.py"
+echo -e "=== Testing file testGui${TestFile}.py, also see ${LOGFILE} ===\n"
+
+tail -F ${LOGFILE} &
+
+/usr/bin/xterm -l -xrm "XTerm*logFile:${LOGFILE}" -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui${TestFile}.py"
 
 # FIXME: the idea is to have a screenshot from outside of yade. But taking a screenshot after it finished (crashed, or by normal exit)
 #        will just produce an empty screenshot. It has to be done in a different way.
