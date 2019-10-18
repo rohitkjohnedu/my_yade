@@ -17,14 +17,14 @@ class TestGUIHelper:
 	"""
 	def __init__(self,name=None):
 		self.scrNum=0;
-		self.maxTestNum=12
+		self.maxTestNum=14
 		if(name != None):
 			self.name=name;
 		else:
 			self.name="";
 
 	def getTestNum(self):
-		return self.maxTestNum+1 # because it starts from 0
+		return self.maxTestNum
 
 	def createEmptyFile(self,path):
 		with open(path, 'a'):
@@ -49,14 +49,15 @@ class TestGUIHelper:
 		time.sleep(1)
 
 	def screenshotEngine(self):
+		self.scrNum += 1
 		intro = "="*20+" "+"stage:"+str(self.scrNum)+" iter:"+str(O.iter)
-		if(self.scrNum == 0):
+		if(self.scrNum == 1):
 			self.makeNextScreenshot();
 			print(intro+" moving yade.qt.Controller()")
 			yade.qt.Controller()
 			yade.qt.controller.setWindowTitle('GUI test: '+self.name)
 			yade.qt.controller.setGeometry(550,20,500,1100)
-		if(self.scrNum == 1):
+		if(self.scrNum == 2):
 			self.makeNextScreenshot();
 			print(intro+" opening yade.qt.View()")
 			yade.qt.View();
@@ -65,7 +66,7 @@ class TestGUIHelper:
 			vv.eyePosition=(2.8717367257539266,-3.2498802823394684,11.986065750108025)
 			vv.upVector  =(-0.786154130840315,-0.2651054185084529,0.558283798475441)
 			vv.center()
-		if(self.scrNum == 2):
+		if(self.scrNum == 3):
 			self.makeNextScreenshot();
 			print(intro+" opening yade.qt.Inspector() , setting wire=True, setting intrGeom=True")
 			self.clickOnScreen(982,60)
@@ -78,62 +79,65 @@ class TestGUIHelper:
 			yade.qt.controller.inspector.show()
 			qt.Renderer().wire=True
 			qt.Renderer().intrGeom=True
-		if(self.scrNum == 3):
-			self.makeNextScreenshot();
-			print(intro+" changing tab to bodies, setting intrPhys=True")
-			yade.qt.controller.inspector.close()
-			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-			yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
-			yade.qt.controller.inspector.show()
-			qt.Renderer().intrPhys=True
 		if(self.scrNum == 4):
 			self.makeNextScreenshot();
-			print(intro+" changing tab to interactions, setting wire=False, setting intrWire=True")
-			yade.qt.controller.inspector.close()
-			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-			yade.qt.controller.inspector.tabWidget.setCurrentIndex(2)
-			yade.qt.controller.inspector.show()
-			qt.Renderer().wire=False
-			qt.Renderer().intrWire=True
+			print(intro+" changing tab to bodies, setting intrPhys=True")
+			self.clickOnScreen(1148,26)
+			#Previously these were used. They work, but do not always trigger crashes.
+			# yade.qt.controller.inspector.close()
+			# yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
+			# yade.qt.controller.inspector.tabWidget.setCurrentIndex(2)
+			# yade.qt.controller.inspector.show()
+			qt.Renderer().intrPhys=True
 		if(self.scrNum == 5):
 			self.makeNextScreenshot();
-			print(intro+" changing tab to cell, setting intrPhys=False")
-			yade.qt.controller.inspector.close()
-			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-			yade.qt.controller.inspector.tabWidget.setCurrentIndex(3)
-			yade.qt.controller.inspector.show()
-			qt.Renderer().intrPhys=False
+			print(intro+" clicking on interaction, setting wire=False, setting intrWire=True")
+			self.clickOnScreen(1494,55)
+			qt.Renderer().wire=False
+			qt.Renderer().intrWire=True
 		if(self.scrNum == 6):
 			self.makeNextScreenshot();
+			print(intro+" changing tab to interactions, setting wire=False, setting intrWire=True")
+			self.clickOnScreen(1234,26)
+			qt.Renderer().wire=False
+			qt.Renderer().intrWire=True
+		if(self.scrNum == 7):
+			self.makeNextScreenshot();
+			print(intro+" changing tab to cell, setting intrPhys=False")
+			self.clickOnScreen(1312,26)
+			qt.Renderer().intrPhys=False
+		if(self.scrNum == 8):
+			self.makeNextScreenshot();
 			print(intro+" changing tab to bodies, setting intrWire=False, setting intrGeom=False, setting intrPhys=True")
-			yade.qt.controller.inspector.close()
-			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-			yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
-			yade.qt.controller.inspector.show()
+			self.clickOnScreen(1148,26)
 			qt.Renderer().intrWire=False
 			qt.Renderer().intrGeom=False
 			qt.Renderer().intrPhys=True
-		if(self.scrNum == 7):
-			self.makeNextScreenshot();
-			print(intro+" changing tab to display, setting intrAllWire=True")
-			yade.qt.controller.setTabActive('display')
-			qt.Renderer().intrAllWire=True
-		if(self.scrNum == 8):
-			self.makeNextScreenshot();
-			print(intro+" changing tab to generator, setting intrGeom=True")
-			yade.qt.controller.setTabActive('generator')
-			qt.Renderer().intrGeom=True
 		if(self.scrNum == 9):
 			self.makeNextScreenshot();
-			print(intro+" changing tab to python, setting intrAllWire=False")
-			yade.qt.controller.setTabActive('python')
-			qt.Renderer().intrAllWire=False
+			print(intro+" changing tab to display, setting intrAllWire=True")
+			self.clickOnScreen(668,26)
+			#yade.qt.controller.setTabActive('display')
+			qt.Renderer().intrAllWire=True
 		if(self.scrNum == 10):
 			self.makeNextScreenshot();
-			print(intro+" changing tab to simulation, setting intrPhys=False")
-			yade.qt.controller.setTabActive('simulation')
-			qt.Renderer().intrPhys=False
+			print(intro+" changing tab to generator, setting intrGeom=True")
+			self.clickOnScreen(744,26)
+			#yade.qt.controller.setTabActive('generator')
+			qt.Renderer().intrGeom=True
 		if(self.scrNum == 11):
+			self.makeNextScreenshot();
+			print(intro+" changing tab to python, setting intrAllWire=False")
+			self.clickOnScreen(821,26)
+			#yade.qt.controller.setTabActive('python')
+			qt.Renderer().intrAllWire=False
+		if(self.scrNum == 12):
+			self.makeNextScreenshot();
+			print(intro+" changing tab to simulation, setting intrPhys=False")
+			self.clickOnScreen(580,26)
+			#yade.qt.controller.setTabActive('simulation')
+			qt.Renderer().intrPhys=False
+		if(self.scrNum == 13):
 			print(intro+" (testing of matplotlib is skipped for now...), setting intrGeom=False")
 			self.makeNextScreenshot();
 			qt.Renderer().intrGeom=False
@@ -150,7 +154,7 @@ class TestGUIHelper:
 			# self.makeNextScreenshot();
 			# matplotlib.pyplot.close(fig)
 			print("ITER = ",O.iter)
-		if(self.scrNum == 12):
+		if(self.scrNum == 14):
 			print("ITER = ",O.iter)
 			# FIXME: this number '12' appears in three places:
 			# * here
@@ -165,5 +169,4 @@ class TestGUIHelper:
 			yade.qt.controller.inspector.close()
 			yade.qt.controller.close()
 			self.finish()
-		self.scrNum += 1
 

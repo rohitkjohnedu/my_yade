@@ -9,6 +9,8 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 echo -e "=== is xterm   present? We found this: "`which xterm`  ; ls -la /usr/bin/xterm
 echo -e "=== is scrot   present? We found this: "`which scrot`  ; ls -la /usr/bin/scrot
 echo -e "=== is xdotool present? We found this: "`which xdotool`; ls -la /usr/bin/xdotool
+echo -e "=== is bash    present? We found this: "`which bash`   ; ls -la /bin/bash
+echo -e "=== is gdb     present? We found this: "`which gdb `   ; ls -la /usr/bin/gdb
 
 YADE_EXECUTABLE=install/bin/yade-ci
 # You can test locally using this script, just change YADE_EXECUTABLE into something that works for you:
@@ -25,13 +27,13 @@ declare -a TESTS=( "Empty" "Simple" )
 
 for TestFile in ${TESTS[@]}; do
 
-LOGFILE="screenshots/testGui_${TestFile}.log"
+LOGFILE="screenshots/testGui_${TestFile}.txt"
 tail -F ${LOGFILE} &
 TAIL_PID=$!
 
-echo -e "=== Testing file testGui${TestFile}.py, also see ${LOGFILE}, tail pid:${TAIL_PID} ===\n"
+echo -e "******************************************\n*** Testing file testGui${TestFile}.py ***\n******************************************\nLog in file: ${LOGFILE}\ntail pid:${TAIL_PID}\n"
 
-/usr/bin/xterm -l -xrm "XTerm*logFile:${LOGFILE}" -geometry 100x48+5+560  -e bash -c "${YADE_EXECUTABLE} scripts/checks-and-tests/gui/testGui${TestFile}.py"
+/usr/bin/xterm -l -xrm "XTerm*logFile:${LOGFILE}" -geometry 100x48+5+560  -e /bin/bash -c "${YADE_EXECUTABLE} scripts/checks-and-tests/gui/testGui${TestFile}.py"
 
 # FIXME: the idea is to have a screenshot from outside of yade. But taking a screenshot after it finished (crashed, or by normal exit)
 #        will just produce an empty screenshot. It has to be done in a different way.
