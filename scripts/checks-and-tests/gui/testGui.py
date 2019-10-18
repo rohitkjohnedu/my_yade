@@ -1,12 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+############################################
+##### the screenshot parameters       #####
+############################################
+from makeScreenshot import MakeScreenshot
+scr = MakeScreenshot("simple")
+
 ############################################
 ##### interesting parameters          #####
 ############################################
 # Cundall non-viscous damping
 # try zero damping and watch total energy...
-from __future__ import print_function
 damping = 0.2
 # initial angular velocity
 angVel = 3.0
@@ -53,7 +59,7 @@ O.engines=[
 	GlobalStiffnessTimeStepper(active=1,timeStepUpdateInterval=50,timestepSafetyCoefficient=.0001),
 	NewtonIntegrator(damping=damping,kinSplit=True,gravity=(0,0,-g)),
 	PyRunner(iterPeriod=20,command='myAddPlotData()')
-	,PyRunner(iterPeriod=guiIterPeriod,command='nextGuiTest()')
+	,PyRunner(iterPeriod=guiIterPeriod,command='scr.screenshotEngine()')
 ]
 
 O.bodies.append(box(center=[0,0,0],extents=[.5,.5,.5],fixed=True,color=[1,0,0],material='granular_material'))
@@ -152,135 +158,7 @@ def myAddPlotData():
 ############################################################################################################################################
 # here start changes of script simple-scene-energy-tracking.py, maybe later this duplication of code above can be removed.
 # The code below, takes screenshot before and after each GUI action. And yade is hopefully not crashing in between.
-# The test runs on debug build, so anyway we should get a useful backtrace from gitlab-CI
-
-scrNum=0;
-plot.liveInterval=0
-def makeNextScreenshot():
-	import subprocess,time
-	global scrNum
-	time.sleep(1)
-	subprocess.run(["scrot", "-z" , "scr"+str(scrNum).zfill(2)+".png"])
-	time.sleep(1)
-
-def nextGuiTest():
-	from yade import qt
-	import time
-	global scrNum
-	scrNum += 1
-	intro = "="*20+" "+"stage:"+str(scrNum)+" iter:"+str(O.iter)
-	if(scrNum == 0):
-		makeNextScreenshot();
-		print(intro)
-		return
-	if(scrNum == 1):
-		makeNextScreenshot();
-		print(intro+" opening yade.qt.View()")
-		yade.qt.View();
-		vv=yade.qt.views()[0]
-		vv.axes=True
-		vv.eyePosition=(2.8717367257539266,-3.2498802823394684,11.986065750108025)
-		vv.upVector  =(-0.786154130840315,-0.2651054185084529,0.558283798475441)
-		vv.center()
-		return
-	if(scrNum == 2):
-		makeNextScreenshot();
-		print(intro+" opening yade.qt.Inspector()")
-		yade.qt.Inspector()
-		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-		yade.qt.controller.inspector.show()
-		return
-	if(scrNum == 3):
-		makeNextScreenshot();
-		print(intro+" changing tab to bodies")
-		yade.qt.controller.inspector.close()
-		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-		yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
-		yade.qt.controller.inspector.show()
-		return
-	if(scrNum == 4):
-		makeNextScreenshot();
-		print(intro+" changing tab to interactions")
-		yade.qt.controller.inspector.close()
-		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-		yade.qt.controller.inspector.tabWidget.setCurrentIndex(2)
-		yade.qt.controller.inspector.show()
-		return
-	if(scrNum == 5):
-		makeNextScreenshot();
-		print(intro+" changing tab to cell")
-		yade.qt.controller.inspector.close()
-		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-		yade.qt.controller.inspector.tabWidget.setCurrentIndex(3)
-		yade.qt.controller.inspector.show()
-		return
-	if(scrNum == 6):
-		makeNextScreenshot();
-		print(intro+" changing tab to bodies")
-		yade.qt.controller.inspector.close()
-		yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
-		yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
-		yade.qt.controller.inspector.show()
-		print(intro+" moving yade.qt.Controller()")
-		yade.qt.Controller()
-		yade.qt.controller.setGeometry(550,5,500,1100)
-		return
-	if(scrNum == 7):
-		makeNextScreenshot();
-		print(intro+" changing tab to display")
-		yade.qt.controller.setTabActive('display')
-		return
-	if(scrNum == 8):
-		makeNextScreenshot();
-		print(intro+" changing tab to generator")
-		yade.qt.controller.setTabActive('generator')
-		return
-	if(scrNum == 9):
-		makeNextScreenshot();
-		print(intro+" changing tab to python")
-		yade.qt.controller.setTabActive('python')
-		return
-	if(scrNum == 10):
-		makeNextScreenshot();
-		print(intro+" changing tab to simulation")
-		yade.qt.controller.setTabActive('simulation')
-		return
-	if(scrNum == 11):
-		makeNextScreenshot();
-		# FIXME: I couldn't get matplotlib to draw the plot, while screenshotting is going on.
-		# makeNextScreenshot();
-		# O.pause()
-		# print(intro+" opening yade.plot.plot()")
-		# plot.liveInterval=0
-		# plot.plot(subPlots=False)
-		# fig=yade.plot.plot();
-		# time.sleep(5)
-		# matplotlib.pyplot.draw()
-		# time.sleep(5)
-		# makeNextScreenshot();
-		# matplotlib.pyplot.close(fig)
-		return
-	if(scrNum == 12):
-		# FIXME: this number '12' appears in three places:
-		# * here
-		# * in function makeNextScreenshot
-		# * bash script scripts/checks-and-tests/testGui.sh
-		# if more stages are added to this test, it has to be updated in three places.
-		makeNextScreenshot();
-		print(intro+" exiting")
-		O.pause()
-		vv=yade.qt.views()[0]
-		vv.close()
-		yade.qt.controller.inspector.close()
-		yade.qt.controller.close()
-		yade.runtime.opts.exitAfter=True
-#		sys.exit(0)
-		os._exit(0)
-#		ip = get_ipython()
-#		ip.ask_exit()
-#		ip.pt_cli.exit()
-#		quit()
-		return
+# The test runs also on debug build, so anyway we should get a useful backtrace from gitlab-CI
 
 O.dt = O.dt*0.0001
 O.run(guiIterPeriod*12+1)
