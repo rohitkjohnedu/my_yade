@@ -9,7 +9,7 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 mkdir -p screenshots
 
 # FIXME: this should be deduced automatically from the files matching pattern testGui*.py, see also testGui.py
-TESTS=( "Simple" )
+TESTS=( "Empty" "Simple" )
 
 for TestFile in ${TESTS}; do
 
