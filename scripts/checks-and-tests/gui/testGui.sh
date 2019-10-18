@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 # This check is to be called inside xvfb-run, so that it has a working Xserver in which a simple yade GUI session can be started, the
 # testGui.py script is only a slightly modified simple-scene-energy-tracking.py example.
@@ -9,9 +9,11 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 mkdir -p screenshots
 
 # FIXME: this should be deduced automatically from the files matching pattern testGui*.py, see also testGui.py
-TESTS=( "Empty" "Simple" )
+declare -a TESTS=( "Empty" "Simple" )
 
-for TestFile in ${TESTS}; do
+for TestFile in ${TESTS[@]}; do
+
+echo -e "=== Testing file testGui${TestFile}.py ===\n"
 
 xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui${TestFile}.py"
 
