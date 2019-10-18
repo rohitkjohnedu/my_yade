@@ -1,4 +1,5 @@
-BasedOnStyle: LLVM
-IndentWidth: 4
-Language: Cpp
+BasedOnStyle: WebKit
+UseTab: ForIndentation
+IndentWidth: 8
 ColumnLimit: 140
+Language: Cpp
