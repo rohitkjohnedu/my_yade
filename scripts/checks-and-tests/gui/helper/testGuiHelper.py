@@ -17,6 +17,7 @@ class TestGUIHelper:
 	"""
 	def __init__(self,name=None):
 		self.scrNum=0;
+		# FIXME : this number 14 is hardcoded in scripts/checks-and-tests/gui/testGui.sh when testing if screenshots are present.
 		self.maxTestNum=14
 		if(name != None):
 			self.name=name;
@@ -50,7 +51,7 @@ class TestGUIHelper:
 
 	def screenshotEngine(self):
 		self.scrNum += 1
-		intro = "="*20+" "+"stage:"+str(self.scrNum)+" iter:"+str(O.iter)
+		intro = "Test '"+self.name+"', stage:"+str(self.scrNum)+" iter:"+str(O.iter)
 		if(self.scrNum == 1):
 			self.makeNextScreenshot();
 			print(intro+" moving yade.qt.Controller()")
@@ -153,16 +154,9 @@ class TestGUIHelper:
 			# time.sleep(5)
 			# self.makeNextScreenshot();
 			# matplotlib.pyplot.close(fig)
-			print("ITER = ",O.iter)
 		if(self.scrNum == 14):
-			print("ITER = ",O.iter)
-			# FIXME: this number '12' appears in three places:
-			# * here
-			# * in function self.makeNextScreenshot
-			# * bash script scripts/checks-and-tests/testGui.sh
-			# if more stages are added to this test, it has to be updated in three places.
 			self.makeNextScreenshot();
-			print(intro+" exiting")
+			print(intro+" exiting\n\n")
 			O.pause()
 			vv=yade.qt.views()[0]
 			vv.close()
