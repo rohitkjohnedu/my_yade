@@ -26,10 +26,10 @@ declare -a TESTS=( "Empty" "Simple" )
 for TestFile in ${TESTS[@]}; do
 
 LOGFILE="screenshots/testGui_${TestFile}.log"
-
-echo -e "=== Testing file testGui${TestFile}.py, also see ${LOGFILE} ===\n"
-
 tail -F ${LOGFILE} &
+TAIL_PID=$!
+
+echo -e "=== Testing file testGui${TestFile}.py, also see ${LOGFILE}, tail pid:${TAIL_PID} ===\n"
 
 /usr/bin/xterm -l -xrm "XTerm*logFile:${LOGFILE}" -geometry 100x48+5+560  -e bash -c "${YADE_EXECUTABLE} scripts/checks-and-tests/gui/testGui${TestFile}.py"
 
@@ -38,6 +38,8 @@ tail -F ${LOGFILE} &
 # scrot -z scrBash01.png
 
 mv scr*.png screenshots
+
+kill -9 ${TAIL_PID}
 
 if [[ ! -f screenshots/scr_${TestFile}_12.png ]] ; then
     echo "File screenshots/scr_${TestFile}_12.png is missing, aborting."
