@@ -6,6 +6,10 @@
 
 echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb crash backtrace, will be on screenshots ===\n\n"
 
+echo -e "=== is xterm   present? We found this: "`which xterm`  ; ls -la /usr/bin/xterm
+echo -e "=== is scrot   present? We found this: "`which scrot`  ; ls -la /usr/bin/scrot
+echo -e "=== is xdotool present? We found this: "`which xdotool`; ls -la /usr/bin/xdotool
+
 mkdir -p screenshots
 
 # FIXME: this should be deduced automatically from the files matching pattern testGui*.py, see also testGui.py
