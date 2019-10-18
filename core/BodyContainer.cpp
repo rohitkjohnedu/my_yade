@@ -148,13 +148,13 @@ void BodyContainer::updateShortLists()
 		if (not b)
 			continue;
 		realBodies.push_back(b->getId());
-#ifdef YADE_MPI
-		// clumps are taken as bounded bodies since their member are bounded, otherwise things would fail with clumps as they would be ignored
-		if (b->subdomain == subdomain and not b->getIsSubdomain())
-			subdomainBodies.push_back(b->id);
-#endif
+	#ifdef YADE_MPI
+		if (b->subdomain == subdomain and not b->getIsSubdomain()) subdomainBodies.push_back(b->id);
+	#endif
+
 	}
 	dirty = false;
 }
+
 
 } // namespace yade
