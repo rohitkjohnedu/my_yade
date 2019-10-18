@@ -8,9 +8,11 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 
 mkdir -p screenshots
 
-xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/testGui.py"
+xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/gui/testGui.py"
 
-scrot -z scrBash01.png
+# FIXME: the idea is to have a screenshot from outside of yade. But taking a screenshot after it finished (crashed, or by normal exit)
+#        will just produce an empty screenshot. It has to be done in a different way.
+# scrot -z scrBash01.png
 
 mv scr*.png screenshots
 
