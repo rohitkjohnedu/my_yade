@@ -8,9 +8,9 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 
 mkdir -p screenshots
 
-ls -la
-
 xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and-tests/testGui.py"
+
+scrot -z scrBash01.png
 
 mv scr*.png screenshots
 
