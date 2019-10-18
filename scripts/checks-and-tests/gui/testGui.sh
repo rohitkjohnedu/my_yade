@@ -23,8 +23,8 @@ xterm -geometry 100x48+5+560  -e bash -c "install/bin/yade-ci scripts/checks-and
 
 mv scr*.png screenshots
 
-if [[ ! -f screenshots/scr12_${TestFile}.png ]] ; then
-    echo "File screenshots/scr12_${TestFile}.png is missing, aborting."
+if [[ ! -f screenshots/scr_${TestFile}_12.png ]] ; then
+    echo "File screenshots/scr_${TestFile}_12.png is missing, aborting."
     exit 1
 fi
 

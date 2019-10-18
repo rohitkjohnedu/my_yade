@@ -24,7 +24,7 @@ class TestGUIHelper:
 
 	def makeNextScreenshot(self):
 		time.sleep(1)
-		subprocess.run(["scrot", "-z" , "scr"+str(self.scrNum).zfill(2)+"_"+self.name+".png"])
+		subprocess.run(["scrot", "-z" , "scr"+"_"+self.name+"_"+str(self.scrNum).zfill(2)+".png"])
 		time.sleep(1)
 
 	def screenshotEngine(self):
