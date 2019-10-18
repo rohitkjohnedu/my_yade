@@ -45,68 +45,84 @@ class MakeScreenshot:
 			return
 		if(self.scrNum == 2):
 			makeNextScreenshot();
-			print(intro+" opening yade.qt.Inspector()")
+			print(intro+" opening yade.qt.Inspector() , setting wire=True, setting intrGeom=True")
 			yade.qt.Inspector()
 			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
 			yade.qt.controller.inspector.show()
+			qt.Renderer().wire=True
+			qt.Renderer().intrGeom=True
 			return
 		if(self.scrNum == 3):
 			makeNextScreenshot();
-			print(intro+" changing tab to bodies")
+			print(intro+" changing tab to bodies, setting intrPhys=True")
 			yade.qt.controller.inspector.close()
 			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
 			yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
 			yade.qt.controller.inspector.show()
+			qt.Renderer().intrPhys=True
 			return
 		if(self.scrNum == 4):
 			makeNextScreenshot();
-			print(intro+" changing tab to interactions")
+			print(intro+" changing tab to interactions, setting wire=False, setting intrWire=True")
 			yade.qt.controller.inspector.close()
 			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
 			yade.qt.controller.inspector.tabWidget.setCurrentIndex(2)
 			yade.qt.controller.inspector.show()
+			qt.Renderer().wire=False
+			qt.Renderer().intrWire=True
 			return
 		if(self.scrNum == 5):
 			makeNextScreenshot();
-			print(intro+" changing tab to cell")
+			print(intro+" changing tab to cell, setting intrPhys=False")
 			yade.qt.controller.inspector.close()
 			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
 			yade.qt.controller.inspector.tabWidget.setCurrentIndex(3)
 			yade.qt.controller.inspector.show()
+			qt.Renderer().intrPhys=False
 			return
 		if(self.scrNum == 6):
 			makeNextScreenshot();
-			print(intro+" changing tab to bodies")
+			print(intro+" changing tab to bodies, setting intrWire=False, setting intrGeom=False, setting intrPhys=True")
 			yade.qt.controller.inspector.close()
 			yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
 			yade.qt.controller.inspector.tabWidget.setCurrentIndex(1)
 			yade.qt.controller.inspector.show()
+			qt.Renderer().intrWire=False
+			qt.Renderer().intrGeom=False
+			qt.Renderer().intrPhys=True
 			print(intro+" moving yade.qt.Controller()")
 			yade.qt.Controller()
+			yade.qt.controller.setWindowTitle('GUI test: '+name)
 			yade.qt.controller.setGeometry(550,20,500,1100)
 			return
 		if(self.scrNum == 7):
 			makeNextScreenshot();
-			print(intro+" changing tab to display")
+			print(intro+" changing tab to display, setting intrAllWire=True")
 			yade.qt.controller.setTabActive('display')
+			qt.Renderer().intrAllWire=True
 			return
 		if(self.scrNum == 8):
 			makeNextScreenshot();
-			print(intro+" changing tab to generator")
+			print(intro+" changing tab to generator, setting intrGeom=True")
 			yade.qt.controller.setTabActive('generator')
+			qt.Renderer().intrGeom=True
 			return
 		if(self.scrNum == 9):
 			makeNextScreenshot();
-			print(intro+" changing tab to python")
+			print(intro+" changing tab to python, setting intrAllWire=False")
 			yade.qt.controller.setTabActive('python')
+			qt.Renderer().intrAllWire=False
 			return
 		if(self.scrNum == 10):
 			makeNextScreenshot();
-			print(intro+" changing tab to simulation")
+			print(intro+" changing tab to simulation, setting intrPhys=False")
 			yade.qt.controller.setTabActive('simulation')
+			qt.Renderer().intrPhys=False
 			return
 		if(self.scrNum == 11):
+			print(intro+" (testing of matplotlib is skipped for now...), setting intrGeom=False")
 			makeNextScreenshot();
+			qt.Renderer().intrGeom=False
 			# FIXME: I couldn't get matplotlib to draw the plot, while screenshotting is going on.
 			# makeNextScreenshot();
 			# O.pause()
