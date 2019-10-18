@@ -50,8 +50,6 @@ ForceContainer::ForceContainer() {
   for(int i=0; i<nThreads; i++){
     _forceData.push_back(vvector());
     _torqueData.push_back(vvector());
-    _moveData.push_back(vvector());
-    _rotData.push_back(vvector());
     sizeOfThreads.push_back(0);
     _maxId.push_back(0);
   }
@@ -77,30 +75,6 @@ void ForceContainer::addTorque(Body::id_t id, const Vector3r& t) {
   ensureSize(id,omp_get_thread_num());
   synced=false;
   _torqueData[omp_get_thread_num()][id]+=t;
-}
-
-const Vector3r& ForceContainer::getMove(Body::id_t id) {
-  ensureSynced();
-  return ((size_t)id<size)?_move[id]:_zero;
-}
-
-void ForceContainer::addMove(Body::id_t id, const Vector3r& m) {
-  ensureSize(id,omp_get_thread_num());
-  synced=false;
-  moveRotUsed=true;
-  _moveData[omp_get_thread_num()][id]+=m;
-}
-
-const Vector3r& ForceContainer::getRot(Body::id_t id) {
-  ensureSynced();
-  return ((size_t)id<size)?_rot[id]:_zero;
-}
-
-void ForceContainer::addRot(Body::id_t id, const Vector3r& r) {
-  ensureSize(id,omp_get_thread_num());
-  synced=false;
-  moveRotUsed=true;
-  _rotData[omp_get_thread_num()][id]+=r;
 }
 
 void ForceContainer::addMaxId(Body::id_t id) {
@@ -158,22 +132,6 @@ const Vector3r ForceContainer::getTorqueSingle(Body::id_t id) {
   return ret;
 }
 
-const Vector3r ForceContainer::getMoveSingle(Body::id_t id) {
-  Vector3r ret(Vector3r::Zero());
-  for(int t=0; t<nThreads; t++) {
-    ret+=((size_t)id<sizeOfThreads[t])?_moveData[t][id]:_zero;
-  }
-  return ret;
-}
-
-const Vector3r ForceContainer::getRotSingle(Body::id_t id) {
-  Vector3r ret(Vector3r::Zero());
-  for(int t=0; t<nThreads; t++) {
-    ret+=((size_t)id<sizeOfThreads[t])?_rotData[t][id]:_zero;
-  }
-  return ret;
-}
-
 void ForceContainer::sync(){
   if(synced) return;
   boost::mutex::scoped_lock lock(globalMutex);
@@ -193,13 +151,6 @@ void ForceContainer::sync(){
 	    _forceData[thread][id]=Vector3r::Zero(); _torqueData[thread][id]=Vector3r::Zero(); }  //reset here so we don't have to do it later
     _force[id]+=sumF; _torque[id]+=sumT;
     if (permForceUsed) {_force[id]+=_permForce[id]; _torque[id]+=_permTorque[id];}
-  }
-  if(moveRotUsed){
-    for(long id=0; id<(long)size; id++){
-      Vector3r sumM(Vector3r::Zero()), sumR(Vector3r::Zero());
-      for(int thread=0; thread<nThreads; thread++){ sumM+=_moveData[thread][id]; sumR+=_rotData[thread][id];}
-      _move[id]=sumM; _rot[id]=sumR;
-    }
   }
   synced=true; syncCount++;
 }
@@ -223,9 +174,6 @@ void ForceContainer::reset(long iter, bool resetAll) {
 		#pragma omp parallel for schedule(static)
 		for (unsigned long k=0;k<currSize;k++) /*_torque[sdIds[k]]=Vector3r::Zero();*/memset(&_torque [sdIds[k]], 0,sizeof(Vector3r));
 		// those need a reset per-thread OTOH
-		if(moveRotUsed) for(int thread=0; thread<nThreads; thread++){
-			for (unsigned long k=0;k<currSize;k++) _moveData[thread][sdIds[k]]=Vector3r::Zero();
-			for (unsigned long k=0;k<currSize;k++) _rotData[thread][sdIds[k]]=Vector3r::Zero();}
 		if (resetAll){
 			for (unsigned long k=0;k<currSize;k++) _permForce[sdIds[k]]=Vector3r::Zero();
 			for (unsigned long k=0;k<currSize;k++) _permTorque[sdIds[k]]=Vector3r::Zero();
@@ -234,22 +182,14 @@ void ForceContainer::reset(long iter, bool resetAll) {
 	} else { // else reset everything		
 		memset(&_force [0], 0,sizeof(Vector3r)*size);
 		memset(&_torque[0], 0,sizeof(Vector3r)*size);
-		if(moveRotUsed) for(int thread=0; thread<nThreads; thread++){
-			memset(&_moveData  [thread][0],0,sizeof(Vector3r)*sizeOfThreads[thread]);
-			memset(&_rotData   [thread][0],0,sizeof(Vector3r)*sizeOfThreads[thread]);}
 	}
   
-	if(moveRotUsed){
-		memset(&_move  [0], 0,sizeof(Vector3r)*size);
-		memset(&_rot   [0], 0,sizeof(Vector3r)*size);}
-		
 	if (resetAll and permForceUsed){
 		memset(&_permForce [0], 0,sizeof(Vector3r)*size);
 		memset(&_permTorque[0], 0,sizeof(Vector3r)*size);
 		permForceUsed = false;}
 		
 	if (!permForceUsed) synced=true; else synced=false;
-	moveRotUsed=false;
 	lastReset=iter;
 }
 
@@ -262,19 +202,12 @@ void ForceContainer::resize(size_t newSize, int threadN) {
   _torqueData[threadN].reserve(size_t(newSize*1.5));
   _forceData[threadN].resize(newSize,Vector3r::Zero());
   _torqueData[threadN].resize(newSize,Vector3r::Zero());
-  if (moveRotUsed) {
-    _moveData[threadN].reserve(size_t(newSize*1.5));
-    _rotData[threadN].reserve(size_t(newSize*1.5));
-    _moveData[threadN].resize(newSize,Vector3r::Zero());
-    _rotData[threadN].resize(newSize,Vector3r::Zero());
-  }
   sizeOfThreads[threadN] = newSize;
   _maxId[threadN]=newSize-1;
   syncedSizes=false;
 }
 
 int ForceContainer::getNumAllocatedThreads() const {return nThreads;}
-bool ForceContainer::getMoveRotUsed() const {return moveRotUsed;}
 bool ForceContainer::getPermForceUsed() const {return permForceUsed;}
 
 void ForceContainer::syncSizesOfContainers() {
@@ -295,12 +228,6 @@ void ForceContainer::syncSizesOfContainers() {
 	  _torque.resize(newSize,Vector3r::Zero());
   }
   if (permForceUsed) resizePerm(newSize);
-  if (moveRotUsed and _move.size()<newSize) {
-	  _move.reserve(size_t(newSize*1.3));
-	  _rot.reserve(size_t(newSize*1.3));
-	  _move.resize(size,Vector3r::Zero());
-	  _rot.resize(size,Vector3r::Zero());
-  }
   syncedSizes=true;
   size=newSize;
 }

@@ -32,28 +32,6 @@ void ForceContainer::addTorque(Body::id_t id,const Vector3r& t) {
   _torque[id]+=t;
 }
 
-const Vector3r& ForceContainer::getMove(Body::id_t id) {
-  ensureSize(id);
-  return _move[id];
-}
-
-void ForceContainer::addMove(Body::id_t id,const Vector3r& f) {
-  ensureSize(id);
-  moveRotUsed=true;
-  _move[id]+=f;
-}
-
-const Vector3r& ForceContainer::getRot(Body::id_t id) {
-  ensureSize(id);
-  return _rot[id];
-}
-
-void ForceContainer::addRot(Body::id_t id,const Vector3r& f) {
-  ensureSize(id);
-  moveRotUsed=true;
-  _rot[id]+=f;
-}
-
 void ForceContainer::addMaxId(Body::id_t id) {
   _maxId=id;
 }
@@ -104,15 +82,6 @@ const Vector3r ForceContainer::getTorqueSingle(Body::id_t id) {
     return _torque[id];
   }
 }
-const Vector3r ForceContainer::getMoveSingle(Body::id_t id) {
-  ensureSize(id);
-  return _move [id];
-}
-
-const Vector3r ForceContainer::getRotSingle(Body::id_t id) {
-  ensureSize(id);
-  return _rot[id];
-}
 
 void ForceContainer::sync() {
   if (_maxId>0) {
@@ -135,11 +104,6 @@ void ForceContainer::sync() {
 void ForceContainer::reset(long iter, bool resetAll) {
   memset(&_force [0],0,sizeof(Vector3r)*size);
   memset(&_torque[0],0,sizeof(Vector3r)*size);
-  if(moveRotUsed){
-    memset(&_move  [0],0,sizeof(Vector3r)*size);
-    memset(&_rot   [0],0,sizeof(Vector3r)*size);
-    moveRotUsed=false;
-  }
   if (resetAll){
     memset(&_permForce [0], 0,sizeof(Vector3r)*size);
     memset(&_permTorque[0], 0,sizeof(Vector3r)*size);
@@ -154,13 +118,10 @@ void ForceContainer::resize(size_t newSize) {
   _torque.resize(newSize,Vector3r::Zero());
   _permForce.resize(newSize,Vector3r::Zero());
   _permTorque.resize(newSize,Vector3r::Zero());
-  _move.resize(newSize,Vector3r::Zero());
-  _rot.resize(newSize,Vector3r::Zero());
   size=newSize;
 }
 
 int ForceContainer::getNumAllocatedThreads() const {return 1;}
-bool ForceContainer::getMoveRotUsed() const {return moveRotUsed;}
 bool ForceContainer::getPermForceUsed() const {return permForceUsed;}
 
 } // namespace yade

@@ -98,11 +98,10 @@ class BodyInspector(QWidget):
 		# forces display
 		forcesWidget=QFrame(self); forcesWidget.setFrameShape(QFrame.Box); self.forceGrid=QGridLayout(forcesWidget); 
 		self.forceGrid.setVerticalSpacing(0); self.forceGrid.setHorizontalSpacing(9); self.forceGrid.setContentsMargins(4,4,4,4);
-		for i,j in itertools.product((0,1,2,3),(-1,0,1,2)):
-			lab=QLabel('<small>'+('force','torque','move','rot')[i]+'</small>' if j==-1 else ''); self.forceGrid.addWidget(lab,i,j+1);
+		for i,j in itertools.product((0,1),(-1,0,1,2)):
+			lab=QLabel('<small>'+('force','torque')[i]+'</small>' if j==-1 else ''); self.forceGrid.addWidget(lab,i,j+1);
 			if j>=0: lab.setAlignment(Qt.AlignRight)
 			if i>1: lab.hide() # do not show forced moves and rotations by default (they will appear if non-zero)
-		self.showMovRot=False
 		#
 		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setContentsMargins(0,0,0,0)
 		self.grid.addWidget(topBoxWidget)
@@ -124,15 +123,8 @@ class BodyInspector(QWidget):
 	def displayForces(self):
 		if self.bodyId<0: return
 		try:
-			val=[O.forces.f(self.bodyId),O.forces.t(self.bodyId),O.forces.move(self.bodyId),O.forces.rot(self.bodyId)]
-			hasMovRot=(val[2]!=Vector3.Zero or val[3]!=Vector3.Zero)
-			if hasMovRot!=self.showMovRot:
-				for i,j in itertools.product((2,3),(-1,0,1,2)):
-					if hasMovRot: self.forceGrid.itemAtPosition(i,j+1).widget().show()
-					else: self.forceGrid.itemAtPosition(i,j+1).widget().hide()
-				self.showMovRot=hasMovRot
-			rows=((0,1,2,3) if hasMovRot else (0,1))
-			for i,j in itertools.product(rows,(0,1,2)):
+			val=[O.forces.f(self.bodyId),O.forces.t(self.bodyId)]
+			for i,j in itertools.product((0,1),(0,1,2)):
 				self.forceGrid.itemAtPosition(i,j+1).widget().setText('<small>'+str(val[i][j])+'</small>')
 		except IndexError:pass
 	def tryShowBody(self):

@@ -130,6 +130,7 @@ void NewtonIntegrator::action()
 	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies){
 			// clump members are handled inside clumps
 			if(b->isClumpMember()) continue;
+			if ((mask>0) and not b->maskCompatible(mask))  continue;
 	#ifdef YADE_MPI
 			if(scene->subdomain!=b->subdomain or b->getIsSubdomain()) continue;//this thread will not move bodies from other subdomains
 	#endif
@@ -192,9 +193,9 @@ void NewtonIntegrator::action()
 			} else if (isPeriodic && homoDeform>1) state->vel+=dt*prevVelGrad*state->vel;
 
 			// update positions from velocities (or torque, for the aspherical integrator)
-			leapfrogTranslate(state,id,dt);
-			if(!useAspherical) leapfrogSphericalRotate(state,id,dt);
-			else leapfrogAsphericalRotate(state,id,dt,m);
+			leapfrogTranslate(state,dt);
+			if(!useAspherical) leapfrogSphericalRotate(state,dt);
+			else leapfrogAsphericalRotate(state,dt,m);
 			
 			saveMaximaDisplacement(b);
 			// move individual members of the clump, save maxima velocity (for collider stride)
@@ -217,39 +218,28 @@ void NewtonIntegrator::action()
 	timingDeltas->checkpoint("terminate");
 }
 
-void NewtonIntegrator::leapfrogTranslate(State* state, const Body::id_t& id, const Real& dt){
-	if (scene->forces.getMoveRotUsed()) state->pos+=scene->forces.getMove(id);
+void NewtonIntegrator::leapfrogTranslate(State* state, const Real& dt){
 	// update velocity reflecting changes in the macroscopic velocity field, making the problem homothetic.
 	//NOTE : if the velocity is updated before moving the body, it means the current velGrad (i.e. before integration in cell->integrateAndUpdate) will be effective for the current time-step. Is it correct? If not, this velocity update can be moved just after "state->pos += state->vel*dt", meaning the current velocity impulse will be applied at next iteration, after the contact law. (All this assuming the ordering is resetForces->integrateAndUpdate->contactLaw->PeriCompressor->NewtonsLaw. Any other might fool us.)
 	//NOTE : dVel defined without wraping the coordinates means bodies out of the (0,0,0) period can move realy fast. It has to be compensated properly in the definition of relative velocities (see Ig2 functors and contact laws).
 		//Reflect mean-field (periodic cell) acceleration in the velocity
 	if(scene->isPeriodic && homoDeform) {Vector3r dVel=dVelGrad*state->pos; state->vel+=dVel;}
-	
-	if ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) ) {
-		state->pos+=state->vel*dt;
-	}
+	state->pos+=state->vel*dt;
 }
 
-void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Body::id_t& id, const Real& dt )
+void NewtonIntegrator::leapfrogSphericalRotate(State* state, const Real& dt )
 {
  	if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
 	Real angle2=state->angVel.squaredNorm();
-	if (angle2!=0 and ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) )) {//If we have an angular velocity, we make a rotation
+	if (angle2!=0) {//If we have an angular velocity, we make a rotation
 		Real angle=sqrt(angle2);
 		Quaternionr q(AngleAxisr(angle*dt,state->angVel/angle));
 		state->ori = q*state->ori;
 	}
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero() 
-		and ( (mask<=0) or ((mask>0) and (Body::byId(id)->maskCompatible(mask))) )) {
-		Vector3r r(scene->forces.getRot(id));
-		Real norm=r.norm(); r/=norm;
-		Quaternionr q(AngleAxisr(norm,r));
-		state->ori=q*state->ori;
-	}
 	state->ori.normalize();
 }
 
-void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& id, const Real& dt, const Vector3r& M){
+void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Real& dt, const Vector3r& M){
 	//FIXME: where to increment angular velocity like this? Only done for spherical rotations at the moment
 	//if(scene->isPeriodic && homoDeform) {state->angVel+=dSpin;}
 	Matrix3r A=state->ori.conjugate().toRotationMatrix(); // rotation matrix from global to local r.f.
@@ -266,13 +256,6 @@ void NewtonIntegrator::leapfrogAsphericalRotate(State* state, const Body::id_t& 
 	const Quaternionr dotQ_half=DotQ(angVel_b_half,Q_half); // dQ/dt at time n+1/2
 	state->ori=Quaternionr(state->ori.coeffs()+dt*dotQ_half.coeffs()); // Q at time n+1
 	state->angVel=state->ori*angVel_b_half; // global angular velocity at time n+1/2
-
-	if(scene->forces.getMoveRotUsed() && scene->forces.getRot(id)!=Vector3r::Zero()) {
-		Vector3r r(scene->forces.getRot(id));
-		Real norm=r.norm(); r/=norm;
-		Quaternionr q(AngleAxisr(norm,r));
-		state->ori=q*state->ori;
-	}
 	state->ori.normalize();
 }
 
