@@ -40,14 +40,14 @@ class TestGUIHelper:
 #		quit()
 
 	def makeNextScreenshot(self):
-		time.sleep(1)
+		time.sleep(0.25)
 		subprocess.run(["/usr/bin/scrot", "-z" , "scr"+"_"+self.name+"_"+str(self.scrNum).zfill(2)+".png"])
-		time.sleep(1)
+		time.sleep(0.25)
 
 	def clickOnScreen(self,x,y,mouseButton=1):
-		time.sleep(1)
+		time.sleep(0.25)
 		subprocess.run(["/usr/bin/xdotool", "mousemove" , str(x) , str(y) , "click" , str(mouseButton) , "mousemove" , "restore" ])
-		time.sleep(1)
+		time.sleep(0.25)
 
 	def screenshotEngine(self):
 		self.scrNum += 1
@@ -82,7 +82,7 @@ class TestGUIHelper:
 			qt.Renderer().intrGeom=True
 		if(self.scrNum == 4):
 			self.makeNextScreenshot();
-			print(intro+" changing tab to bodies, setting intrPhys=True")
+			print(intro+" changing tab to bodies, setting intrPhys=True, setting bound=True")
 			self.clickOnScreen(1148,26)
 			#Previously these were used. They work, but do not always trigger crashes.
 			# yade.qt.controller.inspector.close()
@@ -90,6 +90,7 @@ class TestGUIHelper:
 			# yade.qt.controller.inspector.tabWidget.setCurrentIndex(2)
 			# yade.qt.controller.inspector.show()
 			qt.Renderer().intrPhys=True
+			qt.Renderer().bound=True
 		if(self.scrNum == 5):
 			self.makeNextScreenshot();
 			print(intro+" clicking on interaction, setting wire=False, setting intrWire=True")
@@ -134,14 +135,12 @@ class TestGUIHelper:
 			qt.Renderer().intrAllWire=False
 		if(self.scrNum == 12):
 			self.makeNextScreenshot();
-			print(intro+" changing tab to simulation, setting intrPhys=False")
+			print(intro+" changing tab to simulation")
 			self.clickOnScreen(580,26)
 			#yade.qt.controller.setTabActive('simulation')
-			qt.Renderer().intrPhys=False
 		if(self.scrNum == 13):
-			print(intro+" (testing of matplotlib is skipped for now...), setting intrGeom=False")
+			print(intro+" (testing of matplotlib is skipped for now...)")
 			self.makeNextScreenshot();
-			qt.Renderer().intrGeom=False
 			# FIXME: I couldn't get matplotlib to draw the plot, while screenshotting is going on.
 			# self.makeNextScreenshot();
 			# O.pause()
