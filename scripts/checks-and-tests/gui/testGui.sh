@@ -47,9 +47,12 @@ echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb c
 mkdir -p screenshots
 
 # FIXME: this should be deduced automatically from the files matching pattern testGui*.py, see also testGui.py
+#        currently these names are written manually inside:
+#          *  scripts/checks-and-tests/gui/testGuiEmpty.py
+#          *  scripts/checks-and-tests/gui/testGuiSimple.py
 declare -a TESTS=( "Empty" "Simple" )
 
-	for TestFile in ${TESTS[@]}; do
+for TestFile in ${TESTS[@]}; do
 
 	LOGFILE="screenshots/testGui_${TestFile}.txt"
 	tail -F ${LOGFILE} &
