@@ -21,6 +21,9 @@ IndentCaseLabels: true
 # IndentPPDirectives: BeforeHash
 UseTab: ForContinuationAndIndentation
 KeepEmptyLinesAtTheStartOfBlocks: false
+MacroBlockBegin: "glBegin|glNewList"
+MacroBlockEnd: "glEnd|glEndList"
+MaxEmptyLinesToKeep: 2
 ObjCBinPackProtocolList: Never
 SortUsingDeclarations: true
 # wait till clang supports it: https://reviews.llvm.org/D33029
