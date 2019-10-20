@@ -1,15 +1,28 @@
 BasedOnStyle: WebKit
-UseTab: ForIndentation
-IndentWidth: 8
 AccessModifierOffset: -8
-ContinuationIndentWidth: 8
-ConstructorInitializerIndentWidth: 8
-ColumnLimit: 200
-BinPackParameters: false
 AlignAfterOpenBracket: AlwaysBreak
-AllowAllParametersOfDeclarationOnNextLine: false
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignTrailingComments: true
+#wait till clang supports it
+# AllowAllArgumentsOnNextLine: true
+# AllowShortBlocksOnASingleLine: Always
+AllowShortCaseLabelsOnASingleLine: false
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackArguments: false
+BinPackParameters: false
 BreakBeforeBraces: Stroustrup
 BreakConstructorInitializers: BeforeComma
+ColumnLimit: 140
+ConstructorInitializerIndentWidth: 8
+ContinuationIndentWidth: 8
+IndentWidth: 8
+IndentCaseLabels: true
+# IndentPPDirectives: BeforeHash
+UseTab: ForContinuationAndIndentation
+KeepEmptyLinesAtTheStartOfBlocks: false
+ObjCBinPackProtocolList: Never
+SortUsingDeclarations: true
 # wait till clang supports it: https://reviews.llvm.org/D33029
 # DanglingParenthesis: true
 Cpp11BracedListStyle: false
