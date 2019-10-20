@@ -11,6 +11,7 @@ namespace yade { // Cannot have #include directive inside.
 class GravityEngine: public FieldApplier{
 	public:
 		virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GravityEngine,FieldApplier,"Engine applying constant acceleration to all bodies. DEPRECATED, use :yref:`Newton::gravity` unless you need energy tracking or selective gravity application using groupMask).",
 		((Vector3r,gravity,Vector3r::Zero(),,"Acceleration [kgms⁻²]"))
 		((int,gravPotIx,-1,(Attr::noSave|Attr::hidden),"Index for gravPot energy"))
@@ -18,6 +19,7 @@ class GravityEngine: public FieldApplier{
 		((bool,warnOnce,true,,"For deprecation warning once."))
 		,/*ctor*/,/*py*/
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(GravityEngine);
@@ -30,6 +32,7 @@ REGISTER_SERIALIZABLE(GravityEngine);
 class CentralGravityEngine: public FieldApplier {
 	public:
 		virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CentralGravityEngine,FieldApplier,"Engine applying acceleration to all bodies, towards a central body.",
 		((Body::id_t,centralBody,Body::ID_NONE,,"The :yref:`body<Body>` towards which all other bodies are attracted."))
 		((Real,accel,0,,"Acceleration magnitude [kgms⁻²]"))
@@ -37,6 +40,7 @@ class CentralGravityEngine: public FieldApplier {
 		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be affected by this engine. If 0, all bodies will be affected."))
 		,,
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(CentralGravityEngine);
 
@@ -46,12 +50,14 @@ REGISTER_SERIALIZABLE(CentralGravityEngine);
 class AxialGravityEngine: public FieldApplier {
 	public:
 	virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(AxialGravityEngine,FieldApplier,"Apply acceleration (independent of distance) directed towards an axis.",
 		((Vector3r,axisPoint,Vector3r::Zero(),,"Point through which the axis is passing."))
 		((Vector3r,axisDirection,Vector3r::UnitX(),,"direction of the gravity axis (will be normalized automatically)"))
 		((Real,acceleration,0,,"Acceleration magnitude [kgms⁻²]"))
 		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be affected by this engine. If 0, all bodies will be affected."))
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(AxialGravityEngine);
 
@@ -59,6 +65,7 @@ class HdapsGravityEngine: public GravityEngine{
 	public:
 	Vector2i readSysfsFile(const std::string& name);
 	virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(HdapsGravityEngine,GravityEngine,"Read accelerometer in Thinkpad laptops (`HDAPS <http://en.wikipedia.org/wiki/Active_hard_drive_protection>`__ and accordingly set gravity within the simulation. This code draws from `hdaps-gl <https://sourceforge.net/project/showfiles.php?group_id=138242>`__ . See :ysrc:`scripts/test/hdaps.py` for an example.",
 		((string,hdapsDir,"/sys/devices/platform/hdaps",,"Hdaps directory; contains ``position`` (with accelerometer readings) and ``calibration`` (zero acceleration)."))
 		((Real,msecUpdate,50,,"How often to update the reading."))
@@ -69,6 +76,7 @@ class HdapsGravityEngine: public GravityEngine{
 		((bool,calibrated,false,,"Whether *calibrate* was already updated. Do not set to ``True`` by hand unless you also give a meaningful value for *calibrate*."))
 		((Vector3r,zeroGravity,Vector3r(0,0,-1),,"Gravity if the accelerometer is in flat (zero) position."))
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(HdapsGravityEngine);
 

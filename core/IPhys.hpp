@@ -17,11 +17,13 @@ namespace yade { // Cannot have #include directive inside.
 
 class IPhys : public Serializable, public Indexable
 {
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(IPhys,Serializable,"Physical (material) properties of :yref:`interaction<Interaction>`.",
 		/*attrs*/,
 		/*ctor*/,
 		/*py*/YADE_PY_TOPINDEXABLE(IPhys)
 	);
+	// clang-format on
 	REGISTER_INDEX_COUNTER(IPhys);
 };
 REGISTER_SERIALIZABLE(IPhys);

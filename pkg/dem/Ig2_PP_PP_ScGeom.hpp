@@ -24,6 +24,7 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 		Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
 		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PP_PP_ScGeom,IGeomFunctor,"EXPERIMENTAL. IGeom functor for PotentialParticle - PotentialParticle pair",
 			((Real, accuracyTol, pow(10,-7),, "accuracy desired, tolerance criteria for SOCP"))
 //			((Real, interactionDetectionFactor, 1.0,,"")) //FIXME: Not used but may be useful in the future for distant interactions
@@ -32,6 +33,7 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 			((Real, unitWidth2D, 1.0, ,"Unit width in 2D"))
 			, /* ctor */
 		);
+	// clang-format on
 
 		FUNCTOR2D(PotentialParticle,PotentialParticle);
 		// needed for the dispatcher, even if it is symmetric

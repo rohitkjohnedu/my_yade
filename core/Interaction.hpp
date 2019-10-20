@@ -49,6 +49,7 @@ class Interaction: public Serializable{
 		//! common initialization called from both constructor and reset()
 		void init();
 			
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
 		((Body::id_t,id1,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
 		((Body::id_t,id2,0,Attr::readonly,":yref:`Id<Body::id>` of the second body in this interaction."))
@@ -66,6 +67,7 @@ class Interaction: public Serializable{
 		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
 		.def_readwrite("isActive",&Interaction::isActive,"True if this interaction is active. Otherwise the forces from this interaction will not be taken into account. True by default.")
 	);
+	// clang-format on
 };
 
 REGISTER_SERIALIZABLE(Interaction);

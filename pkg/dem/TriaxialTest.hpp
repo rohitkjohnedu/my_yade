@@ -63,6 +63,7 @@ class TriaxialTest : public FileGenerator
 		~TriaxialTest ();
 		bool generate(string& message);
 		
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		TriaxialTest,FileGenerator,"Prepare a scene for triaxial tests. Full documentation in py/_extraDocs.py."
 		,
@@ -121,6 +122,7 @@ class TriaxialTest : public FileGenerator
 		,
 		//.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
 		 );
+	// clang-format on
 	DECLARE_LOGGER;
 };
 

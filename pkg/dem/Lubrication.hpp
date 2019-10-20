@@ -23,6 +23,7 @@ class LubricationPhys: public ViscElPhys {
         public:
 //                 LubricationPhys(ViscElPhys const& ); // "copy" constructor
                 virtual ~LubricationPhys();
+	// clang-format off
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LubricationPhys,ViscElPhys,"IPhys class for Lubrication w/o FlowEngine. Used by Law2_ScGeom_ImplicitLubricationPhys.",
 												  
 				// Physical properties
@@ -47,6 +48,7 @@ class LubricationPhys: public ViscElPhys {
                 , // ctors
                 createIndex();,
                 );
+	// clang-format on
                 DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(LubricationPhys,ViscElPhys);
 };
@@ -58,12 +60,14 @@ class Ip2_FrictMat_FrictMat_LubricationPhys: public IPhysFunctor{
                 virtual void go(const shared_ptr<Material>& material1, const shared_ptr<Material>& material2, const shared_ptr<Interaction>& interaction);
                 FUNCTOR2D(FrictMat,FrictMat);
                 DECLARE_LOGGER;
+	// clang-format off
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_FrictMat_FrictMat_LubricationPhys,IPhysFunctor,"Ip2 creating LubricationPhys from two Material instances.",
                         ((Real,eta,1,,"Fluid viscosity [Pa.s]"))
                         ((Real,eps,0.001,,"Roughness: fraction of radius enlargement for contact"))
                         ((Real,Fadh,0.,,"Adhesion force."))
                                                   ,,
                 );
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_LubricationPhys);
 
@@ -99,6 +103,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
 			void computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
 		
+	// clang-format off
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			LawFunctor,
 			"Material law for lubrication and contact between two spheres, resolved implicitly. Several resolution methods are available. Iterative exact, solving the 2nd order polynomia. Other resolutions methods are numerical (Newton-Rafson and Dichotomy) with a variable change $\\delta=\\log(u)$, solved in dimentionless coordinates.",
@@ -123,6 +128,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public LawFunctor{
 			.def("getTotalStresses",&Law2_ScGeom_ImplicitLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
 			.staticmethod("getTotalStresses")
                 );
+	// clang-format on
                 DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ImplicitLubricationPhys);
@@ -131,10 +137,12 @@ REGISTER_SERIALIZABLE(Law2_ScGeom_ImplicitLubricationPhys);
 class LubricationPDFEngine: public PDFEngine {
 	public :
 		virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LubricationPDFEngine,PDFEngine,
 		 "Implementation of :yref:`PDFEngine` for Lubrication law",/*ATTRS*/
 		,/*CTOR*/,/*PY*/
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(LubricationPDFEngine);

@@ -22,6 +22,7 @@ class SpheresFactory: public GlobalEngine {
 			SpherCoord(const Vector3r& _c, Real _r){ c=_c; r=_r;}
 		};
 	DECLARE_LOGGER;
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(SpheresFactory,GlobalEngine,"Engine for spitting spheres based on mass flow rate, particle size distribution etc. Initial velocity of particles is given by *vMin*, *vMax*, the *massFlowRate* determines how many particles to generate at each step. When *goalMass* is attained or positive *maxParticles* is reached, the engine does not produce particles anymore. Geometry of the region should be defined in a derived engine by overridden SpheresFactory::pickRandomPosition(). \n\nA sample script for this engine is in :ysrc:`scripts/spheresFactory.py`.",
 		((Real,massFlowRate,NaN,,"Mass flow rate [kg/s]"))
 		((Real,rMin,NaN,,"Minimum radius of generated spheres (uniform distribution)"))
@@ -51,6 +52,7 @@ class SpheresFactory: public GlobalEngine {
 		((bool,exactDiam,true,,"If true, the particles only with the defined in PSDsizes diameters will be created. Otherwise the diameter will be randomly chosen in the range [PSDsizes[i-1]:PSDsizes[i]], in this case the length of PSDsizes should be  more on 1, than the length of PSDcum.")),
 		PSDuse=false;
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(SpheresFactory);
 
@@ -60,11 +62,13 @@ class CircularFactory: public SpheresFactory {
 	public:
 		virtual ~CircularFactory(){};
 		DECLARE_LOGGER;
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(CircularFactory,SpheresFactory,"Circular geometry of the SpheresFactory region. It can be disk (given by radius and center), or cylinder (given by radius, length and center).",
 		((Real,radius,NaN,,"Radius of the region"))
 		((Real,length,0,,"Length of the cylindrical region (0 by default)"))
 		((Vector3r,center,Vector3r(NaN,NaN,NaN),,"Center of the region"))
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(CircularFactory);
 
@@ -74,10 +78,12 @@ class BoxFactory: public SpheresFactory {
 	public:
 		virtual ~BoxFactory(){};
 		DECLARE_LOGGER;
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(BoxFactory,SpheresFactory,"Box geometry of the SpheresFactory region, given by extents and center",
 		((Vector3r,extents,Vector3r(NaN,NaN,NaN),,"Extents of the region"))
 		((Vector3r,center,Vector3r(NaN,NaN,NaN),,"Center of the region"))
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(BoxFactory);
 

@@ -45,6 +45,7 @@ class State: public Serializable, public Indexable{
 		const Quaternionr ori_get() const {return ori; }
 		void ori_set(const Quaternionr o){ori=o;}
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(State,Serializable,"State of a body (spatial configuration, internal variables).",
 		((Se3r,se3,Se3r(Vector3r::Zero(),Quaternionr::Identity()),,"Position and orientation as one object."))
 		((Vector3r,vel,Vector3r::Zero(),,"Current linear velocity."))
@@ -105,6 +106,7 @@ class State: public Serializable, public Indexable{
 		.add_property("press",&State::press,"Returns the pressure (only for SPH-model).")
 #endif
 	);
+	// clang-format on
 	REGISTER_INDEX_COUNTER(State);
 	DECLARE_LOGGER;
 };

@@ -12,6 +12,7 @@ public:
 // 		shared_ptr<Interaction> duplicate;
 
     virtual ~CylScGeom () {};
+	// clang-format off
     YADE_CLASS_BASE_DOC_ATTRS_CTOR(CylScGeom,ScGeom,"Geometry of a cylinder-sphere contact.",
                                    ((bool,onNode,false,,"contact on node?"))
                                    ((int,isDuplicate,0,,"this flag is turned true (1) automatically if the contact is shared between two chained cylinders. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
@@ -22,6 +23,7 @@ public:
                                    ((Real,relPos,0,,"position of the contact on the cylinder (0: node-, 1:node+) |yupdate|")),
                                    createIndex(); /*ctor*/
                                   );
+	// clang-format on
     REGISTER_CLASS_INDEX(CylScGeom,ScGeom);
 };
 REGISTER_SERIALIZABLE(CylScGeom);
@@ -41,6 +43,7 @@ public:
       twistCreep=Quaternionr(1.0,0.0,0.0,0.0);
     }
     State fictiousState;
+	// clang-format off
     YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(CylScGeom6D,ScGeom6D,"Class representing :yref:`geometry<IGeom>` of two :yref:`bodies<Body>` in contact. The contact has 6 DOFs (normal, 2×shear, twist, 2xbending) and uses :yref:`ScGeom` incremental algorithm for updating shear.",
                                            ((bool,onNode,false,,"contact on node?"))
                                            ((int,isDuplicate,0,,"this flag is turned true (1) automatically if the contact is shared between two chained cylinders. A duplicated interaction will be skipped once by the constitutive law, so that only one contact at a time is effective. If isDuplicate=2, it means one of the two duplicates has no longer geometric interaction, and should be erased by the constitutive laws."))
@@ -53,6 +56,7 @@ public:
                                            /* ctor */ createIndex();,
                                            /* py */
                                           );
+	// clang-format on
     REGISTER_CLASS_INDEX(CylScGeom6D,ScGeom6D);
 };
 REGISTER_SERIALIZABLE(CylScGeom6D);

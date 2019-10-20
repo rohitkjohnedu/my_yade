@@ -18,9 +18,11 @@ class Bo1_Node_Aabb : public BoundFunctor
 	public :
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r&, const Body*);
 	FUNCTOR1D(Node);
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(Bo1_Node_Aabb,BoundFunctor,"Functor creating :yref:`Aabb` from :yref:`Node`.",
 		((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"Relative enlargement of the bounding box; deactivated if negative.\n\n.. note::\n\tThis attribute is used to create distant interaction, but is only meaningful with an :yref:`IGeomFunctor` which will not simply discard such interactions: :yref:`Ig2_Sphere_Sphere_ScGeom::interactionDetectionFactor` should have the same value as :yref:`aabbEnlargeFactor<Bo1_Sphere_Aabb::aabbEnlargeFactor>`."))
 	);
+	// clang-format on
 };
 
 REGISTER_SERIALIZABLE(Bo1_Node_Aabb);

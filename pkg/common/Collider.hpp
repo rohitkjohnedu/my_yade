@@ -39,11 +39,13 @@ class Collider: public GlobalEngine {
 		// ctor with functors for the integrated BoundDispatcher
 		virtual void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d);
 		
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Collider,GlobalEngine,"Abstract class for finding spatial collisions between bodies. \n\n.. admonition:: Special constructor\n\n\tDerived colliders (unless they override ``pyHandleCustomCtorArgs``) can be given list of :yref:`BoundFunctors <BoundFunctor>` which is used to initialize the internal :yref:`boundDispatcher <Collider.boundDispatcher>` instance.",
 		((shared_ptr<BoundDispatcher>,boundDispatcher,new BoundDispatcher,Attr::readonly,":yref:`BoundDispatcher` object that is used for creating :yref:`bounds <Body.bound>` on collider's request as necessary."))
 		((mask_t,avoidSelfInteractionMask,0,,"This mask is used to avoid the interactions inside a group of particles. To do so, the particles must have the exact same mask and that mask should have one bit in common with this :yref:`avoidSelfInteractionMask<Collider.avoidSelfInteractionMask>` as for their binary representations."))
 		, /*ctor*/
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Collider);
 

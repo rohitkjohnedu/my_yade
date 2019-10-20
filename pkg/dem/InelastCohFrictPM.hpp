@@ -21,6 +21,7 @@ class InelastCohFrictMat : public FrictMat
 		virtual ~InelastCohFrictMat () {};
 
 /// Serialization
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InelastCohFrictMat,FrictMat,"",
 		((Real,tensionModulus,0.0,,"Tension elasticity modulus"))
 		((Real,compressionModulus,0.0,,"Compresion elasticity modulus"))
@@ -48,6 +49,7 @@ class InelastCohFrictMat : public FrictMat
 		((Real,etaMaxTwist,0.0,,"Maximal plastic twist strain")),
 		createIndex();			  
 					);
+	// clang-format on
 /// Indexable
 	REGISTER_CLASS_INDEX(InelastCohFrictMat,FrictMat);
 };
@@ -58,6 +60,7 @@ class InelastCohFrictPhys : public FrictPhys
 {
 	public :
 		virtual ~InelastCohFrictPhys() {};
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(InelastCohFrictPhys,FrictPhys,"",
 		((bool,cohesionBroken,false,,"is cohesion active? will be set false when a fragile contact is broken"))
 		
@@ -109,6 +112,7 @@ class InelastCohFrictPhys : public FrictPhys
 		,
 		createIndex();
 	);
+	// clang-format on
 /// Indexable
 	REGISTER_CLASS_INDEX(InelastCohFrictPhys,FrictPhys);
 
@@ -124,11 +128,13 @@ class Ip2_2xInelastCohFrictMat_InelastCohFrictPhys : public IPhysFunctor
 					const shared_ptr<Interaction>& interaction);
 		int cohesionDefinitionIteration;
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ip2_2xInelastCohFrictMat_InelastCohFrictPhys,IPhysFunctor,
 		"Generates cohesive-frictional interactions with moments. Used in the contact law :yref:`Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment`.",
 		,
 		cohesionDefinitionIteration = -1;
 		);
+	// clang-format on
 	FUNCTOR2D(InelastCohFrictMat,InelastCohFrictMat);
 };
 
@@ -140,11 +146,13 @@ class Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment: public LawFunctor{
 		Real normElastEnergy();
 		Real shearElastEnergy();
 	virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment,LawFunctor,"This law is currently under developpement. Final version and documentation will come before the end of 2014.",
 		,,
 		.def("normElastEnergy",&Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::normElastEnergy,"Compute normal elastic energy.")
 		.def("shearElastEnergy",&Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment::shearElastEnergy,"Compute shear elastic energy.")
 	);
+	// clang-format on
 	FUNCTOR2D(ScGeom6D,InelastCohFrictPhys);
 	DECLARE_LOGGER;
 };

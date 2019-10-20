@@ -62,7 +62,9 @@ class LBMnode: public Serializable{
         void setAsFluid(){isObstacle=false;}
 
     virtual ~LBMnode();
+	// clang-format off
 	YADE_CLASS_BASE_DOC(LBMnode,Serializable,"Node class for Lattice Boltzmann Method ");
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(LBMnode);
 

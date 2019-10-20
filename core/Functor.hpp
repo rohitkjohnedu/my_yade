@@ -26,6 +26,7 @@ class Functor: public Serializable
 	//! updated before every dispatch loop by the dispatcher; DO NOT ABUSE access to scene, except for getting global variables like scene->dt.
 	Scene* scene;
 	virtual ~Functor() {}; // defined in Dispatcher.cpp
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Functor,Serializable,"Function-like object that is called by Dispatcher, if types of arguments match those the Functor declares to accept.",
 		((string,label,,,"Textual label for this object; must be a valid python identifier, you can refer to it directly from python.")),
 		/*ctor*/
@@ -36,6 +37,7 @@ class Functor: public Serializable
 		.def_readonly("timingDeltas",&Functor::timingDeltas,"Detailed information about timing inside the Dispatcher itself. Empty unless enabled in the source code and O.timingEnabled==True.")
 		.add_property("bases",&Functor::getFunctorTypes,"Ordered list of types (as strings) this functor accepts.")
 	);	
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Functor);
 

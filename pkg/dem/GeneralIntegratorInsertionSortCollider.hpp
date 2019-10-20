@@ -34,7 +34,9 @@ class GeneralIntegratorInsertionSortCollider: public InsertionSortCollider{
 
 	virtual void action(); //override this function to change behaviour with the NewtonIntegrator dependency.
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC(GeneralIntegratorInsertionSortCollider,InsertionSortCollider," This class is the adaptive version of the InsertionSortCollider and changes the NewtonIntegrator dependency of the collider algorithms to the Integrator interface which is more general.");
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(GeneralIntegratorInsertionSortCollider);

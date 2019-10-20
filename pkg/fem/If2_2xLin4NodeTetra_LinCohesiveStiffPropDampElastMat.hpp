@@ -32,7 +32,9 @@ class If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat : public InternalForc
 		virtual ~If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat();
 		FUNCTOR2D(Lin4NodeTetra_Lin4NodeTetra_InteractionElement,LinCohesiveStiffPropDampElastMat);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC(If2_2xLin4NodeTetra_LinCohesiveStiffPropDampElastMat,InternalForceFunctor,"Apply internal forces of the tetrahedral element using lumped mass theory")
+	// clang-format on
 
 	DECLARE_LOGGER;
 };

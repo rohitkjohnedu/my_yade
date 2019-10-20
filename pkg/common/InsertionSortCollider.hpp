@@ -187,6 +187,7 @@ class InsertionSortCollider: public Collider{
 	vector<Body::id_t> probeBoundingVolume(const Bound&);
 
 	virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(InsertionSortCollider,Collider,"\
 		Collider with O(n log(n)) complexity, using :yref:`Aabb` for bounds.\
 		\n\n\
@@ -237,6 +238,7 @@ class InsertionSortCollider: public Collider{
 		.def("dumpBounds",&InsertionSortCollider::dumpBounds,"Return representation of the internal sort data. The format is ``([...],[...],[...])`` for 3 axes, where each ``...`` is a list of entries (bounds). The entry is a tuple with the fllowing items:\n\n* coordinate (float)\n* body id (int), but negated for negative bounds\n* period numer (int), if the collider is in the periodic regime.")
 		.def("isActivated",&InsertionSortCollider::isActivated,"Return true if collider needs execution at next iteration.")
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(InsertionSortCollider);

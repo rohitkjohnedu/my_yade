@@ -67,6 +67,7 @@ class RockBolt: public PeriodicEngine{
 		double evaluateFNoSphereVol(const PotentialBlock* s1,const State* state1, const Vector3r newTrial);
 		bool intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt, const Vector3r plane, const double planeD);
 		virtual void action(void);
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RockBolt,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((double,normalStiffness,0.0 ,,"EA/L"))
 		((double,shearStiffness,0.0 ,,"stiffness"))
@@ -104,6 +105,7 @@ class RockBolt: public PeriodicEngine{
 		,
 		,
 	);
+	// clang-format on
 
 
 };

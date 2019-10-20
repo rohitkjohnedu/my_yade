@@ -80,6 +80,7 @@ class Body: public Serializable{
 		// only BodyContainer can set the id of a body
 		friend class BodyContainer;
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
 		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
@@ -117,6 +118,7 @@ class Body: public Serializable{
 		.def_readwrite("chain",&Body::chain,"Returns Id of chain to which the body belongs.")
 		.def("intrs",&Body::py_intrs,"Return list of all real interactions in which this body participates.")
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Body);
 

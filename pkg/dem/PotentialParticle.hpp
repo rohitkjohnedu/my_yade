@@ -17,6 +17,8 @@ namespace yade { // Cannot have #include directive inside.
 class PotentialParticle : public Shape {
 	public:
 		virtual ~PotentialParticle ();
+
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialParticle,Shape,"EXPERIMENTAL. Geometry of PotentialParticle.",
 			((int, id, 1,, "Particle id (for graphics in vtk output)")) //TODO: Check if we can use the body id instead in all instances and delete this attribute
 			((bool, isBoundary, false,, "Whether the particle is part of a boundary particle"))
@@ -49,6 +51,7 @@ class PotentialParticle : public Shape {
 		}
 #endif
 		);
+	// clang-format on
 		//#endif
 		REGISTER_CLASS_INDEX(PotentialParticle,Shape);
 };

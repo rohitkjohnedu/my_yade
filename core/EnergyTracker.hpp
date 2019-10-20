@@ -52,6 +52,7 @@ class EnergyTracker: public Serializable{
 	typedef std::map<std::string,int> mapStringInt;
 	typedef std::pair<std::string,int> pairStringInt;
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(EnergyTracker,Serializable,"Storage for tracing energies. Only to be used if :yref:`O.trackEnergy<Omega.trackEnergy>` is True.",
 		((OpenMPArrayAccumulator<Real>,energies,,,"Energy values, in linear array"))
 		((mapStringInt,names,,Attr::hidden,"Associate textual name to an index in the energies array."))
@@ -66,6 +67,7 @@ class EnergyTracker: public Serializable{
 			.def("total",&EnergyTracker::total,"Return sum of all energies.")
 			.add_property("_perThreadData",&EnergyTracker::perThreadData,"Contents as dictionary, where each value is tuple of individual threads' values (for debugging)")
 	)
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(EnergyTracker);
 

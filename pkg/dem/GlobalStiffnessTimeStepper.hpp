@@ -39,6 +39,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 	
 		virtual void computeTimeStep(Scene*);
 		virtual bool isActivated();
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(
 			GlobalStiffnessTimeStepper,TimeStepper,"An engine assigning the time-step as a fraction of the minimum eigen-period in the problem. The derivation is detailed in the chapter on :ref:`DEM formulation <DEMSimulations>`. The viscEl option enables to evaluate the timestep in a similar way for the visco-elastic contact law :yref:`Law2_ScGeom_ViscElPhys_Basic`, more detail in :yref:`GlobalStiffnessTimestepper::viscEl`. ",
 			((Real,defaultDt,-1,,"used as the initial value of the timestep (especially useful in the first steps when no contact exist). If negative, it will be defined by :yref:`utils.PWaveTimeStep` * :yref:`GlobalStiffnessTimeStepper::timestepSafetyCoefficient`"))
@@ -49,6 +50,7 @@ class GlobalStiffnessTimeStepper : public TimeStepper
 			((Real,targetDt,1,,"if :yref:`NewtonIntegrator::densityScaling` is active, this value will be used as the simulation  timestep and the scaling will use this value of dt as the target value. The value of targetDt is arbitrary and should have no effect in the result in general. However if some bodies have imposed velocities, for instance, they will move more or less per each step depending on this value."))
 			((bool,viscEl,false,,"To use with :yref:`ViscElPhys`. if True, evaluate separetly the minimum eigen-period in the problem considering only the elastic contribution on one hand (spring only), and only the viscous contribution on the other hand (dashpot only). Take then the minimum of the two and use the safety coefficient :yref:`GlobalStiffnessTimestepper::timestepSafetyCoefficient` to take into account the possible coupling between the two contribution.")),
 			computedOnce=false;)
+	// clang-format on
 		DECLARE_LOGGER;
 };
 

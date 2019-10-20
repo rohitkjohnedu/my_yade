@@ -29,6 +29,7 @@ class Shape: public Serializable, public Indexable {
 		//! cache functor that are called for this type of DeformableElement. Used by FEInternalForceEngine
 		shared_ptr<InternalForceFunctor> internalforcefunctor;
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Shape,Serializable,"Geometry of a body",
 		((Vector3r,color,Vector3r(1,1,1),,"Color for rendering (normalized RGB)."))
 		((bool,wire,false,,"Whether this Shape is rendered using color surfaces, or only wireframe (can still be overridden by global config of the renderer)."))
@@ -36,6 +37,7 @@ class Shape: public Serializable, public Indexable {
 		/*ctor*/,
 		/*py*/ YADE_PY_TOPINDEXABLE(Shape)
 	);
+	// clang-format on
 	REGISTER_INDEX_COUNTER(Shape);
 };
 REGISTER_SERIALIZABLE(Shape);

@@ -47,6 +47,7 @@ class Ig2_PB_PB_ScGeom: public IGeomFunctor
 		double getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, const Vector3r contactPt, const Vector3r contactNormal, int& smaller, bool calJointLength, Vector3r shearDir, double& jointLength, const bool twoDimension);
 
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PB_PB_ScGeom,IGeomFunctor,"PB",
 		((double, accuracyTol, pow(10,-7),, "accuracy desired, tolerance criteria for SOCP"))
 //		((double, stepAngle, pow(10,-2),, ""))
@@ -56,6 +57,7 @@ class Ig2_PB_PB_ScGeom: public IGeomFunctor
 		((Real, unitWidth2D, 1.0,,"Unit width in 2D"))
 		, /* ctor */
 	);
+	// clang-format on
 
 	FUNCTOR2D(PotentialBlock,PotentialBlock);
 	// needed for the dispatcher, even if it is symmetric

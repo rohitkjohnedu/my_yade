@@ -62,6 +62,7 @@ class NewtonIntegrator : public FieldApplier{
 			vector<Real> threadMaxVelocitySq;
 		#endif
 		virtual void action();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(NewtonIntegrator,GlobalEngine,"Engine integrating newtonian motion equations.",
 		((Real,damping,0.2,,"damping coefficient for Cundall's non viscous damping (see :ref:`NumericalDamping` and [Chareyre2005]_)"))
 		((Vector3r,gravity,Vector3r::Zero(),,"Gravitational acceleration (effectively replaces GravityEngine)."))
@@ -90,6 +91,7 @@ class NewtonIntegrator : public FieldApplier{
 		,/*py*/
 		.add_property("densityScaling",&NewtonIntegrator::get_densityScaling,&NewtonIntegrator::set_densityScaling,"if True, then density scaling [Pfc3dManual30]_ will be applied in order to have a critical timestep equal to :yref:`GlobalStiffnessTimeStepper::targetDt` for all bodies. This option makes the simulation unrealistic from a dynamic point of view, but may speedup quasistatic simulations. In rare situations, it could be useful to not set the scalling factor automatically for each body (which the time-stepper does). In such case revert :yref:`GlobalStiffnessTimeStepper.densityScaling` to False.")
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(NewtonIntegrator);

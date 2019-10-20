@@ -72,6 +72,7 @@ class RockLiningGlobal: public PeriodicEngine{
 		double evaluateFNoSphereVol(const PotentialBlock* s1,const State* state1, const Vector3r newTrial);
 		bool intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt, const Vector3r plane, const double planeD);
   		virtual void action(void);
+	// clang-format off
   	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RockLiningGlobal,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((bool,assembledKglobal,false ,,"global stiffness matrix"))
 		((double,density,0.0 ,,"density"))
@@ -120,6 +121,7 @@ class RockLiningGlobal: public PeriodicEngine{
 			//globalStiffnessMatrix = new double[totalNodes*3*totalNodes*3];
 		,
   	);
+	// clang-format on
 
 
 };

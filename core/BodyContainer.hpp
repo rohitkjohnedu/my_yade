@@ -78,6 +78,7 @@ class BodyContainer: public Serializable{
 		
 		void updateShortLists();
 		
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(BodyContainer,Serializable,"Standard body container for a scene",
 		((ContainerT,body,,,"The underlying vector<shared_ptr<Body> >"))
 		((bool,dirty,true,(Attr::noSave|Attr::readonly|Attr::hidden),"true if after insertion/removal of bodies, used only if collider::keepListsShort=true"))
@@ -92,6 +93,7 @@ class BodyContainer: public Serializable{
 		,/*ctor*/,
 		.def("updateShortLists",&BodyContainer::updateShortLists,"update lists realBodies and subdomainBodies. This function is called automatically by e.g. ForceContainer::reset(), it is safe to call multiple times from many places since if the lists are up-to-date he function will just return.")
 		)
+	// clang-format on
 
 	DECLARE_LOGGER;
 };

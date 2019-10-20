@@ -75,6 +75,7 @@ class MPIBodyContainer :  public Serializable{
     }
     
 
+	// clang-format off
   YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(MPIBodyContainer,Serializable,"a dummy container to serialize and send. ",
   ((vector<shared_ptr<Body>>, bContainer,,,"a dummy body container to serialize"))
   ,
@@ -86,6 +87,7 @@ class MPIBodyContainer :  public Serializable{
   .def("getCount", &MPIBodyContainer::getCount, "get container count")
   .def_readonly("subdomainRank", &MPIBodyContainer::subdomainRank, "origin rank of this container") 
   );
+	// clang-format on
   
   DECLARE_LOGGER;
 };

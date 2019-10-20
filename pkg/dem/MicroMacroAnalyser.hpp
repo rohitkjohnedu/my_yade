@@ -44,6 +44,7 @@ class MicroMacroAnalyser : public GlobalEngine
 		void postLoad(MicroMacroAnalyser&);
 
 		
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(MicroMacroAnalyser,GlobalEngine,"compute fabric tensor, local porosity, local deformation, and other micromechanicaly defined quantities based on triangulation/tesselation of the packing.",
 		((unsigned int,stateNumber,0,,"A number incremented and appended at the end of output files to reflect increment number."))
 		((unsigned int,incrtNumber,1,,""))
@@ -61,6 +62,7 @@ class MicroMacroAnalyser : public GlobalEngine
 		initialized = false;
 		,/*py*/
 		);
+	// clang-format on
 		DECLARE_LOGGER;
 		//REGISTER_ATTRIBUTES(GlobalEngine,(stateNumber)(incrtNumber)(outputFile)(stateFileName)(interval)(compDeformation)(compIncrt));
 };

@@ -15,6 +15,7 @@ namespace yade { // Cannot have #include directive inside.
 class KnKsPhys: public FrictPhys {
 	public:
 		virtual ~KnKsPhys();
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPhys,FrictPhys,"EXPERIMENTAL. IPhys for :yref:`PotentialParticle`.",
 			((Real, frictionAngle, 0.0,,"Friction angle"))
 //				((Real,tanFrictionAngle,0.0,,"tangent of fric angle"))
@@ -126,6 +127,7 @@ class KnKsPhys: public FrictPhys {
 			createIndex();
 
 		);
+	// clang-format on
 
 		REGISTER_CLASS_INDEX(KnKsPhys,FrictPhys);
 		DECLARE_LOGGER;
@@ -136,6 +138,7 @@ REGISTER_SERIALIZABLE(KnKsPhys);
 class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPhys,IPhysFunctor,"EXPERIMENTAL. Ip2 functor for :yref:`KnKsPhys`",
 			((Real, Knormal,0.0,,"Volumetric stiffness in the contact normal direction (units: stress/length)"))
 			((Real, Kshear,0.0,,"Volumetric stiffness in the contact shear direction (units: stress/length)"))
@@ -156,6 +159,7 @@ class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 			((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts"))
 //			((bool, twoDimension, true,,"Whether the contact is 2-D"))
 		);
+	// clang-format on
 		FUNCTOR2D(FrictMat,FrictMat);
 		DECLARE_LOGGER;
 };
@@ -168,6 +172,7 @@ class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor {
 		//OpenMPAccumulator<Real,&Law2_SCG_KnKsPhys_KnKsLaw::Real0> plasticDissipation;
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,KnKsPhys);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SCG_KnKsPhys_KnKsLaw,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom` (sphere-box interactions are not implemented for the latest).",
 			((bool, neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 			((bool, preventGranularRatcheting,false,,"bool to avoid granular ratcheting"))
@@ -179,6 +184,7 @@ class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor {
 			,,
 
 		);
+	// clang-format on
 
 		DECLARE_LOGGER;
 };

@@ -34,7 +34,9 @@ class If2_Lin4NodeTetra_LinIsoRayleighDampElast : public InternalForceFunctor
 		virtual ~If2_Lin4NodeTetra_LinIsoRayleighDampElast();
 		FUNCTOR2D(Lin4NodeTetra,LinIsoRayleighDampElastMat);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC(If2_Lin4NodeTetra_LinIsoRayleighDampElast,InternalForceFunctor,"Apply internal forces of the tetrahedral element using lumped mass theory")
+	// clang-format on
 
 	DECLARE_LOGGER;
 };

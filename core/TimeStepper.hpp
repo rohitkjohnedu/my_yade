@@ -23,10 +23,12 @@ class TimeStepper: public GlobalEngine{
 		virtual void action() { computeTimeStep(scene);} ;
 		void setActive(bool a, int nb=-1) {active = a; if (nb>0) {timeStepUpdateInterval = (unsigned int)nb;}}
 		
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(
 			TimeStepper,GlobalEngine,"Engine defining time-step (fundamental class)",
 			((bool,active,true,,"is the engine active?"))
 			((unsigned int,timeStepUpdateInterval,1,,"dt update interval")));
+	// clang-format on
 };
 
 REGISTER_SERIALIZABLE(TimeStepper);

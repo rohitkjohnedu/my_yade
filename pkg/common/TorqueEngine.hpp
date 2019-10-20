@@ -21,9 +21,11 @@ class TorqueEngine: public PartialEngine{
 			scene->forces.addTorque(id,moment);
 		}
 	}
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(TorqueEngine,PartialEngine,"Apply given torque (momentum) value at every subscribed particle, at every step.",
 		((Vector3r,moment,Vector3r::Zero(),,"Torque value to be applied."))
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(TorqueEngine);
 

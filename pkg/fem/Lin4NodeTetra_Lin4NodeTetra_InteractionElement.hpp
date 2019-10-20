@@ -26,6 +26,7 @@ class Lin4NodeTetra_Lin4NodeTetra_InteractionElement: public DeformableCohesiveE
 		virtual ~Lin4NodeTetra_Lin4NodeTetra_InteractionElement();
 		void initialize(void);
 	
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Lin4NodeTetra_Lin4NodeTetra_InteractionElement,DeformableCohesiveElement,"Tetrahedral Deformable Element Composed of Nodes",
 		,
 		,
@@ -35,6 +36,7 @@ class Lin4NodeTetra_Lin4NodeTetra_InteractionElement: public DeformableCohesiveE
 		/*py*/
 
 	);
+	// clang-format on
 		DECLARE_LOGGER;
 
 		REGISTER_CLASS_INDEX(Lin4NodeTetra_Lin4NodeTetra_InteractionElement,DeformableCohesiveElement);

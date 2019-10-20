@@ -30,6 +30,7 @@ public:
 	static void getSpectrums(vector<PDF> &);
 	virtual void action();
 	
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PDFEngine, PeriodicEngine,
 		"Base class for spectrums calculations. Compute Probability Density Functions of normalStress, shearStress, distance, velocity and interactions in spherical coordinates and write result to a file. Column name format is: Data(theta, phi). Convention used: x: phi = 0, y: theta = 0, z: phi = pi/2",
 		((uint, numDiscretizeAngleTheta, 20,,"Number of sector for theta-angle"))
@@ -41,6 +42,7 @@ public:
 		,,
 		//.def("getSpectrums", &LubricationDPFEngine::PyGetSpectrums,(py::arg("nPhi")=40, py::arg("nTheta")=20), "Get Stress spectrums").staticmethod("getSpectrums")
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 	
 	protected:

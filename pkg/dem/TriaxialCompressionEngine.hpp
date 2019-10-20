@@ -77,6 +77,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		///Change physical properties of interactions and/or bodies in the middle of a simulation (change only friction for the moment, complete this function to set cohesion and others before compression test)
 		void setContactProperties(Real frictionDegree);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(
 		TriaxialCompressionEngine,TriaxialStressController,
 		"The engine is a state machine with the following states; transitions my be automatic, see below.\n\n"
@@ -130,6 +131,7 @@ class TriaxialCompressionEngine : public TriaxialStressController
 		,
 	 	.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
 		)
+	// clang-format on
 	DECLARE_LOGGER;
 };
 

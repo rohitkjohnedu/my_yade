@@ -83,6 +83,7 @@ class Lin4NodeTetra: public DeformableElement {
 			   return V;
 		}
 	
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Lin4NodeTetra,DeformableElement,"Tetrahedral Deformable Element Composed of Nodes",
 		,
 		,
@@ -92,6 +93,7 @@ class Lin4NodeTetra: public DeformableElement {
 		/*py*/
 
 	);
+	// clang-format on
 		DECLARE_LOGGER;
 
 		REGISTER_CLASS_INDEX(Lin4NodeTetra,DeformableElement);

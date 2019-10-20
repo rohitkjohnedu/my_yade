@@ -32,7 +32,9 @@ class InternalForceFunctor: public Functor2D<
 	/*argument types*/ TYPELIST_3(const shared_ptr<Shape>&,const shared_ptr<Material>&,const shared_ptr<Body>&)
 >{
 	public: virtual ~InternalForceFunctor();
+	// clang-format off
 	YADE_CLASS_BASE_DOC(InternalForceFunctor,Functor,"Functor for creating/updating :yref:`Body::bound`.");
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(InternalForceFunctor);
 

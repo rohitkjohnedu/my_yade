@@ -15,9 +15,11 @@ class PotentialParticle2AABB : public BoundFunctor {
 
 		FUNCTOR1D(PotentialParticle);
 		//REGISTER_ATTRIBUTES(BoundFunctor,(aabbEnlargeFactor));
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(PotentialParticle2AABB,BoundFunctor,"EXPERIMENTAL. Functor creating :yref:`Aabb` from :yref:`PotentialParticle`.",
 			((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"see :yref:`Sphere2AABB`."))
 		);
+	// clang-format on
 };
 
 REGISTER_SERIALIZABLE(PotentialParticle2AABB);

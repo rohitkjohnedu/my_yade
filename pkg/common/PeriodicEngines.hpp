@@ -41,6 +41,7 @@ class PeriodicEngine:  public GlobalEngine {
 			}
 			return false;
 		}
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PeriodicEngine,GlobalEngine,
 		"Run Engine::action with given fixed periodicity real time (=wall clock time, computation time), \
 		virtual time (simulation time), iteration number), by setting any of those criteria \
@@ -78,6 +79,7 @@ class PeriodicEngine:  public GlobalEngine {
 		((long,nDone,0,,"Track number of executions (cummulative) |yupdate|.")),
 		/* this will be put inside the ctor */ realLast=getClock();
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(PeriodicEngine);
 

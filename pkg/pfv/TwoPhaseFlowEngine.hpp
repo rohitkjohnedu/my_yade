@@ -217,6 +217,7 @@ class PhaseCluster : public Serializable
 			        interfaces[it].volume+=dt*getFlux(it);
 		}
 		
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PhaseCluster,Serializable,"Preliminary.",
 		((int,label,-1,,"Unique label of this cluster, should be reflected in pores of this cluster."))
 		((double,volume,0,,"cumulated volume of all pores."))
@@ -241,6 +242,7 @@ class PhaseCluster : public Serializable
 		.def("updateCapVolList",&PhaseCluster::updateCapVolList,(boost::python::arg("dt")),"increments throat's volume of all interfaces by flux*dt")
 		.def("solvePressure",&PhaseCluster::solvePressure,"Solve 1-phase flow in one single cluster defined by its id.")
 		)
+	// clang-format on
 
 	DECLARE_LOGGER;
 };
@@ -503,6 +505,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	CELL_SCALAR_GETTER(Real,.mergedID,cellMergedID) //Temporary function to allow for simulations in Python	
 
 	
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(TwoPhaseFlowEngine,TwoPhaseFlowEngineT,"documentation here",
 	((double,surfaceTension,0.0728,,"Water Surface Tension in contact with air at 20 Degrees Celsius is: 0.0728(N/m)"))
 	((bool,recursiveInvasion,true,,"If true the invasion stops only when no entry pc is less than current capillary pressure, implying simultaneous invasion of many pores. Else only one pore invasion per invasion step."))
@@ -627,6 +630,7 @@ class TwoPhaseFlowEngine : public TwoPhaseFlowEngineT
 	.def("getEffRcByPosRadius",&TwoPhaseFlowEngine::computeEffRcByPosRadius, (boost::python::arg("position1"),boost::python::arg("radius1"),boost::python::arg("position2"),boost::python::arg("radius2"),boost::python::arg("position3"),boost::python::arg("radius3")), "get effective radius by three spheres position and radius.(inscribed sphere)")
 	.def("getMSPRcByPosRadius",&TwoPhaseFlowEngine::computeMSPRcByPosRadius, (boost::python::arg("position1"),boost::python::arg("radius1"),boost::python::arg("position2"),boost::python::arg("radius2"),boost::python::arg("position3"),boost::python::arg("radius3")), "get entry radius wrt MSP method by three spheres position and radius.")
 	)
+	// clang-format on
 
 	DECLARE_LOGGER;
 };

@@ -36,6 +36,7 @@ class PotentialBlock : public Shape {
 		void calculateVertices();
 		void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialBlock,Shape,"Geometry of PotentialBlock.",
 		((bool, isLining, false,, "Whether particle is part of tunnel lining (used in the RockLining.cpp script)"))
 		((double, liningStiffness, pow(10.0,8),, "Lining stiffness"))
@@ -101,6 +102,7 @@ class PotentialBlock : public Shape {
 	 	}
 		#endif
 	);
+	// clang-format on
 	//#endif
 	REGISTER_CLASS_INDEX(PotentialBlock,Shape);
 };

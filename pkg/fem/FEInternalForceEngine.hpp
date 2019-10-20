@@ -32,6 +32,7 @@ class FEInternalForceEngine: public GlobalEngine {
 	public:
 		virtual void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d);
 		virtual void action();
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(FEInternalForceEngine,GlobalEngine,"Unified dispatcher for handling Finite Element internal force loop at every step, for parallel performance reasons.\n\n.. admonition:: Special constructor\n\n\tConstructs from 3 lists of :yref:`Ig2<IGeomFunctor>`, :yref:`Ip2<IPhysFunctor>`, :yref:`Law<LawFunctor>` functors respectively; they will be passed to interal dispatchers, which you might retrieve.",
 			((shared_ptr<InternalForceDispatcher>,internalforcedispatcher,new InternalForceDispatcher,Attr::readonly,":yref:`InternalForceDispatcher` object that is used for dispatching of element types."))
 			,
@@ -39,6 +40,7 @@ class FEInternalForceEngine: public GlobalEngine {
 			,
 			/*py*/
 		);
+	// clang-format on
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(FEInternalForceEngine);

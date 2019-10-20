@@ -23,6 +23,7 @@ namespace yade { // Cannot have #include directive inside.
 
 class Bound: public Serializable, public Indexable{
 	public:
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Bound,Serializable,"Object bounding part of space taken by associated body; might be larger, used to optimalize collision detection",
 		((int,lastUpdateIter,0,Attr::readonly,"record iteration of last reference position update |yupdate|"))
 		((Vector3r,refPos,Vector3r(NaN,NaN,NaN),Attr::readonly,"Reference position, updated at current body position each time the bound dispatcher update bounds |yupdate|"))
@@ -36,6 +37,7 @@ class Bound: public Serializable, public Indexable{
 		/*py*/
 		YADE_PY_TOPINDEXABLE(Bound)
 	);
+	// clang-format on
 	REGISTER_INDEX_COUNTER(Bound);
 };
 REGISTER_SERIALIZABLE(Bound);

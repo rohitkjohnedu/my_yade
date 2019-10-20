@@ -150,6 +150,7 @@ class Cell: public Serializable{
 	//Matrix3r getCauchyStress() { Matrix3r s=getStress(); return .5*(s+s.transpose()); }
 
 	enum { HOMO_NONE=0, HOMO_POS=1, HOMO_VEL=2, HOMO_VEL_2ND=3 };
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Cell,Serializable,"Parameters of periodic boundary conditions. Only applies if O.isPeriodic==True.",
 		/* overridden below to be modified by getters/setters because of intended side-effects */
 		((Matrix3r,trsf,Matrix3r::Identity(),,"[overridden]")) //"Current transformation matrix of the cell, which defines how far is the current cell geometry (:yref:`hSize<Cell.hSize>`) from the reference configuration. Changing trsf will not change :yref:`hSize<Cell.hSize>`, it serves only as accumulator for transformations applied via :yref:`velGrad<Cell.velGrad>`."))
@@ -196,6 +197,7 @@ class Cell: public Serializable{
 		.def_readonly("unshearTrsf",&Cell::_unshearTrsf,"Inverse of the current skew+rot transformation (no resize)")
 		.add_property("hSize0",&Cell::getHSize0,"Value of untransformed hSize, with respect to current :yref:`trsf<Cell::trsf>` (computed as :yref:`trsf<Cell::trsf>` ⁻¹ × :yref:`hSize<Cell::hSize>`.")
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Cell);
 

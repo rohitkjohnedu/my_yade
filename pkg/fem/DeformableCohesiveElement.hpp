@@ -35,12 +35,14 @@ class DeformableCohesiveElement: public DeformableElement {
 		struct nodepair:public Serializable{
 				public:
 
+	// clang-format off
 				YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(nodepair,Serializable,"Geometry of a body",
 						((shared_ptr<Body>,node1,,,"Node1 of node pair"))
 						((shared_ptr<Body>,node2,,,"Node2 of node pair")),
 						/*ctor*/,
 						/*py*/
 					);
+	// clang-format on
 
 				// Comparison operator for table sorting.
 				bool operator<(const nodepair& param) const
@@ -65,6 +67,7 @@ class DeformableCohesiveElement: public DeformableElement {
 		void addPair(const shared_ptr<Body>& node1,const shared_ptr<Body>& node2);
 		void delPair(const shared_ptr<Body>& node1,const shared_ptr<Body>& node2);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DeformableCohesiveElement,DeformableElement,"Tetrahedral Deformable Element Composed of Nodes",
 		((NodePairsMap,nodepairs,,,"Ids and relative position+orientation difference of members of the cohesive deformable element in the inital condition (should not be accessed directly)"))
 		,
@@ -76,6 +79,7 @@ class DeformableCohesiveElement: public DeformableElement {
 		.def("addPair",&DeformableCohesiveElement::addPair,"Add a node shared_pt<:yref:'Body'>& as into the element")
 		.def("removePair",&DeformableCohesiveElement::delPair,"Add a node shared_pt<:yref:'Body'>& as into the element")
 	);
+	// clang-format on
 		DECLARE_LOGGER;
 
 		REGISTER_CLASS_INDEX(DeformableCohesiveElement,DeformableElement);

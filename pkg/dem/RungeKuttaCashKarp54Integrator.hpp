@@ -33,6 +33,7 @@ class RungeKuttaCashKarp54Integrator: public Integrator {
 
 		virtual void action();
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RungeKuttaCashKarp54Integrator,Integrator,"RungeKuttaCashKarp54Integrator engine.",
 		((Real,abs_err,1e-6,,"Relative integration tolerance"))
 		((Real,rel_err,1e-6,,"Absolute integration tolerance"))		
@@ -46,6 +47,7 @@ class RungeKuttaCashKarp54Integrator: public Integrator {
 		.def("__init__",boost::python::make_constructor(RungeKuttaCashKarp54Integrator_ctor_list),"Construct from (possibly nested) list of slaves.")
 		/*py*/
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(RungeKuttaCashKarp54Integrator);
 

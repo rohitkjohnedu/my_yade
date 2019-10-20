@@ -66,6 +66,7 @@ class DeformableElement: public Shape {
 		boost::python::dict localmap_get();
 
 		virtual Real getVolume(){return -1;}
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DeformableElement,Shape,"Deformable aggregate of nodes",
 		((NodeMap,localmap,,,"Ids and relative positions+orientations of members of the deformable element (should not be accessed directly)"))
 		((Se3r,elementframe,,,"Position and orientation of the element frame"))
@@ -85,6 +86,7 @@ class DeformableElement: public Shape {
 		.def("getVolume",&DeformableElement::getVolume,"Get volume of the element")
 
 	);
+	// clang-format on
 	REGISTER_CLASS_INDEX(DeformableElement,Shape);
 	DECLARE_LOGGER;
 };

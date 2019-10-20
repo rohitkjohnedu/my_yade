@@ -132,6 +132,7 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 	public :
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialParticle,GlShapeFunctor,"Renders :yref:`PotentialParticle` object",
 			((int,sizeX,20,,"Number of divisions in the X direction for triangulation"))
 			((int,sizeY,20,,"Number of divisions in the Y direction for triangulation"))
@@ -141,6 +142,7 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 			((Real,aabbEnlargeFactor,1.3,,"Enlargement factor of the Marching Cubes drawing grid, used for displaying purposes. Try different value if the particles are not displayed properly"))
 			((bool,wire,false,,"Only show wireframe"))
 		);
+	// clang-format on
 		RENDERS(PotentialParticle);
 };
 REGISTER_SERIALIZABLE(Gl1_PotentialParticle);
@@ -152,6 +154,7 @@ class PotentialParticleVTKRecorder: public PeriodicEngine {
 		vtkSmartPointer<ImpFunc> function;
 
 		virtual void action(void);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialParticleVTKRecorder,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 			((string,fileName,,,"File prefix to save to"))
 			((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
@@ -168,6 +171,7 @@ class PotentialParticleVTKRecorder: public PeriodicEngine {
 			,
 
 		);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(PotentialParticleVTKRecorder);
 

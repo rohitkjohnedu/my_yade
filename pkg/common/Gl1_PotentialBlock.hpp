@@ -101,9 +101,11 @@ namespace yade { // Cannot have #include directive inside.
 
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
 
+	// clang-format off
 			YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialBlock,GlShapeFunctor,"Renders :yref:`PotentialBlock` object",
 				((bool,wire,false,,"Only show wireframe"))
 			);
+	// clang-format on
 			RENDERS(PotentialBlock);
 
 		protected:
@@ -157,6 +159,7 @@ bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 //		static vector<scalarF> SF ;
 //		//void clearMemory();
 //		
+	// clang-format off
 //	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialBlock,GlShapeFunctor,"Renders :yref:`PotentialBlock` object",
 //		((int,sizeX,30,,"Number of divisions in the X direction for triangulation"))
 //		((int,sizeY,30,,"Number of divisions in the Y direction for triangulation"))
@@ -167,6 +170,7 @@ bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
 //		((bool,wire,false,,"Only show wireframe"))
 ////		((vector<scalarF>,SF,"Scalar field used by the Marching cubes algorithm"))
 //	);
+	// clang-format on
 //	RENDERS(PotentialBlock);
 
 
@@ -224,6 +228,7 @@ namespace yade { // Cannot have #include directive inside.
 		vtkSmartPointer<ImpFuncPB> function;
 		
 	  virtual void action(void);
+	// clang-format off
 	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorder,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((string,fileName,,,"File prefix to save to"))
 		((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
@@ -240,6 +245,7 @@ namespace yade { // Cannot have #include directive inside.
 		,
 		
 	  );
+	// clang-format on
 	};
 	REGISTER_SERIALIZABLE(PotentialBlockVTKRecorder);
 
@@ -250,6 +256,7 @@ namespace yade { // Cannot have #include directive inside.
 		vtkSmartPointer<ImpFuncPB> function;
 		
 	  virtual void action(void);
+	// clang-format off
 	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorderTunnel,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((string,fileName,,,"File prefix to save to"))
 		((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
@@ -266,6 +273,7 @@ namespace yade { // Cannot have #include directive inside.
 		,
 		
 	  );
+	// clang-format on
 	};
 	REGISTER_SERIALIZABLE(PotentialBlockVTKRecorderTunnel);
 

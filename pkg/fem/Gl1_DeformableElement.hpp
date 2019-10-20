@@ -16,8 +16,10 @@ class Gl1_DeformableElement : public GlShapeFunctor
 {	
 	public:
 		virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+	// clang-format off
 		YADE_CLASS_BASE_DOC(Gl1_DeformableElement,GlShapeFunctor,"Renders :yref:`Node` object"
 		);
+	// clang-format on
 	RENDERS(DeformableElement);
 };
 

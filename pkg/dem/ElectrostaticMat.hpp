@@ -20,6 +20,7 @@ namespace yade { // Cannot have #include directive inside.
 class ElectrostaticPhys: public LubricationPhys {
         public:
 				explicit ElectrostaticPhys(LubricationPhys const&); // Inheritance constructor
+	// clang-format off
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(ElectrostaticPhys,LubricationPhys,"IPhys class containing parameters of DLVO interaction Inherits from LubricationPhys. Used by :yref:`Law2_ScGeom_ElectrostaticPhys`.",
                         ((Real,DebyeLength,1e-6,Attr::readonly,"Debye Length $\\kappa^{-1}$[m]"))
                         ((Real,Z,1e-12,Attr::readonly,"Double layer interaction constant $Z$ [N]"))
@@ -27,6 +28,7 @@ class ElectrostaticPhys: public LubricationPhys {
 			, // ctors
                         createIndex();,
 		);
+	// clang-format on
 		DECLARE_LOGGER;
                 REGISTER_CLASS_INDEX(ElectrostaticPhys,LubricationPhys);
 };
@@ -39,12 +41,14 @@ class Ip2_FrictMat_FrictMat_ElectrostaticPhys: public Ip2_FrictMat_FrictMat_Lubr
 		//BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getInteractionConstant_overloads, getInteractionConstant, 0, 4)
                 FUNCTOR2D(FrictMat,FrictMat);
 		DECLARE_LOGGER;
+	// clang-format off
                 YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Ip2_FrictMat_FrictMat_ElectrostaticPhys, Ip2_FrictMat_FrictMat_LubricationPhys,"Ip2 creating Electrostatic_Phys from two ElectrostaticMat instances.",
                         ((Real,DebyeLength,1.e-6,,"Debye length [m]."))
                         ((Real,Z,1.e-12,,"Interaction constant [N]."))
                     ,,
 					.def("getInteractionConstant", &getInteractionConstant, (py::args("epsr")=78,py::args("T")=293,py::args("z")=1,py::args("phi0")=0.050),"Get the interaction constant from thermal properties").staticmethod("getInteractionConstant")
 		);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_ElectrostaticPhys);
 
@@ -64,12 +68,14 @@ class Law2_ScGeom_ElectrostaticPhys: public Law2_ScGeom_ImplicitLubricationPhys{
 		
 		bool go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction);
 		FUNCTOR2D(GenericSpheresContact,ElectrostaticPhys);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ElectrostaticPhys,Law2_ScGeom_ImplicitLubricationPhys,"Material law for lubricated spheres with Double Layer interaction between 2 spheres. Solved by dichotomy method. No exact resolution method available",,,
 			.def("getStressForEachBody",&Law2_ScGeom_ElectrostaticPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, DL stress.")
 			.staticmethod("getStressForEachBody")
 			.def("getTotalStresses",&Law2_ScGeom_ElectrostaticPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, DL stress")
 			.staticmethod("getTotalStresses")
 		);
+	// clang-format on
 		DECLARE_LOGGER;
 
 };

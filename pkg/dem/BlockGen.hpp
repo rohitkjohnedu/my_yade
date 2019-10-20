@@ -141,6 +141,7 @@ class BlockGen : public FileGenerator {
 		Vector3r calCentroid(struct Block block, double & blockVol);
 		bool checkCentroid(struct Block block, Vector3r presentTrial);
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		BlockGen,FileGenerator,"Prepare a scene for Block Generation using the Potential Blocks."
 		,
@@ -235,6 +236,7 @@ class BlockGen : public FileGenerator {
 		, /* py */
 		//.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
 		 );
+	// clang-format on
 	DECLARE_LOGGER;
 };
 

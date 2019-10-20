@@ -257,6 +257,7 @@ class Subdomain: public Shape {
 	bool bodiesSet = false;  // flag 
          
 		
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain",
 // 		((testType, testArray,testType({0,0}),,""))
 		((Real,extraLength,0,,"verlet dist for the subdomain, added to bodies verletDist"))
@@ -291,6 +292,7 @@ class Subdomain: public Shape {
 		.add_property("comm",&Subdomain::getMyComm,&Subdomain::setMyComm,"Communicator to be used for MPI (converts mpi4py comm <-> c++ comm)")
 		.def("splitBodiesToWorkers", &Subdomain::splitBodiesToWorkers,(boost::python::arg("eraseWorkerBodies")), "of true bodies in workers are erased and reassigned.")
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Subdomain,Shape);
 };
@@ -300,7 +302,9 @@ class Bo1_Subdomain_Aabb : public BoundFunctor{
 	public:
 		void go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 	FUNCTOR1D(Subdomain);
+	// clang-format off
 	YADE_CLASS_BASE_DOC(Bo1_Subdomain_Aabb,BoundFunctor,"Creates/updates an :yref:`Aabb` of a :yref:`Facet`.");
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Bo1_Subdomain_Aabb);

@@ -99,12 +99,14 @@ class Clump: public Shape {
 
     boost::python::dict members_get();
 	
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Clump,Shape,"Rigid aggregate of bodies",
 		((MemberMap,members,,Attr::hidden,"Ids and relative positions+orientations of members of the clump (should not be accessed directly)"))
 		 ((vector<int>,ids,,Attr::readonly,"Ids of constituent particles (only informative; direct modifications will have no effect).")) //FIXME
 		,/*ctor*/ createIndex();
 		,/*py*/ .add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")
 	);
+	// clang-format on
 	DECLARE_LOGGER;
 	REGISTER_CLASS_INDEX(Clump,Shape);
 };

@@ -23,6 +23,7 @@ namespace yade { // Cannot have #include directive inside.
 class KnKsPBPhys: public FrictPhys {
 	public:
 	virtual ~KnKsPBPhys();
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPBPhys,FrictPhys,"EXPERIMENTAL. IPhys for :yref:`PotentialBlock`.",
 //			((vector<double>,lambdaIPOPT,0.0,,"not used, lagrane multiplier for equality constraints"))
 //			((vector<int>,cstatCPLEX,,,"not used"))
@@ -136,6 +137,7 @@ class KnKsPBPhys: public FrictPhys {
 		//((Quaternionr, initialOrientation2, Quaternionr(1.0,0.0,0.0,0.0),,"orientation2")),
 		createIndex();
 	);
+	// clang-format on
 	REGISTER_CLASS_INDEX(KnKsPBPhys,FrictPhys);
 	DECLARE_LOGGER;
 };
@@ -146,6 +148,7 @@ REGISTER_SERIALIZABLE(KnKsPBPhys);
 class Ip2_FrictMat_FrictMat_KnKsPBPhys: public IPhysFunctor{
 	public:
 		virtual void go(const shared_ptr<Material>& pp1, const shared_ptr<Material>& pp2, const shared_ptr<Interaction>& interaction);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPBPhys,IPhysFunctor,"EXPERIMENTAL. Ip2 functor for :yref:`KnKsPBPhys`",
 		((Real, Knormal, ,,"Volumetric stiffness in the contact normal direction (units: stress/length)"))
 		((Real, Kshear, ,,"Volumetric stiffness in the contact shear direction (units: stress/length)"))
@@ -166,6 +169,7 @@ class Ip2_FrictMat_FrictMat_KnKsPBPhys: public IPhysFunctor{
 		((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts")) //TODO: This attr to be moved in Ig2_PB_PB_ScGeom
 //		((bool, twoDimension, false,,"Whether the contact is 2-D")) // Moved this attr in Ig2_PB_PB_ScGeom @vsangelidakis
 		);
+	// clang-format on
 		FUNCTOR2D(FrictMat,FrictMat);
 		DECLARE_LOGGER;
 };
@@ -192,6 +196,7 @@ class Law2_SCG_KnKsPBPhys_KnKsPBLaw: public LawFunctor{
 
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,KnKsPBPhys);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_SCG_KnKsPBPhys_KnKsPBLaw,LawFunctor,"Law for linear compression, without cohesion and Mohr-Coulomb plasticity surface.\n\n.. note::\n This law uses :yref:`ScGeom`; there is also functionally equivalent :yref:`Law2_Dem3DofGeom_FrictPhys_Basic`, which uses :yref:`Dem3DofGeom` (sphere-box interactions are not implemented for the latest).",
 		((bool, neverErase, false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 		((bool, preventGranularRatcheting, false,,"bool to avoid granular ratcheting"))
@@ -214,6 +219,7 @@ class Law2_SCG_KnKsPBPhys_KnKsPBLaw: public LawFunctor{
 		.def("initPlasticDissipation",&Law2_SCG_KnKsPBPhys_KnKsPBLaw::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
 		.def("ratioSlidingContacts",&Law2_SCG_KnKsPBPhys_KnKsPBLaw::ratioSlidingContacts,"Return the ratio between the number of contacts sliding to the total number at a given time.")
 		);
+	// clang-format on
 		DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_SCG_KnKsPBPhys_KnKsPBLaw);

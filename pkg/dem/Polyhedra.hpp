@@ -71,6 +71,7 @@ class Polyhedra: public Shape{
 		Quaternionr orientation;
 		void GenerateRandomGeometry();
 
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(Polyhedra,Shape,"Polyhedral (convex) geometry.",
 			((std::vector<Vector3r>,v,,,"Polyhedron vertices in local coordinate system."))
 			((int,seed, time(NULL),,"Seed for random generator."))
@@ -89,6 +90,7 @@ class Polyhedra: public Shape{
 			.def("setVertices",&Polyhedra::setVertices,"set vertices and update receiver. Takes a list/tuple of vertices as argument.\n\n.. note:: Causes memory leaks, so if you want to use it maaaany times, use one of setVertices mentioned lower, passing each vertex as individual argument (currently only setVertices(v1,v2,v3,v4) for tetrahedron is implemented, on request it is easy to implement more vertices).")
 			.def("setVertices4",&Polyhedra::setVertices4,"set 4 vertices and update receiver. Each vertex is single argument.")
 		);
+	// clang-format on
 		REGISTER_CLASS_INDEX(Polyhedra,Shape);
 };
 REGISTER_SERIALIZABLE(Polyhedra);
@@ -109,6 +111,7 @@ class PolyhedraGeom: public IGeom{
 		std::vector<int> sep_plane;
 		bool isShearNew;
 	protected:
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraGeom,IGeom,"Geometry of interaction between 2 :yref:`Polyhedra`, including volumetric characteristics",
 			((Real,penetrationVolume,NaN,,"Volume of overlap [m³]"))
 			((Real,equivalentCrossSection,NaN,,"Cross-section area of the overlap (perpendicular to the normal) - not used"))
@@ -121,6 +124,7 @@ class PolyhedraGeom: public IGeom{
 			createIndex();
 			sep_plane.assign(3,0);
 		);
+	// clang-format on
 		//FUNCTOR2D(Tetra,Tetra);
 		REGISTER_CLASS_INDEX(PolyhedraGeom,IGeom);
 };
@@ -134,9 +138,11 @@ class Bo1_Polyhedra_Aabb: public BoundFunctor{
 	public:
 		void go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*);
 		FUNCTOR1D(Polyhedra);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS(Bo1_Polyhedra_Aabb,BoundFunctor,"Create/update :yref:`Aabb` of a :yref:`Polyhedra`",
 			((Real,aabbEnlargeFactor,((void)"deactivated",-1),,"see :yref:`Bo1_Sphere_Aabb.aabbEnlargeFactor`"))
 		);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Bo1_Polyhedra_Aabb);
 
@@ -153,6 +159,7 @@ class PolyhedraMat: public FrictMat{
 		 Real GetWeiV0() const;
 		 Real GetP() const;
 	virtual ~PolyhedraMat(){};
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraMat,FrictMat,"Elastic material with Coulomb friction.",
 		((bool,IsSplitable,0,,"To be splitted ... or not"))
 		((Real,strength,100,,"Stress at which polyhedra of volume 4/3*pi [mm] breaks."))
@@ -166,6 +173,7 @@ class PolyhedraMat: public FrictMat{
 		((Real,young,1e8,,"Young modulus")),
 		/*ctor*/ createIndex();
 	);
+	// clang-format on
 	REGISTER_CLASS_INDEX(PolyhedraMat,FrictMat);
 };
 REGISTER_SERIALIZABLE(PolyhedraMat);
@@ -174,11 +182,13 @@ REGISTER_SERIALIZABLE(PolyhedraMat);
 class PolyhedraPhys: public FrictPhys{
 	public:
 	virtual ~PolyhedraPhys(){};
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PolyhedraPhys,FrictPhys,"Simple elastic material with friction for volumetric constitutive laws",
 		/*attrs*/
 		,
 		/*ctor*/ createIndex();
 	);
+	// clang-format on
 	REGISTER_CLASS_INDEX(PolyhedraPhys,FrictPhys);
 };
 REGISTER_SERIALIZABLE(PolyhedraPhys);
@@ -189,9 +199,11 @@ REGISTER_SERIALIZABLE(PolyhedraPhys);
 	class Gl1_Polyhedra: public GlShapeFunctor{	
 		public:
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
+	// clang-format off
 			YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_Polyhedra,GlShapeFunctor,"Renders :yref:`Polyhedra` object",
 			((bool,wire,false,,"Only show wireframe"))
 			);
+	// clang-format on
 			RENDERS(Polyhedra);
 	};
 	REGISTER_SERIALIZABLE(Gl1_Polyhedra);
@@ -200,8 +212,10 @@ REGISTER_SERIALIZABLE(PolyhedraPhys);
 		RENDERS(PolyhedraGeom);
 		void go(const shared_ptr<IGeom>&, const shared_ptr<Interaction>&, const shared_ptr<Body>&, const shared_ptr<Body>&, bool);
 		void draw(const shared_ptr<IGeom>&);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PolyhedraGeom,GlIGeomFunctor,"Render :yref:`PolyhedraGeom` geometry.",
 		);
+	// clang-format on
 	};
 	REGISTER_SERIALIZABLE(Gl1_PolyhedraGeom);
 
@@ -209,6 +223,7 @@ REGISTER_SERIALIZABLE(PolyhedraPhys);
 		static GLUquadric* gluQuadric; // needed for gluCylinder, initialized by ::go if no initialized yet
 		public:
 			virtual void go(const shared_ptr<IPhys>&,const shared_ptr<Interaction>&,const shared_ptr<Body>&,const shared_ptr<Body>&,bool wireFrame);
+	// clang-format off
 		YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PolyhedraPhys,GlIPhysFunctor,"Renders :yref:`PolyhedraPhys` objects as cylinders of which diameter and color depends on :yref:`PolyhedraPhys::normForce` magnitude.",
 			((Real,maxFn,0,,"Value of :yref:`NormPhys.normalForce` corresponding to :yref:`maxDiameter<Gl1_NormPhys.maxDiameter>`. This value will be increased (but *not decreased* ) automatically."))
 			((Real,refRadius,std::numeric_limits<Real>::infinity(),,"Reference (minimum) particle radius"))
@@ -217,6 +232,7 @@ REGISTER_SERIALIZABLE(PolyhedraPhys);
 			((int,slices,6,,"Number of sphere slices; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))
 		(	(int,stacks,1,,"Number of sphere stacks; (see `glutCylinder reference <http://www.opengl.org/sdk/docs/man/xhtml/gluCylinder.xml>`__)"))			
 		);
+	// clang-format on
 		RENDERS(PolyhedraPhys);
 	};
 	REGISTER_SERIALIZABLE(Gl1_PolyhedraPhys);
@@ -231,8 +247,10 @@ class Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys: public IPhysFunctor{
 			const shared_ptr<Material>& b2,
 			const shared_ptr<Interaction>& interaction);
 	FUNCTOR2D(PolyhedraMat,PolyhedraMat);
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys,IPhysFunctor,"",		
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys);
 
@@ -242,8 +260,10 @@ class Ip2_FrictMat_PolyhedraMat_FrictPhys: public IPhysFunctor{
 			const shared_ptr<Material>& b2,
 			const shared_ptr<Interaction>& interaction);
 	FUNCTOR2D(FrictMat,PolyhedraMat);
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_PolyhedraMat_FrictPhys,IPhysFunctor,"",		
 	);
+	// clang-format on
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_PolyhedraMat_FrictPhys);
 
@@ -256,6 +276,7 @@ class Law2_PolyhedraGeom_PolyhedraPhys_Volumetric: public LawFunctor{
 	Real elasticEnergy ();
 	Real getPlasticDissipation();
 	void initPlasticDissipation(Real initVal=0);
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric,LawFunctor,"Calculate physical response of 2 :yref:`vector<Polyhedra>` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`. Normal force is proportional to the volume of intersection",
 	((Real,volumePower,1.,,"Power of volume used in evaluation of normal force. Default is 1.0 - normal force is linearly proportional to volume. 1.0/3.0 would mean that normal force is proportional to the cube root of volume, approximation of penetration depth."))
 	((Vector3r,shearForce,Vector3r::Zero(),,"Shear force from last step"))
@@ -267,6 +288,7 @@ class Law2_PolyhedraGeom_PolyhedraPhys_Volumetric: public LawFunctor{
 	.def("plasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::traceEnergy` is true.")
 	.def("initPlasticDissipation",&Law2_PolyhedraGeom_PolyhedraPhys_Volumetric::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
 	);
+	// clang-format on
 	FUNCTOR2D(PolyhedraGeom,PolyhedraPhys);
 	DECLARE_LOGGER;
 };
