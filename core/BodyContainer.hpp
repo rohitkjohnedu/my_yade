@@ -39,7 +39,7 @@ class BodyContainer: public Serializable{
 			ContainerT::iterator end;
 			smart_iterator& operator++() {
 				ContainerT::iterator::operator++();
-				while (!(this->operator*()) && end!=(*this)) ContainerT::iterator::operator++();
+				while (((*this)->get() != nullptr) && !(this->operator*()) && end!=(*this)) ContainerT::iterator::operator++();
 				return *this;}
 			smart_iterator operator++(int) {smart_iterator temp(*this); operator++(); return temp;}
 			smart_iterator& operator=(const ContainerT::iterator& rhs) {ContainerT::iterator::operator=(rhs); return *this;}
