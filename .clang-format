@@ -1,5 +1,16 @@
 BasedOnStyle: WebKit
 UseTab: ForIndentation
 IndentWidth: 8
-ColumnLimit: 140
+AccessModifierOffset: -8
+ContinuationIndentWidth: 8
+ConstructorInitializerIndentWidth: 8
+ColumnLimit: 200
+BinPackParameters: false
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllParametersOfDeclarationOnNextLine: false
+BreakBeforeBraces: Stroustrup
+BreakConstructorInitializers: BeforeComma
+# wait till clang supports it: https://reviews.llvm.org/D33029
+# DanglingParenthesis: true
+Cpp11BracedListStyle: false
 Language: Cpp
