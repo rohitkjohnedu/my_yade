@@ -3,7 +3,7 @@ AccessModifierOffset: -8
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
-AlignTrailingComments: true
+AlignTrailingComments: false
 #wait till clang supports it
 # AllowAllArgumentsOnNextLine: true
 # AllowShortBlocksOnASingleLine: Always
@@ -39,7 +39,7 @@ IndentCaseLabels: true
 # IndentPPDirectives: BeforeHash
 # not working on xenial & stretch
 # UseTab: ForContinuationAndIndentation
-UseTab: Always
+UseTab: ForIndentation
 KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: "glBegin|glNewList"
 MacroBlockEnd: "glEnd|glEndList"
@@ -49,4 +49,5 @@ MaxEmptyLinesToKeep: 2
 # wait till clang supports it: https://reviews.llvm.org/D33029
 # DanglingParenthesis: true
 Cpp11BracedListStyle: false
+ReflowComments: false
 Language: Cpp
