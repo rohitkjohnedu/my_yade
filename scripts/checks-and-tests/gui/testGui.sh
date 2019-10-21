@@ -67,8 +67,8 @@ for TestFile in ${TESTS[@]}; do
 	# scrot -z scrBash01.png
 
 	mv scr*.png screenshots
-	echo -e "******************************************\n*** Finished file testGui${TestFile}.py ***\n******************************************\n"
 	sleep 0.25
+	echo -e "******************************************\n*** Finished file testGui${TestFile}.py ***\n******************************************\n"
 	kill -9 ${TAIL_PID}
 
 # FIXME : this number 14 is hardcoded in scripts/checks-and-tests/gui/helper/testGuiHelper.py as self.maxTestNum=14

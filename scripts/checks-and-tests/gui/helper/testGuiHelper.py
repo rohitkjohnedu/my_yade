@@ -47,7 +47,7 @@ class TestGUIHelper:
 	def clickOnScreen(self,x,y,mouseButton=1):
 		time.sleep(0.25)
 		subprocess.run(["/usr/bin/xdotool", "mousemove" , str(x) , str(y) , "click" , str(mouseButton) , "mousemove" , "restore" ])
-		time.sleep(0.25)
+		time.sleep(1.25)
 
 	def screenshotEngine(self):
 		self.scrNum += 1
@@ -76,6 +76,7 @@ class TestGUIHelper:
 				yade.qt.controller.inspector.setGeometry(1050,20,500,1100)
 			except:
 				self.createEmptyFile("screenshots/mouse_click_the_Inspector_open_FAILED_"+self.name)
+				print("*** ERROR: self.clickOnScreen failed to open Inspector window ***")
 				self.finish();
 			yade.qt.controller.inspector.show()
 			qt.Renderer().wire=True
