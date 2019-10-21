@@ -7,13 +7,13 @@ AlignTrailingComments: true
 #wait till clang supports it
 # AllowAllArgumentsOnNextLine: true
 # AllowShortBlocksOnASingleLine: Always
-AllowShortCaseLabelsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
 BinPackArguments: false
 BinPackParameters: false
-BreakBeforeBraces: Stroustrup
+# BreakBeforeBraces: Stroustrup
 BreakConstructorInitializers: BeforeComma
-ColumnLimit: 140
+ColumnLimit: 160
 ConstructorInitializerIndentWidth: 8
 ContinuationIndentWidth: 8
 IndentWidth: 8
