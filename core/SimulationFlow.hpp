@@ -9,6 +9,7 @@
 #pragma once
 
 #include "ThreadWorker.hpp"
+#include <lib/base/Logging.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

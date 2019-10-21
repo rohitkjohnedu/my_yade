@@ -5,6 +5,7 @@
 #pragma once
 
 #include <lib/serialization/Serializable.hpp>
+#include <core/Body.hpp>
 #include <boost/tuple/tuple.hpp>
 
 namespace yade { // Cannot have #include directive inside.

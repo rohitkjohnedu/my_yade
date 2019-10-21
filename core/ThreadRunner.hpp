@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <lib/base/Logging.hpp>
 #include <boost/thread/mutex.hpp>
 
 namespace yade { // Cannot have #include directive inside.

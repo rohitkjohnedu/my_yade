@@ -7,6 +7,7 @@
 #include <core/GlobalEngine.hpp> 
 #include <core/Body.hpp>
 #include <core/Omega.hpp>
+#include <mpi.h>
 #include <pkg/common/Sphere.hpp> 
 #include <vector> 
 #include <core/InteractionContainer.hpp> // for pairwise hydro interaction (to be implemented) 
