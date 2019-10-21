@@ -77,6 +77,8 @@ Performance enhancements
   :maxdepth: 2
 
   GPUacceleration.rst
+  
+  mpy.rst
 
   amazonEC2.rst
 
