@@ -8,6 +8,7 @@
 
 #pragma once
 
+// clang-format off
 #ifndef YADE_OPENGL
 #error "This build doesn't support openGL. Therefore, this header must not be used."
 #endif
@@ -238,6 +239,7 @@ template< typename Type > inline void glOneFace(Type & t, unsigned int a, unsign
 }
 
 #undef LDOUBL
+// clang-format on
 
 //} // namespace yade
 
