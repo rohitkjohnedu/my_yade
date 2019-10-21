@@ -856,35 +856,35 @@ class pyOmega{
 class pyGenericPotential : public GenericPotential, public py::wrapper<GenericPotential> {
 public:
     
-    Real potential(Real const& u, LubricationPhys const&) const {
+    Real potential(Real const& u, LubricationPhys const& phys) const {
         TRACE;
-        return contactForce(u) + potentialForce(u);
+        return contactForce(u, phys.a) + potentialForce(u, phys.a);
     }
 
     void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const&n) {
         TRACE;
-        phys.normalContactForce = contactForce(u)*n;
-        phys.normalPotentialForce = potentialForce(u)*n;
-        phys.contact = hasContact(u);
+        phys.normalContactForce = contactForce(u, phys.a)*n;
+        phys.normalPotentialForce = potentialForce(u, phys.a)*n;
+        phys.contact = hasContact(u, phys.a);
     }
 
-    virtual Real contactForce(Real const& u) const {
+    virtual Real contactForce(Real const& u, Real const& a) const {
         TRACE;
         gilLock lock;
         LOG_TRACE("GIL State: " << PyGILState_Check());
-        return get_override("contactForce")(u);
+        return get_override("contactForce")(u, a);
     }
 
-    virtual Real potentialForce(Real const& u) const {
+    virtual Real potentialForce(Real const& u, Real const& a) const {
         TRACE;
         gilLock lock;
-        return get_override("potentialForce")(u);
+        return get_override("potentialForce")(u, a);
     }
 
-    virtual bool hasContact(Real const& u) const {
+    virtual bool hasContact(Real const& u, Real const& a) const {
         TRACE;
         gilLock lock;
-        return get_override("hasContact")(u);
+        return get_override("hasContact")(u, a);
     }        
 };
 
