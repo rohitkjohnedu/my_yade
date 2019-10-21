@@ -12,11 +12,13 @@ AllowAllParametersOfDeclarationOnNextLine: true
 BinPackArguments: false
 BinPackParameters: false
 # BreakBeforeBraces: Stroustrup
-BreakConstructorInitializers: BeforeComma
+# not working on xenial & stretch
+# BreakConstructorInitializers: BeforeComma
 ColumnLimit: 160
 ConstructorInitializerIndentWidth: 8
 ContinuationIndentWidth: 8
-IncludeBlocks: Merge
+# not working on xenial & stretch
+# IncludeBlocks: Merge
 # make sure that yade includes are in this order: lib, core, pkg, gui.
 # Then Eigen, Python. And others at the end. Urecognized go first.
 IncludeCategories:
@@ -35,12 +37,15 @@ IncludeCategories:
 IndentWidth: 8
 IndentCaseLabels: true
 # IndentPPDirectives: BeforeHash
-UseTab: ForContinuationAndIndentation
+# not working on xenial & stretch
+# UseTab: ForContinuationAndIndentation
+UseTab: Always
 KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: "glBegin|glNewList"
 MacroBlockEnd: "glEnd|glEndList"
 MaxEmptyLinesToKeep: 2
-SortUsingDeclarations: true
+# not working on xenial & stretch
+# SortUsingDeclarations: true
 # wait till clang supports it: https://reviews.llvm.org/D33029
 # DanglingParenthesis: true
 Cpp11BracedListStyle: false
