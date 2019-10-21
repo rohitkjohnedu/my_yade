@@ -16,6 +16,22 @@ BreakConstructorInitializers: BeforeComma
 ColumnLimit: 160
 ConstructorInitializerIndentWidth: 8
 ContinuationIndentWidth: 8
+IncludeBlocks: Merge
+# make sure that yade includes are in this order: lib, core, pkg, gui.
+# Then Eigen, Python. And others at the end. Urecognized go first.
+IncludeCategories:
+  - Regex:           '^<(Eigen|Python)'
+    Priority:        5
+  - Regex:           '^(<|")gui/'
+    Priority:        4
+  - Regex:           '^(<|")(core|pkg)/'
+    Priority:        3
+  - Regex:           '^(<|")lib/'
+    Priority:        2
+  - Regex:           '^<.*>'
+    Priority:        6
+  - Regex:           '.*'
+    Priority:        1
 IndentWidth: 8
 IndentCaseLabels: true
 # IndentPPDirectives: BeforeHash
@@ -24,7 +40,6 @@ KeepEmptyLinesAtTheStartOfBlocks: false
 MacroBlockBegin: "glBegin|glNewList"
 MacroBlockEnd: "glEnd|glEndList"
 MaxEmptyLinesToKeep: 2
-ObjCBinPackProtocolList: Never
 SortUsingDeclarations: true
 # wait till clang supports it: https://reviews.llvm.org/D33029
 # DanglingParenthesis: true
