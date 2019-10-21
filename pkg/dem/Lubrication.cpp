@@ -174,7 +174,12 @@ Real Law2_ScGeom_ImplicitLubricationPhys::DichoAdimExp_integrate_u(Real const& u
         	}
 	}
 
-	if(!std::isfinite(F_left) || !std::isfinite(F_right)) LOG_ERROR("Initial point problem!! d_left=" << d_left << " F_left=" << F_left << " d_right=" << d_right << " F_right=" << F_right);
+	if(!std::isfinite(F_left) || !std::isfinite(F_right))  {
+        LOG_FATAL("Initial point problem!!");
+        TRVAR4(d_left, d_right, F_left, F_right);
+        TRVAR5(un, prevDotU, dt, prev_d, undot);
+        throw new std::string("Lubrication law error.");
+    }
 
 	// Iterate to find the zero.
 	int i;
@@ -461,11 +466,15 @@ bool Law2_ScGeom_ImplicitLubricationPhys::go(shared_ptr<IGeom> &iGeom, shared_pt
     {
            //FIXME: it needs to go to potential always based on distance, the "undot < 0" here is dangerous (let the collider do its job), ex: if true is returned here the interaction is still alive and it will be included in the stress
 //         return undot < 0; // Only go to potential if distance is increasing 
+        
 	    return false;
     }
 
     // inititalization
-	if(phys->u == -1. ) {phys->u = -geom->penetrationDepth; isNew=true;}
+	if(phys->u == -1. ) {
+        phys->u = -geom->penetrationDepth;
+        isNew=true;
+    }
 	
 	// reset forces
 	phys->normalForce = Vector3r::Zero();

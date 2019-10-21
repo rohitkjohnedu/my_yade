@@ -3,6 +3,8 @@
 #include "LubricationWithPotential.hpp"
 #include <boost/python/call_method.hpp>
 
+namespace yade {
+
 YADE_PLUGIN((Law2_ScGeom_PotentialLubricationPhys)(GenericPotential)(CundallStrackPotential))
 
 bool Law2_ScGeom_PotentialLubricationPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction)
@@ -169,3 +171,5 @@ void CundallStrackPotential::applyPotential(Real const& u, LubricationPhys& phys
 }
 
 CREATE_LOGGER(CundallStrackPotential);
+
+} // namespace yade

@@ -2,6 +2,8 @@
 
 #include "Lubrication.hpp"
 
+namespace yade {
+
 class GenericPotential : public Serializable {
     public:
         /* This is where the magic happens.
@@ -70,3 +72,4 @@ class CundallStrackPotential : public GenericPotential {
 };
 REGISTER_SERIALIZABLE(CundallStrackPotential)
 
+} // namespace yade
