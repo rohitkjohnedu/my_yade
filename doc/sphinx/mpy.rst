@@ -24,20 +24,24 @@ ________
 
 
 Execution
----------
+_________
 
 Passive mode
+------------
 
 Interactive mode
-	Automatic initialization
-	Explicit initialization
+----------------
+ - Automatic initialization
+ - Explicit initialization
 
 
 Centralized scene construction
+------------------------------
 
 Distributed scene construction
+------------------------------
 
 
-
-Remarks:
+Various remarks
+---------------
 - omca_oversubscribe = 1
