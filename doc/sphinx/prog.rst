@@ -429,6 +429,10 @@ The following coding rules should be respected; documentation is treated separat
   * Use ``YADE_CAST`` and ``YADE_PTR_CAST`` where you want type-check during debug builds, but fast casting in optimized build.
   * Initialize all class variables in the default constructor. This avoids bugs that may manifest randomly and are difficult to fix. Initializing with NaN's will help you find otherwise unitialized variable. (This is taken care of by :ref:`YADE_CLASS_BASE_DOC` macros for user classes)
 
+Using clang-format
+------------------
+
+The file :ysrc:`.clang-format` contains the config which should produce always the same results. The aim is to eliminate commits that change formatting. The script :ysrc:`scripts/clang-formatter.sh` can be invoked on either file or a directory and will do the reformatting. Usually this can be integrated with the editor, `see clang-format documentation <https://clang.llvm.org/docs/ClangFormat.html>`_ (except that for vim ``py3f`` command has to be used), and in kdevelop it is added `as a custom formatter <https://www.kdevelop.org/features>`_.
 
 Class naming
 -------------
