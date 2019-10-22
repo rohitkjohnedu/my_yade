@@ -125,9 +125,13 @@ import yade.runtime
 
 mit_mode = yade.runtime.opts.mit>1
 
-def initialize():
-	global comm,rank,numThreads
+def initialize(np=None):
+	global comm,rank,numThreads,mit_mode
+	if (np!=None):
+		yade.runtime.opts.mit=np
+		mit_mode=True
 	if(mit_mode):
+		
 		numThreads=yade.runtime.opts.mit
 		process_count = comm.Get_size()
 		if not yade.runtime.opts.mpi_mode and process_count<numThreads: #MASTER ONLY
@@ -143,6 +147,9 @@ def initialize():
 			comm = MPI.Comm.Get_parent().Merge()
 			rank=comm.Get_rank()
 			mprint("Hello, I'm worker "+str(rank))
+		#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
+		O.subD=Subdomain() #for storage and comm only, this one will not be used beyond that 
+		O.subD.comm = comm
 	else:
 		rank = os.getenv('OMPI_COMM_WORLD_RANK')
 		numThreads=None
@@ -152,11 +159,11 @@ def initialize():
 		#else monolithic simulation (no mpiexec, no mit)
 	return rank,numThreads
 
-def autoInitialize(np):
-	global mit_mode
-	yade.runtime.opts.mit=np
-	mit_mode=True
-	return initialize()
+#def autoInitialize(np):
+	#global mit_mode
+	#yade.runtime.opts.mit=np
+	#mit_mode=True
+	#return initialize()
 
 def spawnedProcessWaitCommand():
 	global waitingCommands
@@ -169,7 +176,7 @@ def spawnedProcessWaitCommand():
 		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
 			time.sleep(0.001)
 		command = comm.recv(source=s.source,tag=_MASTER_COMMAND_)
-		mprint("I will now execute ",command)
+		wprint("I will now execute ",command)
 		try:
 			exec(command)
 		except:
@@ -202,7 +209,7 @@ def sendCommand(executors,command,wait=True):
 	
 	if wait:
 		resCommand=resCommand+ [O.subD.comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors if w>0]
-		mprint("sendCommand returned in "+str(time.time()-start)+" s")
+		wprint("sendCommand returned in "+str(time.time()-start)+" s")
 		return (resCommand if argIsList else resCommand[0])
 	else:
 		return None
@@ -630,7 +637,6 @@ def splitScene():
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain() 
 		if rank == 0 or DISTRIBUTED_INSERT: 
-			O.subD=Subdomain() #for storage only, this one will not be used beyond that 
 			subD= O.subD #alias
 			#insert "meta"-bodies
 			subD.subdomains=[] #list subdomains by body ids
@@ -904,7 +910,7 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		userScriptInCheckList=stack[1][1]
 	caller_name = stack[2][3]
 	if (np>numThreads):  
-		if not mit_mode: autoInitialize(np) #this will set numThreads
+		if not mit_mode: initialize(np) #this will set numThreads
 		else: mprint("number of cores can't be increased after first call to mpirun")
 	if(mit_mode and rank==0 and not caller_name=='execfile'): #if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
 		for w in range(1,numThreads):

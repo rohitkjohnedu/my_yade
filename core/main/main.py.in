@@ -351,8 +351,12 @@ def userSession(gui='none',qapp=None):
 			runScript(arg0)
 		if yade.runtime.opts.exitAfter: sys.exit(0)
 	## start interpreter
-	if not opts.mpi_mode: ipshell()
-	
+	if not opts.mpi_mode:
+		ipshell()
+	else: #if we reach here it means yade is executed by a spawned worker, and without a user script, we go directly to the waitCommand state 
+		from yade import mpy as mp
+		mp.initialize(mp.numThreads+1) #within the spawned comm master is not visible, hence not counted in numThreads yet (reason for the +1), initialize() will merge them
+		mp.spawnedProcessWaitCommand() #after the script execution, don't exit and wait a command from master.
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
