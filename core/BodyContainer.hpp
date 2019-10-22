@@ -1,6 +1,7 @@
 // 2004 © Olivier Galizzi <olivier.galizzi@imag.fr>
-// 2004 © Janek Kozicki <cosurgi@berlios.de>
+// 2004,2019 © Janek Kozicki <cosurgi@berlios.de>
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
+// 2019 © Anton Gladky <gladk@debian.org>
 
 #pragma once
 
