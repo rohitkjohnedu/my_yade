@@ -146,7 +146,7 @@ def initialize(np=None):
 		else:	#WORKERS
 			comm = MPI.Comm.Get_parent().Merge()
 			rank=comm.Get_rank()
-			mprint("Hello, I'm worker "+str(rank))
+			wprint("Hello, I'm worker "+str(rank))
 		#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
 		O.subD=Subdomain() #for storage and comm only, this one will not be used beyond that 
 		O.subD.comm = comm
@@ -170,7 +170,7 @@ def spawnedProcessWaitCommand():
 	if waitingCommands: return
 	waitingCommands = True
 	sys.stderr.write=sys.stdout.write
-	mprint("I'm now waiting")
+	wprint("I'm now waiting")
 	s=MPI.Status()
 	while 1:
 		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
@@ -183,12 +183,13 @@ def spawnedProcessWaitCommand():
 			O.subD.comm.send(None,dest=s.source,tag=_RETURN_VALUE_)
 			mprint(sys.exc_info())
 		
-def sendCommand(executors,command,wait=True):
+def sendCommand(executors,command,wait=True,workerToWorker=False):
 	'''
 	Send a command to a worker (or list of) from master or from another worker. executors="all" is accepted, then even master will execute the command.
 	'''
 	start=time.time()
-	if not mit_mode: mprint("sendCommand in interactive mode only"); return	
+	if not mit_mode: mprint("sendCommand in interactive mode only"); return
+	if (rank>0 and not workerToWorker): mprint("sendCommand ignored by worker", rank, ", pass workerToWorker=True to force it"); return
 	if (executors=="all"): executors=list(range(numThreads))
 	argIsList=isinstance(executors,list)
 	toMaster = (argIsList and 0 in executors) or executors==0
@@ -198,14 +199,19 @@ def sendCommand(executors,command,wait=True):
 	#if 0 in executors: mprint("master does not accept mpi commands"); return
 	if len(executors)>numThreads: mprint("executors > numThreads"); return
 	
-	if wait:
+	if wait:#trick command to make it return a result by mpi
 		commandSent="resCommand="+command+";O.subD.comm.send(resCommand,dest="+str(rank)+",tag=_RETURN_VALUE_)"
 	else: commandSent=command
 	
-	resCommand=[]
+	reqs=[]
 	for w in executors:
-		if (w>0): O.subD.comm.isend(commandSent,dest=w,tag=_MASTER_COMMAND_)
-	if toMaster: resCommand = [eval(command)]+resCommand
+		#note: if the return from this isend() is not appended to a list we have random deadlock
+		if (w>0): reqs.append(O.subD.comm.isend(commandSent,dest=w,tag=_MASTER_COMMAND_) )
+	
+	resCommand=[]
+	if toMaster:#eval command on master since it wasn't done yet
+		try: resCommand = [eval(command)]
+		except: resCommand = [None]
 	
 	if wait:
 		resCommand=resCommand+ [O.subD.comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors if w>0]

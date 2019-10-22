@@ -1,16 +1,46 @@
 
 
-import os
-from yade import mpy as mp
-rank,numThreads = mp.initialize(4)
-
-wallId=O.bodies.append(box(center=(numThreads*N*0.5,-0.5,0),extents=(2*numThreads*N,0,2),fixed=True))
-for x in range(3)
-	O.bodies.append(sphere((0.5+x,0.5,0),0.5))
+wallId=O.bodies.append(box(center=(0,0,0),extents=(2,0,1),fixed=True))
+for x in range(-1,2):
+	O.bodies.append(sphere((x,0.5,0),0.5))
 
 newton.gravity=(0,-10,0) #else nothing would move
-O.dt=0.1*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
-O.dynDt=False
+O.dt=0.1*PWaveTimeStep() 
+O.dynDt=False #very important, we don't want subdomains to use many different timesteps...
+
+from yade import mpy as mp
+mp.initialize(3)
+
+if mp.rank==0:
+	print( mp.sendCommand(executors="all",command="len(O.bodies)",wait=True) )
+
+	#note that 'rank' is used instead of mp.rank, the scope of the mpy module is accessed here
+	mp.sendCommand(executors=[1,2],command= "ids=O.bodies.append([sphere((xx,1.5+rank,0),0.5) for xx in range(-1,2)])",wait=True)
+
+	print( mp.sendCommand(executors="all",command="len(O.bodies)",wait=True) )
+
+	mp.sendCommand(executors=[1,2],command= "list(map(lambda b: setattr(b,'subdomain',rank),O.bodies))", wait=True)
+
+	print("Assigned bodies:", mp.sendCommand([1,2], "len([b for b in O.bodies if b.subdomain==rank])", True) )
+	
+mp.DISTRIBUTED_INSERT=True
+mp.MERGE_W_INTERACTIONS=True
+mp.ERASE_REMOTE_MASTER=False
+
+# we can exploit sendCommand to send data between yade instances directly with mpi4py functions (see mpi4py documentation)
+#Yade [8]: mp.sendCommand(executors=1,command="message=comm.recv(source=0); print('received',message)",wait=False)
+
+#Yade [10]: mp.comm.send("hello",dest=1)
+#received hello
+
+#Yade [11]: mp.sendCommand(executors=1,command="message=comm.recv(source=0); mprint('received: ',message)",wait=False)
+
+#Yade [12]: mp.comm.send("hello",dest=1)
+#Worker1: received hello
+
+
+#inspect 3D view
+
 
 
 ##########  RUN  ##########

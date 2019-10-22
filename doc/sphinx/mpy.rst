@@ -42,6 +42,13 @@ Distributed scene construction
 ------------------------------
 
 
+
+Control variables
+_________________
+
+ - VERBOSE_OUTPUT
+
+
 Various remarks
----------------
-- omca_oversubscribe = 1
+_______________
+- sendCommand() has a hardcoded latency of 0.001s to not keep all workers 100\% busy waiting for a command. If sendCommand() is used at high frequency in complex algorithms it might be beneficial to decrease that sleep time. 
