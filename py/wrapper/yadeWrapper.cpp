@@ -463,12 +463,11 @@ class pyInteractionIterator{
 
 class pyInteractionContainer{
 	public:
-		void checkId(long id){ if(id<0 || (size_t)id>=scene->bodies->size()){ PyErr_SetString(PyExc_IndexError, "Body id out of range."); py::throw_error_already_set(); /* never reached */ throw; } }
 		const shared_ptr<InteractionContainer> proxee;
 		const shared_ptr<Scene> scene;
 		pyInteractionContainer(const shared_ptr<InteractionContainer>& _proxee): proxee(_proxee), scene(Omega::instance().getScene()) {}
 		pyInteractionIterator pyIter(){return pyInteractionIterator(proxee);}
-		bool has(Body::id_t id1, Body::id_t id2){ checkId(id1); checkId(id2); return proxee->found(id1,id2);}
+		bool has(Body::id_t id1, Body::id_t id2){return proxee->found(id1,id2);}
 		shared_ptr<Interaction> pyGetitem(vector<Body::id_t> id12){
 			//if(!PySequence_Check(id12.ptr())) throw invalid_argument("Key must be a tuple");
 			//if(py::len(id12)!=2) throw invalid_argument("Key must be a 2-tuple: id1,id2.");
@@ -488,8 +487,8 @@ class pyInteractionContainer{
 		}
 		long len(){return proxee->size();}
 		void clear(){proxee->clear();}
-		py::list withBody(long id){ checkId(id); py::list ret; FOREACH(const Body::MapId2IntrT::value_type& I, Body::byId(id,scene)->intrs){ if(I.second->isReal()) ret.append(I.second);} return ret;}
-		py::list withBodyAll(long id){ checkId(id);  py::list ret; FOREACH(const Body::MapId2IntrT::value_type& I, Body::byId(id,scene)->intrs) ret.append(I.second); return ret; }
+		py::list withBody(long id){ py::list ret; FOREACH(const Body::MapId2IntrT::value_type& I, Body::byId(id,scene)->intrs){ if(I.second->isReal()) ret.append(I.second);} return ret;}
+		py::list withBodyAll(long id){ py::list ret; FOREACH(const Body::MapId2IntrT::value_type& I, Body::byId(id,scene)->intrs) ret.append(I.second); return ret; }
 		py::list getAll(bool onlyReal){ py::list ret; FOREACH(const shared_ptr<Interaction>& I, *proxee){
 			if(onlyReal && !I->isReal()) continue; ret.append(I);}
 			return ret;}
@@ -497,7 +496,7 @@ class pyInteractionContainer{
 		bool serializeSorted_get(){return proxee->serializeSorted;}
 		void serializeSorted_set(bool ss){proxee->serializeSorted=ss;}
 		void eraseNonReal(){ proxee->eraseNonReal(); }
-		void erase(Body::id_t id1, Body::id_t id2){ checkId(id1); checkId(id2);   proxee->requestErase(id1,id2); }
+		void erase(Body::id_t id1, Body::id_t id2){ proxee->requestErase(id1,id2); }
 };
 
 class pyForceContainer{
