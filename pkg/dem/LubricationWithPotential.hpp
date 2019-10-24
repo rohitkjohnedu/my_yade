@@ -72,4 +72,48 @@ class CundallStrackPotential : public GenericPotential {
 };
 REGISTER_SERIALIZABLE(CundallStrackPotential)
 
+class CundallStrackAdhesivePotential : public CundallStrackPotential {
+    public:
+        Real potential(Real const& u, LubricationPhys const& phys) const;
+        void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const& n);
+        YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(CundallStrackAdhesivePotential, CundallStrackPotential,
+                                          "CundallStrack model with adhesive part. Contact is created when $u/a-\\varepsilon < 0$ and released when $u/a-\\varepsilon > l_{adh}$, where $l_{adh} = f_{adh}/k_n$. This lead to an hysteretic attractive part.",
+                                          // ATTRS
+                                          ((Real, fadh, 0, , "Adhesion force."))
+                                          , // CTOR
+                                          , // PY
+        );
+        DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(CundallStrackAdhesivePotential)
+
+class LinExponentialPotential : public CundallStrackPotential {
+    public:
+        Real potential(Real const& u, LubricationPhys const& phys) const;
+        void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const& n);
+        
+        Real LinExpPotential(Real const& u_) const;
+        void setParameters(Real const& x_0, Real const& xe, Real const& k);
+        void computeParametersFromF0(Real const& F0, Real const& xe, Real const& k);
+        void computeParametersFromF0Fe(Real const& x_e, Real const& Fe, Real const& F0);
+        
+        YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(LinExponentialPotential, CundallStrackPotential,
+                                          "LinExponential Potential with only Cundall-and-Strack-like contact. The LinExponential potential formula is $F(u) = \\frac{k*(x_e-x_0)}{x_e}(u/a-x_0)\\exp\\left(\\frac{-(u/a)}{x_e-x_0}\\right)$. Where $k$ is the slope at the origin, $x_0$ is the position where the potential cross $0$ and $x_e$ is the position of the extremum. ",
+                                          // ATTRS
+                                          ((Real, x0, 0, Attr::readonly, "Equilibrium distance. Potential force is 0 at $x_0$ (LinExponential)"))
+                                          ((Real, xe, 1, Attr::readonly, "Extremum position. Position of local max/min of force. (LinExponential)"))
+                                          ((Real, k, 1, Attr::readonly, "Slope at the origin (stiffness). (LinExponential)"))
+                                          ((Real, F0, 1, Attr::readonly, "Force at contact. Force when $F_0 = F(u=0)$ (LinExponential)"))
+                                          ((Real, Fe, 1, Attr::readonly, "Extremum force. Value of force at extremum. (LinExponential)"))
+                                          , // CTOR
+                                          , // PY
+                                          .def("setParameters", &LinExponentialPotential::setParameters, py::args("x0", "xe", "k"),"Set parameters of the potential")
+                                          .def("computeParametersFromF0", &LinExponentialPotential::computeParametersFromF0, py::args("F0", "xe", "k"),  "Set parameters of the potential, with $k$ computed from $F_0$")
+                                          .def("computeParametersFromF0Fe", &LinExponentialPotential::computeParametersFromF0Fe, py::args("xe", "Fe", "F0"), "Set parameters of the potential, with $k$ and $x_0$ computed from $F_0$ and $F_e$")
+                                          .def("potential", &LinExponentialPotential::LinExpPotential, py::args("u"), "Get potential value at any point.")
+        );
+        DECLARE_LOGGER;
+};
+REGISTER_SERIALIZABLE(LinExponentialPotential)
+
 } // namespace yade

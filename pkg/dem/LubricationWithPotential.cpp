@@ -5,7 +5,7 @@
 
 namespace yade {
 
-YADE_PLUGIN((Law2_ScGeom_PotentialLubricationPhys)(GenericPotential)(CundallStrackPotential))
+YADE_PLUGIN((Law2_ScGeom_PotentialLubricationPhys)(GenericPotential)(CundallStrackPotential)(CundallStrackAdhesivePotential)(LinExponentialPotential))
 
 bool Law2_ScGeom_PotentialLubricationPhys::go(shared_ptr<IGeom>& iGeom, shared_ptr<IPhys>& iPhys, Interaction* interaction)
 {
@@ -160,16 +160,109 @@ CREATE_LOGGER(GenericPotential);
 
 Real CundallStrackPotential::potential(Real const& u, LubricationPhys const& phys) const
 {
-    return std::min(0.,-alpha*phys.kn*phys.a*(phys.eps*phys.a-u));
+    return std::min(0.,-alpha*phys.kn*(phys.eps*phys.a-u));
 }
 
 void CundallStrackPotential::applyPotential(Real const& u, LubricationPhys& phys, Vector3r const& n)
 {
     phys.contact = u < phys.eps*phys.a;
-    phys.normalContactForce = (phys.contact) ? Vector3r(-alpha*phys.kn*phys.a*(phys.eps*phys.a-u)*n) : Vector3r::Zero();
+    phys.normalContactForce = (phys.contact) ? Vector3r(-alpha*phys.kn*(phys.eps*phys.a-u)*n) : Vector3r::Zero();
     phys.normalPotentialForce = Vector3r::Zero();
 }
 
 CREATE_LOGGER(CundallStrackPotential);
+
+Real CundallStrackAdhesivePotential::potential(Real const& u, LubricationPhys const& phys) const
+{
+    Real ladh((phys.contact) ? fadh/phys.kn : 0.);
+    
+    if(u < phys.eps*phys.a + ladh)
+        return -alpha*phys.kn*(phys.eps*phys.a - u);
+    return 0;
+}
+
+void CundallStrackAdhesivePotential::applyPotential(Real const& u, LubricationPhys & phys, Vector3r const& n)
+{
+    Real ladh((phys.contact) ? fadh/phys.kn : 0.);
+    
+    phys.contact = u < phys.eps*phys.a + ladh;
+    phys.normalContactForce = (phys.contact) ? Vector3r(-alpha*phys.kn*(phys.eps*phys.a-u)*n) : Vector3r::Zero();
+    phys.normalPotentialForce = Vector3r::Zero();
+}
+
+CREATE_LOGGER(CundallStrackAdhesivePotential);
+
+Real LinExponentialPotential::potential(Real const& u, LubricationPhys const& phys) const
+{
+    return std::min(0.,-alpha*phys.kn*(phys.eps*phys.a-u)) + LinExpPotential(u/phys.a);
+}
+
+void LinExponentialPotential::applyPotential(Real const& u, LubricationPhys & phys, Vector3r const& n)
+{    
+    phys.contact = u < phys.eps*phys.a;
+    phys.normalContactForce = (phys.contact) ? Vector3r(-alpha*phys.kn*(phys.eps*phys.a-u)*n) : Vector3r::Zero();
+    phys.normalPotentialForce = LinExpPotential(u/phys.a)*n;
+}
+
+void LinExponentialPotential::setParameters(Real const& x_0, Real const& x_e, Real const& k_)
+{
+    if(x_0 >= x_e) throw std::runtime_error("x0 must be lower than xe!");
+    if(x_e == 0.) throw std::runtime_error("Extremum can't be at the origin.");
+    
+    x0 = x_0;
+    xe = x_e;
+    k = k_;
+    F0 = LinExpPotential(0);
+    Fe = LinExpPotential(xe);
+}
+
+void LinExponentialPotential::computeParametersFromF0(Real const& F_0, Real const& x_e, Real const& k_)
+{
+    Real rho = x_e*x_e*+4.*F_0*x_e/k_;
+    
+    if(rho <= 0) throw std::runtime_error("xe^2 + 4F0 xe/k must be positive!");
+    if(x_e == 0.) throw std::runtime_error("Extremum can't be at the origin.");
+    
+    k = k_;
+    xe = x_e;
+    F0 = F_0;
+    x0 = (xe - std::sqrt(rho))/2.;    
+    Fe = LinExpPotential(xe);
+    
+}
+
+void LinExponentialPotential::computeParametersFromF0Fe(Real const& x_e, Real const& F_e, Real const& F_0)
+{
+    if(x_e == 0.) throw std::runtime_error("Extremum can't be at the origin.");
+    if(F_e*F_0 < 0) {
+        if(x_e < 0) throw std::runtime_error("When xe < 0, F0 and Fe must be same sign!");
+        if(abs(F_e) <= 1.5*abs(F_0)) throw std::runtime_error("When F0 and Fe are different sign, you must ensure |Fe| > 1.5|F0|");
+    } else {
+        if(abs(F_e) <= abs(F_0)) throw std::runtime_error("When F0 and F0 are same sign, you must ensure |Fe| > |F0|");
+    }
+    
+    xe = x_e;
+    
+    k = (F_e/(xe*std::exp(-1)));
+    x0 = 0.;
+    F0 = F_0;
+    Fe = F_e;
+    
+    for(int i(0);i<100;i++) {
+        
+        x0 = (xe-std::sqrt(xe*xe+4.*F0*xe/k))/2.;
+        k = Fe*xe/((xe-x0)*(xe-x0)*exp(-xe/(xe-x0)));
+        
+        // Iteration quit if relative difference is below 1%.
+        if(std::sqrt((LinExpPotential(0)-F0)*(LinExpPotential(0)-F0)/(F0*F0) + (LinExpPotential(xe)-Fe)*(LinExpPotential(xe)-Fe)/(Fe*Fe)) < 0.01) break;
+    }
+}
+
+Real LinExponentialPotential::LinExpPotential(Real const& u_) const
+{
+    return k*((xe - x0)/xe)*(u_-x0)*std::exp(-u_/(xe - x0));
+}
+
+CREATE_LOGGER(LinExponentialPotential);
 
 } // namespace yade
