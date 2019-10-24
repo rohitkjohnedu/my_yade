@@ -177,8 +177,10 @@ class BodyInspector(QWidget):
 		except IndexError: meLabel=u'…'
 		self.plusLabel.setText(' '.join(meLabel.split()[1:])+'  <b>+</b>') # do not repeat the id
 		self.bodyIdBox.setMaximum(len(O.bodies)-1)
-		others=[(i.id1 if i.id1!=meId else i.id2) for i in O.interactions.withBody(self.bodyIdBox.value()) if i.isReal]
-		others.sort()
+		if self.bodyIdBox.value()>=0:
+			others=[(i.id1 if i.id1!=meId else i.id2) for i in O.interactions.withBody(self.bodyIdBox.value())]
+			others.sort()
+		else: others=[]
 		self.intrWithCombo.clear()
 		self.intrWithCombo.addItems([makeBodyLabel(O.bodies[i]) for i in others])
 		if pos>self.intrWithCombo.count() or pos<0: pos=0
