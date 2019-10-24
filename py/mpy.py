@@ -626,9 +626,11 @@ def mergeScene():
 			# turn mpi engines off
 			sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = collisionChecker.dead = True
 			O.splitted=False
-			collider.doSort = True			
-			if (AUTO_COLOR): colorDomains()
-
+			collider.doSort = True
+		
+		if (AUTO_COLOR): colorDomains()
+		if rank==0: O.engines = O.initialEngines
+			
 def splitScene(): 
 
 	'''
@@ -638,6 +640,7 @@ def splitScene():
 	if not COPY_MIRROR_BODIES_WHEN_COLLIDE: mprint("COPY_MIRROR_BODIES_WHEN_COLLIDE=False is not supported")
 	if not ERASE_REMOTE: mprint("ERASE_REMOTE=False is not supported")
 	if not O.splittedOnce:
+		O.initialEngines = O.engines
 		if DOMAIN_DECOMPOSITION: #if not already partitionned by the user we partition here
 			if rank == 0:
 				decomposition = dd.decompBodiesSerial(comm) 
@@ -699,9 +702,8 @@ def splitScene():
 		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="pass",label="waitForcesRunner")]
 		O.engines=O.engines+[PyRunner(iterPeriod=1,initRun=True,command="if sys.modules['yade.mpy'].checkAndCollide(): O.pause();",label="collisionChecker")]
 
-		O.splitted=True
 		O.splittedOnce = True
-		
+		O.splittedEngines = O.engines
 	else: 
 		if (DOMAIN_DECOMPOSITION and RESET_SUBDOMAINS_WHEN_COLLIDE):
 			if rank == 0:
@@ -710,11 +712,13 @@ def splitScene():
 			O.subD.splitBodiesToWorkers(RESET_SUBDOMAINS_WHEN_COLLIDE)
 			parallelCollide()
 		if rank == 0 :
+			O.engines = O.splittedEngines
 			O.interactions.clear()
 			unboundRemoteBodies()
 			if (ERASE_REMOTE and ERASE_REMOTE_MASTER): eraseRemote()
 		sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = collisionChecker.dead = False
-		O.splitted = True
+	
+	O.splitted = True
 		
 def updateAllIntersections():
 	subD=O.subD
