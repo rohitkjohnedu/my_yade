@@ -84,7 +84,7 @@ Real PWaveTimeStep(){
 	const shared_ptr<Scene> _rb=shared_ptr<Scene>();
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 	Real dt=std::numeric_limits<Real>::infinity();
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	for(const auto & b :  *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
@@ -160,7 +160,7 @@ void SieveCurve(){
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 	std::vector< std::pair<double,double> > sieve_volume;
 	double total_volume = 0;
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	for(const auto & b :  *rb->bodies){
 		if(!b || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		if(p){
@@ -188,7 +188,7 @@ void SizeRatio(){
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 	ofstream myfile;
   	myfile.open ("sizes.dat");
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	for(const auto & b :  *rb->bodies){
 		if(!b || !b->shape) continue;
 		shared_ptr<Polyhedra> p=YADE_PTR_DYN_CAST<Polyhedra>(b->shape);
 		if(p){

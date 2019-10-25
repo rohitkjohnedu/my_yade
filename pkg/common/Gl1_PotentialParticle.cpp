@@ -110,7 +110,7 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 	}
 
 	if(initialized == false ) {
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies) {
+		for(const auto & b :  *scene->bodies) {
 			if (!b) continue;
 			PotentialParticle* cmbody = dynamic_cast<PotentialParticle*>(b->shape.get());
 			if (!cmbody) continue;
@@ -362,7 +362,7 @@ void PotentialParticleVTKRecorder::action() {
 	vtkSmartPointer<vtkActor> textActor[scene->bodies->size()];
 
 
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies) {
+	for(const auto & b :  *scene->bodies) {
 		if (!b) continue;
 		if (b->isClump() == true) continue;
 		const PotentialParticle* pb=dynamic_cast<PotentialParticle*>(b->shape.get());

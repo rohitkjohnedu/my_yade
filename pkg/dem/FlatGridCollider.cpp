@@ -31,7 +31,7 @@ void FlatGridCollider::action(){
 	scene->interactions->iterColliderLastRun=scene->iter;
 	// adjust grid if necessary
 	updateGrid();
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if(!b) continue; // deleted bodies
 		updateBodyCells(b);
 	}

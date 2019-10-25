@@ -80,7 +80,7 @@ namespace yade { // Cannot have #include directive inside.
 
 		/* Calculation of the particle surface as the Convex Hull of the vertices */
 		if(initialized == false ) {
-			FOREACH(const shared_ptr<Body>& b, *scene->bodies) {
+			for(const auto & b :  *scene->bodies) {
 				if (!b) continue;
 				PotentialBlock* cmbody = dynamic_cast<PotentialBlock*>(b->shape.get());
 				if (!cmbody) continue;
@@ -255,7 +255,7 @@ namespace yade { // Cannot have #include directive inside.
 
 //		/* CONSTRUCTION OF PARTICLE SURFACE USING THE MARCHING CUBES ALGORITHM */
 //		if(initialized == false ) {
-//			FOREACH(const shared_ptr<Body>& b, *scene->bodies) {
+//			for(const auto & b :  *scene->bodies) {
 //				if (!b) continue;
 //				PotentialBlock* cmbody = dynamic_cast<PotentialBlock*>(b->shape.get());
 //				if (!cmbody) continue;
@@ -522,7 +522,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 	vtkSmartPointer<vtkActor> textActor[scene->bodies->size()];
 
 
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if (!b) continue;
 		if (b->isClumpMember() == true ) continue;
 		
@@ -854,7 +854,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 #if 0
 	if(REC_ID== true){
 		int counter =0;
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		for(const auto & b :  *scene->bodies){
 			if (!b) {continue;}
 			if (b->isClumpMember()==true) {continue;}
 			textArray2[counter]->Delete();
@@ -1010,7 +1010,7 @@ void PotentialBlockVTKRecorder::action(){
 	vtkSmartPointer<vtkActor> textActor[scene->bodies->size()];
 
 
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if (!b) continue;
 		if (b->isClump() == true) continue;
 		const PotentialBlock* pb=dynamic_cast<PotentialBlock*>(b->shape.get()); 

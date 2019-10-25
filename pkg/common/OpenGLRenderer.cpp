@@ -50,7 +50,7 @@ void OpenGLRenderer::init(){
 
 void OpenGLRenderer::setBodiesRefSe3(){
 	LOG_DEBUG("(re)initializing reference positions and orientations.");
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
+	for(const auto & b :  *scene->bodies) if(b && b->state) { b->state->refPos=b->state->pos; b->state->refOri=b->state->ori; }
 	scene->cell->refHSize=scene->cell->hSize;
 }
 
@@ -84,7 +84,7 @@ void OpenGLRenderer::setBodiesDispInfo(){
 		for (unsigned k=0; k<scene->bodies->size(); k++) bodyDisp[k].hidden=0;}
 	bool scaleRotations=(rotScale!=1.0);
 	bool scaleDisplacements=(dispScale!=Vector3r::Ones());
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if(!b || !b->state) continue;
 		size_t id=b->getId();
 		const Vector3r& pos=b->state->pos; const Vector3r& refPos=b->state->refPos;
@@ -308,7 +308,7 @@ void OpenGLRenderer::renderIPhys(){
 void OpenGLRenderer::renderBound(){
 	boundDispatcher.scene=scene.get(); boundDispatcher.updateScenePtr();
 
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if(!b || !b->bound) continue;
 		if(!bodyDisp[b->getId()].isDisplayed or bodyDisp[b->getId()].hidden) continue;
 		if(b->bound && ((b->getGroupMask()&mask) || b->getGroupMask()==0)){

@@ -88,7 +88,7 @@ void HydroForceEngine::averageProfile(){
         vector<double> velAverageZ2(nMax,0.0);
 
 	//Loop over the particles
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const double zPos = b->state->pos[2]-zRef;
 		int Np = int(std::floor(zPos/deltaZ));	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. (otherwise problem with volPart evaluation)
@@ -235,7 +235,7 @@ void HydroForceEngine::averageProfilePP(){
 	vector<double> dragAverage(nMax,0.0);
 
 	//Loop over the particles
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		const double zPos = b->state->pos[2]-zRef;
 		int Np = int(std::floor(zPos/deltaZ));	//Define the layer number with 0 corresponding to zRef. Let the z position wrt to zero, that way all z altitude are positive. 

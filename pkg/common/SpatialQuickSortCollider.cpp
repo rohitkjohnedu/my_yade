@@ -39,7 +39,7 @@ void SpatialQuickSortCollider::action()
 
 	Vector3r min,max;
 	int n=0;
-	FOREACH(const shared_ptr<Body>& b, *bodies){
+	for(const auto & b :  *bodies){
 		if(!b->bound) continue;
 		min = b->bound->min;
 		max = b->bound->max;

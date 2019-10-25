@@ -78,7 +78,7 @@ void GeneralIntegratorInsertionSortCollider::action(){
 
 		if(verletDist<0){
 			Real minR=std::numeric_limits<Real>::infinity();
-			FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+			for(const auto & b :  *scene->bodies){
 				if(!b || !b->shape) continue;
 				Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
 				if(!s) continue;

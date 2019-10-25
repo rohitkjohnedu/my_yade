@@ -631,7 +631,7 @@ Real LiqControl::liqVolBody (id_t id) const {
 Real LiqControl::totalLiqVol(int mask=0) const{
   Scene* scene=Omega::instance().getScene().get();
   Real totalLiqVol = 0.0;
-  FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+  for(const auto & b :  *scene->bodies){
     if((mask>0 && (b->groupMask & mask)==0) or (!b)) continue;
     totalLiqVol += liqVolIterBody(b);
     if (b->state->Vf > 0) {totalLiqVol +=b->state->Vf;}

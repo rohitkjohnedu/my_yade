@@ -473,7 +473,7 @@ void VTKRecorder::action(){
 		// map to keep real body ids and their number in a vector (intrBodyPos)
 		boost::unordered_map<Body::id_t,Body::id_t> bIdVector;
 		Body::id_t curId = 0;
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		for(const auto & b :  *scene->bodies){
 			if (b) {
 				if(!scene->isPeriodic) {
 					intrBodyPos->InsertNextPoint(b->state->pos[0],b->state->pos[1],b->state->pos[2]);
@@ -598,7 +598,7 @@ void VTKRecorder::action(){
         Law2_ScGeom_ImplicitLubricationPhys::getStressForEachBody(NCStresses, SCStresses, NLStresses, SLStresses);
     }
     
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if (!b) continue;
 		if(mask!=0 && !b->maskCompatible(mask)) continue;
 		if (recActive[REC_SPHERES]){

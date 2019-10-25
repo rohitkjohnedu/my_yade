@@ -131,7 +131,7 @@ class pyBodyContainer{
 		//convert excludeList to a c++ list
 		vector<Body::id_t> excludeListC;
 		for (int ii = 0; ii < py::len(excludeList); ii++) excludeListC.push_back(py::extract<Body::id_t>(excludeList[ii])());
-		FOREACH(const shared_ptr<Body>& b, *proxee){
+		for(const auto & b :  *proxee){
 			if ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) {
 				if (b->isClump()) Clump::updateProperties(b, discretization);
 			}
@@ -250,7 +250,7 @@ class pyBodyContainer{
 		vector<shared_ptr<Body> > sphereList;
 		shared_ptr<Sphere> sph (new Sphere);
 		int Sph_Index = sph->getClassIndexStatic();
-		FOREACH(const shared_ptr<Body>& b, *proxee) if ( (b->shape->getClassIndex() == Sph_Index) && (b->isStandalone()) ) sphereList.push_back(b);
+		for(const auto & b :  *proxee) if ( (b->shape->getClassIndex() == Sph_Index) && (b->isStandalone()) ) sphereList.push_back(b);
 		int num = sphereList.size();
 		
 		//loop over templates:
@@ -378,7 +378,7 @@ class pyBodyContainer{
 		Real RC_sum = 0.0;	//sum of local roundnesses
 		Real R1, R2, vol, dens;
 		int c = 0;		//counter
-		FOREACH(const shared_ptr<Body>& b, *proxee){
+		for(const auto & b :  *proxee){
 			if ( !(std::find(excludeListC.begin(), excludeListC.end(), b->getId()) != excludeListC.end()) ) {
 				if ((b->shape->getClassIndex() ==  Sph_Index) && (b->isStandalone())) { RC_sum += 1.0; c += 1; }
 				if (b->isClump()){

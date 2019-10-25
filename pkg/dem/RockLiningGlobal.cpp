@@ -64,7 +64,7 @@ void RockLiningGlobal::action(){
 
 			vector<double> distanceFrOpening; vector<int> IDs;
 			double outerRadius = openingRad + 1.0;
-			FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+			for(const auto & b :  *scene->bodies){
 				if (!b) continue;
 				if (b->isClump() == true) continue;
 				PotentialBlock* pb=static_cast<PotentialBlock*>(b->shape.get());

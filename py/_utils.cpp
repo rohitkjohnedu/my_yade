@@ -16,7 +16,7 @@ py::tuple negPosExtremeIds(int axis, Real distFactor){
 	py::tuple extrema=Shop::aabbExtrema();
 	Real minCoord=py::extract<double>(extrema[0][axis])(),maxCoord=py::extract<double>(extrema[1][axis])();
 	py::list minIds,maxIds;
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		if(b->state->pos[axis]-s->radius*distFactor<=minCoord) minIds.append(b->getId());
 		if(b->state->pos[axis]+s->radius*distFactor>=maxCoord) maxIds.append(b->getId());
@@ -38,7 +38,7 @@ py::tuple coordsAndDisplacements(int axis,py::tuple Aabb){
 
 void setRefSe3(){
 	Scene* scene=Omega::instance().getScene().get();
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		b->state->refPos=b->state->pos;
 		b->state->refOri=b->state->ori;
 	}
@@ -130,7 +130,7 @@ py::dict getViscoelasticFromSpheresInteraction(Real tc, Real en, Real es)
 }
 /* reset highlight of all bodies */
 void highlightNone(){
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		if(!b->shape) continue;
 		b->shape->highlight=false;
 	}
@@ -201,7 +201,7 @@ void wireSome(string filter){
 	enum{none,all,noSpheres,unknown};
 	int mode=(filter=="none"?none:(filter=="all"?all:(filter=="noSpheres"?noSpheres:unknown)));
 	if(mode==unknown) { LOG_WARN("Unknown wire filter `"<<filter<<"', using noSpheres instead."); mode=noSpheres; }
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		if(!b->shape) return;
 		bool wire;
 		switch(mode){
@@ -264,7 +264,7 @@ Real approxSectionArea(Real coord, int axis){
 	const int ax1=(axis+1)%3, ax2=(axis+2)%3;
 	const Real sqrt3=sqrt(3);
 	Vector2r mm,mx; int i=0;
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		Sphere* s=dynamic_cast<Sphere*>(b->shape.get());
 		if(!s) continue;
 		const Vector3r& pos(b->state->pos); const Real r(s->radius);

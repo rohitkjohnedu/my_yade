@@ -74,7 +74,7 @@ void HydrodynamicsLawLBM::action()
         //NB_DYNWALLS=0;
         NB_DYNGRAINS=0;
         LBMbody tmpbody;
-        FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+        for(const auto & b :  *scene->bodies){
             if(!b) continue; // deleted bodies
             if (b->shape->getClassName()=="Box"){
                 Vector3r ext(YADE_PTR_CAST<Box> ( b->shape )->extents);
@@ -445,7 +445,7 @@ void HydrodynamicsLawLBM::action()
     /*---------------------------------------------------------------*/
     NumberOfDynamicParticles=0;
     if(removingCriterion!=0) IdOfNextErodedPtc.clear();
-    FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+    for(const auto & b :  *scene->bodies){
         if(!b) continue; // deleted bodies
         State* state=b->state.get();
         const int id=b->getId();
@@ -614,7 +614,7 @@ void HydrodynamicsLawLBM::action()
         /*         REINITIALIZATION RELATIVE TO THE MODE 1                  */
         /*------------------------------------------------------------------*/
         if(MODE==1){
-            FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+            for(const auto & b :  *scene->bodies){
                 if(!b) continue;
                 const int id=b->getId();
                 LBbodies[id].force=Vector3r::Zero();
@@ -1348,7 +1348,7 @@ void HydrodynamicsLawLBM::CalculateAndApplyForcesAndTorquesOnBodies(bool mean,bo
     /*---------------- APPLICATION OF HYDRODYNAMIC FORCES ON SPHERES -----------------*/
     /*--------------------------------------------------------------------------------*/
     if(mean) FhTotale=Vector3r::Zero();
-    FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+    for(const auto & b :  *scene->bodies){
         if(!b) continue;
         const int id=b->getId();
             //if ( ((b->isDynamic())&&(b->shape->getClassName()=="Sphere")) || (b->shape->getClassName()=="Box") ){  //ModLuc: remove the condition (b->isDynamic()) to be able to apply force and torque on non dynamic bodies, by this way hydrodynamic force and torque on bodies can be read through python even if bodies are non dynamic.
