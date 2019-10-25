@@ -1155,7 +1155,7 @@ def migrateBodies(ids,origin,destination):
 	ts = time.time() 
 	
 	if rank==origin:
-		if USE_CPP_MEDIAN: 
+		if USE_CPP_REALLOC: 
 			O.subD.migrateBodiesSend(ids, destination)
 	  
 		else:
@@ -1202,7 +1202,7 @@ def medianFilter(i,j):
 	
 	ts = time.time()
 	
-	if USE_CPP_MEDIAN: 
+	if USE_CPP_REALLOC: 
 		useAABB = False; 
 		otherSubDCM = O.subD._centers_of_mass[j]
 		subDCM = O.subD._centers_of_mass[i]
@@ -1257,7 +1257,7 @@ def reallocateBodiesToSubdomains(_filter=medianFilter,blocking=True):
 	O.subD.completeSendBodies()
 	
 	ts = time.time()
-	if USE_CPP_MEDIAN:
+	if USE_CPP_REALLOC:
 		O.subD.updateLocalIds(ERASE_REMOTE_MASTER)
 		if not ERASE_REMOTE_MASTER:
 			if rank == 0 : 
@@ -1289,7 +1289,7 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	ts = time.time()
 	if True: #clean intersections, remove bodies already moved to other domain
 	  
-		if USE_CPP_MEDIAN: 
+		if USE_CPP_REALLOC: 
 			O.subD.cleanIntersections(otherDomain)
 		else: 
 			ints = [ii for ii in O.subD.intersections[otherDomain] if O.bodies[ii].subdomain==rank] #make sure we don't send ids of already moved bodies
@@ -1305,7 +1305,7 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	
 	ts = time.time() 
 	
-	if USE_CPP_MEDIAN:
+	if USE_CPP_REALLOC:
 		O.subD.updateNewMirrorIntrs(otherDomain, newMirror[0])
 	else:
 		O.subD.mirrorIntersections=O.subD.mirrorIntersections[:otherDomain]+[newMirror[0]]+O.subD.mirrorIntersections[otherDomain+1:]
