@@ -1,7 +1,7 @@
 // © 2004 Olivier Galizzi <olivier.galizzi@imag.fr>
 // © 2004 Janek Kozicki <cosurgi@berlios.de>
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
-// © 2006 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// © 2006 Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 
 #include<pkg/dem/ScGeom.hpp>
 #include<core/Omega.hpp>

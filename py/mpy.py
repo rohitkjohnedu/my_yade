@@ -1,3 +1,5 @@
+# 2018 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr> 
+
 '''
 This module defines mpirun(), a parallel implementation of run() using a distributed memory approach. Message passing is done with mpi4py mainly, however some messages are also handled in c++ (with openmpi).
 

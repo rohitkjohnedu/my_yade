@@ -1,6 +1,6 @@
 /*************************************************************************
 *  Copyright (C) 2012 by Chao Yuan <chao.yuan@3sr-grenoble.fr>           *
-*  Copyright (C) 2012 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2012 by Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>     *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *

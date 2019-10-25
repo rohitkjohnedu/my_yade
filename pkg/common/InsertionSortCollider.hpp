@@ -1,5 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz> 
-// 2013 © Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// 2013 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 #pragma once
 #include<pkg/common/Collider.hpp>
 #include<core/Scene.hpp>

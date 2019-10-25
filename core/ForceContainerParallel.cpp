@@ -1,3 +1,6 @@
+// 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+// 2019 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr> 
+
 #include <core/ForceContainer.hpp>
 #include<boost/date_time/posix_time/posix_time.hpp>
 #include<core/BodyContainer.hpp>

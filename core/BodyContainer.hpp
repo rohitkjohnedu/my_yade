@@ -1,6 +1,7 @@
 // 2004 © Olivier Galizzi <olivier.galizzi@imag.fr>
 // 2004 © Janek Kozicki <cosurgi@berlios.de>
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
+// 2018 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr> 
 
 #pragma once
 

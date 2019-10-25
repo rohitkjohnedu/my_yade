@@ -1,6 +1,6 @@
 /*************************************************************************
 *  Copyright (C) 2009 by Emanuele Catalano <catalano@grenoble-inp.fr>    *
-*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2009 by Bruno Chareyre <bruno.chareyre@grenoble-inp.fr> *
 *  Copyright (C) 2012 by Donia Marzougui <donia.marzougui@grenoble-inp.fr>*
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
