@@ -92,6 +92,9 @@ _REALLOC_COUNT=0
 bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033[95m','\033[93m','\033[91m','\033[1m','\033[4m','\033[0m']
 
 def colorDomains():
+	'''
+	Apply color to body to reflect their subdomain idx
+	'''	
 	import colorsys
 	colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
 	for b in O.bodies:
@@ -645,16 +648,19 @@ def splitScene():
 			if rank == 0:
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain() 
-		if rank == 0 or DISTRIBUTED_INSERT: 
-			subD= O.subD #alias
+		if rank == 0 or DISTRIBUTED_INSERT:
+			subdomains=[] #list subdomains by body ids
 			#insert "meta"-bodies
-			subD.subdomains=[] #list subdomains by body ids
-			if mit_mode: subD.comm=comm #make sure the c++ uses the merged intracommunicator
-			
 			for k in range(1,numThreads):
 				domainBody=Body(shape=Subdomain(ids=[b.id for b in O.bodies if b.subdomain==k]),subdomain=k) #note: not clear yet how shape.subDomainIndex and body.subdomain should interact, currently equal values
 				domainBody.isSubdomain=True
-				subD.subdomains.append(O.bodies.append(domainBody))
+				if rank==k: O.subD=domainBody.shape
+				subdomains.append(O.bodies.append(domainBody))
+				
+			if rank==0:  O.subD = Subdomain()  #initialize() is not called if mit==False, hence we make sure it's initialized here
+			O.subD.subdomains = subdomains
+			subD= O.subD #alias
+			if mit_mode: subD.comm=comm #make sure the c++ uses the merged intracommunicator
 
 			#tell the collider how to handle this new thing
 			collider.boundDispatcher.functors=collider.boundDispatcher.functors+[Bo1_Subdomain_Aabb()]
