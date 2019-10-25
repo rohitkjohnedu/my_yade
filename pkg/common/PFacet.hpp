@@ -1,6 +1,6 @@
 /*****************************************************************************
 *  Copyright (C) 2015 by Anna Effeindzourou   anna.effeindzourou@gmail.com   *
-*  Copyright (C) 2015 by Bruno Chareyre       bruno.chareyre@hmg.inpg.fr     *
+*  Copyright (C) 2015 by Bruno Chareyre       bruno.chareyre@grenoble-inp.fr     *
 *  Copyright (C) 2015 by Klaus Thoeni         klaus.thoeni@gmail.com         *
 *  This program is free software; it is licensed under the terms of the      *
 *  GNU General Public License v2 or later. See file LICENSE for details.     *

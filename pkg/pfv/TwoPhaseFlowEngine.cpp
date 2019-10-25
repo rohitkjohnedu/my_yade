@@ -1,5 +1,5 @@
 /*************************************************************************
-*  Copyright (C) 2014 by Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>     *
+*  Copyright (C) 2014 by Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>     *
 *  Copyright (C) 2013 by T. Sweijen (T.sweijen@uu.nl)                    *
 *  Copyright (C) 2012 by Chao Yuan <chao.yuan@3sr-grenoble.fr>           *
 *                                                                        *

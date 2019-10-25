@@ -1,4 +1,5 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
+// 2019 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr> 
 #pragma once
 
 #include <lib/base/Math.hpp>

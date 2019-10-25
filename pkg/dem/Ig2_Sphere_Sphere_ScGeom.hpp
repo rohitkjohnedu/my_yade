@@ -1,5 +1,5 @@
 // © 2004 Janek Kozicki <cosurgi@berlios.de>
-// © 2007 Bruno Chareyre <bruno.chareyre@hmg.inpg.fr>
+// © 2007 Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 
 #pragma once

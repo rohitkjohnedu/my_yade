@@ -2,6 +2,7 @@
 // 2004,2019 © Janek Kozicki <cosurgi@berlios.de>
 // 2010 © Václav Šmilauer <eudoxos@arcig.cz>
 // 2019 © Anton Gladky <gladk@debian.org>
+// 2018 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 
 #pragma once
 
