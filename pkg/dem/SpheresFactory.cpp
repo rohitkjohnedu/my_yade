@@ -56,9 +56,9 @@ void SpheresFactory::action(){
 		}
 		
 		//Make normalization of PSDcum
-		if (PSDcum[PSDcum.size()]!=1.0) {
+		if (PSDcum.back()!=1.0 && PSDcum.back()!=0.0) {
 			Real k;
-			k = 1.0/PSDcum[PSDcum.size()-1];
+			k = 1.0/PSDcum.back();
 			for (unsigned int i=1; i<PSDcum.size(); i++) {
 				PSDcum[i] = PSDcum[i]*k;
 			}
