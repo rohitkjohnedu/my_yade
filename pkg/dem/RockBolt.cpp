@@ -57,7 +57,7 @@ void RockBolt::action(){
 
 	if (openingCreated == true && installed == false){
 			vector<double> distanceFrOpening;
-			FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+			for(const auto & b :  *scene->bodies){
 				if (!b) continue;
 				if (b->isClump() == true) continue;
 				PotentialBlock* pb=static_cast<PotentialBlock*>(b->shape.get());

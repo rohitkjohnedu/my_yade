@@ -25,7 +25,7 @@ void PeriIsoCompressor::action(){
 		LOG_INFO("No charLen defined, taking avg bbox size of body #0 = "<<charLen);
 	}
 	if(maxSpan<=0){
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		for(const auto & b :  *scene->bodies){
 			if(!b || !b->bound) continue;
 			for(int i=0; i<3; i++) maxSpan=max(maxSpan,b->bound->max[i]-b->bound->min[i]);
 		}
@@ -144,7 +144,7 @@ void PeriTriaxController::action()
 	Vector3r cellArea=Vector3r(cellSize[1]*cellSize[2],cellSize[0]*cellSize[2],cellSize[0]*cellSize[1]);
 	// initial updates
 	if (maxBodySpan[0]<=0){
-		FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+		for(const auto & b : *scene->bodies){
 			if(!b || !b->bound) continue;
 			for(int i=0; i<3; i++) if ((b->bound->max[i]-b->bound->min[i])<cellSize[i]) maxBodySpan[i]=max(maxBodySpan[i],b->bound->max[i]-b->bound->min[i]);}
 	}
@@ -157,7 +157,7 @@ void PeriTriaxController::action()
 
 	// set mass to be sum of masses, if not set by the user
 	if(dynCell && std::isnan(mass)){
-		mass=0; FOREACH(const shared_ptr<Body>& b, *scene->bodies){ if(b && b->state) mass+=b->state->mass; }
+		mass=0; for(const auto & b :  *scene->bodies){ if(b && b->state) mass+=b->state->mass; }
 		LOG_INFO("Setting cell mass to "<<mass<<" automatically.");}
 	bool allOk=true;
 	// apply condition along each axis separately (stress or strain)

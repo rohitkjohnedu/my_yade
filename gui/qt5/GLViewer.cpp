@@ -328,7 +328,7 @@ void GLViewer::centerMedianQuartile(){
 	}
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
-	FOREACH(shared_ptr<Body> b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if(!b) continue;
 		for(int i=0; i<3; i++) coords[i].push_back(b->state->pos[i]);
 	}
@@ -360,7 +360,7 @@ void GLViewer::centerScene(){
 		LOG_DEBUG("scene's bound not yet calculated or has zero or nan dimension(s), attempt get that from bodies' positions.");
 		Real inf=std::numeric_limits<Real>::infinity();
 		min=Vector3r(inf,inf,inf); max=Vector3r(-inf,-inf,-inf);
-		FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+		for(const auto & b :  *rb->bodies){
 			if(!b) continue;
 			max=max.cwiseMax(b->state->pos);
 			min=min.cwiseMin(b->state->pos);

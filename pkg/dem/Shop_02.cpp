@@ -54,7 +54,7 @@ Still broken, some interactions are missed. Should be checked.
 Real Shop::RayleighWaveTimeStep(const shared_ptr<Scene> _rb){
 	shared_ptr<Scene> rb=(_rb?_rb:Omega::instance().getScene());
 	Real dt=std::numeric_limits<Real>::infinity();
-	FOREACH(const shared_ptr<Body>& b, *rb->bodies){
+	for(const auto & b :  *rb->bodies){
 		if(!b || !b->material || !b->shape) continue;
 		
 		shared_ptr<ElastMat> ebp=YADE_PTR_DYN_CAST<ElastMat>(b->material);
@@ -446,7 +446,7 @@ py::tuple Shop::getStressProfile(Real volume, int nCell, Real dz, Real zRef, vec
 	//
 	//Dynamic contribution to the stress tensor
 	//
-	FOREACH(const shared_ptr<Body>& b,*Omega::instance().getScene()->bodies){
+	for(const auto & b : *Omega::instance().getScene()->bodies){
 		int Np = int(std::floor((b->state->pos[2]-zRef)/dz));	//Define the layer number with 0 corresponding to zRef
 		if ((Np>=0)&&(Np<nCell)){	//To avoid non defined vPartAverage
 			//Velocity fluctuation wrt the average field
@@ -636,7 +636,7 @@ py::tuple Shop::getDepthProfiles(Real vCell, int nCell, Real dz, Real zRef,bool 
 	vector<Real> phiAverage(nCell,0.0);
 
 	//Loop over the particles
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		if (activateCond==true){
 			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
@@ -700,7 +700,7 @@ py::tuple Shop::getDepthProfiles_center(Real vCell, int nCell, Real dz, Real zRe
 	vector<Real> Npart(nCell,0.0);
 
 	//Loop over the particles
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		if (activateCond==true){
 			const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
@@ -808,7 +808,7 @@ py::list Shop::getBodyIdsContacts(Body::id_t bodyID) {
 void Shop::setContactFriction(Real angleRad){
 	Scene* scene = Omega::instance().getScene().get();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+	for(const auto & b : *scene->bodies){
 		if(b->isClump()) continue;
 		if (b->isDynamic())
 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = angleRad;
@@ -829,7 +829,7 @@ void Shop::growParticles(Real multiplier, bool updateMass, bool dynamicOnly)
 {
 	Scene* scene = Omega::instance().getScene().get();
 	const int sphereIdx = Sphere::getClassIndexStatic();
-	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+	for(const auto & b : *scene->bodies){
 		if (dynamicOnly && !b->isDynamic()) continue;
 		//We grow only spheres and clumps 
 		if(b->isClump() or sphereIdx == b->shape->getClassIndex()){			
@@ -884,7 +884,7 @@ py::tuple Shop::aabbExtrema(Real cutoff, bool centers){
 	if(cutoff<0. || cutoff>1.) throw invalid_argument("Cutoff must be >=0 and <=1.");
 	Real inf=std::numeric_limits<Real>::infinity();
 	Vector3r minimum(inf,inf,inf),maximum(-inf,-inf,-inf);
-	FOREACH(const shared_ptr<Body>& b, *Omega::instance().getScene()->bodies){
+	for(const auto & b :  *Omega::instance().getScene()->bodies){
 		shared_ptr<Sphere> s=YADE_PTR_DYN_CAST<Sphere>(b->shape); if(!s) continue;
 		Vector3r rrr(s->radius,s->radius,s->radius);
 		minimum=minimum.cwiseMin(b->state->pos-(centers?Vector3r::Zero():rrr));

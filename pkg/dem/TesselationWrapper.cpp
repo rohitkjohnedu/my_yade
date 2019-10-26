@@ -352,7 +352,7 @@ boost::python::dict TesselationWrapper::getVolPoroDef(bool deformation)
  		numpy_boost<double,1> vol(dim1);
  		numpy_boost<double,1> poro(dim1);
  		numpy_boost<double,2> def(dim2);
- 		//FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+ 		//for(const auto & b :  *scene->bodies){
  		for (RTriangulation::Finite_vertices_iterator  V_it = Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
  			//id[]=V_it->info().id()
  			//if(!b) continue;

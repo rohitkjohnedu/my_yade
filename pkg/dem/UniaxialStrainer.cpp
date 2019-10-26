@@ -71,7 +71,7 @@ void UniaxialStrainer::init(){
 		}
 		assert(p1>p0);
 		// set speeds for particles on the boundary
-		FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+		for(const auto & b :  *scene->bodies){
 			// skip bodies on the boundary, since those will have their positions updated directly
 			if(std::find(posIds.begin(),posIds.end(),b->id)!=posIds.end() || std::find(negIds.begin(),negIds.end(),b->id)!=negIds.end()) { continue; }
 			Real p=axisCoord(b->id);

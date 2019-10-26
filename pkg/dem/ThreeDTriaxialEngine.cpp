@@ -126,7 +126,7 @@ void ThreeDTriaxialEngine::setContactProperties(Real frictionDegree)
 {
 	scene = Omega::instance().getScene().get();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	FOREACH(const shared_ptr<Body>& b,*scene->bodies){
+	for(const auto & b : *scene->bodies){
 		if (b->isDynamic())
 		YADE_PTR_CAST<FrictMat> (b->material)->frictionAngle = frictionDegree * Mathr::PI/180.0;
 	}

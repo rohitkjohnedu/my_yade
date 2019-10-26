@@ -27,7 +27,7 @@ YADE_PLUGIN((DomainLimiter)(LawTester)
 
 void DomainLimiter::action(){
 	std::list<Body::id_t> out;
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if((!b) or ((mask>0) and ((b->groupMask & mask)==0)) or b->isClumpMember()) continue;
 		const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		if (sphere or b->isClump()){ //Delete only spheres and clumps

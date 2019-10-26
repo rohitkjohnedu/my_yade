@@ -72,7 +72,7 @@ void SpherePack::toFile(const string fname) const {
 void SpherePack::fromSimulation() {
 	pack.clear();
 	Scene* scene=Omega::instance().getScene().get();
-	FOREACH(const shared_ptr<Body>& b, *scene->bodies){
+	for(const auto & b :  *scene->bodies){
 		if(!b) continue;
 		shared_ptr<Sphere> intSph=YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		if(!intSph) continue;
