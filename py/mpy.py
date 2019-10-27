@@ -649,7 +649,13 @@ def splitScene():
 		if DOMAIN_DECOMPOSITION: #if not already partitionned by the user we partition here
 			if rank == 0:
 				decomposition = dd.decompBodiesSerial(comm) 
-				decomposition.partitionDomain() 
+				decomposition.partitionDomain()
+		
+		maxid = len(O.bodies)+1
+		if DISTRIBUTED_INSERT: #find max id before inserting subdomains
+			maxid = comm.allreduce(maxid,op=MPI.MAX)
+			wprint("Splitting with maxId=",maxid)
+			
 		if rank == 0 or DISTRIBUTED_INSERT:
 			subdomains=[] #list subdomains by body ids
 			#insert "meta"-bodies
@@ -657,7 +663,7 @@ def splitScene():
 				domainBody=Body(shape=Subdomain(ids=[b.id for b in O.bodies if b.subdomain==k]),subdomain=k) #note: not clear yet how shape.subDomainIndex and body.subdomain should interact, currently equal values
 				domainBody.isSubdomain=True
 				if rank==k: O.subD=domainBody.shape
-				subdomains.append(O.bodies.append(domainBody))
+				subdomains.append(O.bodies.insertAtId(domainBody,maxid+k))
 				
 			if rank==0:  O.subD = Subdomain()  #initialize() is not called if mit==False, hence we make sure it's initialized here
 			O.subD.subdomains = subdomains
