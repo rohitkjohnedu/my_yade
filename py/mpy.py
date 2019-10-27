@@ -88,24 +88,8 @@ _GET_CONNEXION_= 22
 _REALLOC_COUNT=0
 
 
-#for coloring processes outputs differently
+# for coloring processes outputs differently
 bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033[95m','\033[93m','\033[91m','\033[1m','\033[4m','\033[0m']
-#for coloring bodies
-colorScale=None
-
-def colorDomains():
-	'''
-	Apply color to body to reflect their subdomain idx
-	'''
-	global colorScale
-	if colorScale==None or len(colorScale)<numThreads:
-		import colorsys
-		colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
-		from random import shuffle
-		random.seed(1)
-		shuffle(colorScale)
-	for b in O.bodies:
-		b.shape.color=colorScale[b.subdomain]
 
 def mprint(*args): #this one will print regardless of VERBOSE_OUTPUT
 	if NO_OUTPUT or rank>MAX_RANK_OUTPUT: return
@@ -127,6 +111,24 @@ from yade.utils import *
 from yade.wrapper import *
 import yade.runtime
 mit_mode = yade.runtime.opts.mit>1
+
+# for coloring bodies
+import colorsys
+colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
+from random import shuffle
+random.seed(1)
+shuffle(colorScale)
+
+def colorDomains():
+	'''
+	Apply color to body to reflect their subdomain idx
+	'''
+	global colorScale
+	if colorScale==None or len(colorScale)<numThreads:
+		colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
+		shuffle(colorScale)
+	for b in O.bodies:
+		b.shape.color=colorScale[b.subdomain]
 
 def initialize(np=None):
 	global comm,rank,numThreads,mit_mode
@@ -162,6 +164,7 @@ def initialize(np=None):
 			numThreads=int(os.getenv('OMPI_COMM_WORLD_SIZE'))
 			#if rank==0: yade.runtime.opts.mpi_mode=False #This is to make master call ipshell() after executing scripts
 		#else monolithic simulation (no mpiexec, no mit)
+	if AUTO_COLOR: colorDomains()
 	return rank,numThreads
 
 #def autoInitialize(np):
