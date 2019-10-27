@@ -15,7 +15,7 @@ if len(sys.argv)>1: #we then assume L,M,N are provided as as cmd line arguments
 Nx=Ny=Nz=1 #the number of subD in each direction of space
 
 from yade import mpy as mp
-numThreads = 13 if mp.numThreads<=1 else mp.numThreads # 13 is the default, 'mpirun -n' overrides
+numThreads = 13 #if mp.numThreads<=1 else mp.numThreads # 13 is the default, 'mpirun -n' overrides
 mp.initialize(numThreads)
 np = numThreads-1  #remember to set odd number of cores to make the number of domains even
 
@@ -32,16 +32,15 @@ if np%2==0:
 Nz*=np
 
 # sequential grain colors
-import colorsys
-colorScale = (Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads))
+colorScale = mp.colorScale
 
 #add spheres
 subdNo=0
 import itertools
 _id = 0 #will be used to count total number of bodies regardless of subdomain attribute, so that same ids are not reused for different bodies
 for x,y,z in itertools.product(range(int(Nx)),range(int(Ny)),range(int(Nz))):
+	col = colorScale[subdNo]
 	subdNo+=1
-	col = next(colorScale)
 	if mp.rank!=subdNo: continue
 	ids=[]
 	for i in range(L):#(numThreads-1) x N x M x L spheres, one thread is for master and will keep only the wall, others handle spheres
