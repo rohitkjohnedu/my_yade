@@ -4,9 +4,10 @@
 /* The numerical library is changed from CPLEX to CLP because subscription to the academic initiative is required to use CPLEX for free */
 #ifdef YADE_POTENTIAL_BLOCKS
 #pragma once
-#include<core/FileGenerator.hpp>
+// XXX never do #include<Python.h>, see https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/building/include_issues.html
+#include <boost/python/detail/wrap_python.hpp>
 
-#include<Python.h>
+#include<core/FileGenerator.hpp>
 
 
 #include<lib/base/Math.hpp>

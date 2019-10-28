@@ -6,11 +6,13 @@
 #ifdef YADE_POTENTIAL_BLOCKS
 
 #pragma once
+// XXX never do #include<Python.h>, see https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/building/include_issues.html
+#include <boost/python/detail/wrap_python.hpp>
+
 #include <lib/serialization/Serializable.hpp>
 #include <pkg/dem/PotentialBlock.hpp>
 #include <pkg/common/Dispatching.hpp>
 #include <pkg/common/Sphere.hpp>
-#include <Python.h>
 #include <Eigen/Core>
 #include <stdio.h>
 

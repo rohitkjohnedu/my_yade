@@ -32,11 +32,13 @@
 #define PYGTS_DEBUG 1
 #endif /* PYGTS_DEBUG */
 
+// XXX never do #include<Python.h>, see https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/building/include_issues.html
+#include <boost/python/detail/wrap_python.hpp>
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#include <Python.h>
 #include <structmember.h>
 
 /* Defined for arrayobject.h which is only included where needed */

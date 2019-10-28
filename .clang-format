@@ -21,7 +21,10 @@ ContinuationIndentWidth: 8
 # IncludeBlocks: Merge
 # make sure that yade includes are in this order: lib, core, pkg, gui.
 # Then Eigen, Python. And others at the end. Urecognized go first.
+# wrap_python.hpp must always be the first one, see https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/building/include_issues.html
 IncludeCategories:
+  - Regex:           '^(<|")boost/python/detail/wrap_python.hpp(>|")'
+    Priority:        -10
   - Regex:           '^<(Eigen|Python)'
     Priority:        5
   - Regex:           '^(<|")gui/'
