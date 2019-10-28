@@ -1,22 +1,25 @@
 
 '''
+(c) 2018 Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
+# MPI execution of gravity deposition of 3D stacked blocked
 # Possible executions of this script
-### Parallel:
-# mpiexec -n 13 yade-mpi script.py (semi-interactive after mp.initialize())
-# yade-mpi script.py (interactive)
+# yade-mpi -x script.py (interactive, the default numThreads is used)
+# yade-mpi script.py (passive, the default numThreads is used)
+# mpiexec -n N yade-mpi script.py (semi-interactive, N defines numThreads)
+# mpiexec -n N yade-mpi -x script.py (passive, N defines numThreads)
+
 '''
 
 
-NSTEPS=1000 #turn it >0 to see time iterations, else only initilization TODO!HACK
-L=2; M=2; N=2; #default size per thread
+NSTEPS=100 #turn it >0 to see time iterations, else only initilization TODO!HACK
+L=5; M=5; N=5; #default size per thread
 if len(sys.argv)>1: #we then assume L,M,N are provided as as cmd line arguments
 	L=int(sys.argv[1]); N=int(sys.argv[3]); M=int(sys.argv[2])
 
 Nx=Ny=Nz=1 #the number of subD in each direction of space
 
 from yade import mpy as mp
-numThreads = 13 #if mp.numThreads<=1 else mp.numThreads # 13 is the default, 'mpirun -n' overrides
-#mp.initialize(numThreads)
+numThreads = 13 if mp.numThreads<=1 else mp.numThreads # 13 is the default, 'mpirun -n' overrides
 np = numThreads-1  #remember to set odd number of cores to make the number of domains even
 
 # Here we try and find a smart way to pile np blocks, expending in all three directions
@@ -31,9 +34,6 @@ if np%2==0:
 	Nx*=2; np/=2
 Nz*=np
 
-# sequential grain colors
-#colorScale = mp.colorScale
-
 #add spheres
 subdNo=0
 import itertools
@@ -45,31 +45,33 @@ for x,y,z in itertools.product(range(int(Nx)),range(int(Ny)),range(int(Nz))):
 	for i in range(L):#(numThreads-1) x N x M x L spheres, one thread is for master and will keep only the wall, others handle spheres
 		for j in range(M):
 			for k in range(N):
-				id = O.bodies.insertAtId(sphere((x*L+i+j/30.,y*M+j,z*N+k+j/15.0),0.500),_id+(N*M*L*(subdNo-1))) #a small shift in x-positions of the rows to break symmetry
+				dxOndy = 1/5.; dzOndy=1/15. # to make the columns inclined
+				px= x*L+i+j*dxOndy; pz= z*N+k+j*dzOndy; py = (y*M+j)*(1 -dxOndy**2 -dzOndy**2)**0.5
+				id = O.bodies.insertAtId(sphere((px,py,pz),0.500),_id+(N*M*L*(subdNo-1))) #a small shift in x-positions of the rows to break symmetry
 				_id+=1
 				ids.append(id)
 	for id in ids: O.bodies[id].subdomain = subdNo
 	
-if mp.rank==0:
+if mp.rank==0: #the wall belongs to master
 	WALL_ID=O.bodies.insertAtId(box(center=(Nx*L/2,-0.5,Nz*N/2),extents=(2*Nx*L,0,2*Nz*N),fixed=True),(N*M*L*(numThreads-1)))
 
-collider.verletDist = 0.25
+collider.verletDist = 0.5
 newton.gravity=(0,-10,0) #else nothing would move
 tsIdx=O.engines.index(timeStepper) #remove the automatic timestepper. Very important: we don't want subdomains to use many different timesteps...
 O.engines=O.engines[0:tsIdx]+O.engines[tsIdx+1:]
-O.dt=0.001 #this very small timestep will make it possible to run 2000 iter without merging
-#O.dt=0.1*PWaveTimeStep() #very important, we don't want subdomains to use many different timesteps...
-
+O.dt=0.002
 
 #import yade's mpi module
 #from yade import mpy as mp
 # customize
 mp.VERBOSE_OUTPUT=False
-mp.YADE_TIMING=True
 mp.DISTRIBUTED_INSERT=True
+mp.REALLOCATE_FREQUENCY=4
+mp.MAX_RANK_OUTPUT=2
 mp.mpirun(1,numThreads,True) #this is to eliminate initialization overhead in Cundall number and timings
-from yade import timing
-timing.reset()
+#from yade import timing
+#timing.reset()
+mp.YADE_TIMING=True
 t1=time.time()
 mp.mpirun(NSTEPS,withMerge=False)
 t2=time.time()
@@ -79,6 +81,3 @@ if mp.rank==0:
 	mp.mprint("CPU wall time for ",NSTEPS," iterations:",t2-t1,"; Cundall number = ",N*M*(numThreads-1)*NSTEPS/(t2-t1))
 	#collectTiming()
 mp.mergeScene()
-#if rank==0: O.save('mergedScene.yade')
-#mp.MPI.Finalize()
-#exit()

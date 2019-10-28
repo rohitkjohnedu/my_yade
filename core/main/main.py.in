@@ -340,24 +340,25 @@ def userSession(gui='none',qapp=None):
 					traceback.print_exc()
 					if yade.runtime.opts.exitAfter: sys.exit(1)
 			runScript(arg0)
-		if yade.runtime.opts.exitAfter:
-			if opts.mpi_mode:
-				from yade import mpy as mp
-				mp.MPI.Finalize()
-			sys.exit(0)
 	## start interpreter
 	if not opts.mpi_mode:
-		ipshell()
-	else: 	
+		if yade.runtime.opts.exitAfter: sys.exit(0)
+		else: ipshell()
+	else: # if mpi_mode start shell on master, waiting loops on workers, and exit mpi properly
 		from yade import mpy as mp
 		if mp.rank==0:
-			ipshell()
-			mp.sendCommand(list(range(1,mp.numThreads)),"exit",wait=False)
+			if not yade.runtime.opts.exitAfter:
+				ipshell()
+			mp.wprint("sending exit command to workers", mp.numThreads)
+			res=mp.sendCommand(list(range(1,mp.numThreads)),"exit",wait=True) # a blocking call to workers, we only finalize after letting them now
 			mp.MPI.Finalize()
 		else:
-			mp.spawnedProcessWaitCommand() #after the script execution, don't exit and wait a command from master.
+			# after the script execution, never exit directly. Instead, wait a command from master to do so.
+			# We do this even in non-interactive mode since that's the only way found to exit without various openmpi warnings.
+			# In that case the wait process is spawned just long enough to receive the 'exit' command
+			mp.spawnedProcessWaitCommand()
+			mp.wprint("received and exit command, finalizing")
 			mp.MPI.Finalize()
-			sys.exit(0)
 
 ## run userSession in a way corresponding to the features we use:
 gui=None

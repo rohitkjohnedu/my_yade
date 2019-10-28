@@ -61,7 +61,7 @@ ERASE_REMOTE = True # True is MANDATORY. Erase bodies not interacting wit a give
 ERASE_REMOTE_MASTER = True # erase remotes on master or keep them for fast merge (updating just b.state)
 OPTIMIZE_COM=True
 USE_CPP_MPI=True and OPTIMIZE_COM
-YADE_TIMING=True #report timing.stats()?
+YADE_TIMING=False #report timing.stats()?
 MERGE_SPLIT = False
 MERGE_W_INTERACTIONS = True
 COPY_MIRROR_BODIES_WHEN_COLLIDE = True  # True is MANDATORY 
@@ -99,13 +99,14 @@ bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033
 def mprint(*args): #this one will print regardless of VERBOSE_OUTPUT
 	if NO_OUTPUT or rank>MAX_RANK_OUTPUT: return
 	m=bcolors[min(rank,len(bcolors)-2)]
+	resetFont='\033[0m'
 	if rank==0:
 		m+='Master: '
 	else:
 		m+='Worker'+str(rank)+": "
 	for a in args:
 		m+=str(a)+" "
-	print (m)
+	print (m+resetFont)
 
 def wprint(*args):
 	if not VERBOSE_OUTPUT: return
@@ -118,19 +119,24 @@ import yade.runtime
 
 # for coloring bodies
 import colorsys
-colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
-from random import shuffle
-random.seed(1)
-shuffle(colorScale)
+
+def makeColorScale(n=numThreads):
+	scale= [(0.3+random.random())*Vector3(colorsys.hsv_to_rgb(value*1.0/n, 1, 1)) for value in range(0, n)]
+	from random import shuffle
+	random.seed(1)
+	shuffle(scale)
+	return scale
+
+colorScale= makeColorScale(numThreads)
+
 
 def colorDomains():
 	'''
 	Apply color to body to reflect their subdomain idx
 	'''
 	global colorScale
-	if colorScale==None or len(colorScale)<numThreads:
-		colorScale = [Vector3(colorsys.hsv_to_rgb(value*1.0/numThreads, 1, 1)) for value in range(0, numThreads)]
-		shuffle(colorScale)
+	if len(colorScale)<numThreads:
+		colorScale = makeColorScale(numThreads)
 	for b in O.bodies:
 		b.shape.color=colorScale[b.subdomain]
 
@@ -139,26 +145,24 @@ def initialize(np):
 	process_count = comm.Get_size()
 
 	if(process_count<np):
-		mprint("______________INITIALIZE___________________")
 		numThreads=np
 		if not yade.runtime.opts.mpi_mode: #MASTER only, the workers will be already in mpi_mode
 			mprint("I will spawn ",numThreads-process_count," workers")
 			if (userScriptInCheckList==""): #normal case
-				mprint(sys.yade_argv[0], sys.yade_argv[1:])
 				comm = MPI.COMM_WORLD.Spawn(sys.yade_argv[0], args=sys.yade_argv[1:],maxprocs=numThreads-process_count).Merge()
 			else: #HACK, otherwise, handle execution from checkList.py otherwise will we run checkList.py in parallel
 				os.environ['OMPI_MCA_rmaps_base_oversubscribe'] = "1" #else spawn fails randomly
 				comm = MPI.COMM_WORLD.Spawn(sys.yade_argv[0], args=[userScriptInCheckList],maxprocs=numThreads-process_count).Merge()
 			#TODO: if process_count>numThreads, free some workers
+			yade.runtime.opts.mpi_mode=True
 			rank=0
 		else:	#WORKERS
 			wprint("Hello, I'm worker "+str(rank))
 		#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
 		O.subD=Subdomain() #for storage and comm only, this one will not be used beyond that 
 		O.subD.comm = comm
-	else:  ## This is certainly useless...
-		if rank==0: yade.runtime.opts.mpi_mode=False #This is to make master call ipshell() after executing scripts
-	if AUTO_COLOR: colorDomains()
+	else:
+		if rank==0: yade.runtime.opts.mpi_mode=True #since if we started without mpiexec it is initialized to False
 	return rank,numThreads
 
 def spawnedProcessWaitCommand():
@@ -172,7 +176,9 @@ def spawnedProcessWaitCommand():
 		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
 			time.sleep(0.001)
 		command = comm.recv(source=s.source,tag=_MASTER_COMMAND_)
-		if command=="exit": break #this is to terminate the waiting loop remotely
+		if command=="exit": #this is to terminate the waiting loop remotely
+			O.subD.comm.send(None,dest=s.source,tag=_RETURN_VALUE_)
+			break
 		wprint("I will now execute ",command)
 		try:
 			exec(command)
@@ -195,7 +201,7 @@ def sendCommand(executors,command,wait=True,workerToWorker=False):
 	#if 0 in executors: mprint("master does not accept mpi commands"); return
 	if len(executors)>numThreads: mprint("executors > numThreads"); return
 	
-	if wait:#trick command to make it return a result by mpi
+	if wait and not command=="exit":#trick command to make it return a result by mpi
 		commandSent="resCommand="+command+";O.subD.comm.send(resCommand,dest="+str(rank)+",tag=_RETURN_VALUE_)"
 	else: commandSent=command
 	
@@ -645,7 +651,7 @@ def splitScene():
 		maxid = len(O.bodies)-1
 		if DISTRIBUTED_INSERT: #find max id before inserting subdomains
 			maxid = comm.allreduce(maxid,op=MPI.MAX)
-			mprint("Splitting with maxId=",maxid)
+			wprint("Splitting with maxId=",maxid)
 			
 		if rank == 0 or DISTRIBUTED_INSERT:
 			subdomains=[] #list subdomains by body ids
@@ -938,8 +944,8 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		wprint("splitting")
 		splitScene()
 		wprint("splitted")
-	if YADE_TIMING:
-		O.timingEnabled=True
+		
+	O.timingEnabled=YADE_TIMING #turn it ON/OFF
 		
 	# run iterations
 	if not (MERGE_SPLIT):
