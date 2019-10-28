@@ -98,9 +98,9 @@ class Law2_ScGeom_VirtualLubricationPhys: public LawFunctor{
 			((Real, MaxDist, 2.,,"Maximum distance (d/a) for the interaction"))
 			,// CTOR
 			,// PY
-			.def("getStressForEachBody",&Law2_ScGeom_VirtualLubricationPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress.")
+			.def("getStressForEachBody",&Law2_ScGeom_VirtualLubricationPhys::PyGetStressForEachBody,"Get stresses tensors for each bodies: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, stress from additionnal potential forces.")
 			.staticmethod("getStressForEachBody")
-			.def("getTotalStresses",&Law2_ScGeom_VirtualLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress")
+			.def("getTotalStresses",&Law2_ScGeom_VirtualLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, stress from additionnal potential forces.")
 			.staticmethod("getTotalStresses")
                 );
                 DECLARE_LOGGER;

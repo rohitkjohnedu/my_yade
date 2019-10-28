@@ -1987,7 +1987,7 @@ In some (rare) cases, it can be useful to derive new class from wrapped c++ type
 
 ``boost::python`` provides special ``boost::python::wrapper`` template for such cases, where each overridable virtual method has to be declared explicitly, requesting python override of that method, if present. See `Overridable virtual functions <http://wiki.python.org/moin/boost.python/OverridableVirtualFunctions>`_ for more details.
 
-When python code is called from C++, the calling thread must hold the python lock. When initalizing the script as well as running one iteration calling ``O.step()``, the running thread is the same as python, and no additional code is required. On the other hand, calling python code inside the simulation loop using ``O.run()`` needs the lock to be acquired by the thread, or a segfault error will occurs. See implementation of :yref:`pyGenericPotential` for a complete exemple.
+When python code is called from C++, the calling thread must hold the python "Global Interpreter Lock" (GIL). When initalizing the script as well as running one iteration calling ``O.step()``, the running thread is the same as python, and no additional code is required. On the other hand, calling python code inside the simulation loop using ``O.run()`` needs the lock to be acquired by the thread, or a segfault error will occurs. See implementation of :yref:`pyGenericPotential` (:ysrc:`<py/wrapper/yadeWrapper.cpp>`) for a complete exemple.
 
 Reference counting
 ------------------
