@@ -673,7 +673,7 @@ py::tuple Law2_ScGeom_VirtualLubricationPhys::PyGetTotalStresses()
 void LubricationPDFEngine::action()
 {
 	vector<PDFEngine::PDF> pdfs;
-	pdfs.resize(8);
+	pdfs.resize(9);
 	
 	for(uint i(0);i<pdfs.size();i++) {
 		pdfs[i].resize(boost::extents[numDiscretizeAngleTheta][numDiscretizeAnglePhi]);
