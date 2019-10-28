@@ -919,12 +919,16 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
         nSteps : int
             The numer of steps to compute
         np : int
-            number of iterations
+            number of mpi workers (master+subdomains), if=1 the function fallback to O.run()
         withMerge : bool
             wether subdomains should be merged into master at the end of the run (default False). If True the scene in the master process is exactly in the same state as after O.run(nSteps,True). The merge can be time consumming, it is recommended to activate only if post-processing or other similar tasks require it.
 	'''
 	
 	# Detect evironment (interactive or not, initialized or not...)
+	if(np==1):
+		mprint("single-core, fall back to O.run()")
+		O.run(nSteps,True)
+		return
 	stack=inspect.stack()
 	global userScriptInCheckList
 	if len(stack[3][1])>12 and stack[3][1][-12:]=="checkList.py":
@@ -988,7 +992,7 @@ def runOnSynchronouslPairs(workers,command):
 	
 	In this function pair connexions are established by the workers in a non-supervized and non-deterministic manner. Each time an interactive communication (i,j) is established 'command' is executed simultaneously by i and j. It is guaranted that all possible pairs are visited.
 	
-	The function can be used for all-to-all operations (N^2 pairs), but more interestingly it works with workers=intersections[rank] (O(N) pairs). It can be tested with with the dummy funtion 'pairOp': runOnSynchronouslPairs(range(numThreads),pairOp)
+	The function can be used for all-to-all operations (N^2 pairs), but more interestingly it works with workers=intersections[rank] (O(N) pairs). It can be tested with the dummy funtion 'pairOp': runOnSynchronouslPairs(range(numThreads),pairOp)
 	
 	command:
 		a function taking index of another worker as argument, can include blocking communications with the other worker since runOnSynchronouslPairs guarantee that the other worker will be running the command symmetrically. 
@@ -1173,31 +1177,4 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	#mprint("sending to ",otherDomain,": ",len(candidates))
 	migrateBodies(candidates,rank,otherDomain) #send
 	migrateBodies(None,otherDomain,rank)       #recv
-			
-#def reallocateBodiesSynchronous(_filter=medianFilter):
-	#'''
-	#Re-assign bodies to subdomains based on '_filter' argument.
-	#Requirement: '_filter' is a function taking ranks of origin and destination and returning the list of bodies (by index) to be moved. That's where the decomposition strategy is defined. See example medianFilter (used by default).
-	#This function must be called in parallel, hence if ran interactively the command needs to be sent explicitely:
-	#mp.sendCommand("all","reallocateBodiesToSubdomains(medianFilter)",True)
-	#'''
-	
-	#_functor = lambda x : reallocateBodiesPairWiseBlocking(medianFilter,x)
-	#runOnSynchronouslPairs(O.subD.intersections[rank],_functor)
-	
-	#O.subD.completeSendBodies()
-	#O.subD.ids = [b.id for b in O.bodies if (b.subdomain==rank and not b.isSubdomain)] #update local ids
-	
-	#if not ERASE_REMOTE_MASTER:
-		## update remote ids in master
-		#if rank>0: req = comm.isend(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
-		#else: #master will update subdomains for correct display (besides, keeping 'ids' updated for remote subdomains may not be a strict requirement)
-			#for k in range(1,numThreads):
-				#ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
-				#O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
-				#for i in ids: O.bodies[i].subdomain=k
-			#if (AUTO_COLOR): colorDomains()
-		## update intersections and mirror
-		#updateAllIntersections() #triggers communication
-		#if rank>0: req.wait()
-	
+
