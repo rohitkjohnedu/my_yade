@@ -15,13 +15,13 @@ class GenericPotential : public Serializable {
          */
         virtual Real potential(Real const& u, LubricationPhys const& phys) const;
         virtual void applyPotential(Real const& u, LubricationPhys& phys, Vector3r const& n);
-//         YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GenericPotential,Serializable,
-//                                           "Generic class for potential representation in PotentialLubrication law. Don't do anything. If set as potential, the result will be a lubrication-only simulation.",
-//                                           // ATTRS
-//                                           , // CTOR
-//                                           , // PY
-//         );
-        REGISTER_CLASS_AND_BASE(GenericPotential,Serializable);
+         YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(GenericPotential,Serializable,
+                                           "Generic class for potential representation in PotentialLubrication law. Don't do anything. If set as potential, the result will be a lubrication-only simulation.",
+                                           // ATTRS
+                                           , // CTOR
+                                           , // PY
+         );
+//        REGISTER_CLASS_AND_BASE(GenericPotential,Serializable);
         DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(GenericPotential);
