@@ -1010,23 +1010,23 @@ public:
 	Real stopAtTime_get() { return OMEGA.getScene()->stopAtTime; }
 	void stopAtTime_set(Real s) { OMEGA.getScene()->stopAtTime = s; }
 	
-#ifdef YADE_MPI 
-	Body::id_t getSubdomainId(){
-		return OMEGA.getScene()->thisSubdomainId; 
-	}
-	
-	void setSubdomainId(Body::id_t subdId){
-		OMEGA.getScene()->thisSubdomainId = subdId; 
-	}
-	
-	void setSubD(shared_ptr<Subdomain> subD){
-		OMEGA.getScene()->subD = subD; 
-	}
-	
-	shared_ptr<Subdomain> getSubD() {
-		return YADE_PTR_DYN_CAST<Subdomain>(OMEGA.getScene()->subD); 
-	}
-#endif 
+// #ifdef YADE_MPI 
+// 	Body::id_t getSubdomainId(){
+// 		return OMEGA.getScene()->thisSubdomainId; 
+// 	}
+// 	
+// 	void setSubdomainId(Body::id_t subdId){
+// 		OMEGA.getScene()->thisSubdomainId = subdId; 
+// 	}
+// 	
+// 	void setSubD(shared_ptr<Subdomain> subD){
+// 		OMEGA.getScene()->subD = subD; 
+// 	}
+// 	
+// 	shared_ptr<Subdomain> getSubD() {
+// 		return YADE_PTR_DYN_CAST<Subdomain>(OMEGA.getScene()->subD); 
+// 	}
+// #endif 
 	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
 	bool dynDt_set(bool activate){if(not OMEGA.getScene()->timeStepperActivate(activate) and activate) /* not activated despite passed value */ throw runtime_error("No TimeStepper found in O.engines."); return true;}
 	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
@@ -1476,6 +1476,7 @@ try {
 	        .value("noResize", yade::Attr::noResize);
 
 	py::class_<pyOmega>("Omega")
+<<<<<<< e7f265c737fec320f60d04d8bf857a5ebd5c0681
 	        .add_property("iter", &pyOmega::iter, "Get current step number")
 	        .add_property(
 	                "subStep",
