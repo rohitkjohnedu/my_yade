@@ -41,6 +41,11 @@ sys.stderr.write=sys.stdout.write #so we see error messages from workers
 this = sys.modules[__name__]
 
 comm = MPI.COMM_WORLD
+parent = comm.Get_parent()
+if parent!=MPI.COMM_NULL:
+	xx=comm.Get_size()
+	comm=parent.Merge()
+
 rank = comm.Get_rank()
 numThreads = comm.Get_size()
 
@@ -110,7 +115,6 @@ from yade import *
 from yade.utils import *
 from yade.wrapper import *
 import yade.runtime
-mit_mode = yade.runtime.opts.mit>1
 
 # for coloring bodies
 import colorsys
@@ -130,15 +134,13 @@ def colorDomains():
 	for b in O.bodies:
 		b.shape.color=colorScale[b.subdomain]
 
-def initialize(np=None):
-	global comm,rank,numThreads,mit_mode
+def initialize(np):
+	global comm,rank,numThreads
 	process_count = comm.Get_size()
-	if (np!=None):  # if current process count is too small we spawn, if process_count==numThreads we don't (we are already running a mpiexec)
-		yade.runtime.opts.mit=np
-		mit_mode=True
 
-	if(mit_mode and process_count<np):
-		numThreads=yade.runtime.opts.mit
+	if(process_count<np):
+		mprint("______________INITIALIZE___________________")
+		numThreads=np
 		if not yade.runtime.opts.mpi_mode: #MASTER only, the workers will be already in mpi_mode
 			mprint("I will spawn ",numThreads-process_count," workers")
 			if (userScriptInCheckList==""): #normal case
@@ -150,28 +152,14 @@ def initialize(np=None):
 			#TODO: if process_count>numThreads, free some workers
 			rank=0
 		else:	#WORKERS
-			comm = MPI.Comm.Get_parent().Merge()
-			rank=comm.Get_rank()
 			wprint("Hello, I'm worker "+str(rank))
 		#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
 		O.subD=Subdomain() #for storage and comm only, this one will not be used beyond that 
 		O.subD.comm = comm
 	else:  ## This is certainly useless...
-		rank = os.getenv('OMPI_COMM_WORLD_RANK')
-		numThreads=None
-		if rank is not None: #mpiexec was used
-			rank=int(rank)
-			numThreads=int(os.getenv('OMPI_COMM_WORLD_SIZE'))
-			#if rank==0: yade.runtime.opts.mpi_mode=False #This is to make master call ipshell() after executing scripts
-		#else monolithic simulation (no mpiexec, no mit)
+		if rank==0: yade.runtime.opts.mpi_mode=False #This is to make master call ipshell() after executing scripts
 	if AUTO_COLOR: colorDomains()
 	return rank,numThreads
-
-#def autoInitialize(np):
-	#global mit_mode
-	#yade.runtime.opts.mit=np
-	#mit_mode=True
-	#return initialize()
 
 def spawnedProcessWaitCommand():
 	global waitingCommands
@@ -184,6 +172,7 @@ def spawnedProcessWaitCommand():
 		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
 			time.sleep(0.001)
 		command = comm.recv(source=s.source,tag=_MASTER_COMMAND_)
+		if command=="exit": break #this is to terminate the waiting loop remotely
 		wprint("I will now execute ",command)
 		try:
 			exec(command)
@@ -196,7 +185,6 @@ def sendCommand(executors,command,wait=True,workerToWorker=False):
 	Send a command to a worker (or list of) from master or from another worker. executors="all" is accepted, then even master will execute the command.
 	'''
 	start=time.time()
-	if not mit_mode: mprint("sendCommand in interactive mode only"); return
 	if (rank>0 and not workerToWorker): mprint("sendCommand ignored by worker", rank, ", pass workerToWorker=True to force it"); return
 	if (executors=="all"): executors=list(range(numThreads))
 	argIsList=isinstance(executors,list)
@@ -654,10 +642,10 @@ def splitScene():
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain()
 		
-		maxid = len(O.bodies)+1
+		maxid = len(O.bodies)-1
 		if DISTRIBUTED_INSERT: #find max id before inserting subdomains
 			maxid = comm.allreduce(maxid,op=MPI.MAX)
-			wprint("Splitting with maxId=",maxid)
+			mprint("Splitting with maxId=",maxid)
 			
 		if rank == 0 or DISTRIBUTED_INSERT:
 			subdomains=[] #list subdomains by body ids
@@ -668,10 +656,10 @@ def splitScene():
 				if rank==k: O.subD=domainBody.shape
 				subdomains.append(O.bodies.insertAtId(domainBody,maxid+k))
 				
-			if rank==0:  O.subD = Subdomain()  #initialize() is not called if mit==False, hence we make sure it's initialized here
+			if rank==0:  O.subD = Subdomain()  # make sure it's initialized here
 			O.subD.subdomains = subdomains
 			subD= O.subD #alias
-			if mit_mode: subD.comm=comm #make sure the c++ uses the merged intracommunicator
+			subD.comm=comm #make sure the c++ uses the merged intracommunicator
 
 			#tell the collider how to handle this new thing
 			collider.boundDispatcher.functors=collider.boundDispatcher.functors+[Bo1_Subdomain_Aabb()]
@@ -703,7 +691,7 @@ def splitScene():
 				O.subD.subdomains = subdomains
 		
 		O._sceneObj.subdomain = rank
-		if mit_mode: O.subD.comm=comm #make sure the c++ uses the merged intracommunicator
+		O.subD.comm=comm #make sure the c++ uses the merged intracommunicator
 		
 		O.subD.init()
 		
@@ -937,9 +925,9 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 		userScriptInCheckList=stack[1][1]
 	caller_name = stack[2][3]
 	if (np>numThreads):  
-		if not mit_mode: initialize(np) #this will set numThreads
-		else: mprint("number of cores can't be increased after first call to mpirun")
-	if(mit_mode and rank==0 and not caller_name=='execfile'): #if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
+		if numThreads==1: initialize(np) #this will set numThreads
+		else: mprint("number of mpy cores can't be increased when already initialized")
+	if(rank==0 and not caller_name=='execfile'): #if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
 		for w in range(1,numThreads):
 			comm.send("yade.mpy.mpirun(nSteps="+str(nSteps)+",withMerge="+str(withMerge)+")",dest=w,tag=_MASTER_COMMAND_)
 			wprint("Command sent to ",w)

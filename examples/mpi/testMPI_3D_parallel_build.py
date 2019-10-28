@@ -16,7 +16,7 @@ Nx=Ny=Nz=1 #the number of subD in each direction of space
 
 from yade import mpy as mp
 numThreads = 13 #if mp.numThreads<=1 else mp.numThreads # 13 is the default, 'mpirun -n' overrides
-mp.initialize(numThreads)
+#mp.initialize(numThreads)
 np = numThreads-1  #remember to set odd number of cores to make the number of domains even
 
 # Here we try and find a smart way to pile np blocks, expending in all three directions
@@ -32,21 +32,20 @@ if np%2==0:
 Nz*=np
 
 # sequential grain colors
-colorScale = mp.colorScale
+#colorScale = mp.colorScale
 
 #add spheres
 subdNo=0
 import itertools
 _id = 0 #will be used to count total number of bodies regardless of subdomain attribute, so that same ids are not reused for different bodies
 for x,y,z in itertools.product(range(int(Nx)),range(int(Ny)),range(int(Nz))):
-	col = colorScale[subdNo]
 	subdNo+=1
 	if mp.rank!=subdNo: continue
 	ids=[]
 	for i in range(L):#(numThreads-1) x N x M x L spheres, one thread is for master and will keep only the wall, others handle spheres
 		for j in range(M):
 			for k in range(N):
-				id = O.bodies.insertAtId(sphere((x*L+i+j/30.,y*M+j,z*N+k+j/15.0),0.500,color=col),_id+(N*M*L*(subdNo-1))) #a small shift in x-positions of the rows to break symmetry
+				id = O.bodies.insertAtId(sphere((x*L+i+j/30.,y*M+j,z*N+k+j/15.0),0.500),_id+(N*M*L*(subdNo-1))) #a small shift in x-positions of the rows to break symmetry
 				_id+=1
 				ids.append(id)
 	for id in ids: O.bodies[id].subdomain = subdNo
@@ -69,18 +68,17 @@ mp.VERBOSE_OUTPUT=False
 mp.YADE_TIMING=True
 mp.DISTRIBUTED_INSERT=True
 mp.mpirun(1,numThreads,True) #this is to eliminate initialization overhead in Cundall number and timings
-#from yade import timing
-#timing.reset()
-#t1=time.time()
-#mp.mpirun(NSTEPS)
-#t2=time.time()
-#mp.mprint("num. bodies:",len([b for b in O.bodies])," ",len(O.bodies))
+from yade import timing
+timing.reset()
+t1=time.time()
+mp.mpirun(NSTEPS,withMerge=False)
+t2=time.time()
+mp.mprint("num. bodies:",len([b for b in O.bodies])," ",len(O.bodies))
 if mp.rank==0:
 	mp.mprint( "Total force on floor="+str(O.forces.f(WALL_ID)[1]))
-	#mp.mprint("CPU wall time for ",NSTEPS," iterations:",t2-t1,"; Cundall number = ",N*M*(numThreads-1)*NSTEPS/(t2-t1))
+	mp.mprint("CPU wall time for ",NSTEPS," iterations:",t2-t1,"; Cundall number = ",N*M*(numThreads-1)*NSTEPS/(t2-t1))
 	#collectTiming()
-#else: mp.mprint( "Partial force on floor="+str(O.forces.f(WALL_ID)[1]))
-#mp.mergeScene()
+mp.mergeScene()
 #if rank==0: O.save('mergedScene.yade')
 #mp.MPI.Finalize()
 #exit()
