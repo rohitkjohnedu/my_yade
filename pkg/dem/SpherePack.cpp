@@ -405,7 +405,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 			#endif
 
 			// add the clump, if no collisions
-			/*number clumps consecutively*/ ci.clumpId=nGen; ci.center=pos; ci.rad=rad; ci.minId=pack.size(); ci.maxId=pack.size()+C.pack.size(); 
+			/*number clumps consecutively*/ ci.clumpId=nGen; ci.center=pos; ci.rad=rad; ci.minId=pack.size(); ci.maxId=pack.size()+C.pack.size()-1; 
 			FOREACH(const Sph& s, C.pack){
 				pack.push_back(Sph(s.c,s.r,ci.clumpId));
 			}
