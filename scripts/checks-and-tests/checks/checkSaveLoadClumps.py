@@ -10,8 +10,8 @@
 from __future__ import print_function
 
 from yade import pack
-import tempfile, shutil
 import time
+from tempfile import TemporaryDirectory
 
 #define material for all bodies:
 id_Mat=O.materials.append(FrictMat(young=1e6,poisson=0.3,density=1000,frictionAngle=1))
@@ -48,14 +48,35 @@ else:
   print("ERROR! choose either spheres or clumps for partType!")
 
 O.dt=1e-6
+kinEnergyMax = 1e-7
+
+# We check the kinetic energy to be sure that the particles are not overlapping and do not explode
+def checkKineticEnergy():
+  if (kineticEnergy() > kinEnergyMax):
+    O.pause()
+    raise YadeCheckError("Kinetic energy is over a threshold value %E > %E! Error!"%(kineticEnergy(), kinEnergyMax))
+  else:
+    print ("Kinetic energy OK")
 
 #write some restart files
-tmp_dir = tempfile.mkdtemp()
-O.save(tmp_dir + '/restartMinWorkEx_'+partType+'_Initial')
-O.run(100000,True)
-O.save(tmp_dir + '/restartMinWorkEx_'+partType+str(O.iter))
-time.sleep(1)
-O.reset()
-time.sleep(1)
-O.load(tmp_dir + '/restartMinWorkEx_'+partType +'100000')
-O.run(1000, True)
+with TemporaryDirectory() as tmp_dir:
+  O.save(tmp_dir + '/restartMinWorkEx_'+partType+'_Initial')
+
+  # Run simulation to check the kinetic energy
+  O.run(10, True)
+  checkKineticEnergy()
+
+  # Let the object settle
+  O.run(100000,True)
+  curIter = O.iter
+
+  # Save simulation
+  O.save(tmp_dir + '/restartMinWorkEx_%s_%d'%(partType,curIter))
+
+  time.sleep(1)
+  O.reset()
+  time.sleep(1)
+
+  # Load simulation
+  O.load(tmp_dir + '/restartMinWorkEx_%s_%d'%(partType,curIter))
+  O.run(1000, True)
