@@ -256,7 +256,7 @@ class Subdomain: public Shape {
 	bool ranksSet=false; 
 	bool bodiesSet = false;  // flag 
 	
-	// Geometry
+	// Geometry and other helper functions
 	Real boundOnAxis(Bound& b, Vector3r direction, bool min); //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
 	
 	Vector3r centerOfMass() {
@@ -269,9 +269,14 @@ class Subdomain: public Shape {
 			mass+=b->state->mass;}
 		return center*(1/mass);
 	}
+	// Count interactions of a body with given subdomain
+	unsigned countIntsWith(Body::id_t body, Body::id_t someSubD, const shared_ptr<Scene>& scene ) const {
+		const auto& intrs=Body::byId(body,scene)->intrs;
+		return std::count_if(intrs.begin(), intrs.end(), [&](auto i){return (Body::byId(i.first,scene)->subdomain == someSubD and not Body::byId(i.first,scene)->getIsSubdomain());});
+	}
 		
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain. Stores internals and provides optimized functions for communications between workers. This class may not be used directly. Instead, Subdomains are appended automatically to the scene bodies when using :yref:`mpy.mpirun`",
 // 		((testType, testArray,testType({0,0}),,""))
 		((Real,extraLength,0,,"verlet dist for the subdomain, added to bodies verletDist"))
 		((Vector3r,boundsMin,Vector3r(NaN,NaN,NaN),,"min corner of all bboxes of members; differs from effective domain bounds by the extra length (sweepLength)"))
@@ -306,6 +311,7 @@ class Subdomain: public Shape {
 		.def("splitBodiesToWorkers", &Subdomain::splitBodiesToWorkers,(boost::python::arg("eraseWorkerBodies")), "of true bodies in workers are erased and reassigned.")
 		.def("boundOnAxis", &Subdomain::boundOnAxis,(boost::python::arg("bound"),boost::python::arg("axis"),boost::python::arg("min")), "computes projected position of a bound in a certain direction")
 		.def("centerOfMass", &Subdomain::centerOfMass, "returns center of mass of assigned bodies")
+		.def("countIntsWith", &Subdomain::countIntsWith, (boost::python::arg("body"),boost::python::arg("someSubDomain"),boost::python::arg("someSubDomain")=Omega::instance().getScene()), "returns for a body the count of interactions (real or virtual) with bodies from a certain subdomain, interactions with subdomains excluded. Third parameter (scene pointer) can be left to default (equivalent to O._sceneObj).")
 	);
 	// clang-format on
 	DECLARE_LOGGER;
