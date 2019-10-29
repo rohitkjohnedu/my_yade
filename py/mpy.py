@@ -36,10 +36,9 @@ from mpi4py import MPI
 import numpy as np
 import yade.bisectionDecomposition as dd
 
-sys.stderr.write=sys.stdout.write #so we see error messages from workers
-
 this = sys.modules[__name__]
 
+sys.stderr.write=sys.stdout.write #so we see error messages from workers
 comm = MPI.COMM_WORLD
 parent = comm.Get_parent()
 if parent!=MPI.COMM_NULL:
@@ -50,7 +49,7 @@ rank = comm.Get_rank()
 numThreads = comm.Get_size()
 
 waitingCommands=False #are workers currently interactive?
-userScriptInCheckList=""	# the simulation script from which mpy.py is used
+userScriptInCheckList=""	# detect if mpy is executed by checkList.py
 
 ACCUMULATE_FORCES=True #control force summation on master's body. FIXME: if false master goes out of sync since nothing is blocking rank=0 thread
 VERBOSE_OUTPUT=False
@@ -202,21 +201,21 @@ def sendCommand(executors,command,wait=True,workerToWorker=False):
 	if len(executors)>numThreads: mprint("executors > numThreads"); return
 	
 	if wait and not command=="exit":#trick command to make it return a result by mpi
-		commandSent="resCommand="+command+";O.subD.comm.send(resCommand,dest="+str(rank)+",tag=_RETURN_VALUE_)"
+		commandSent="resCommand="+command+";comm.send(resCommand,dest="+str(rank)+",tag=_RETURN_VALUE_)"
 	else: commandSent=command
 	
 	reqs=[]
 	for w in executors:
 		#note: if the return from this isend() is not appended to a list we have random deadlock
-		if (w>0): reqs.append(O.subD.comm.isend(commandSent,dest=w,tag=_MASTER_COMMAND_) )
+		if (w>0): reqs.append(comm.isend(commandSent,dest=w,tag=_MASTER_COMMAND_) )
 	
 	resCommand=[]
 	if toMaster:#eval command on master since it wasn't done yet
 		try: resCommand = [eval(command)]
-		except: resCommand = [None]
+		except: resCommand = [None]; mprint(sys.exc_info())
 	
 	if wait:
-		resCommand=resCommand+ [O.subD.comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors if w>0]
+		resCommand=resCommand+ [comm.recv(source=w,tag=_RETURN_VALUE_) for w in executors if w>0]
 		wprint("sendCommand returned in "+str(time.time()-start)+" s")
 		return (resCommand if argIsList else resCommand[0])
 	else:
@@ -225,10 +224,10 @@ def sendCommand(executors,command,wait=True,workerToWorker=False):
 
 def probeRecvMessage(source, tag):
 	msgStat = MPI.Status() 
-	O.subD.comm.Probe(source=source, tag=tag, status=msgStat)
+	comm.Probe(source=source, tag=tag, status=msgStat)
 	if msgStat.tag == tag : print("message size recvd")
 	data = bytearray(msgStat.Get_count(MPI.BYTE))  
-	O.subD.comm.Recv([data, MPI.BYTE], source=source, tag=tag)
+	comm.Recv([data, MPI.BYTE], source=source, tag=tag)
 	return data
 
 
@@ -910,7 +909,7 @@ def reassignBodies():
 
 
 ##### RUN MPI #########
-def mpirun(nSteps,np=numThreads,withMerge=False):
+def mpirun(nSteps,np=None,withMerge=False):
 	'''
 	Parallel version of O.run() using MPI domain decomposition.
 	
@@ -925,6 +924,7 @@ def mpirun(nSteps,np=numThreads,withMerge=False):
 	'''
 	
 	# Detect evironment (interactive or not, initialized or not...)
+	if np==None: np=numThreads
 	if(np==1):
 		mprint("single-core, fall back to O.run()")
 		O.run(nSteps,True)
