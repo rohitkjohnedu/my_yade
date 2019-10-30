@@ -16,8 +16,8 @@ void PotentialBlock::addPlaneStruct()    { planeStruct.push_back(Planes());    }
 //void PotentialBlock::addVertexStruct()   { vertexStruct.push_back(Vertices()); }
 //void PotentialBlock::addEdgeStruct()     { edgeStruct.push_back(Edges());      }
 
-
-//TODO: I need to use the planeStruct to store ordered (cwise or ccwise) vertices belonging to each plane. We can use the ordered vertices for: 1. Visualisation without using CGAL and 2. Calculation of volume and inertia (more specifically, to create the pyramids and subsequently tetrahedra, used to calculate the volume and inertia below). By saving the ordered vertices for each plane, it is trivial to create a triangulation of them without needing the convex hull of CGAL. For volume and inertia we already order the vertices of each face, but we don't save the serially oriented vertices of each face in the struct.
+//TODO: We can use the ordered (cwise or ccwise) vertices belonging to each plane, stored in the planeStruct for: 1. Visualisation without using CGAL and 2. Calculation of volume and inertia (more specifically, to create the pyramids and subsequently tetrahedra, used to calculate the volume and inertia below). By saving the ordered vertices for each plane, it is trivial to create a triangulation of them without needing the convex hull of CGAL.
+//TODO: We need a check to merge duplicate faces during initialisation, so that when we write the plane coefficients a,b,c,d in the shape class, we don't allow duplicate combinations. This means that the planeNo will change, and we need to ensure it is updated everywhere, after we remove the duplicate faces
 
 
 void PotentialBlock::postLoad(PotentialBlock& )
@@ -28,8 +28,9 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 	int planeNo = a.size();
 
 	/* Normalize the coefficients of the planes defining the particle faces */
+	Vector3r planeNormVec;
 	for (int i=0; i<planeNo; i++){
-		Vector3r planeNormVec = Vector3r(a[i],b[i],c[i]);
+		planeNormVec = Vector3r(a[i],b[i],c[i]);
 		if ( std::abs(planeNormVec.norm() - 1.0 ) > 1e-3) { /* Normalize only if the normal vectors are not normalized already */
 //		if (planeNormVec.norm() > 1+1e-3) { /* Normalize only if the normal vectors are not normalized already */
 			a[i] /= planeNormVec.norm();
@@ -38,6 +39,9 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 			d[i] /= planeNormVec.norm();
 		}
 	}
+
+	/* Check that the defined planes have the same number of coefficients */
+	if ( b.size()!=a.size() or c.size()!=a.size() or d.size()!=a.size() ) {std::cout<<"The planes do not have the same number of coefficients. Check the input geometry!"<<endl;}
 
 	/* Make sure the d[i] values given by the user are positive (i.e. the normal vectors of the faces point outwards) */
 	for (int i=0; i<planeNo; i++){ if (d[i]<0) { a[i] *= -1; b[i] *= -1; c[i] *= -1; d[i] *= -1; } }
@@ -52,19 +56,26 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 	/* A reminder that R in the Potential Blocks is meant to represent a reference length, used to calculate the initial bisection search employed to identify points on the particle surfaces. Here, R does not affect the curvature of the faces, like in the Potetial Particles code. The faces of a Potential Block are always flat. */
 	/* Although half the distance of the farthest vertices is in no case the circumradius, we just need a value around this order of magnitude for the bisection search code to run smoothly */
 	if (R==0.0 and ( not vertices.empty() )) {
-		Real maxDistance=0.0;
+		Real maxDistance=0.0, Distance;
 		for (unsigned int i=0; i<vertices.size()-1;i++){
 			for (unsigned int j=i+1; i<vertices.size();i++){
-				Real Distance = (vertices[i] - vertices[j]).norm();
+				Distance = (vertices[i] - vertices[j]).norm();
 				if (Distance > maxDistance) { maxDistance = Distance; }
 			}
 		}
 		if (maxDistance>0.0) {
 			R = maxDistance/2.;
 		}
+		calculateVertices(); //Recalculate vertices after calculating R: Not strictly necessary to recalculate, but kept for consistency
 		if (R==0) { std::cout<<"R must be positive. Incorrect automatic calculation from the vertices."<<endl;}
 	}
 	assert(R>0.0);
+
+	/* Set a default value for the attrs minAabb, maxAabb, used for visualisation in vtk, if they are left undefined */
+	if (minAabb.norm()==0 and maxAabb.norm()==0) {
+		minAabb = Vector3r(R,R,R);
+		maxAabb = Vector3r(R,R,R);
+	}
 
 	// Calculate geometric properties: volume, centroid, inertia, principal orientation (inertia is calculated after the particle is centered to its centroid)
 	Vector3r centr = Vector3r::Zero();
@@ -83,17 +94,18 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 			d[i] = -(a[i]*centr.x() + b[i]*centr.y() + c[i]*centr.z() - d[i]);
 			if (d[i]<0) { a[i] *= -1; b[i] *= -1; c[i] *= -1; d[i] *= -1; }
 		}
+		position=centr;
 		calculateVertices(); // Recalculate vertices for the centered particle faces
 		calculateInertia(centr, Ixx, Iyy, Izz, Ixy, Ixz, Iyz); // Calculate inertia for the centered particle
 	}
 
 /* ------------------------------------------------------------------------------------------------------------------------------ */
-	if ( std::abs(Ixy) + std::abs(Iyz) + std::abs(Iyz)<1e-15 ) {
+	if ( std::abs(Ixy) + std::abs(Ixz) + std::abs(Iyz)<1e-15 ) {
 		inertia = Vector3r(Ixx,Iyy,Izz);
 	} else { //rotate the planes to the principal axes if they are not already rotated
 		if( fabs(Ixx) < pow(10,-15) ){Ixx = 0.0;} //TODO: Check whether I should keep/modify these or if there is a case where they introduce bugs
 		if( fabs(Iyy) < pow(10,-15) ){Iyy = 0.0;} // TODO: Maybe I could just check only the non-diagonal terms Ixy, Iyz, Ixz?
-		if( fabs(Izz) < pow(10,-15) ){Izz = 0.0;} // Or I could normalise the checked inertia values to make them dimensionless, by dividing with pow(R,5) or V*pow(R,3) or something similar
+		if( fabs(Izz) < pow(10,-15) ){Izz = 0.0;} // Or I could normalise the checked inertia values to make them dimensionless, by dividing with pow(R,5) or V*pow(R,2) or something similar
 		if( fabs(Ixy) < pow(10,-15) ){Ixy = 0.0;}
 		if( fabs(Iyz) < pow(10,-15) ){Iyz = 0.0;}
 		if( fabs(Ixz) < pow(10,-15) ){Ixz = 0.0;}
@@ -149,6 +161,11 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 			vertices[i] =  q*vertices[i];
 		}
 	}
+
+	for (unsigned int j=0; j<a.size(); j++){
+		connectivity.push_back(planeStruct[j].vertexID);
+	}
+
 }
 }
 
@@ -181,7 +198,7 @@ double PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, con
 void PotentialBlock::calculateVertices() {
 	std::vector<double> D (3); std::vector<double> Ax (9); Eigen::Matrix3d Aplanes;
 	double Distance;
-	Real vertCount=0; Real minDistance;
+	int vertCount=0; Real minDistance;
 	int planeNo = a.size();
 
 	Vector3r plane1, plane2, plane3;
@@ -192,19 +209,22 @@ void PotentialBlock::calculateVertices() {
 	Real plane;
 	int vertexID;
 
+	int closestVertex=0;
 	vertices.clear();
+
+	for (int i=0; i<planeNo; i++){ planeStruct[i].vertexID.clear(); } //Empty the planeStruct every time calculateVertices is ran
 
 	for (int i=0; i<planeNo-2; i++){
 		for (int j=i+1; j<planeNo-1; j++){
-			for(int k=j+1; k<planeNo; k++){
+			for(int kk=j+1; kk<planeNo; kk++){
 
 				plane1 = Vector3r(a[i],b[i],c[i]);
 				plane2 = Vector3r(a[j],b[j],c[j]);
-				plane3 = Vector3r(a[k],b[k],c[k]);
+				plane3 = Vector3r(a[kk],b[kk],c[kk]);
 
 				d1 = d[i]+r;
 				d2 = d[j]+r;
-				d3 = d[k]+r;
+				d3 = d[kk]+r;
 
 				D[0]=d1;
 				D[1]=d2;
@@ -231,39 +251,116 @@ void PotentialBlock::calculateVertices() {
 						if (inside == true){
 
 							/* Check for duplicate vertices: New vertices cannot be too close to existing ones */
-							if (vertCount==0) { // Allow the first vertex to be written
+							if (vertCount==0) { // Allow the first vertex to be written always
 								vertices.push_back(vertex);
-								vertCount=vertCount+1;
+								vertCount++;
+
+								vertexID = vertices.size()-1;
+								planeStruct[i].vertexID.push_back(vertexID);
+								planeStruct[j].vertexID.push_back(vertexID);
+								planeStruct[kk].vertexID.push_back(vertexID);
 							} else {
 								minDistance=1.0e15;
-								for (unsigned int n=0; n<vertCount; n++){
+								for (int n=0; n<vertCount; n++){
 									Distance = (vertex-vertices[n]).norm();
-									if (Distance < minDistance) { minDistance = Distance; }
+									if (Distance < minDistance) { minDistance = Distance; closestVertex=n; }
 								}
 
-								if ( minDistance/(R > 0.0 ? R : 1.0) > 1.0e-15 ) {
+								if ( minDistance/(R > 0.0 ? R : 1.0) > 1.0e-6 ) {
 									vertices.push_back(vertex);
-									vertCount=vertCount+1;
+									vertCount++;
+
+									vertexID = vertices.size()-1;
+									planeStruct[i].vertexID.push_back(vertexID); // If not duplicate, save new ID
+									planeStruct[j].vertexID.push_back(vertexID);
+									planeStruct[kk].vertexID.push_back(vertexID);
+								} else {
+									planeStruct[i].vertexID.push_back(closestVertex); // If duplicate save ID of duplicate
+									planeStruct[j].vertexID.push_back(closestVertex);
+									planeStruct[kk].vertexID.push_back(closestVertex);
 								}
 							}
 
+							/* Structs associating: Vertices-Edges-Planes: Could become useful in the future */
+							#if 0
+							/* vertexStruct */
 							vertexID = vertices.size()-1;
 //							addVertexStruct();
 //							int vertexID = vertexStruct.size()-1;
 //							vertexStruct[vertexID].planeID.push_back(i);   /* Note that the planeIDs are arranged from small to large! */
 //							vertexStruct[vertexID].planeID.push_back(j);   /* planeIDs are arranged in the same sequence as [a,b,c] and d */
-//							vertexStruct[vertexID].planeID.push_back(k);   /* vertices store information on planeIDs */
+//							vertexStruct[vertexID].planeID.push_back(kk);   /* vertices store information on planeIDs */
 
-							/*Planes */
+
+							/* edgeStruct */
+							int vertexNo = vertices.size(); int edgeCount=0;
+							for (int i=0; i<vertexNo; i++ ){
+								for (int j=0; j<vertexNo; j++){
+									if(i==j){continue;}
+									int v1a = vertexStruct[i].planeID[0];
+									int v2a = vertexStruct[i].planeID[1];
+									int v3a = vertexStruct[i].planeID[2];
+									int v1b = vertexStruct[j].planeID[0];
+									int v2b = vertexStruct[j].planeID[1];
+									int v3b = vertexStruct[j].planeID[2];
+
+									if(  (v1a != v1b && v2a == v2b && v3a == v3b) || (v1a == v1b && v2a != v2b && v3a == v3b) || (v1a == v1b && v2a == v2b && v3a != v3b)  ){
+										double length = ( vertices[i] - vertices[j] ).norm();
+										if(length<pow(10,-3) ){ continue; }
+										addEdgeStruct();
+										edgeStruct[edgeCount].vertexID.push_back(i); /* edges store information on vertexIDs */
+										edgeStruct[edgeCount].vertexID.push_back(j);
+										vertexStruct[i].edgeID.push_back(edgeCount); /* vertices store information on edgeIDs */
+										vertexStruct[j].edgeID.push_back(edgeCount);
+										edgeCount++;
+									}
+								}
+							}
+
+							/* planeStruct */
+							vertexID = vertices.size()-1;
 							planeStruct[i].vertexID.push_back(vertexID);   /* planes store information on vertexIDs */
 							planeStruct[j].vertexID.push_back(vertexID);
-							planeStruct[k].vertexID.push_back(vertexID);
+							planeStruct[kk].vertexID.push_back(vertexID);
+							#endif
 						}
 					}
 				}
 			}
 		}
 	}
+
+	//Remove duplicate vertices from each planeStruct[j] and record the IDs of planes with less than 3 vertices (these planes are redundant)
+	//This is done to guard the code against non-manifold geometrical inputs
+	std::vector<int> pWLTTV; //planes With Less Than Three Vertices
+	for (int j=0; j<planeNo; j++){
+		std::stable_sort( planeStruct[j].vertexID.begin(), planeStruct[j].vertexID.end() );
+		planeStruct[j].vertexID.erase( std::unique( planeStruct[j].vertexID.begin(), planeStruct[j].vertexID.end() ), planeStruct[j].vertexID.end() );
+		if (planeStruct[j].vertexID.size()<3 ) { pWLTTV.push_back(j); }
+	}
+
+	//Sort the IDs of the planes to be removed in descending order, in order to start removing from last to first, using the reverse iterators: rbegin(), rend()
+	std::stable_sort( pWLTTV.rbegin(), pWLTTV.rend() );
+	int pWLTTVSize=pWLTTV.size();
+
+	for (int j=0; j<pWLTTVSize; j++){
+		a.erase(a.begin()+pWLTTV[j]);
+		b.erase(b.begin()+pWLTTV[j]);
+		c.erase(c.begin()+pWLTTV[j]);
+		d.erase(d.begin()+pWLTTV[j]);
+
+		if ( not phi_b.empty()     ) { phi_b.erase(phi_b.begin()+pWLTTV[j]);         }
+		if ( not phi_r.empty()     ) { phi_r.erase(phi_r.begin()+pWLTTV[j]);         }
+		if ( not cohesion.empty()  ) { cohesion.erase(cohesion.begin()+pWLTTV[j]);   }
+		if ( not tension.empty()   ) { tension.erase(tension.begin()+pWLTTV[j]);     }
+		if ( not jointType.empty() ) { jointType.erase(jointType.begin()+pWLTTV[j]); }
+
+		planeStruct.erase(planeStruct.begin()+pWLTTV[j]);
+	}
+
+	//Here we repeat this check, after the redundant faces are removed, just in case
+	if ( b.size()!=a.size() or c.size()!=a.size() or d.size()!=a.size() ) {std::cout<<"The planes do not have the same number of coefficients. Check the input geometry!"<<endl;}
+
 }
 
 
@@ -271,42 +368,42 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 
 	Vector3r pointInside(0,0,0), vertex, planeNormal, oriNormal(0,0,1), crossProd, rotatedCoord;
 	Vector3r pt1, pt2, pt3, baseOnPolygon, oriBaseOnPolygon, centroidPyramid, centroidTetra, tempVert1, tempVert2, tempVert3, tempVert4;;
-	double totalVolume=0.0, plane, det, area, height, vol, areaPyramid, volumePyramid, heightTetra, tempArea, areaTri, tetraVol;
+	double totalVolume=0.0, /*plane,*/ det, area, height, vol, areaPyramid, volumePyramid, heightTetra, tempArea, areaTri, tetraVol;
 	double detJ, x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
 	Quaternionr Qp;
-	unsigned int h, k, m, counter;
+	unsigned int h, kk, m, counter;
 	int lastEntry;
 	Eigen::MatrixXd B(4,2), vertexOnPlane;
-	vector<Vector3r> verticesOnPlane, oriVerticesOnPlane, orderedVerticesOnPlane, oriOrderedVerticesOnPlane; //vector<int> oriOrderedVerticesOnplaneID;
+	std::vector<Vector3r> verticesOnPlane, oriVerticesOnPlane, orderedVerticesOnPlane, oriOrderedVerticesOnPlane; //vector<int> oriOrderedVerticesOnplaneID;
 
 	centroid = Vector3r::Zero();
 	Ixx = 0.0; Iyy = 0.0; Izz= 0.0; Ixy = 0.0; Ixz= 0.0; Iyz=0.0;
 
 	for (unsigned int j=0; j<a.size(); j++){
+
 		if(not verticesOnPlane.empty()){ verticesOnPlane.clear(); oriVerticesOnPlane.clear(); }
-		for (unsigned int i=0; i<vertices.size();i++){
-			vertex = vertices[i]; /*local coordinates*/
-			plane = a[j]*vertex.x() + b[j]*vertex.y() + c[j]*vertex.z() - d[j] - r;
-			if( fabs(plane) < pow(10,-3) ){
-				planeNormal = Vector3r(a[j],b[j],c[j]);
-//				Vector3r oriNormal(0,0,1); //normal vector of x-y plane
-				crossProd = oriNormal.cross(planeNormal);
-				Qp.w() = 1.0 + oriNormal.dot(planeNormal);
-				Qp.x() = crossProd.x(); Qp.y() = crossProd.y();  Qp.z() = crossProd.z();
-				Qp.normalize();
-				if(crossProd.norm() < pow(10,-7)){ Qp = Quaternionr::Identity(); }
-				rotatedCoord = Qp.conjugate()*vertex;
-				verticesOnPlane.push_back(rotatedCoord);
-				oriVerticesOnPlane.push_back(vertex);
-//				oriOrderedVerticesOnPlaneID.pushback(i); //Here I store the ID of the first vertex on plane, to use it for visualisation purposes
-			}
+		for (unsigned int i=0; i<planeStruct[j].vertexID.size();i++){ //iterate through the vertices of each face
+			vertex = vertices[planeStruct[j].vertexID[i]]; /*local coordinates*/
+			planeNormal = Vector3r(a[j],b[j],c[j]);
+			crossProd = oriNormal.cross(planeNormal);
+			Qp.w() = 1.0 + oriNormal.dot(planeNormal);
+			Qp.x() = crossProd.x(); Qp.y() = crossProd.y();  Qp.z() = crossProd.z();
+			Qp.normalize();
+			if(crossProd.norm() < pow(10,-7)){ Qp = Quaternionr::Identity(); }
+			rotatedCoord = Qp.conjugate()*vertex;
+
+			verticesOnPlane.push_back(rotatedCoord);
+			oriVerticesOnPlane.push_back(vertex);
 		}
+
 		if(verticesOnPlane.empty()){continue;}
+//		if(verticesOnPlane.size()<3) {continue;} //Only calculate volume/inertia for faces with three or more vertices
+		if(verticesOnPlane.size()<3) {std::cout<<"Face: "<<j<<" has less than 3 vertices! Check particle geometry"<<endl;}
 
 		/* REORDER VERTICES counterclockwise positive*/
-		h = 0; k = 1; m = 2;
+		h = 0; kk = 1; m = 2;
 		pt1 = verticesOnPlane[h];
-		pt2 = verticesOnPlane[k];
+		pt2 = verticesOnPlane[kk];
 		pt3 = verticesOnPlane[m];
 		orderedVerticesOnPlane.push_back(pt1); oriOrderedVerticesOnPlane.push_back(oriVerticesOnPlane[0]);
 		counter = 1;
@@ -314,29 +411,42 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 		while(counter<verticesOnPlane.size()){
 			while (m<verticesOnPlane.size()){
 				pt1 = verticesOnPlane[h];
-				pt2 = verticesOnPlane[k];
+				pt2 = verticesOnPlane[kk];
 				pt3 = verticesOnPlane[m];
 				if (getSignedArea(pt1,pt2,pt3) < 0.0){
 					/* clockwise means 3rd point is better than 2nd */
-					k=m; /*3rd point becomes 2nd point */
-					pt2 = verticesOnPlane[k];
+					kk=m; /*3rd point becomes 2nd point */
+					pt2 = verticesOnPlane[kk];
 
 				}/* else counterclockwise is good.  We need to find and see whether there is a point(3rd point) better than the 2nd point */
 				/* advance m */
 				m=m+1;
-				while(m==h || m==k){ m=m+1; }
+				while(m==h || m==kk){ m=m+1; }
 			}
-			//std::cout<<"h: "<<h<<", k :"<<k<<", m: "<<m<<endl;
+			//std::cout<<"h: "<<h<<", kk :"<<kk<<", m: "<<m<<endl;
 			orderedVerticesOnPlane.push_back(pt2);
-			oriOrderedVerticesOnPlane.push_back(oriVerticesOnPlane[k]);
-			h=k;
-			/* advance k */
-			k=0;
-			while(k==h ){ k=k+1; }
+			oriOrderedVerticesOnPlane.push_back(oriVerticesOnPlane[kk]);
+
+			h=kk;
+			/* advance kk */
+			kk=0;
+			while(kk==h ){ kk=kk+1; }
 			/* advance m */
 			m=0;
-			while(m==h || m==k){ m=m+1; }
+			while(m==h || m==kk){ m=m+1; }
 			counter++;
+		}
+
+		/* Save the IDs of the vertices of each face in an ordered sequence. Can be used to triangulate each face */
+		std::vector<int> tempPlanes=planeStruct[j].vertexID;
+
+		planeStruct[j].vertexID.clear();
+		for (unsigned int i=0; i<oriOrderedVerticesOnPlane.size(); i++){
+			for (unsigned int n=0; n<vertices.size(); n++){
+				if( vertices[n][0]==oriOrderedVerticesOnPlane[i][0] and vertices[n][1]==oriOrderedVerticesOnPlane[i][1] and vertices[n][2]==oriOrderedVerticesOnPlane[i][2]  ) {
+					planeStruct[j].vertexID.push_back(n);
+				}
+			}
 		}
 
 		vertexOnPlane = Eigen::MatrixXd(orderedVerticesOnPlane.size()+1,2);
