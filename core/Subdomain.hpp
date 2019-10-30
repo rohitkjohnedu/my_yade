@@ -166,7 +166,7 @@ class Subdomain: public Shape {
 	void mpiIrecvStates(unsigned otherSubdomain){
 		if (mirrorIntersections.size() <= otherSubdomain) LOG_ERROR("inconsistent size of mirrorIntersections and/or stateBuffer");
 		if (stateBuffer.size() <= otherSubdomain) stateBuffer.resize(otherSubdomain+1);
-		if (mpiReqs.size() <= otherSubdomain) mpiReqs.resize(otherSubdomain+1);		
+		if (mpiReqs.size() <= otherSubdomain) mpiReqs.resize(otherSubdomain+1);
 		
 		const vector<Body::id_t>& b_ids = mirrorIntersections[otherSubdomain];
 		unsigned nb = b_ids.size()*13;
@@ -257,9 +257,9 @@ class Subdomain: public Shape {
 	bool bodiesSet = false;  // flag 
 	
 	// Geometry and other helper functions
-	Real boundOnAxis(Bound& b, Vector3r direction, bool min); //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
+	Real boundOnAxis(Bound& b, Vector3r direction, bool min) const; //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
 	
-	Vector3r centerOfMass() {
+	Vector3r centerOfMass() const {
 		Vector3r center(0,0,0); Real mass=0;
 		const shared_ptr<Scene>& scene= Omega::instance().getScene();
 		for (unsigned k=0; k<ids.size(); k++) {
@@ -270,9 +270,37 @@ class Subdomain: public Shape {
 		return center*(1/mass);
 	}
 	// Count interactions of a body with given subdomain
-	unsigned countIntsWith(Body::id_t body, Body::id_t someSubD, const shared_ptr<Scene>& scene ) const {
+	unsigned countIntsWith(Body::id_t body, Body::id_t someSubD, const shared_ptr<Scene>& scene) const {
+		if (not Body::byId(body,scene)) {LOG_WARN("invalid body id"); return 0;}
 		const auto& intrs=Body::byId(body,scene)->intrs;
-		return std::count_if(intrs.begin(), intrs.end(), [&](auto i){return (Body::byId(i.first,scene)->subdomain == someSubD and not Body::byId(i.first,scene)->getIsSubdomain());});
+		return std::count_if(intrs.begin(), intrs.end(), [&](auto i){assert(scene->bodies->exists(i.first)); return (Body::byId(i.first,scene)->subdomain == someSubD and not Body::byId(i.first,scene)->getIsSubdomain());});
+	}
+	
+	vector<Body::id_t> filteredInts(Body::id_t someSubD, bool mirror) const {
+		auto& intrs = mirror ?  mirrorIntersections[someSubD] : intersections[someSubD];
+		std::vector<Body::id_t> filtered;
+		const shared_ptr<Scene>& scene= Omega::instance().getScene();
+		std::copy_if (intrs.begin(), intrs.end(), std::back_inserter(filtered), [&](auto i){return (this->countIntsWith(i,mirror? scene->subdomain : someSubD, scene)>0);} );
+		return filtered;
+	}
+	
+	double filterIntersections(const shared_ptr<Scene>& scene) {
+		// we don't touch intersections with zero yet, unsure it would work directly as it's a bit special
+		assert(intersections.size()==mirrorIntersections.size());
+		assert(scene->subdomain>0);// this function should not be called by master
+		unsigned oldNum(0), newNum(0);
+		for (unsigned subd=1; subd< intersections.size(); subd++) if (Body::id_t(subd)!=scene->subdomain) {
+			// PLEASE DON'T REMOVE THOSE COMMENTED DEBUG MESSAGES 
+// 			unsigned oldI(intersections[subd].size()), oldM(mirrorIntersections[subd].size());
+			oldNum+=intersections[subd].size();
+			mirrorIntersections[subd]=filteredInts(subd,true);
+			intersections[subd]=filteredInts(subd,false);
+			newNum+=intersections[subd].size();
+// 			LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<(oldI-intersections[subd].size())<<" / "<<oldI<<"  vs. "<<subd);
+// 			LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<(oldM-mirrorIntersections[subd].size())<<" / "<<oldM<<" from "<<subd);
+		}
+		LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<oldNum-newNum<<" / "<<oldNum);
+		return (oldNum ? (oldNum-newNum)/double(oldNum) : 0); //return overall ratio of removed elements (low means useless)
 	}
 		
 	// clang-format off
@@ -312,6 +340,8 @@ class Subdomain: public Shape {
 		.def("boundOnAxis", &Subdomain::boundOnAxis,(boost::python::arg("bound"),boost::python::arg("axis"),boost::python::arg("min")), "computes projected position of a bound in a certain direction")
 		.def("centerOfMass", &Subdomain::centerOfMass, "returns center of mass of assigned bodies")
 		.def("countIntsWith", &Subdomain::countIntsWith, (boost::python::arg("body"),boost::python::arg("someSubDomain"),boost::python::arg("someSubDomain")=Omega::instance().getScene()), "returns for a body the count of interactions (real or virtual) with bodies from a certain subdomain, interactions with subdomains excluded. Third parameter (scene pointer) can be left to default (equivalent to O._sceneObj).")
+		.def("filteredInts", &Subdomain::filteredInts, (boost::python::arg("someSubDomain"),boost::python::arg("mirror")), "return a copy of intersections or mirrorIntersections from which non-interacting bodies have been removed.")
+		.def("filterIntersections", &Subdomain::filterIntersections,(boost::python::arg("someSubDomain")=Omega::instance().getScene()),"clear intersections and mirror intersections of all non-interacting bodies.")
 	);
 	// clang-format on
 	DECLARE_LOGGER;

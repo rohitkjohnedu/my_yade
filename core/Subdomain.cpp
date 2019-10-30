@@ -177,7 +177,7 @@ void Subdomain::setCommunicationContainers() {
 	recvRanks.clear(); sendContainer.clear();
 	unsigned int zero = 0;
 	for (unsigned int i=1; i != intersections.size(); ++i){
-		if ((intersections[i].size()== zero) || (i == static_cast<unsigned int>(subdomainRank))){continue ; } // exclude self or if no intersections with others)
+		if ((intersections[i].size()== zero) || (i == (unsigned) subdomainRank)){continue ; } // exclude self or if no intersections with others)
 		shared_ptr<MPIBodyContainer> container(shared_ptr<MPIBodyContainer> (new MPIBodyContainer()));
 		container->subdomainRank = subdomainRank;  // used to identify the origin rank at the reciever side. (maybe not needed?)
 		std::string containerString = fillContainerGetString(container, intersections[i]);
@@ -199,7 +199,7 @@ void Subdomain::sendContainerString() {
 	for (unsigned int i=0; i != sendContainer.size(); ++i) {
 	  MPI_Request request;
 	  sendString(sendContainer[i].first, sendContainer[i].second, TAG_STRING+sendContainer[i].second, request);
-	  mpiReqs.push_back(request);
+	  mpiReqs.push_back(request);//FIXME will not work since we access by index...
 	}
 }
 
@@ -475,7 +475,7 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 	if (subdomainRank != master){ rcharBuff.clear(); } // assuming master alwasy recieves from workers, hence the size of this vector for master is fixed.
 }
 
-Real Subdomain::boundOnAxis(Bound& b, Vector3r direction, bool min) //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
+Real Subdomain::boundOnAxis(Bound& b, Vector3r direction, bool min) const //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
 {
 	Vector3r size = b.max-b.min;
 	Real extremum = 0;
