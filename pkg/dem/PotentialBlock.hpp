@@ -36,7 +36,6 @@ class PotentialBlock : public Shape {
 		void calculateVertices();
 		void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
 
-	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialBlock,Shape,"Geometry of PotentialBlock.",
 		((bool, isLining, false,, "Whether particle is part of tunnel lining (used in the RockLining.cpp script)"))
 		((double, liningStiffness, pow(10.0,8),, "Lining stiffness"))
@@ -62,8 +61,9 @@ class PotentialBlock : public Shape {
 		((Real, r, 0.0,, "r in Potential Particles"))
 		((Real, R, 0.0,, "R in Potential Particles. If left zero, a default value is calculated as half the distance of the farthest vertices"))
 		((Real, k, 0.0,, "k in Potential Particles (not used)"))
-		((Real, volume, ,, "Volume"))
-		((Vector3r, inertia, Vector3r::Zero(),, "Principal inertia tensor"))
+		((Real, volume, ,, "Volume |yupdate|"))
+		((Vector3r, inertia, Vector3r::Zero(),, "Principal inertia tensor |yupdate|"))
+		((Vector3r, position, Vector3r::Zero(),, "Initial position of the particle, if initially defined eccentrically to the centroid |yupdate|"))
 		((Quaternionr, orientation, Quaternionr::Identity(),, "Principal orientation"))
 		((int, id, -1,, "Particle id (for graphics in vtk output)")) //TODO: Check if we can use the body id instead in all instances and delete this attribute
 		((bool, erase, false,, "Parameter to mark particles to be removed (for excavation)"))
@@ -84,7 +84,7 @@ class PotentialBlock : public Shape {
 //			((vector<double>, ks, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
 //			((vector<double>, heatCapacity, ,Attr::hidden, "Property for plane, rock joint"))
 //			((vector<double>, rFactor, ,Attr::hidden, "(not used), individual factor for r"))
-		((vector<Vector3r>, vertices,,,"Vertices"))
+		((vector<Vector3r>, vertices, ,(Attr::readonly),"Vertices |yupdate|"))
 		//((Eigen::MatrixXd , Amatrix, ,, "a "))
 		//((Eigen::MatrixXd , Dmatrix, ,, "b "))
 //			((double, waterVolume, ,, "volume of body submerged in water"))
@@ -93,6 +93,7 @@ class PotentialBlock : public Shape {
 		((vector<double>, b, ,, "List of b coefficients of plane normals"))
 		((vector<double>, c, ,, "List of c coefficients of plane normals"))
 		((vector<double>, d, ,, "List of d coefficients of plane equations"))
+		((vector<vector<int> >, connectivity, ,(Attr::readonly), "Connectivity of vertices for each plane |yupdate|"))
 		, /*ctor*/
 		createIndex();
 		#if 0
@@ -102,7 +103,6 @@ class PotentialBlock : public Shape {
 	 	}
 		#endif
 	);
-	// clang-format on
 	//#endif
 	REGISTER_CLASS_INDEX(PotentialBlock,Shape);
 };
