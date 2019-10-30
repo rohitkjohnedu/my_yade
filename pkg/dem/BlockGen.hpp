@@ -122,8 +122,8 @@ class BlockGen : public FileGenerator {
 			Vector3r color;
 		};
 
-		double getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
-		double getDet(const Eigen::MatrixXd A);
+//			double getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
+//			double getDet(const Eigen::MatrixXd A);
 		bool createBlock(shared_ptr<Body>& body, struct BlockGen::Block block, int no);
 		bool contactDetectionLPCLPglobal(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
 		bool checkRedundancyLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
@@ -138,11 +138,11 @@ class BlockGen : public FileGenerator {
 //			bool contactBoundaryLPCLPslack(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
 //			Real evaluateFNoSphere(struct Block block, Vector3r presentTrial); //not used
 
-		void calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
-		Vector3r calCentroid(struct Block block, double & blockVol);
+//			void calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
+//			Vector3r calCentroid(struct Block block, double & blockVol);
+
 		bool checkCentroid(struct Block block, Vector3r presentTrial);
 
-	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
 		BlockGen,FileGenerator,"Prepare a scene for Block Generation using the Potential Blocks."
 		,
@@ -194,7 +194,7 @@ class BlockGen : public FileGenerator {
 //			((Real, subdivisionRatio,0.1,,"smallest size/boundary of octree algorithms"))
 		/* Set up GlobalStiffnessTimeStepper */
 		((bool, useGlobalStiffnessTimeStepper,false,,"Whether to use :yref:`GlobalStiffnessTimeStepper`"))
-		((Real, defaultDt,-1,,"Max time-step. Used as initial value if defined. Latter adjusted by the time stepper"))
+		((Real, defaultDt,-1,,"Max time-step. Used as initial value if defined. Later adjusted by the time stepper"))
 		((int, timeStepUpdateInterval,50,,"Interval for :yref:`GlobalStiffnessTimeStepper`"))
 		/* which contact law to use */
 //			((bool, useBartonBandis,false,,"not used"))  // not used: To be deleted (or better, developed) in the future
@@ -203,9 +203,9 @@ class BlockGen : public FileGenerator {
 
 		/* Add joints from python*/
 		((vector<double>, joint_a, ,,"Introduce discontinuities from Python: List of a coefficients of plane normals"))
-		((vector<double>, joint_b, ,,"Introduce discontinuities from Python: List of a coefficients of plane normals"))
-		((vector<double>, joint_c, ,,"Introduce discontinuities from Python: List of a coefficients of plane normals"))
-		((vector<double>, joint_d, ,,"Introduce discontinuities from Python: List of a coefficients of plane equations"))
+		((vector<double>, joint_b, ,,"Introduce discontinuities from Python: List of b coefficients of plane normals"))
+		((vector<double>, joint_c, ,,"Introduce discontinuities from Python: List of c coefficients of plane normals"))
+		((vector<double>, joint_d, ,,"Introduce discontinuities from Python: List of d coefficients of plane equations"))
 
 		/* Add joints from .csv files: Check for different joint types */
 		((bool, persistentPlanes,false,,"Whether to check persistence"))
@@ -237,7 +237,6 @@ class BlockGen : public FileGenerator {
 		, /* py */
 		//.def("setContactProperties",&TriaxialCompressionEngine::setContactProperties,"Assign a new friction angle (degrees) to dynamic bodies and relative interactions")
 		 );
-	// clang-format on
 	DECLARE_LOGGER;
 };
 
