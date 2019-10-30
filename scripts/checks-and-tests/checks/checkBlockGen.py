@@ -35,7 +35,7 @@ if ('PotentialBlocks' in features):
 	p.boundarySizeXmin = 20.0; #South
 	p.boundarySizeXmax = 20.0; #North
 	p.boundarySizeYmin = 20.0; #West
-	p.boundarySizeYmax = 20.0; #East 4100
+	p.boundarySizeYmax = 20.0; #East
 	p.boundarySizeZmin =  0.0; #Up
 	p.boundarySizeZmax = 40.0; #Down
 	p.persistentPlanes = False
@@ -93,8 +93,8 @@ if ('PotentialBlocks' in features):
 	d = sum(len(b.shape.d) for b in O.bodies )
 
 	average=(a+b+c+d)/4.
-	if a!=average or b!=average or c!=average or c!=average or a!=41: #41 faces of all bodies
-		errMsg+=str( "Wrong calculation of faces of all the generated blocks: " + str(average)+" , instead of: "+ str(41) +"\n" ) #The planes should have the same size of a,b,c,d vectors
+	if a!=average or b!=average or c!=average or c!=average or a!=32: #32 faces of all bodies
+		errMsg+=str( "Wrong calculation of faces of all the generated blocks: " + str(average)+" , instead of: "+ str(32) +"\n" ) #The planes should have the same size of a,b,c,d vectors
 		errors += 1
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
