@@ -299,7 +299,7 @@ class Subdomain: public Shape {
 // 			LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<(oldI-intersections[subd].size())<<" / "<<oldI<<"  vs. "<<subd);
 // 			LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<(oldM-mirrorIntersections[subd].size())<<" / "<<oldM<<" from "<<subd);
 		}
-		LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<oldNum-newNum<<" / "<<oldNum);
+// 		LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<oldNum-newNum<<" / "<<oldNum);
 		return (oldNum ? (oldNum-newNum)/double(oldNum) : 0); //return overall ratio of removed elements (low means useless)
 	}
 		

@@ -120,6 +120,7 @@ from yade import *
 from yade.utils import *
 from yade.wrapper import *
 import yade.runtime
+from yade import timing; timing.mpi={} #prepare a dictionnary for mpi-related stats
 
 # for coloring bodies
 import colorsys
@@ -130,6 +131,7 @@ def makeColorScale(n=numThreads):
 	random.seed(1)
 	shuffle(scale)
 	return scale
+
 
 colorScale= makeColorScale(numThreads)
 
@@ -161,7 +163,7 @@ def initialize(np):
 			yade.runtime.opts.mpi_mode=True
 			rank=0
 		else:	#WORKERS
-			wprint("Hello, I'm worker "+str(rank))
+			mprint("spawned")
 		#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
 		O.subD=Subdomain() #for storage and comm only, this one will not be used beyond that 
 		O.subD.comm = comm
@@ -235,6 +237,21 @@ def probeRecvMessage(source, tag):
 	comm.Recv([data, MPI.BYTE], source=source, tag=tag)
 	return data
 
+###  TIMING ###
+
+def recordMpiTiming(name,val):
+	'''
+	append val to a list of values defined by 'name' in the dictionnary timing.mpi
+	'''
+	if not name in yade.timing.mpi.keys(): yade.timing.mpi[name]=[]
+	yade.timing.mpi[name].append(val)
+	
+def mpiStats():
+	if (waitingCommands and rank==0): sendCommand(list(range(1,numThreads)),"mpiStats()")
+	dat = yade.timing.mpi
+	dat = comm.gather(dat,root=0)
+	return dat
+yade.timing.mpiStats=mpiStats
 
 class Timing_comm():
 	def __init__(self):
@@ -325,34 +342,34 @@ def shrinkIntersections():
 	'''
 	O.subD.fullIntersections = O.subD.intersections
 	O.subD.fullMirrorIntersections = O.subD.mirrorIntersections
-	if (rank==0): return
+	if (rank==0): return 0,0
 	res=O.subD.filterIntersections()
+	oriLen=sum([len(c) for c in O.subD.intersections])
 	reqs=[]
 	for other in O.subD.intersections[rank]:
 			if other==0: continue
 			reqs.append([other,comm.irecv(None, other, tag=_MIRROR_INTERSECTIONS_)])
 			comm.send(O.subD.intersections[other],dest=other,tag=_MIRROR_INTERSECTIONS_)
 	ints = O.subD.mirrorIntersections
+	
 	for r in reqs:
 		ints[r[0]]=r[1].wait()
 		if ints[r[0]]!=O.subD.mirrorIntersections[r[0]]:
-			mprint("inconsistency in the filtering of intersections[",r[0],"]:",len(ints[r[0]]),"received vs.",len(O.subD.mirrorIntersections[r[0]]))
+			wprint("inconsistency in the filtering of intersections[",r[0],"]:",len(ints[r[0]]),"received vs.",len(O.subD.mirrorIntersections[r[0]]))
 	O.subD.mirrorIntersections = ints #that's because python wrapping only enable assignment
-	return res
-				
+	return res,oriLen
+
 def checkAndCollide():
 	'''
 	return true if collision detection needs activation in at least one SD, else false. If COPY_MIRROR_BODIES_WHEN_COLLIDE run collider when needed, and in that case return False.
 	'''
 	global _REALLOC_COUNT
-	comm.barrier()
 	needsCollide = int(utils.typedEngine("InsertionSortCollider").isActivated())
 	if(needsCollide!=0):
 		wprint("triggers collider at iter "+str(O.iter))
 	needsCollide = timing_comm.allreduce("checkcollider",needsCollide,op=MPI.SUM)
 	if needsCollide:
 		if(COPY_MIRROR_BODIES_WHEN_COLLIDE):
-			mprint("barrierX"); comm.barrier(); mprint("_______"); 
 			if MINIMAL_INTERSECTIONS:
 				if hasattr(O.subD,"fullIntersections"): # if we have tricked intersections in previous steps we set them backto full content in order to update all positions before colliding
 					O.subD.intersections = O.subD.fullIntersections
@@ -361,9 +378,7 @@ def checkAndCollide():
 					sendRecvStates() # triggers comm
 			
 			# parallel collision detection (incl. insertion of newly intersecting bodies)
-			mprint("barrierY"); comm.barrier(); mprint("_______"); 
 			parallelCollide()
-			mprint("barrierZ"); comm.barrier(); mprint("_______"); 
 			# reallocate and/or minimize intersections
 			if REALLOCATE_FREQUENCY>0:
 				_REALLOC_COUNT+=1
@@ -371,13 +386,14 @@ def checkAndCollide():
 					#comm.barrier() #we will modify intersections while they can still be accessed by calls to mpi in parallelCollide()
 					if (MINIMAL_INTERSECTIONS and REALLOCATE_MINIMAL):
 						r=shrinkIntersections() #if we filter before reallocation we minimize the reallocations
-						mprint("filtered out (1)",r)
+						#mprint("filtered out (1)",r[0],"of",r[1])
 					reallocateBodiesToSubdomains(REALLOCATE_FILTER)
 					_REALLOC_COUNT=0
 			if (MINIMAL_INTERSECTIONS): #filter here, even if already done before, since realloc updated intersections
 				#if rank>0:
 				r=shrinkIntersections()
-				mprint("filtered out (2)",r)
+				recordMpiTiming("filteredInts",r[0]); recordMpiTiming("totInts",r[1]); recordMpiTiming("interactionsInts",len(O.interactions)); recordMpiTiming("iterInts",O.iter)
+				#mprint("filtered out (2)",r[0],"of",r[1])
 			return False
 		else: return True
 	return False
@@ -537,8 +553,11 @@ def genUpdatedStates(b_ids):
 
 #############   COMMUNICATIONS   ################"
 
+statesCommTime=0
+
 def sendRecvStates():
-	mprint("barrier1"); comm.barrier(); mprint("_______"); 
+	global statesCommTime
+	start=time.time()
 	#____1. get ready to receive positions from other subdomains
 	pstates = []
 	buf = [] #heuristic guess, assuming number of intersecting is ~linear in the number of rows, needs
@@ -546,23 +565,17 @@ def sendRecvStates():
 	if rank!=0: #the master process never receive updated states (except when gathering)
 		for otherDomain in O.subD.intersections[rank]:
 			if len(O.subD.mirrorIntersections[otherDomain])==0:
-				mprint("skip recv from ",otherDomain)
 				continue #can happen if MINIMAL_INTERSECTIONS
-			mprint( str(": getting states from ")+str(otherDomain))
 			if not USE_CPP_MPI:
 				buf.append(bytearray(1<<22)) #FIXME: smarter size? this is for a few thousands states max (empirical); bytearray(1<<24) = 128 MB 
 				pstates.append( comm.irecv(buf[-1],otherDomain, tag=_ID_STATE_SHAPE_))  #warning leaving buffer size undefined crash for large subdomains (MPI_ERR_TRUNCATE: message truncated)
 			else:
-				mprint(" O.subD.mpiIrecvStates()",otherDomain)
 				O.subD.mpiIrecvStates(otherDomain) #use yade's messages (coded in cpp)
-				mprint(" O.subD.mpiIrecvStates() got from ",otherDomain)
-	mprint("barrier2"); comm.barrier(); mprint("_______"); 
 	#____2. broadcast new positions (should be non-blocking if n>2, else lock) - this includes subdomain bodies intersecting the current one	
 	reqs=[]
 	for k in O.subD.intersections[rank]:
 		if k==rank or k==0: continue #don't broadcast to itself... OTOH this list intersections[rank] will be used to receive
 		if len(O.subD.intersections[k])==0:
-			mprint("skip sending to ",k)
 			continue #can happen if MINIMAL_INTERSECTIONS
 		#if len(b_ids)>0:#skip empty intersections, it means even the bounding boxes of the corresponding subdomains do not overlap
 		wprint("sending "+str(len(O.subD.intersections[k]))+" states to "+str(k))
@@ -576,7 +589,6 @@ def sendRecvStates():
 	for r in reqs: r.wait() #empty if USE_CPP_MPI
 		
 	#____3. receive positions and update bodies
-	mprint("barrier3"); comm.barrier(); mprint("_______"); 
 	
 	if rank==0: return #positions sent from master, done. Will receive forces instead of states
 	if not USE_CPP_MPI:
@@ -594,7 +606,7 @@ def sendRecvStates():
 			if len(O.subD.mirrorIntersections[otherDomain])==0: continue #can happen if MINIMAL_INTERSECTIONS
 			O.subD.mpiWaitReceived(otherDomain)
 			O.subD.setStateValuesFromBuffer(otherDomain)
-	mprint("done sendRecvSt"); 
+	statesCommTime+=(time.time()-start)
 
 def isendRecvForces():
 	'''
@@ -846,7 +858,6 @@ def updateAllIntersections():
 bodiesToImport=[]
 
 def parallelCollide():
-	mprint("barrierA"); comm.barrier(); mprint("_______"); 
 	global bodiesToImport
 	subD=O.subD
 	start = time.time()
@@ -859,7 +870,6 @@ def parallelCollide():
 	collider.__call__() #see [1]
 	unboundRemoteBodies() #in splitted stage we exploit bounds to detect bodies which are no longer part of intersections (they will be left with no bounds after what follows)
 	updateAllIntersections()  #triggers communications
-	mprint("barrierB"); comm.barrier(); mprint("_______"); 
 	if rank!=0:
 		for l in subD.mirrorIntersections:
 			if len(l)>0:
@@ -902,14 +912,11 @@ def parallelCollide():
 				if(len(requestedIds)>0):
 					wprint("I will now send ",len(requestedIds)," to ",worker)
 					subD.sendBodies(worker,requestedIds)
-		mprint("barrierC"); comm.barrier(); mprint("_______"); 
 		for worker in requestedSomethingFrom:
 			subD.receiveBodies(worker)
 		for s in sent:
 			s.wait()
-		mprint("barrierD"); comm.barrier(); mprint("_______"); 
 		subD.completeSendBodies();
-		mprint("barrierE"); comm.barrier(); mprint("_______"); 
 		
 	if not collider.keepListsShort: collider.doSort = True
 	collider.__call__()
@@ -1000,6 +1007,7 @@ def mpirun(nSteps,np=None,withMerge=False):
 		if numThreads==1: initialize(np) #this will set numThreads
 		else: mprint("number of mpy cores can't be increased when already initialized")
 	if(rank==0 and not caller_name=='execfile'): #if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
+		waitingCommands=True
 		for w in range(1,numThreads):
 			comm.send("yade.mpy.mpirun(nSteps="+str(nSteps)+",withMerge="+str(withMerge)+")",dest=w,tag=_MASTER_COMMAND_)
 			wprint("Command sent to ",w)
