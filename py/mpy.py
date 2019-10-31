@@ -287,6 +287,10 @@ class Timing_comm():
 		return comm.send(*args,**kwargs)
 	
 	@enable_timing
+	def recv(self, *args, **kwargs):
+		return comm.recv(*args,**kwargs)
+	
+	@enable_timing
 	def bcast(self, *args, **kwargs):
 		return comm.bcast(*args,**kwargs)
 	
@@ -305,6 +309,14 @@ class Timing_comm():
 	@enable_timing
 	def Allgather(self, *args, **kwargs):
 		return comm.Allgather(*args, **kwargs)
+	 #this is to time the cpp messages
+	@enable_timing
+	def mpiWaitReceived(self,*args, **kwargs):
+		return O.subD.mpiWaitReceived(*args, **kwargs)
+	
+	@enable_timing
+	def mpiSendStates(self,*args, **kwargs):
+		return O.subD.mpiSendStates(*args, **kwargs)
 
 timing_comm = Timing_comm()
 
@@ -327,7 +339,7 @@ def receiveForces(subdomains):
 				O.forces.addT(ft[0],ft[2])
 	else:
 		for sd in subdomains:
-			forces=comm.recv(source=sd, tag=_FORCES_)
+			forces=timing_comm.recv("isendRecvForces",source=sd, tag=_FORCES_)
 			#wprint( "master got forces from "+str(sd)+": "+str(forces)+" iter="+str(O.iter)+" dt="+str(O.dt))
 			for ft in forces:
 				#wprint(  "adding force "+str(ft[1])+" to body "+str(ft[0]))
@@ -580,12 +592,12 @@ def sendRecvStates():
 		#if len(b_ids)>0:#skip empty intersections, it means even the bounding boxes of the corresponding subdomains do not overlap
 		wprint("sending "+str(len(O.subD.intersections[k]))+" states to "+str(k))
 		if not OPTIMIZE_COM:
-			comm.send(genUpdatedStates(O.subD.intersections[k]), dest=k, tag=_ID_STATE_SHAPE_) #should be non-blocking if n>2, else lock?
+			timing_comm.send("sendRecvStates",genUpdatedStates(O.subD.intersections[k]), dest=k, tag=_ID_STATE_SHAPE_) #should be non-blocking if n>2, else lock?
 		else:
 			if not USE_CPP_MPI:
 				reqs.append(comm.isend(O.subD.getStateValues(k), dest=k, tag=_ID_STATE_SHAPE_)) #should be non-blocking if n>2, else lock?
 			else:
-				O.subD.mpiSendStates(k)
+				timing_comm.mpiSendStates("mpiSendStates",k)
 	for r in reqs: r.wait() #empty if USE_CPP_MPI
 		
 	#____3. receive positions and update bodies
@@ -604,7 +616,7 @@ def sendRecvStates():
 		
 		for otherDomain in O.subD.intersections[rank]:
 			if len(O.subD.mirrorIntersections[otherDomain])==0: continue #can happen if MINIMAL_INTERSECTIONS
-			O.subD.mpiWaitReceived(otherDomain)
+			timing_comm.mpiWaitReceived("mpiWaitReceived(States)",otherDomain)
 			O.subD.setStateValuesFromBuffer(otherDomain)
 	statesCommTime+=(time.time()-start)
 
@@ -619,7 +631,7 @@ def isendRecvForces():
 			forces0=[[id,O.forces.f(id),O.forces.t(id)] for id in  O.subD.mirrorIntersections[0]]
 			#wprint ("worker "+str(rank)+": sending "+str(len(forces0))+" "+str("forces to 0 "))
 			#O.freqs.append(comm.isend(forces0, dest=0, tag=_FORCES_))
-			comm.send(forces0, dest=0, tag=_FORCES_)
+			timing_comm.send("isendRecvForces",forces0, dest=0, tag=_FORCES_)
 		else: #master
 			receiveForces(O.subD.intersections[0])
 
@@ -715,7 +727,7 @@ def splitScene():
 		
 		maxid = len(O.bodies)-1
 		if DISTRIBUTED_INSERT: #find max id before inserting subdomains
-			maxid = comm.allreduce(maxid,op=MPI.MAX)
+			maxid = timing_comm.allreduce("splitScene",maxid,op=MPI.MAX)
 			wprint("Splitting with maxId=",maxid)
 			
 		if rank == 0 or DISTRIBUTED_INSERT:
@@ -747,7 +759,7 @@ def splitScene():
 			#END Garbage
 		if not DISTRIBUTED_INSERT: #we send scene from master to all workers
 			sceneAsString= O.sceneToString() if rank==0 else None
-			sceneAsString=comm.bcast(sceneAsString,root=0)
+			sceneAsString=timing_comm.bcast("splitScene",sceneAsString,root=0)
 			if rank > 0: 
 				O.stringToScene(sceneAsString) #receive a scene pre-processed by master (i.e. with appropriate body.subdomain's)  
 				# as long as subD.subdomains isn't serialized we need to rebuild it here since it's lost
@@ -809,7 +821,7 @@ def updateAllIntersections():
 			timing_comm.send("sendIntersections",m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
 	else:
 		# from master
-		b_ids=comm.recv(source=0, tag=_MIRROR_INTERSECTIONS_)
+		b_ids=timing_comm.recv("updateAllIntersections",source=0, tag=_MIRROR_INTERSECTIONS_)
 		wprint("Received mirrors from master: ",len(b_ids))
 		#FIXME: we are assuming that Body::id_t is 4 bytes here, not that portable...
 		numInts0= int(len(b_ids)/4) if SEND_BYTEARRAYS else len(b_ids)  #ints = 4 bytes
@@ -844,7 +856,7 @@ def updateAllIntersections():
 			#wprint("sending "+str(len(subD.intersections[worker]))+" states to "+str(worker))
 			wprint("Send mirrors to: ", worker)
 			m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
-			timing_comm.send("splitScene_intersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
+			timing_comm.send("updateAllIntersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
 		for req in reqs:
 			intrs=req[1].wait()
 			wprint("Received mirrors from: ", req[0], " : ",len(np.frombuffer(intrs,dtype=np.int32)))
@@ -907,7 +919,7 @@ def parallelCollide():
 		for worker in subD.intersections[rank]:
 			if worker!=0:
 				wprint("waiting requests from ",worker)
-				requestedIds=comm.recv(source=worker, tag=_MIRROR_INTERSECTIONS_)
+				requestedIds=timing_comm.recv("parallelCollide",source=worker, tag=_MIRROR_INTERSECTIONS_)
 				wprint("requested: ",len(requestedIds),"from ",worker)
 				if(len(requestedIds)>0):
 					wprint("I will now send ",len(requestedIds)," to ",worker)
@@ -1087,7 +1099,7 @@ def runOnSynchronouslPairs(workers,command):
 		
 		while not (connected):
 			if comm.Iprobe(source=MPI.ANY_SOURCE, status=s,tag=_GET_CONNEXION_):
-				data = comm.recv(None,s.source,tag=_GET_CONNEXION_)
+				data = timing_comm.recv("runOnSynchronouslPairs",None,s.source,tag=_GET_CONNEXION_)
 				talkTo = s.source
 				connected = True
 			elif rank>other:
@@ -1106,12 +1118,12 @@ def pairOp(talkTo):
 	# send/recv data 
 	message="haha"
 	comm.isend(message,talkTo,tag=_PAIR_OP_)
-	feedback = comm.recv(None,talkTo,tag=_PAIR_OP_)
+	feedback = timming_comm.recv("pair_op",None,talkTo,tag=_PAIR_OP_)
 	# crunch feedback and numbers...
 	time.sleep(0.01)
 	# send/recv result
 	comm.isend(message,talkTo,tag=_PAIR_OP_)
-	feedback = comm.recv(None,talkTo,tag=_PAIR_OP_)
+	feedback = timing_comm.recv("pair_op",None,talkTo,tag=_PAIR_OP_)
 	print("(",rank,talkTo,") done in",time.time()-t1,"s")
 
 def migrateBodies(ids,origin,destination):
@@ -1205,7 +1217,7 @@ def reallocateBodiesToSubdomains(_filter=medianFilter,blocking=True):
 		if rank>0: req = comm.isend(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
 		else: #master will update subdomains for correct display (besides, keeping 'ids' updated for remote subdomains may not be a strict requirement)
 			for k in range(1,numThreads):
-				ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
+				ids=timing_comm.recv("reallocateBodiesToSubdomains",source=k,tag=_ASSIGNED_IDS_)
 				O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
 				for i in ids: O.bodies[i].subdomain=k
 			if (AUTO_COLOR): colorDomains()
@@ -1226,7 +1238,7 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 		O.subD.intersections=O.subD.intersections[:otherDomain]+[ints]+O.subD.intersections[otherDomain+1:]
 	
 	req = comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
-	comm.send([O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank]],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	timing_comm.send("reallocateBodiesPairWiseBlocking",[O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank]],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
 	newMirror = req.wait()
 	O.subD.mirrorIntersections=O.subD.mirrorIntersections[:otherDomain]+[newMirror[0]]+O.subD.mirrorIntersections[otherDomain+1:]
 	O.subD._centers_of_mass[otherDomain]=newMirror[1]
