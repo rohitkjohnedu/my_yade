@@ -48,15 +48,15 @@ else:
   print("ERROR! choose either spheres or clumps for partType!")
 
 O.dt=1e-6
-kinEnergyMax = 1e-7
 
 # We check the kinetic energy to be sure that the particles are not overlapping and do not explode
-def checkKineticEnergy():
-  if (kineticEnergy() > kinEnergyMax):
+def checkKineticEnergy(lowerBound,upperBound):
+  Ekin=kineticEnergy()
+  if ( Ekin > upperBound or Ekin < lowerBound ):
     O.pause()
-    raise YadeCheckError("Kinetic energy is over a threshold value %E > %E! Error!"%(kineticEnergy(), kinEnergyMax))
+    raise YadeCheckError("Kinetic energy %E is not within bounds from %E to %E! Error!"%( Ekin, lowerBound , upperBound ))
   else:
-    print ("Kinetic energy OK")
+    print ("Kinetic energy OK %E"%(Ekin))
 
 #write some restart files
 with TemporaryDirectory() as tmp_dir:
@@ -64,11 +64,12 @@ with TemporaryDirectory() as tmp_dir:
 
   # Run simulation to check the kinetic energy
   O.run(10, True)
-  checkKineticEnergy()
+  checkKineticEnergy(0.6e-9,1.4e-9)
 
   # Let the object settle
   O.run(100000,True)
   curIter = O.iter
+  checkKineticEnergy(0.07,0.16)
 
   # Save simulation
   O.save(tmp_dir + '/restartMinWorkEx_%s_%d'%(partType,curIter))
@@ -79,4 +80,7 @@ with TemporaryDirectory() as tmp_dir:
 
   # Load simulation
   O.load(tmp_dir + '/restartMinWorkEx_%s_%d'%(partType,curIter))
+  O.run(10,True)
+  checkKineticEnergy(0.07,0.16)
   O.run(1000, True)
+  checkKineticEnergy(0.07,0.16)
