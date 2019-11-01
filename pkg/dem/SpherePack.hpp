@@ -39,7 +39,7 @@ public:
 		Sph(const Vector3r& _c, Real _r, int _clumpId = -1)
 		        : c(_c)
 		        , r(_r)
-		        , clumpId(_clumpId) {};
+		        , clumpId(_clumpId){};
 		boost::python::tuple asTuple() const
 		{
 			if (clumpId < 0)
@@ -55,7 +55,7 @@ public:
 	SpherePack()
 	        : cellSize(Vector3r::Zero())
 	        , appliedPsdScaling(1.)
-	        , isPeriodic(0) {};
+	        , isPeriodic(0){};
 	SpherePack(const boost::python::list& l)
 	        : cellSize(Vector3r::Zero())
 	{
@@ -68,8 +68,8 @@ public:
 	void                fromList(const boost::python::list& l);
 	void                fromLists(const vector<Vector3r>& centers, const vector<Real>& radii); // used as ctor in python
 	boost::python::list toList() const;
-	void                fromFile(const string file);
-	void                toFile(const string file) const;
+	void                fromFile(const string& file);
+	void                toFile(const string& file) const;
 	void                fromSimulation();
 
 	// random generation; if num<0, insert as many spheres as possible; if porosity>0, recompute meanRadius (porosity>0.65 recommended) and try generating this porosity with num spheres.
@@ -120,8 +120,7 @@ public:
 		Real inf = std::numeric_limits<Real>::infinity();
 		mn       = Vector3r(inf, inf, inf);
 		mx       = Vector3r(-inf, -inf, -inf);
-		FOREACH(const Sph& s, pack)
-		{
+		for (const auto& s : pack) {
 			Vector3r r(s.r, s.r, s.r);
 			mn = mn.cwiseMin(s.c - r);
 			mx = mx.cwiseMax(s.c + r);
@@ -137,7 +136,9 @@ public:
 	{
 		Real     sphVol = 0;
 		Vector3r dd     = dim();
-		FOREACH(const Sph& s, pack) sphVol += pow(s.r, 3);
+		for (const Sph& s : pack) {
+			sphVol += pow(s.r, 3);
+		}
 		sphVol *= (4 / 3.) * Mathr::PI;
 		return sphVol / (dd[0] * dd[1] * dd[2]);
 	}
@@ -146,7 +147,12 @@ public:
 	boost::python::tuple getClumps() const;
 
 	// transformations
-	void translate(const Vector3r& shift) { FOREACH(Sph & s, pack) s.c += shift; }
+	void translate(const Vector3r& shift)
+	{
+		for (auto& s : pack) {
+			s.c += shift;
+		}
+	}
 	void rotate(const Vector3r& axis, Real angle)
 	{
 		if (cellSize != Vector3r::Zero()) {
@@ -155,7 +161,9 @@ public:
 		}
 		Vector3r    mid = midPt();
 		Quaternionr q(AngleAxisr(angle, axis));
-		FOREACH(Sph & s, pack) s.c = q * (s.c - mid) + mid;
+		for (auto& s : pack) {
+			s.c = q * (s.c - mid) + mid;
+		}
 	}
 	void rotateAroundOrigin(const Quaternionr& rot)
 	{
@@ -163,14 +171,15 @@ public:
 			LOG_WARN("Periodicity reset when rotating periodic packing (non-zero cellSize=" << cellSize << ")");
 			cellSize = Vector3r::Zero();
 		}
-		FOREACH(Sph & s, pack) s.c = rot * s.c;
+		for (auto& s : pack) {
+			s.c = rot * s.c;
+		}
 	}
 	void scale(Real scale)
 	{
 		Vector3r mid = midPt();
 		cellSize *= scale;
-		FOREACH(Sph & s, pack)
-		{
+		for (auto& s : pack) {
 			s.c = scale * (s.c - mid) + mid;
 			s.r *= std::abs(scale);
 		}

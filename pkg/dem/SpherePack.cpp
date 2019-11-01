@@ -54,31 +54,34 @@ void SpherePack::fromLists(const vector<Vector3r>& centers, const vector<Real>& 
 py::list SpherePack::toList() const
 {
 	py::list ret;
-	FOREACH(const Sph& s, pack) ret.append(s.asTuple());
+	for (const auto& s : pack) {
+		ret.append(s.asTuple());
+	}
 	return ret;
 };
 
-void SpherePack::fromFile(string file)
+void SpherePack::fromFile(const string& file)
 {
 	typedef boost::tuple<Vector3r, Real, int> tupleVector3rRealInt;
 	vector<tupleVector3rRealInt>              ss;
 	Vector3r                                  mn, mx;
 	ss = Shop::loadSpheresFromFile(file, mn, mx, &cellSize);
 	pack.clear();
-	FOREACH(const tupleVector3rRealInt& s, ss) pack.push_back(Sph(boost::get<0>(s), boost::get<1>(s), boost::get<2>(s)));
+	for (const auto& s : ss) {
+		pack.push_back(Sph(boost::get<0>(s), boost::get<1>(s), boost::get<2>(s)));
+	}
 }
 
-void SpherePack::toFile(const string fname) const
+void SpherePack::toFile(const string& fname) const
 {
 	ofstream f(fname.c_str());
-	if (!f.good())
+	if (!f.good()) {
 		throw runtime_error("Unable to open file `" + fname + "'");
+	}
 	if (cellSize != Vector3r::Zero()) {
 		f << "##PERIODIC:: " << cellSize[0] << " " << cellSize[1] << " " << cellSize[2] << endl;
 	}
-	FOREACH(const Sph& s, pack)
-	{
-		//if(s.clumpId>=0) throw std::invalid_argument("SpherePack with clumps cannot be (currently) exported to a text file.");
+	for (const Sph& s : pack) {
 		f << s.c[0] << " " << s.c[1] << " " << s.c[2] << " " << s.r << " " << s.clumpId << endl;
 	}
 	f.close();
@@ -121,7 +124,7 @@ long SpherePack::makeCloud(
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real>> rnd(randGen, boost::uniform_real<Real>(0, 1));
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution
-	Vector3r     size       = mx - mn;
+	const auto   size       = mx - mn;
 	bool         hSizeFound = (hSize != Matrix3r::Zero()); //is hSize passed to the function?
 	if (!hSizeFound) {
 		hSize = size.asDiagonal();
@@ -411,8 +414,7 @@ py::tuple SpherePack::psd(int bins, bool mass) const
 	// volume, but divided by π*4/3
 	Real vol = 0;
 	long N   = pack.size();
-	FOREACH(const Sph& s, pack)
-	{
+	for (const auto& s : pack) {
 		maxD = max(2 * s.r, maxD);
 		minD = min(2 * s.r, minD);
 		vol += pow(s.r, 3);
@@ -429,8 +431,7 @@ py::tuple SpherePack::psd(int bins, bool mass) const
 		edges[i] = minD + i * (maxD - minD) / bins;
 	}
 	// weight each grain by its "volume" relative to overall "volume"
-	FOREACH(const Sph& s, pack)
-	{
+	for (const Sph& s : pack) {
 		int bin = int(bins * (2 * s.r - minD) / (maxD - minD));
 		bin     = min(bin, bins - 1); // to make sure
 		if (mass)
@@ -447,29 +448,30 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 {
 	// recenter given clumps and compute their margins
 	vector<SpherePack> clumps; /* vector<Vector3r> margins; */
-	Vector3r           boxMargins(Vector3r::Zero());
 	Real               maxR = 0;
 	vector<Real>       boundRad; // squared radii of bounding sphere for each clump
-	FOREACH(const shared_ptr<SpherePack>& c, _clumps)
-	{
+	for (const shared_ptr<SpherePack>& c : _clumps) {
 		SpherePack c2(*c);
 		c2.translate(c2.midPt()); //recenter
 		clumps.push_back(c2);
-		Real r                           = 0;
-		FOREACH(const Sph& s, c2.pack) r = max(r, s.c.norm() + s.r);
+		Real r = 0;
+		for (const auto& s : c2.pack) {
+			r = max(r, s.c.norm() + s.r); // find bounds of the pack
+		}
 		boundRad.push_back(r);
 		Vector3r cMn, cMx;
 		c2.aabb(cMn, cMx); // centered at zero now, this gives margin
-		//margins.push_back(periodic?cMx:Vector3r::Zero());
-		//boxMargins=boxMargins.cwise().max(cMx);
-		FOREACH(const Sph& s, c2.pack) maxR = max(maxR, s.r); // keep track of maximum sphere radius
+		for (const auto& s : c2.pack) {
+			maxR = max(maxR, s.r); // keep track of maximum sphere radius
+		}
 	}
 	std::list<ClumpInfo> clumpInfos;
-	Vector3r             size = mx - mn;
-	if (periodic)
-		(cellSize = size);
-	const int maxTry = 200;
-	int       nGen   = 0; // number of clumps generated
+	const auto           sizePack = mx - mn;
+	if (periodic) {
+		cellSize = sizePack;
+	}
+	const auto maxTry = 200;
+	int        nGen   = 0; // number of clumps generated
 	// random point coordinate generator, with non-zero margins if aperiodic
 	static boost::minstd_rand randGen(seed != 0 ? seed : (int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
 	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real>> rnd(randGen, boost::uniform_real<Real>(0, 1));
@@ -496,77 +498,60 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 			if (!periodic) {
 				// check overlap with box margins first
 				if ((pos + rad * Vector3r::Ones()).cwiseMax(mx) != mx || (pos - rad * Vector3r::Ones()).cwiseMin(mn) != mn) {
-					FOREACH(const Sph& s, C.pack)
-					if ((s.c + s.r * Vector3r::Ones()).cwiseMax(mx) != mx
-					    || (s.c - s.r * Vector3r::Ones()).cwiseMin(mn) != mn) goto overlap;
+					for (const auto& s : C.pack) {
+						if ((s.c + s.r * Vector3r::Ones()).cwiseMax(mx) != mx || (s.c - s.r * Vector3r::Ones()).cwiseMin(mn) != mn) {
+							goto overlap;
+						}
+					}
 				}
 				// check overlaps with bounding spheres of other clumps
-				FOREACH(const ClumpInfo& cInfo, clumpInfos)
-				{
+				for (const ClumpInfo& cInfo : clumpInfos) {
 					bool detailedCheck = false;
 					// check overlaps between individual spheres and bounding sphere of the other clump
 					if ((pos - cInfo.center).squaredNorm() < pow(rad + cInfo.rad, 2)) {
-						FOREACH(const Sph& s, C.pack) if (pow(s.r + cInfo.rad, 2) > (s.c - cInfo.center).squaredNorm())
-						{
-							detailedCheck = true;
-							break;
+						for (const auto& s : C.pack) {
+							if (pow(s.r + cInfo.rad, 2) > (s.c - cInfo.center).squaredNorm()) {
+								detailedCheck = true;
+								break;
+							}
 						}
 					}
 					// check sphere-by-sphere, since bounding spheres did overlap
 					if (detailedCheck) {
-						FOREACH(const Sph& s, C.pack)
-						for (int id = cInfo.minId; id <= cInfo.maxId;
-						     id++) if ((s.c - pack[id].c).squaredNorm() < pow(s.r + pack[id].r, 2)) goto overlap;
+						for (const auto& s : C.pack) {
+							for (int id = cInfo.minId; id <= cInfo.maxId; id++) {
+								if ((s.c - pack[id].c).squaredNorm() < pow(s.r + pack[id].r, 2)) {
+									goto overlap;
+								}
+							}
+						}
 					}
 				}
 			} else {
-				FOREACH(const ClumpInfo& cInfo, clumpInfos)
-				{
+				for (const ClumpInfo& cInfo : clumpInfos) {
 					// bounding spheres overlap (in the periodic space)
 					if (periPtDistSq(pos, cInfo.center) < pow(rad + cInfo.rad, 2)) {
 						bool detailedCheck = false;
 						// check spheres with bounding sphere of the other clump
-						FOREACH(const Sph& s, C.pack) if (pow(s.r + cInfo.rad, 2) > periPtDistSq(s.c, cInfo.center))
-						{
-							detailedCheck = true;
-							break;
+						for (const auto& s : C.pack) {
+							if (pow(s.r + cInfo.rad, 2) > periPtDistSq(s.c, cInfo.center)) {
+								detailedCheck = true;
+								break;
+							}
 						}
 						// check sphere-by-sphere
 						if (detailedCheck) {
-							FOREACH(const Sph& s, C.pack)
-							for (int id = cInfo.minId; id <= cInfo.maxId;
-							     id++) if (periPtDistSq(s.c, pack[id].c) < pow(s.r + pack[id].r, 2)) goto overlap;
+							for (const auto& s : C.pack) {
+								for (int id = cInfo.minId; id <= cInfo.maxId; id++) {
+									if (periPtDistSq(s.c, pack[id].c) < pow(s.r + pack[id].r, 2)) {
+										goto overlap;
+									}
+								}
+							}
 						}
 					}
 				}
 			}
-
-#if 0
-			// crude algorithm: check all spheres against all other spheres (slow!!)
-			// use vtkPointLocator, add all existing points and check distance of r+maxRadius, then refine
-			// for periodicity, duplicate points close than boxMargins to the respective boundary
-			if(!periodic){
-				for(size_t i=0; i<C.pack.size(); i++){
-					for(size_t j=0; j<pack.size(); j++){
-						const Vector3r& c(C.pack[i].c); const Real& r(C.pack[i].r);
-						if(pow(r+pack[j].r,2)>=(c-pack[j].c).squaredNorm()) goto overlap;
-						// check that we are not over the box boundary
-						// this could be handled by adjusting the position random interval (by taking off the smallest radius in the clump)
-						// but usually the margin band is relatively small and this does not make the code as hairy 
-						if((c+r*Vector3r::Ones()).cwise().max(mx)!=mx || (c-r*Vector3r::Ones()).cwise().min(mn)!=mn) goto overlap; 
-					}
-				}
-			}else{
-				for(size_t i=0; i<C.pack.size(); i++){
-					for(size_t j=0; j<pack.size(); j++){
-						const Vector3r& c(C.pack[i].c); const Real& r(C.pack[i].r);
-						Vector3r dr;
-						for(int axis=0; axis<3; axis++) dr[axis]=min(cellWrapRel(c[axis],pack[j].c[axis],pack[j].c[axis]+size[axis]),cellWrapRel(pack[j].c[axis],c[axis],c[axis]+size[axis]));
-						if(pow(pack[j].r+r,2)>= dr.squaredNorm()) goto overlap;
-					}
-				}
-			}
-#endif
 
 			// add the clump, if no collisions
 			/*number clumps consecutively*/ ci.clumpId = nGen;
@@ -574,7 +559,9 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 			ci.rad                                     = rad;
 			ci.minId                                   = pack.size();
 			ci.maxId                                   = pack.size() + C.pack.size() - 1;
-			FOREACH(const Sph& s, C.pack) { pack.push_back(Sph(s.c, s.r, ci.clumpId)); }
+			for (const auto& s : C.pack) {
+				pack.push_back(Sph(s.c, s.r, ci.clumpId));
+			}
 			clumpInfos.push_back(ci);
 			nGen++;
 			//cerr<<"O";
@@ -596,8 +583,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 
 bool SpherePack::hasClumps() const
 {
-	FOREACH(const Sph& s, pack)
-	{
+	for (const auto& s : pack) {
 		if (s.clumpId >= 0)
 			return true;
 	}
@@ -618,9 +604,10 @@ py::tuple SpherePack::getClumps() const
 			clumps[s.clumpId] = py::list();
 		clumps[s.clumpId].append(i);
 	}
-	py::list                         clumpList;
-	typedef std::pair<int, py::list> intListPair;
-	FOREACH(const intListPair& c, clumps) clumpList.append(c.second);
+	py::list clumpList;
+	for (const auto& c : clumps) {
+		clumpList.append(c.second);
+	}
 	return py::make_tuple(standalone, clumpList);
 }
 
