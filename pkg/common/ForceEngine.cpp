@@ -10,10 +10,6 @@
 #include<core/IGeom.hpp>
 #include<core/IPhys.hpp>
 
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-
 namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((ForceEngine)(InterpolatingDirectedForceEngine)(RadialForceEngine)(DragEngine)(LinearDragEngine));

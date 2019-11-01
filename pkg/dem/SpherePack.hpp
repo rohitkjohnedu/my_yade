@@ -39,7 +39,7 @@ public:
 		Sph(const Vector3r& _c, Real _r, int _clumpId = -1)
 		        : c(_c)
 		        , r(_r)
-		        , clumpId(_clumpId){};
+		        , clumpId(_clumpId) {};
 		boost::python::tuple asTuple() const
 		{
 			if (clumpId < 0)
@@ -55,7 +55,7 @@ public:
 	SpherePack()
 	        : cellSize(Vector3r::Zero())
 	        , appliedPsdScaling(1.)
-	        , isPeriodic(0){};
+	        , isPeriodic(0) {};
 	SpherePack(const boost::python::list& l)
 	        : cellSize(Vector3r::Zero())
 	{
@@ -95,8 +95,7 @@ public:
 
 	// generate packing of clumps, selected with equal probability
 	// periodic boundary is supported
-	long
-	makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack>>& clumps, bool periodic = false, int num = -1, int seed = 0);
+	long makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack>>& clumps, bool periodic = false, int num = -1);
 
 	// periodic repetition
 	void cellRepeat(Vector3i count);

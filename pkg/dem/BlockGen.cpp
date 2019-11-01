@@ -33,11 +33,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
-// random
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/variate_generator.hpp>
-	#include<pkg/dem/SpherePack.hpp>
+#include<pkg/dem/SpherePack.hpp>
 //#include<pkg/dem/MicroMacroAnalyser.hpp>
 
 #include "BlockGen.hpp"
@@ -46,10 +42,6 @@
 #include<lib/pyutil/gil.hpp>
 
  /* IpOpt */
-
-#include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
-
 
 namespace yade { // Cannot have #include directive inside.
 

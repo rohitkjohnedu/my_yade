@@ -1,18 +1,13 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 
-#include <pkg/dem/SpherePack.hpp>
-
+#include <lib/base/AliasNamespaces.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
+#include <core/Timing.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/Shop.hpp>
-
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/variate_generator.hpp>
-
-#include <lib/base/AliasNamespaces.hpp>
-#include <core/Timing.hpp>
+#include <pkg/dem/SpherePack.hpp>
+#include <random>
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -120,8 +115,11 @@ long SpherePack::makeCloud(
         Matrix3r            hSize)
 {
 	isPeriodic = periodic;
-	static boost::minstd_rand randGen(seed != 0 ? seed : (int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
-	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real>> rnd(randGen, boost::uniform_real<Real>(0, 1));
+
+	std::random_device               rd;
+	std::mt19937                     gen(rd());
+	std::uniform_real_distribution<> dis(0.0, 1.0);
+
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
 	vector<Real> psdCumm2; // psdCumm but dimensionally transformed to match mass distribution
 	const auto   size       = mx - mn;
@@ -235,7 +233,7 @@ long SpherePack::makeCloud(
 		if (num > 0)
 			rand = ((Real)num - (Real)i + 0.5) / ((Real)num + 1.);
 		else
-			rand = rnd();
+			rand = dis(gen);
 		int t;
 		switch (mode) {
 			case RDIST_RMEAN:
@@ -262,11 +260,11 @@ long SpherePack::makeCloud(
 			if (!periodic) {
 				//we handle 2D with the special case size[axis]==0
 				for (int axis = 0; axis < 3; axis++) {
-					c[axis] = mn[axis] + (size[axis] ? (size[axis] - 2 * r) * rnd() + r : 0);
+					c[axis] = mn[axis] + (size[axis] ? (size[axis] - 2 * r) * dis(gen) + r : 0);
 				}
 			} else {
 				for (int axis = 0; axis < 3; axis++) {
-					c[axis] = rnd(); //coordinates in [0,1]
+					c[axis] = dis(gen); //coordinates in [0,1]
 				}
 				c = hSize * c + mn; //coordinates in reference frame (inside the base cell)
 			}
@@ -444,7 +442,7 @@ py::tuple SpherePack::psd(int bins, bool mass) const
 	return py::make_tuple(edges, cumm);
 }
 
-long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack>>& _clumps, bool periodic, int num, int seed)
+long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const vector<shared_ptr<SpherePack>>& _clumps, bool periodic, int num)
 {
 	// recenter given clumps and compute their margins
 	vector<SpherePack> clumps; /* vector<Vector3r> margins; */
@@ -470,21 +468,21 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 	if (periodic) {
 		cellSize = sizePack;
 	}
-	const auto maxTry = 200;
-	int        nGen   = 0; // number of clumps generated
-	// random point coordinate generator, with non-zero margins if aperiodic
-	static boost::minstd_rand randGen(seed != 0 ? seed : (int)TimingInfo::getNow(/* get the number even if timing is disabled globally */ true));
-	static boost::variate_generator<boost::minstd_rand&, boost::uniform_real<Real>> rnd(randGen, boost::uniform_real<Real>(0, 1));
+	const auto                       maxTry = 200;
+	int                              nGen   = 0; // number of clumps generated
+	std::random_device               rd;
+	std::mt19937                     gen(rd());
+	std::uniform_real_distribution<> dis(0.0, 1.0);
 	while (nGen < num || num < 0) {
-		int clumpChoice = (int)(rnd() * (clumps.size() - 1e-20));
+		int clumpChoice = (int)(dis(gen) * (clumps.size() - 1e-20));
 		int tries       = 0;
 		while (true) { // check for tries at the end
 			Vector3r pos(0., 0., 0.);
 			for (int i = 0; i < 3; i++) {
-				pos[i] = rnd() * (mx[i] - mn[i]) + mn[i];
+				pos[i] = dis(gen) * (mx[i] - mn[i]) + mn[i];
 			}
 			// TODO: check this random orientation is homogeneously distributed
-			Quaternionr ori(rnd(), rnd(), rnd(), rnd());
+			Quaternionr ori(dis(gen), dis(gen), dis(gen), dis(gen));
 			ori.normalize();
 			// copy the packing and rotate
 			SpherePack C(clumps[clumpChoice]);
@@ -554,11 +552,12 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 			}
 
 			// add the clump, if no collisions
-			/*number clumps consecutively*/ ci.clumpId = nGen;
-			ci.center                                  = pos;
-			ci.rad                                     = rad;
-			ci.minId                                   = pack.size();
-			ci.maxId                                   = pack.size() + C.pack.size() - 1;
+			/*number clumps consecutively*/
+			ci.clumpId = nGen;
+			ci.center  = pos;
+			ci.rad     = rad;
+			ci.minId   = pack.size();
+			ci.maxId   = pack.size() + C.pack.size() - 1;
 			for (const auto& s : C.pack) {
 				pack.push_back(Sph(s.c, s.r, ci.clumpId));
 			}
