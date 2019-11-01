@@ -21,7 +21,7 @@ class SpherePack {
 	};
 
 public:
-	enum { RDIST_RMEAN, RDIST_NUM, RDIST_PSD };
+	enum class e_Mode { UNDEFINED, RDIST_RMEAN, RDIST_NUM, RDIST_PSD };
 	struct Sph {
 		Vector3r c;
 		Real     r;

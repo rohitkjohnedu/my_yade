@@ -141,7 +141,7 @@ long SpherePack::makeCloud(
 			LOG_WARN("The volume of the min-max box is null, we will assume that the packing is 2D. If it is not what you want then you defined "
 			         "wrong input values; check that min and max corners are defined correctly.");
 	}
-	int  mode = -1;
+	auto mode = e_Mode::UNDEFINED;
 	bool err  = false;
 	// determine the way we generate radii
 	if (porosity <= 0 and rMean <= 0) {
@@ -150,9 +150,9 @@ long SpherePack::makeCloud(
 	}
 	//If rMean is not defined, then in will be defined in RDIST_NUM
 	if (rMean > 0)
-		mode = RDIST_RMEAN;
+		mode = e_Mode::RDIST_RMEAN;
 	else if (num > 0 && psdSizes.size() == 0) {
-		mode = RDIST_NUM;
+		mode = e_Mode::RDIST_NUM;
 		// the term (1+rRelFuzz²) comes from the mean volume for uniform distribution : Vmean = 4/3*pi*Rmean*(1+rRelFuzz²)
 		if (volume)
 			rMean = pow(volume * (1 - porosity) / (Mathr::PI * (4 / 3.) * (1 + rRelFuzz * rRelFuzz) * num), 1 / 3.);
@@ -165,8 +165,8 @@ long SpherePack::makeCloud(
 	}
 	// transform sizes and cummulated fractions values in something convenient for the generation process
 	if (psdSizes.size() > 0) {
-		err  = (mode >= 0);
-		mode = RDIST_PSD;
+		err  = (mode != e_Mode::UNDEFINED);
+		mode = e_Mode::RDIST_PSD;
 		if (psdSizes.size() != psdCumm.size())
 			throw invalid_argument(("SpherePack.makeCloud: psdSizes and psdCumm must have same dimensions ("
 			                        + boost::lexical_cast<string>(psdSizes.size()) + "!=" + boost::lexical_cast<string>(psdCumm.size()))
@@ -220,7 +220,7 @@ long SpherePack::makeCloud(
 			for (size_t i = 1; i < psdSizes.size(); i++)
 				psdCumm2[i] /= psdCumm2[psdSizes.size() - 1];
 	}
-	if (err || mode < 0)
+	if (err || mode == e_Mode::UNDEFINED)
 		throw invalid_argument("SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be "
 		                       "combined with psdSizes.");
 	// adjust uniform distribution parameters with distributeMass; rMean has the meaning (dimensionally) of _volume_
@@ -237,16 +237,20 @@ long SpherePack::makeCloud(
 			rand = dis(gen);
 		int t;
 		switch (mode) {
-			case RDIST_RMEAN:
+			case e_Mode::UNDEFINED:
+				throw invalid_argument(
+				        "SpherePack.makeCloud: at least one of rMean, porosity, psdSizes & psdCumm arguments must be specified. rMean can't be "
+				        "combined with psdSizes.");
+			case e_Mode::RDIST_RMEAN:
 			//FIXME : r is never defined, it will be zero at first iteration, but it will have values in the next ones.
 			//I don't understand why it apparently works. Some magic?
-			case RDIST_NUM:
+			case e_Mode::RDIST_NUM:
 				if (distributeMass)
 					r = pow3Interp(rand, rMean * (1 - rRelFuzz), rMean * (1 + rRelFuzz));
 				else
 					r = rMean * (2 * (rand - .5) * rRelFuzz + 1); // uniform distribution in rMean*(1±rRelFuzz)
 				break;
-			case RDIST_PSD:
+			case e_Mode::RDIST_PSD:
 				if (distributeMass) {
 					int piece = psdGetPiece(rand, psdCumm2, norm);
 					r         = pow3Interp(norm, psdRadii[piece], psdRadii[piece + 1]);
@@ -315,7 +319,7 @@ long SpherePack::makeCloud(
 		}
 		if (t == maxTry) {
 			if (num > 0) {
-				if (mode != RDIST_RMEAN) {
+				if (mode != e_Mode::RDIST_RMEAN) {
 					//if rMean is not imposed, then we call makeCloud recursively,
 					//scaling the PSD down until the target num is obtained
 					Real nextPoro = porosity + (1 - porosity) / 10.;
