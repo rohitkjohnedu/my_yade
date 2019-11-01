@@ -7,28 +7,16 @@
 #include <core/Clump.hpp>
 #include <pkg/dem/KnKsPBLaw.hpp>
 
-//FIXME: The indented "include" statements might not be needed. Check before deleting them
 #include <pkg/dem/GlobalStiffnessTimeStepper.hpp>
-	#include <pkg/common/ElastMat.hpp>
-	#include <pkg/dem/TriaxialStressController.hpp>
-	#include <pkg/dem/TriaxialCompressionEngine.hpp>
-	#include <pkg/dem/TriaxialStateRecorder.hpp>
 #include <pkg/common/Aabb.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/InsertionSortCollider.hpp>
 #include <core/Interaction.hpp>
-	#include <pkg/common/Dispatching.hpp>
-	#include <pkg/common/GravityEngines.hpp>
 #include <pkg/dem/NewtonIntegrator.hpp>
-	#include <pkg/dem/PotentialBlock.hpp>
 #include <core/Body.hpp>
-	#include <pkg/common/Box.hpp>
-	#include <pkg/common/Sphere.hpp>
-	#include <pkg/common/Facet.hpp>
-	#include <pkg/common/Wall.hpp>
 #include <pkg/common/ForceResetter.hpp>
 #include <pkg/common/InteractionLoop.hpp>
-	#include <pkg/dem/Shop.hpp>
+//#include <pkg/dem/Shop.hpp>
 #include <boost/filesystem/convenience.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
@@ -37,8 +25,6 @@
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
-	#include<pkg/dem/SpherePack.hpp>
-//#include<pkg/dem/MicroMacroAnalyser.hpp>
 
 #include "BlockGen.hpp"
 #include<pkg/dem/Ig2_PB_PB_ScGeom.hpp>
@@ -98,16 +84,6 @@ bool BlockGen::generate(string& /*message*/)
 	blk[0].d = { xmax-rForPP, xmin-rForPP, ymax-rForPP, ymin-rForPP, zmax-rForPP, zmin-rForPP };
 //	blk[0].d = { xmax, xmin, ymax, ymin, zmax, zmin };
 
-//	if (saveBlockGenData==true) { //output to file
-//		if (!outputFile.empty() ) {
-//			myfile.open(outputFile.c_str(), std::ofstream::app);
-//			myfile << "blk[0].intactRock[i]" << endl;
-//			myfile.close();
-//		}
-//	} else { //output to terminal
-//		std::cout << "blk[0].intactRock[i]" << endl;
-//	}
-
 	for(unsigned int i=0; i<blk[0].a.size(); i++){
 		blk[0].redundant.push_back(false);
 		blk[0].JRC.push_back(15.0);
@@ -124,16 +100,6 @@ bool BlockGen::generate(string& /*message*/)
 		blk[0].hwater.push_back(-1.0);
 		blk[0].intactRock.push_back(false);
 		blk[0].jointType.push_back(0);
-
-//		if (saveBlockGenData==true) { //output to file
-//			if (!outputFile.empty() ) {
-//				myfile.open(outputFile.c_str(), std::ofstream::app);
-//				myfile << blk[0].intactRock[i] << endl;
-//				myfile.close();
-//			}
-//		} else { //output to terminal
-//			std::cout << blk[0].intactRock[i] << endl;
-//		}
 	}
 
 	/* List of Discontinuities */
