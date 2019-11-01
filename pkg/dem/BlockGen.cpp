@@ -46,6 +46,8 @@
 #include<lib/pyutil/gil.hpp>
 
  /* IpOpt */
+#include <boost/random.hpp>
+#include <boost/random/normal_distribution.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 
