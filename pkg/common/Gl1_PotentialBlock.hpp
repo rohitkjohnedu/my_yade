@@ -2,13 +2,10 @@
 #ifdef YADE_POTENTIAL_BLOCKS
 
 #pragma once
-#ifdef YADE_OPENGL
-	#include <pkg/common/GLDrawFunctors.hpp>
-#endif
 
 #include <vector>
 #include <lib/computational-geometry/MarchingCube.hpp>
-#include <pkg/dem/PotentialBlock.hpp>
+//#include <pkg/dem/PotentialBlock.hpp>
 #include <pkg/dem/PotentialBlock2AABB.hpp>
 #include <pkg/common/PeriodicEngines.hpp>
 
@@ -52,78 +49,38 @@
 #include <vtkTextActor3D.h>
 #include <vtkCylinderSource.h>
 
-
-
-#ifdef YADE_CGAL
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-/* INCLUDE STATEMENTS FROM: Polyhedra.hpp file */
-// TODO Remember to remove redundant scripts. I don't need all the below #include invocations
-#include <core/Omega.hpp>
-#include <core/Shape.hpp>
-#include <core/Interaction.hpp>
-#include <core/Material.hpp>
-#include <pkg/dem/ScGeom.hpp>
-#include <pkg/dem/FrictPhys.hpp>
-#include <pkg/common/Wall.hpp>
-#include <pkg/common/Facet.hpp>
-#include <pkg/common/Sphere.hpp>
-#include <pkg/common/Dispatching.hpp>
-#include <pkg/common/ElastMat.hpp>
 
 #ifdef YADE_OPENGL
 	#include<pkg/common/GLDrawFunctors.hpp>
 	#include<lib/opengl/OpenGLWrapper.hpp>
 	#include<lib/opengl/GLUtils.hpp>
 	#include<GL/glu.h>
-	#include<pkg/dem/Shop.hpp>
 #endif
 
-#include <lib/base/AliasCGAL.hpp>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 namespace yade { // Cannot have #include directive inside.
 
-/* NEW SCRIPT USING FACETS*/
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
 #ifdef YADE_OPENGL
-	
 	/* Draw PotentialBlocks using OpenGL */
 	class Gl1_PotentialBlock: public GlShapeFunctor{
-
 		public:
-			struct TriangulationMatrix{ vector<Vector3i> triangles; }; 	static vector<TriangulationMatrix> TM ;
-			struct VerticesMatrix{ vector<Vector3r> v; }; 			static vector<VerticesMatrix> VM ;
-			struct CentroidMatrix{ Vector3r c; };				static vector<CentroidMatrix> CM ;
-
 			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-
-	// clang-format off
+			// clang-format off
 			YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialBlock,GlShapeFunctor,"Renders :yref:`PotentialBlock` object",
 				((bool,wire,false,,"Only show wireframe"))
 			);
-	// clang-format on
+			// clang-format on
 			RENDERS(PotentialBlock);
-
-		protected:
-			Polyhedron P;
-			Vector3r centroid;
-			Real volume; // used to be: vo
-			bool init;
+//		protected:
+//			Vector3r centroid;
 	};
 	REGISTER_SERIALIZABLE(Gl1_PotentialBlock);
-
-bool P_volume_centroid(Polyhedron P, Real * volume, Vector3r * centroid);
-//Polyhedron Simplify(Polyhedron P, Real lim);
-
 #endif // YADE_OPENGL
 
 } // namespace yade
-
-#endif // YADE_CGAL
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
