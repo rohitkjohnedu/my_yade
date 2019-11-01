@@ -15,6 +15,7 @@ namespace yade { // Cannot have #include directive inside.
 
 CREATE_LOGGER(SpherePack);
 
+void SpherePack::add(const Vector3r& c, Real r) { pack.push_back(Sph(c, r)); }
 
 void SpherePack::fromList(const py::list& l)
 {
@@ -385,7 +386,9 @@ void SpherePack::cellRepeat(Vector3i count)
 	cellSize = Vector3r(cellSize[0] * count[0], cellSize[1] * count[1], cellSize[2] * count[2]);
 }
 
-int SpherePack::psdGetPiece(Real x, const vector<Real>& cumm, Real& norm)
+Real SpherePack::pow3Interp(Real x, Real a, Real b) const { return pow(x * (pow(b, -2) - pow(a, -2)) + pow(a, -2), -1. / 2); }
+
+int SpherePack::psdGetPiece(Real x, const vector<Real>& cumm, Real& norm) const
 {
 	int sz = cumm.size();
 	int i  = 0;
@@ -610,4 +613,133 @@ py::tuple SpherePack::getClumps() const
 	return py::make_tuple(standalone, clumpList);
 }
 
+Real SpherePack::cellWrapRel(const Real x, const Real x0, const Real x1) const
+{
+	const auto xNorm = (x - x0) / (x1 - x0);
+	return (xNorm - floor(xNorm)) * (x1 - x0);
+}
+
+Real SpherePack::periPtDistSq(const Vector3r& p1, const Vector3r& p2) const
+{
+	Vector3r dr;
+	for (int ax = 0; ax < 3; ax++)
+		dr[ax] = min(cellWrapRel(p1[ax], p2[ax], p2[ax] + cellSize[ax]), cellWrapRel(p2[ax], p1[ax], p1[ax] + cellSize[ax]));
+	return dr.squaredNorm();
+}
+Vector3r SpherePack::dim() const
+{
+	Vector3r mn, mx;
+	aabb(mn, mx);
+	return mx - mn;
+}
+
+boost::python::tuple SpherePack::aabb_py() const
+{
+	Vector3r mn, mx;
+	aabb(mn, mx);
+	return boost::python::make_tuple(mn, mx);
+}
+
+void SpherePack::aabb(Vector3r& mn, Vector3r& mx) const
+{
+	Real inf = std::numeric_limits<Real>::infinity();
+	mn       = Vector3r(inf, inf, inf);
+	mx       = Vector3r(-inf, -inf, -inf);
+	for (const auto& s : pack) {
+		Vector3r r(s.r, s.r, s.r);
+		mn = mn.cwiseMin(s.c - r);
+		mx = mx.cwiseMax(s.c + r);
+	}
+}
+
+Vector3r SpherePack::midPt() const
+{
+	Vector3r mn, mx;
+	aabb(mn, mx);
+	return .5 * (mn + mx);
+}
+
+Real SpherePack::relDensity() const
+{
+	Real     sphVol = 0;
+	Vector3r dd     = dim();
+	for (const Sph& s : pack) {
+		sphVol += pow(s.r, 3);
+	}
+	sphVol *= (4 / 3.) * Mathr::PI;
+	return sphVol / (dd[0] * dd[1] * dd[2]);
+}
+
+void SpherePack::translate(const Vector3r& shift)
+{
+	for (auto& s : pack) {
+		s.c += shift;
+	}
+}
+
+void SpherePack::rotate(const Vector3r& axis, Real angle)
+{
+	if (cellSize != Vector3r::Zero()) {
+		LOG_WARN("Periodicity reset when rotating periodic packing (non-zero cellSize=" << cellSize << ")");
+		cellSize = Vector3r::Zero();
+	}
+	Vector3r    mid = midPt();
+	Quaternionr q(AngleAxisr(angle, axis));
+	for (auto& s : pack) {
+		s.c = q * (s.c - mid) + mid;
+	}
+}
+
+void SpherePack::rotateAroundOrigin(const Quaternionr& rot)
+{
+	if (cellSize != Vector3r::Zero()) {
+		LOG_WARN("Periodicity reset when rotating periodic packing (non-zero cellSize=" << cellSize << ")");
+		cellSize = Vector3r::Zero();
+	}
+	for (auto& s : pack) {
+		s.c = rot * s.c;
+	}
+}
+
+void SpherePack::scale(Real scale)
+{
+	Vector3r mid = midPt();
+	cellSize *= scale;
+	for (auto& s : pack) {
+		s.c = scale * (s.c - mid) + mid;
+		s.r *= std::abs(scale);
+	}
+}
+
+size_t SpherePack::len() const { return pack.size(); }
+
+boost::python::tuple SpherePack::getitem(size_t idx) const
+{
+	if (idx >= pack.size())
+		throw runtime_error("Index " + boost::lexical_cast<string>(idx) + " out of range 0.." + boost::lexical_cast<string>(pack.size() - 1));
+	return pack[idx].asTuple();
+}
+
+
+SpherePack::_iterator SpherePack::getIterator() const { return SpherePack::_iterator(*this); };
+
+SpherePack::_iterator SpherePack::_iterator::iter() { return *this; }
+boost::python::tuple  SpherePack::_iterator::next()
+{
+	if (pos == sPack.pack.size()) {
+		PyErr_SetNone(PyExc_StopIteration);
+		boost::python::throw_error_already_set();
+	}
+	return sPack.pack[pos++].asTupleNoClump();
+}
+
+boost::python::tuple SpherePack::Sph::asTuple() const
+{
+	if (clumpId < 0)
+		return boost::python::make_tuple(c, r);
+	return boost::python::make_tuple(c, r, clumpId);
+}
+
+
+boost::python::tuple SpherePack::Sph::asTupleNoClump() const { return boost::python::make_tuple(c, r); }
 } // namespace yade
