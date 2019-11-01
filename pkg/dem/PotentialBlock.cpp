@@ -92,7 +92,7 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 	if (centr.norm()/R > 1e-6) {
 		for (int i=0; i<planeNo; i++){
 			d[i] = -(a[i]*centr.x() + b[i]*centr.y() + c[i]*centr.z() - d[i]);
-			if (d[i]<0) { a[i] *= -1; b[i] *= -1; c[i] *= -1; d[i] *= -1; }
+//			if (d[i]<0) { a[i] *= -1; b[i] *= -1; c[i] *= -1; d[i] *= -1; }
 		}
 		position=centr;
 		calculateVertices(); // Recalculate vertices for the centered particle faces
