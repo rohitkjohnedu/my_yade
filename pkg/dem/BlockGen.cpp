@@ -33,7 +33,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <boost/limits.hpp>
-#include<pkg/dem/SpherePack.hpp>
+// random
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/uniform_real.hpp>
+#include <boost/random/variate_generator.hpp>
+	#include<pkg/dem/SpherePack.hpp>
 //#include<pkg/dem/MicroMacroAnalyser.hpp>
 
 #include "BlockGen.hpp"
