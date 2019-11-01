@@ -109,21 +109,10 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 		vector<vector<vector<Real > > > scalarField,weights;
 		void generateScalarField(const PotentialParticle& pp);
 		void calcMinMax(const PotentialParticle& pp);
-		Real oldIsoValue,oldIsoSec,oldIsoThick;
 		Vector3r isoStep;
-		struct Leaf {
-			Vector3r centre;
-			Leaf(Vector3r pos) {
-				centre = pos;
-			}
-			Leaf() {
-				centre = Vector3r(0,0,0);
-			}
-		};
 		struct scalarF {
-			vector<vector<vector<Real > > > scalarField2;
 			vector<Vector3r> triangles;
-//			vector<Vector3r> normals;
+			vector<Vector3r> normals;
 			int nbTriangles;
 		};
 		Real evaluateF(const PotentialParticle& pp, Real x, Real y, Real z);
