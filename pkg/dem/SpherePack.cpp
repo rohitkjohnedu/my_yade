@@ -489,6 +489,7 @@ long SpherePack::makeClumpCloud(const Vector3r& mn, const Vector3r& mx, const ve
 				pos[i] = dis(gen) * (mx[i] - mn[i]) + mn[i];
 			}
 			// TODO: check this random orientation is homogeneously distributed
+			// Note: I've seen some proofs it is not. Chosing uniformly distributed orientation needs more work / Janek
 			Quaternionr ori(dis(gen), dis(gen), dis(gen), dis(gen));
 			ori.normalize();
 			// copy the packing and rotate
