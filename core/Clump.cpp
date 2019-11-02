@@ -272,7 +272,7 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 		s: local subBody's coordinates
 		c: local clump coordinates
 	*/
-	double M=0; // mass
+	Real M=0; // mass
 	Vector3r Sg(0,0,0); // static moment, for getting clump's centroid
 	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
 
@@ -376,7 +376,7 @@ void Clump::updatePropertiesNonSpherical(const shared_ptr<Body>& clumpBody, bool
 		s: local subBody's coordinates
 		c: local clump coordinates
 	*/
-	double M=0; // mass
+	Real M=0; // mass
 	Vector3r Sg(0,0,0); // static moment, for getting clump's centroid
 	Matrix3r Ig(Matrix3r::Zero()), Ic(Matrix3r::Zero()); // tensors of inertia; is upper triangular, zeros instead of symmetric elements
 

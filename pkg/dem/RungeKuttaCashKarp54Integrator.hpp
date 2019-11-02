@@ -7,7 +7,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-typedef boost::numeric::odeint::runge_kutta_cash_karp54< stateVector > error_stepper_type; //Runge-Kutta 54 error stepper other steppers can also be used
+typedef boost::numeric::odeint::runge_kutta_cash_karp54< stateVector , Real > error_stepper_type; //Runge-Kutta 54 error stepper other steppers can also be used
 
 typedef boost::numeric::odeint::controlled_runge_kutta< error_stepper_type > controlled_stepper_type;//Controlled Runge Kutta stepper
 

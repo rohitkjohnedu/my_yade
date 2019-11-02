@@ -143,7 +143,7 @@ class Ig2_Tetra_Tetra_TTetraGeom: public IGeomFunctor
 		std::list<Tetra> Tetra2TetraIntersection(const Tetra& A, const Tetra& B);
 		std::list<Tetra> TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& n);
 		//! Intersection of line given by points A, B and plane given by P and its normal.
-		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const double t=(P-A).dot(normal) / (B-A).dot(normal); return A+t*(B-A); }
+		Vector3r PtPtPlaneIntr(const Vector3r& A, const Vector3r& B, const Vector3r& P, const Vector3r& normal){const Real t=(P-A).dot(normal) / (B-A).dot(normal); return A+t*(B-A); }
 };
 
 REGISTER_SERIALIZABLE(Ig2_Tetra_Tetra_TTetraGeom);

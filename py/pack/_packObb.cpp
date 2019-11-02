@@ -18,7 +18,7 @@ template<typename Scalar> Eigen::Matrix<Scalar,3,3> matrixFromEulerAnglesXYZ(Sca
 	#include <unsupported/Eigen/EulerAngles>
 
 	inline yade::Matrix3r makeFromEulerAngle(Real x, Real y, Real z) {
-		yade::Matrix3r ret = Eigen::EulerAnglesXYZd( x,y,z ).toRotationMatrix();
+		yade::Matrix3r ret = Eigen::EulerAngles< Real , Eigen::EulerSystemXYZ >( x,y,z ).toRotationMatrix();
 		assert(ret == matrixFromEulerAnglesXYZ<Real>(x,y,z));
 		return ret;
 	}

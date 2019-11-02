@@ -615,11 +615,11 @@ class pyOmega{
 	bool subStepping_get(){ return OMEGA.getScene()->subStepping; }
 	void subStepping_set(bool val){ OMEGA.getScene()->subStepping=val; }
 
-	double time(){return OMEGA.getScene()->time;}
-	double realTime(){ return OMEGA.getRealTime(); }
-	double speed(){ return OMEGA.getScene()->speed; }
-	double dt_get(){return OMEGA.getScene()->dt;}
-	void dt_set(double dt){
+	Real time(){return OMEGA.getScene()->time;}
+	Real realTime(){ return OMEGA.getRealTime(); }
+	Real speed(){ return OMEGA.getScene()->speed; }
+	Real dt_get(){return OMEGA.getScene()->dt;}
+	void dt_set(Real dt){
 		Scene* scene=OMEGA.getScene().get();
 		// activate timestepper, if possible (throw exception if there is none)
 		if(dt<0){ if(!scene->timeStepperActivate(true)) /* not activated*/ throw runtime_error("No TimeStepper found in O.engines."); }

@@ -203,7 +203,7 @@ long SpherePack::makeCloud(
 				if (psdCumm2[psdSizes.size() - 1] < num)
 					appliedPsdScaling = pow(psdCumm2[psdSizes.size() - 1] / num, 1. / 3.);
 			} else {
-				double totVol = 0;
+				Real totVol = 0;
 				for (size_t i = 1; i < psdSizes.size(); i++)
 					totVol += 4 / 3 * Mathr::PI * (psdCumm[i] - psdCumm[i - 1]) * num * pow(0.5 * (psdSizes[i] + psdSizes[i - 1]), 3)
 					        * (1 + pow(0.5 * (psdSizes[i] - psdSizes[i - 1]), 2));

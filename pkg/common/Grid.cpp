@@ -166,7 +166,7 @@ bool Ig2_GridConnection_GridConnection_GridCoGridCoGeom::go( const shared_ptr<Sh
 	/*NEW VERSION END*/
 	
 	//Compute the geometry if "penetrationDepth" is positive.
-	double penetrationDepth = conn1->radius + conn2->radius - (A+k*a - (B+m*b)).norm();
+	Real penetrationDepth = conn1->radius + conn2->radius - (A+k*a - (B+m*b)).norm();
 	shared_ptr<GridCoGridCoGeom> scm;
 	if(isNew){
 		if(penetrationDepth<0)return false;
