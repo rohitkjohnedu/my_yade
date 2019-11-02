@@ -9,10 +9,6 @@
 #include <lib/compatibility/VTKCompatibility.hpp>
 
 #include "Gl1_PotentialBlock.hpp"
-#ifdef YADE_OPENGL
-	#include <lib/opengl/OpenGLWrapper.hpp>
-#endif
-
 #include <vtkFloatArray.h>
 #include<vtkUnstructuredGrid.h>
 #include<vtkXMLUnstructuredGridWriter.h>
@@ -60,133 +56,47 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-/* New script to visualise the PBs using OPENGL and CGAL */
-
-#ifdef YADE_CGAL
-	#ifdef YADE_OPENGL
+/* New script to visualise the PBs using OPENGL. The triangulation of the particles is derived from: PotentialBlock.connectivity */
+#ifdef YADE_OPENGL
 	bool Gl1_PotentialBlock::wire;
+	
+	void Gl1_PotentialBlock::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)
+	{
+		glColor3v(cm->color); //glColor3v is used when lighting is not enabled
+		PotentialBlock* pb=static_cast<PotentialBlock*>(cm.get());
 
-	bool initialized;
-	int iterBornMax=0;
-
-	vector<Gl1_PotentialBlock::TriangulationMatrix> Gl1_PotentialBlock::TM;
-	vector<Gl1_PotentialBlock::VerticesMatrix>      Gl1_PotentialBlock::VM;
-	vector<Gl1_PotentialBlock::CentroidMatrix>      Gl1_PotentialBlock::CM;
-
-	void Gl1_PotentialBlock::go(const shared_ptr<Shape>& cm, const shared_ptr<State>&,bool wire2,const GLViewInfo&)	{
-
-		PotentialBlock* pp = static_cast<PotentialBlock*>(cm.get());
-			int shapeId = pp->id;
-
-		/* Calculation of the particle surface as the Convex Hull of the vertices */
-		if(initialized == false ) {
-			for(const auto & b :  *scene->bodies) {
-				if (!b) continue;
-				PotentialBlock* cmbody = dynamic_cast<PotentialBlock*>(b->shape.get());
-				if (!cmbody) continue;
-
-
-				//compute convex hull of vertices	
-				std::vector<CGALpoint> points;
-				points.resize(cmbody->vertices.size());
-				for(unsigned int i=0;i<points.size();i++) {
-					points[i] = CGALpoint(cmbody->vertices[i][0],cmbody->vertices[i][1],cmbody->vertices[i][2]);
-				}
-
-				CGAL::convex_hull_3(points.begin(), points.end(), P);
-
-		//		modify order of vertices according to CGAl polyhedron 
-				int i = 0;
-				cmbody->vertices.clear();
-				for (Polyhedron::Vertex_iterator vIter = P.vertices_begin(); vIter != P.vertices_end(); ++vIter, i++){
-					cmbody->vertices.push_back(Vector3r(vIter->point().x(),vIter->point().y(),vIter->point().z()));
-				}
-
-		//		list surface triangles for plotting
-				TM.push_back(TriangulationMatrix());
-				VM.push_back(VerticesMatrix());
-				CM.push_back(CentroidMatrix());
-
-				VM[cmbody->id].v = cmbody->vertices;
-
-				P_volume_centroid(P, &volume, &centroid); //FIXME when I calculate the centroid using Boon's algorithm, I should change this
-				CM[cmbody->id].c = centroid;
-
-
-				for (Polyhedron::Facet_iterator fIter = P.facets_begin(); fIter != P.facets_end(); fIter++){
-					Polyhedron::Halfedge_around_facet_circulator hfc0;
-					int n = fIter->facet_degree();
-					hfc0 = fIter->facet_begin();
-					int a = std::distance(P.vertices_begin(), hfc0->vertex());
-					for (int j=2; j<n; j++){
-						++hfc0;
-						int b = std::distance(P.vertices_begin(), hfc0->vertex());
-						int c = std::distance(P.vertices_begin(), hfc0->next()->vertex());
-						TM[cmbody->id].triangles.push_back(Vector3i(a,b,c));
-					}
-				}
-			initialized = true;
-			}
+		if (wire || wire2) { 
+			glDisable(GL_CULL_FACE); //FIXME: This may not be needed: It's the default choice
+			glDisable(GL_LIGHTING);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Turn on wireframe mode. Render front and back faces of the wireframe
+		} else {
+			glMaterialv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,Vector3r(cm->color[0],cm->color[1],cm->color[2])); //glMaterialv is used when lighting is enabled
+			glDisable(GL_CULL_FACE);
+			glCullFace(GL_BACK); glEnable(GL_CULL_FACE);
+			glEnable(GL_LIGHTING);
+			glPolygonMode(GL_FRONT, GL_FILL); // Turn off wireframe mode. Render only front faces
+//			glEnable(GL_NORMALIZE); //I don't need this. The normals are normalised inside the shape class
 		}
 
-		const vector<Vector3i>& triangles = TM[shapeId].triangles;
-		const vector<Vector3r>& v = VM[shapeId].v;
-		Vector3r centroid = CM[shapeId].c;
+		vector<vector<int> > con=pb->connectivity;
 
-		glMaterialv(GL_BACK,GL_AMBIENT_AND_DIFFUSE,Vector3r(pp->color[0],pp->color[1],pp->color[2]));
-		glColor3v(pp->color);
+		//TODO: Orient the faces always as cwise or ccwise in the shape class, to avoid going through the if statement below in every timestep qt.View() is activated.
+		for(int j=0; j < (int) con.size(); j++) {
+			Vector3r n=(pb->vertices[con[j][1]]-pb->vertices[con[j][0]]).cross(pb->vertices[con[j][2]]-pb->vertices[con[j][0]]); n.normalize();
+			Vector3r nFace=Vector3r(pb->a[j], pb->b[j], pb->c[j]);
 
-		if (wire || wire2) {
-			glDisable(GL_LIGHTING);
-			glDisable(GL_CULL_FACE);
-			glBegin(GL_LINES);
-			for(unsigned int i=0; i<triangles.size(); ++i) {
-				const auto a = triangles[i].x();
-				const auto b = triangles[i].y();
-				const auto c = triangles[i].z();
-
-				glVertex3v(v[a]); glVertex3v(v[b]);
-				glVertex3v(v[a]); glVertex3v(v[c]);
-				glVertex3v(v[b]); glVertex3v(v[c]);
-			
-			}
-			glEnd();
-		} else	{
-
-			////Turn on wireframe mode
-			// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-			//// Turn off wireframe mode
-			// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			//glDisable(GL_CULL_FACE);  //FIXME TO BE REVISITED. CULLING FACES CAN SAVE MEMORY.
-			glEnable(GL_CULL_FACE);
-			glEnable(GL_LIGHTING);
-
-			glEnable(GL_NORMALIZE);
-			glBegin(GL_TRIANGLES);
-			Vector3r n, faceCenter;
-			for(unsigned int i=0; i<triangles.size(); ++i) {
-				const auto a = triangles[i].x();
-				const auto b = triangles[i].y();
-				const auto c = triangles[i].z();
-
-				n = (v[b]-v[a]).cross(v[c]-v[a]); 
-				faceCenter = (v[a]+v[b]+v[c])/3.;
-				if((faceCenter-centroid).dot(n)<0) n=-n;
-				n.normalize();
-
-				glNormal3v(n);
-				glVertex3v(v[a]);
-				glVertex3v(v[b]);
-				glVertex3v(v[c]);
-			}
+			glBegin(GL_TRIANGLE_FAN);
+				glNormal3v(nFace);
+				if (n.dot(nFace)<0.0) {
+					for(int i1=con[j].size()-1; i1>=0; i1--) { glVertex3v(pb->vertices[con[j][i1]]); } // Create a fan with vertices on plane in descending order
+				} else {
+					for(unsigned int i2=0; i2<con[j].size(); i2++) { glVertex3v(pb->vertices[con[j][i2]]); }  // Create a fan with vertices on plane in ascending order
+				}
 			glEnd();
 		}
 	}
 	YADE_PLUGIN((Gl1_PotentialBlock));
-	#endif  // YADE_OPENGL
-#endif  // YADE_CGAL
+#endif  // YADE_OPENGL
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 

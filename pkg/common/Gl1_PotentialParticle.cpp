@@ -121,7 +121,7 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 			generateScalarField(*cmbody);
 			mc.computeTriangulation(scalarField,0.0);
 			SF[b->id].triangles = mc.getTriangles();
-//			SF[b->id].normals = mc.getNormals();
+			SF[b->id].normals = mc.getNormals();
 			SF[b->id].nbTriangles = mc.getNbTriangles();
 			for(unsigned int i=0; i<scalarField.size(); i++) {
 				for(unsigned int j=0; j<scalarField[i].size(); j++) scalarField[i][j].clear();
@@ -134,57 +134,51 @@ void Gl1_PotentialParticle::go( const shared_ptr<Shape>& cm, const shared_ptr<St
 
 		const vector<Vector3r>& triangles = SF[shapeId].triangles; //mc.getTriangles();
 		int nbTriangles = SF[shapeId].nbTriangles; // //mc.getNbTriangles();
-//		const vector<Vector3r>& normals = SF[shapeId].normals; //mc.getNormals();
+		const vector<Vector3r>& normals = SF[shapeId].normals; //mc.getNormals();
 
-		glMaterialv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Vector3r(pp->color[0],pp->color[1],pp->color[2]));
-		glColor3v(pp->color);
+		glColor3v(cm->color); //glColor3v is used when lighting is not enabled
 
 		if (wire || wire2) {
 			glDisable(GL_CULL_FACE);
 			glDisable(GL_LIGHTING);
-			glBegin(GL_LINES);
-			for(int i=0; i<3*nbTriangles; i+=3) {
-				glVertex3v(triangles[i+0]); glVertex3v(triangles[i+1]);
-				glVertex3v(triangles[i+0]); glVertex3v(triangles[i+2]);
-				glVertex3v(triangles[i+1]); glVertex3v(triangles[i+2]);
-			}
-			glEnd();
+			glPolygonMode(GL_FRONT_AND_BACK,GL_LINE); // Turn on wireframe mode. Render front and back faces of the wireframe
 		} else {
+			//TODO: Using glMaterialv(GL_FRONT,...) in conjunction with: glCullFace(GL_BACK); glEnable(GL_CULL_FACE); is the most cost-effective approach, since culling the back faces makes the visualisation lighter. An example why I don't activate this for now, is that in cubePPscaled.py we visualise the faces of the box as hollow, even with wire=False and culling the back faces makes the visualisation of the hollow particles confusing. Thus, for the time being I chose to keep and color the back faces; to be revisited @vsangelidakis
+//			glEnable(GL_NORMALIZE); //Not needed for vertex-based shading. The normals have been normalised inside the Marching Cubes script
+			glMaterialv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Vector3r(cm->color[0],cm->color[1],cm->color[2])); //glMaterialv is used when lighting is enabled
 			glDisable(GL_CULL_FACE);
-//			glEnable(GL_CULL_FACE);
-//			glEnable(GL_NORMALIZE);
+//			glCullFace(GL_BACK); glEnable(GL_CULL_FACE); 
 			glEnable(GL_LIGHTING); // 2D
+			glPolygonMode(GL_FRONT,GL_FILL); // Turn off wireframe mode
+		}
 
-			// Use the normal vector of each face
-			Vector3r centroid=Vector3r(0,0,0);
-			glBegin(GL_TRIANGLES);
-			for(int i=0; i<3*nbTriangles; i+=3) {
-				const auto a = triangles[i+0];
-				const auto b = triangles[i+1];
-				const auto c = triangles[i+2];
-				
-				Vector3r n=(b-a).cross(c-a);
-				n.normalize();
-				Vector3r faceCenter=(a+b+c)/3.;
-				if((-faceCenter-centroid).dot(n)<0) n=-n;
-				
-				glNormal3v(n);
-				glVertex3v(a);
-				glVertex3v(b);
-				glVertex3v(c);
-			}
-			glEnd();
-
-			// Alternativelly, use the normal vector of each vertex. To use this, the "normals" variable must be uncommented above and in the headers' file.
+//			// FACE-BASED SHADING: Use the normal vector of each triangle (makes the shading of each face look sharper)
+//			Vector3r centroid=Vector3r(0,0,0);
 //			glBegin(GL_TRIANGLES);
 //			for(int i=0; i<3*nbTriangles; i+=3) {
-//				glNormal3v(normals[i+0]); glVertex3v(triangles[i+0]); 
-//				glNormal3v(normals[i+1]); glVertex3v(triangles[i+1]);
-//				glNormal3v(normals[i+2]); glVertex3v(triangles[i+2]);
+//				const auto a = triangles[i+0];
+//				const auto b = triangles[i+1];
+//				const auto c = triangles[i+2];
+//
+//				Vector3r n=(b-a).cross(c-a); n.normalize();
+//				Vector3r faceCenter=(a+b+c)/3.;
+//				if((faceCenter-centroid).dot(n)<0) n=-n;
+//
+//				glNormal3v(n);
+//				glVertex3v(c); //vertex #2
+//				glVertex3v(b); //vertex #1
+//				glVertex3v(a); //vertex #0
 //			}
 //			glEnd();
 
-		}
+//			// VERTEX-BASED SHADING: Use the normal vector of each vertex of each triangle (makes the shading of each face look smoother)
+			glBegin(GL_TRIANGLES);
+			for(int i=0; i<3*nbTriangles; i+=3) {
+				glNormal3v(normals[i+2]); glVertex3v(triangles[i+2]); //vertex #2 The sequence of the vertices specifies which side of the faces is front and which is back
+				glNormal3v(normals[i+1]); glVertex3v(triangles[i+1]); //vertex #1
+				glNormal3v(normals[i+0]); glVertex3v(triangles[i+0]); //vertex #0
+			}
+			glEnd();
 	return;
 }
 
