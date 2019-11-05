@@ -107,7 +107,6 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 		bool succ=I->functorCache.geom->go(b1Swp->shape,b2Swp->shape,*b1Swp->state,*b2Swp->state,shift2,/*force*/true,I);
 		if(!succ and force) throw logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force IGeom creation. Please report bug.");
 		return I;
-	}
 }
 
 void IGeomDispatcher::action(){
