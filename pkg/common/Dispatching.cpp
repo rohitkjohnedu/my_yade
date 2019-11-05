@@ -93,7 +93,7 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 	}
 	Vector3r shift2=scene->cell->hSize*cellDist.cast<Real>();
 	updateScenePtr();
-	if(force){
+
 		assert(b1->shape && b2->shape);
 		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
 		I->cellDist=cellDist;
@@ -105,12 +105,7 @@ shared_ptr<Interaction> IGeomDispatcher::explicitAction(const shared_ptr<Body>& 
 		const shared_ptr<Body>& b1Swp=Body::byId(I->getId1(),scene);
 		const shared_ptr<Body>& b2Swp=Body::byId(I->getId2(),scene);
 		bool succ=I->functorCache.geom->go(b1Swp->shape,b2Swp->shape,*b1Swp->state,*b2Swp->state,shift2,/*force*/true,I);
-		if(!succ) throw logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force IGeom creation. Please report bug.");
-		return I;
-	} else {
-		shared_ptr<Interaction> I(new Interaction(b1->getId(),b2->getId()));
-		I->cellDist=cellDist;
-		b1->shape && b2->shape && I->functorCache.geom->go(b1->shape,b2->shape,*b1->state,*b2->state,shift2,/*force*/true,I);
+		if(!succ and force) throw logic_error("Functor "+I->functorCache.geom->getClassName()+"::go returned false, even if asked to force IGeom creation. Please report bug.");
 		return I;
 	}
 }
