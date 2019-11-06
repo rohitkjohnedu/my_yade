@@ -416,7 +416,7 @@ void Law2_ScGeom_VirtualLubricationPhys::shearForce_firstOrder_log(LubricationPh
 			//LOG_INFO("SLIP");
 			Ft *= phys->normalContactForce.norm()*std::max(0.,phys->mum)/Ft.norm();
 			phys->shearContactForce = Ft;
-			Ft = (Ft*kt*scene->dt + Ft_*nut + dus*kt*nut)/(kt*scene->dt+nut);
+			Ft = (-Ft*kt*scene->dt + Ft_*nut + dus*kt*nut)/(kt*scene->dt+nut);
 			phys->slip = true;
 			phys->shearLubricationForce = nut*dus/scene->dt;
 		}
