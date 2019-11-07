@@ -955,7 +955,7 @@ void VTKRecorder::action(){
             spheresUg->GetPointData()->AddArray(spheresLubricationShearContactStress);
             spheresUg->GetPointData()->AddArray(spheresLubricationNormalLubricationStress);
             spheresUg->GetPointData()->AddArray(spheresLubricationShearLubricationStress);
-            spheresUg->GetPointData()->AddArray(spheresLubricationNormalLubricationStress);
+            spheresUg->GetPointData()->AddArray(spheresLubricationNormalPotentialStress);
         }		
 		if (recActive[REC_FORCE]){
 			spheresUg->GetPointData()->AddArray(spheresForceVec);
