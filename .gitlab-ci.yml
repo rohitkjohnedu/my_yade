@@ -83,6 +83,10 @@ stages:
     - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this build, because it's a WIP merge request.\n===\e[0m\n"; else make install -j $JOBSNUM; fi
     - make clean
     - ccache -s
+    - cd ..
+    - if [[ ${TEST_ASAN} == "TEST_ASAN" ]] ; then install/bin/yade-ci --test ; fi
+    - if [[ ${TEST_ASAN} == "TEST_ASAN" ]] ; then install/bin/yade-ci --check; fi
+    - if [[ ${TEST_ASAN} == "TEST_ASAN" ]] ; then xvfb-run -a -s "-screen 0 1600x1200x16" scripts/checks-and-tests/gui/testGui.sh; fi
   tags:
     - fast
 
@@ -144,7 +148,24 @@ make_debug:
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DDEBUG=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
+    - export CXXFLAGS="-O2 $CXXFLAGS"
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+
+make_asan:
+  <<: *make_definition
+  before_script:
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TEST_ASAN="TEST_ASAN"; fi
+    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 $EXTRA_CMAKE_ARGS"
+    - echo $EXTRA_CMAKE_ARGS
+    - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  tags:
+    - debug
+  artifacts:
+    when: always
+    paths:
+      - screenshots
 
 make_minimal:
   <<: *make_definition

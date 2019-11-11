@@ -29,6 +29,7 @@
 #  ENABLE_DEFORM: enable constant volume deformation engine (OFF by default)
 #  ENABLE_FEMLIKE: enable meshed solids (FEM-like)
 #  ENABLE_OAR: generate a script for oar-based task scheduler (OFF by default)
+#  ENABLE_ASAN: AddressSanitizer build, please see documentation (OFF by default)
 #  runtimePREFIX: used for packaging, when install directory is not the same is runtime directory (/usr/local by default)
 #  CHUNKSIZE: set >1, if you want several sources to be compiled at once. Increases compilation speed and RAM-consumption during it (1 by default)
 #  VECTORIZE: enables vectorization and alignment in Eigen3 library, experimental (OFF by default)
@@ -83,6 +84,7 @@ OPTION(ENABLE_DEFORM "Enable Deformation Engine" OFF)
 OPTION(ENABLE_FEMLIKE "Enable deformable solids" ON)
 OPTION(CHOLMOD_GPU "Enable GPU acceleration flow engine direct solver" OFF)
 OPTION(ENABLE_THERMAL "Enable thermal engine (experimental)" ON)
+OPTION(ENABLE_ASAN "Enable AddressSanitizer build, please see documentation" OFF)
 #Set -DPYTHON_VERSION numeric option below:
 set(PYTHON_VERSION -1 CACHE STRING "Force python version to the given one. Defaults to -DPYTHON_VERSION=-1 which automatically uses the newest available python version on the system.")
 #===========================================================
@@ -140,25 +142,26 @@ ENDIF()
 
 #===========================================================
 
-IF ("${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_ARG1}" MATCHES ".*clang")
-  ADD_DEFINITIONS("-ftemplate-depth-512 -fstack-protector ")
-ELSE()
-  IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.9 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.9)
-    MESSAGE(STATUS "GCC Version >= 4.9. Adding -fstack-protector-strong")
-    ADD_DEFINITIONS("-fstack-protector-strong")
-  ELSE()
-    ADD_DEFINITIONS("-fstack-protector")
-  ENDIF()
-ENDIF()
-
 FIND_PACKAGE(Eigen3 REQUIRED)
 
-IF (DEBUG)
+#===========================================================
+# AddressSanitizer build
+IF(ENABLE_ASAN)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -g -fsanitize=address -fno-omit-frame-pointer")
+  SET(CMAKE_BUILD_TYPE Debug)
+  SET(CMAKE_VERBOSE_MAKEFILE 1)
+ENDIF(ENABLE_ASAN)
+#===========================================================
+
+IF(DEBUG)
   SET(CMAKE_VERBOSE_MAKEFILE 1)
   SET(CMAKE_BUILD_TYPE Debug)
-  ADD_DEFINITIONS("-DYADE_DEBUG -g")
+  ADD_DEFINITIONS("-DYADE_DEBUG")
 ELSE (DEBUG)
-  ADD_DEFINITIONS("-DNDEBUG")
+  IF (NOT(CMAKE_BUILD_TYPE))
+    # If no build_type set, we use Release profile
+    SET(CMAKE_BUILD_TYPE Release)
+  ENDIF (NOT(CMAKE_BUILD_TYPE))
 ENDIF (DEBUG)
 
 IF(ENABLE_LOGGER)
@@ -301,7 +304,7 @@ if(ENABLE_USEFUL_ERRORS)
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-unused-function")
   ENDIF()
   SET(ALL_ENABLED_USEFUL_ERRORS " -Werror -Wformat -Wformat-security -Wformat-nonliteral -Wall -Wextra -Wnarrowing -Wreturn-type -Wuninitialized -Wfloat-conversion -Wcast-align -Wdisabled-optimization -Wtrampolines -Wpointer-arith -Wswitch-bool -Wwrite-strings -Wnon-virtual-dtor")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -fdce")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ALL_ENABLED_USEFUL_ERRORS} ${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cpp -fdce -fstack-protector-strong")
 
 #  -Wcast-qual      is useful, but too many warnings in libeigen
 #  -Wlogical-op     (1 unfixable warning in /usr/include/vtk-6.3/vtkVariantInlineOperators.h: logical ‘or’ of equal expressions )
@@ -314,7 +317,7 @@ if(ENABLE_USEFUL_ERRORS)
 # -Wmaybe-uninitialized (  10) -Wcomment          (   3) -Wcpp         (   2) -Wcast-function-type (   2) -Wlogical-op     (   1)
 
 ELSE(ENABLE_USEFUL_ERRORS)
-  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -O2 --param=ssp-buffer-size=4 -Wformat -Wformat-security -Werror=format-security -Wall")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wformat -Wformat-security -Werror=format-security -Wall -fstack-protector-strong")
 ENDIF(ENABLE_USEFUL_ERRORS)
 #===========================================================
 MESSAGE(STATUS   "${Esc}[36mChosen compiler flags are: CMAKE_CXX_FLAGS = ${CMAKE_CXX_FLAGS} ${Esc}[0m")
@@ -744,15 +747,10 @@ ELSE(ENABLE_POTENTIAL_BLOCKS)
   SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialBlocks")
 ENDIF(ENABLE_POTENTIAL_BLOCKS)
 #===========================================================
-
-
-#===========================================================
 #= Forced detection of library versions for libVersions ====
 #===========================================================
 INCLUDE(FindMissingVersions)
 #===========================================================
-
-
 
 IF (INSTALL_PREFIX)
   SET(CMAKE_INSTALL_PREFIX ${INSTALL_PREFIX})
@@ -912,22 +910,27 @@ INSTALL(TARGETS yade DESTINATION ${YADE_LIB_PATH})
 
 #===========================================================
 MESSAGE(STATUS "===========================================================")
-MESSAGE(STATUS "Yade configured with following features:${CONFIGURED_FEATS}")
-MESSAGE(STATUS "Disabled features:${DISABLED_FEATS}")
+MESSAGE(STATUS "Yade configured with following features:${Esc}[36m${CONFIGURED_FEATS}${Esc}[0m")
+MESSAGE(STATUS "Disabled features:${Esc}[33m${DISABLED_FEATS}${Esc}[0m")
 IF(ENABLE_LOGGER)
   MESSAGE(STATUS "${Esc}[36mUsing MAX_LOG_LEVEL=${MAX_LOG_LEVEL}, ENABLE_LOGGER=ON${Esc}[0m")
 ELSE(ENABLE_LOGGER)
   MESSAGE(STATUS "${Esc}[36mUsing MAX_LOG_LEVEL=${MAX_LOG_LEVEL}, ENABLE_LOGGER=OFF${Esc}[0m")
 ENDIF(ENABLE_LOGGER)
 IF (DEBUG)
-  MESSAGE(STATUS "Debug build")
+  MESSAGE(STATUS "${Esc}[33mDebug build${Esc}[0m")
   SET (debugbuild " (debug build)")
 ELSE (DEBUG)
-  MESSAGE(STATUS "Optimized build")
+  IF (ENABLE_ASAN)
+    MESSAGE(STATUS "${Esc}[33mAddressSanitizer build! Check documentation how to run${Esc}[0m")
+  ELSE (ENABLE_ASAN)
+    MESSAGE(STATUS "${Esc}[32mOptimized build${Esc}[0m")
+  ENDIF (ENABLE_ASAN)
 ENDIF (DEBUG)
 IF (CHUNKSIZE)
   MESSAGE(STATUS "CHUNKSIZE is set to " ${CHUNKSIZE})
 ENDIF (CHUNKSIZE)
+
 MESSAGE(STATUS "===========================================================")
 #===========================================================
 #Building doc
