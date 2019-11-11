@@ -84,9 +84,11 @@ stages:
     - make clean
     - ccache -s
     - cd ..
-    - if [[ ${TEST_ASAN} == "TEST_ASAN" ]] ; then install/bin/yade-ci --test ; fi
-    - if [[ ${TEST_ASAN} == "TEST_ASAN" ]] ; then install/bin/yade-ci --check; fi
-    - if [[ ${TEST_ASAN} == "TEST_ASAN" ]] ; then xvfb-run -a -s "-screen 0 1600x1200x16" scripts/checks-and-tests/gui/testGui.sh; fi
+    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --test ; fi
+    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --check; fi
+    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then xvfb-run -a -s "-screen 0 1600x1200x16" scripts/checks-and-tests/gui/testGui.sh; fi
+    - cd build
+    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then xvfb-run -s "-screen 0 1600x1200x24" make doc; fi
   tags:
     - fast
 
@@ -139,13 +141,12 @@ make_no_mpi:
 make_debug:
   <<: *make_definition
   artifacts:
+    when: always
     paths:
-      - install
-      - build
-    expire_in: 6 days
+      - screenshots
   before_script:
     # there can be only one before_script:, so the line below cannot be in a separate template
-    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
     - export EXTRA_CMAKE_ARGS="-DDEBUG=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
     - export CXXFLAGS="-O2 $CXXFLAGS"
@@ -155,7 +156,7 @@ make_asan:
   <<: *make_definition
   before_script:
     # there can be only one before_script:, so the line below cannot be in a separate template
-    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TEST_ASAN="TEST_ASAN"; fi
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
     - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
     - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
@@ -282,14 +283,6 @@ test_no_mpi:
     - make_no_mpi
   needs: ["make_no_mpi"]
 
-test_debug:
-  <<: *test_definition
-  <<: *skip_wip_test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
-  dependencies:
-    - make_debug
-  needs: ["make_debug"]
-
 test_minimal:
   <<: *test_definition
   <<: *skip_wip_test_definition_nogui
@@ -401,14 +394,6 @@ check_no_mpi:
     - make_no_mpi
   needs: ["make_no_mpi"]
 
-check_debug:
-  <<: *check_definition
-  <<: *skip_wip_test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
-  dependencies:
-    - make_debug
-  needs: ["make_debug"]
-
 check_minimal:
   <<: *check_definition
   <<: *skip_wip_test_definition
@@ -451,15 +436,6 @@ doc_18_04:
   dependencies:
     - make_18_04
   needs: ["make_18_04"]
-
-doc_debug:
-  <<: *doc_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
-  before_script:
-    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
-  dependencies:
-    - make_debug
-  needs: ["make_debug"]
 
 
 # 5. pages stage; uploads documentation to the website
