@@ -477,7 +477,7 @@ Monitor RAM and disk usage during compilation to prevent out-of-RAM problems.
 To find the proper libasan library in your particular distribution, use the "find" command.
 
 By default the leak detector is enabled in the asan build. Yade is producing a lot of leak warnings at the moment.
-To mute those warnings and concentrate on other memory errors, one can to use detect_leaks=0 option. The full command
+To mute those warnings and concentrate on other memory errors, one can use detect_leaks=0 option. The full command
 to run tests with the AddressSanitized-Yade on Debian 10 Buster is::
 
 	ASAN_OPTIONS=detect_leaks=0:verify_asan_link_order=false yade --test
