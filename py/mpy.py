@@ -748,7 +748,7 @@ def splitScene():
 			subD= O.subD #alias
 			subD.comm=comm #make sure the c++ uses the merged intracommunicator
 			
-			masterBodies = [b.id for b in O.bodies if b.subdomain==0] 
+			masterBodies = [b.id for b in O.bodies if b.subdomain==0] #for VTKRecorderParallel, easier to loop through the owned bodies. 
 			subD.setIDstoSubdomain(masterBodies)
 			
 			
