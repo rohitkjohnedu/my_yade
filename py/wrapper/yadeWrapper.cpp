@@ -28,6 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/math/special_functions/nonfinite_num_facets.hpp>
+<<<<<<< da3c5e663fd6e641dc3328e1e6d009aeb48aa4a6
 #include <boost/python/raw_function.hpp>
 
 #include <locale>
