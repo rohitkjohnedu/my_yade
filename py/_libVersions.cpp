@@ -51,7 +51,13 @@ py::tuple extractNumbers(std::string verStr, std::string what) {
 #ifdef BOOST_CLANG
 		prefix += "CLANG_";
 #endif
+#ifndef __clang__
 		ret.append( prefix+boost::lexical_cast<std::string>(__GNUC__)+"."+boost::lexical_cast<std::string>(__GNUC_MINOR__)+"."+boost::lexical_cast<std::string>(__GNUC_PATCHLEVEL__ ));
+#else
+		ret.append( py::make_tuple( __clang_major__ , __clang_minor__ , __clang_patchlevel__ ));
+		ret.append( boost::lexical_cast<std::string>( __clang_version__ ));
+#endif
+
 		return ret;
 	}
 #else
