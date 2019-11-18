@@ -12,6 +12,44 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN( (Law2_SCG_KnKsPhys_KnKsLaw) (Ip2_FrictMat_FrictMat_KnKsPhys) (KnKsPhys)
 );
 
+/* ***************************************************************************************************************************** */
+/** Function which returns the ratio between the number of sliding contacts to the total number at a given time */
+Real Law2_SCG_KnKsPhys_KnKsLaw::ratioSlidingContacts()
+{
+	Real ratio(0); int count(0);
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		KnKsPhys* phys = dynamic_cast<KnKsPhys*>(I->phys.get()); /* contact physics */
+		if (phys->isSliding) {ratio+=1;}
+		count++;
+	}
+	ratio/=count;
+	return ratio;
+}
+
+
+/* ***************************************************************************************************************************** */
+/** Energy calculations */
+Real Law2_SCG_KnKsPhys_KnKsLaw::getPlasticDissipation() {return (Real) plasticDissipation;}
+void Law2_SCG_KnKsPhys_KnKsLaw::initPlasticDissipation(Real initVal) {plasticDissipation.reset(); plasticDissipation+=initVal;}
+Real Law2_SCG_KnKsPhys_KnKsLaw::getnormDampDissip() {return (Real) normDampDissip;}
+Real Law2_SCG_KnKsPhys_KnKsLaw::getshearDampDissip() {return (Real) shearDampDissip;}
+
+Real Law2_SCG_KnKsPhys_KnKsLaw::elasticEnergy() {
+	Real energy=0;
+	FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
+		if(!I->isReal()) continue;
+		KnKsPhys* phys = dynamic_cast<KnKsPhys*>(I->phys.get()); /* contact physics */
+		if(phys) {
+			//FIXME: Check whether we need to add the viscous forces to the elastic ones below, since the normalForce is reduced by normalViscous
+			//Currently, damping in the shear direction is deactivated, so shearViscous=Vector3r(0,0,0) in all cases.
+/* reduced+viscous */	//energy += 0.5*( (phys->normalForce + phys->normalViscous).squaredNorm()/phys->kn + (phys->shearForce + phys->shearViscous).squaredNorm()/phys->ks);
+/* reduced*/		energy += 0.5*( (phys->normalForce                      ).squaredNorm()/phys->kn + (phys->shearForce                     ).squaredNorm()/phys->ks);
+		}
+	}
+	return energy;
+}
+
 
 /* ***************************************************************************************************************************** */
 /** Law2_SCG_KnKsPhys_KnKsLaw */
@@ -35,11 +73,12 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 
 	/* Need to initialise in python.  In the 1st time step.  All the particles in contact (controlled by initialOverlap) are identified.  The interactions are set to tensile and cohesive (tensionBroken = false and cohesionBroken = false).  If there is no initial tension or cohesion, the contact law is run in a tensionless or cohesionless mode */
 
-	if(geom->penetrationDepth <0.0 ) {
+	if(un<0.0) {
 		if (neverErase) {
 			phys->shearForce = Vector3r::Zero();
 			phys->normalForce = Vector3r::Zero();
 			phys->normalViscous = Vector3r::Zero();
+			phys->shearViscous = Vector3r::Zero();
 			geom->normal = Vector3r::Zero();
 			phys->tensionBroken = true;
 		} else {
@@ -117,7 +156,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 		phys->tensionBroken = true;
 		phys->cohesionBroken = true;
 	}
-	if(!Talesnick) {
+	if(!Talesnick) { //FIXME: Talesnick is not developed for the PPs. Either remove this check or develop it
 		un = un-initialOverlapDistance;
 
 		if (phys->jointType==3) {
@@ -129,7 +168,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 		phys->normalForce = phys->prevSigma*std::max(pow(10,-15),phys->contactArea)*geom->normal;
 	}
 
-	phys->kn = phys->knVol*std::max(pow(10,-8),phys->contactArea);
+	phys->kn = phys->knVol*std::max(pow(10,-15),phys->contactArea);
 
 	if((un <0.0 && fabs(phys->prevSigma)>phys->tension && phys->tensionBroken == false /* first time tension is broken */) || (un<0.0 && phys->tensionBroken==true)) {
 		if (neverErase) {
@@ -148,10 +187,11 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	/*ORIGINAL */
 	Vector3r c1x = geom->contactPoint - de1->pos;
 	Vector3r c2x = geom->contactPoint - de2->pos;
-	incidentV = (de2->vel+de2->angVel.cross(c2x)) - (de1->vel+de1->angVel.cross(c1x));
+	incidentV = (de2->vel+de2->angVel.cross(c2x)) - (de1->vel+de1->angVel.cross(c1x)); //FIXME: If we need to recalculate the relative velocity here, we should add shiftVel manually in this line, to handle periodicity @vsangelidakis
 	incidentVn = geom->normal.dot(incidentV)*geom->normal; // contact normal velocity
 	incidentVs = incidentV-incidentVn; // contact shear velocity
-	shearIncrement=incidentVs*dt;
+	shearIncrement=incidentVs*dt; //FIXME: Do we need to recalculate incidentV, incidentVn, incidentVs and shearIncrement here? Need to revise whether to subtract shift2 from c2x @vsangelidakis
+
 	if(!Talesnick) {
 		double Ks=0.0;
 		if(phys->jointType == 3) {
@@ -159,9 +199,9 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 		} else {
 			Ks = phys->ksVol;
 		}
-		shearForce -= Ks*shearIncrement*std::max(pow(10,-11),phys->contactArea);
+		shearForce -= Ks*shearIncrement*std::max(pow(10,-15),phys->contactArea);
 	}
-	phys->ks = phys->ksVol*std::max(pow(10,-11),phys->contactArea);
+	phys->ks = phys->ksVol*std::max(pow(10,-15),phys->contactArea);
 
 
 //	const shared_ptr<Body>& b1=Body::byId(id1,scene);
@@ -179,7 +219,30 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	//if(phys->normalViscous.norm() > maxFnViscous){
 	//	phys->normalViscous = phys->normalViscous * maxFnViscous/phys->normalViscous.norm();
 	//}
-	phys->normalForce -= phys->normalViscous; //FIXME: Here we need to create a check whether the viscous force is attractive
+
+	/* Check whether to allow fictitious (unnatural) attractive forces due to viscous damping, near the end of a collision */
+	if(not allowViscousAttraction) {
+		// viscous force should not exceed the value of current normal force, i.e. no attraction force should be permitted if particles are non-adhesive
+		// *** enforce normal force to zero if no adhesion is permitted ***
+
+		// This commented block is the approach used in Hertz-Mindlin. I don't think this worked correctly, since using it gave me some -practically- infinite plastic slips in some individual timesteps, which make me believe that this approach some times can lead to negative (attractive) contact forces. Thus, I used the uncommented code-block below, following this one. @vsangelidakis
+		#if 0
+		Vector3r normTemp = phys->normalForce - phys->normalViscous; // temporary normal force
+		if (normTemp.dot(geom->normal) < 0.0){
+			phys->normalViscous = phys->normalForce;
+		}
+		#endif
+
+//		#if 0
+		if (phys->normalViscous.norm() > phys->normalForce.norm() ) {
+			phys->normalViscous=phys->normalForce;
+		}
+//		#endif
+
+		//FIXME: The same must be done for the shearForce, if viscous damping is to be considered in the shear direction as well in the future
+	}
+
+	phys->normalForce -= phys->normalViscous;
 	//double baseElevation =  geom->contactPoint.z();
 
 	/* Water pressure, heat effect */
@@ -212,20 +275,71 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 			if (phys->cohesionBroken == true && allowBreakage == true) {
 				maxFs = std::max( fN,0.0)*tan_effective_phi;
 			} else {
-				double cohesiveForce = phys->cohesion*std::max(pow(10,-11),phys->contactArea);
+				double cohesiveForce = phys->cohesion*std::max(pow(10,-15),phys->contactArea);
 				maxFs = cohesiveForce+std::max( fN,0.0)*tan_effective_phi;
 			}
 		} else {	maxFs = std::max( fN,0.0)*tan_effective_phi; }
 	}
-	if( shearForce.norm() > maxFs ) {
-		Real ratio = maxFs / shearForce.norm();
-		shearForce *= ratio;
-		dampedShearForce = shearForce;
-		if(allowBreakage == true) { phys->cohesionBroken = true; }
-		phys->shearViscous = Vector3r(0,0,0);
-	} else { /* no damping when it slides */
-		phys->shearViscous = cs*incidentVs;
-		dampedShearForce = shearForce - phys->shearViscous;
+
+	/* ********************************************************************************************************************* */
+	/** SHEAR CORRECTION - MOHR-COULOMB CRITERION */
+	phys->isSliding=false;
+
+	if (!scene->trackEnergy && !traceEnergy){//Update force but don't compute energy terms (see below))
+		if( shearForce.norm() > maxFs ) {
+			phys->isSliding=true;
+			Real ratio = maxFs / shearForce.norm();
+			shearForce *= ratio;
+			if(allowBreakage == true) { phys->cohesionBroken = true; }
+			dampedShearForce = shearForce;  /* no damping when it slides */
+			phys->shearViscous = Vector3r(0,0,0);
+		} else {
+			phys->shearViscous = Vector3r::Zero(); //cs*incidentVs;  //For now we do not consider viscous damping in the shear direction
+			dampedShearForce = shearForce - phys->shearViscous;
+		}
+	} else {
+		//almost the same with additional Vector3r instatinated for energy tracing,
+		//duplicated block to make sure there is no cost for the instanciation of the vector when traceEnergy==false
+		if( shearForce.norm() > maxFs ) {
+			phys->isSliding=true;
+			Real ratio = maxFs / shearForce.norm();
+			/*const*/ Vector3r trialForce=shearForce; //Store prev force for definition of plastic slip
+			shearForce *= ratio;
+			if(allowBreakage == true) { phys->cohesionBroken = true; }
+			dampedShearForce = shearForce;  /* no damping when it slides */
+			phys->shearViscous = Vector3r(0,0,0);
+
+			/* Plastic dissipation due to friction */
+			/*const*/ Real dissip=((1/phys->ks)*(trialForce-shearForce))/*plastic disp*/ .dot(shearForce)/*active force*/;
+			if (traceEnergy) plasticDissipation += dissip;
+			else if(dissip>0) scene->energy->add(dissip,"plastDissip",plastDissipIx,/*reset at every timestep*/false);
+		} else {
+			phys->shearViscous = Vector3r::Zero(); //cs*incidentVs;  //For now we do not consider viscous damping in the shear direction
+			dampedShearForce = shearForce - phys->shearViscous;
+		}
+
+		// ------------------------------------------------------------------------------------------------------------------------------
+		/* Elastic potential energy*/
+
+		//FIXME: Check whether we need to add the viscous forces to the elastic ones on the elastic potential energy below, since the normalForce is reduced by normalViscous
+
+/* reduced+viscous */	//scene->energy->add(0.5*( (phys->normalForce + phys->normalViscous).squaredNorm()/phys->kn + (phys->shearForce + phys->shearViscous).squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
+
+/* reduced*/		scene->energy->add(0.5*(phys->normalForce.squaredNorm()/phys->kn+phys->shearForce.squaredNorm()/phys->ks),"elastPotential",elastPotentialIx,/*reset at every timestep*/true);
+
+		// ------------------------------------------------------------------------------------------------------------------------------
+		/* Dissipation due to viscous damping*/
+		if ( phys->viscousDamping > 0.0 ) {
+			/*const*/ Real normDampDissipValue = phys->normalViscous.dot(incidentVn*dt);
+			if (traceEnergy) normDampDissip += normDampDissipValue; // calc dissipation of energy due to normal damping
+			else if (normDampDissipValue>0) scene->energy->add(normDampDissipValue,"normDampDissip",normDampDissipIx,/*reset at every timestep*/false);
+			// Here, instead of checking shearViscous.norm(), I should consider a boolean variable "noShearDamp", like in HertzMindlin.cpp
+			if ( phys->shearViscous.norm() > 0.0 ) {
+				/*const*/ Real shearDampDissipValue = phys->shearViscous.dot(incidentVs*dt);
+				if (traceEnergy) {shearDampDissip += shearDampDissipValue; // calc dissipation of energy due to shear damping damping
+				}else{ scene->energy->add(shearDampDissipValue,"shearDampDissip",shearDampDissipIx,/*reset at every timestep*/false);}
+			}
+		}
 	}
 	if(shearForce.norm() < pow(10,-11) ) {
 		phys->mobilizedShear = 1.0;
@@ -234,10 +348,9 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 		phys->mobilizedShear = shearForce.norm()/maxFs;
 	}
 
-	//we need to use correct branches in the periodic case, the following apply for spheres only
 	Vector3r force = -phys->normalForce-dampedShearForce;
-	if(std::isnan(force.norm())) {
-		//std::cout<<"shearForce: "<<shearForce<<", normalForce: "<<phys->normalForce<<", debugFn: "<<debugFn<<", viscous: "<<phys->normalViscous<<", normal: "<<phys->normal<<", geom normal: "<<geom->normal<<", effective_phi: "<<phys->effective_phi<<", shearIncrement: "<<shearIncrement<<", id1: "<<id1<<", id2: "<<id2<<", shearForceBeforeRotate: "<<shearForceBeforeRotate<<", shearForceAfterRotate: " <<shearForceAfterRotate<<endl;
+	if(std::isnan(force.norm())) {//FIXME: Check who necessarry this output is or else comment out this branch
+		std::cout<<"shearForce: "<<shearForce<<", normalForce: "<<phys->normalForce<<", viscousNormal: "<<phys->normalViscous<<", viscousShear: "<<phys->shearViscous<<", geom normal: "<<geom->normal<<", effective_phi: "<<phys->effective_phi<<", shearIncrement: "<<shearIncrement<<", cs: "<<cs<<", incidentVs: "<<incidentVs<<", id1: "<<id1<<", id2: "<<id2<<", phys->mobilizedShear: "<<phys->mobilizedShear<<endl;
 	}
 	scene->forces.addForce(id1,force);
 	scene->forces.addForce(id2,-force);
