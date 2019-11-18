@@ -19,9 +19,9 @@ class KnKsPhys: public FrictPhys {
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPhys,FrictPhys,"EXPERIMENTAL. IPhys for :yref:`PotentialParticle`.",
 			((Real, frictionAngle, 0.0,,"Friction angle"))
 //				((Real,tanFrictionAngle,0.0,,"tangent of fric angle"))
-			((Vector3r, contactDetectionPt, Vector3r::Zero(),,"contact detection result"))
-			((Real, viscousDamping, 0.0,,"Viscous damping"))
-//			((Real, unitWidth2D, 1.0,,"Unit width in 2D")) // Moved this attr in Ig2_PB_PB_ScGeom @vsangelidakis
+//				((Vector3r, contactDetectionPt, Vector3r::Zero(),,"contact detection result"))
+			((Real, viscousDamping, 0.0,,"Viscous damping"))//FIXME: We don't need to store this attr for each contact. It can be stored only in the Law2
+//			((Real, unitWidth2D, 1.0,,"Unit width in 2D")) // Moved this attr in Ig2_PP_PP_ScGeom @vsangelidakis
 				((Real, maxClosure, 0.0002,,"not fully in use, vmi")) //FIXME: It is used once; check this
 //				((Real, u_peak, 0.05,,"peak shear displacement, not fully in use"))
 				((Real, u_elastic, 0.0,,"Elastic shear displacement, not fully in use"))
@@ -74,7 +74,7 @@ class KnKsPhys: public FrictPhys {
 //				((int, smallerID, 1 ,,"id of particle with smaller plane"))
 			((Real, cumulative_us, 0.0,,"Cumulative shear translation (not fully in use)"))
 //				((Real, cumulativeRotation, 0.0,,"cumulative rotation"))
-			((Real, mobilizedShear, ,,"Percentage of mobilized shear force as the ratio of the current shear force to the current frictional limit. Representa a quantified measure of the isSliding parameter"))
+			((Real, mobilizedShear, ,,"Percentage of mobilized shear force as the ratio of the current shear force to the current frictional limit. Represents a quantified measure of the isSliding parameter"))
 			((Real, contactArea, 0.0,,"Contact area"))
 //				((Real, radCurvFace, ,,"not used, face"))
 //				((double, prevJointLength, 0.0,,"previous joint length"))
@@ -119,6 +119,7 @@ class KnKsPhys: public FrictPhys {
 			((double, effective_phi, 0.0,,"Friction angle in clay after displacement"))
 //				((double, prevOverlap, 0.0,,"previous overlap"))
 //				((Real, h, 0.0,,"not used, cd"))
+			((bool,isSliding,false,,"Check if the contact is sliding (useful to calculate the ratio of sliding contacts)"))
 			, /* ctor */
 
 			//((Real, cumulativeRotation, 0.0,,"cumulative rotation"))
@@ -142,7 +143,7 @@ class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 		YADE_CLASS_BASE_DOC_ATTRS(Ip2_FrictMat_FrictMat_KnKsPhys,IPhysFunctor,"EXPERIMENTAL. Ip2 functor for :yref:`KnKsPhys`",
 			((Real, Knormal,0.0,,"Volumetric stiffness in the contact normal direction (units: stress/length)"))
 			((Real, Kshear,0.0,,"Volumetric stiffness in the contact shear direction (units: stress/length)"))
-//			((Real, unitWidth2D, 1.0,,"Unit width in 2D")) // Moved this attr in Ig2_PB_PB_ScGeom @vsangelidakis
+//			((Real, unitWidth2D, 1.0,,"Unit width in 2D")) // Moved this attr in Ig2_PP_PP_ScGeom @vsangelidakis
 			((double, brittleLength, ,,"Shear length for degradation"))
 			((double, kn_i, ,,"Currently, we assume kn_i and Knormal are adopting the same value in Ip2 initialisation"))
 			((double, ks_i, ,,"Currently, we assume ks_i and Kshear are adopting the same value in Ip2 initialisation"))
@@ -168,6 +169,17 @@ REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_KnKsPhys);
 
 class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor {
 	public:
+		OpenMPAccumulator<Real> plasticDissipation; // Energy dissipation due to sliding
+		OpenMPAccumulator<Real> normDampDissip; // Energy dissipated by normal damping
+		OpenMPAccumulator<Real> shearDampDissip; // Energy dissipated by tangential damping
+
+		Real elasticEnergy();
+		Real getPlasticDissipation();
+		void initPlasticDissipation(Real initVal=0);
+		Real ratioSlidingContacts();
+		Real getnormDampDissip();
+		Real getshearDampDissip();
+
 //		static Real Real0;
 		//OpenMPAccumulator<Real,&Law2_SCG_KnKsPhys_KnKsLaw::Real0> plasticDissipation;
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
@@ -181,7 +193,19 @@ class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor {
 //				((double,waterLevel,0.0,,"not used"))
 			((bool, allowBreakage, false,,"Allow cohesion to break. Once broken, cohesion = 0"))
 			((double, initialOverlapDistance,0.0,,"Initial overlap distance, defining the offset distance for tension overlap, i.e. negative overlap."))
-			,,
+			((bool, allowViscousAttraction, true,,"Whether to allow attractive forces due to viscous damping"))
+			((int, normDampDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for normal viscous damping dissipation work (with O.trackEnergy)"))
+			((int, shearDampDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for shear viscous damping dissipation work (with O.trackEnergy)"))
+			((int, plastDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for plastic dissipation (with O.trackEnergy)"))
+			((int, elastPotentialIx, -1,(Attr::hidden|Attr::noSave),"Index for elastic potential energy (with O.trackEnergy)"))
+			, /* ctor */
+			, /* py */
+			.def("elasticEnergy",&Law2_SCG_KnKsPhys_KnKsLaw::elasticEnergy,"Compute and return the total elastic energy in all \"FrictPhys\" contacts. Computed only if :yref:`Law2_SCG_KnKsPhys_KnKsLaw::traceEnergy` is true.")
+			.def("normDampDissip",&Law2_SCG_KnKsPhys_KnKsLaw::getnormDampDissip,"Total energy dissipated in normal viscous damping. Computed only if :yref:`Law2_SCG_KnKsPhys_KnKsLaw::traceEnergy` is true.")
+			.def("shearDampDissip",&Law2_SCG_KnKsPhys_KnKsLaw::getshearDampDissip,"Total energy dissipated in shear viscous damping. Computed only if :yref:`Law2_SCG_KnKsPhys_KnKsLaw::traceEnergy` is true.")
+			.def("plasticDissipation",&Law2_SCG_KnKsPhys_KnKsLaw::getPlasticDissipation,"Total energy dissipated in plastic slips at all FrictPhys contacts. Computed only if :yref:`Law2_SCG_KnKsPhys_KnKsLaw::traceEnergy` is true.")
+			.def("initPlasticDissipation",&Law2_SCG_KnKsPhys_KnKsLaw::initPlasticDissipation,"Initialize cummulated plastic dissipation to a value (0 by default).")
+			.def("ratioSlidingContacts",&Law2_SCG_KnKsPhys_KnKsLaw::ratioSlidingContacts,"Return the ratio between the number of contacts sliding to the total number at a given time.")
 
 		);
 	// clang-format on
