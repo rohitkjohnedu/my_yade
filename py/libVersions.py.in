@@ -107,7 +107,7 @@ def getAllVersionsCmake():
 	addVer("cmake",'${CMAKE_MAJOR_VERSION}','${CMAKE_MINOR_VERSION}','${CMAKE_PATCH_VERSION}','${CMAKE_VERSION}')
 	# 1. compiler
 	try:
-		addVer("gcc"  ,'${CMAKE_CXX_COMPILER_VERSION}'.split('.')[0],'${CMAKE_CXX_COMPILER_VERSION}'.split('.')[1],'${CMAKE_CXX_COMPILER_VERSION}'.split('.')[2],'${CMAKE_CXX_COMPILER_VERSION}')
+		addVer('compiler'  ,'${CMAKE_CXX_COMPILER_VERSION}'.split('.')[0],'${CMAKE_CXX_COMPILER_VERSION}'.split('.')[1],'${CMAKE_CXX_COMPILER_VERSION}'.split('.')[2],'${CMAKE_CXX_COMPILER} ${CMAKE_CXX_COMPILER_VERSION}')
 	except:
 		pass
 	addVer("clang",'${CLANG_VERSION_MAJOR}','${CLANG_VERSION_MINOR}','${CLANG_VERSION_PATCHLEVEL}','${CLANG_VERSION}')

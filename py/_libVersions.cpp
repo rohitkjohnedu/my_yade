@@ -37,51 +37,31 @@ py::tuple extractNumbers(std::string verStr, std::string what)
 // If we need a version of some library not listed in doc/sphinx/installation.rst, then it must also be added to that list!
 
 // 1. compiler
-// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
-#ifdef __GNUC__
-py::list gccVer()
+py::list compilerVer()
 {
 	py::list ret;
-	ret.append(py::make_tuple(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__));
-	std::string prefix {};
-#ifndef BOOST_GCC
+#ifdef BOOST_GCC
+	// BOOST_GCC is defined if the compiler is really gcc
 	// https://www.boost.org/doc/libs/1_44_0/libs/config/doc/html/boost_config/boost_macro_reference.html#boost_config.boost_macro_reference.boost_informational_macros
-	// use boost macro to detect if it's really a gcc compiler.
-	prefix += "not_gcc_";
-#endif
-#ifdef BOOST_INTEL
-	prefix += "INTEL_";
-#endif
-#ifdef BOOST_CLANG
-	prefix += "CLANG_";
-#endif
-#ifndef __clang__
+	// https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+	ret.append(py::make_tuple(__GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__));
 	ret.append(
-	        prefix + boost::lexical_cast<std::string>(__GNUC__) + "." + boost::lexical_cast<std::string>(__GNUC_MINOR__) + "."
+	        "gcc " + boost::lexical_cast<std::string>(__GNUC__) + "." + boost::lexical_cast<std::string>(__GNUC_MINOR__) + "."
 	        + boost::lexical_cast<std::string>(__GNUC_PATCHLEVEL__));
-#else
+#elif __clang__
+	// http://clang.llvm.org/docs/LanguageExtensions.html#builtin-macros
 	ret.append(py::make_tuple(__clang_major__, __clang_minor__, __clang_patchlevel__));
-	ret.append(boost::lexical_cast<std::string>(__clang_version__));
+	ret.append("clang " + boost::lexical_cast<std::string>(__clang_version__));
+#elif BOOST_INTEL
+	ret.append(py::make_tuple(__INTEL_COMPILER, __INTEL_COMPILER_UPDATE, __INTEL_COMPILER_BUILD_DATE));
+	ret.append("intel " + boost::lexical_cast<std::string>(BOOST_COMPILER) + " " + boost::lexical_cast<std::string>(__ICC));
+#else
+	// BOOST_COMPILER is defined as a string describing the name and version number of the compiler in use. Mainly for debugging the configuration.
+	ret.append(py::make_tuple(0, 0, 0));
+	ret.append("unrecognized " + boost::lexical_cast<std::string>(BOOST_COMPILER));
 #endif
-
 	return ret;
 }
-#else
-py::list gccVer() { return {}; }
-#endif
-
-// http://clang.llvm.org/docs/LanguageExtensions.html#builtin-macros
-#ifdef __clang__
-py::list clangVer()
-{
-	py::list ret;
-	ret.append(py::make_tuple(__clang_major__, __clang_minor__, __clang_patchlevel__));
-	ret.append(boost::lexical_cast<std::string>(__clang_version__));
-	return ret;
-}
-#else
-py::list clangVer() { return {}; }
-#endif
 
 // 2. Boost
 // https://www.boost.org/doc/libs/1_44_0/libs/config/doc/html/boost_config/boost_macro_reference.html#boost_config.boost_macro_reference.boost_informational_macros
@@ -373,8 +353,7 @@ py::dict getAllVersionsCpp()
 	py::dict ret;
 	// I found relevant names with commad:
 	// dpkg -L libName-dev |  xargs -I'{}' -P 1 cat {} | grep -i -E "defi.*versio.*"
-	ret["gcc"]         = gccVer();
-	ret["clang"]       = clangVer();
+	ret["compiler"]    = compilerVer();
 	ret["boost"]       = boostVer();
 	ret["qt"]          = qtVer();
 	ret["gl"]          = glVer();
