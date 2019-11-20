@@ -333,6 +333,14 @@ test_18_04_nogui:
     - make_18_04_nogui
   needs: ["make_18_04_nogui"]
 
+test_clang:
+  <<: *test_definition
+  <<: *skip_wip_test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_clang
+  needs: ["make_clang"]
+
 
 # 3.2. check stage
 .check_template: &check_definition
@@ -416,6 +424,14 @@ check_suse15:
   dependencies:
     - make_suse15
   needs: ["make_suse15"]
+
+check_clang:
+  <<: *check_definition
+  <<: *skip_wip_test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_clang
+  needs: ["make_clang"]
 
 
 .doc_template: &doc_definition
