@@ -9,7 +9,7 @@ Accelerating Yade's FlowEngine with GPU
 Summary
 =======
 
-This document contains instructions for adding Suite Sparse's GPU acceleration to Yade's Pore Finite Volume (PFV) scheme. The guide is intended for intermediate to advanced Yade users. As such, the guide assumes the reader knows how to modify and compile Yade's source files. Readers will find that this guide introduces system requirements, installation of necessary prerequisites, and installation of the modified Yade. Lastly, the document shows the performance enhancement expected by acceleration of the factorization of various model sizes.
+This document contains instructions for adding Suite Sparse's GPU acceleration to Yade's Pore Finite Volume (PFV) scheme as demonstrated in [Caulk2019]_. The guide is intended for intermediate to advanced Yade users. As such, the guide assumes the reader knows how to modify and compile Yade's source files. Readers will find that this guide introduces system requirements, installation of necessary prerequisites, and installation of the modified Yade. Lastly, the document shows the performance enhancement expected by acceleration of the factorization of various model sizes.
 
 Hardware, Software, and Model Requirements
 ==========================================
@@ -52,14 +52,8 @@ The following instructions to install CUDA are a boiled down version of `these i
 
 Restart your computer.
 
-Verify your CUDA installation by navigating to ``/usr/local/cuda/samples`` and executing the ``make`` command. You may need to edit the findglib.mk file with the following command:
+Verify your CUDA installation by navigating to ``/usr/local/cuda/samples`` and executing the ``make`` command. Now you can navigate to ``/usr/local/cuda/samples/1_Utilities/deviceQuery/`` and execute ``./deviceQuery`` . Verify the ``Result = PASS``. 
 
-::
-
-	sed -i "s/nvidia-367/nvidia-375/g" 'grep "nvidia-367" -r ./ -l'
-
-
-Now you can navigate to ``/usr/local/cuda/samples/1_Utilities/deviceQuery/`` and execute ``./deviceQuery`` . Verify the ``Result = PASS``. 
 
 Install OpenBlas, and Lapack
 ============================
@@ -111,6 +105,6 @@ Performance increase
 	:width: 16.2 cm
 	:align: center
 
-	Time required to factorize and analyze various sized matrices for 10-core CPU, 1050Ti GPU, and Tesla K20 GPU.
+	Time required to factorize and analyze various sized matrices for 10-core CPU, 1050Ti GPU, and Tesla K20 GPU [Caulk2019]_.
 
 Note: Tesla K20 5GB CPU + 10-core Xeon E5 2.8 GHz CPU
