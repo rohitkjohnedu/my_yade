@@ -53,8 +53,10 @@ py::list compilerVer()
 	ret.append(py::make_tuple(__clang_major__, __clang_minor__, __clang_patchlevel__));
 	ret.append("clang " + boost::lexical_cast<std::string>(__clang_version__));
 #elif BOOST_INTEL
-	ret.append(py::make_tuple(__INTEL_COMPILER, __INTEL_COMPILER_UPDATE, __INTEL_COMPILER_BUILD_DATE));
-	ret.append("intel " + boost::lexical_cast<std::string>(BOOST_COMPILER) + " " + boost::lexical_cast<std::string>(__ICC));
+	ret.append(py::make_tuple(__INTEL_COMPILER / 100, __INTEL_COMPILER % 100, __INTEL_COMPILER_UPDATE));
+	ret.append(
+	        "intel " + boost::lexical_cast<std::string>(BOOST_COMPILER) + " " + boost::lexical_cast<std::string>(__ICC) + " "
+	        + boost::lexical_cast<std::string>(__INTEL_COMPILER_BUILD_DATE));
 #else
 	// BOOST_COMPILER is defined as a string describing the name and version number of the compiler in use. Mainly for debugging the configuration.
 	ret.append(py::make_tuple(0, 0, 0));
