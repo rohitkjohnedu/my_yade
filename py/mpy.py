@@ -49,8 +49,6 @@ if parent!=MPI.COMM_NULL:
 
 rank = comm.Get_rank()
 numThreads = comm.Get_size()
-commSplit = False 
-
 waitingCommands=False #are workers currently interactive?
 userScriptInCheckList=""	# detect if mpy is executed by checkList.py
 
@@ -84,6 +82,7 @@ fibreList = []
 FLUID_COUPLING = False
 fluidBodies = [] 
 USE_CPP_MEDIAN = True
+USE_CPP_INTERS = False #sending intersections using mpi4py sometimes fails (dependent on mpi4py version, needs confirmation) (ERR : MPI_ERR_TRUNCATE)
 
 #tags for mpi messages
 _SCENE_=11
@@ -105,6 +104,8 @@ _REALLOC_COUNT=0
 
 # for coloring processes outputs differently
 bcolors=['\033[95m','\033[94m','\033[93m','\033[92m','\033[91m','\033[90m','\033[95m','\033[93m','\033[91m','\033[1m','\033[4m','\033[0m']
+
+
 
 def mprint(*args): #this one will print regardless of VERBOSE_OUTPUT
 	if NO_OUTPUT or rank>MAX_RANK_OUTPUT: return
@@ -420,7 +421,9 @@ def unboundRemoteBodies():
 	Turn bounding boxes on/off depending on rank
 	'''
 	for b in O.bodies:# unbound the bodies assigned to workers (not interacting directly with other bodies in master scene)
-		if (not (b.isSubdomain or isinstance(b.shape, FluidDomainBbox)) and b.subdomain!=rank):
+		#if FLUID_COUPLING: 
+			#if (isinstance(b.shape, FluidDomainBbox) ) : continue
+		if not b.isSubdomain and b.subdomain!=rank:
 			b.bounded=False
 			
 def reboundRemoteBodies(ids):
@@ -540,7 +543,6 @@ def genLocalIntersections(subdomains):
 						intersections[subdIdx]+=maskedConnection(b, appended); continue
 				#else (standalone body, normal case)
 				intersections[subdIdx].append(otherId)
-				
 		#for master domain set list of interacting subdomains (could be handled above but for the sake of clarity complex if-else-if are avoided for now)
 		if rank==0 and len(intersections[subdIdx])>0:
 			intersections[0].append(subdIdx)
@@ -632,9 +634,18 @@ def isendRecvForces():
 	Warning: the sending sides (everyone but master) must wait() the returned list of requests
 	'''	
 	O.freqs=[] #keep that one defined even if empty, it is accessed in other functions
+	#TDOD: FORCES FROM FLUID DOMAIN BOXES!!!!
 	if ACCUMULATE_FORCES:
 		if rank!=0:
-			forces0=[[id,O.forces.f(id),O.forces.t(id)] for id in  O.subD.mirrorIntersections[0]]
+			if FLUID_COUPLING: 
+				forces0 = []
+				for id in O.subD.mirrorIntersections[0]: 
+					if not isinstance(O.bodies[id].shape, FluidDomainBbox): 
+						forces0.append([id, O.forces.f(id), O.forces.t(id)])
+				#forces0=[[id, O.forces.f(id), O.forces.t(id)] for id in O.subD.mirrorIntersections[0] and not isinstance(O.bodies[id].shape, FluidDomainBbox)]
+				
+			else: 
+				forces0=[[id,O.forces.f(id),O.forces.t(id)] for id in  O.subD.mirrorIntersections[0]]
 			#wprint ("worker "+str(rank)+": sending "+str(len(forces0))+" "+str("forces to 0 "))
 			#O.freqs.append(comm.isend(forces0, dest=0, tag=_FORCES_))
 			timing_comm.send("isendRecvForces",forces0, dest=0, tag=_FORCES_)
@@ -754,9 +765,9 @@ def splitScene():
 			
 			#tell the collider how to handle this new thing
 			collider = utils.typedEngine("InsertionSortCollider")
-			collider.boundDispatcher.functors=collider.boundDispatcher.functors+[Bo1_Subdomain_Aabb()]
 			if FLUID_COUPLING: 
 				collider.boundDispatcher.functors = collider.boundDispatcher.functors+[Bo1_FluidDomainBbox_Aabb()]
+			collider.boundDispatcher.functors=collider.boundDispatcher.functors+[Bo1_Subdomain_Aabb()]
 			collider.targetInterv=0
 			collider.keepListsShort=True # probably not needed, O.bodies.insertAtId should turn it on automaticaly 
 			O.bodies.useRedirection=True # idem
@@ -786,18 +797,20 @@ def splitScene():
 				O.subD.subdomains = subdomains
 				subD = O.subD
 
+		if FLUID_COUPLING: 
+			fluidCoupling = utils.typedEngine("FoamCoupling")
+			fluidCoupling.comm = comm
+			fluidCoupling.setIdList(fluidBodies)
+			fluidCoupling.couplingModeParallel = True
+
+
 		O._sceneObj.subdomain = rank
 		O.subD.comm=comm #make sure the c++ uses the merged intracommunicator
 		
 		O.subD.init() 
-		
-		if FLUID_COUPLING:
-			fluidCoupling = utils.typedEngine("FoamCoupling") 
-			fluidCoupling.comm = comm 
-			fluidCoupling.getFluidDomainBbox() #triggers the communication between yade procs and Yales2/openfoam procs, get's fluid domain bounding boxes from all fluid procs. 
-			fluidCoupling.setIdList(fluidBodies) 
-
+		wprint("to parallel collide")
 		parallelCollide()
+		wprint("end parallel collide")
 		
 		# insert states communicator after newton 
 		idx = O.engines.index(utils.typedEngine("NewtonIntegrator"))
@@ -831,60 +844,65 @@ def splitScene():
 def updateAllIntersections():
 	subD=O.subD
 	subD.intersections=genLocalIntersections(subD.subdomains)
+	if USE_CPP_INTERS:
+		subD.getMirrorIntrs() # 
+		
+	else: 
 	#update mirror intersections so we know message sizes in advance
-	subD.mirrorIntersections=[[] for n in range(numThreads)]
-	if rank==0:#master domain
-		for worker in range(1,numThreads):#FIXME: we actually don't need so much data since at this stage the states are unchanged and the list is used to re-bound intersecting bodies, this is only done in the initialization phase, though
-			#wprint("sending mirror intersections to "+str(worker)+" ("+str(len(subD.intersections[worker]))+" bodies), "+str(subD.intersections[worker]))
-			m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
-			timing_comm.send("sendIntersections",m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
-	else:
-		# from master
-		b_ids=timing_comm.recv("updateAllIntersections",source=0, tag=_MIRROR_INTERSECTIONS_)
-		wprint("Received mirrors from master: ",len(b_ids))
-		#FIXME: we are assuming that Body::id_t is 4 bytes here, not that portable...
-		numInts0= int(len(b_ids)/4) if SEND_BYTEARRAYS else len(b_ids)  #ints = 4 bytes
-		
-		if numInts0>0:
-			if SEND_BYTEARRAYS:
-				O.bufferFromIntrsct(subD,0,numInts0,True)[:]=b_ids
-				b_ids=np.frombuffer(b_ids,dtype=np.int32)
-			else:
-				subD.mirrorIntersections= [b_ids]+subD.mirrorIntersections[1:]
+		subD.mirrorIntersections=[[] for n in range(numThreads)]
+		if rank==0:#master domain
+			for worker in range(1,numThreads):#FIXME: we actually don't need so much data since at this stage the states are unchanged and the list is used to re-bound intersecting bodies, this is only done in the initialization phase, though
+				#wprint("sending mirror intersections to "+str(worker)+" ("+str(len(subD.intersections[worker]))+" bodies), "+str(subD.intersections[worker]))
+				m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
+				timing_comm.send("sendIntersections",m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
+		else:
+			# from master
+			b_ids=comm.recv(source=0, tag=_MIRROR_INTERSECTIONS_)
+			wprint("Received mirrors from master: ",b_ids)
+			#FIXME: we are assuming that Body::id_t is 4 bytes here, not that portable...
+			numInts0= int(len(b_ids)/4) if SEND_BYTEARRAYS else len(b_ids)  #ints = 4 bytes
+			
+			if numInts0>0:
+				if SEND_BYTEARRAYS:
+					O.bufferFromIntrsct(subD,0,numInts0,True)[:]=b_ids
+					b_ids=np.frombuffer(b_ids,dtype=np.int32)
+				else:
+					subD.mirrorIntersections= [b_ids]+subD.mirrorIntersections[1:]
 
-			#reboundRemoteBodies(b_ids)
-			# since interaction with 0-bodies couldn't be detected before, mirror intersections from master will
-			# tell if we need to wait messages from master (and this is declared via intersections) 
-			if not 0 in subD.intersections[rank]:
-				temp=subD.intersections[rank]
-				temp+=[0]
-				subD.intersections=subD.intersections[:rank]+[temp]+subD.intersections[rank+1:]
-			else:
-				if not O.splittedOnce: mprint("0 already in intersections (should not happen)")
-		reqs=[]
-		
-		#from workers
-		for worker in subD.intersections[rank]:
-			if worker==0: continue #already received above
-			#wprint("subD.intersections["+str(rank)+"]: "+str(subD.intersections[rank]))
-			#buf = bytearray(1<<22) #CRITICAL
-			reqs.append([worker,comm.irecv(None, worker, tag=_MIRROR_INTERSECTIONS_)])
+				#reboundRemoteBodies(b_ids)
+				# since interaction with 0-bodies couldn't be detected before, mirror intersections from master will
+				# tell if we need to wait messages from master (and this is declared via intersections) 
+				if not 0 in subD.intersections[rank]:
+					temp=subD.intersections[rank]
+					temp+=[0]
+					subD.intersections=subD.intersections[:rank]+[temp]+subD.intersections[rank+1:]
+				else:
+					if not O.splittedOnce: mprint("0 already in intersections (should not happen)")
+			reqs=[]
+			
+			#from workers
+			for worker in subD.intersections[rank]:
+				if worker==0: continue #already received above
+				#wprint("subD.intersections["+str(rank)+"]: "+str(subD.intersections[rank]))
+				#buf = bytearray(1<<22) #CRITICAL
+				#FIXME : using 'None' as a buffer
+				reqs.append([worker,comm.irecv(None, worker, tag=_MIRROR_INTERSECTIONS_)])
 
-		for worker in subD.intersections[rank]:
-			if worker==0: continue #we do not send positions to master, only forces
-			#wprint("sending "+str(len(subD.intersections[worker]))+" states to "+str(worker))
-			wprint("Send mirrors to: ", worker)
-			m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
-			timing_comm.send("updateAllIntersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
-		for req in reqs:
-			intrs=req[1].wait()
-			wprint("Received mirrors from: ", req[0], " : ",len(np.frombuffer(intrs,dtype=np.int32)))
-			if SEND_BYTEARRAYS:
-				O.bufferFromIntrsct(subD,req[0],int(len(intrs)/4),True)[:]=intrs
-				intrs=np.frombuffer(intrs,dtype=np.int32)
-			else:
-				subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
-			#reboundRemoteBodies(intrs)
+			for worker in subD.intersections[rank]:
+				if worker==0: continue #we do not send positions to master, only forces
+				#wprint("sending "+str(len(subD.intersections[worker]))+" states to "+str(worker))
+				wprint("Send mirrors to: ", worker)
+				m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
+				timing_comm.send("splitScene_intersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
+			for req in reqs:
+				intrs=req[1].wait()
+				if SEND_BYTEARRAYS:
+					wprint("Received mirrors from: ", req[0], " : ",np.frombuffer(intrs,dtype=np.int32))
+					O.bufferFromIntrsct(subD,req[0],int(len(intrs)/4),True)[:]=intrs
+					intrs=np.frombuffer(intrs,dtype=np.int32)
+				else:
+					subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
+				#reboundRemoteBodies(intrs)
 
 bodiesToImport=[]
 
@@ -978,35 +996,6 @@ def eraseRemote():
 				if not connected:
 					O.bodies.erase(b.id)
 
-#def migrateBodies(ids,origin,destination):
-	#'''
-	#Note: subD.completeSendBodies() will have to be called after a series of reassignement since subD.sendBodies() is non-blocking
-	#'''
-	#if rank==origin:
-		#for id in ids:
-			#if not O.bodies[id]: mprint("reassignBodies failed,",id," is not in subdomain ",rank)
-			#O.bodies[id].subdomain = destination
-		#O.subD.sendBodies(destination,ids)
-	#elif rank==destination:
-		#O.subD.receiveBodies(origin)
-	
-	
-#def reassignBodies():
-	#for worker in [2]:
-		#candidates = O.subD.intersections[worker]
-		#migrateBodies(candidates,1,worker)
-	#O.subD.completeSendBodies()
-	#O.subD.ids = [b.id for b in O.bodies if (b.subdomain==rank and not b.isSubdomain)]
-	
-	#reqs=[]
-		
-	#if rank>0: req = comm.send(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
-	#else: #master will update subdomains for correct display (besides, keeping 'ids' updated for remote subdomains may not be a strict requirement)
-		#for k in range(1,numThreads):
-			#ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
-			#O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
-			#for i in ids: O.bodies[i].subdomain=k
-
 
 ##### RUN MPI #########
 def mpirun(nSteps,np=None,withMerge=False):
@@ -1043,7 +1032,13 @@ def mpirun(nSteps,np=None,withMerge=False):
 		for w in range(1,numThreads):
 			comm.send("yade.mpy.mpirun(nSteps="+str(nSteps)+",withMerge="+str(withMerge)+")",dest=w,tag=_MASTER_COMMAND_)
 			wprint("Command sent to ",w)
-			
+	
+	
+	if FLUID_COUPLING:
+		fluidCoupling = utils.typedEngine("FoamCoupling") 
+		fluidCoupling.comm = comm 
+		fluidCoupling.getFluidDomainBbox() #triggers the communication between yade procs and Yales2/openfoam procs, get's fluid domain bounding boxes from all fluid procs. 
+	
 	# split if needed
 	initStep = O.iter
 	if not O.splitted:
