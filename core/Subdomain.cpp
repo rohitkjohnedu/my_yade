@@ -310,7 +310,7 @@ void Subdomain::recvBodyContainersFromWorkers() {
     }
 }
 
-
+//
 // set all body properties from the recvd MPIBodyContainer
 void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MPIBodyContainer> >& containers, bool ifMerge, bool overwriteBodies) {
 	// to be used when deserializing a recieved container.
@@ -500,12 +500,14 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 
 void Subdomain::getMirrorIntersections(){
 	/* to be used after calling genLocalIntersections in mpy.py */ 
+	
 	std::vector<MPI_Request> interReqs;  
 	mirrorIntersections.clear(); 
 	mirrorIntersections.resize(commSize);
 	
 	//workers exchange their intersections. 
 	if (subdomainRank != master) {
+		assert(intersections[subdomainRank].size()); 
 		//get procs to communicate. 
 		const auto& interProcs = intersections[subdomainRank]; 
 		for (const auto& proc : interProcs){
@@ -624,7 +626,7 @@ std::vector<projectedBoundElem> Subdomain::projectedBoundsCPP(int otherSD, const
 	}
 	
 	// from mirror intersections (bodies from other subdomain which has intersections with this sd) 
-	for (auto bId : mirrorIntersections[otherSD]){
+	for (const auto& bId : mirrorIntersections[otherSD]){
 		const shared_ptr<Body>& b = (*scene->bodies)[bId]; 
 		if (!b or b->getIsSubdomain()){continue; } 
 		Real ps = boundOnAxis((*b->bound), axis, false);
@@ -684,9 +686,9 @@ void Subdomain::updateLocalIds(bool eraseRemoteMaster){
 		}
 	}
 	if (!eraseRemoteMaster){
-		//MPI_Status iSendstat; MPI_Request iSendReq; 
+		MPI_Status iSendstat; MPI_Request iSendReq; 
 		if (subdomainRank != master) { 
-			MPI_Send(&ids.front(), (int)ids.size(), MPI_INT, master, 500, selfComm()); 
+			MPI_Isend(&ids.front(), (int)ids.size(), MPI_INT, master, 500, selfComm(), &iSendReq); 
 		} 
 		
 		if (subdomainRank == master) {
@@ -716,9 +718,9 @@ void Subdomain::updateLocalIds(bool eraseRemoteMaster){
 			
 		}
 		
-// 		if (subdomainRank != master) {
-// 			MPI_Wait(&iSendReq, &iSendstat); 
-// 		}
+		if (subdomainRank != master) {
+			MPI_Wait(&iSendReq, &iSendstat); 
+		}
 	}
 	
 }
