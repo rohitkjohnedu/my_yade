@@ -246,6 +246,10 @@ Additional options can be configured in the same line with the following
 syntax::
 
 	cmake -DOPTION1=VALUE1 -DOPTION2=VALUE2
+	
+For example::
+    
+    cmake -DENABLE_POTENTIAL_BLOCKS=ON
 
 As of Yade version git-2315bd8 (or 2018.02b release), the following options are available: (see the `source code <https://gitlab.com/yade-dev/trunk/blob/master/CMakeLists.txt>`_ for a most up-to-date list)
 
