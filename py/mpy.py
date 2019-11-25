@@ -421,8 +421,6 @@ def unboundRemoteBodies():
 	Turn bounding boxes on/off depending on rank
 	'''
 	for b in O.bodies:# unbound the bodies assigned to workers (not interacting directly with other bodies in master scene)
-		#if FLUID_COUPLING: 
-			#if (isinstance(b.shape, FluidDomainBbox) ) : continue
 		if not b.isSubdomain and b.subdomain!=rank:
 			b.bounded=False
 			
@@ -844,8 +842,8 @@ def splitScene():
 def updateAllIntersections():
 	subD=O.subD
 	subD.intersections=genLocalIntersections(subD.subdomains)
-	if USE_CPP_INTERS:
-		subD.getMirrorIntrs() # 
+	if USE_CPP_INTERS: #to be used in case of  possible issue with older mpi4py versions, this is slightly faster.  
+		subD.getMirrorIntrs() 
 		
 	else: 
 	#update mirror intersections so we know message sizes in advance
