@@ -296,7 +296,7 @@ import sphinx,sys,shutil
 sys.path.append('.') # for bib2rst
 
 genReferences()
-for bib in ('references','yade-articles','yade-theses','yade-conferences','yade-docref'):
+for bib in ('references','yade-articles','yade-theses','yade-conferences','citing_yade'):
     shutil.copyfile('../%s.bib'%bib,outDir+'/latex/%s.bib'%bib)
 
 # NOTE: for some unexplained reason, all code after the sphinx.main() invocation will not be executed (python exits) on docker images (gitlab), despite the try: except: statements.
