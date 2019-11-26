@@ -63,8 +63,18 @@ class Tenseur3 : public Tens
 		Tenseur3& operator= ( const Tenseur3& source );
 		Tenseur3& operator/= ( Real d );
 		Tenseur3& operator+= ( const Tenseur3& source );
-		Real operator() ( int i, int j ) const {return T[i-1][j-1];}
-		Real &operator() ( int i, int j ) {return T[i-1][j-1];}
+		Real operator() ( int i, int j ) const {
+			if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
+				return T[i-1][j-1];
+		} else {
+			throw logic_error("Tensor indexes are out of bounds!");
+		};
+		Real &operator() ( int i, int j )  {
+			if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
+				return T[i-1][j-1];
+		} else {
+			throw logic_error("Tensor indexes are out of bounds!");
+		};
 
 		virtual void reset ( void ) {for ( int i=0; i<3; i++ ) for ( int j=0; j<3; j++ ) T[i][j] = 0;}
 
