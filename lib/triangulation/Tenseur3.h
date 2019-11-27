@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RegularTriangulation.h"
+#include <Eigen/Core>
 #include <fstream>
 #include <iostream>
 
@@ -37,7 +38,7 @@ namespace CGT {
 
 	class Tenseur3 : public Tens {
 	private:
-		Real T[3][3];
+		Eigen::Matrix<Real, 3, 3> T = Eigen::Matrix<Real, 3, 3>::Zero();
 
 	public:
 		Tenseur3(bool init = true); // Sp�cifier "false" pour �conomiser le temps d'initialisation du tableau

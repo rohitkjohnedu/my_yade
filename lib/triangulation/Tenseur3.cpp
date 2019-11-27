@@ -34,65 +34,53 @@ namespace CGT {
 
 	Tenseur3::Tenseur3(bool init)
 	{
-		if (init)
-			for (int i = 0; i < 3; i++)
-				for (int j = 0; j < 3; j++)
-					T[i][j] = 0;
+		if (init) {
+			T.setZero();
+		}
 	}
 
-	Tenseur3::Tenseur3(const Tenseur3& source)
-	{
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				T[i][j] = source.T[i][j];
-	}
+	Tenseur3::Tenseur3(const Tenseur3& source) { T = source.T; }
 
 	Tenseur3::Tenseur3(Real a11, Real a12, Real a13, Real a21, Real a22, Real a23, Real a31, Real a32, Real a33)
 	{
-		T[0][0] = a11;
-		T[0][1] = a12;
-		T[0][2] = a13;
-		T[1][0] = a21;
-		T[1][1] = a22;
-		T[1][2] = a23;
-		T[2][0] = a31;
-		T[2][1] = a32;
-		T[2][2] = a33;
+		T(0, 0) = a11;
+		T(0, 1) = a12;
+		T(0, 2) = a13;
+		T(1, 0) = a21;
+		T(1, 1) = a22;
+		T(1, 2) = a23;
+		T(2, 0) = a31;
+		T(2, 1) = a32;
+		T(2, 2) = a33;
 	}
 
 
 	Tenseur3& Tenseur3::operator=(const Tenseur3& source)
 	{
-		if (&source != this)
-			for (int i = 0; i < 3; i++)
-				for (int j = 0; j < 3; j++)
-					T[i][j] = source.T[i][j];
+		if (&source != this) {
+			T = source.T;
+		}
 		return *this;
 	}
 
 	Tenseur3& Tenseur3::operator/=(Real d)
 	{
 		if (d != 0) {
-			d = 1.0 / d;
-			for (int i = 0; i < 3; i++)
-				for (int j = 0; j < 3; j++)
-					T[i][j] *= d;
+			T /= d;
 		}
 		return *this;
 	}
 
 	Tenseur3& Tenseur3::operator+=(const Tenseur3& source)
 	{
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				T[i][j] += source.T[i][j];
+		T += source.T;
 		return *this;
 	}
 
 	Real Tenseur3::operator()(int i, int j) const
 	{
 		if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
-			return T[i - 1][j - 1];
+			return T(i - 1, j - 1);
 		} else {
 			throw logic_error("Tensor indexes are out of bounds!");
 		}
@@ -101,18 +89,13 @@ namespace CGT {
 	Real& Tenseur3::operator()(int i, int j)
 	{
 		if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
-			return T[i - 1][j - 1];
+			return T(i - 1, j - 1);
 		} else {
 			throw logic_error("Tensor indexes are out of bounds!");
 		}
 	}
 
-	void Tenseur3::reset()
-	{
-		for (int i = 0; i < 3; i++)
-			for (int j = 0; j < 3; j++)
-				T[i][j] = 0;
-	}
+	void Tenseur3::reset() { T.setZero(); }
 
 	///////////		 Classe Tenseur_sym3		////////////
 	Tenseur_sym3::Tenseur_sym3(bool init)
