@@ -81,7 +81,21 @@ Tenseur3 & Tenseur3::operator +=(const Tenseur3 & source)
 	return *this;
 }
 
+Real Tenseur3::operator() ( int i, int j ) const {
+	if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
+		return T[i-1][j-1];
+	} else {
+		throw logic_error("Tensor indexes are out of bounds!");
+	}
+}
 
+Real &Tenseur3::operator() ( int i, int j )  {
+	if (i >= 1 && i <= 3 && j >= 1 && j <= 3) {
+		return T[i-1][j-1];
+	} else {
+		throw logic_error("Tensor indexes are out of bounds!");
+	}
+}
 
 ///////////		 Classe Tenseur_sym3		////////////
 
