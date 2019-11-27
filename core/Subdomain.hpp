@@ -132,7 +132,7 @@ class Subdomain: public Shape {
 
 			//b-bound should not be instanciate except pour the last body (k = N-1)
 			if (!b->bound){
-				b->bound = make_shared<Aabb>(new Aabb);
+				b->bound = boost::make_shared<Aabb>();
 			}
 			b->bound->min = Vector3r(input[idx+13],input[idx+14],input[idx+15]);
 			b->bound->max = Vector3r(input[idx+16],input[idx+17],input[idx+18]);
