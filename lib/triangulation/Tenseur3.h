@@ -18,7 +18,6 @@ using std::string;
 class Tens;
 class Tenseur3;
 class Tenseur_sym3;
-class Tenseur_anti3;
 
 CVector operator* ( Tens& tens, CVector& vect );
 CVector& NormalizedCVector ( CVector& vect );
@@ -29,7 +28,6 @@ void Somme ( Tenseur3 &result, CVector &v1, CVector &v2 );
 
 std::ostream& operator<< ( std::ostream& os,const Tenseur3& T );
 std::ostream& operator<< ( std::ostream& os,const Tenseur_sym3& T );
-std::ostream& operator<< ( std::ostream& os,const Tenseur_anti3& T );
 
 class Tens
 {
@@ -88,28 +86,6 @@ class Tenseur_sym3 : public Tens
 		Tenseur_sym3 Deviatoric ( void ) const; //retourne la partie d�viatoire
 		Real operator() ( int i, int j ) const;
 		Real &operator() ( int i, int j );
-
-		void reset ( void ) {for ( int i=0; i<6; i++ ) T[i] = 0;}
-
-};
-
-class Tenseur_anti3 : public Tens
-{
-	private:
-		Real T [6];
-
-	public:
-		Tenseur_anti3 ( bool init = true );// Sp�cifier "false" pour �conomiser le temps d'initialisation du tableau
-		virtual ~Tenseur_anti3 ( void );
-		Tenseur_anti3 ( const Tenseur_anti3& source );
-		Tenseur_anti3 ( const Tenseur3& source );
-		Tenseur_anti3 ( Real a11, Real a22, Real a33,
-						Real a12, Real a13, Real a23 );
-
-		Tenseur_anti3& operator= ( const Tenseur_anti3& source );
-		Tenseur_anti3& operator/= ( Real d );
-		Real operator() ( int i, int j ) const;
-		//Real &operator() (int i, int j); //Supprim�e car pb. pour retourner une r�f�rence vers -T[i+j]
 
 		void reset ( void ) {for ( int i=0; i<6; i++ ) T[i] = 0;}
 

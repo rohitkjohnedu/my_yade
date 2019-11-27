@@ -179,73 +179,6 @@ Tenseur_sym3 Tenseur_sym3::Deviatoric (void) const	//retourne la partie d�viat
 	return temp;
 }
 
-///////////		 Classe Tenseur_anti3		////////////
-
-Tenseur_anti3::Tenseur_anti3(bool init)
-{
-	if (init)
-	{
-		for (int i=0; i<6; i++) T[i] = 0;
-	}
-}
-
-Tenseur_anti3::~Tenseur_anti3(void)
-{
-}
-
-Tenseur_anti3::Tenseur_anti3(const Tenseur_anti3& source)
-{
-//	for (int i=0; i<6; i++)
-	{
-		for (int i=0; i<6; i++) T[i] = source.T[i];
-	}
-}
-
-Tenseur_anti3::Tenseur_anti3(const Tenseur3& source)
-{
-	for (int i=1; i<=3; i++)
-	{
-		T[i-1]=0;
-		for (int j=3; j>i; j--) T[i+j] = (source(i,j)-source(j,i))*0.5;
-	}
-}
-
-Tenseur_anti3::Tenseur_anti3(Real a11, Real a22, Real a33,
-				   Real a12, Real a13, Real a23)
-{
-	T[0] = a11;
-	T[1] = a22;
-	T[2] = a33;
-	T[3] = a12;
-	T[4] = a13;
-	T[5] = a23;
-}
-
-
-Tenseur_anti3 &Tenseur_anti3::operator=(const Tenseur_anti3& source)
-{
-	if (&source != this)
-	{
-		for (int i=0; i<6; i++)	T[i] = source.T[i];
-	}
-	return *this;
-}
-
-Tenseur_anti3 &Tenseur_anti3::operator/=(Real d)
-{
-	if (d!=0)	for (int i=0; i<6; i++)	T[i]/= d;
-	return *this;
-}
-
-Real Tenseur_anti3::operator() (int i, int j) const 
-{
-	if (i==j) return T[i-1];
-	else
-	{
-		if (i<j) return T[i+j];
-		else return -T[i+j];
-	}
-}
 
 void Tenseur_produit (CVector &v1, CVector &v2, Tenseur3 &result)
 {
@@ -300,21 +233,6 @@ operator<<(std::ostream& os, const Tenseur_sym3& T)
 		for (int i=1; i<4; i++)
 		{
 			os << T(j,i) << " ";
-		}
-		os  << endl;
-	}	
-	return os;
-}
-
-std::ostream&
-operator<<(std::ostream& os, const Tenseur_anti3& T)
-  
-{
-	for (int j=1 ; j<4; j++)
-	{
-		for (int i=1; i<4; i++)
-		{
-			os << (Real) T(j,i) << (string) " ";
 		}
 		os  << endl;
 	}	
