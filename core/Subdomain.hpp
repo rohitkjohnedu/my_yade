@@ -132,7 +132,7 @@ class Subdomain: public Shape {
 
 			//b-bound should not be instanciate except pour the last body (k = N-1)
 			if (!b->bound){
-				b->bound = shared_ptr<Aabb>(new Aabb);
+				b->bound = make_shared<Aabb>(new Aabb);
 			}
 			b->bound->min = Vector3r(input[idx+13],input[idx+14],input[idx+15]);
 			b->bound->max = Vector3r(input[idx+16],input[idx+17],input[idx+18]);
@@ -257,7 +257,7 @@ class Subdomain: public Shape {
 	bool bodiesSet = false;  // flag 
 	
 	// Geometry and other helper functions
-	Real boundOnAxis(Bound& b, Vector3r direction, bool min) const; //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
+	Real boundOnAxis(Bound& b, const Vector3r& direction, bool min) const; //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
 	
 	Vector3r centerOfMass() const {
 		Vector3r center(0,0,0); Real mass=0;

@@ -475,7 +475,7 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 	if (subdomainRank != master){ rcharBuff.clear(); } // assuming master alwasy recieves from workers, hence the size of this vector for master is fixed.
 }
 
-Real Subdomain::boundOnAxis(Bound& b, Vector3r direction, bool min) const //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
+Real Subdomain::boundOnAxis(Bound& b, const Vector3r& direction, bool min) const //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
 {
 	Vector3r size = b.max-b.min;
 	Real extremum = 0;
