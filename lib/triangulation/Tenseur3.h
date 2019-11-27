@@ -28,17 +28,13 @@ std::ostream& operator<< ( std::ostream& os,const Tenseur_sym3& T );
 class Tens
 {
 	public:
-		Tens ( void ) {}
-		virtual ~Tens ( void ) {}
-		virtual Real operator() ( int /*i*/, int /*j*/ ) const {return 0;}
-		Real Norme2 ( void );
-		Real Norme ( void ) {return sqrt ( Norme2() );}
-		Real Trace ( void )
-		{
-			return this->operator () ( 1,1 )
-				   + this->operator () ( 2,2 )
-				   + this->operator () ( 3,3 );
-		}
+		virtual ~Tens ( ) =default;
+		virtual Real operator() ( int /*i*/, int /*j*/ ) const = 0;
+		virtual Real &operator() ( int /*i*/, int /*j*/ ) = 0;
+		Real Norme2 ( );
+		Real Norme ( );
+		Real Trace ( );
+		virtual void reset ( ) = 0;
 };
 
 class Tenseur3 : public Tens
@@ -48,7 +44,6 @@ class Tenseur3 : public Tens
 
 	public:
 		Tenseur3 ( bool init = true );// Sp�cifier "false" pour �conomiser le temps d'initialisation du tableau
-		virtual ~Tenseur3 ( void );
 		Tenseur3 ( const Tenseur3& source );
 		Tenseur3 ( Real a11, Real a12, Real a13,
 				   Real a21, Real a22, Real a23,
@@ -57,10 +52,9 @@ class Tenseur3 : public Tens
 		Tenseur3& operator= ( const Tenseur3& source );
 		Tenseur3& operator/= ( Real d );
 		Tenseur3& operator+= ( const Tenseur3& source );
-		Real operator() ( int i, int j ) const;
-		Real &operator() ( int i, int j );
-
-		virtual void reset ( void ) {for ( int i=0; i<3; i++ ) for ( int j=0; j<3; j++ ) T[i][j] = 0;}
+		Real operator() ( int i, int j ) const override;
+		Real &operator() ( int i, int j ) override;
+		void reset ( ) override;
 
 };
 
@@ -71,7 +65,6 @@ class Tenseur_sym3 : public Tens
 
 	public:
 		Tenseur_sym3 ( bool init = true );// Sp�cifier "false" pour �conomiser le temps d'initialisation du tableau
-		~Tenseur_sym3 ( void );
 		Tenseur_sym3 ( const Tenseur_sym3& source );
 		Tenseur_sym3 ( const Tenseur3& source );
 		Tenseur_sym3 ( Real a11, Real a22, Real a33,
@@ -79,11 +72,10 @@ class Tenseur_sym3 : public Tens
 
 		Tenseur_sym3& operator= ( const Tenseur_sym3& source );
 		Tenseur_sym3& operator/= ( Real d );
-		Tenseur_sym3 Deviatoric ( void ) const; //retourne la partie d�viatoire
-		Real operator() ( int i, int j ) const;
-		Real &operator() ( int i, int j );
-
-		void reset ( void ) {for ( int i=0; i<6; i++ ) T[i] = 0;}
+		Tenseur_sym3 Deviatoric ( ) const; //retourne la partie d�viatoire
+		Real operator() ( int i, int j ) const override;
+		Real &operator() ( int i, int j ) override;
+		void reset ( ) override;
 
 };
 

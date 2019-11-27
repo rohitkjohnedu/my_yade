@@ -5,7 +5,7 @@ namespace yade { // Cannot have #include directive inside.
 
 namespace CGT {
 
-Real Tens::Norme2(void)
+Real Tens::Norme2()
 {
 	Real N=0;
     for (int i=1; i<=3; i++)
@@ -13,6 +13,12 @@ Real Tens::Norme2(void)
 			N+= pow(operator ()(i,j), 2);
     return N;
 }
+Real Tens::Norme ( ) {return sqrt ( this->Norme2() );}
+Real Tens::Trace ( ) {
+			return this->operator () ( 1,1 )
+				   + this->operator () ( 2,2 )
+				   + this->operator () ( 3,3 );
+		}
 
 CVector operator* (Tens& tens, CVector& vect)
 {
@@ -32,10 +38,6 @@ CVector& NormalizedCVector (CVector& vect)
 Tenseur3::Tenseur3(bool init)
 {
 	if (init) for (int i=0; i<3; i++) for (int j=0; j<3; j++) T[i][j] = 0;
-}
-
-Tenseur3::~Tenseur3(void)
-{
 }
 
 Tenseur3::Tenseur3(const Tenseur3& source)
@@ -97,6 +99,8 @@ Real &Tenseur3::operator() ( int i, int j )  {
 	}
 }
 
+void Tenseur3::reset ( ) {for ( int i=0; i<3; i++ ) for ( int j=0; j<3; j++ ) T[i][j] = 0;}
+
 ///////////		 Classe Tenseur_sym3		////////////
 
 Tenseur_sym3::Tenseur_sym3(bool init)
@@ -105,10 +109,6 @@ Tenseur_sym3::Tenseur_sym3(bool init)
 	{
 		for (int i=0; i<6; i++) T[i] = 0;
 	}
-}
-
-Tenseur_sym3::~Tenseur_sym3(void)
-{
 }
 
 Tenseur_sym3::Tenseur_sym3(const Tenseur_sym3& source)
@@ -169,7 +169,7 @@ Real &Tenseur_sym3::operator() (int i, int j)
 	else return T[i+j];
 }
 
-Tenseur_sym3 Tenseur_sym3::Deviatoric (void) const	//retourne la partie d�viatoire
+Tenseur_sym3 Tenseur_sym3::Deviatoric () const	//retourne la partie d�viatoire
 {
 	Tenseur_sym3 temp(*this);
 	Real spheric = temp.Trace()/3;
@@ -179,6 +179,7 @@ Tenseur_sym3 Tenseur_sym3::Deviatoric (void) const	//retourne la partie d�viat
 	return temp;
 }
 
+void Tenseur_sym3::reset ( ) {for ( int i=0; i<6; i++ ) T[i] = 0;}
 
 void Tenseur_produit (CVector &v1, CVector &v2, Tenseur3 &result)
 {
