@@ -219,7 +219,7 @@ operator<<(std::ostream& os, const Tenseur3& T)
 		{
 			os << T(j,i) << " ";
 		}
-		os  << endl;
+		os  << std::endl;
 	}	
 	return os;
 }
@@ -234,7 +234,7 @@ operator<<(std::ostream& os, const Tenseur_sym3& T)
 		{
 			os << T(j,i) << " ";
 		}
-		os  << endl;
+		os  << std::endl;
 	}	
 	return os;
 }

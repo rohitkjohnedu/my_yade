@@ -9,10 +9,6 @@ namespace yade { // Cannot have #include directive inside.
 namespace CGT {
 
 using std::endl;
-using std::cout;
-using std::cerr;
-using std::string;
-
 #define NORMALIZE(vecteur) ((vecteur) = (vecteur)*(1.0/sqrt(pow((vecteur)[0],2)+pow((vecteur)[1],2)+pow((vecteur)[2],2))))
 
 class Tens;
