@@ -2,20 +2,21 @@
 
 // for some reading about these conversions, see e.g. https://misspent.wordpress.com/2009/09/27/how-to-write-boost-python-converters/ (except the latter advocates using some "borrowed()" in the from-Python construc(), which is not done here)
 
+#include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
 #include <lib/base/openmp-accu.hpp>
-
 #include <core/Engine.hpp>
-
 #include <pkg/common/Callbacks.hpp>
 #include <pkg/common/Dispatching.hpp>
 #include <pkg/common/KinematicEngines.hpp>
+#include <pkg/common/MatchMaker.hpp>
 #include <pkg/dem/SpherePack.hpp>
 #ifdef YADE_OPENGL
 #include <pkg/common/GLDrawFunctors.hpp>
 #include <pkg/common/OpenGLRenderer.hpp>
 #endif
-#include <pkg/common/MatchMaker.hpp>
+
+CREATE_CPP_LOCAL_LOGGER("customConverters.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -244,7 +245,7 @@ struct custom_mask_from_long {
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_customConverters)
-{
+try {
 	namespace y = ::yade;
 
 	y::custom_Se3r_from_seq();
@@ -318,5 +319,12 @@ BOOST_PYTHON_MODULE(_customConverters)
 #endif
 	}
 #undef VECTOR_SEQ_CONV
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
 

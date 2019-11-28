@@ -39,9 +39,9 @@
 #include <core/Subdomain.hpp>
 #endif
 
-namespace yade { // Cannot have #include directive inside.
-
 CREATE_CPP_LOCAL_LOGGER("yadeWrapper.cpp");
+
+namespace yade { // Cannot have #include directive inside.
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
@@ -1430,11 +1430,11 @@ public:
 };
 
 } // namespace yade
+
+
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
-
-
 BOOST_PYTHON_MODULE(wrapper)
-{
+try {
 	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
 	namespace py                = ::boost::python;
 	py::scope().attr("__doc__") = "Wrapper for c++ internals of yade.";
@@ -1807,5 +1807,12 @@ BOOST_PYTHON_MODULE(wrapper)
 	        .def("reset", &TimingDeltas::reset, "Reset timing information");
 
 	py::scope().attr("O") = pyOmega();
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
 

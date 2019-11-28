@@ -1,7 +1,8 @@
 #include <lib/base/Logging.hpp>
 #include <core/Omega.hpp>
-
 #include <signal.h>
+
+CREATE_CPP_LOCAL_LOGGER("pyboot.cpp");
 
 #ifdef YADE_DEBUG
 void crashHandler(int sig)
@@ -57,8 +58,15 @@ void yadeInitialize(boost::python::list& pp, const std::string& confDir)
 void yadeFinalize() { yade::Omega::instance().cleanupTemps(); }
 
 BOOST_PYTHON_MODULE(boot)
-{
+try {
 	boost::python::scope().attr("initialize") = &yadeInitialize;
 	boost::python::scope().attr("finalize")   = &yadeFinalize; //,"Finalize yade (only to be used internally).")
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
 

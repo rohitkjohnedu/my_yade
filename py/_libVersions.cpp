@@ -1,3 +1,4 @@
+#include <lib/base/Logging.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <core/Omega.hpp>
 #include <boost/lexical_cast.hpp>
@@ -345,7 +346,7 @@ py::dict getAllVersionsCpp()
 }
 
 BOOST_PYTHON_MODULE(_libVersions)
-{
+try {
 	YADE_SET_DOCSTRING_OPTS;
 	// We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 	// The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
@@ -367,4 +368,19 @@ As an example the dict below reflects what libraries this documentation was comp
 .. note:: Please add here C++ detection of other libraries when yade starts using them.
 
 	)""");
+
+} catch (...) {
+	// How to work with python exceptions:
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_errors_hpp.html#high_level_components.boost_python_errors_hpp.example
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/embedding.html
+	//     https://stackoverflow.com/questions/1418015/how-to-get-python-exception-text
+	// If we wanted custom yade exceptions thrown to python:
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/exception.html
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_exception_translato.html
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
+

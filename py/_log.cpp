@@ -15,9 +15,9 @@
 #include <core/Omega.hpp>
 #include <string>
 
-namespace yade { // Cannot have #include directive inside.
-
 CREATE_CPP_LOCAL_LOGGER("_log.cpp");
+
+namespace yade { // Cannot have #include directive inside.
 
 #ifdef YADE_BOOST_LOG
 
@@ -153,7 +153,7 @@ void testAllLevels()
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_log)
-{
+try {
 	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
 	namespace py = ::boost::python;
 	YADE_SET_DOCSTRING_OPTS;
@@ -236,13 +236,19 @@ Saves log config to specified file.
 	py::scope().attr("ERROR")    = int(2);
 	py::scope().attr("FATAL")    = int(1);
 	py::scope().attr("NOFILTER") = int(0);
+
+} catch (...) {
+	// How to work with python exceptions:
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_errors_hpp.html#high_level_components.boost_python_errors_hpp.example
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/embedding.html
+	//     https://stackoverflow.com/questions/1418015/how-to-get-python-exception-text
+	// If we wanted custom yade exceptions thrown to python:
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/exception.html
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_exception_translato.html
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
-
-/* this was in git revision 014b11496
-
-BOOST_PYTHON_MODULE(log){
-	python::def("loadConfig",logLoadConfig,(python::arg("fileName")),"Load configuration from file (log4cxx::PropertyConfigurator::configure)");
-}
-
-*/
 

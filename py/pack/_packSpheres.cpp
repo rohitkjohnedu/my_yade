@@ -1,12 +1,15 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
+#include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <pkg/dem/SpherePack.hpp>
 
+CREATE_CPP_LOCAL_LOGGER("_packSpheres.cpp");
+
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_packSpheres)
-{
+try {
 	using SpherePack                       = ::yade::SpherePack;
 	using Vector3r                         = ::yade::Vector3r;
 	using Matrix3r                         = ::yade::Matrix3r;
@@ -136,5 +139,12 @@ BOOST_PYTHON_MODULE(_packSpheres)
 	boost::python::class_<SpherePack::_iterator>("SpherePackIterator", boost::python::init<SpherePack::_iterator&>())
 	        .def("__iter__", &SpherePack::_iterator::iter)
 	        .def("__next__", &SpherePack::_iterator::next);
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
 

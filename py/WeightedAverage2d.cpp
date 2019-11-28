@@ -1,4 +1,7 @@
+#include <lib/base/Logging.hpp>
 #include <lib/smoothing/WeightedAverage2d.hpp>
+
+CREATE_CPP_LOCAL_LOGGER("WeightedAverage2d.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -24,7 +27,7 @@ bool pyGaussAverage::pointInsidePolygon(const Vector2r& pt, const vector<Vector2
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(WeightedAverage2d)
-{
+try {
 	using pyGaussAverage                   = ::yade::pyGaussAverage;
 	boost::python::scope().attr("__doc__") = "Smoothing (2d gauss-weighted average) for postprocessing scalars in 2d.";
 	boost::python::class_<pyGaussAverage>(
@@ -46,5 +49,12 @@ BOOST_PYTHON_MODULE(WeightedAverage2d)
 	        .add_property("nCells", &pyGaussAverage::nCells_get)
 	        .add_property("cellArea", &pyGaussAverage::cellArea)
 	        .add_property("cellDim", &pyGaussAverage::cellDim);
-};
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
+}
 

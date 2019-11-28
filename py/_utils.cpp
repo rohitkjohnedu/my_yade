@@ -8,9 +8,9 @@
 #include <numpy/arrayobject.h>
 #pragma GCC diagnostic pop
 
-namespace yade { // Cannot have #include directive inside.
-
 CREATE_CPP_LOCAL_LOGGER("_utils.cpp");
+
+namespace yade { // Cannot have #include directive inside.
 
 py::tuple negPosExtremeIds(int axis, Real distFactor)
 {
@@ -618,7 +618,7 @@ void setBodyColor(int id, Vector3r newColor)
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_utils)
-{
+try {
 	using namespace yade; // 'using namespace' inside function keeps namespace pollution under control. Alernatively I could add y:: in front of function names below and put 'namespace y  = ::yade;' here.
 	namespace py = ::boost::python;
 	YADE_SET_DOCSTRING_OPTS;
@@ -962,5 +962,12 @@ BOOST_PYTHON_MODULE(_utils)
 	        setBodyColor,
 	        (py::args("id"), py::args("color")),
 	        "Set a body color from its id and a new Vector3r.\n\n:param int id: the body id.\n:param Vector3 color: the desired updated color.");
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
 

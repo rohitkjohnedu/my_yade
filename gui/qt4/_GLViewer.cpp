@@ -1,11 +1,13 @@
 #include "GLViewer.hpp"
 #include "OpenGLManager.hpp"
 #include <lib/base/AliasNamespaces.hpp>
+#include <lib/base/Logging.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <pkg/common/OpenGLRenderer.hpp>
-
 #include <QApplication>
 #include <QCloseEvent>
+
+CREATE_CPP_LOCAL_LOGGER("qt4/_GLViewer.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -262,7 +264,7 @@ shared_ptr<OpenGLRenderer> getRenderer() { return OpenGLManager::self->renderer;
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_GLViewer)
-{
+try {
 	namespace y  = ::yade;
 	namespace py = ::boost::python;
 
@@ -329,5 +331,12 @@ BOOST_PYTHON_MODULE(_GLViewer)
 	        .def("close", &pyGLViewer::close)
 	        .def("saveSnapshot", &pyGLViewer::saveSnapshot, (py::arg("filename")), "Save the current view to image file")
 	        .add_property("selection", &pyGLViewer::get_selection, &pyGLViewer::set_selection);
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
 

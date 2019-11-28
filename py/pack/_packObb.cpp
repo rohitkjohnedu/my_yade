@@ -6,6 +6,8 @@
 #include <lib/base/Math.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 
+CREATE_CPP_LOCAL_LOGGER("_packObb.cpp");
+
 template <typename Scalar> Eigen::Matrix<Scalar, 3, 3> matrixFromEulerAnglesXYZ(Scalar x, Scalar y, Scalar z)
 {
 	Eigen::Matrix<Scalar, 3, 3> m;
@@ -105,7 +107,7 @@ boost::python::tuple bestFitOBB_py(const boost::python::tuple& _pts)
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(_packObb)
-{
+try {
 	YADE_SET_DOCSTRING_OPTS;
 	boost::python::scope().attr("__doc__") = "Computation of oriented bounding box for cloud of points.";
 	boost::python::def(
@@ -113,5 +115,12 @@ BOOST_PYTHON_MODULE(_packObb)
 	        yade::bestFitOBB_py,
 	        "Return (Vector3 center, Vector3 halfSize, Quaternion orientation) of\nbest-fit oriented bounding-box for given tuple of points\n(uses "
 	        "brute-force velome minimization, do not use for very large clouds).");
-};
+
+} catch (...) {
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
+}
 
