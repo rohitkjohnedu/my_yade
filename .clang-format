@@ -3,7 +3,7 @@ AccessModifierOffset: -8
 AlignAfterOpenBracket: AlwaysBreak
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
-AlignTrailingComments: false
+AlignTrailingComments: true
 #wait till clang supports it
 # AllowAllArgumentsOnNextLine: true
 # AllowShortBlocksOnASingleLine: Always
