@@ -644,6 +644,7 @@ BOOST_PYTHON_MODULE(_utils)
 	py::def("voxelPorosity",
 	        Shop__getVoxelPorosity,
 	        (py::arg("resolution") = 200, py::arg("start") = Vector3r(0, 0, 0), py::arg("end") = Vector3r(0, 0, 0)),
+	        // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
 	        "Compute packing porosity $\\frac{V-V_v}{V}$ where $V$ is a specified volume (from start to end) and $V_v$ is volume of voxels that fall "
 	        "inside any sphere. The calculation method is to divide whole volume into a dense grid of voxels (at given resolution), and count the voxels "
 	        "that fall inside any of the spheres. This method allows one to calculate porosity in any given sub-volume of a whole sample. It is properly "
@@ -792,6 +793,7 @@ BOOST_PYTHON_MODULE(_utils)
 	        "this value could be set to zero if one wanted to make distinction between compressive and tensile forces.");
 	py::def("bodyStressTensors",
 	        Shop__getStressLWForEachBody,
+	        // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
 	        "Compute and return a table with per-particle stress tensors. Each tensor represents the average stress in one particle, obtained from the "
 	        "contour integral of applied load as detailed below. This definition is considering each sphere as a continuum. It can be considered exact in "
 	        "the context of spheres at static equilibrium, interacting at contact points with negligible volume changes of the solid phase (this last "
@@ -830,6 +832,7 @@ BOOST_PYTHON_MODULE(_utils)
 	         py::args("vPartAverageX"),
 	         py::args("vPartAverageY"),
 	         py::args("vPartAverageZ")),
+	        // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
 	        "Compute and return the stress tensor depth profile, including the contribution from Love-Weber stress tensor and the dynamic stress tensor "
 	        "taking into account the effect of particles inertia. For each defined cell z, the stress tensor reads: \n\n $\\sigma_{ij}^z= "
 	        "\\frac{1}{V}\\sum_c f_i^c l_j^{c,z} - \\frac{1}{V}\\sum_p m^p u'^p_i u'^p_j$,\n\nwhere the first sum is made over the contacts which are "

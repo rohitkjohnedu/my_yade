@@ -47,6 +47,7 @@ BOOST_PYTHON_MODULE(_packSpheres)
 	              boost::python::arg("distributeMass") = false,
 	              boost::python::arg("seed")           = 0,
 	              boost::python::arg("hSize")          = Matrix3r(Matrix3r::Zero())),
+	             // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
 	             "Create random very loose packing enclosed in a parallelepiped (also works in 2D if minCorner[k]=maxCorner[k] for one coordinate). The "
 	             "resulting packing conforms in fact a gas-like state (see Cloud denomination) with no contacts between particles. Usually used as a first "
 	             "step for packing generation, before subsequent mechanical loading that will confer a solid-like nature to the packing."

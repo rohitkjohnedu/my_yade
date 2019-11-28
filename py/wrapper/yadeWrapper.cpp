@@ -1533,6 +1533,7 @@ BOOST_PYTHON_MODULE(wrapper)
 	             "Load simulation from a string passed as argument (see also sceneToString).")
 	        .def("labeledEngine",
 	             &pyOmega::labeled_engine_get,
+	             // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
 	             "Return instance of engine/functor with the given label. This function shouldn't be called by the user directly; every ehange in "
 	             "O.engines will assign respective global python variables according to labels.\n\nFor example:\n\n\t "
 	             "*O.engines=[InsertionSortCollider(label='collider')]*\n\n\t *collider.nBins=5 # collider has become a variable after assignment to "
