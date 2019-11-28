@@ -771,9 +771,9 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::computeParticlesDeformati
 	Real v;
 	v_total = 0;
 	v_solid_total = 0;
-	grad_u_total = NULL_TENSEUR3;
+	grad_u_total.reset();
 	v_total_g = 0;
-	grad_u_total_g = NULL_TENSEUR3;
+	grad_u_total_g.reset();
 	Delta_epsilon(3,3) = TS1->eps3 - TS0->eps3;
 	Delta_epsilon(1,1) = TS1->eps1 - TS0->eps1;
 	Delta_epsilon(2,2) = TS1->eps2 - TS0->eps2;
@@ -789,7 +789,7 @@ const vector<Tenseur3>& KinematicLocalisationAnalyser::computeParticlesDeformati
 	for (RTriangulation::Finite_vertices_iterator  V_it=Tri.finite_vertices_begin(); V_it !=  Tri.finite_vertices_end(); V_it++) {
 		//cerr << V_it->info().id() << endl;
 		V_it->info().v() =0;//WARNING : this will erase previous values if some have been computed
-		ParticleDeformation[V_it->info().id()]=NULL_TENSEUR3;
+		ParticleDeformation[V_it->info().id()].reset();
 		if (!V_it->info().isFictious) ++n_real_vertices; else ++n_fictious_vertices;
 	}
 	Finite_cells_iterator cell = Tri.finite_cells_begin();

@@ -4,6 +4,8 @@
 namespace yade {
 namespace CGT {
 
+	void NORMALIZE(CVector& v) { v = v * (1.0 / sqrt(pow(v[0], 2) + pow(v[1], 2) + pow(v[2], 2))); }
+
 	Real Tens::Norme2()
 	{
 		Real N = 0;
@@ -18,25 +20,11 @@ namespace CGT {
 
 	CVector operator*(Tens& tens, CVector& vect)
 	{
-		CVector result;
-		result = CVector(
+		const auto result = CVector(
 		        tens(1, 1) * vect.x() + tens(1, 2) * vect.y() + tens(1, 3) * vect.z(),
 		        tens(2, 1) * vect.x() + tens(2, 2) * vect.y() + tens(2, 3) * vect.z(),
 		        tens(3, 1) * vect.x() + tens(3, 2) * vect.y() + tens(3, 3) * vect.z());
 		return result;
-	}
-
-	CVector& NormalizedCVector(CVector& vect)
-	{
-		vect = vect * (1.0 / sqrt(pow(vect.x(), 2) + pow(vect.y(), 2) + pow(vect.z(), 2)));
-		return vect;
-	}
-
-	Tenseur3::Tenseur3(bool init)
-	{
-		if (init) {
-			T.setZero();
-		}
 	}
 
 	Tenseur3::Tenseur3(const Tenseur3& source) { T = source.T; }
@@ -98,22 +86,7 @@ namespace CGT {
 	void Tenseur3::reset() { T.setZero(); }
 
 	///////////		 Classe Tenseur_sym3		////////////
-	Tenseur_sym3::Tenseur_sym3(bool init)
-	{
-		if (init) {
-			for (int i = 0; i < 6; i++)
-				T[i] = 0;
-		}
-	}
-
-	Tenseur_sym3::Tenseur_sym3(const Tenseur_sym3& source)
-	{
-		//	for (int i=0; i<6; i++)
-		{
-			for (int i = 0; i < 6; i++)
-				T[i] = source.T[i];
-		}
-	}
+	Tenseur_sym3::Tenseur_sym3(const Tenseur_sym3& source) { T = source.T; }
 
 	Tenseur_sym3::Tenseur_sym3(const Tenseur3& source)
 	{
@@ -138,8 +111,7 @@ namespace CGT {
 	Tenseur_sym3& Tenseur_sym3::operator=(const Tenseur_sym3& source)
 	{
 		if (&source != this) {
-			for (int i = 0; i < 6; i++)
-				T[i] = source.T[i];
+			T = source.T;
 		}
 		return *this;
 	}
@@ -147,9 +119,7 @@ namespace CGT {
 	Tenseur_sym3& Tenseur_sym3::operator/=(Real d)
 	{
 		if (d != 0) {
-			d = 1.0 / d;
-			for (int i = 0; i < 6; i++)
-				T[i] *= d;
+			T /= d;
 		}
 		return *this;
 	}
@@ -180,24 +150,7 @@ namespace CGT {
 		return temp;
 	}
 
-	void Tenseur_sym3::reset()
-	{
-		for (int i = 0; i < 6; i++)
-			T[i] = 0;
-	}
-
-	void Tenseur_produit(CVector& v1, CVector& v2, Tenseur3& result)
-	{
-		result(1, 1) = v1.x() * v2.x();
-		result(1, 2) = v1.x() * v2.y();
-		result(1, 3) = v1.x() * v2.z();
-		result(2, 1) = v1.y() * v2.x();
-		result(2, 2) = v1.y() * v2.y();
-		result(2, 3) = v1.y() * v2.z();
-		result(3, 1) = v1.z() * v2.x();
-		result(3, 2) = v1.z() * v2.y();
-		result(3, 3) = v1.z() * v2.z();
-	}
+	void Tenseur_sym3::reset() { T.setZero(); }
 
 	void Somme(Tenseur3& result, CVector& v1, CVector& v2)
 	{
