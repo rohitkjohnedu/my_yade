@@ -81,7 +81,7 @@ REALLOCATE_MINIMAL = False # if true, intersections are minimized before realloc
 fibreList = []
 FLUID_COUPLING = False
 fluidBodies = [] 
-USE_CPP_MEDIAN = True
+USE_CPP_REALLOC = True
 USE_CPP_INTERS = False #sending intersections using mpi4py sometimes fails (dependent on mpi4py version, needs confirmation) (ERR : MPI_ERR_TRUNCATE)
 
 #tags for mpi messages
@@ -753,6 +753,7 @@ def splitScene():
 				subdomains.append(O.bodies.insertAtId(domainBody,maxid+k))
 				
 			if rank==0:  O._sceneObj.subD = Subdomain()  # make sure it's initialized here
+			O.subD = O._sceneObj.subD
 			O.subD.subdomains = subdomains
 			subD= O.subD #alias
 			subD.comm=comm #make sure the c++ uses the merged intracommunicator
