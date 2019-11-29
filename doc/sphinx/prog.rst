@@ -2078,6 +2078,7 @@ It might happen that when working with a new module some cryptic errors occur li
 	.. ipython::
 	
 	   In [1]: from yade.yourNewModule import *
+
 	   In [1]: foo()
 
 	.. note:: Notes, hints and warnings about how to use foo().
