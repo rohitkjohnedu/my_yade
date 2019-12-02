@@ -40,13 +40,19 @@ void Subdomain::setMinMax()
 				boundsMax=boundsMax.cwiseMax(b->bound->max);
 				boundsMin=boundsMin.cwiseMin(b->bound->min);
 			} else { 
-				//if periodic wrap bounds
-				const Vector3r& wMax = scene->cell->wrapPt(b->bound->max); 
-				const Vector3r& wMin = scene->cell->wrapPt(b->bound->min);
+				// if periodic, find the period of minbound, find size, wrap minbound based on period and add size to get maxbound (of body)
+				Vector3r inVsz = Vector3r(1./scene->cell->getSize()[0],1./scene->cell->getSize()[1],1./scene->cell->getSize()[2]);
+				Vector3i period(Vector3i::Zero()); 
+				for (int i=0; i != 3; ++i) { period[i] = (int)(std::floor(b->bound->min[i]*inVsz[i]));  }
+				Vector3r sz = b->bound->max - b->bound->min; 
+				Vector3r wMax; Vector3r wMin; 
+				for (int i=0; i != 3; ++i) {
+					wMin[i] = (period[i]) != 0 ? (b->bound->min[i]/period[i]) : (b->bound->min[i]);  
+				}
+				wMax = wMin + sz; 
 				boundsMax=boundsMax.cwiseMax(wMax);
 				boundsMin=boundsMin.cwiseMin(wMin);
 			}
-
 	}
 }
 
@@ -176,7 +182,6 @@ void Subdomain::getRankSize() {
 
 void Subdomain::mergeOp() {
 
-        //if (subdomainRank == master) {std::cout << "In merge operation " << std::endl; }
 	getRankSize(); 
 	sendAllBodiesToMaster();
 	recvBodyContainersFromWorkers();
@@ -252,10 +257,6 @@ void Subdomain::sendAllBodiesToMaster() {
 }
 
 void Subdomain::sendBodies(const int receiver, const vector<Body::id_t >& idsToSend) {
-  // FIXME:BLABLABLA
-// 	cout<<"sending from "<<subdomainRank<<" to "<<receiver<<" ids [";
-// 	for(auto const& i: idsToSend) cout<<i<<" ";
-// 	cout<<"]"<<endl;
 	shared_ptr<MPIBodyContainer> container(shared_ptr<MPIBodyContainer> (new MPIBodyContainer()));
 	std::string s = idsToSerializedMPIBodyContainer(idsToSend);
 	stringBuff[receiver]=s;
@@ -499,8 +500,8 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 }
 
 void Subdomain::getMirrorIntersections(){
-	/* to be used after calling genLocalIntersections in mpy.py */ 
-	
+	/* warning : local intersections have to be generated first. */ 
+
 	std::vector<MPI_Request> interReqs;  
 	mirrorIntersections.clear(); 
 	mirrorIntersections.resize(commSize);
@@ -544,7 +545,7 @@ void Subdomain::getMirrorIntersections(){
 	//get intesections from master
 	std::vector<int> intrSzMaster; 
 	if (subdomainRank == master) {
-		for (auto& vec : intersections) {
+		for (const auto& vec : intersections) {
 			intrSzMaster.push_back( (int) vec.size()); 
 		}
 	} else {intrSzMaster.resize(commSize); } 
@@ -662,7 +663,7 @@ std::vector<Body::id_t> Subdomain::medianFilterCPP(boost::python::list& idsToRec
 void Subdomain::migrateBodiesSend(const std::vector<Body::id_t>& sendIds,  int destination){
 	const shared_ptr<Scene>& scene = Omega::instance().getScene(); 
 	const auto& thisSubd = subdomains[subdomainRank-1]; 
-	for (auto& bId : sendIds){
+	for (const auto& bId : sendIds){
 		const shared_ptr<Body>& bdy = (*scene->bodies)[bId]; 
 		if (!bdy) {LOG_ERROR("reassignBodies failed " << bId << "  is not in subdomain " << subdomainRank << std::endl); }
 		bdy->subdomain = destination; 
