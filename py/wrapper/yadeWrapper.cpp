@@ -28,10 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/math/special_functions/nonfinite_num_facets.hpp>
-<<<<<<< da3c5e663fd6e641dc3328e1e6d009aeb48aa4a6
 #include <boost/python/raw_function.hpp>
-
-#include <locale>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -724,7 +721,7 @@ public:
 	{
 		if (id < 0 || (size_t)id >= scene->bodies->size()) {
 			PyErr_SetString(PyExc_IndexError, "Body id out of range.");
-			py::throw_error_already_set(); /* never reached */
+			py::throw_error_already_set(); /* never reached */
 			throw;
 		}
 	}
@@ -803,7 +800,7 @@ public:
 		int id = (_id >= 0 ? _id : scene->materials.size() + _id);
 		if (id < 0 || (size_t)id >= scene->materials.size()) {
 			PyErr_SetString(PyExc_IndexError, "Material id out of range.");
-			py::throw_error_already_set(); /* never reached */
+			py::throw_error_already_set(); /* never reached */
 			throw;
 		}
 		return Material::byId(id, scene);
@@ -1010,31 +1007,6 @@ public:
 	void stopAtIter_set(long s) { OMEGA.getScene()->stopAtIter = s; }
 	Real stopAtTime_get() { return OMEGA.getScene()->stopAtTime; }
 	void stopAtTime_set(Real s) { OMEGA.getScene()->stopAtTime = s; }
-	
-// #ifdef YADE_MPI 
-// 	Body::id_t getSubdomainId(){
-// 		return OMEGA.getScene()->thisSubdomainId; 
-// 	}
-// 	
-// 	void setSubdomainId(Body::id_t subdId){
-// 		OMEGA.getScene()->thisSubdomainId = subdId; 
-// 	}
-// 	
-// 	void setSubD(shared_ptr<Subdomain> subD){
-// 		OMEGA.getScene()->subD = subD; 
-// 	}
-// 	
-// 	shared_ptr<Subdomain> getSubD() {
-// 		return YADE_PTR_DYN_CAST<Subdomain>(OMEGA.getScene()->subD); 
-// 	}
-// #endif 
-	bool dynDt_get(){return OMEGA.getScene()->timeStepperActive();}
-	bool dynDt_set(bool activate){if(not OMEGA.getScene()->timeStepperActivate(activate) and activate) /* not activated despite passed value */ throw runtime_error("No TimeStepper found in O.engines."); return true;}
-	bool dynDtAvailable_get(){ return OMEGA.getScene()->timeStepperPresent(); }
-	long stopAtIter_get(){return OMEGA.getScene()->stopAtIter; }
-	void stopAtIter_set(long s){OMEGA.getScene()->stopAtIter=s; }
-	Real stopAtTime_get(){return OMEGA.getScene()->stopAtTime; }
-	void stopAtTime_set(Real s){OMEGA.getScene()->stopAtTime=s; }
 
 
 	bool timingEnabled_get() { return TimingInfo::enabled; }
@@ -1477,7 +1449,6 @@ try {
 	        .value("noResize", yade::Attr::noResize);
 
 	py::class_<pyOmega>("Omega")
-<<<<<<< e7f265c737fec320f60d04d8bf857a5ebd5c0681
 	        .add_property("iter", &pyOmega::iter, "Get current step number")
 	        .add_property(
 	                "subStep",
