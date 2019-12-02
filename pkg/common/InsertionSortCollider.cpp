@@ -559,26 +559,31 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		Real lmin = (minima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
 		Real lmax = (maxima[3*id2+axis]-maxima[3*id1+axis])*invSizes[axis];
 		Real shiftedMin = (minima[3*id1+axis]-maxima[3*id1+axis])*invSizes[axis]+1.;
+		
+#ifdef YADE_MPI
+		bool subDoverlap = (Body::byId(id1, scene)->getIsSubdomain() || Body::byId(id2, scene)->getIsSubdomain()); 
+		bool fluidBodyOverLap = (Body::byId(id1, scene)->getIsFluidDomainBbox() || Body::byId(id2, scene)->getIsFluidDomainBbox()); 
+		if(((lmax-lmin)>0.5 || shiftedMin<0) &&  !(subDoverlap || fluidBodyOverLap)){
+#else 
 		if((lmax-lmin)>0.5 || shiftedMin<0){
-			#ifdef YADE_MPI
-				bool subDoverlap = (Body::byId(id1, scene)->getIsSubdomain() || Body::byId(id2, scene)->getIsSubdomain()); 
-				bool fluidBodyOverLap = (Body::byId(id1, scene)->getIsFluidDomainBbox() || Body::byId(id2, scene)->getIsFluidDomainBbox()); 
-				if (allowBiggerThanPeriod) {periods[axis]=0; continue;}
-				else if (subDoverlap || fluidBodyOverLap) {periods[axis]=0; continue;}
-				else { LOG_FATAL("Body #"<<((lmax-lmin)>0.5?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
-				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
-			#else
+#endif
 				if (allowBiggerThanPeriod) {periods[axis]=0; continue;}
 				else {	LOG_FATAL("Body #"<<((lmax-lmin)>0.5?id2:id1)<<" spans over half of the cell size "<<dim<<" (axis="<<axis<<", see flag allowBiggerThanPeriod)");
 				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");}
-			#endif 
-
 		}
 		int period1 = int(std::floor(lmax));
+	
+#ifdef YADE_MPI
 		//overlap around zero, on the "+" side
-		if ((lmin-period1) <= overlapTolerance) {periods[axis]=-period1; continue;}
-		 //overlap around 1, on the "-" side
-		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]=-period1-1; continue;}
+		if ((lmin-period1) <= overlapTolerance) {periods[axis] = (subDoverlap || fluidBodyOverLap) ? 0 :  -period1 ; continue;}
+		 //overlap around 1, on the "-" sides
+		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]= (subDoverlap || fluidBodyOverLap) ? 0 :  -period1-1 ; continue;}
+#else
+		//overlap around zero, on the "+" side
+		if ((lmin-period1) <= overlapTolerance) {periods[axis] = -period1 ; continue;}
+		 //overlap around 1, on the "-" sides
+		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]= -period1-1 ; continue;}
+#endif
 		// none of the above, exit
 		return false;
 	}
