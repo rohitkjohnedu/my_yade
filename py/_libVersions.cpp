@@ -1,3 +1,4 @@
+#include <lib/base/Logging.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <core/Omega.hpp>
 #include <boost/lexical_cast.hpp>
@@ -318,37 +319,7 @@ py::list clpVer() { return {}; }
 
 
 // 19. mpi4py
-/*
- * It turns out that getting PyMPI version in C++ is not possible. Because it's a python library ;)
- * The PyMPI_Get_version and PyMPI_Get_library_version are only #defines (in file https://bitbucket.org/mpi4py/mpi4py/src/master/src/lib-mpi/fallback.h )
- * that point to original MPI_Get_version, so using them makes no sense at all.
- *
-#ifdef YADE_MPI
-	#include <mpi.h>
-	#include <mpi4py/mpi4py.h> // for passing MPI_Comm from python to c++
-	py::list mpi4PyVer() {
-		py::list ret;
-		// the PyMPI uses char array[], which is rather annoying. And this version string can be very long sometimes.
-		char charStr[10000] = "unknown_version";
-		int  rlen=0;
-		// and I don't know if this is the correct way to do this. But I didn't find anything else.
-		PyMPI_Get_library_version(charStr,&rlen);
-		std::string verStr(charStr);
-		// now I will try to parse this string to extract the numbers. I suppose I will end up with MPI_VERSION, MPI_SUBVERSION, but in fact
-		// I don't know which implementation of PyMPI_Get_library_version I am calling here, so I cannot be sure what will be the result.
-
-		// I want to extract numbers using stringstream, to make it simpler I replace '.' with ' '.
-		std::replace( verStr.begin(), verStr.end(), '.' , ' ');
-
-		ret.append( extractNumbers(verStr , "mpi4PyVer()") );
-		ret.append( verStr );
-		return ret;
-	}
-#else
-	py::list mpi4PyVer() { return {}; }
-#endif
-*
-*/
+// It turns out that getting PyMPI version in C++ is not possible. Because it's a python library ;)
 
 py::dict getAllVersionsCpp()
 {
@@ -375,21 +346,11 @@ py::dict getAllVersionsCpp()
 }
 
 BOOST_PYTHON_MODULE(_libVersions)
-{
+try {
 	YADE_SET_DOCSTRING_OPTS;
-	/*
- * Maybe exporting them all is not necessary. All data is aggregated inside getAllVersionsCpp() anyway.
- *
-	py::def("gccVer"  , gccVer   , "Returns g++   compiler version with which yade was compiled.                                                       \n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
-	py::def("clangVer", clangVer , "Returns clang compiler version with which yade was compiled.                                                       \n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
-	py::def("boostVer", boostVer , "Returns boost  library version with which yade was compiled.                                                       \n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
-	py::def("mpiVer"  , mpiVer   , "Returns MPI    library version with which yade was compiled, as detected from ``#include                 <mpi.h>``.\n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
-	py::def("vtkVer"  , vtkVer   , "Returns VTK    library version with which yade was compiled, as detected from ``#include          <vtkVersion.h>``.\n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
-	py::def("cgalVer" , cgalVer  , "Returns CGAL   library version with which yade was compiled, as detected from ``#include <CGAL/version_macros.h>``.\n\n:return: list in format ``[ (major,minor,patch) , \"versionString\" ]``.");
-*/
-
 	// We can use C++ string literal just like """ """ in python to write docstrings (see. https://en.cppreference.com/w/cpp/language/string_literal )
 	// The """ is a custom delimeter, we could use    R"RAW( instead, or any other delimeter. This decides what will be the termination delimeter.
+	// Remember that we can always use .. ipython:: to execute actual python code while documentation is built.
 
 	py::def("getAllVersionsCpp", getAllVersionsCpp, R"""(
 This function returns library versions as discovered by C++ during compilation from all the ``#include`` headers. This can be useful in debugging to detect some library ``.so`` conflicts.
@@ -407,4 +368,19 @@ As an example the dict below reflects what libraries this documentation was comp
 .. note:: Please add here C++ detection of other libraries when yade starts using them.
 
 	)""");
+
+} catch (...) {
+	// How to work with python exceptions:
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_errors_hpp.html#high_level_components.boost_python_errors_hpp.example
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/embedding.html
+	//     https://stackoverflow.com/questions/1418015/how-to-get-python-exception-text
+	// If we wanted custom yade exceptions thrown to python:
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/exception.html
+	//     https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_exception_translato.html
+	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+	PyErr_Print();
+	PyErr_SetString(PyExc_SystemError, __FILE__);
+	boost::python::handle_exception();
+	throw;
 }
+

@@ -510,7 +510,7 @@ Syntax of documentation is `ReST <http://docutils.sourceforge.net/rst.html>`__ (
 
 
 .. note::
-	Use C++ `string literal <https://en.cppreference.com/w/cpp/language/string_literal>`__ when writing docstrings in C++. By convention the ``R"""(raw text)"""`` is used. For example see :ysrccommit:`here<c5993a086/pkg/dem/VTKRecorder.hpp#L27>`.
+	Use C++ `string literal <https://en.cppreference.com/w/cpp/language/string_literal>`__ when writing docstrings in C++. By convention the ``R"""(raw text)"""`` is used. For example see :ref:`here <debug-exceptions>` and :ysrccommit:`here<c5993a086/pkg/dem/VTKRecorder.hpp#L27>`.
 
 .. note::
 	Remember that inside C++ docstrings it is possible to invoke python commands which are executed by yade when documentation is being compiled. For example compare this :ysrccommit:`source docstring<c5993a086/py/_libVersions.cpp#L364>` with the :yref:`final effect<yade._libVersions.getAllVersionsCpp>`.
@@ -2047,6 +2047,63 @@ Modules are placed in ``py/`` directory, the ``C++`` parts of the modules begin 
 	#. The cmake command to install it: :ysrccommit:`like this<bf906f74a6/CMakeLists.txt#L897>`.
 
 .. hint:: The last step regarding ``yourNewModule.py.in`` (or ``_yourNewModule.cpp.in``) is needed only on very rare occasions, and is included here only for the sake of completeness.
+
+.. _debug-exceptions:
+
+Debugging boundary between python and C++
+-----------------------------------------
+
+During normal use all ``C++`` exceptions are propagated back to ``python`` interface with full information associated with them. The only situation where this might not be the case is during execution of command ``import module`` inside a ``python`` script. It might happen that when importing a new module some cryptic errors occur like: ``initialization of module raised unreported exception``. These ``unreported exceptions`` happen in the situation when the ``C++`` code executed a ``python`` code inside it (this is called embedding) and this ``python`` code threw an exception. The proper way to deal with this situation is to wrap entire module declaration inside a ``try {} catch(...) {}`` block. It might be possible to deal with specific exceptions also (see `here <https://gitlab.com/yade-dev/trunk/merge_requests/348>`__ for other example catch blocks), however the general solution is to properly inform ``python`` that importing this module did not work. In this catch block it is possible to execute  ``PyErr_Print();`` command to see what the problem was and propagate the exception back to python, however during ``import module`` command only the ``SystemError`` python exception can get through. Hence the ``catch(...)`` block after ``BOOST_PYTHON_MODULE(_yourNewModule)`` should look like this:
+
+.. code-block:: c++
+
+	#include <lib/base/Logging.hpp>
+
+	CREATE_CPP_LOCAL_LOGGER("_yourNewModule.cpp");
+
+	BOOST_PYTHON_MODULE(_yourNewModule)
+	try {
+		py::def("foo", foo, R"""(
+	The description of function foo().
+	
+	:param arg1: description of first argument
+	:param arg2: description of second argument
+	:type arg1: type description
+	:type arg2: type description
+	:return: return description
+	:rtype: the return type description
+	
+	Example usage of foo:
+	
+	.. ipython::
+	
+	   In [1]: from yade.yourNewModule import *
+
+	   In [1]: foo()
+
+	.. note:: Notes, hints and warnings about how to use foo().
+
+		)""");
+
+	} catch (...) {
+		LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
+		PyErr_Print();
+		PyErr_SetString(PyExc_SystemError, __FILE__);
+		boost::python::handle_exception();
+		throw;
+	}
+
+.. note:: Pay attention to the ``_yourNewModule`` inside ``BOOST_PYTHON_MODULE(…)``, it has to match the file name of the ``.cpp`` file.
+
+Further reading, about how to work with python exceptions:
+
+#. `Example in boost::python reference manual <https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_errors_hpp.html#high_level_components.boost_python_errors_hpp.example>`__.
+#. `Example in boost::python tutorial <https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/embedding.html>`__.
+#. `When PyErr_Print(); is not enough <https://stackoverflow.com/questions/1418015/how-to-get-python-exception-text>`__.
+
+.. comment: #. Custom yade exceptions thrown to python:
+.. comment: #. `Exceptions in boost::python tutorial <https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/tutorial/tutorial/exception.html>`__
+.. comment: #. `Translating exceptions <https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/reference/high_level_components/boost_python_exception_translato.html`__
 
 Maintaining compatibility
 ==========================
