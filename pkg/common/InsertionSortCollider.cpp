@@ -563,7 +563,7 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 #ifdef YADE_MPI
 		bool subDoverlap = (Body::byId(id1, scene)->getIsSubdomain() || Body::byId(id2, scene)->getIsSubdomain()); 
 		bool fluidBodyOverLap = (Body::byId(id1, scene)->getIsFluidDomainBbox() || Body::byId(id2, scene)->getIsFluidDomainBbox()); 
-		if(((lmax-lmin)>0.5 || shiftedMin<0) &&  !(subDoverlap || fluidBodyOverLap)){
+		if(((lmax-lmin)>0.5 || shiftedMin<0) &&  !(subDoverlap or fluidBodyOverLap)){
 #else 
 		if((lmax-lmin)>0.5 || shiftedMin<0){
 #endif
@@ -573,17 +573,10 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2,Sc
 		}
 		int period1 = int(std::floor(lmax));
 	
-#ifdef YADE_MPI
-		//overlap around zero, on the "+" side
-		if ((lmin-period1) <= overlapTolerance) {periods[axis] = (subDoverlap || fluidBodyOverLap) ? 0 :  -period1 ; continue;}
-		 //overlap around 1, on the "-" sides
-		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]= (subDoverlap || fluidBodyOverLap) ? 0 :  -period1-1 ; continue;}
-#else
 		//overlap around zero, on the "+" side
 		if ((lmin-period1) <= overlapTolerance) {periods[axis] = -period1 ; continue;}
 		 //overlap around 1, on the "-" sides
 		if ((lmax-period1+overlapTolerance) >= shiftedMin) {periods[axis]= -period1-1 ; continue;}
-#endif
 		// none of the above, exit
 		return false;
 	}
