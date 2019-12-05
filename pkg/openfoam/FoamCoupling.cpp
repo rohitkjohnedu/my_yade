@@ -73,6 +73,7 @@ void FoamCoupling::insertBodyId(int bId){
 	const auto& iter = std::find(bodyList.begin(), bodyList.end(), bId); 
 	if ( iter != bodyList.end()) {LOG_WARN("Body Id " << bId << "  already exists in coupling. ")} else{
 	bodyList.push_back(bId); } 
+	bodyListModified = true; 
 }
 
 bool FoamCoupling::eraseId(int bId){
@@ -82,6 +83,7 @@ bool FoamCoupling::eraseId(int bId){
 		LOG_ERROR("Id not found in list of ids in coupling"); 
 		return false; 
 	}
+	bodyListModified = true; 
 }
 
 
@@ -392,14 +394,14 @@ bool FoamCoupling::ifFluidDomain(const Body::id_t&  testId ){
 void FoamCoupling::buildLocalIds(){
 	if (localRank == yadeMaster) { return; }  // master has no bodies. 
 	if (bodyList.size() == 0) { LOG_ERROR("Ids for coupling has no been set, FAIL!"); return;   } 
-	const shared_ptr<Subdomain>& subD =  YADE_PTR_CAST<Subdomain>(scene->subD); 
-	if (!subD) {LOG_ERROR("subdomain not found for local rank/ world rank  = "  << localRank << "   " << worldRank); return; }  
-	for (const auto& testId : bodyList) {
-		std::vector<Body::id_t>::iterator iter = std::find(subD->ids.begin(), subD->ids.end(), testId);  // can subD have ids sorted? 
-		if (iter != subD->ids.end()){
-			localIds.push_back(*iter); 
+		const shared_ptr<Subdomain>& subD =  YADE_PTR_CAST<Subdomain>(scene->subD); 
+		if (!subD) {LOG_ERROR("subdomain not found for local rank/ world rank  = "  << localRank << "   " << worldRank); return; }  
+		for (const auto& testId : bodyList) {
+			std::vector<Body::id_t>::iterator iter = std::find(subD->ids.begin(), subD->ids.end(), testId);  // can subD have ids sorted? 
+			if (iter != subD->ids.end()){
+				localIds.push_back(*iter); 
+			}
 		}
-	}
 	
 }
 
@@ -706,7 +708,7 @@ bool FoamCoupling::exchangeData(){
 
 void FoamCoupling::killMPI() { 
 	castTerminate(); 
-	MPI_Finalize();
+	if (!couplingModeParallel) MPI_Finalize();
 }
 } // namespace yade
 
