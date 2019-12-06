@@ -19,13 +19,17 @@
 #include <core/ForceContainer.hpp>
 #include <core/InteractionContainer.hpp>
 #include <core/EnergyTracker.hpp>
+#ifdef YADE_MPI 
+	#include<mpi.h>
+#endif
 
 #ifdef YADE_OPENMP
 	#include<omp.h>
 #endif
 
-namespace yade { // Cannot have #include directive inside.
 
+namespace yade { // Cannot have #include directive inside.
+class Shape; 
 class Bound;
 #ifdef YADE_OPENGL
 	class OpenGLRenderer;
@@ -70,9 +74,13 @@ class Scene: public Serializable{
 		#ifdef YADE_OPENGL
 			shared_ptr<OpenGLRenderer> renderer;
 		#endif
-
+			
+		#ifdef YADE_MPI
+			MPI_Comm getComm(); 
+		#endif 
+		
 		void postLoad(Scene&);
-
+		
 		boost::posix_time::ptime prevTime; //Time value on the previous step
 
 	// clang-format off
@@ -92,6 +100,7 @@ class Scene: public Serializable{
 		((Body::id_t,selectedBody,-1,,"Id of body that is selected by the user"))
 	#ifdef YADE_MPI
 		((int,subdomain,0,,"the subdomain this scene is assigned in MPI/domain decomposition."))
+		((shared_ptr<Shape>,subD,boost::make_shared<Shape>(),,"subdomain (shape) attached to this proc."))
 	#endif
 		((vector<string>,tags,,,"Arbitrary key=value associations (tags like mp3 tags: author, date, version, description etc.)"))
 		((vector<shared_ptr<Engine> >,engines,,Attr::hidden,"Engines sequence in the simulation."))

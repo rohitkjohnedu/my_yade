@@ -16,6 +16,11 @@
 #include<pkg/common/Sphere.hpp>
 #include<pkg/dem/Shop.hpp>
 #include<pkg/dem/ViscoelasticPM.hpp>
+#ifdef YADE_MPI 
+	#include <mpi.h> 
+	#include <core/Subdomain.hpp>
+#endif
+
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -114,7 +119,8 @@ void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& bo
 
 bool GlobalStiffnessTimeStepper::isActivated()
 {
-	return (active && ((!computedOnce) || (scene->iter % timeStepUpdateInterval == 0) || (scene->iter < (long int) 2) ));
+      return  (active && ((!computedOnce) || (scene->iter % timeStepUpdateInterval == 0) || (scene->iter < (long int) 2) ));
+	
 }
 
 void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
@@ -129,6 +135,7 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 	newDt = Mathr::MAX_REAL;
 	computedSomething=false;
 	for (const auto &b : *bodies) {
+		if (!b) {continue; } 
 		if (b->isDynamic() && !b->isClumpMember()) findTimeStepFromBody(b, ncb);
 	}
 	if(densityScaling) (newDt=targetDt);
@@ -137,6 +144,17 @@ void GlobalStiffnessTimeStepper::computeTimeStep(Scene* ncb)
 		scene->dt=previousDt;
 		computedOnce = true;}
 	else if (!computedOnce) scene->dt=defaultDt;
+	
+#ifdef YADE_MPI
+	if (parallelMode){
+		if (scene->iter % timeStepUpdateInterval == 0){
+			Real recvDt; Real myDt = scene->dt; 
+			MPI_Allreduce(&myDt,&recvDt,1, MPI_DOUBLE,MPI_MIN,scene->getComm()); 
+			scene->dt = recvDt;  
+		}
+	}
+#endif 
+ 
 // 	LOG_INFO("computed timestep " << newDt <<
 // 			(scene->dt==newDt ? string(", applied") :
 // 			string(", BUT timestep is ")+boost::lexical_cast<string>(scene->dt))<<".");

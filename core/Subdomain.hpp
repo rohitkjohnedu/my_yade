@@ -1,5 +1,5 @@
 // (c) 2018 Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
-//  deepak, 03/05/19 --> added some helper functions. 
+// (c) 2019 Deepak Kunhappan, <deepak.kunhappan@3sr-grenoble.fr> <deepak.kn1990@gmail.com>
 //  francois kneib
 
 #pragma once
@@ -13,11 +13,14 @@
 #include <mpi.h>
 #include <core/MPIBodyContainer.hpp>
 #include <mpi4py/mpi4py.h> // for passing MPI_Comm from python to c++
-
+#include <core/Scene.hpp>
 namespace yade { // Cannot have #include directive inside.
 
+using  projectedBoundElem = std::pair<double, std::pair<int, int> >;  // [dist, subdomain, bodyid] this seems to be faster than struct. 
+   
 class Subdomain: public Shape {
 	public:
+	  
 	void init(){
 		getRankSize();
 		stringBuff.resize(commSize);
@@ -231,15 +234,19 @@ class Subdomain: public Shape {
 	 void clearSubdomainIds();  // clears the member ids (std::vector <Body::id_t>
 	 void getRankSize();  
 	 void clearRecvdCharBuff(std::vector<char*>& ); // frees std::vector<char*>
+	 void setSubdomainIds(std::vector<Body::id_t>);
+	 std::vector<Body::id_t> getSubdomainIds(); 
+	 void append(Body::id_t); 
+	 void appendList(const boost::python::list& ); 
 	 
-         
+	 
          
         //declarations dpk 
          
 	vector<MPI_Status>  mpiStatus; 
 	std::vector<std::pair<std::string, int> > sendContainer;  // list containing the serialized data (string) to be sent with the destination rank.
 	int subdomainRank, commSize;  //NOTE: subdomainRank is redundant with scene->subdomain, would be better to avoid to be sure they don't diverge
-	int TAG_STRING = 420, TAG_COUNT = 20, TAG_WALL_INTR=100, TAG_FORCE=200, TAG_BODY=111; 
+	int TAG_STRING = 420, TAG_COUNT = 20, TAG_WALL_INTR=100, TAG_FORCE=200, TAG_BODY=111, TAG_INTERSECTIONS=112; 
 	bool commContainer=false; 
 	bool containersRecvd = false; 
 	std::vector<shared_ptr<MPIBodyContainer> > recvdBodyContainers; 
@@ -302,8 +309,18 @@ class Subdomain: public Shape {
 // 		LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<oldNum-newNum<<" / "<<oldNum);
 		return (oldNum ? (oldNum-newNum)/double(oldNum) : 0); //return overall ratio of removed elements (low means useless)
 	}
-		
-	// clang-format off
+	
+	 // body reallocation 
+	 
+	 std::vector<yade::projectedBoundElem> projectedBoundsCPP(int , const Vector3r&, const Vector3r&, bool useAABB = false ); 
+	 std::vector<Body::id_t> medianFilterCPP(boost::python::list& , int otherSD, const Vector3r& , const Vector3r& ,  bool useAABB=false );
+	 void migrateBodiesSend(const std::vector<Body::id_t>&  , int );
+	 void updateLocalIds(bool); 
+	 void cleanIntersections(int);
+	 void updateNewMirrorIntrs(int, const std::vector<Body::id_t>& ); 
+	 void getMirrorIntersections();
+	 
+	 
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain. Stores internals and provides optimized functions for communications between workers. This class may not be used directly. Instead, Subdomains are appended automatically to the scene bodies when using :yref:`mpy.mpirun`",
 // 		((testType, testArray,testType({0,0}),,""))
 		((Real,extraLength,0,,"verlet dist for the subdomain, added to bodies verletDist"))
@@ -313,6 +330,7 @@ class Subdomain: public Shape {
 		((IntersectionMap,mirrorIntersections,IntersectionMap(),Attr::hidden,"[will be overridden below]"))
 		((vector<Body::id_t>,ids,vector<Body::id_t>(),,"Ids of owned particles."))
 		((vector<vector<Real> >,stateBuffer,vector<vector<Real> >(),(Attr::noSave | Attr::hidden),"container storing data from other subdomains")) 
+		((vector<Body::id_t>, subdomains, vector<Body::id_t> (), (Attr::noSave | Attr::hidden), "subdomain ids (by body id)"))
 		,/*ctor*/ createIndex(); myComm_p=NULL;
 		,/*py*/ /*.add_property("members",&Clump::members_get,"Return clump members as {'id1':(relPos,relOri),...}")*/
 		.def("init",&Subdomain::init,"Initialize subdomain variables as rank and buffer sizes, call this from each thread after scene distribution by master.")
@@ -336,12 +354,22 @@ class Subdomain: public Shape {
 		.def("completeSendBodies", &Subdomain::completeSendBodies, "calls MPI_wait to complete the non blocking sends/recieves.")
 		.add_property("mirrorIntersections",&Subdomain::mIntrs_get,&Subdomain::mIntrs_set,"lists of bodies from other subdomains intersecting this one. WARNING: only assignement and concatenation allowed")
 		.add_property("comm",&Subdomain::getMyComm,&Subdomain::setMyComm,"Communicator to be used for MPI (converts mpi4py comm <-> c++ comm)")
+		.add_property("subdomains", &Subdomain::getSubdomainIds, &Subdomain::setSubdomainIds, "subdomain ids of other bodies, WARNING: only assignement and concatenation allowed ")
 		.def("splitBodiesToWorkers", &Subdomain::splitBodiesToWorkers,(boost::python::arg("eraseWorkerBodies")), "of true bodies in workers are erased and reassigned.")
 		.def("boundOnAxis", &Subdomain::boundOnAxis,(boost::python::arg("bound"),boost::python::arg("axis"),boost::python::arg("min")), "computes projected position of a bound in a certain direction")
 		.def("centerOfMass", &Subdomain::centerOfMass, "returns center of mass of assigned bodies")
 		.def("countIntsWith", &Subdomain::countIntsWith, (boost::python::arg("body"),boost::python::arg("someSubDomain"),boost::python::arg("someSubDomain")=Omega::instance().getScene()), "returns for a body the count of interactions (real or virtual) with bodies from a certain subdomain, interactions with subdomains excluded. Third parameter (scene pointer) can be left to default (equivalent to O._sceneObj).")
 		.def("filteredInts", &Subdomain::filteredInts, (boost::python::arg("someSubDomain"),boost::python::arg("mirror")), "return a copy of intersections or mirrorIntersections from which non-interacting bodies have been removed.")
 		.def("filterIntersections", &Subdomain::filterIntersections,(boost::python::arg("someSubDomain")=Omega::instance().getScene()),"clear intersections and mirror intersections of all non-interacting bodies.")
+		.def("setIDstoSubdomain", &Subdomain::setIDstoSubdomain, (boost::python::arg("idList")), "set list of ids to the subdomain." )
+		.def("boundOnAxis", &Subdomain::boundOnAxis,(boost::python::arg("bound"),boost::python::arg("axis"),boost::python::arg("min")), "computes projected position of a bound in a certain direction")
+		.def("centerOfMass", &Subdomain::centerOfMass, "returns center of mass of assigned bodies")
+		.def("medianFilterCPP", &Subdomain::medianFilterCPP, (boost::python::arg("bodiesToRecv"), boost::python::arg("otherSubdomain"), boost::python::arg("oterSubdomainCenterofMass"), boost::python::arg("useAABB")), "cpp version of median filter, used for body reallocation operations. ")
+		.def("migrateBodiesSend", &Subdomain::migrateBodiesSend, (boost::python::arg("bodiesToSend"), boost::python::arg("destination")), "ids of body to be sent have their subdomain parameter reassigned, followed by sendBodies")
+		.def("updateLocalIds", &Subdomain::updateLocalIds, (boost::python::arg("eraseRemoteMastrer")), "updates the ids in the subdomain id vector, if not eraseRemoteMastrer, body->subdomain in master are updated.")
+		.def("cleanIntersections",&Subdomain::cleanIntersections, (boost::python::arg("otherDomain")), "makes sure that the ids in the current subdomain belong to the current subdomain")
+		.def("updateNewMirrorIntrs", &Subdomain::updateNewMirrorIntrs, (boost::python::arg("otherdomain"), boost::python::arg("newMirrorList")), "update the mirrorIntersections of a specific subdomain")
+		.def("getMirrorIntrs", &Subdomain::getMirrorIntersections,"get mirrorIntersections from other subdomains")
 	);
 	// clang-format on
 	DECLARE_LOGGER;
@@ -359,6 +387,8 @@ class Bo1_Subdomain_Aabb : public BoundFunctor{
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Bo1_Subdomain_Aabb);
+
+
 
 } // namespace yade
 

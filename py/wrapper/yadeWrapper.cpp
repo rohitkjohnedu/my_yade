@@ -721,7 +721,7 @@ public:
 	{
 		if (id < 0 || (size_t)id >= scene->bodies->size()) {
 			PyErr_SetString(PyExc_IndexError, "Body id out of range.");
-			py::throw_error_already_set(); /* never reached */
+			py::throw_error_already_set(); /* never reached */
 			throw;
 		}
 	}
@@ -800,7 +800,7 @@ public:
 		int id = (_id >= 0 ? _id : scene->materials.size() + _id);
 		if (id < 0 || (size_t)id >= scene->materials.size()) {
 			PyErr_SetString(PyExc_IndexError, "Material id out of range.");
-			py::throw_error_already_set(); /* never reached */
+			py::throw_error_already_set(); /* never reached */
 			throw;
 		}
 		return Material::byId(id, scene);

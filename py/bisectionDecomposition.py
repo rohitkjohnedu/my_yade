@@ -24,10 +24,9 @@ _TOL_ = 1e-08
 
 
 # for coloring bodies. 
-import colorsys
+import yade.coloring as col
 
 class decompBodiesSerial: 
-
 
 	
 	def __init__(self, mpiComm): 
@@ -35,9 +34,7 @@ class decompBodiesSerial:
 		self.comm = mpiComm
 		self.numWorkers = self.comm.Get_size() - 1
 		# for coloring bodies 
-		self.colorscale = []
-		for i in range(self.numWorkers): 
-			self.colorscale.append(Vector3(colorsys.hsv_to_rgb(i*1./self.numWorkers,1,1)))
+		self.colorscale = col.getCol(self.numWorkers)
 		
 
 	def isEqual(self, a,b): 
@@ -168,13 +165,27 @@ class decompBodiesSerial:
 		
 		return splitPlaneIndex
 		
-		
-	
-	def partitionDomain(self):
-	  
+
+
+	def checkIfMasterBody(self,b): 
+		''' check if the body is a boundary body or bodies that would be typically be in master. '''
+		if (isinstance(b.shape, Wall)) : return True 
+		elif (isinstance(b.shape, Box)) : return True 
+		elif (isinstance(b.shape, FluidDomainBbox)) : return True 
+		elif (isinstance(b.shape, Facet)) : return True 
+		elif (isinstance(b.shape, Subdomain)) : return True 
+		else : return False 
+
+      
+	def partitionDomain(self, fibreList = None): 
 		''' The main driver function  '''
 		
-		blst = [(b.state.pos, b.id) for b in O.bodies if not (isinstance(b.shape, Wall) or isinstance(b.shape, Box) or b.isSubdomain)]
+		blst = []
+		if not fibreList: 
+			blst = [(b.state.pos, b.id) for b in O.bodies if not self.checkIfMasterBody(b)]
+		else : 
+			blst = [(O.bodies[j.cntrId].state.pos, j.cntrId) for j in fibreList]
+	
 		if self.ifPw2(self.numWorkers) : 
 			self._partitionDomain(blst, self.numWorkers, strideRank = 0)
 		else : 
@@ -183,5 +194,18 @@ class decompBodiesSerial:
 			for i in range(len(parts)): 
 				nr = nr - parts[i]
 				self._partitionDomain(wIds[i], parts[i], nr-1)
+				
+				
+		if fibreList : 
+			for fib in fibreList: 
+				for j in fib.nodes:
+					O.bodies[j].subdomain = O.bodies[fib.cntrId].subdomain 
+					O.bodies[j].shape.color = O.bodies[fib.cntrId].shape.color
+					for intr in O.bodies[j].intrs(): 
+						O.bodies[intr.geom.connectionBody.id].subdomain = O.bodies[fib.cntrId].subdomain 
+						O.bodies[intr.geom.connectionBody.id].shape.color = O.bodies[fib.cntrId].shape.color
+				
+
+  
 
 

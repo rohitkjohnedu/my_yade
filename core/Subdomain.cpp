@@ -1,9 +1,8 @@
 // (c) 2018 Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
-
+// (c) 2019 Deepak Kunhappan, <deepak.kunhappan@3sr-grenoble.fr> <deepak.kn1990@gmail.com>
 #ifdef YADE_MPI
 
 #include "Subdomain.hpp"
-#include <core/Scene.hpp>
 #include <core/BodyContainer.hpp>
 #include <core/State.hpp>
 #include <core/InteractionContainer.hpp>
@@ -15,6 +14,7 @@
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/stream_buffer.hpp>
+#include <pkg/dem/Shop.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -32,11 +32,26 @@ void Subdomain::setMinMax()
 	boundsMin=Vector3r(inf,inf,inf); boundsMax=Vector3r(-inf,-inf,-inf);
 	if (ids.size()==0) LOG_WARN("empty subdomain!");
 	if (ids.size()>0 and Body::byId(ids[0],scene)->subdomain != scene->subdomain) LOG_WARN("setMinMax executed with deprecated data (body->subdomain != scene->subdomain)");
+
 	for (const auto & id : ids){
 		const shared_ptr<Body>& b = Body::byId(id,scene);
 		if(!b or !b->bound) continue;
-		boundsMax=boundsMax.cwiseMax(b->bound->max);
-		boundsMin=boundsMin.cwiseMin(b->bound->min);
+			if (!scene->isPeriodic){
+				boundsMax=boundsMax.cwiseMax(b->bound->max);
+				boundsMin=boundsMin.cwiseMin(b->bound->min);
+			} else { 
+				// if periodic, find the period of minbound, find size, wrap minbound based on period and add size to get maxbound (of body)
+				Vector3r inVsz = Vector3r(1./scene->cell->getSize()[0],1./scene->cell->getSize()[1],1./scene->cell->getSize()[2]);
+				Vector3i period(Vector3i::Zero()); 
+				for (int i=0; i != 3; ++i) { period[i] = (int)(std::floor(b->state->pos[i]*inVsz[i]));  }
+				Vector3r wMax; Vector3r wMin; 
+				for (int i=0; i != 3; ++i) {
+					wMin[i] = (period[i]) != 0 ? (b->bound->min[i]/period[i]) : (b->bound->min[i]);  
+					wMax[i] = (period[i]) != 0 ? (b->bound->max[i]/period[i]) : (b->bound->max[i]);  
+				}
+				boundsMax=boundsMax.cwiseMax(wMax);
+				boundsMin=boundsMin.cwiseMin(wMin);
+			}
 	}
 }
 
@@ -81,17 +96,32 @@ boost::python::list Subdomain::mIntrs_get(){
 	return ret;
 }
 
+void Subdomain::setSubdomainIds(std::vector<Body::id_t> subdIds){
+	subdomains = subdIds;  
+}
+
+std::vector<Body::id_t> Subdomain::getSubdomainIds() {
+	return subdomains; 
+}
+
+void Subdomain::append(Body::id_t bId){ subdomains.push_back(bId);  }
+void Subdomain::appendList(const boost::python::list&  lst) {
+	unsigned sz = boost::python::len(lst); 
+	for (unsigned i = 0; i != sz; ++i) {
+		subdomains.push_back(boost::python::extract<int> (lst[i]));
+	}
+}
+
+
 void Bo1_Subdomain_Aabb::go(const shared_ptr<Shape>& cm, shared_ptr<Bound>& bv, const Se3r& /*se3*/, const Body* /*b*/){
 // 	LOG_WARN("Bo1_Subdomain_Aabb::go()")
+	scene = Omega::instance().getScene().get(); 
 	Subdomain* domain = static_cast<Subdomain*>(cm.get());
 	if(!bv){ bv=shared_ptr<Bound>(new Aabb);}
 	Aabb* aabb=static_cast<Aabb*>(bv.get());
-
-	if(!scene->isPeriodic){
-		aabb->min=domain->boundsMin; aabb->max=domain->boundsMax;
-		return;
-	} else {LOG_ERROR("to be implemented")}
-	LOG_WARN("Bo1_Subdomain_Aabb::go not implemented for periodic boundaries");
+	aabb->min=domain->boundsMin; aabb->max=domain->boundsMax;
+	return;
+	
 }
 
 /********************dpk********************/
@@ -140,30 +170,28 @@ void Subdomain::setIDstoSubdomain(boost::python::list& idList ){//Remark: probab
 }
 
 void Subdomain::getRankSize() {
-	  if (!ranksSet){
-	    MPI_Comm_rank(selfComm(), &subdomainRank);
-	    MPI_Comm_size(selfComm(), &commSize); 
-	    ranksSet = true; 
-	  } else {return; }
+	if (!ranksSet){
+		MPI_Comm_rank(selfComm(), &subdomainRank);
+		MPI_Comm_size(selfComm(), &commSize); 
+		ranksSet = true; 
+	} else {return; }
 }
 
 // driver function for merge operation // workers send bodies, master recieves, sets the bodies into bodycontainer, sets interactions in interactionContainer.
 
 void Subdomain::mergeOp() {
 
-        //if (subdomainRank == master) {std::cout << "In merge operation " << std::endl; }
 	getRankSize(); 
 	sendAllBodiesToMaster();
 	recvBodyContainersFromWorkers();
 	if (subdomainRank==master){
-	  Scene* scene = Omega::instance().getScene().get();
-	  bool ifMerge = true; bool overWriteBodies = true; 
-	  processContainerStrings();
-	  setBodiesToBodyContainer(scene, recvdBodyContainers, ifMerge, overWriteBodies); 
-	  recvdBodyContainers.clear(); 
-	  bodiesSet = false; // reset flag for next merge op.
-	  containersRecvd = false;
-	  
+		Scene* scene = Omega::instance().getScene().get();
+		bool ifMerge = true; bool overWriteBodies = true; 
+		processContainerStrings();
+		setBodiesToBodyContainer(scene, recvdBodyContainers, ifMerge, overWriteBodies); 
+		recvdBodyContainers.clear(); 
+		bodiesSet = false; // reset flag for next merge op.
+		containersRecvd = false;
 	}
 }
 
@@ -228,10 +256,6 @@ void Subdomain::sendAllBodiesToMaster() {
 }
 
 void Subdomain::sendBodies(const int receiver, const vector<Body::id_t >& idsToSend) {
-  // FIXME:BLABLABLA
-// 	cout<<"sending from "<<subdomainRank<<" to "<<receiver<<" ids [";
-// 	for(auto const& i: idsToSend) cout<<i<<" ";
-// 	cout<<"]"<<endl;
 	shared_ptr<MPIBodyContainer> container(shared_ptr<MPIBodyContainer> (new MPIBodyContainer()));
 	std::string s = idsToSerializedMPIBodyContainer(idsToSend);
 	stringBuff[receiver]=s;
@@ -286,7 +310,7 @@ void Subdomain::recvBodyContainersFromWorkers() {
     }
 }
 
-
+//
 // set all body properties from the recvd MPIBodyContainer
 void Subdomain::setBodiesToBodyContainer(Scene* scene ,std::vector<shared_ptr<MPIBodyContainer> >& containers, bool ifMerge, bool overwriteBodies) {
 	// to be used when deserializing a recieved container.
@@ -416,7 +440,6 @@ void Subdomain::recvBuffBlocking(char* cbuf, int cbufSz, int tag, int sourceRank
 }
 
 
-
 //non-blocking calls  --> Isend, Iprobe, Irecv, Waitall();  (we will use mpi_isend + mpi_wait and then mpi_probe followed by mpi_recv)
 
 void Subdomain::sendString(std::string& s, int destRank, int tag,  MPI_Request& request){
@@ -475,6 +498,92 @@ void Subdomain::clearRecvdCharBuff(std::vector<char*>& rcharBuff) {
 	if (subdomainRank != master){ rcharBuff.clear(); } // assuming master alwasy recieves from workers, hence the size of this vector for master is fixed.
 }
 
+void Subdomain::getMirrorIntersections(){
+	/* warning : local intersections have to be generated first. */ 
+
+	std::vector<MPI_Request> interReqs;  
+	mirrorIntersections.clear(); 
+	mirrorIntersections.resize(commSize);
+	
+	//workers exchange their intersections. 
+	if (subdomainRank != master) {
+		assert(intersections[subdomainRank].size()); 
+		//get procs to communicate. 
+		const auto& interProcs = intersections[subdomainRank]; 
+		for (const auto& proc : interProcs){
+			if (proc == master) continue; 
+			const auto& interVec = intersections[proc]; 
+			MPI_Request req; 
+			//send the intersections
+			MPI_Isend(&interVec.front(), (int) interVec.size(), MPI_INT, proc, TAG_INTERSECTIONS, selfComm(), &req); 
+			interReqs.push_back(req); 
+		}
+		
+		// probe size of incoming intersections : 
+		for (const auto& proc : interProcs){
+			if (proc == master) continue; 
+			MPI_Status status; 
+			MPI_Probe(proc, TAG_INTERSECTIONS, selfComm(), &status);
+			int sz;
+			MPI_Get_count(&status, MPI_INT, &sz);
+			auto& mirrorVec = mirrorIntersections[proc]; 
+			mirrorVec.resize(sz); 
+		}
+		
+		// recv intersections.. 
+		for (const auto& proc : interProcs){
+			if (proc == master) continue; 
+			auto& mirrorVec = mirrorIntersections[proc]; 
+			MPI_Status stat; 
+			MPI_Recv(&mirrorVec.front(), (int) mirrorVec.size(), MPI_INT, proc, TAG_INTERSECTIONS, selfComm(), &stat);
+		}
+		//complete the interactive send. 
+		processReqs(interReqs); 
+	}
+	
+	//get intesections from master
+	std::vector<int> intrSzMaster; 
+	if (subdomainRank == master) {
+		for (const auto& vec : intersections) {
+			intrSzMaster.push_back( (int) vec.size()); 
+		}
+	} else {intrSzMaster.resize(commSize); } 
+	
+	//master bcasts it's size of intersections 
+	MPI_Bcast(&intrSzMaster.front(), commSize, MPI_INT, master, selfComm()); 
+
+	// master sends intersections to those procs with size 
+	if (subdomainRank == master) {
+		interReqs.clear(); 
+		int prc = 0; 
+		for (auto& inters : intersections) {
+			if (inters.size() and prc != subdomainRank){
+				MPI_Request req; 
+				MPI_Isend(&inters.front(), (int) inters.size(), MPI_INT, prc, TAG_INTERSECTIONS, selfComm(), &req); 
+				interReqs.push_back(req); 
+			}
+			++prc; 
+		}
+	}
+	// workers with intersection with master receives. 
+	if (subdomainRank != master) {
+		if (intrSzMaster[subdomainRank] > 0 ) {
+			const auto& it = std::find(intersections[subdomainRank].begin(), intersections[subdomainRank].end(), master); 
+			if (it == intersections[subdomainRank].end()) intersections[subdomainRank].push_back(master); 
+			auto& vecMaster = mirrorIntersections[0]; 
+			vecMaster.clear(); vecMaster.resize(intrSzMaster[subdomainRank]); 
+			// recv 
+			MPI_Status stat; 
+			MPI_Recv(&vecMaster.front(), (int) vecMaster.size(), MPI_INT, master, TAG_INTERSECTIONS, selfComm(), &stat); 
+		}
+	}
+	//complete the interactive send in master's side. 
+	if (subdomainRank == master) {processReqs(interReqs);}
+}
+
+
+/* Migrate bodies, translation of python functions  */ 
+
 Real Subdomain::boundOnAxis(Bound& b, const Vector3r& direction, bool min) const //return projected extremum of an AABB in a particular direction (in the the '+' or '-' sign depending on 'min' )
 {
 	Vector3r size = b.max-b.min;
@@ -485,6 +594,150 @@ Real Subdomain::boundOnAxis(Bound& b, const Vector3r& direction, bool min) const
 	return 0.5*extremum;
 }
 
+std::vector<projectedBoundElem> Subdomain::projectedBoundsCPP(int otherSD, const Vector3r& otherSubDCM, const Vector3r& subDCM,  bool useAABB){
+	
+	std::vector<projectedBoundElem> pos; 
+	
+	const shared_ptr<Scene>& scene = Omega::instance().getScene(); 
+	const shared_ptr<Body>& otherSubdomainBody = (*scene->bodies)[subdomains[otherSD-1]]; 
+	if (! otherSubdomainBody) {LOG_ERROR("invalid subdomain id, perhaps not in intersection?, other subd =  " << otherSD); return pos; }
+	//const shared_ptr<Subdomain>& otherSubD = YADE_PTR_CAST<Subdomain>(otherSubdomainBody->shape);  
+	Vector3r pt1, pt2, axis; 
+	
+	if (useAABB) {
+		const auto& otherSubDBound = otherSubdomainBody->bound; 
+		const auto& thisSubDBound = (*scene->bodies)[subdomains[subdomainRank-1]]->bound; 
+		pt1 = 0.5*(thisSubDBound->min + thisSubDBound->max); 
+		pt2 = 0.5*(otherSubDBound->min + otherSubDBound->max); 
+	} else {
+		pt1 = subDCM; 
+		pt2 = otherSubDCM; 
+	}
+	
+	axis = pt2-pt1; axis.normalize(); 
+	
+	// from intersections (bodies in this subdomain which has intersections with the other sd) 
+	for (const auto& bId : intersections[otherSD]){
+		const shared_ptr<Body>& b = (*scene->bodies)[bId]; 
+		if (!b or b->getIsSubdomain()){continue; } 
+		Real ps = boundOnAxis((*b->bound), axis, true); 
+		projectedBoundElem pElem(ps, std::make_pair(subdomainRank, bId)); 
+		pos.push_back(pElem); 
+	}
+	
+	// from mirror intersections (bodies from other subdomain which has intersections with this sd) 
+	for (const auto& bId : mirrorIntersections[otherSD]){
+		const shared_ptr<Body>& b = (*scene->bodies)[bId]; 
+		if (!b or b->getIsSubdomain()){continue; } 
+		Real ps = boundOnAxis((*b->bound), axis, false);
+		projectedBoundElem pElem(ps, std::make_pair(otherSD, bId)); 
+		pos.push_back(pElem); 
+	}
+	
+	// sort 
+	std::sort(pos.begin(), pos.end(),[] (const auto& p1, const auto& p2) {return p1.first < p2.first;}); 
+	return pos; 
+}
+
+std::vector<Body::id_t> Subdomain::medianFilterCPP(boost::python::list& idsToRecv, int otherSD, const Vector3r& otherSubDCM, const Vector3r& subDCM , bool useAABB ){
+
+	std::vector<Body::id_t> idsToSend;  
+	std::vector<projectedBoundElem> pos = projectedBoundsCPP(otherSD, otherSubDCM, subDCM, useAABB); 
+	if (! pos.size()) {LOG_ERROR("ERROR IN CALCULATING PROJECTED BOUNDS WITH SUBDOMAIN = " << otherSD << "  from Subdomain = "  <<  subdomainRank); }
+	int xminus = 0; int xplus = (int) pos.size() - 1; 
+	while (xminus < xplus){
+		while ((pos[xminus].second.first == subdomainRank) && (xminus < xplus)) ++xminus; 
+		while ((pos[xplus].second.first == otherSD) && (xminus < xplus)) --xplus;
+		if (xminus < xplus){
+			idsToSend.push_back(pos[xplus].second.second);
+			idsToRecv.append(pos[xminus].second.second); 
+			pos[xminus].second.first = subdomainRank; pos[xplus].second.first = otherSD; 
+			++xminus; --xplus; 
+		}
+	} return idsToSend; 
+	
+}
+
+
+void Subdomain::migrateBodiesSend(const std::vector<Body::id_t>& sendIds,  int destination){
+	const shared_ptr<Scene>& scene = Omega::instance().getScene(); 
+	const auto& thisSubd = subdomains[subdomainRank-1]; 
+	for (const auto& bId : sendIds){
+		const shared_ptr<Body>& bdy = (*scene->bodies)[bId]; 
+		if (!bdy) {LOG_ERROR("reassignBodies failed " << bId << "  is not in subdomain " << subdomainRank << std::endl); }
+		bdy->subdomain = destination; 
+		yade::Shop::createExplicitInteraction(thisSubd, bId, false, true); 
+	}
+	sendBodies(destination, sendIds); 
+	 
+}
+
+// void Subdomain::migrateBodiesRecv() 
+
+void Subdomain::updateLocalIds(bool eraseRemoteMaster){
+	/* in case of the master proc and not eraseRemoteMaster  the worker ids are updated */ 
+	if (subdomainRank != master){
+		const shared_ptr<Scene>& scene = Omega::instance().getScene(); 
+		ids.clear(); 
+		for (const auto&  b : (*scene->bodies)){
+			if (!b){continue; }
+			if ((b->subdomain == subdomainRank) && (!(b->getIsSubdomain()))){ids.push_back(b->id); }
+			  
+		}
+	}
+	if (!eraseRemoteMaster){
+		MPI_Status iSendstat; MPI_Request iSendReq; 
+		if (subdomainRank != master) { 
+			MPI_Isend(&ids.front(), (int)ids.size(), MPI_INT, master, 500, selfComm(), &iSendReq); 
+		} 
+		
+		if (subdomainRank == master) {
+			std::vector<std::vector<Body::id_t> > workerIdsVec; 
+			workerIdsVec.resize(commSize-1); 
+			int worker = 1; 
+			for (auto& workerId : workerIdsVec ){
+				MPI_Status status;
+				MPI_Probe(worker, 500, selfComm(), &status);
+				int sz; 
+				MPI_Get_count(&status, MPI_INT, &sz);
+				workerId.resize(sz); 
+				MPI_Recv(&workerId.front(), sz, MPI_INT, worker, 500, selfComm(), &status ); 
+				++worker; 
+			}
+			// in master
+			const shared_ptr<Scene>& scene = Omega::instance().getScene(); 
+			worker = 1; 
+			for (const auto& workerIds : workerIdsVec){
+				for (const auto& bId : workerIds){
+					(*scene->bodies)[bId]->subdomain = worker; 
+				}
+				const auto& workerSubD  = YADE_PTR_CAST<Subdomain>((*scene->bodies)[subdomains[worker-1]]->shape); 
+				workerSubD->ids = workerIds; 
+				++worker; 
+			}
+			
+		}
+		
+		if (subdomainRank != master) {
+			MPI_Wait(&iSendReq, &iSendstat); 
+		}
+	}
+	
+}
+
+void Subdomain::cleanIntersections(int otherDomain){
+	std::vector<Body::id_t> ints; 
+	const shared_ptr<Scene>& scene = Omega::instance().getScene(); 
+	for (const auto& bId : intersections[otherDomain]){
+		const shared_ptr<Body>& b = (*scene->bodies)[bId]; 
+		if (b && (b->subdomain==subdomainRank)) ints.push_back(bId); 
+	}
+	intersections[otherDomain] = ints; 
+}
+
+void Subdomain::updateNewMirrorIntrs(int otherDomain, const std::vector<Body::id_t>& newMirror){
+	mirrorIntersections[otherDomain] = newMirror; 
+}
 
 } // namespace yade
 
