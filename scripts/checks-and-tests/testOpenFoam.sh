@@ -19,7 +19,8 @@ ls -la ./yadeimport.py
 blockMesh
 decomposePar
 mkdir yadep
+mkdir spheres
 
 mpiexec --allow-run-as-root -n 1 python3 scriptYade.py : -n 2 icoFoamYade -parallel
-mpiexec --allow-run-as-root -n 4 ../../../install/bin/yade-ci : -n 2 icoFoamYade -parallel
+mpiexec --allow-run-as-root -n 4 ../../../install/bin/yade-ci scriptMPI.py : -n 2 icoFoamYade -parallel
 
