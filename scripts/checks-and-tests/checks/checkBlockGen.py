@@ -45,7 +45,7 @@ if ('PotentialBlocks' in features):
 	p.slopeFace = False
 	p.twoDimension = False
 #	p.unitWidth2D = 9.0
-#	p.calJointLength = False
+	p.calContactArea = True
 	p.intactRockDegradation = True
 	#p.useFaceProperties = False
 	p.neverErase = False # Must be used when tension is on
@@ -99,7 +99,7 @@ if ('PotentialBlocks' in features):
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 	# Check volume of the rockmass
-	tol=1e-3
+	tol=1e-6
 	sumVolume = sum( b.shape.volume for b in O.bodies )
 	target = (p.boundarySizeXmin + p.boundarySizeXmax) * (p.boundarySizeYmin + p.boundarySizeYmax) * (p.boundarySizeZmin + p.boundarySizeZmax); V=target
 	if (abs(sumVolume-target)/abs(target)>tol):
@@ -108,7 +108,7 @@ if ('PotentialBlocks' in features):
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 	# Check mass of the rockmass
-	tol=1e-3
+	tol=1e-6
 	sumMass = sum (b.state.mass for b in O.bodies)
 	target = V*p.density
 	if (abs(sumMass-target)/abs(target)>tol):
@@ -117,7 +117,7 @@ if ('PotentialBlocks' in features):
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 	# Check centroid of the generated rockmass
-	tol=1e-3
+	tol=1e-6
 	target=Vector3.Zero
 	target = Vector3( 0.5*(p.boundarySizeXmax-p.boundarySizeXmin), 0.5*(p.boundarySizeYmax-p.boundarySizeYmin), 0.5*(p.boundarySizeZmax-p.boundarySizeZmin) ); centroid=target;
 	x = sum( b.state.pos[0]*b.shape.volume for b in O.bodies )/sumVolume
@@ -132,7 +132,7 @@ if ('PotentialBlocks' in features):
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 	# Check inertia of the generated rockmass
-	tol=1e-3
+	tol=1e-6
 	target=Vector3.Zero
 	target[0] = 1/12. * V * ( (p.boundarySizeYmax + p.boundarySizeYmin)**2 + (p.boundarySizeZmax + p.boundarySizeZmin)**2 )
 	target[1] = 1/12. * V * ( (p.boundarySizeXmax + p.boundarySizeXmin)**2 + (p.boundarySizeZmax + p.boundarySizeZmin)**2 )
