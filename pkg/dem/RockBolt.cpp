@@ -56,7 +56,7 @@ namespace yade { // Cannot have #include directive inside.
 void RockBolt::action(){
 
 	if (openingCreated == true && installed == false){
-			vector<double> distanceFrOpening;
+			vector<Real> distanceFrOpening;
 			for(const auto & b :  *scene->bodies){
 				if (!b) continue;
 				if (b->isClump() == true) continue;
@@ -75,7 +75,7 @@ void RockBolt::action(){
 			/* sort blocks according to distance from the centre */
 			int totalBlocks = blockIDs.size();
 			for (int i=0; i<totalBlocks; i++){
-				double distance = distanceFrOpening[i];
+				Real distance = distanceFrOpening[i];
 				int blockID = blockIDs[i];
 				int ihole = i;
 				while (ihole> 0 && distanceFrOpening[ihole-1] > distance){
@@ -94,11 +94,11 @@ void RockBolt::action(){
 				PotentialBlock *pb=static_cast<PotentialBlock*>(shape1);
 				int totalPlanes = pb->a.size();
 				int intersectNo = 0;
-				vector<Vector3r> tempCoord; vector<double> distance;
+				vector<Vector3r> tempCoord; vector<Real> distance;
 				for (int i=0; i<totalPlanes; i++){
-					Vector3r plane = state1->ori*Vector3r(pb->a[i], pb->b[i], pb->c[i]); double planeD = plane.dot(state1->pos) + pb->d[i] +pb->r;
+					Vector3r plane = state1->ori*Vector3r(pb->a[i], pb->b[i], pb->c[i]); Real planeD = plane.dot(state1->pos) + pb->d[i] +pb->r;
 					if ( intersectPlane(pb, state1,startingPoint,boltDirection, boltLength, jointIntersection, plane, planeD)){
-						double sign = plane.dot(boltDirection);
+						Real sign = plane.dot(boltDirection);
 						jointIntersection = jointIntersection - Mathr::Sign(sign)*halfActiveLength*boltDirection;
 						distance.push_back(jointIntersection.norm() );
 						jointIntersection = state1->ori.conjugate()*(jointIntersection-state1->pos);
@@ -193,7 +193,7 @@ void RockBolt::action(){
 						initialLength[j-1] =nodeDistance.norm()*Mathr::Sign(nodeDistance.dot(boltDirection) );
 						resetLengthInit = false;
 					}
-					Vector3r direction = nodeDistance; direction.normalize(); double dirSign = 1.0;
+					Vector3r direction = nodeDistance; direction.normalize(); Real dirSign = 1.0;
 					nodeDistanceVec[j-1] =nodeDistance;
 					//if (initialDirection[j-1].norm()>pow(10,-11) ){
 					//	dirSign = direction.dot(initialDirection[j-1]);
@@ -230,7 +230,7 @@ void RockBolt::action(){
 				}
 			}
 
-			averageForce = averageForce/static_cast<double>(blockNo-1);
+			averageForce = averageForce/static_cast<Real>(blockNo-1);
 
 	}
 	if ((scene->iter-vtkRefTimeStep)%vtkIteratorInterval == 0 && installed == true && blockIDs.size()>=2){
@@ -258,8 +258,8 @@ void RockBolt::action(){
 		  	Vector3r globalPoint1 = state1->ori*localCoordinates[2*i]+state1->pos;
 			Vector3r globalPoint2 = state1->ori*localCoordinates[2*i+1]+state1->pos;
 			vtkSmartPointer<vtkLineSource> lineSource =  vtkSmartPointer<vtkLineSource>::New();
-			double p0[3] = {globalPoint1[0], globalPoint1[1], globalPoint1[2]};
-			double p1[3] = {globalPoint2[0], globalPoint2[1], globalPoint2[2]};
+			Real p0[3] = {globalPoint1[0], globalPoint1[1], globalPoint1[2]};
+			Real p1[3] = {globalPoint2[0], globalPoint2[1], globalPoint2[2]};
 			lineSource->SetPoint1(p0);
 			lineSource->SetPoint2(p1);
 			appendFilter->AddInputConnection(lineSource-> GetOutputPort());
@@ -275,8 +275,8 @@ void RockBolt::action(){
 				State* state2 = Body::byId(blockIDs[i+1],scene)->state.get();
 				Vector3r globalPoint3 = state2->ori*localCoordinates[2*i+2]+state2->pos;
 				vtkSmartPointer<vtkLineSource> lineSourceJoint =  vtkSmartPointer<vtkLineSource>::New();
-				double p2[3] = {globalPoint2[0], globalPoint2[1], globalPoint2[2]};
-	  			double p3[3] = {globalPoint3[0], globalPoint3[1], globalPoint3[2]};
+				Real p2[3] = {globalPoint2[0], globalPoint2[1], globalPoint2[2]};
+	  			Real p3[3] = {globalPoint3[0], globalPoint3[1], globalPoint3[2]};
 				lineSourceJoint->SetPoint1(p2);
 				lineSourceJoint->SetPoint2(p3);
 				appendFilter->AddInputConnection(lineSourceJoint-> GetOutputPort());
@@ -350,7 +350,7 @@ Vector3r RockBolt::getNodeDistance(const PotentialBlock* /*cm1*/,const State* st
 }
 
 
-double RockBolt::evaluateFNoSphereVol(const PotentialBlock* s1,const State* state1, const Vector3r newTrial){
+Real RockBolt::evaluateFNoSphereVol(const PotentialBlock* s1,const State* state1, const Vector3r newTrial){
 	Vector3r tempP1 = newTrial - state1->pos;
 	/* Direction cosines */
 	//state1.ori.normalize();
@@ -375,7 +375,7 @@ double RockBolt::evaluateFNoSphereVol(const PotentialBlock* s1,const State* stat
 }
 
 
-bool RockBolt::installBolts(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt){
+bool RockBolt::installBolts(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const Real length, Vector3r& intersectionPt){
 
   //Vector3r endPt = startingPt + length*direction;
 
@@ -393,7 +393,7 @@ bool RockBolt::installBolts(const PotentialBlock* s1,const State* state1,const V
 /* Variables to keep things neat */
   int NUMCON = 3 /* equality */ + planeNoA /*block inequality */;
   int NUMVAR = 3/*3D */ + 1 /*t */+ 1 /* s */;
-  double s = 0.0;
+  Real s = 0.0;
   //bool converge = true;
 
   Matrix3r Q1 = (state1->ori.conjugate()).toRotationMatrix();
@@ -434,8 +434,8 @@ model2.setOptimizationDirection(1);
 		 model2.setColumnLower(4,-COIN_DBL_MAX);
 		    model2.setColumnUpper(4,COIN_DBL_MAX);
                // Rows
-	double rowLower[numberRows];
-	double rowUpper[numberRows];
+	Real rowLower[numberRows];
+	Real rowUpper[numberRows];
 
 rowLower[0] = startingPt.x();
 rowLower[1] = startingPt.y();
@@ -451,21 +451,21 @@ for (int k = 0; k < planeNoA; k++){
 }
 
 int row1Index[] = {0,3};
-double row1Value[] = {1.0,  -1.0*direction.x()};
+Real row1Value[] = {1.0,  -1.0*direction.x()};
 model2.addRow(2,row1Index,row1Value,rowLower[0],rowUpper[0]);
 
 int row2Index[] = {1,3};
-double row2Value[] = {1.0,  -1.0*direction.y()};
+Real row2Value[] = {1.0,  -1.0*direction.y()};
 model2.addRow(2,row2Index,row2Value,rowLower[1],rowUpper[1]);
 
 int row3Index[] = {2,3};
-double row3Value[] = {1.0,  -1.0*direction.z()};
+Real row3Value[] = {1.0,  -1.0*direction.z()};
 model2.addRow(2,row3Index,row3Value,rowLower[2],rowUpper[2]);
 
 for (int i=0; i<planeNoA; i++){
 
 	int rowIndex[] = {0,1,2,4};
-	double rowValue[] = {AQ1(i,0),AQ1(i,1),AQ1(i,2),-1.0};
+	Real rowValue[] = {AQ1(i,0),AQ1(i,1),AQ1(i,2),-1.0};
 	model2.addRow(4,rowIndex,rowValue,rowLower[3+i],rowUpper[3+i]);
 }
 
@@ -473,7 +473,7 @@ model2.scaling(0);
 model2.setLogLevel(0);
 model2.primal();
 
-          double * columnPrimal = model2.primalColumnSolution();
+          Real * columnPrimal = model2.primalColumnSolution();
 
 
 	 Vector3r temp = Vector3r(columnPrimal[0],columnPrimal[1],columnPrimal[2]);
@@ -490,7 +490,7 @@ model2.primal();
 }
 
 
-bool RockBolt::intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const double length, Vector3r& intersectionPt, const Vector3r plane, const double planeD){
+bool RockBolt::intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const Real length, Vector3r& intersectionPt, const Vector3r plane, const Real planeD){
   //bool feasible = true;
   //Vector3r endPt = startingPt + length*direction;
 
@@ -500,7 +500,7 @@ bool RockBolt::intersectPlane(const PotentialBlock* s1,const State* state1,const
 /* Variables to keep things neat */
   int NUMCON = 3 /* equality */ + 1 /*planeEquality */;
   int NUMVAR = 3/*3D */ + 1 /*t */;
-  double t = 0.0;
+  Real t = 0.0;
   //bool converge = true;
 
 /* line equality */
@@ -533,8 +533,8 @@ model2.setOptimizationDirection(1);
 	}
 
 	// Rows
-	double rowLower[numberRows];
-	double rowUpper[numberRows];
+	Real rowLower[numberRows];
+	Real rowUpper[numberRows];
 
 rowLower[0] = startingPt.x();
 rowLower[1] = startingPt.y();
@@ -546,31 +546,31 @@ rowUpper[2] = startingPt.z();
 rowUpper[3] = planeD;
 
 int row1Index[] = {0,3};
-double row1Value[] = {1.0,  -1.0*direction.x()};
+Real row1Value[] = {1.0,  -1.0*direction.x()};
 model2.addRow(2,row1Index,row1Value,rowLower[0],rowUpper[0]);
 
 int row2Index[] = {1,3};
-double row2Value[] = {1.0,  -1.0*direction.y()};
+Real row2Value[] = {1.0,  -1.0*direction.y()};
 model2.addRow(2,row2Index,row2Value,rowLower[1],rowUpper[1]);
 
 int row3Index[] = {2,3};
-double row3Value[] = {1.0,  -1.0*direction.z()};
+Real row3Value[] = {1.0,  -1.0*direction.z()};
 model2.addRow(2,row3Index,row3Value,rowLower[2],rowUpper[2]);
 
 int row4Index[] = {0,1,2};
-double row4Value[] = {plane.x(),plane.y(),plane.z()};
+Real row4Value[] = {plane.x(),plane.y(),plane.z()};
 model2.addRow(3,row4Index,row4Value,rowLower[3],rowUpper[3]);
 
 model2.scaling(0);
 model2.setLogLevel(0);
 model2.primal();
-	double * columnPrimal = model2.primalColumnSolution();
+	Real * columnPrimal = model2.primalColumnSolution();
 
 	Vector3r temp = Vector3r(columnPrimal[0],columnPrimal[1],columnPrimal[2]);
 	intersectionPt = temp; //state1->ori.conjugate()*(temp-state1->pos);
 	t = columnPrimal[3];
 
-double f = evaluateFNoSphereVol(s1,state1,intersectionPt);
+Real f = evaluateFNoSphereVol(s1,state1,intersectionPt);
 //std::cout<<"t: "<<t<<", f: "<<f<<", status: "<<status<<endl;
  int convergeSuccess = model2.status();
    if( t>1.001*length || t< 0.0 || f> 0.0|| convergeSuccess !=0){
