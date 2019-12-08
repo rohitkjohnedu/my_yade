@@ -64,6 +64,7 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 	Vector3r avgNormal(0.0,0.0,0.0);
 	Vector3r ptOnP1(0.0,0.0,0.0);
 	Vector3r ptOnP2(0.0,0.0,0.0);
+	Vector3r shearDir(0.0,0.0,0.0);
 	bool converge = false;
 
 	if(c->geom) {
@@ -135,14 +136,21 @@ bool Ig2_PP_PP_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 			if(hasPhys){
 //				phys->normal= avgNormal;
 				phys->ptOnP1 = ptOnP1; phys->ptOnP2 = ptOnP2;
-//				bool calJointLength = phys->calJointLength; double jointLength = phys->jointLength; /*int smallerID = 1*/;
-//				phys->contactArea = getAreaPolygon2(cm1, state1, cm2, state2, contactPt, avgNormal, smallerID, calJointLength, shearDir, jointLength, twoD); //TODO: Currently,the contact area of 3D contacts or the jointLength of 2D contacts is not calculated for the PotentialParticle class. So, what we have now is a linear stiffness model
-//				if(jointLength < pow(10,-11) || std::isnan(jointLength)  || calJointLength == false ) {jointLength = 1.0; /*std::min(s1->R,s2->R);*/}
-//				phys->jointLength = jointLength;
-				/* phys->smallerID = smallerID; */
-				if(twoDimension) { // moved this from KnKsLaw.cpp
-					phys->contactArea = unitWidth2D*phys->jointLength;
+				/*bool calJointLength = phys->calJointLength; */ Real jointLength = phys->jointLength; int smallerID = 1;
+				shearDir = phys->shearDir; shearDir.normalize();
+
+				if(calContactArea) { //calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts
+					phys->contactArea = getAreaPolygon2(cm1, state1, cm2, state2, shift2, contactPt, avgNormal, smallerID, shearDir, jointLength, twoDimension, unitWidth2D, areaStep);
+					/* phys->smallerID = smallerID; */
+				} else { //don't calculate jointLength or contactArea; assume constant linear stiffness in both normal and shear directions
+					phys->jointLength = 1.0;
+					if (twoDimension == true) {
+						phys->contactArea=phys->jointLength*unitWidth2D;
+					} else {
+						phys->contactArea = 1.0;
+					}
 				}
+//				if( std::isnan(jointLength ) {jointLength = 1.0; phys->jointLength = jointLength; /*std::min(s1->R,s2->R);*/}
 			}
 
 			scm->precompute(state1,state2,scene,c,avgNormal,!(hasGeom),shift2,false /* avoidGranularRatcheting */); //Assign contact point and normal after precompute!!!!
@@ -180,6 +188,110 @@ bool Ig2_PP_PP_ScGeom::goReverse(
 			c->swapOrder();
 			return go(cm2,cm1,state2,state1,-shift2,force,c); // This works with c->swapOrder()
 //			return go(cm1,cm2,state2,state1,-shift2,force,c); // Alternativelly, this works without c->swapOrder()
+}
+
+
+// In getAreaPolygon2 we calculate the contact area. This function follows a slightly different approach from the namesake function in the Potential Blocks. Here, to calculate the contact area we swipe along the shear direction in fixed angular steps, finding points of the overlapping volume through bisection searches.
+/* ***************************************************************************************************************************** */
+Real Ig2_PP_PP_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, const Vector3r contactPoint, const Vector3r contactNormal, int& smaller, Vector3r shearDir, Real& jointLength, const bool twoD, Real unitWidth2D, int areaStep){
+	Real areaTri = 0.0;
+//	Real bisectionStepSize = 1.0;//*std::min(s1->R, s2->R);
+
+	if(!twoD){ //3D contact - search counter-clockwise
+		int count = 0, countParticleA = 0, countParticleB = 0;
+		Vector3r ptOnBoundary = contactPoint;
+		Vector3r orthogonalDir = Vector3r(contactNormal.y(), -contactNormal.x(), 0.0); //Vector along the shear direction
+
+		if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(contactNormal.z(), 0.0, -contactNormal.x()); } //TODO: Optimise these two ifs into a nested one
+		if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(0.0, contactNormal.z(), -contactNormal.y()); }
+		orthogonalDir.normalize();
+		Real tol = pow(10,-8);
+//		Vector3r orthogonalDir2 = contactNormal.cross(orthogonalDir); orthogonalDir2.normalize(); //Vector along the shear direction, perpendicular to orthogonalDir
+
+		Vector3r prevPoint = ptOnBoundary;
+		Matrix3r area1; Matrix3r area2; Matrix3r area3;
+		//http://en.wikipedia.org/wiki/Triangle#Using_coordinates
+		area1(0,0) = contactPoint.x();		area2(0,0) = contactPoint.y();		area3(0,0) = contactPoint.z();
+		area1(1,0) = contactPoint.y();		area2(1,0) = contactPoint.z();		area3(1,0) = contactPoint.x();
+		area1(2,0) = 1.0;			area2(2,0) = 1.0;			area3(2,0) = 1.0;
+
+		Vector3r newPt(0,0,0), secondPoint(0,0,0), newSearchDir, ptOnP1a, ptOnP2a, p1, p2, v;
+		Real theta;
+
+		for (int i=0; i<=360; i+=areaStep){ //Here we iterate every "areaStep" degrees, to find the contact area
+			theta = i * Mathr::PI/180.; //theta is "i" in radians
+			v = orthogonalDir;
+			newSearchDir = v*std::cos(theta) + contactNormal.cross(v)*std::sin(theta) + contactNormal*(contactNormal.dot(v)) * (1-std::cos(theta));
+			newSearchDir.normalize(); //FIXME lose accuracy
+//			std::cout<< count << " | " << theta << " | " << newSearchDir	<<endl; //Debug message
+
+			prevPoint = ptOnBoundary;
+			ptOnP1a = Vector3r(0,0,0); ptOnP2a = Vector3r(0,0,0);
+
+			getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, newSearchDir, ptOnP1a);
+			getPtOnParticle2(cm2, state2, shift2         , contactPoint, newSearchDir, ptOnP2a);
+
+			p1 = (ptOnP1a - contactPoint);
+			p2 = (ptOnP2a - contactPoint);
+			if( p1.norm() < p2.norm() ){
+				ptOnBoundary = ptOnP1a; countParticleA++;
+			}else{
+				ptOnBoundary = ptOnP2a; countParticleB++;
+			}
+			if(count >= 1){
+				area1(0,1) = prevPoint.x();	area2(0,1) = prevPoint.y();	area3(0,1) = prevPoint.z();
+				area1(1,1) = prevPoint.y();	area2(1,1) = prevPoint.z();	area3(1,1) = prevPoint.x();
+				area1(2,1) = 1.0;		area2(2,1) = 1.0;		area3(2,1) = 1.0;
+
+				area1(0,2) = ptOnBoundary.x();	area2(0,2) = ptOnBoundary.y();	area3(0,2) = ptOnBoundary.z();
+				area1(1,2) = ptOnBoundary.y();	area2(1,2) = ptOnBoundary.z();	area3(1,2) = ptOnBoundary.x();
+				area1(2,2) = 1.0;		area2(2,2) = 1.0;		area3(2,2) = 1.0;
+
+				areaTri += 0.5*sqrt(( pow(area1.determinant(),2) + pow(area2.determinant(),2) + pow(area3.determinant(),2) ));
+//				std::cout<<count<<" | "<<areaTri<<" | "<<contactPoint<<" | "<<prevPoint<< " | "<<ptOnBoundary<<endl;
+			}
+			if(count==0){
+				secondPoint = ptOnBoundary;
+			}
+			newPt = ptOnBoundary;
+			count++;
+		}
+		if(count<4 || (newPt-secondPoint).norm() > tol) {std::cout<<"The contactArea calculation did not end in a closed loop. The last/first points: "<<newPt<<" | "<<secondPoint<<endl;}
+		if(countParticleA > countParticleB){smaller = 1;}else{smaller = 2;} //TODO: countParticleA,B and smaller variables could be removed in the future; they are not actively used so far.
+	} else { //2D contact (twoD=true)
+		Vector3r searchDir = shearDir;
+		Vector3r ptOnBoundary1(0,0,0), ptOnBoundary2(0,0,0);
+
+		searchDir = contactNormal.cross(twoDdir);
+		if(searchDir.squaredNorm() < pow(10,-14) ){
+			Vector3r xDir = Vector3r(1,0,0); //FIXME: Instead of the hardcoded Vector3r(1,0,0), here we should define a perpendicular direction to the twoDir attr in the 2D plane, where the particles are defined.
+			searchDir = xDir.cross(twoDdir);
+		}
+		searchDir.normalize();
+//		searchDir *= bisectionStepSize;
+		Vector3r ptOnP1(0,0,0); Vector3r ptOnP2(0,0,0);
+		getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, searchDir, ptOnP1);
+		getPtOnParticle2(cm2, state2, shift2,          contactPoint, searchDir, ptOnP2);
+
+		if( (ptOnP1 - contactPoint).squaredNorm() < (ptOnP2 - contactPoint).squaredNorm() ){ //FIXME: just .norm() should work fine too
+			ptOnBoundary1 = ptOnP1;
+		}else{
+			ptOnBoundary1 = ptOnP2;
+		}
+		getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, -searchDir, ptOnP1);
+		getPtOnParticle2(cm2, state2, shift2,          contactPoint, -searchDir, ptOnP2);
+
+		if( (ptOnP1 - contactPoint).squaredNorm() < (ptOnP2 - contactPoint).squaredNorm() ){
+			ptOnBoundary2 = ptOnP1;
+		}else{
+			ptOnBoundary2 = ptOnP2;
+		}
+
+		jointLength = (ptOnBoundary1- ptOnBoundary2).norm(); //Contact length of 2-D contact
+		areaTri = unitWidth2D*jointLength; //Contact area of 2-D contact
+
+	}
+	return areaTri;
 }
 
 
@@ -378,7 +490,7 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 	Real pdxSum = 0.0;
 	Real pdySum = 0.0;
 	Real pdzSum = 0.0;
-	for (int i=0; i<planeNo; i++) {
+	for (int i=0; i<planeNo; i++) {//FIXME: Instead of saving the value of "plane" inside the vector "p" and iterate through "p[i]" in a different loop below, we can calculate pdxSum, pdySum, pdzSum directly here, and avoid storing all this information in the vector "p". In this way, we don't need "p"
 		pdxSum += (s1->a[i]*p[i]);
 		pdySum += (s1->b[i]*p[i]);
 		pdzSum += (s1->c[i]*p[i]);
@@ -426,14 +538,14 @@ Vector3r Ig2_PP_PP_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 
 
 /* ***************************************************************************************************************************** */
-void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r midPoint, Vector3r normal, Vector3r& ptOnParticle) {
+void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r midPoint, Vector3r searchDir, Vector3r& ptOnParticle) {
 	//PotentialParticle *s1=static_cast<PotentialParticle*>(cm1.get());
 	ptOnParticle = midPoint;
 	Real f = evaluatePP(cm1,state1,shift2,ptOnParticle);//evaluateFNoSphere(cm1,state1, ptOnParticle); //
 	Real fprevious = f;
 	int counter = 0;
 	//normal.normalize();
-	Vector3r step = normal*Mathr::Sign(f) *-1.0;
+	Vector3r step = searchDir*Mathr::Sign(f) *-1.0;
 	Vector3r bracketA(0,0,0), bracketB(0,0,0);
 
 	do {
@@ -443,9 +555,8 @@ void Ig2_PP_PP_ScGeom::getPtOnParticle2(const shared_ptr<Shape>& cm1, const Stat
 		counter++;
 		if (counter == 50000 ) {
 			//LOG_WARN("Initial point searching exceeded 500 iterations!");
-			//std::cout<<"ptonparticle2 search exceeded 50000 iterations! step:"<<step<<endl;
+			std::cout<<"ptonparticle2 search exceeded 50000 iterations! step:"<<step<<endl;
 		}
-
 	} while(Mathr::Sign(fprevious)*Mathr::Sign(f)*1.0> 0.0 );
 	bracketA = ptOnParticle;
 	bracketB = ptOnParticle -step;
