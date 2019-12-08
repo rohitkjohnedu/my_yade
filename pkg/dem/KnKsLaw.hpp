@@ -75,13 +75,13 @@ class KnKsPhys: public FrictPhys {
 			((Real, cumulative_us, 0.0,,"Cumulative shear translation (not fully in use)"))
 //				((Real, cumulativeRotation, 0.0,,"cumulative rotation"))
 			((Real, mobilizedShear, ,,"Percentage of mobilized shear force as the ratio of the current shear force to the current frictional limit. Represents a quantified measure of the isSliding parameter"))
-			((Real, contactArea, 0.0,,"Contact area"))
+			((Real, contactArea, 0.0,,"Contact area |yupdate|"))
 //				((Real, radCurvFace, ,,"not used, face"))
 //				((double, prevJointLength, 0.0,,"previous joint length"))
 //				((Real, radCurvCorner, ,,"not used, corners"))
 			((Real, prevSigma, 0.0 ,,"Previous normal stress"))
 //				((vector<Real>, prevSigmaList, 0.0 ,,"previous normal stress"))
-			((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts"))
+//			((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts")) //This attr is replaced by Ig2_PP_PP_ScGeom::calContactArea
 //				((bool, useOverlapVol, false,,"calculate overlap volume"))
 //				((bool, calContactArea, false,,"calculate contact area"))
 			((double, jointLength, 1.0,,"Approximated contact length"))
@@ -157,7 +157,7 @@ class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 			((Real, phi_b, 0.0,,"Basic friction angle"))
 //				((bool, useOverlapVol, false,,"not used, calculate overlap volume"))
 			((bool, useFaceProperties, false,,"Whether to get face properties from the intersecting particles"))
-			((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts"))
+//			((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts")) //This attr is replaced by Ig2_PP_PP_ScGeom::calContactArea
 //			((bool, twoDimension, true,,"Whether the contact is 2-D"))
 		);
 	// clang-format on
