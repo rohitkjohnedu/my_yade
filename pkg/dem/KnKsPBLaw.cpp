@@ -110,12 +110,12 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	//Vector3r oriNormalF = phys->normalForce;
 
 	/** CALCULATE SHEAR INCREMENT */
-	Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*contact->cellDist.cast<double>()) : Vector3r::Zero();
-	Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*contact->cellDist.cast<double>()): Vector3r::Zero();
+	Vector3r shiftVel=scene->isPeriodic ? Vector3r(scene->cell->velGrad*scene->cell->hSize*contact->cellDist.cast<Real>()) : Vector3r::Zero();
+	Vector3r shift2 = scene->isPeriodic ? Vector3r(scene->cell->hSize*contact->cellDist.cast<Real>()): Vector3r::Zero();
 
 	const shared_ptr<Body>& b1=Body::byId(id1,scene), b2=Body::byId(id2,scene);
 	//erase the interaction when aAbB shows separation, otherwise keep it to be able to store previous separating plane for fast detection of separation
-//	Vector3r shift2=scene->cell->hSize*I->cellDist.cast<double>();
+//	Vector3r shift2=scene->cell->hSize*I->cellDist.cast<Real>();
 	if (	b1->bound->min[0] >= b2->bound->max[0]+shift2[0] ||
 		b1->bound->min[1] >= b2->bound->max[1]+shift2[1] ||
 		b1->bound->min[2] >= b2->bound->max[2]+shift2[2] ||
@@ -131,7 +131,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	Vector3r incidentVs = incidentV-incidentVn; /* get shear relative velocity */
 	Vector3r shearIncrement = incidentVs*dt; /* calculate shear increment from shear velocity */
 
-	double du = shearIncrement.norm(); /* magnitude of shear increment */
+	Real du = shearIncrement.norm(); /* magnitude of shear increment */
 	phys->shearDir = shearIncrement; /* get shear direction */
 	if(phys->shearDir.norm() > pow(10,-15)){
 		phys->shearDir.normalize(); // FIXME: Maybe normalise the shearDir regardless of its magnitude?
@@ -151,7 +151,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 
 	/* ********************************************************************************************************************* */
 	/** NORMAL CONTACT FORCE */
-	double normalStiffness = phys->knVol; /* use default stiffness values */
+	Real normalStiffness = phys->knVol; /* use default stiffness values */
 	if(Talesnick){
 		//phys->prevSigma = phys->knVol*std::max(un,(Real) 0.0);
 		//phys->normalForce=phys->prevSigma*phys->normal*std::max(pow(10,-15),phys->contactArea);
@@ -159,35 +159,35 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 		//#if 0
 		/* linear */
 		//un = un - 8.0*pow(10.0,-5);
-		double A = 0.5*4.0*pow(10.0,9);//*pow(10.0,9);
-		double B = 0.5*7.4*pow(10.0,4);
-		double expTerm = B*(std::max(un,0.0)) + std::log(A) ;
+		Real A = 0.5*4.0*pow(10.0,9);//*pow(10.0,9);
+		Real B = 0.5*7.4*pow(10.0,4);
+		Real expTerm = B*(std::max(un,0.0)) + std::log(A) ;
 		phys->prevSigma = std::max(( (std::exp(expTerm)-A)) / B, 0.0);
-		double Fn = phys->prevSigma*std::max(pow(10,-15),phys->contactArea);
+		Real Fn = phys->prevSigma*std::max(pow(10,-15),phys->contactArea);
 		phys->normalForce = Fn*geom->normal;
 		phys->knVol = (A + B * phys->prevSigma);
 		//#endif
 		#if 0
 		/* power */phys->h
-		double Fn = pow(525000*std::max(un,(Real) 0),1.0/0.25)*std::max(pow(10,-11),phys->contactArea);
+		Real Fn = pow(525000*std::max(un,(Real) 0),1.0/0.25)*std::max(pow(10,-11),phys->contactArea);
 		phys->knVol = 2.1*pow(10.0,6)*pow(phys->prevSigma,0.75);
 		#endif
 
 		#if 0
-		double A = 7.0*pow(10.0,13);//*pow(10.0,9);
-		double B = 1.0*pow(10.0,6);
+		Real A = 7.0*pow(10.0,13);//*pow(10.0,9);
+		Real B = 1.0*pow(10.0,6);
 		phys->prevSigma = (A*un)*un - B*un;
-		double Fn = phys->prevSigma*std::max(pow(10,-15),phys->contactArea);
+		Real Fn = phys->prevSigma*std::max(pow(10,-15),phys->contactArea);
 		phys->normalForce = Fn*geom->normal;
 		phys->knVol = A*2.0*un - pow(10,6);
 		#endif
 
 		#if 0
 		//power
-		double A = 2.1*pow(10.0,6); //4.2*pow(10.0,5);
-		double B = 0.75; //0.88;
+		Real A = 2.1*pow(10.0,6); //4.2*pow(10.0,5);
+		Real B = 0.75; //0.88;
 		phys->prevSigma = pow( (1.0-B)*A*std::max(un, 0.0),1.0/(1.0-B) );
-		double Fn = phys->prevSigma*std::max(pow(10,-14),phys->contactArea);
+		Real Fn = phys->prevSigma*std::max(pow(10,-14),phys->contactArea);
 		phys->knVol = A*pow(phys->prevSigma,B); //1.0/(1.0-B)*pow( (1.0-B)*A,1.0/(1.0-B) ) * pow(std::max(un,0.0), B/(1.0-B)); //A*pow(phys->prevSigma,B); //
 		phys->normalForce = Fn*geom->normal;
 		#endif
@@ -268,16 +268,16 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	TIMING_DELTAS_CHECKPOINT("After normalForce");
 	/* ********************************************************************************************************************* */
 	/** SHEAR CONTACT FORCE */
-	double Ks = 0.0;
+	Real Ks = 0.0;
 	if(Talesnick){
 		//shearForce -= phys->ksVol*shearIncrement*std::max(pow(10,-15),phys->contactArea);
 		#if 0
 		/* TALESNICK */
 		/* linear law */
-		double shearStiffness = 1.0*pow(10.0,8) + 9.7*pow(10.0,4)*phys->prevSigma; /* current sigmaN from above */
+		Real shearStiffness = 1.0*pow(10.0,8) + 9.7*pow(10.0,4)*phys->prevSigma; /* current sigmaN from above */
 		/* power law */
-		//double shearStiffness = 0.95*pow(10.0,6)*pow(phys->prevSigma,0.7); /* current sigmaN from above */
-		//double shearStiffness = 3.3*pow(10.0,5)*pow(phys->prevSigma,0.88); /* current sigmaN from above */
+		//Real shearStiffness = 0.95*pow(10.0,6)*pow(phys->prevSigma,0.7); /* current sigmaN from above */
+		//Real shearStiffness = 3.3*pow(10.0,5)*pow(phys->prevSigma,0.88); /* current sigmaN from above */
 		phys->ksVol = shearStiffness;
 		Ks = shearStiffness;
 		shearForce -= shearStiffness*shearIncrement*std::max(pow(10,-15),phys->contactArea);
@@ -342,8 +342,8 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	Real Cs_crit = Cn_crit; // Critical damping coefficient (shear direction)
 	// Real Cs_crit = 2.*sqrt(mbar*phys->ks); //TODO: Calculation of Cs_crit to be revisited, if viscous damping is to be considered in the shear direction @vsangelidakis
 	// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
-	double cn = Cn_crit*phys->viscousDamping; // Damping normal coefficient
-	double cs = Cs_crit*phys->viscousDamping; // Damping tangential coefficient
+	Real cn = Cn_crit*phys->viscousDamping; // Damping normal coefficient
+	Real cs = Cs_crit*phys->viscousDamping; // Damping tangential coefficient
 
 	/* Add normal viscous component if damping is included */
 	phys->normalViscous = cn*incidentVn;
@@ -376,16 +376,16 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 
 	/* ********************************************************************************************************************* */
 	/** FRICTION LIMIT */
-//	const double PI = std::atan(1.0)*4;
-	double tan_effective_phi = 0.0;
+//	const Real PI = std::atan(1.0)*4;
+	Real tan_effective_phi = 0.0;
 	bool useIterativeMethod = false;
 	if(Talesnick){
 		phys->cumulative_us = phys->cumulative_us + fabs(du);
 		phys->effective_phi = phys->phi_b;
 		tan_effective_phi = tan(phys->effective_phi/180.0*Mathr::PI);
 		#if 0
-		double upeak = 2.0*pow(10.0,-6)*pow(phys->prevSigma,0.213);
-		double delta_miu = phys->ksVol/phys->prevSigma*(1.0 - std::min(fabs(phys->cumulative_us)/upeak, 1.0) ); if (isnan(delta_miu)){delta_miu = phys->ksVol/phys->prevSigma;}
+		Real upeak = 2.0*pow(10.0,-6)*pow(phys->prevSigma,0.213);
+		Real delta_miu = phys->ksVol/phys->prevSigma*(1.0 - std::min(fabs(phys->cumulative_us)/upeak, 1.0) ); if (isnan(delta_miu)){delta_miu = phys->ksVol/phys->prevSigma;}
 		if (shearForce.norm() > phys->normalForce.norm()*phys->effective_phi){
 			phys->effective_phi = phys->effective_phi + delta_miu*fabs(du);
 		}
@@ -425,11 +425,11 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	/* ********************************************************************************************************************* */
 	/** SHEAR CORRECTION - MOHR-COULOMB CRITERION */
 	Vector3r dampedShearForce = shearForce;
-	Real maxFs=0.0; //double maxShear = 0.0;
+	Real maxFs=0.0; //Real maxShear = 0.0;
 
 	if (useIterativeMethod == false){
-		double fN = phys->normalForce.dot(geom->normal); //This calculation takes into account the sign of fN
-//		double fN = phys->normalForce.norm(); //This alternative calculation does not check whether fN is compressive or tensile (attractive)
+		Real fN = phys->normalForce.dot(geom->normal); //This calculation takes into account the sign of fN
+//		Real fN = phys->normalForce.norm(); //This alternative calculation does not check whether fN is compressive or tensile (attractive)
 
 //		if (fN<=0) { std::cout<<"Negative fN: "<<fN<<endl; } //This is here for debugging purposes, to check when fN can be negative
 //		else       { std::cout<<"Positive fN: "<<fN<<endl; }
@@ -439,7 +439,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 
 		if(phys->intactRock == true){
 			if(allowBreakage == false || phys->cohesionBroken == false){
-				double cohesiveForce = phys->cohesion*std::max(pow(10,-15),phys->contactArea);
+				Real cohesiveForce = phys->cohesion*std::max(pow(10,-15),phys->contactArea);
 				maxFs = cohesiveForce + fN*tan_effective_phi;   }
 			else{   maxFs = std::max(fN,0.0) * tan_effective_phi;   }
 		}else{          maxFs = std::max(fN,0.0) * tan_effective_phi;   }
@@ -511,24 +511,24 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	}else{		//FIXME: The traceEnergy feature is yet to be implemented for this branch, where useIterativeMethod=True
 		Vector3r Fs_prev = oriShear; /* shear force before stress update */
 		Vector3r delta_us = -shearIncrement; /* increment of shear displacement */
-		//double beta = 0.0; /* rate of plastic multiplier */
-		double beta_prev = phys->cumulative_us; /* accumulated plastic mutliplier before stress update */
-		double fN = phys->normalForce.norm(); //FIXME: We calculate this differently in the above branch. Check whether they lead to the same value
+		//Real beta = 0.0; /* rate of plastic multiplier */
+		Real beta_prev = phys->cumulative_us; /* accumulated plastic mutliplier before stress update */
+		Real fN = phys->normalForce.norm(); //FIXME: We calculate this differently in the above branch. Check whether they lead to the same value
 		if(std::isnan(fN)){fN=0.0;}
-		double phi = phys->phi_b;
+		Real phi = phys->phi_b;
 		Vector3r newFs (0,0,0);
-		double plasticDisp = 0.0;
+		Real plasticDisp = 0.0;
 		if(!Talesnick){
 			plasticDisp = stressUpdateVec(ip /*contact physics */, Fs_prev, delta_us, beta_prev, phys->ks /*shear stiffness */,fN, phi, newFs);
 		}else{
-			double upeak = 2.0*pow(10.0,-6)*pow(phys->prevSigma,0.213);
+			Real upeak = 2.0*pow(10.0,-6)*pow(phys->prevSigma,0.213);
 			plasticDisp = stressUpdateVecTalesnick(ip /*contact physics */, Fs_prev, delta_us, beta_prev, phys->ks /*shear stiffness */,fN, phi, newFs, upeak);
 		}
 		shearForce = newFs;
 		dampedShearForce = newFs;
 		phys->cumulative_us = phys->cumulative_us + plasticDisp; //beta*shearIncrement; /* add plastic displacements */
-		double miu_peak = tan(phys->phi_b/180.0*Mathr::PI);
-		double delta_miu = 0.059266;
+		Real miu_peak = tan(phys->phi_b/180.0*Mathr::PI);
+		Real delta_miu = 0.059266;
 		tan_effective_phi = miu_peak - delta_miu*(1.0-exp(-phys->cumulative_us/0.35));
 		phys->effective_phi = atan(tan_effective_phi)/Mathr::PI*180.0;
 		maxFs = fN*tan_effective_phi;
@@ -568,22 +568,22 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 
 /* ***************************************************************************************************************************** */
 /** FUNCTION RETURNS PLASTIC MULTIPLIER RATE (beta) AND CURRENT SHEAR FORCE */
-double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& /*ip*/, const Vector3r Fs_prev /*prev shear force*/ , const Vector3r du /*shear displacement increment*/, const double beta_prev /* prev plastic displacements*/, const double Ks /*shear stiffness */,const double fN /*normal force*/, const double phi_b /*peak friction angle*/, Vector3r & newFs /*new shear force*/){
+Real Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& /*ip*/, const Vector3r Fs_prev /*prev shear force*/ , const Vector3r du /*shear displacement increment*/, const Real beta_prev /* prev plastic displacements*/, const Real Ks /*shear stiffness */,const Real fN /*normal force*/, const Real phi_b /*peak friction angle*/, Vector3r & newFs /*new shear force*/){
 
 	newFs = Vector3r::Zero();
-	double maxFs = 0.0;
-//	const double PI = std::atan(1.0)*4;
+	Real maxFs = 0.0;
+//	const Real PI = std::atan(1.0)*4;
 	// Define beta_prev as the cumulated plastic multiplier
 	// Define beta as the rate of plastic multiplier at the current time step
 	// Fs_new = Fs_prev + dF
 	// dF = Ks*du_elastic = Ks*(du - du_plastic) = Ks*(du - beta*du_p)
-	//double beta = 0.0; //beta is the plastic multiplier
-	double effective_phi = phi_b;
-	double tan_effective_phi = tan(effective_phi/180.0*Mathr::PI);
-	double miu_peak = tan_effective_phi ;
-	double delta_miu = 0.059266;
-	double function = 0.0;
-	double lambda = 0.0;
+	//Real beta = 0.0; //beta is the plastic multiplier
+	Real effective_phi = phi_b;
+	Real tan_effective_phi = tan(effective_phi/180.0*Mathr::PI);
+	Real miu_peak = tan_effective_phi ;
+	Real delta_miu = 0.059266;
+	Real function = 0.0;
+	Real lambda = 0.0;
 
 	newFs = Fs_prev + Ks*du;
 	maxFs = fN*(miu_peak-delta_miu*(1.0-exp(-1.0*beta_prev/0.35)));
@@ -606,16 +606,16 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& /*ip*/,
 		/* Establish lower bound for lambda*/
 		/* Lower bound = 0.0, i.e. fully elastic */
 		/* f_lower_bound <0.0, because it is outside the yield surface */
-		double lowerBound = 0.0;
+		Real lowerBound = 0.0;
 		Vector3r termA = (Fs_prev + Ks*du)/(Ks*lowerBound + 1.0);
-		double beta = beta_prev + lowerBound*termA.norm();
-		double f_lower_bound = termA.norm() - fN*(miu_peak - delta_miu*(1.0 - exp(-1.0*beta/0.35)));
+		Real beta = beta_prev + lowerBound*termA.norm();
+		Real f_lower_bound = termA.norm() - fN*(miu_peak - delta_miu*(1.0 - exp(-1.0*beta/0.35)));
 
 		/* Establish upper bound for lambda*/
-		double upperBound = du.norm()/Fs_prev.norm(); if(std::isnan(upperBound)==true){upperBound=1.0;} if(std::isinf(upperBound)==true || upperBound>pow(10.0,12) ){upperBound=pow(10.0,12);}
+		Real upperBound = du.norm()/Fs_prev.norm(); if(std::isnan(upperBound)==true){upperBound=1.0;} if(std::isinf(upperBound)==true || upperBound>pow(10.0,12) ){upperBound=pow(10.0,12);}
 		termA = (Fs_prev + Ks*du)/(Ks*upperBound + 1.0);
 		beta = beta_prev + upperBound*termA.norm();
-		double f_upper_bound= termA.norm() - fN*(miu_peak - delta_miu*(1.0 - exp(-1.0*beta/0.35)));
+		Real f_upper_bound= termA.norm() - fN*(miu_peak - delta_miu*(1.0 - exp(-1.0*beta/0.35)));
 		int iterUpper = 0;
 		while(Mathr::Sign(f_upper_bound)*Mathr::Sign(f_lower_bound)>0.0){
 			upperBound=5.0*upperBound;
@@ -628,15 +628,15 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& /*ip*/,
 			}
 		}
 
-		double oriUpperBound = upperBound;
-		double orif_upper_bound = f_upper_bound;
-		double orif_lower_bound = f_lower_bound;
-		double midTrial = 0.5*(lowerBound+upperBound);
+		Real oriUpperBound = upperBound;
+		Real orif_upper_bound = f_upper_bound;
+		Real orif_lower_bound = f_lower_bound;
+		Real midTrial = 0.5*(lowerBound+upperBound);
 
 		int iter = 0;
 		function = 1.0;
 		/* Bisection to find beta*/
-		double Fmid;
+		Real Fmid;
 		while(fabs(function) > pow(10,-14) && fabs(lowerBound-upperBound)> pow(10,-14) ) {
 			midTrial = 0.5*(lowerBound+upperBound);
 			lambda = midTrial;
@@ -671,22 +671,22 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(shared_ptr<IPhys>& /*ip*/,
 
 /* ***************************************************************************************************************************** */
 /** FUNCTION RETURNS PLASTIC MULTIPLIER RATE (beta) AND CURRENT SHEAR FORCE */
-double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>& /*ip*/, const Vector3r Fs_prev /*prev shear force*/ , const Vector3r du /*shear displacement increment*/, const double beta_prev /* prev plastic displacements*/, const double Ks /*shear stiffness */,const double fN /*normal force*/, const double phi_b /*peak friction angle*/, Vector3r & newFs /*new shear force*/, const double upeak){
+Real Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>& /*ip*/, const Vector3r Fs_prev /*prev shear force*/ , const Vector3r du /*shear displacement increment*/, const Real beta_prev /* prev plastic displacements*/, const Real Ks /*shear stiffness */,const Real fN /*normal force*/, const Real phi_b /*peak friction angle*/, Vector3r & newFs /*new shear force*/, const Real upeak){
 
 	newFs = Vector3r::Zero();
-	double maxFs = 0.0;
-//	const double PI = std::atan(1.0)*4;
+	Real maxFs = 0.0;
+//	const Real PI = std::atan(1.0)*4;
 
 	// Define beta_prev as the cumulated plastic multiplier
 	// Define beta as the rate of plastic multiplier at the current time step
 	// Fs_new = Fs_prev + dF
 	// dF = Ks*du_elastic = Ks*(du - du_plastic) = Ks*(du - beta*du_p)
-	//double beta = 0.0; //beta is the plastic multiplier
-	double effective_phi = phi_b;
-	double tan_effective_phi = tan(effective_phi/180.0*Mathr::PI);
-	double miu_peak = tan_effective_phi ;
-	double function = 0.0;
-	double lambda = 0.0;
+	//Real beta = 0.0; //beta is the plastic multiplier
+	Real effective_phi = phi_b;
+	Real tan_effective_phi = tan(effective_phi/180.0*Mathr::PI);
+	Real miu_peak = tan_effective_phi ;
+	Real function = 0.0;
+	Real lambda = 0.0;
 
 	newFs = Fs_prev + Ks*du;
 	maxFs = fN*(miu_peak*(1.0-exp(-1.0*beta_prev/upeak)));
@@ -709,16 +709,16 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>
 		/* Establish lower bound for lambda*/
 		/* Lower bound = 0.0, i.e. fully elastic */
 		/* f_lower_bound <0.0, because it is outside the yield surface */
-		double lowerBound = 0.0;
+		Real lowerBound = 0.0;
 		Vector3r termA = (Fs_prev + Ks*du)/(Ks*lowerBound + 1.0);
-		double beta = beta_prev + lowerBound*termA.norm();
-		double f_lower_bound = termA.norm() - fN*(miu_peak*(1.0-exp(-1.0*beta_prev/upeak)));
+		Real beta = beta_prev + lowerBound*termA.norm();
+		Real f_lower_bound = termA.norm() - fN*(miu_peak*(1.0-exp(-1.0*beta_prev/upeak)));
 
 		/* Establish upper bound for lambda*/
-		double upperBound = du.norm()/Fs_prev.norm(); if(std::isnan(upperBound)==true){upperBound=1.0;} if(std::isinf(upperBound)==true || upperBound>pow(10.0,12) ){upperBound=pow(10.0,12);}
+		Real upperBound = du.norm()/Fs_prev.norm(); if(std::isnan(upperBound)==true){upperBound=1.0;} if(std::isinf(upperBound)==true || upperBound>pow(10.0,12) ){upperBound=pow(10.0,12);}
 		termA = (Fs_prev + Ks*du)/(Ks*upperBound + 1.0);
 		beta = beta_prev + upperBound*termA.norm();
-		double f_upper_bound= termA.norm() - fN*(miu_peak*(1.0-exp(-1.0*beta_prev/upeak)));
+		Real f_upper_bound= termA.norm() - fN*(miu_peak*(1.0-exp(-1.0*beta_prev/upeak)));
 		int iterUpper = 0;
 		while(Mathr::Sign(f_upper_bound)*Mathr::Sign(f_lower_bound)>0.0){
 			upperBound=5.0*upperBound;
@@ -731,15 +731,15 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>
 			}
 		}
 
-		double oriUpperBound = upperBound;
-		double orif_upper_bound = f_upper_bound;
-		double orif_lower_bound = f_lower_bound;
-		double midTrial = 0.5*(lowerBound+upperBound);
+		Real oriUpperBound = upperBound;
+		Real orif_upper_bound = f_upper_bound;
+		Real orif_lower_bound = f_lower_bound;
+		Real midTrial = 0.5*(lowerBound+upperBound);
 
 		int iter = 0;
 		function = 1.0;
 		/* Bisection to find beta*/
-		double Fmid;
+		Real Fmid;
 		while(fabs(function) > pow(10,-14) && fabs(lowerBound-upperBound)> pow(10,-14) ) {
 			midTrial = 0.5*(lowerBound+upperBound);
 			lambda = midTrial;
@@ -777,7 +777,7 @@ double Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(shared_ptr<IPhys>
 CREATE_LOGGER(Ip2_FrictMat_FrictMat_KnKsPBPhys);
 
 void Ip2_FrictMat_FrictMat_KnKsPBPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction){
-//	const double PI = 3.14159265358979323846;
+//	const Real PI = 3.14159265358979323846;
 	if(interaction->phys) return;
 
 	ScGeom* scg = YADE_CAST<ScGeom*>(interaction->geom.get()); assert(scg);
