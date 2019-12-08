@@ -1578,6 +1578,7 @@ void BlockGen::createActors(shared_ptr<Scene>& scene){
 //	cd-> stepAngle=calAreaStep;
 	cd->twoDimension = twoDimension;
 	cd->unitWidth2D = unitWidth2D;
+	cd->calContactArea = calContactArea;
 	interactionGeometryDispatcher->add(cd);
 
 	shared_ptr<IPhysDispatcher> interactionPhysicsDispatcher(new IPhysDispatcher);
@@ -1590,7 +1591,7 @@ void BlockGen::createActors(shared_ptr<Scene>& scene){
 //		ss->useOverlapVol = useOverlapVol; // not used
 	ss->useFaceProperties = useFaceProperties;
 //	ss->unitWidth2D = unitWidth2D;
-	ss->calJointLength = calJointLength;
+//	ss->calJointLength = calJointLength;
 //	ss->twoDimension = twoDimension;
 //		ss->brittleLength = brittleLength; // not used
 //		ss->u_peak = peakDisplacement; // not used
