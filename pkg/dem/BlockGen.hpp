@@ -168,7 +168,8 @@ class BlockGen : public FileGenerator {
 		((bool, probabilisticOrientation,false,,"Whether to generate rock joints randomly"))
 		((bool, Talesnick,false,,"Whether to choose the Talesnick contact law, used for validating code previously against model test"))
 		((bool, neverErase,false,,"Whether to erase non interacting contacts"))
-		((bool, calJointLength,false,,"Whether to calculate jointLength"))
+//		((bool, calJointLength,false,,"Whether to calculate jointLength"))
+		((bool, calContactArea,true,,"Whether to calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts"))
 		((bool, twoDimension,false,,"Whether the model is 2D"))
 		((Real, shrinkFactor,1.0,,"Ratio to shrink r")) //FIXME: This parameter is used, but we need to revise if it is actually useful
 		((Real, viscousDamping,0.0,,"Viscous damping"))
