@@ -25,14 +25,14 @@ class KnKsPhys: public FrictPhys {
 				((Real, maxClosure, 0.0002,,"not fully in use, vmi")) //FIXME: It is used once; check this
 //				((Real, u_peak, 0.05,,"peak shear displacement, not fully in use"))
 				((Real, u_elastic, 0.0,,"Elastic shear displacement, not fully in use"))
-				((double, brittleLength, 5.0,,"Shear length where strength degrades, not fully in use"))
-			((double, knVol, 0.0,,"Volumetric normal stiffness = Knormal")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
-			((double, ksVol, 0.0,,"Volumetric shear stiffness = Kshear" )) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
-			((double, kn_i, 5.0,,"Currently, we assume kn_i and Knormal are adopting the same value in Ip2 initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
-			((double, ks_i, 5.0,,"Currently, we assume ks_i and Kshear are adopting the same value in Ip2 initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+				((Real, brittleLength, 5.0,,"Shear length where strength degrades, not fully in use"))
+			((Real, knVol, 0.0,,"Volumetric normal stiffness = Knormal")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+			((Real, ksVol, 0.0,,"Volumetric shear stiffness = Kshear" )) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+			((Real, kn_i, 5.0,,"Currently, we assume kn_i and Knormal are adopting the same value in Ip2 initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+			((Real, ks_i, 5.0,,"Currently, we assume ks_i and Kshear are adopting the same value in Ip2 initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
 			((Vector3r, normalViscous, Vector3r::Zero(),,"Viscous normal force"))
 			((Vector3r, shearViscous, Vector3r::Zero(),,"Viscous shear force (assumed zero at the moment)"))
-//				((double, hwater, 0.0,,"not used, height of pore water"))
+//				((Real, hwater, 0.0,,"not used, height of pore water"))
 //				((bool, rockJointContact, false,," rock joint"))
 			((bool, intactRock, false,,"Whether to consider cohesive force in the Mohr-Coulomb criterion, if allowBreakage=False and cohesionBroken=False."))
 			((int, jointType, 0,,"jointType"))
@@ -45,11 +45,11 @@ class KnKsPhys: public FrictPhys {
 //				((Vector3r, normal, Vector3r::Zero(),," normalVector"))
 //				((vector<Vector3r>, pointsArea, ,,"not used, intermediate contact points"))
 //				((vector<Vector3r>, pointsShear, ,,"not used, points to calculate shear"))
-//				((vector<double>, areaShear, ,,"area to attribute shear"))
-//				((vector<double>, overlapDistances, ,,"not used, overlap distance"))
+//				((vector<Real>, areaShear, ,,"area to attribute shear"))
+//				((vector<Real>, overlapDistances, ,,"not used, overlap distance"))
 //				((Real, finalSize, 0.0,,"not used, finalgridsize"))
 //				((int, finalGridNo, 0,,"not used, final number of grids"))
-//				((vector<double>, dualityGap, ,,"not used, duality gap for SOCP"))
+//				((vector<Real>, dualityGap, ,,"not used, duality gap for SOCP"))
 				((bool, warmstart, false,,"Warmstart for SOCP, not fully in use"))
 //				((int, generation, 0,,"not used, number of subdivisions"))
 //				((int, triNoMain, 24,,"not used, number of subdivisions"))
@@ -77,19 +77,19 @@ class KnKsPhys: public FrictPhys {
 			((Real, mobilizedShear, ,,"Percentage of mobilized shear force as the ratio of the current shear force to the current frictional limit. Represents a quantified measure of the isSliding parameter"))
 			((Real, contactArea, 0.0,,"Contact area |yupdate|"))
 //				((Real, radCurvFace, ,,"not used, face"))
-//				((double, prevJointLength, 0.0,,"previous joint length"))
+//				((Real, prevJointLength, 0.0,,"previous joint length"))
 //				((Real, radCurvCorner, ,,"not used, corners"))
 			((Real, prevSigma, 0.0 ,,"Previous normal stress"))
 //				((vector<Real>, prevSigmaList, 0.0 ,,"previous normal stress"))
 //			((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts")) //This attr is replaced by Ig2_PP_PP_ScGeom::calContactArea
 //				((bool, useOverlapVol, false,,"calculate overlap volume"))
 //				((bool, calContactArea, false,,"calculate contact area"))
-			((double, jointLength, 1.0,,"Approximated contact length"))
-				((double, shearIncrementForCD, 0.0,,"toSeeWhether it is necessary to update contactArea"))
+			((Real, jointLength, 1.0,,"Approximated contact length"))
+				((Real, shearIncrementForCD, 0.0,,"toSeeWhether it is necessary to update contactArea"))
 //				((Real, overlappingVol, 0.0 ,,"not used, overlapping vol"))
 //				((Real, overlappingVolMulti, 0.0 ,,"not used, overlapping vol"))
-//				((double, gap_normalized, 0.0,,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
-//				((double, gap, 0.0,,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
+//				((Real, gap_normalized, 0.0,,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
+//				((Real, gap, 0.0,,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
 //				((bool, findCurv, false,,"not used, to get radius of curvature"))
 			((bool, useFaceProperties, false,,"Whether to get face properties from the intersecting particles"))
 			((Real, cohesion, 0.0,,"Cohesion"))
@@ -112,12 +112,12 @@ class KnKsPhys: public FrictPhys {
 			((Real, u_cumulative, 0.0,,"Cumulative translation")) //FIXME: This was marked as "not used", but it is; check this
 //				((Vector3r, prevShearDir, Vector3r::Zero(),,"previous shear direction"))
 			((Vector3r, initialShearDir, Vector3r::Zero(),,"Initial shear direction"))
-//				((double, delta_porePressure, 0.0,,"not used, change in pore water pressure"))
-//				((double, porePressure, 0.0,,"not used, pore water pressure"))
-//				((double, bandThickness, 0.1,,"not used, clay layer thickness"))
-//				((double, heatCapacities, 0.0,,"not used, clay layer thickness"))
-			((double, effective_phi, 0.0,,"Friction angle in clay after displacement"))
-//				((double, prevOverlap, 0.0,,"previous overlap"))
+//				((Real, delta_porePressure, 0.0,,"not used, change in pore water pressure"))
+//				((Real, porePressure, 0.0,,"not used, pore water pressure"))
+//				((Real, bandThickness, 0.1,,"not used, clay layer thickness"))
+//				((Real, heatCapacities, 0.0,,"not used, clay layer thickness"))
+			((Real, effective_phi, 0.0,,"Friction angle in clay after displacement"))
+//				((Real, prevOverlap, 0.0,,"previous overlap"))
 //				((Real, h, 0.0,,"not used, cd"))
 			((bool,isSliding,false,,"Check if the contact is sliding (useful to calculate the ratio of sliding contacts)"))
 			, /* ctor */
@@ -144,11 +144,11 @@ class Ip2_FrictMat_FrictMat_KnKsPhys: public IPhysFunctor {
 			((Real, Knormal,0.0,,"Volumetric stiffness in the contact normal direction (units: stress/length)"))
 			((Real, Kshear,0.0,,"Volumetric stiffness in the contact shear direction (units: stress/length)"))
 //			((Real, unitWidth2D, 1.0,,"Unit width in 2D")) // Moved this attr in Ig2_PP_PP_ScGeom @vsangelidakis
-			((double, brittleLength, ,,"Shear length for degradation"))
-			((double, kn_i, ,,"Currently, we assume kn_i and Knormal are adopting the same value in Ip2 initialisation"))
-			((double, ks_i, ,,"Currently, we assume ks_i and Kshear are adopting the same value in Ip2 initialisation"))
-//				((double, u_peak, -1.0,,"not used"))
-				((double, maxClosure, 0.002,,"not fully in use")) //FIXME: It is used once; check this
+			((Real, brittleLength, ,,"Shear length for degradation"))
+			((Real, kn_i, ,,"Currently, we assume kn_i and Knormal are adopting the same value in Ip2 initialisation"))
+			((Real, ks_i, ,,"Currently, we assume ks_i and Kshear are adopting the same value in Ip2 initialisation"))
+//				((Real, u_peak, -1.0,,"not used"))
+				((Real, maxClosure, 0.002,,"not fully in use")) //FIXME: It is used once; check this
 			((Real, viscousDamping, 0.0,,"Viscous damping"))
 			((Real, cohesion, 0.0,,"Cohesion"))
 			((Real, tension, 0.0,,"Tension"))
@@ -190,9 +190,9 @@ class Law2_SCG_KnKsPhys_KnKsLaw: public LawFunctor {
 			((bool, preventGranularRatcheting,false,,"bool to avoid granular ratcheting"))
 			((bool, traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts."))
 			((bool, Talesnick,false,,"Use contact law developed for validation against model test"))
-//				((double,waterLevel,0.0,,"not used"))
+//				((Real,waterLevel,0.0,,"not used"))
 			((bool, allowBreakage, false,,"Allow cohesion to break. Once broken, cohesion = 0"))
-			((double, initialOverlapDistance,0.0,,"Initial overlap distance, defining the offset distance for tension overlap, i.e. negative overlap."))
+			((Real, initialOverlapDistance,0.0,,"Initial overlap distance, defining the offset distance for tension overlap, i.e. negative overlap."))
 			((bool, allowViscousAttraction, true,,"Whether to allow attractive forces due to viscous damping"))
 			((int, normDampDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for normal viscous damping dissipation work (with O.trackEnergy)"))
 			((int, shearDampDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for shear viscous damping dissipation work (with O.trackEnergy)"))
