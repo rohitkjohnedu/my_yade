@@ -25,7 +25,7 @@ class KnKsPBPhys: public FrictPhys {
 	virtual ~KnKsPBPhys();
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(KnKsPBPhys,FrictPhys,"EXPERIMENTAL. IPhys for :yref:`PotentialBlock`.",
-//			((vector<double>,lambdaIPOPT,0.0,,"not used, lagrane multiplier for equality constraints"))
+//			((vector<Real>,lambdaIPOPT,0.0,,"not used, lagrane multiplier for equality constraints"))
 //			((vector<int>,cstatCPLEX,,,"not used"))
 //			((vector<int>,rstatCPLEX,,,"not used"))
 		((Real, frictionAngle,0.0,,"Friction angle"))
@@ -36,14 +36,14 @@ class KnKsPBPhys: public FrictPhys {
 //			((Real, maxClosure, 0.0002,Attr::hidden,"not used, vmi"))
 //			((Real, u_peak, 0.05,,"peak shear displacement, not fully in use"))
 			((Real, u_elastic, 0.0,,"Elastic shear displacement, not fully in use"))
-//			((double, brittleLength, 5.0,,"shear length where strength degrades, not fully in use"))
-		((double, knVol, 0.0,,"Volumetric normal stiffness = Knormal")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
-		((double, ksVol, 0.0,,"Volumetric shear stiffness = Kshear" )) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
-		((double, kn_i, 5.0,,"initial normal stiffness, user must provide input during initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
-		((double, ks_i, 5.0,,"initial shear stiffness, user must provide input during initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+//			((Real, brittleLength, 5.0,,"shear length where strength degrades, not fully in use"))
+		((Real, knVol, 0.0,,"Volumetric normal stiffness = Knormal")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+		((Real, ksVol, 0.0,,"Volumetric shear stiffness = Kshear" )) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+		((Real, kn_i, 5.0,,"initial normal stiffness, user must provide input during initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
+		((Real, ks_i, 5.0,,"initial shear stiffness, user must provide input during initialisation")) //FIXME: We don't need to store this attr for each contact. It can be stored only in the IPhys functor
 		((Vector3r, normalViscous, Vector3r::Zero(),,"Viscous normal force"))
 		((Vector3r, shearViscous, Vector3r::Zero(),,"Viscous shear force (assumed zero at the moment)"))
-//			((double, hwater, 0.0,Attr::hidden,"not used, height of pore water"))
+//			((Real, hwater, 0.0,Attr::hidden,"not used, height of pore water"))
 //			((bool, rockJointContact, false,Attr::hidden,"rock joint"))
 		((bool, intactRock, false,,"Whether to consider cohesive force in the Mohr-Coulomb criterion, if allowBreakage=False and cohesionBroken=False"))
 		((int, jointType, 0,,"jointType"))
@@ -56,11 +56,11 @@ class KnKsPBPhys: public FrictPhys {
 //			((Vector3r, normal, Vector3r::Zero(),," normalVector"))
 //			((vector<Vector3r>, pointsArea, ,Attr::hidden,"not used, intermediate contact points"))
 //			((vector<Vector3r>, pointsShear, ,Attr::hidden,"not used, points to calculate shear"))
-//			((vector<double>, areaShear, ,Attr::hidden,"not used, area to attribute shear"))
-//			((vector<double>, overlapDistances, ,Attr::hidden,"not used, overlap distance"))
+//			((vector<Real>, areaShear, ,Attr::hidden,"not used, area to attribute shear"))
+//			((vector<Real>, overlapDistances, ,Attr::hidden,"not used, overlap distance"))
 //			((Real, finalSize, 0.0,Attr::hidden,"not used, finalgridsize"))
 //			((int, finalGridNo, 0,Attr::hidden,"not used, final number of grids"))
-//			((vector<double>, dualityGap, ,Attr::hidden,"not used, duality gap for SOCP"))
+//			((vector<Real>, dualityGap, ,Attr::hidden,"not used, duality gap for SOCP"))
 			((bool, warmstart, false,,"Warmstart for SOCP, not fully in use"))
 //			((int, generation, 0,Attr::hidden,"not used, number of subdivisions"))
 //			((int, triNoMain, 24,Attr::hidden,"not used, number of subdivisions"))
@@ -88,19 +88,19 @@ class KnKsPBPhys: public FrictPhys {
 		((Real, mobilizedShear, ,,"Percentage of mobilized shear force as the ratio of the current shear force to the current frictional limit. Represents a quantified measure of the isSliding parameter"))
 		((Real, contactArea, 0.0,,"Contact area |yupdate|"))
 //			((Real, radCurvFace, ,Attr::hidden,"not used, face"))
-//			((double, prevJointLength, 0.0,,"previous joint length"))
+//			((Real, prevJointLength, 0.0,,"previous joint length"))
 //			((Real, radCurvCorner, ,Attr::hidden,"not used, corners"))
 		((Real, prevSigma,0.0,,"Previous normal stress"))
 //			((vector<Real>, prevSigmaList,0.0 ,Attr::hidden,"not used, previous normal stress"))
 //		((bool, calJointLength, false,,"Whether to calculate joint length for 2D contacts")) //This attr is replaced by Ig2_PB_PB_ScGeom::calContactArea
 //			((bool, useOverlapVol, false,,"calculate overlap volume"))
 //			((bool, calContactArea, false,,"calculate contact area"))
-		((double, jointLength, 1.0,,"Approximated contact length"))
-			((double, shearIncrementForCD, 0.0,,"toSeeWhether it is necessary to update contactArea")) //FIXME: calculated but not used; check if we have a use for it
+		((Real, jointLength, 1.0,,"Approximated contact length"))
+			((Real, shearIncrementForCD, 0.0,,"toSeeWhether it is necessary to update contactArea")) //FIXME: calculated but not used; check if we have a use for it
 //			((Real, overlappingVol,0.0 ,,"overlapping vol"))
 //			((Real, overlappingVolMulti,0.0 ,,"overlapping vol"))
-//			((double, gap_normalized, 0.0,Attr::hidden,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
-//			((double, gap, 0.0,Attr::hidden,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
+//			((Real, gap_normalized, 0.0,Attr::hidden,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
+//			((Real, gap, 0.0,Attr::hidden,"not used, distance between particles normalized by particle size. Estimated using Taubin Distance"))
 //			((bool, findCurv, false,Attr::hidden,"not used, to get radius of curvature"))
 		((bool, useFaceProperties, false,,"Whether to get face properties from the intersecting particles"))
 		((Real, cohesion, 0.0,,"Cohesion (stress units)"))
@@ -123,12 +123,12 @@ class KnKsPBPhys: public FrictPhys {
 			((Real, u_cumulative, 0.0,,"Cumulative translation")) //FIXME: (not used) This is used for the PPs; check whether we can use it here for the PBs as well
 //			((Vector3r, prevShearDir, Vector3r::Zero(),,"previous shear direction"))
 			((Vector3r, initialShearDir, Vector3r::Zero(),,"Initial shear direction")) //FIXME: (not used) This is used for the PPs; check whether we can use it here for the PBs as well
-//			((double, delta_porePressure, 0.0,Attr::hidden,"not used, change in pore water pressure"))
-//			((double, porePressure, 0.0,Attr::hidden,"not used, pore water pressure"))
-//			((double, bandThickness, 0.1,Attr::hidden,"not used, clay layer thickness"))
-//			((double, heatCapacities, 0.0,Attr::hidden,"not used, clay layer thickness"))
-		((double, effective_phi, 0.0,,"Friction angle in clay after displacement"))
-//			((double, prevOverlap, 0.0,,"previous overlap"))
+//			((Real, delta_porePressure, 0.0,Attr::hidden,"not used, change in pore water pressure"))
+//			((Real, porePressure, 0.0,Attr::hidden,"not used, pore water pressure"))
+//			((Real, bandThickness, 0.1,Attr::hidden,"not used, clay layer thickness"))
+//			((Real, heatCapacities, 0.0,Attr::hidden,"not used, clay layer thickness"))
+		((Real, effective_phi, 0.0,,"Friction angle in clay after displacement"))
+//			((Real, prevOverlap, 0.0,,"previous overlap"))
 //			((Real, h, 0.0,Attr::hidden,"not used, cd"))
 		((bool,isSliding,false,,"Check if the contact is sliding (useful to calculate the ratio of sliding contacts)"))
 		, /* ctor*/
@@ -153,11 +153,11 @@ class Ip2_FrictMat_FrictMat_KnKsPBPhys: public IPhysFunctor{
 		((Real, Knormal, ,,"Volumetric stiffness in the contact normal direction (units: stress/length)"))
 		((Real, Kshear, ,,"Volumetric stiffness in the contact shear direction (units: stress/length)"))
 //		((Real, unitWidth2D, 1.0,,"Unit width in 2D")) // Moved this attr in Ig2_PB_PB_ScGeom @vsangelidakis
-//			((double, brittleLength, ,,"shear length for degradation"))
-		((double, kn_i, ,,"Volumetric stiffness in the contact normal direction (units: stress/length) when isBoundary=True for one of the PBs")) //initial normal stiffness, user need to initialise
-		((double, ks_i, ,,"Volumetric stiffness in the contact shear direction (units: stress/length) when isBoundary=True for one of the PBs")) //initial shear stiffness, user need to initialise
-//			((double, u_peak, -1.0,,"peak displacement, not fully in use"))
-//			((double, maxClosure, 0.002,Attr::hidden,"not used"))
+//			((Real, brittleLength, ,,"shear length for degradation"))
+		((Real, kn_i, ,,"Volumetric stiffness in the contact normal direction (units: stress/length) when isBoundary=True for one of the PBs")) //initial normal stiffness, user need to initialise
+		((Real, ks_i, ,,"Volumetric stiffness in the contact shear direction (units: stress/length) when isBoundary=True for one of the PBs")) //initial shear stiffness, user need to initialise
+//			((Real, u_peak, -1.0,,"peak displacement, not fully in use"))
+//			((Real, maxClosure, 0.002,Attr::hidden,"not used"))
 		((Real, viscousDamping, 0.0,,"Viscous damping"))
 		((Real, cohesion, 0.0,,"Cohesion (stress units)"))
 		((Real, tension, 0.0,,"Tension (stress units)"))
@@ -190,9 +190,9 @@ class Law2_SCG_KnKsPBPhys_KnKsPBLaw: public LawFunctor{
 		Real getnormDampDissip();
 		Real getshearDampDissip();
 
-//		double stressUpdate(shared_ptr<IPhys>& ip, const Vector3r Fs_prev, const Vector3r du, const Vector3r prev_us, const double ks /*shear stiffness */,const double fN, const double dFn, const double phi_b, Vector3r & newFs);
-		double stressUpdateVec(shared_ptr<IPhys>& ip, const Vector3r Fs_prev, const Vector3r du, const double prev_us, const double ks /*shear stiffness */,const double fN, const double phi_b, Vector3r & newFs);
-		double stressUpdateVecTalesnick(shared_ptr<IPhys>& ip, const Vector3r Fs_prev, const Vector3r du, const double prev_us, const double ks /*shear stiffness */,const double fN, const double phi_b, Vector3r & newFs, const double upeak);
+//		Real stressUpdate(shared_ptr<IPhys>& ip, const Vector3r Fs_prev, const Vector3r du, const Vector3r prev_us, const Real ks /*shear stiffness */,const Real fN, const Real dFn, const Real phi_b, Vector3r & newFs);
+		Real stressUpdateVec(shared_ptr<IPhys>& ip, const Vector3r Fs_prev, const Vector3r du, const Real prev_us, const Real ks /*shear stiffness */,const Real fN, const Real phi_b, Vector3r & newFs);
+		Real stressUpdateVecTalesnick(shared_ptr<IPhys>& ip, const Vector3r Fs_prev, const Vector3r du, const Real prev_us, const Real ks /*shear stiffness */,const Real fN, const Real phi_b, Vector3r & newFs, const Real upeak);
 
 		virtual bool go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _phys, Interaction* I);
 		FUNCTOR2D(ScGeom,KnKsPBPhys);
@@ -202,9 +202,9 @@ class Law2_SCG_KnKsPBPhys_KnKsPBLaw: public LawFunctor{
 		((bool, preventGranularRatcheting, false,,"bool to avoid granular ratcheting"))
 		((bool, traceEnergy, false,,"Whether to calculate energy terms (elastic potential energy (normal and shear), plastic dissipation due to friction and dissipation of energy (normal and tangential) due to viscous damping)"))
 		((bool, Talesnick, false,,"Use contact law developed for validation against model test"))
-//			((double, waterLevel, 0.0,Attr::hidden,"not used"))
+//			((Real, waterLevel, 0.0,Attr::hidden,"not used"))
 		((bool, allowBreakage, false,,"Allow cohesion to break. Once broken, cohesion = 0"))
-		((double, initialOverlapDistance, 0.0,,"Initial overlap distance, defining the offset distance for tension overlap, i.e. negative overlap."))
+		((Real, initialOverlapDistance, 0.0,,"Initial overlap distance, defining the offset distance for tension overlap, i.e. negative overlap."))
 		((bool, allowViscousAttraction, true,,"Whether to allow attractive forces due to viscous damping"))
 		((int, normDampDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for normal viscous damping dissipation work (with O.trackEnergy)"))
 		((int, shearDampDissipIx, -1,(Attr::hidden|Attr::noSave),"Index for shear viscous damping dissipation work (with O.trackEnergy)"))
