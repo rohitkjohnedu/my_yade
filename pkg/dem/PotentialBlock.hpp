@@ -31,18 +31,18 @@ class PotentialBlock : public Shape {
 		virtual ~PotentialBlock ();
 		void postLoad(PotentialBlock&);
 
-		double getDet(const Eigen::MatrixXd A);
-		double getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
+		Real getDet(const Eigen::MatrixXd A);
+		Real getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
 		void calculateVertices();
 		void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialBlock,Shape,"Geometry of PotentialBlock.",
 		((bool, isLining, false,, "Whether particle is part of tunnel lining (used in the RockLining.cpp script)"))
-		((double, liningStiffness, pow(10.0,8),, "Lining stiffness"))
-		((double, liningFriction, 20.0,, "Lining friction"))
-		((double, liningLength, 0.0,, "Lining spacing between nodes"))
-		((double, liningTensionGap, 0.0,, "Numerical gap between lining and block to allowing tension to be calculated"))
+		((Real, liningStiffness, pow(10.0,8),, "Lining stiffness"))
+		((Real, liningFriction, 20.0,, "Lining friction"))
+		((Real, liningLength, 0.0,, "Lining spacing between nodes"))
+		((Real, liningTensionGap, 0.0,, "Numerical gap between lining and block to allowing tension to be calculated"))
 		((Vector3r, liningNormalPressure, Vector3r(0,0,0),, "Normal pressure acting on lining"))
 		((Vector3r, liningTotalPressure, Vector3r(0,0,0),, "Total pressure acting on lining"))
 		((bool, isBoundary, false,, "Whether the particle is part of a boundary block"))
@@ -70,30 +70,30 @@ class PotentialBlock : public Shape {
 		((bool, erase, false,, "Parameter to mark particles to be removed (for excavation)"))
 		((vector<bool>, intactRock, false,, "Property for plane")) //TODO: Provide more info on the functionality of this attribute
 //			((vector<bool>, isBoundaryPlane, ,Attr::hidden, "Property for plane (not used)"))
-//			((vector<double>, hwater, ,Attr::hidden, "Property for plane (not used), height of pore water"))
-//			((vector<double>, JRC, ,Attr::hidden, "Property for plane (not used), rock joint"))
-//			((vector<double>, JCS, ,Attr::hidden, "Property for plane (not used), rock joint"))
-//			((vector<double>, asperity, ,Attr::hidden, "Property for plane (not used), rock joint"))
-//			((vector<double>, sigmaC, ,Attr::hidden,"Property for plane (not used), rock joint"))
-		((vector<double>, phi_b, ,, "Basic friction angle of each face (property for plane, rock joint)"))
-		((vector<double>, phi_r, ,, "Residual friction angle of each face (property for plane, rock joint)"))
-		((vector<double>, cohesion, ,, "Cohesion (stress) of each face (property for plane, rock joint)"))
-		((vector<double>, tension, ,, "Tension (stress) of each face (property for plane, rock joint)"))
+//			((vector<Real>, hwater, ,Attr::hidden, "Property for plane (not used), height of pore water"))
+//			((vector<Real>, JRC, ,Attr::hidden, "Property for plane (not used), rock joint"))
+//			((vector<Real>, JCS, ,Attr::hidden, "Property for plane (not used), rock joint"))
+//			((vector<Real>, asperity, ,Attr::hidden, "Property for plane (not used), rock joint"))
+//			((vector<Real>, sigmaC, ,Attr::hidden,"Property for plane (not used), rock joint"))
+		((vector<Real>, phi_b, ,, "Basic friction angle of each face (property for plane, rock joint)"))
+		((vector<Real>, phi_r, ,, "Residual friction angle of each face (property for plane, rock joint)"))
+		((vector<Real>, cohesion, ,, "Cohesion (stress) of each face (property for plane, rock joint)"))
+		((vector<Real>, tension, ,, "Tension (stress) of each face (property for plane, rock joint)"))
 		((vector<int>, jointType, ,, "jointType"))
-//			((vector<double>, lambda0, ,Attr::hidden, "Property for plane (not used), heat"))
-//			((vector<double>, kn, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
-//			((vector<double>, ks, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
-//			((vector<double>, heatCapacity, ,Attr::hidden, "Property for plane, rock joint"))
-//			((vector<double>, rFactor, ,Attr::hidden, "(not used), individual factor for r"))
+//			((vector<Real>, lambda0, ,Attr::hidden, "Property for plane (not used), heat"))
+//			((vector<Real>, kn, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
+//			((vector<Real>, ks, ,Attr::hidden, "Property for plane, rock joint (not used: would be used in that each face could have it's own stiffness properties (not developed))"))
+//			((vector<Real>, heatCapacity, ,Attr::hidden, "Property for plane, rock joint"))
+//			((vector<Real>, rFactor, ,Attr::hidden, "(not used), individual factor for r"))
 		((vector<Vector3r>, vertices, ,(Attr::readonly),"Vertices |yupdate|"))
 		//((Eigen::MatrixXd , Amatrix, ,, "a "))
 		//((Eigen::MatrixXd , Dmatrix, ,, "b "))
-//			((double, waterVolume, ,, "volume of body submerged in water"))
+//			((Real, waterVolume, ,, "volume of body submerged in water"))
 //			((vector<Vector3r>, verticesCD, ,, "vertices"))
-		((vector<double>, a, ,, "List of a coefficients of plane normals"))
-		((vector<double>, b, ,, "List of b coefficients of plane normals"))
-		((vector<double>, c, ,, "List of c coefficients of plane normals"))
-		((vector<double>, d, ,, "List of d coefficients of plane equations"))
+		((vector<Real>, a, ,, "List of a coefficients of plane normals"))
+		((vector<Real>, b, ,, "List of b coefficients of plane normals"))
+		((vector<Real>, c, ,, "List of c coefficients of plane normals"))
+		((vector<Real>, d, ,, "List of d coefficients of plane equations"))
 		((vector<vector<int> >, connectivity, ,(Attr::readonly), "Connectivity of vertices for each plane |yupdate|"))
 		, /*ctor*/
 		createIndex();
@@ -116,8 +116,8 @@ REGISTER_SERIALIZABLE(PotentialBlock);
 #ifdef __cplusplus
 extern "C" {
 #endif
-	void dgesv_(const int *N, const int *nrhs, double *Hessian, const int *lda, int *ipiv, double *gradient, const int *ldb, int *info);
-	void dsyev_(const char *jobz, const char *uplo, const int *N, double *A, const int *lda, double *W, double *work, int *lwork, int *info);
+	void dgesv_(const int *N, const int *nrhs, Real *Hessian, const int *lda, int *ipiv, Real *gradient, const int *ldb, int *info);
+	void dsyev_(const char *jobz, const char *uplo, const int *N, Real *A, const int *lda, Real *W, Real *work, int *lwork, int *info);
 #ifdef __cplusplus
 };
 #endif
