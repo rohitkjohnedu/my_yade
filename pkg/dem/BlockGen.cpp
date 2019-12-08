@@ -125,20 +125,20 @@ bool BlockGen::generate(string& /*message*/)
 		getline ( file, value);
 		int count = 0;
 		Vector3r jointCentre(0,0,0);
-//		const double PI = std::atan(1.0)*4;
-		/* int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //double persistenceA=0; double persistenceB=0; double spacing = 0;
+//		const Real PI = std::atan(1.0)*4;
+		/* int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //Real persistenceA=0; Real persistenceB=0; Real spacing = 0;
 		while ( file.good() )
 		{
 			count ++;
 			getline ( file, value, ';' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			//std::cout<<"count: "<<count<<", value: "<<value<<endl;
 			const char *valueChar = value.c_str();
-			double valueDouble = atof ( valueChar);
-			if(count == 1) dip = valueDouble;
+			Real valueReal = atof ( valueChar);
+			if(count == 1) dip = valueReal;
 			if(count == 2) {
-				dipdir = valueDouble;
-				double dipdirN = 0.0;
-				double dipN = 90.0-dip;
+				dipdir = valueReal;
+				Real dipdirN = 0.0;
+				Real dipN = 90.0-dip;
 
 				if(dipdir > 180.0){
 					dipdirN = dipdir - 180.0;
@@ -157,20 +157,20 @@ bool BlockGen::generate(string& /*message*/)
 				planeNormal = Vector3r(a/l,b/l,c/l);
 				//std::cout<<"planeNormal: "<<planeNormal<<endl;
 			}
-			if(count == 3) jointCentre.x() = valueDouble;
-			if(count == 4) jointCentre.y() = valueDouble;
-			if(count == 5) {jointCentre.z() = valueDouble; joint[jointNo].centre = jointCentre; joint[jointNo].isBoundary = true;}
-			if(count == 6) {joint[jointNo].phi_b = valueDouble;}
-			if(count == 7) {joint[jointNo].phi_r = valueDouble;}
-			if(count == 8) {joint[jointNo].JRC = valueDouble;}
-			if(count == 9) {joint[jointNo].JCS = valueDouble;}
-			if(count == 10){joint[jointNo].asperity = valueDouble;}
-			if(count == 11){joint[jointNo].sigmaC = valueDouble;}
-			if(count == 12){joint[jointNo].cohesion = valueDouble;}
-			if(count == 13){joint[jointNo].tension = valueDouble;}
-			if(count == 14){joint[jointNo].lambda0 = valueDouble;}
-			if(count == 15){joint[jointNo].heatCapacity = valueDouble;}
-			if(count == 16){joint[jointNo].hwater = valueDouble;joint[jointNo].throughGoing = true;count = 0;}
+			if(count == 3) jointCentre.x() = valueReal;
+			if(count == 4) jointCentre.y() = valueReal;
+			if(count == 5) {jointCentre.z() = valueReal; joint[jointNo].centre = jointCentre; joint[jointNo].isBoundary = true;}
+			if(count == 6) {joint[jointNo].phi_b = valueReal;}
+			if(count == 7) {joint[jointNo].phi_r = valueReal;}
+			if(count == 8) {joint[jointNo].JRC = valueReal;}
+			if(count == 9) {joint[jointNo].JCS = valueReal;}
+			if(count == 10){joint[jointNo].asperity = valueReal;}
+			if(count == 11){joint[jointNo].sigmaC = valueReal;}
+			if(count == 12){joint[jointNo].cohesion = valueReal;}
+			if(count == 13){joint[jointNo].tension = valueReal;}
+			if(count == 14){joint[jointNo].lambda0 = valueReal;}
+			if(count == 15){joint[jointNo].heatCapacity = valueReal;}
+			if(count == 16){joint[jointNo].hwater = valueReal;joint[jointNo].throughGoing = true;count = 0;}
 		}
 	}
 
@@ -185,7 +185,7 @@ bool BlockGen::generate(string& /*message*/)
 		getline ( file, value);
 		int count = 0;
 		Vector3r jointCentre(0,0,0);
-//		const double PI = std::atan(1.0)*4;
+//		const Real PI = std::atan(1.0)*4;
 		Vector3r planeNormal(0,0,0);  int jointNo = 0;
 		while ( file.good() )
 		{
@@ -193,12 +193,12 @@ bool BlockGen::generate(string& /*message*/)
 			getline ( file, value, ';' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			//std::cout<<"count: "<<count<<", value: "<<value<<endl;
 			const char *valueChar = value.c_str();
-			double valueDouble = atof ( valueChar);
-			if(count == 1) dip = valueDouble;
+			Real valueReal = atof ( valueChar);
+			if(count == 1) dip = valueReal;
 			if(count == 2) {
-				dipdir = valueDouble;
-				double dipdirN = 0.0;
-				double dipN = 90.0-dip;
+				dipdir = valueReal;
+				Real dipdirN = 0.0;
+				Real dipN = 90.0-dip;
 				if(dipdir > 180.0){
 					dipdirN = dipdir - 180.0;
 				}else{
@@ -216,17 +216,17 @@ bool BlockGen::generate(string& /*message*/)
 				planeNormal = Vector3r(a/l,b/l,c/l);
 				//std::cout<<"planeNormal: "<<planeNormal<<endl;
 			}
-			if(count == 3) jointCentre.x() = valueDouble;
-			if(count == 4) jointCentre.y() = valueDouble;
-			if(count == 5) {jointCentre.z() = valueDouble; joint[jointNo].centre = jointCentre; joint[jointNo].sliceBoundaries = true;}
-			if(count == 6){joint[jointNo].phi_b = valueDouble;}
-			if(count == 7){joint[jointNo].phi_r = valueDouble;}
-			if(count == 8){joint[jointNo].JRC = valueDouble;}
-			if(count == 9){joint[jointNo].JCS = valueDouble;}
-			if(count == 10){joint[jointNo].asperity = valueDouble;}
-			if(count == 11){joint[jointNo].sigmaC = valueDouble;}
-			if(count == 12){joint[jointNo].cohesion = valueDouble;}
-			if(count == 13){joint[jointNo].tension = valueDouble;joint[jointNo].throughGoing = true;count = 0;}
+			if(count == 3) jointCentre.x() = valueReal;
+			if(count == 4) jointCentre.y() = valueReal;
+			if(count == 5) {jointCentre.z() = valueReal; joint[jointNo].centre = jointCentre; joint[jointNo].sliceBoundaries = true;}
+			if(count == 6){joint[jointNo].phi_b = valueReal;}
+			if(count == 7){joint[jointNo].phi_r = valueReal;}
+			if(count == 8){joint[jointNo].JRC = valueReal;}
+			if(count == 9){joint[jointNo].JCS = valueReal;}
+			if(count == 10){joint[jointNo].asperity = valueReal;}
+			if(count == 11){joint[jointNo].sigmaC = valueReal;}
+			if(count == 12){joint[jointNo].cohesion = valueReal;}
+			if(count == 13){joint[jointNo].tension = valueReal;joint[jointNo].throughGoing = true;count = 0;}
 		}
 	}
 
@@ -239,24 +239,24 @@ bool BlockGen::generate(string& /*message*/)
 		/* skip first line */
 		getline ( file, value);
 		int count = 0;
-//		const double PI = std::atan(1.0)*4;
-		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  /* int jointNo = 0; double persistenceA=0; double persistenceB=0; */ double spacing = 0; double a=0,b=0,c=0 /* d */, l = 0.0;
+//		const Real PI = std::atan(1.0)*4;
+		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  /* int jointNo = 0; Real persistenceA=0; Real persistenceB=0; */ Real spacing = 0; Real a=0,b=0,c=0 /* d */, l = 0.0;
 		while ( file.good() )
 		{
 			count ++;
 			getline ( file, value, ';' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			//std::cout<<"count: "<<count<<", value: "<<value<<endl;
 			const char *valueChar = value.c_str();
-			double valueDouble = atof ( valueChar);
+			Real valueReal = atof ( valueChar);
 
-			double phi_b=0 ,phi_r=0,JRC=0,JCS=0,asperity=0, sigmaC=0,cohesion=0, tension = 0.0;
-			if(count == 1) dip = valueDouble;
-			if(count == 2) dipdir = valueDouble;
+			Real phi_b=0 ,phi_r=0,JRC=0,JCS=0,asperity=0, sigmaC=0,cohesion=0, tension = 0.0;
+			if(count == 1) dip = valueReal;
+			if(count == 2) dipdir = valueReal;
 			if(count == 3) {
-					spacing = valueDouble;
+					spacing = valueReal;
 					//std::cout<<"dip: "<<dip<<", dipdir: "<<dipdir<<", spacing: "<<spacing<<endl;
-					double dipdirN = 0.0;
-					double dipN = 90.0-dip;
+					Real dipdirN = 0.0;
+					Real dipN = 90.0-dip;
 					if(dipdir > 180.0){
 						dipdirN = dipdir - 180.0;
 					}else{
@@ -271,15 +271,15 @@ bool BlockGen::generate(string& /*message*/)
 					planeNormal = Vector3r(a/l,b/l,c/l); //save for later
 					//std::cout<<"planeNormal1: "<<planeNormal<<endl;
 			}
-			if(count == 4){phi_b = valueDouble;}
-			if(count == 5){phi_r = valueDouble;}
-			if(count == 6){JRC = valueDouble;}
-			if(count == 7){JCS = valueDouble;}
-			if(count == 8){asperity = valueDouble;}
-			if(count == 9){sigmaC = valueDouble;}
-			if(count == 10){cohesion = valueDouble;}
+			if(count == 4){phi_b = valueReal;}
+			if(count == 5){phi_r = valueReal;}
+			if(count == 6){JRC = valueReal;}
+			if(count == 7){JCS = valueReal;}
+			if(count == 8){asperity = valueReal;}
+			if(count == 9){sigmaC = valueReal;}
+			if(count == 10){cohesion = valueReal;}
 			if(count == 11){
-				tension = valueDouble;
+				tension = valueReal;
 				joint.push_back(Discontinuity(firstBlockCentre));
 				{
 				int i = joint.size()-1;
@@ -292,11 +292,11 @@ bool BlockGen::generate(string& /*message*/)
 				for(int j=1; j<=number/2.0 /* -1 */; j++){
 					joint.push_back(Discontinuity(firstBlockCentre));
 					int i = joint.size()-1;
-					joint[i].a = a/l;   joint[i].b = b/l;   joint[i].c = c/l;  joint[i].d = spacing*static_cast<double>(j);
+					joint[i].a = a/l;   joint[i].b = b/l;   joint[i].c = c/l;  joint[i].d = spacing*static_cast<Real>(j);
 					joint[i].phi_b = phi_b; joint[i].phi_r = phi_r; joint[i].JRC = JRC; joint[i].JCS = JCS; joint[i].asperity = asperity; joint[i].sigmaC = sigmaC; joint[i].cohesion = cohesion; joint[i].tension = tension;
 					joint.push_back(Discontinuity(firstBlockCentre));
 					i = joint.size()-1;
-					joint[i].a = -a/l;   joint[i].b = -b/l;   joint[i].c = -c/l;  joint[i].d =spacing*static_cast<double>(j);
+					joint[i].a = -a/l;   joint[i].b = -b/l;   joint[i].c = -c/l;  joint[i].d =spacing*static_cast<Real>(j);
 					joint[i].phi_b = phi_b; joint[i].phi_r = phi_r; joint[i].JRC = JRC; joint[i].JCS = JCS; joint[i].asperity = asperity; joint[i].sigmaC = sigmaC; joint[i].cohesion = cohesion; joint[i].tension = tension;
 				}
 				count = 0;
@@ -314,8 +314,8 @@ bool BlockGen::generate(string& /*message*/)
 		getline ( file, value);
 		int count = 0; //int linecount = 0;
 		Real dip2 = 0.0;Real dipdir2 = 0.0; Vector3r jointCentre(0,0,0);
-//		const double PI = std::atan(1.0)*4;
-		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //double persistenceA=0; double persistenceB=0; double spacing = 0;
+//		const Real PI = std::atan(1.0)*4;
+		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //Real persistenceA=0; Real persistenceB=0; Real spacing = 0;
 		boost::normal_distribution<> nd(0.0, 1.0);
 		boost::variate_generator<boost::mt19937,boost::normal_distribution<> > generator(boost::mt19937(time(0)),nd);
 		while ( file.good() )
@@ -325,19 +325,19 @@ bool BlockGen::generate(string& /*message*/)
 			getline ( file, value, ';' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			//std::cout<<"count: "<<count<<", value: "<<value<<endl;
 			const char *valueChar = value.c_str();
-			double valueDouble = atof ( valueChar);
-			if(count == 1) { dip2 = valueDouble;  }
+			Real valueReal = atof ( valueChar);
+			if(count == 1) { dip2 = valueReal;  }
 			if(count == 2) {
-				dipdir2 = valueDouble;
-				double dipdirN = 0.0;
-				double dipN = 90.0-dip2;
+				dipdir2 = valueReal;
+				Real dipdirN = 0.0;
+				Real dipN = 90.0-dip2;
 				if(dipdir2 > 180.0){
 					dipdirN = dipdir2 - 180.0;
 				}else{
 					dipdirN = dipdir2 + 180.0;
 				}
 				if(probabilisticOrientation == true && dip2 < 120.0 && dip2 > 60.0 ){
-					double perturb = gen_normal_3(generator);
+					Real perturb = gen_normal_3(generator);
 					dipN = dipN + perturb;
 
 					if (saveBlockGenData==true) { //output to file
@@ -361,12 +361,12 @@ bool BlockGen::generate(string& /*message*/)
 				joint[i].a = a/l;   joint[i].b = b/l;   joint[i].c = c/l;  joint[i].d = 0.0;
 				planeNormal = Vector3r(a/l,b/l,c/l);
 			}
-			if(count == 3) {jointCentre.x() = valueDouble;}
-			if(count == 4) {jointCentre.y() = valueDouble;}
-			if(count == 5) {jointCentre.z() = valueDouble; joint[jointNo].centre = jointCentre; }
+			if(count == 3) {jointCentre.x() = valueReal;}
+			if(count == 4) {jointCentre.y() = valueReal;}
+			if(count == 5) {jointCentre.z() = valueReal; joint[jointNo].centre = jointCentre; }
 			if(count == 6) {
-				double strike = dipdir2 - 90.0;
-				double strikeRad = strike/180.0*Mathr::PI;
+				Real strike = dipdir2 - 90.0;
+				Real strikeRad = strike/180.0*Mathr::PI;
 				Vector3r Nstrike = Vector3r(cos(strikeRad), sin(strikeRad), 0.0);
 				Vector3r Ndip = planeNormal.cross(Nstrike); Ndip.normalize();
 				Matrix3r Qp=Eigen::Matrix3d::Zero();
@@ -390,11 +390,11 @@ bool BlockGen::generate(string& /*message*/)
 				joint[jointNo].persistence_a.push_back(rotatedPersistence.x());	joint[jointNo].persistence_a.push_back(-rotatedPersistence.x());
 				joint[jointNo].persistence_b.push_back(rotatedPersistence.y());	joint[jointNo].persistence_b.push_back(-rotatedPersistence.y());
 				joint[jointNo].persistence_c.push_back(rotatedPersistence.z());	joint[jointNo].persistence_c.push_back(-rotatedPersistence.z());
-				joint[jointNo].persistence_d.push_back(valueDouble);		joint[jointNo].persistence_d.push_back(valueDouble);
+				joint[jointNo].persistence_d.push_back(valueReal);		joint[jointNo].persistence_d.push_back(valueReal);
 			}
 			if(count == 7){
-				double strike = dipdir2 - 90.0;
-				double strikeRad = strike/180.0*Mathr::PI;
+				Real strike = dipdir2 - 90.0;
+				Real strikeRad = strike/180.0*Mathr::PI;
 				Vector3r Nstrike = Vector3r(cos(strikeRad), sin(strikeRad), 0.0);
 
 				if (saveBlockGenData==true) { //output to file
@@ -439,18 +439,18 @@ bool BlockGen::generate(string& /*message*/)
 				joint[jointNo].persistence_a.push_back(rotatedPersistence.x());	joint[jointNo].persistence_a.push_back(-rotatedPersistence.x());
 				joint[jointNo].persistence_b.push_back(rotatedPersistence.y());	joint[jointNo].persistence_b.push_back(-rotatedPersistence.y());
 				joint[jointNo].persistence_c.push_back(rotatedPersistence.z());	joint[jointNo].persistence_c.push_back(-rotatedPersistence.z());
-				joint[jointNo].persistence_d.push_back(valueDouble);		joint[jointNo].persistence_d.push_back(valueDouble);
+				joint[jointNo].persistence_d.push_back(valueReal);		joint[jointNo].persistence_d.push_back(valueReal);
 			}
-			if(count == 8){joint[jointNo].phi_b = valueDouble;}
-			if(count == 9){joint[jointNo].phi_r = valueDouble;}
-			if(count == 10){joint[jointNo].JRC = valueDouble;}
-			if(count == 11){joint[jointNo].JCS = valueDouble;}
-			if(count == 12){joint[jointNo].asperity = valueDouble;}
-			if(count == 13){joint[jointNo].sigmaC = valueDouble;}
-			if(count == 14){joint[jointNo].cohesion = valueDouble;}
-			if(count == 15){joint[jointNo].tension = valueDouble;}
+			if(count == 8){joint[jointNo].phi_b = valueReal;}
+			if(count == 9){joint[jointNo].phi_r = valueReal;}
+			if(count == 10){joint[jointNo].JRC = valueReal;}
+			if(count == 11){joint[jointNo].JCS = valueReal;}
+			if(count == 12){joint[jointNo].asperity = valueReal;}
+			if(count == 13){joint[jointNo].sigmaC = valueReal;}
+			if(count == 14){joint[jointNo].cohesion = valueReal;}
+			if(count == 15){joint[jointNo].tension = valueReal;}
 			if(count == 16){
-				joint[jointNo].jointType = static_cast<int>(valueDouble);
+				joint[jointNo].jointType = static_cast<int>(valueReal);
 			}
 			if(count == 17){count = 0; /* to include comments */
 				if(intactRockDegradation==true){
@@ -470,7 +470,7 @@ bool BlockGen::generate(string& /*message*/)
 		getline ( file, value);
 		int count = 0;
 		Vector3r jointCentre(0,0,0);
-//		const double PI = std::atan(1.0)*4;
+//		const Real PI = std::atan(1.0)*4;
 		Vector3r planeNormal(0,0,0);  int jointNo = 0;
 		while ( file.good() )
 		{
@@ -478,12 +478,12 @@ bool BlockGen::generate(string& /*message*/)
 			getline ( file, value, ';' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			//std::cout<<"count: "<<count<<", value: "<<value<<endl;
 			const char *valueChar = value.c_str();
-			double valueDouble = atof ( valueChar);
-			if(count == 1) dip = valueDouble;
+			Real valueReal = atof ( valueChar);
+			if(count == 1) dip = valueReal;
 			if(count == 2) {
-				dipdir = valueDouble;
-				double dipdirN = 0.0;
-				double dipN = 90.0-dip;
+				dipdir = valueReal;
+				Real dipdirN = 0.0;
+				Real dipN = 90.0-dip;
 				if(dipdir > 180.0){
 					dipdirN = dipdir - 180.0;
 				}else{
@@ -501,9 +501,9 @@ bool BlockGen::generate(string& /*message*/)
 				planeNormal = Vector3r(a/l,b/l,c/l);
 				//std::cout<<"planeNormal: "<<planeNormal<<endl;
 			}
-			if(count == 3) jointCentre.x() = valueDouble;
-			if(count == 4) jointCentre.y() = valueDouble;
-			if(count == 5) {jointCentre.z() = valueDouble; joint[jointNo].centre = jointCentre;}
+			if(count == 3) jointCentre.x() = valueReal;
+			if(count == 4) jointCentre.y() = valueReal;
+			if(count == 5) {jointCentre.z() = valueReal; joint[jointNo].centre = jointCentre;}
 			if(count == 6 or count == 7) {
 //				if(count == 6) {
 					Vector3r rotatedPersistence(1,0,0); //if(count == 6)
@@ -523,16 +523,16 @@ bool BlockGen::generate(string& /*message*/)
 				joint[jointNo].persistence_a.push_back(rotatedPersistence.x());	joint[jointNo].persistence_a.push_back(-rotatedPersistence.x());
 				joint[jointNo].persistence_b.push_back(rotatedPersistence.y());	joint[jointNo].persistence_b.push_back(-rotatedPersistence.y());
 				joint[jointNo].persistence_c.push_back(rotatedPersistence.z());	joint[jointNo].persistence_c.push_back(-rotatedPersistence.z());
-				joint[jointNo].persistence_d.push_back(valueDouble);		joint[jointNo].persistence_d.push_back(valueDouble);
+				joint[jointNo].persistence_d.push_back(valueReal);		joint[jointNo].persistence_d.push_back(valueReal);
 			}
-			if(count == 8){joint[jointNo].phi_b = valueDouble;}
-			if(count == 9){joint[jointNo].phi_r = valueDouble;}
-			if(count == 10){joint[jointNo].JRC = valueDouble;}
-			if(count == 11){joint[jointNo].JCS = valueDouble;}
-			if(count == 12){joint[jointNo].asperity = valueDouble;}
-			if(count == 13){joint[jointNo].sigmaC = valueDouble;}
-			if(count == 14){joint[jointNo].cohesion = valueDouble;}
-			if(count == 15){joint[jointNo].tension = valueDouble;joint[jointNo].throughGoing=true;joint[jointNo].constructionJoints=true; count = 0;}
+			if(count == 8){joint[jointNo].phi_b = valueReal;}
+			if(count == 9){joint[jointNo].phi_r = valueReal;}
+			if(count == 10){joint[jointNo].JRC = valueReal;}
+			if(count == 11){joint[jointNo].JCS = valueReal;}
+			if(count == 12){joint[jointNo].asperity = valueReal;}
+			if(count == 13){joint[jointNo].sigmaC = valueReal;}
+			if(count == 14){joint[jointNo].cohesion = valueReal;}
+			if(count == 15){joint[jointNo].tension = valueReal;joint[jointNo].throughGoing=true;joint[jointNo].constructionJoints=true; count = 0;}
 			//if(intactRockDegradation==true){
 			//	joint[jointNo].intactRock = true;
 			//}
@@ -549,22 +549,22 @@ bool BlockGen::generate(string& /*message*/)
 		getline ( file, value);
 		int count = 0; //int linecount = 0;
 		Vector3r jointCentre(0,0,0);
-		//const double PI = std::atan(1.0)*4;
-		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //double persistenceA=0; double persistenceB=0; double spacing = 0;
+		//const Real PI = std::atan(1.0)*4;
+		/* int boundaryNo = 0; int boundaryCount = 0; int abdCount=0; */  Vector3r planeNormal(0,0,0);  int jointNo = 0; //Real persistenceA=0; Real persistenceB=0; Real spacing = 0;
 		while ( file.good() )
 		{
 			count ++;
 			getline ( file, value, ';' ); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			//std::cout<<"count: "<<count<<", value: "<<value<<endl;
 			const char *valueChar = value.c_str();
-			double valueDouble = atof ( valueChar);
-			if(count == 1) { planeNormal.x() = valueDouble;}
-			if(count == 2) { planeNormal.y() = valueDouble;}
-			if(count == 3) { planeNormal.z() = valueDouble; planeNormal.normalize();}
+			Real valueReal = atof ( valueChar);
+			if(count == 1) { planeNormal.x() = valueReal;}
+			if(count == 2) { planeNormal.y() = valueReal;}
+			if(count == 3) { planeNormal.z() = valueReal; planeNormal.normalize();}
 			if(count == 4) {
 				joint.push_back(Discontinuity(jointCentre));
 				int i = joint.size()-1; jointNo=i; //std::cout<<"planeNormal: "<<planeNormal<<endl;
-				joint[i].a = planeNormal.x();   joint[i].b = planeNormal.y();   joint[i].c = planeNormal.z();  joint[i].d = valueDouble;
+				joint[i].a = planeNormal.x();   joint[i].b = planeNormal.y();   joint[i].c = planeNormal.z();  joint[i].d = valueReal;
 			}
 			if(count == 5 or count == 6) {
 //				if(count == 5){
@@ -586,16 +586,16 @@ bool BlockGen::generate(string& /*message*/)
 				joint[jointNo].persistence_a.push_back(rotatedPersistence.x());	joint[jointNo].persistence_a.push_back(-rotatedPersistence.x());
 				joint[jointNo].persistence_b.push_back(rotatedPersistence.y());	joint[jointNo].persistence_b.push_back(-rotatedPersistence.y());
 				joint[jointNo].persistence_c.push_back(rotatedPersistence.z());	joint[jointNo].persistence_c.push_back(-rotatedPersistence.z());
-				joint[jointNo].persistence_d.push_back(valueDouble);		joint[jointNo].persistence_d.push_back(valueDouble);
+				joint[jointNo].persistence_d.push_back(valueReal);		joint[jointNo].persistence_d.push_back(valueReal);
 			}
-			if(count == 7){joint[jointNo].phi_b = valueDouble;}
-			if(count == 8){joint[jointNo].phi_r = valueDouble;}
-			if(count == 9){joint[jointNo].JRC = valueDouble;}
-			if(count == 10){joint[jointNo].JCS = valueDouble;}
-			if(count == 11){joint[jointNo].asperity = valueDouble;}
-			if(count == 12){joint[jointNo].sigmaC = valueDouble;}
-			if(count == 13){joint[jointNo].cohesion = valueDouble;}
-			if(count == 14){joint[jointNo].tension = valueDouble;joint[jointNo].throughGoing=true;joint[jointNo].constructionJoints=true; count = 0;}
+			if(count == 7){joint[jointNo].phi_b = valueReal;}
+			if(count == 8){joint[jointNo].phi_r = valueReal;}
+			if(count == 9){joint[jointNo].JRC = valueReal;}
+			if(count == 10){joint[jointNo].JCS = valueReal;}
+			if(count == 11){joint[jointNo].asperity = valueReal;}
+			if(count == 12){joint[jointNo].sigmaC = valueReal;}
+			if(count == 13){joint[jointNo].cohesion = valueReal;}
+			if(count == 14){joint[jointNo].tension = valueReal;joint[jointNo].throughGoing=true;joint[jointNo].constructionJoints=true; count = 0;}
 		}
 	}
 
@@ -637,8 +637,8 @@ bool BlockGen::generate(string& /*message*/)
 				/* Fast contact detection */
 				Vector3r vertexFrJoint(0,0,0);
 				if(joint[j].throughGoing == false){
-					double twoRadiiDist = 1.2*(presentBlock.R+ std::max(fabs(joint[j].persistence_d[0]), fabs(joint[j].persistence_d[2])));
-					double centroidDist = (joint[j].centre-presentBlock.tempCentre).norm();
+					Real twoRadiiDist = 1.2*(presentBlock.R+ std::max(fabs(joint[j].persistence_d[0]), fabs(joint[j].persistence_d[2])));
+					Real centroidDist = (joint[j].centre-presentBlock.tempCentre).norm();
 					if(centroidDist > twoRadiiDist ){subMemberIter++; continue;}
 					/* std::cout<<"centroidDist: "<<centroidDist<<", twoRadiiDist: "<<twoRadiiDist<<", presentBlock.R: "<<presentBlock.R<<", presentBlock.tempCentre: "<<presentBlock.tempCentre<<", joint.centre: "<<joint[j].centre<<endl; */
 				}
@@ -851,14 +851,14 @@ bool BlockGen::generate(string& /*message*/)
 					if(joint[j].isBoundary == true){
 						Vector3r startingPt = Vector3r(0,0,0); //centroid
 //						//bool converge=startingPointFeasibility(blkA, startingPt);
-						double radius  = inscribedSphereCLP(blkA, startingPt, twoDimension); //Although we don't need the "radius" of the inscribed sphere here, we invoke "inscribedSphereCLP" in order to pass by reference the calculated value for "startingPt"
+						Real radius  = inscribedSphereCLP(blkA, startingPt, twoDimension); //Although we don't need the "radius" of the inscribed sphere here, we invoke "inscribedSphereCLP" in order to pass by reference the calculated value for "startingPt"
 						bool converge = true;
 						if (radius < 0.0){converge = false;}
 						if(converge == false){
 							radius+=0;
 						}
 						Vector3r centroidA = blkA.centre+startingPt;
-						double fA = joint[j].a*(centroidA.x()-joint[j].centre.x()) + joint[j].b*(centroidA.y()-joint[j].centre.y()) + joint[j].c*(centroidA.z()-joint[j].centre.z()) - joint[j].d;
+						Real fA = joint[j].a*(centroidA.x()-joint[j].centre.x()) + joint[j].b*(centroidA.y()-joint[j].centre.y()) + joint[j].c*(centroidA.z()-joint[j].centre.z()) - joint[j].d;
 						if (fA>0.0){
 							blkA.isBoundary = true;
 						}else{
@@ -866,12 +866,12 @@ bool BlockGen::generate(string& /*message*/)
 						}
 					}
 
-					double RblkA = 0.0;  Vector3r tempCentreA(0,0,0);
-					double RblkB = 0.0;  Vector3r tempCentreB(0,0,0);
+					Real RblkA = 0.0;  Vector3r tempCentreA(0,0,0);
+					Real RblkB = 0.0;  Vector3r tempCentreB(0,0,0);
 					/* Prune blocks that are too small or too elongated */
 					bool tooSmall = false;
 					if(joint[j].throughGoing == false){
-						//double conditioningFactor = 1.0;
+						//Real conditioningFactor = 1.0;
 						Real minX = 0.0; Real minY = 0.0; Real minZ = 0.0;
 						Real maxX = 0.0; Real maxY = 0.0; Real maxZ = 0.0;
 
@@ -940,7 +940,7 @@ bool BlockGen::generate(string& /*message*/)
 						Real maxYoverall = fabs(maxY-minY);
 						Real maxZoverall = fabs(maxZ-minZ);
 						tempCentreA = 1.0/6.0*tempCentreA; Vector3r tempA(0,0,0);
-						double chebyshevRa = inscribedSphereCLP(blkA, tempA, twoDimension); tempCentreA = tempA; //std::cout<<"chebyshevRa: "<<chebyshevRa<<endl;
+						Real chebyshevRa = inscribedSphereCLP(blkA, tempA, twoDimension); tempCentreA = tempA; //std::cout<<"chebyshevRa: "<<chebyshevRa<<endl;
 						RblkA = sqrt(maxXoverall*maxXoverall + maxYoverall*maxYoverall + maxZoverall*maxZoverall);
 
 						if (saveBlockGenData==true) { //output to file
@@ -1025,7 +1025,7 @@ bool BlockGen::generate(string& /*message*/)
 						maxYoverall = fabs(maxY-minY);
 						maxZoverall = fabs(maxZ-minZ);
 						tempCentreB = 1.0/6.0*tempCentreB; Vector3r tempB(0,0,0);
-						double chebyshevRb = inscribedSphereCLP(blkB, tempB, twoDimension); tempCentreB = tempB; //std::cout<<"chebyshevRb: "<<chebyshevRb<<endl;
+						Real chebyshevRb = inscribedSphereCLP(blkB, tempB, twoDimension); tempCentreB = tempB; //std::cout<<"chebyshevRb: "<<chebyshevRb<<endl;
 						RblkB = sqrt(maxXoverall*maxXoverall + maxYoverall*maxYoverall + maxZoverall*maxZoverall);
 
 						if (saveBlockGenData==true) { //output to file
@@ -1211,7 +1211,7 @@ bool BlockGen::generate(string& /*message*/)
 					Vector3r startingPt = blk[i].subMembers[j].centre; //centroid
 
 					//bool converge = startingPointFeasibility(blk[i].subMembers[j], startingPt);
-					double radius = inscribedSphereCLP(blk[i].subMembers[j], startingPt, twoDimension);
+					Real radius = inscribedSphereCLP(blk[i].subMembers[j], startingPt, twoDimension);
 					bool converge = true;
 					if (radius < 0.0){converge = false;}
 					Vector3r centroid = blk[i].subMembers[j].centre+startingPt;
@@ -1304,7 +1304,7 @@ bool BlockGen::generate(string& /*message*/)
 			Vector3r startingPt = blk[i].centre; //centroid
 
 			//bool converge = startingPointFeasibility(blk[i], startingPt);
-			double radius = inscribedSphereCLP(blk[i], startingPt, twoDimension);
+			Real radius = inscribedSphereCLP(blk[i], startingPt, twoDimension);
 			bool converge = true;
 			if (radius < 0.0){converge = false;}
 			Vector3r centroid = blk[i].centre+startingPt;
@@ -1551,7 +1551,7 @@ bool BlockGen::createBlock(shared_ptr<Body>& body,  struct Block block, int numb
 	if(exactRotation == true){
 		body->state->inertia = pBlock->inertia * density * inertiaFactor;
 	}else{
-		double maxInertia = std::max(std::max(std::max(pBlock->inertia[0],pBlock->inertia[1]),pBlock->inertia[2]), 2.0/5.0*body->state->mass/density*minSize*minSize);
+		Real maxInertia = std::max(std::max(std::max(pBlock->inertia[0],pBlock->inertia[1]),pBlock->inertia[2]), 2.0/5.0*body->state->mass/density*minSize*minSize);
 		body->state->inertia = Vector3r(maxInertia, maxInertia, maxInertia) * density * inertiaFactor;
 	}
 	body->state->pos = block.centre+pBlock->position;
@@ -1657,11 +1657,11 @@ bool BlockGen::contactDetectionLPCLPglobal(struct Discontinuity joint, struct Bl
 	/* Variables to keep things neat */
 	int NUMCON = 1 /* equality */ + planeNoA /*block inequality */ + persistenceNoA /*persistence inequalities */;
 	int NUMVAR = 3/*3D */ + 1 /* s */;
-	double s = 0.0;
+	Real s = 0.0;
 	//bool converge = true;
 
-	double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
-	double xlocalB=0; double ylocalB = 0; double zlocalB = 0;
+	Real xlocalA=0; Real ylocalA = 0; Real zlocalA = 0;
+	Real xlocalB=0; Real ylocalB = 0; Real zlocalB = 0;
 	Vector3r localA (0,0,0); Vector3r xGlobalA (0,0,0);
 	Vector3r localB (0,0,0); Vector3r xGlobalB (0,0,0);
 
@@ -1690,8 +1690,8 @@ bool BlockGen::contactDetectionLPCLPglobal(struct Discontinuity joint, struct Bl
 	model2.setColumnUpper(2, COIN_DBL_MAX);
 	model2.setColumnUpper(3, COIN_DBL_MAX);
 
-	double rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
-	double rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	Real rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	Real rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
 
 	// Rows
 	rowLower[0] = joint.a*joint.centre.x() + joint.b*joint.centre.y() + joint.c*joint.centre.z() + joint.d; //3 plane = 0
@@ -1712,18 +1712,18 @@ bool BlockGen::contactDetectionLPCLPglobal(struct Discontinuity joint, struct Bl
 
 
 	int row1Index[] = {0, 1, 2};
-	double row1Value[] = {joint.a, joint.b, joint.c};
+	Real row1Value[] = {joint.a, joint.b, joint.c};
 	model2.addRow(3, row1Index, row1Value,rowLower[0], rowUpper[0]);
 
 	for (int i = 0; i < planeNoA;i++){
 		int rowIndex[] = {0, 1, 2, 3};
-		double rowValue[] = {block.a[i], block.b[i], block.c[i], -1.0};
+		Real rowValue[] = {block.a[i], block.b[i], block.c[i], -1.0};
 		model2.addRow(4, rowIndex, rowValue,rowLower[1+i], rowUpper[1+i]);
 	}
 
 	for (int i = 0; i < persistenceNoA;i++){
 		int rowIndex[] = {0, 1, 2, 3};
-		double rowValue[] = {joint.persistence_a[i], joint.persistence_b[i], joint.persistence_c[i], -1.0};
+		Real rowValue[] = {joint.persistence_a[i], joint.persistence_b[i], joint.persistence_c[i], -1.0};
 		model2.addRow(4, rowIndex, rowValue,rowLower[1+planeNoA+i], rowUpper[1+planeNoA+i]);
 	}
 
@@ -1735,7 +1735,7 @@ bool BlockGen::contactDetectionLPCLPglobal(struct Discontinuity joint, struct Bl
 
 
 		// Alternatively getColSolution()
-		double * columnPrimal = model2.primalColumnSolution();
+		Real * columnPrimal = model2.primalColumnSolution();
 
 		xlocalA = columnPrimal[0];
 		ylocalA = columnPrimal[1];
@@ -1769,8 +1769,8 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 	/* Variables to keep things neat */
 	int NUMCON = planeNoA /*block inequality */;
 	int NUMVAR = 3/*3D */;
-	//double s = 0.0;
-	//double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
+	//Real s = 0.0;
+	//Real xlocalA=0; Real ylocalA = 0; Real zlocalA = 0;
 	Vector3r localA (0,0,0);
 	Vector3r xGlobalA (0,0,0);
 
@@ -1794,8 +1794,8 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 	model2.setColumnUpper(1, COIN_DBL_MAX);
 	model2.setColumnUpper(2, COIN_DBL_MAX);
 
-	double rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
-	double rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	Real rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	Real rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
 
 	// Rows
 	for(int i=0; i<planeNoA; i++  ){
@@ -1805,7 +1805,7 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 
 	for (int i = 0; i < planeNoA;i++){
 		int rowIndex[] = {0, 1, 2};
-		double rowValue[] = {block.a[i], block.b[i], block.c[i]};
+		Real rowValue[] = {block.a[i], block.b[i], block.c[i]};
 		model2.addRow(3, rowIndex, rowValue,rowLower[i], rowUpper[i]);
 	}
 	model2.scaling(0);
@@ -1817,7 +1817,7 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 	//model2.writeMps("contactBoundary.mps");
 
 		// Alternatively getColSolution()
-		double * columnPrimal = model2.primalColumnSolution();
+		Real * columnPrimal = model2.primalColumnSolution();
 
 		xGlobalA = Vector3r(columnPrimal[0],columnPrimal[1],columnPrimal[2]);
 		touchingPt = xGlobalA;
@@ -1842,8 +1842,8 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 //	/* Variables to keep things neat */
 //	int NUMCON = planeNoA /*block inequality */ + 1;
 //	int NUMVAR = 3 +1/*3D */;
-//	//double s = 0.0;
-//	//double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
+//	//Real s = 0.0;
+//	//Real xlocalA=0; Real ylocalA = 0; Real zlocalA = 0;
 //	Vector3r localA (0,0,0);
 //	Vector3r xGlobalA (0,0,0);
 
@@ -1857,16 +1857,16 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 //		       int numberElements = numberRows * numberColumns;
 //		       // Arrays will be set to default values
 //		      model2.resize(numberRows, numberColumns);
-//		      double * elements = new double [numberElements];
+//		      Real * elements = new Real [numberElements];
 //		      CoinBigIndex * starts = new CoinBigIndex [numberColumns+1];
 //		      int * rows = new int [numberElements];;
 //		      int * lengths = new int[numberColumns];
 //		       // Now fill in - totally unsafe but ....
-//		       double * columnLower = model2.columnLower();
-//		       double * columnUpper = model2.columnUpper();
-//		       double * objective = model2.objective();
-//		       double * rowLower = model2.rowLower();
-//		       double * rowUpper = model2.rowUpper();
+//		       Real * columnLower = model2.columnLower();
+//		       Real * columnUpper = model2.columnUpper();
+//		       Real * objective = model2.objective();
+//		       Real * rowLower = model2.rowLower();
+//		       Real * rowUpper = model2.rowUpper();
 //			// Columns - objective was packed
 //			  objective[0] = 0.0; //joint.a;
 //			  objective[1] = 0.0; //joint.b;
@@ -1950,7 +1950,7 @@ bool BlockGen::contactBoundaryLPCLP(struct Discontinuity joint, struct Block blo
 //		  //int numberColumns = model2.numberColumns();
 
 //		  // Alternatively getColSolution()
-//		  double * columnPrimal = model2.primalColumnSolution();
+//		  Real * columnPrimal = model2.primalColumnSolution();
 
 //	    xGlobalA = Vector3r(columnPrimal[0],columnPrimal[1],columnPrimal[2]);
 //	    touchingPt = xGlobalA;
@@ -1981,8 +1981,8 @@ bool BlockGen::checkRedundancyLPCLP(struct Discontinuity joint, struct Block blo
 	/* Variables to keep things neat */
 	  int NUMCON = planeNoA /*block inequality */;
 	  int NUMVAR = 3/*3D */;
-	  //double s = 0.0;
-	  //double xlocalA=0; double ylocalA = 0; double zlocalA = 0;
+	  //Real s = 0.0;
+	  //Real xlocalA=0; Real ylocalA = 0; Real zlocalA = 0;
 	  Vector3r localA (0,0,0);
 	  Vector3r xGlobalA (0,0,0);
 
@@ -1996,16 +1996,16 @@ bool BlockGen::checkRedundancyLPCLP(struct Discontinuity joint, struct Block blo
 		       int numberElements = numberRows * numberColumns;
 		       // Arrays will be set to default values
 		      model2.resize(numberRows, numberColumns);
-		      double * elements = new double [numberElements]; //TODO: Check whether to replace C array with std::vector<>
+		      Real * elements = new Real [numberElements]; //TODO: Check whether to replace C array with std::vector<>
 		      CoinBigIndex * starts = new CoinBigIndex [numberColumns+1];
 		      int * rows = new int [numberElements]; //TODO: Check whether to replace C array with std::vector<>
 		      int * lengths = new int[numberColumns]; //TODO: Check whether to replace C array with std::vector<>
 		       // Now fill in - totally unsafe but ....
-		       double * columnLower = model2.columnLower();
-		       double * columnUpper = model2.columnUpper();
-		       double * objective = model2.objective();
-		       double * rowLower = model2.rowLower();
-		       double * rowUpper = model2.rowUpper();
+		       Real * columnLower = model2.columnLower();
+		       Real * columnUpper = model2.columnUpper();
+		       Real * objective = model2.objective();
+		       Real * rowLower = model2.rowLower();
+		       Real * rowUpper = model2.rowUpper();
 			// Columns - objective was packed
 			  objective[0] = -joint.a;
 			  objective[1] = -joint.b;
@@ -2068,7 +2068,7 @@ bool BlockGen::checkRedundancyLPCLP(struct Discontinuity joint, struct Block blo
 		  //int numberColumns = model2.numberColumns();
 
 		  // Alternatively getColSolution()
-		  double * columnPrimal = model2.primalColumnSolution();
+		  Real * columnPrimal = model2.primalColumnSolution();
 
 	    xGlobalA = Vector3r(columnPrimal[0],columnPrimal[1],columnPrimal[2]);
 	     touchingPt = xGlobalA;
@@ -2085,13 +2085,13 @@ bool BlockGen::checkRedundancyLPCLP(struct Discontinuity joint, struct Block blo
 }
 
 
-double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, bool twoDimension){
+Real BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, bool twoDimension){
 
 	/* minimise s */
 	/* s.t. Ax - s <= d*/
 	//  bool converge = true;
 	/* Parameters for particles A and B */
-	double s = 0.0; /* get value of x[3] after optimization */
+	Real s = 0.0; /* get value of x[3] after optimization */
 	int planeNoA = block.a.size();
 	vector<unsigned int> plane2Dno;
 	if (twoDimension == true){
@@ -2106,7 +2106,7 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 	}
 
 	int NUMCON = planeNoA;
-	int NUMVAR = 3/*3D*/ +1;  double xlocalA = 0.0; double ylocalA = 0.0; double zlocalA = 0.0; Vector3r localA(0,0,0);
+	int NUMVAR = 3/*3D*/ +1;  Real xlocalA = 0.0; Real ylocalA = 0.0; Real zlocalA = 0.0; Vector3r localA(0,0,0);
 
 	ClpSimplex  model2;
 
@@ -2130,8 +2130,8 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 	model2.setColumnUpper(2, COIN_DBL_MAX);
 	model2.setColumnUpper(3, COIN_DBL_MAX);
 
-	double rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
-	double rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	Real rowLower[numberRows]; //TODO: Check whether to replace C array with std::vector<>
+	Real rowUpper[numberRows]; //TODO: Check whether to replace C array with std::vector<>
 	if(twoDimension == true){ model2.setColumnLower(1, 0.0);model2.setColumnUpper(1, 0.0);}
 
 	int planeIndex[planeNoA]; //TODO: Check whether to replace C array with std::vector<>
@@ -2155,7 +2155,7 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 
 	for (int i = 0; i < planeNoA;i++){
 		int rowIndex[] = {0, 1, 2, 3};
-		double rowValue[] = {block.a[planeIndex[i]], block.b[planeIndex[i]], block.c[planeIndex[i]], 1.0};
+		Real rowValue[] = {block.a[planeIndex[i]], block.b[planeIndex[i]], block.c[planeIndex[i]], 1.0};
 		model2.addRow(4, rowIndex, rowValue,rowLower[i], rowUpper[i]);
 	}
 
@@ -2169,7 +2169,7 @@ double BlockGen::inscribedSphereCLP(struct Block block, Vector3r& initialPoint, 
 		// Print column solution
 
 		// Alternatively getColSolution()
-		double * columnPrimal = model2.primalColumnSolution();
+		Real * columnPrimal = model2.primalColumnSolution();
 
 		xlocalA = columnPrimal[0];
 		ylocalA = columnPrimal[1];
