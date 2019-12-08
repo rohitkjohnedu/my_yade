@@ -63,7 +63,7 @@ bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 	shared_ptr<ScGeom> scm;
 	shared_ptr<KnKsPBPhys> phys;
 
-	double stepBisection = 0.001*std::min(s1->R,s2->R);
+	Real stepBisection = 0.001*std::min(s1->R,s2->R);
 	if( stepBisection < pow(10,-6) ){ std::cout<<"R1: "<<s1->R<<", R2: "<<s2->R<<", stepBisection: "<<stepBisection<<", id1: "<<c->getId1()<<", id2: "<<c->getId2()<<endl; }
 
 	bool contact = false;   // Whether contact is established, using: startingPointFeasibilityCLP
@@ -90,7 +90,7 @@ bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 	}
 
 	if(s1->isLining == true ||  s2->isLining==true){
-		double overlap = 0.0; //overlap represents the penetrationDepth
+		Real overlap = 0.0; //overlap represents the penetrationDepth
 		if (s1->isLining == true){
 			contactPt = state1.pos;
 			fA = evaluatePB(cm2, state2, Vector3r(0,0,0) /* shift2*/ , contactPt); //Periodic Boundary conditions are not considered for the RockLiningGlobal code
@@ -220,11 +220,11 @@ bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 //				phys->normal = avgNormal;
 				phys->ptOnP1 = ptOnP1; phys->ptOnP2 = ptOnP2;// phys->initial1 = scm->contactPoint;
 //				phys->gap = scm->penetrationDepth;
-				/*bool calJointLength = phys->calJointLength;*/ double jointLength = phys->jointLength; int smallerID = 1; //bool twoD = phys->twoDimension;
+				/*bool calJointLength = phys->calJointLength;*/ Real jointLength = phys->jointLength; int smallerID = 1; //bool twoD = phys->twoDimension;
 				shearDir = phys->shearDir; shearDir.normalize();
 
 				/* Get contact area */
-//				phys->prevJointLength = jointLength; //double prevContactArea = phys->contactArea;
+//				phys->prevJointLength = jointLength; //Real prevContactArea = phys->contactArea;
 				if(calContactArea) { //calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts
 					phys->contactArea = getAreaPolygon2(cm1, state1, cm2, state2, shift2, contactPt, avgNormal, smallerID, shearDir, jointLength, twoDimension, unitWidth2D);
 					/* phys->smallerID = smallerID; */
@@ -242,16 +242,16 @@ bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 
 				/* Get physical properties of the contact from the physical properties of the involved (intersecting) particle faces */
 				if(phys->useFaceProperties){
-					double phi_b1=0.0, phi_b2=0.0, phi_r1=0.0, phi_r2=0.0, cohesion1=0.0, cohesion2=0.0, tension1=0.0, tension2=0.0;
+					Real phi_b1=0.0, phi_b2=0.0, phi_r1=0.0, phi_r2=0.0, cohesion1=0.0, cohesion2=0.0, tension1=0.0, tension2=0.0;
 					bool intactRock1=false, intactRock2=false;
 					int jointType1=0, jointType2=0, noActive1=0, noActive2=0;
-					/* double JRC1=0.0, JRC2=0.0, JSC1=0.0, JSC2=0.0, sigmaC1=0.0, sigmaC2=0.0, asperity1=0.0, asperity2=0.0; */
-					/* double lambda01=0.0, lambda02=0.0, heatCapacity1=0.0, heatCapacity2=0.0, hwater1 = 0.0, hwater2 = 0.0; */
+					/* Real JRC1=0.0, JRC2=0.0, JSC1=0.0, JSC2=0.0, sigmaC1=0.0, sigmaC2=0.0, asperity1=0.0, asperity2=0.0; */
+					/* Real lambda01=0.0, lambda02=0.0, heatCapacity1=0.0, heatCapacity2=0.0, hwater1 = 0.0, hwater2 = 0.0; */
 
-					double f1 = evaluatePhys(cm1, state1, Vector3r(0,0,0), contactPt, phi_b1, phi_r1, /* JRC1, JSC1, */ cohesion1, /* sigmaC1, asperity1, */ tension1, /* lambda01, heatCapacity1, hwater1, */ intactRock1, noActive1, jointType1);
-					double f2 = evaluatePhys(cm2, state2, shift2         , contactPt, phi_b2, phi_r2, /* JRC2, JSC2, */ cohesion2, /* sigmaC2, asperity2, */ tension2, /* lambda02, heatCapacity2, hwater2, */ intactRock2, noActive2, jointType2);
+					Real f1 = evaluatePhys(cm1, state1, Vector3r(0,0,0), contactPt, phi_b1, phi_r1, /* JRC1, JSC1, */ cohesion1, /* sigmaC1, asperity1, */ tension1, /* lambda01, heatCapacity1, hwater1, */ intactRock1, noActive1, jointType1);
+					Real f2 = evaluatePhys(cm2, state2, shift2         , contactPt, phi_b2, phi_r2, /* JRC2, JSC2, */ cohesion2, /* sigmaC2, asperity2, */ tension2, /* lambda02, heatCapacity2, hwater2, */ intactRock2, noActive2, jointType2);
 
-					f1+=0; f2+=0; //FIXME: These two statements are added to mute compiler warnings for unused parameters f1, f2. To be amended soon, by changing the type of evaluatePhys to "void", instead of "double"
+					f1+=0; f2+=0; //FIXME: These two statements are added to mute compiler warnings for unused parameters f1, f2. To be amended soon, by changing the type of evaluatePhys to "void", instead of "Real"
 
 					if(s1->isBoundary == true){
 						phys->phi_b = phi_b1;
@@ -328,7 +328,7 @@ bool Ig2_PB_PB_ScGeom::goReverse(
 
 /* ***************************************************************************************************************************** */
 /* The evaluatePhys function detects the active planes, i.e. the planes of the intersecting particles which are involved in the current interaction, if the contact point is located between the actual particle and the inner potential particle (works only in this case). Then, the contact properties of the interaction are set as the minimal or average contact properties of the active planes. This assumes that the user has defined different contact properties for each face of each particle, in the vector parameters: phi_b, phi_r, tension, cohesion, jointType of the shape class. @vsangelidakis */
-double Ig2_PB_PB_ScGeom::evaluatePhys(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial, double& phi_b, double& phi_r, /* double& JRC, double& JSC, */ double& cohesion, /* double& sigmaC, double& asperity, */ double& tension, /* double& lambda0,double& heatCapacity, double &hwater, */ bool &intactRock, int &activePlanesNo, int& jointType){
+Real Ig2_PB_PB_ScGeom::evaluatePhys(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial, Real& phi_b, Real& phi_r, /* Real& JRC, Real& JSC, */ Real& cohesion, /* Real& sigmaC, Real& asperity, */ Real& tension, /* Real& lambda0,Real& heatCapacity, Real &hwater, */ bool &intactRock, int &activePlanesNo, int& jointType){
 
 	PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
 	///////////////////Transforming trial values to local frame of particles//////////////////
@@ -380,11 +380,11 @@ double Ig2_PB_PB_ScGeom::evaluatePhys(const shared_ptr<Shape>& cm1, const State&
 		cohesion = cohesion;
 		tension = tension;
 		jointType = jointType;
-//		JRC = JRC/static_cast<double>(activeNo);
-//		JSC = JSC/static_cast<double>(activeNo);
-//		sigmaC = sigmaC/static_cast<double>(activeNo);
-//		asperity = asperity/static_cast<double>(activeNo);
-//		lambda0 = lambda0/static_cast<double>(activeNo);
+//		JRC = JRC/static_cast<Real>(activeNo);
+//		JSC = JSC/static_cast<Real>(activeNo);
+//		sigmaC = sigmaC/static_cast<Real>(activeNo);
+//		asperity = asperity/static_cast<Real>(activeNo);
+//		lambda0 = lambda0/static_cast<Real>(activeNo);
 //		heatCapacity = heatCapacity;
 //		hwater = hwater;
 	}else{
@@ -412,7 +412,7 @@ double Ig2_PB_PB_ScGeom::evaluatePhys(const shared_ptr<Shape>& cm1, const State&
 
 
 /* ***************************************************************************************************************************** */
-double Ig2_PB_PB_ScGeom::getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3){
+Real Ig2_PB_PB_ScGeom::getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3){
 	/* if positive, counter clockwise, 2nd point makes a larger angle */
 	/* if negative, clockwise, 3rd point makes a larger angle */
 	Eigen::MatrixXd triangle(4,2);
@@ -420,18 +420,18 @@ double Ig2_PB_PB_ScGeom::getSignedArea(const Vector3r pt1, const Vector3r pt2, c
 	triangle(1,0) = pt2.x();  triangle(1,1) = pt2.y(); // triangle(1,2) = pt2.z();
 	triangle(2,0) = pt3.x();  triangle(2,1) = pt3.y(); // triangle(2,2) = pt3.z();
 	triangle(3,0) = pt1.x();  triangle(3,1) = pt1.y(); // triangle(3,2) = pt1.z();
-	double determinant = getDet(triangle);
+	Real determinant = getDet(triangle);
 	return determinant; //triangle.determinant();
 }
 
 
 /* ***************************************************************************************************************************** */
-double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2,  const Vector3r& shift2, const Vector3r contactPoint, const Vector3r contactNormal, int& smaller, Vector3r shearDir, double& jointLength, const bool twoD, Real unitWidth2D){
-	//const double PI = 3.14159265358979323846;
-	double areaTri = 0.0;
+Real Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2,  const Vector3r& shift2, const Vector3r contactPoint, const Vector3r contactNormal, int& smaller, Vector3r shearDir, Real& jointLength, const bool twoD, Real unitWidth2D){
+	//const Real PI = 3.14159265358979323846;
+	Real areaTri = 0.0;
 	//PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
 	//PotentialBlock *s2=static_cast<PotentialBlock*>(cm2.get());
-	double bisectionStepSize = 1.0;//*std::min(s1->R, s2->R);
+	Real bisectionStepSize = 1.0;//*std::min(s1->R, s2->R);
 
 	if(!twoD){ //3D contact - search counter-clockwise
 		int countParticleA = 0, countParticleB = 0; 
@@ -442,7 +442,7 @@ double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const Sta
 		if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(contactNormal.z(), 0.0, -contactNormal.x()); } //TODO: Optimise these two ifs into a nested one
 		if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(0.0, contactNormal.z(), -contactNormal.y()); }
 		orthogonalDir.normalize();
-		double tol = pow(10,-8);
+		Real tol = pow(10,-8);
 		Vector3r orthogonalDir2 = contactNormal.cross(orthogonalDir); orthogonalDir2.normalize();
 
 		Vector3r prevPoint = contactPoint;
@@ -485,11 +485,11 @@ double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const Sta
 //		Vector3r firstAxis(0,0,0);
 		Vector3r secondPoint(0,0,0);
 		Vector3r newSearchDir;
-		double distanceBackup = 0.0;
+		Real distanceBackup = 0.0;
 
 		Vector3r v1, v2, v3, ptOnP1a, ptOnP2a, p1, p2;
 		Vector3r dirA, dirB;
-		double dotA, dotB;
+		Real dotA, dotB;
 
 		do {
 			newSearchDir = normalDir.cross(contactNormal);
@@ -646,13 +646,13 @@ bool Ig2_PB_PB_ScGeom::getPtOnParticleAreaNormal(const shared_ptr<Shape>& cm1, c
 	Quaternionr Q1 = state1.ori;
 	int planeNo = s1->a.size();
 	Vector3r intersection (0,0,0);
-	double closestDistance = pow(10,11);
+	Real closestDistance = pow(10,11);
 	newNo = -1;
-	//double fA = evaluatePB(cm1, state1, previousPt);
+	//Real fA = evaluatePB(cm1, state1, previousPt);
 	//std::cout<<"fA: "<<fA<<endl;
 
 	Vector3r planeNormal, newPoint;
-	double d, dotProd, u, testDistance;
+	Real d, dotProd, u, testDistance;
 
 	for (int i=0; i<planeNo; i++){
 		if( i == prevNo){continue;}
@@ -668,15 +668,15 @@ bool Ig2_PB_PB_ScGeom::getPtOnParticleAreaNormal(const shared_ptr<Shape>& cm1, c
 			}
 
 			#if 0
-			double check = planeNormal.dot(newPoint) - d;
+			Real check = planeNormal.dot(newPoint) - d;
 			if(prevNo != -1){
 				for(int j=0; j<planeNo; j++){
 					Vector3r planeNormal1 (s1->a[j], s1->b[j], s1->c[j]);
 					planeNormal1 = Q1*planeNormal1;
-					double d1 = -1.0*( planeNormal1.x()*(-state1.pos.x()) + planeNormal1.y()*(-state1.pos.y()) + planeNormal1.z()*(-state1.pos.z()) - s1->d[j] -s1->r);
-					double check1 = planeNormal1.dot(newPoint) - d1;
-					double check1ori = planeNormal1.dot(previousPt) - d1;
-					double dotCheck = planeNormal1.dot(prevDir);
+					Real d1 = -1.0*( planeNormal1.x()*(-state1.pos.x()) + planeNormal1.y()*(-state1.pos.y()) + planeNormal1.z()*(-state1.pos.z()) - s1->d[j] -s1->r);
+					Real check1 = planeNormal1.dot(newPoint) - d1;
+					Real check1ori = planeNormal1.dot(previousPt) - d1;
+					Real dotCheck = planeNormal1.dot(prevDir);
 					std::cout<<"j: "<<j<<", prevNo: "<<prevNo<<", prevDir: "<<prevDir<<", planeNormal1: "<<planeNormal1<<", d1: "<<d1<<", newPoint: "<<newPoint<<", check1: "<<check1<<", check1ori: "<<check1ori<<", dotCheck: "<<dotCheck<<", check: "<<check<<", u: "<<u<<", i: "<<i<<endl;
 				}
 			}
@@ -746,9 +746,9 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 	int totalPlanes = planeNoA+planeNoB;
 	Matrix3r QA = state1.ori.toRotationMatrix(); /*direction cosine */
 	Matrix3r QB = state2.ori.toRotationMatrix(); /*direction cosine */
-	double blasQ1[3*3]; double blasQ2[3*3];
-	double blasP1Q [planeNoA*3]; double d1 [planeNoA];
-	double blasP2Q [planeNoB*3]; double d2 [planeNoB];
+	Real blasQ1[3*3]; Real blasQ2[3*3];
+	Real blasP1Q [planeNoA*3]; Real d1 [planeNoA];
+	Real blasP2Q [planeNoB*3]; Real d2 [planeNoB];
 	int blasCount = 0;
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
@@ -757,16 +757,16 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 			blasCount++;
 		}
 	}
-	double blasP1[planeNoA*3];
+	Real blasP1[planeNoA*3];
 	for(int i=0; i<planeNoA; i++){
 		blasP1[3*i]=s1->a[i]; blasP1[3*i+1]=s1->b[i]; blasP1[3*i+2]=s1->c[i]; d1[i] = s1->d[i] + s1->r;
 	}
-	double blasP2[planeNoB*3];
+	Real blasP2[planeNoB*3];
 	for(int i=0; i<planeNoB; i++){
 		blasP2[3*i]=s2->a[i]; blasP2[3*i+1]=s2->b[i]; blasP2[3*i+2]=s2->c[i]; d2[i] = s2->d[i] + s2->r;
 	}
 	int incx =1; int incy=1;
-	int blas3 = 3; char blasNT = 'N'; char blasT= 'T'; double blas0 = 0.0; double blas1 = 1.0; double blasNeg1 = -1.0; double HessTemp[3*totalPlanes];
+	int blas3 = 3; char blasNT = 'N'; char blasT= 'T'; Real blas0 = 0.0; Real blas1 = 1.0; Real blasNeg1 = -1.0; Real HessTemp[3*totalPlanes];
 	dgemm_(&blasNT, &blasNT, &blas3, &planeNoA, &blas3, &blas1, &blasQ1[0], &blas3, &blasP1[0], &blas3, &blas0, &blasP1Q[0], &blas3); /*Matrix mulitplication Q1*P1 */
 	dgemm_(&blasNT, &blasNT, &blas3, &planeNoB, &blas3, &blas1, &blasQ2[0], &blas3, &blasP2[0], &blas3, &blas0, &blasP2Q[0], &blas3); /*Matrix mulitplication Q2*P2 */
 
@@ -778,12 +778,12 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 	}
 
 	int iter=0;
-	double xx [3]; xx[0]=0.0; xx[1]=0.0; xx[2]=0.0; double blasStep[3];
-	double grad [3];
-	double Hess [9];
-	double Atranspose[totalPlanes*3];
-	double B [totalPlanes]; double D [totalPlanes]; double Dinvert [totalPlanes];
-	double Ddiag[totalPlanes*totalPlanes]; double oriMinD = 9999999;
+	Real xx [3]; xx[0]=0.0; xx[1]=0.0; xx[2]=0.0; Real blasStep[3];
+	Real grad [3];
+	Real Hess [9];
+	Real Atranspose[totalPlanes*3];
+	Real B [totalPlanes]; Real D [totalPlanes]; Real Dinvert [totalPlanes];
+	Real Ddiag[totalPlanes*totalPlanes]; Real oriMinD = 9999999;
 	memset(Ddiag,0.0,sizeof(Ddiag));
 	//int planeNoA3 = planeNoA*3; int planeNoB3 = planeNoB*3; int totalPlanes3 = totalPlanes*3;
 
@@ -802,13 +802,13 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 
 
 	//TODO: Below, we need to move some variable type declarations outside the "while" and "for" loops & replace the C arrays with std::vector<>
-	double val, a, b, c, orival;
-	double backtrack;  double blasFprime; double minD;
-	double initbacktrack;
+	Real val, a, b, c, orival;
+	Real backtrack;  Real blasFprime; Real minD;
+	Real initbacktrack;
 	Vector3r solution;
 
 	while(iter<50){
-		val = 0.0; //double Dinit[totalPlanes];
+		val = 0.0; //Real Dinit[totalPlanes];
 		for (int i=0; i<totalPlanes; i++){
 			a = Atranspose[3*i]; b = Atranspose[3*i+1]; c = Atranspose[3*i+2];
 			D[i] = B[i]-a*xx[0] -b*xx[1] -c*xx[2];
@@ -834,7 +834,7 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 		/* L */
 			int varNo = 3;
 			int info; char UPLO ='L'; int KD = varNo-1; int nrhs=1; //FIXME: varNo, UPLO, KD, nrhs could be defined as "const" variables
-			double HessianChol[varNo][varNo];
+			Real HessianChol[varNo][varNo];
 			for( int j=1; j<=varNo ; j++){
 				blasStep[j-1]=-grad[j-1];
 				for (int i=j; i<=j+KD && i<=varNo; i++){
@@ -870,7 +870,7 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 			for (int i=0; i<varNo; i++ ){
 					blasStep[i]=-1.0*grad[i]; //g[i];
 			}
-			double work[30]; int lwork = 30;
+			Real work[30]; int lwork = 30;
 			dgels_(&blasT, &blas3, &blas3, &nrhs, Hess, &blas3, blasStep, &blas3, work, &lwork, &info);
 		#endif
 			if (info!=0){
@@ -878,7 +878,7 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 			}
 		//std::cout<<"blasStep: "<<blasStep[0]<<", "<<blasStep[1]<<", "<<blasStep[2]<<endl;
 		 /*Linesearch */
-		 backtrack = 1.0; double blasNewX[3];
+		 backtrack = 1.0; Real blasNewX[3];
 		 dcopy_(&varNo, &xx[0], &incx, &blasNewX[0], &incy);
 		 daxpy_(&varNo, &backtrack, &blasStep[0], &incx, &blasNewX[0], &incy);
 		 //fprime = step.transpose()*g;
@@ -959,10 +959,10 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, c
 
 
 /* ***************************************************************************************************************************** */
-double Ig2_PB_PB_ScGeom::getDet(const Eigen::MatrixXd A){
+Real Ig2_PB_PB_ScGeom::getDet(const Eigen::MatrixXd A){
 	/* if positive, counter clockwise, 2nd point makes a larger angle */
 	/* if negative, clockwise, 3rd point makes a larger angle */
-	int rowNo = A.rows(); double firstTerm = 0.0, secondTerm = 0.0;
+	int rowNo = A.rows(); Real firstTerm = 0.0, secondTerm = 0.0;
 	for(int i=0; i<rowNo-1; i++){
 		firstTerm += A(i,0)*A(i+1,1);
 		secondTerm += A(i,1)*A(i+1,0);
@@ -975,7 +975,7 @@ double Ig2_PB_PB_ScGeom::getDet(const Eigen::MatrixXd A){
 bool Ig2_PB_PB_ScGeom::startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPoint/*, bool &convergeFeasibility*/){
 //timingDeltas->start();
 //FIXME: rescale variable below might be unnecessary
-  Vector3r xGlobal (0,0,0); double rescale = 1.0; //bool converge = true;
+  Vector3r xGlobal (0,0,0); Real rescale = 1.0; //bool converge = true;
 /* minimise s */
 /* s.t. Ax - s <= d*/
   PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
@@ -1012,7 +1012,7 @@ bool Ig2_PB_PB_ScGeom::startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1,
  // Eigen::MatrixXd xinit(3,1);
   Eigen::MatrixXd b1 = Q1pos1;// - AQ1*xinit;
   Eigen::MatrixXd b2 = Q2pos2;// - AQ2*xinit;
-  //double constraintInit[planeNoA+planeNoB];
+  //Real constraintInit[planeNoA+planeNoB];
   //for (int i=0; i<planeNoA; i++){
   //	constraintInit[i] = b1(i,0);
   //}
@@ -1020,7 +1020,7 @@ bool Ig2_PB_PB_ScGeom::startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1,
   //	constraintInit[planeNoA+i] = b2(i,0);
   //}
 /* Parameters for particles A and B */
-  double s = 0.0; /* get value of x[3] after optimization */
+  Real s = 0.0; /* get value of x[3] after optimization */
   int NUMCON = planeNoA + planeNoB;
   int NUMVAR = 3/*3D*/ +1;
 
@@ -1045,8 +1045,8 @@ model2.setColumnUpper(1,  COIN_DBL_MAX);
 model2.setColumnUpper(2,  COIN_DBL_MAX);
 model2.setColumnUpper(3,  COIN_DBL_MAX);
 
-double rowLower[numberRows];
-double rowUpper[numberRows];
+Real rowLower[numberRows];
+Real rowUpper[numberRows];
 
 // Rows
 for( int i=0; i<planeNoA;   i++ ){ rowUpper[i]            = s1->d[i] + s1->r + Q1pos1(i,0); }
@@ -1055,12 +1055,12 @@ for( int k=0; k<numberRows; k++ ){ rowLower[k] = -COIN_DBL_MAX; }
 
 for( int i=0; i < planeNoA; i++ ){
 	int rowIndex[] = {0, 1, 2, 3};
-	double rowValue[] = {AQ1(i,0), AQ1(i,1), AQ1(i,2), -1.0};
+	Real rowValue[] = {AQ1(i,0), AQ1(i,1), AQ1(i,2), -1.0};
 	model2.addRow(4, rowIndex, rowValue,rowLower[i], rowUpper[i]);
 }
 for( int i=0; i < planeNoB; i++ ){
 	int rowIndex[] = {0, 1, 2, 3};
-	double rowValue[] = {AQ2(i,0), AQ2(i,1), AQ2(i,2), -1.0};
+	Real rowValue[] = {AQ2(i,0), AQ2(i,1), AQ2(i,2), -1.0};
 	model2.addRow(4, rowIndex, rowValue,rowLower[planeNoA+i], rowUpper[planeNoA+i]);
 }
 
@@ -1072,7 +1072,7 @@ model2.setLogLevel(0);
    //model2.writeMps("a.mps");
 
           // Alternatively getColSolution()
-          double * columnPrimal = model2.primalColumnSolution();
+          Real * columnPrimal = model2.primalColumnSolution();
 
     xGlobal = Vector3r(columnPrimal[0],columnPrimal[1],columnPrimal[2])/rescale;
     contactPoint = xGlobal;
@@ -1190,7 +1190,7 @@ void Ig2_PB_PB_ScGeom::BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& 
 
 /* ***************************************************************************************************************************** */
 /* Routine to get value of function (constraint) at a particular position */
-double Ig2_PB_PB_ScGeom::evaluatePB(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial){
+Real Ig2_PB_PB_ScGeom::evaluatePB(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial){
 	PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
 	///////////////////Transforming trial values to local frame of particles//////////////////
 	Vector3r tempP1 = newTrial - state1.pos - shift2;
@@ -1232,14 +1232,14 @@ Vector3r Ig2_PB_PB_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 
 ////////////////////////////// assembling potential planes particle 1//////////////////////////////
 	int planeNo = s1->a.size();
-	vector<double>p; Real pSum2 = 0.0, plane; bool isSphere = true; int minNo = 0; double closestDistance = pow(10,12);
+	vector<Real>p; Real pSum2 = 0.0, plane; bool isSphere = true; int minNo = 0; Real closestDistance = pow(10,12);
 	for (int i=0; i<planeNo; i++){
 		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z -s1-> d[i]; //Distance aX-d: innerPP
 		if (plane<pow(10,-15)){ //if trial point inside the inner PP
 			if (fabs(plane)<closestDistance){ //find the plane closest to the contactPoint
 				if (twoD){ //2-D
 					Vector3r normal (s1->a[i],s1->b[i],s1->c[i]);
-					double dist = normal.dot(Vector3r(0,1,0)); //FIXME: Instead of the hardcoded Vector3r(0,1,0), here we should use "twoDir"
+					Real dist = normal.dot(Vector3r(0,1,0)); //FIXME: Instead of the hardcoded Vector3r(0,1,0), here we should use "twoDir"
 					if(fabs(dist)<0.99 ){minNo = i; closestDistance = fabs(plane); }
 				}else{ //3-D
 					minNo = i; closestDistance = fabs(plane);
@@ -1347,8 +1347,8 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   int totalIter = 0;
 
  /* Parameters for particles A and B */
-  double rA = s1->r;double kA = s1->k;double RA = s1->R;
-  double rB = s2->r;double kB = s2->k;double RB = s2->R;
+  Real rA = s1->r;Real kA = s1->k;Real RA = s1->R;
+  Real rB = s2->r;Real kB = s2->k;Real RB = s2->R;
   int planeNoA = s1->a.size();int planeNoB = s2->a.size();
   int varNo = 3+1+planeNoA+planeNoB;  int planeNoAB = planeNoA + planeNoB; int varNo2 = varNo*varNo;
   int planeNoA3 = 3+planeNoA; int planeNoB3=3+planeNoB; //int planeNoA2 =planeNoA*planeNoA; int planeNoB2=planeNoB*planeNoB;
@@ -1356,12 +1356,12 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
   Matrix3r QB = state2.ori.conjugate().toRotationMatrix(); /*direction cosine */
 
-  int blas3 = 3; char blasNT = 'N'; char blasT= 'T'; int blas1planeNoA = std::max(1,planeNoA); int blas1planeNoB = std::max(1,planeNoB); int blas1planeNoAB = std::max(1,planeNoAB); double blas0 = 0.0; double blas1 = 1.0; double blasNeg1 = -1.0;
+  int blas3 = 3; char blasNT = 'N'; char blasT= 'T'; int blas1planeNoA = std::max(1,planeNoA); int blas1planeNoB = std::max(1,planeNoB); int blas1planeNoAB = std::max(1,planeNoAB); Real blas0 = 0.0; Real blas1 = 1.0; Real blasNeg1 = -1.0;
 
-  double blasQA[9];   double blasQB[9];
-  double blasPosA[3]; double blasPosB[3];
-  double blasContactPt[3];
-  double blasC[varNo];
+  Real blasQA[9];   Real blasQB[9];
+  Real blasPosA[3]; Real blasPosB[3];
+  Real blasContactPt[3];
+  Real blasC[varNo];
   for (int i=0; i<varNo; i++){
 	blasC[i] = 0.0;
   }
@@ -1388,30 +1388,30 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 //}
 
  /* Variables to keep things neat */
-  double kAs = sqrt(kA)/RA;
-  double kAp = sqrt(1.0 - kA)/rA;
-  double kBs = sqrt(kB)/RB;
-  double kBp = sqrt(1.0 - kB)/rB;
+  Real kAs = sqrt(kA)/RA;
+  Real kAp = sqrt(1.0 - kA)/rA;
+  Real kBs = sqrt(kB)/RB;
+  Real kBp = sqrt(1.0 - kB)/rB;
 
   /* penalty */
-  double t = 1.0;  double mu=10.0;  double planePert = 0.1*rA;  double sPert = 1.0; //+ 10.0*planePert*(planeNoA+planeNoB)/(rA*rA);
+  Real t = 1.0;  Real mu=10.0;  Real planePert = 0.1*rA;  Real sPert = 1.0; //+ 10.0*planePert*(planeNoA+planeNoB)/(rA*rA);
   if (warmstart){
 	t = 0.01; mu= 50.0; planePert = 0.01; sPert = 0.01; ///* pow(10,-1)+ */ sqrt(planePert*planePert*(planeNoA+planeNoB)/(rA*rA));
   }
   /* s */
-  double s = 0.0;  double m=2.0;  double NTTOL = pow(10,-8);  double tol = accuracyTol/*pow(10,-4)* RA*pow(10,-6)*/; double gap =0.0;
+  Real s = 0.0;  Real m=2.0;  Real NTTOL = pow(10,-8);  Real tol = accuracyTol/*pow(10,-4)* RA*pow(10,-6)*/; Real gap =0.0;
   /* x */
-  double blasX[varNo]; double blasNewX[varNo];
+  Real blasX[varNo]; Real blasNewX[varNo];
   blasX[0] = contactPt[0]; blasX[1] = contactPt[1]; blasX[2] = contactPt[2];
 
   //////////////////// evaluate fA and fB to initialize ////////////////////////////////
   /* fA */
-  double blasTemPB1[3]; double blasLocalP1[3];
+  Real blasTemPB1[3]; Real blasLocalP1[3];
   for(int i=0; i<3; i++){
 	blasTemPB1[i] = blasContactPt[i] - blasPosA[i];
   }
   char transA = 'N';  /* char transB = 'N'; int  blasM = 3; int  blasN = 3; */ int  blasK = 3;
-  /* int blasLDA = 3; */ int  blasLDB = 3;    double blasAlpha = 1.0;  double blasBeta = 0.0;
+  /* int blasLDA = 3; */ int  blasLDB = 3;    Real blasAlpha = 1.0;  Real blasBeta = 0.0;
   /* int blasLDC = 3; */ int incx=1; int incy=1;
 //dgemv_(&transA, &blasM, &blasN, &blasAlpha, &blasQA[0], &blasLDA, &blasTemPB1[0], &incx, &blasBeta, &blasLocalP1[0], &incy);
   dgemv_(&blasNT, &blas3, &blas3, &blas1, &blasQA[0], &blas3, &blasTemPB1[0], &incx, &blas0, &blasLocalP1[0], &incy);
@@ -1421,13 +1421,13 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   /* P1Q */ //Eigen::MatrixXd P1 = Eigen::MatrixXd::Zero(planeNoA,3);
   /*d1*/    //Eigen::MatrixXd d1 = Eigen::MatrixXd::Zero(planeNoA,1);
 
-  double blasP1[planeNoA*3];
-  double blasD1[planeNoA];
-  double blasP1Q[planeNoA*3];
-  double pertSumA2 = 0.0;
+  Real blasP1[planeNoA*3];
+  Real blasD1[planeNoA];
+  Real blasP1Q[planeNoA*3];
+  Real pertSumA2 = 0.0;
 
   for (int i=0; i<planeNoA; i++){
-	double plane = s1->a[i]*blasLocalP1[0] + s1->b[i]*blasLocalP1[1] + s1->c[i]*blasLocalP1[2] - s1->d[i];
+	Real plane = s1->a[i]*blasLocalP1[0] + s1->b[i]*blasLocalP1[1] + s1->c[i]*blasLocalP1[2] - s1->d[i];
 	if (plane<pow(10,-15)){
 		plane = 0.0;
 		blasX[4+i] = plane + planePert;
@@ -1448,7 +1448,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   Real sA = (1.0-kA)*(pertSumA2/pow(rA,2) - 1.0)+kA*(sphereA -1.0);
 
   /* fB */
-  double blasTemPB2[3]; double blasLocalP2[3];
+  Real blasTemPB2[3]; Real blasLocalP2[3];
   for(int i=0; i<3; i++){
 	blasTemPB2[i] = blasContactPt[i] - blasPosB[i];
   }
@@ -1460,11 +1460,11 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   // Vector3r localP2 = QB*temPB2;
   /*P2Q*/ //Eigen::MatrixXd P2 = Eigen::MatrixXd::Zero(planeNoB,3);
   /*d2*/  //Eigen::MatrixXd d2 = Eigen::MatrixXd::Zero(planeNoB,1);
-  double blasP2[planeNoB*3];
-  double blasD2[planeNoB];
-  double blasP2Q[planeNoB*3]; double pertSumB2 = 0.0;
+  Real blasP2[planeNoB*3];
+  Real blasD2[planeNoB];
+  Real blasP2Q[planeNoB*3]; Real pertSumB2 = 0.0;
   for (int i=0; i<planeNoB; i++){
-	double plane = s2->a[i]*blasLocalP2[0] + s2->b[i]*blasLocalP2[1] + s2->c[i]*blasLocalP2[2] - s2->d[i];
+	Real plane = s2->a[i]*blasLocalP2[0] + s2->b[i]*blasLocalP2[1] + s2->c[i]*blasLocalP2[2] - s2->d[i];
 	if (plane<pow(10,-15)){
 		plane = 0.0;
 		blasX[4+planeNoA+i] = plane+ planePert;
@@ -1493,12 +1493,12 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
  // Eigen::MatrixXd c=Eigen::MatrixXd::Zero(varNo,1);
  // c[3] = 1.0;
 
-  double blasA1[(3+planeNoA)*varNo];  double blasA2[(3+planeNoB)*varNo];
+  Real blasA1[(3+planeNoA)*varNo];  Real blasA2[(3+planeNoB)*varNo];
   /* Second order cone constraints */
   /* A1 */
   //Eigen::MatrixXd A1(3+planeNoA,varNo);
   //Matrix3r QAs=kAs*QA; //cwise()
-  double blasQAs[9]; int noElements=9; double scaleFactor = kAs;
+  Real blasQAs[9]; int noElements=9; Real scaleFactor = kAs;
   dcopy_(&noElements, &blasQA[0], &incx, &blasQAs[0], &incx);
   dscal_(&noElements, &scaleFactor, &blasQAs[0], &incx);
 
@@ -1516,7 +1516,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   /* A2 */
   //Eigen::MatrixXd A2(3+planeNoB,varNo);
   //Matrix3r QBs=kBs*QB; //cwise();
-  double blasQBs[9];  noElements=9;  scaleFactor = kBs;
+  Real blasQBs[9];  noElements=9;  scaleFactor = kBs;
   dcopy_(&noElements, &blasQB[0], &incx, &blasQBs[0], &incx);
   dscal_(&noElements, &scaleFactor, &blasQBs[0], &incx);
 
@@ -1540,7 +1540,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   b1[0] = -b1temp[0];		b1[1]= -b1temp[1];	b1[2] = -b1temp[2];
 #endif
 
-  double blasB1[planeNoA3]; double blasB1temp[3];
+  Real blasB1[planeNoA3]; Real blasB1temp[3];
   memset(blasB1,0.0,sizeof(blasB1));
  // blasM = 3;   blasN=3;
 //  blasLDA = 3;    blasAlpha = -1.0;  blasBeta=0.0;  blasLDC = 3;
@@ -1555,7 +1555,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   b2[0] = -b2temp[0];		b2[1]= -b2temp[1];	b2[2] = -b2temp[2];
 #endif
 
-  double blasB2[planeNoB3]; double blasB2temp[3];
+  Real blasB2[planeNoB3]; Real blasB2temp[3];
   memset(blasB2,0.0,sizeof(blasB2));
  //  blasM = 3;   blasN=3; blasLDA = 3; blasAlpha=-1.0; blasBeta=0.0;
  // dgemv_(&transA, &blasM, &blasN, &blasAlpha, &blasQBs[0], &blasLDA, &blasPosB[0], &incx, &blasBeta, &blasB2temp[0], &incy);
@@ -1567,7 +1567,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
  // AL<<P1Q, Eigen::MatrixXd::Zero(planeNoA,1), -1.0*Eigen::MatrixXd::Identity(planeNoA,planeNoA), Eigen::MatrixXd::Zero(planeNoA,planeNoB), //cwise()
 //	      P2Q, Eigen::MatrixXd::Zero(planeNoB,1), Eigen::MatrixXd::Zero(planeNoB,planeNoA), -1.0*Eigen::MatrixXd::Identity(planeNoB,planeNoB);
 
-  double blasAL[planeNoAB*varNo];
+  Real blasAL[planeNoAB*varNo];
   memset(blasAL,0.0,sizeof(blasAL));
   for (int i=0; i<planeNoA; i++){
 	blasAL[i] = blasP1Q[i];  blasAL[i+planeNoAB] = blasP1Q[i+planeNoA];  blasAL[i+2*planeNoAB] = blasP1Q[i+2*planeNoA];
@@ -1590,7 +1590,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
   bL<<btempU,btempL;
 #endif
 
-  double blasBL[planeNoAB];  double blasBTempU[planeNoA]; double blasBTempL[planeNoB];
+  Real blasBL[planeNoAB];  Real blasBTempU[planeNoA]; Real blasBTempL[planeNoB];
    noElements = planeNoA;
   dcopy_(&noElements, &blasD1[0], &incx, &blasBTempU[0], &incx);
   //transA = 'N';	blasM = planeNoA;   blasN = 3;
@@ -1610,12 +1610,12 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	blasBL[planeNoA+i]=blasBTempL[i];
   }
 
-  double u1; double u2;
-  double blasCCtranspose[varNo2];
+  Real u1; Real u2;
+  Real blasCCtranspose[varNo2];
   memset(blasCCtranspose,0.0,sizeof(blasCCtranspose));
   blasCCtranspose[3+varNo*3]=1.0;
 
-   double blasCa1[varNo2];
+   Real blasCa1[varNo2];
 //#if 0
 	#if 0
 	  Eigen::MatrixXd ca1Transpose = ccTranspose - A1.transpose()*A1;
@@ -1633,7 +1633,7 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 
 
 	/* ca2Transpose */
-	  double blasCa2[varNo2]; blasCount = 0;
+	  Real blasCa2[varNo2]; blasCount = 0;
 	  dcopy_(&noElements, &blasCCtranspose[0], &incx, &blasCa2[0], &incy);
 
 	 //transA = 'T';   transB = 'N';   blasM = varNo;   blasN = varNo;  blasK = 3+planeNoB;
@@ -1643,32 +1643,32 @@ bool Ig2_PB_PB_ScGeom::customSolve(const shared_ptr<Shape>& cm1, const State& st
 	  dgemm_(&blasT, &blasNT, &varNo, &varNo, &planeNoB3, &blasNeg1, &blasA2[0], &planeNoB3, &blasA2[0], &planeNoB3, &blas1, &blasCa2[0], &varNo);
 
 /* DL */
-double blasDL[planeNoAB*planeNoAB];  blasCount = 0;
+Real blasDL[planeNoAB*planeNoAB];  blasCount = 0;
 memset(blasDL,0.0,sizeof(blasDL));
 
 //#endif
 
 
-  double wLlogsum = 0.0;
-  double val = 0.0;
-  double newval = 0.0;
+  Real wLlogsum = 0.0;
+  Real val = 0.0;
+  Real newval = 0.0;
   /*Linesearch */
-  double backtrack = 1.0;
-  double penalty = 1.0/t;
+  Real backtrack = 1.0;
+  Real penalty = 1.0/t;
 
 /* LAPACK */
   int info; char UPLO ='L'; int KD = varNo-1; int nrhs=1;
-  //double gradient[varNo];
-  double HessianChol[varNo][varNo];
+  //Real gradient[varNo];
+  Real HessianChol[varNo][varNo];
 
 
- double blasGA[varNo]; double blasGB[varNo]; double blasGL[varNo];
+ Real blasGA[varNo]; Real blasGB[varNo]; Real blasGL[varNo];
 
- double blasW1[3+planeNoA]; double blasW2[3+planeNoB]; double blasWL[planeNoAB]; double blasVL[planeNoAB]; double minWL=0.0;
- double blasHA[varNo*varNo]; double blasHB[varNo*varNo];  double blasHL[varNo*varNo];  double blasADAtemp[varNo*planeNoAB];
+ Real blasW1[3+planeNoA]; Real blasW2[3+planeNoB]; Real blasWL[planeNoAB]; Real blasVL[planeNoAB]; Real minWL=0.0;
+ Real blasHA[varNo*varNo]; Real blasHB[varNo*varNo];  Real blasHL[varNo*varNo];  Real blasADAtemp[varNo*planeNoAB];
  noElements = varNo;
- double blasW1dot=0.0; double blasW2dot=0.0;
- double blasGrad[varNo]; double blasHess[varNo*varNo]; double blasStep[varNo];  double blasFprime = 0.0;
+ Real blasW1dot=0.0; Real blasW2dot=0.0;
+ Real blasGrad[varNo]; Real blasHess[varNo*varNo]; Real blasStep[varNo];  Real blasFprime = 0.0;
 
 #if 0
 //	MAKE SURE POINTS ARE FEASIBLE //
