@@ -21,8 +21,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([PotentialParticle2AABB()],verletDist=0.01),
 	InteractionLoop(
-		[Ig2_PP_PP_ScGeom(twoDimension=True, unitWidth2D=1.0)],
-		[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=1e8, ks_i=1e7, Knormal = 1e8, Kshear = 1e7, useFaceProperties=False, calJointLength=False, viscousDamping=0.05)],
+		[Ig2_PP_PP_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True, areaStep=5)],
+		[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=1e8, ks_i=1e7, Knormal = 1e8, Kshear = 1e7, useFaceProperties=False, viscousDamping=0.05)],
 		[Law2_SCG_KnKsPhys_KnKsLaw(label='law',neverErase=False)]
 	),
 	NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,-9.81,0]),
