@@ -46,7 +46,7 @@ class Ig2_PB_PB_ScGeom: public IGeomFunctor
 		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
 		bool startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPoint/*, bool &convergeFeasibility*/);
 		bool customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r& contactPt);
-		double getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, const Vector3r contactPt, const Vector3r contactNormal, int& smaller, bool calJointLength, Vector3r shearDir, double& jointLength, const bool twoDimension);
+		double getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, const Vector3r contactPt, const Vector3r contactNormal, int& smaller, Vector3r shearDir, double& jointLength, const bool twoDimension, Real unitWidth2D);
 
 
 	// clang-format off
@@ -57,6 +57,7 @@ class Ig2_PB_PB_ScGeom: public IGeomFunctor
 		((Vector3r, twoDdir, Vector3r(0,1,0),, "Direction of 2D"))
 		((bool, twoDimension, false,,"Whether the contact is 2-D"))
 		((Real, unitWidth2D, 1.0,,"Unit width in 2D"))
+		((bool, calContactArea, true,,"Whether to calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts"))
 		, /* ctor */
 	);
 	// clang-format on
