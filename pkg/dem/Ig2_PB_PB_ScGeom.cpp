@@ -220,19 +220,24 @@ bool Ig2_PB_PB_ScGeom::go(const shared_ptr<Shape>& cm1,const shared_ptr<Shape>& 
 //				phys->normal = avgNormal;
 				phys->ptOnP1 = ptOnP1; phys->ptOnP2 = ptOnP2;// phys->initial1 = scm->contactPoint;
 //				phys->gap = scm->penetrationDepth;
-				bool calJointLength = phys->calJointLength; double jointLength = phys->jointLength; int smallerID = 1; //bool twoD = phys->twoDimension;
+				/*bool calJointLength = phys->calJointLength;*/ double jointLength = phys->jointLength; int smallerID = 1; //bool twoD = phys->twoDimension;
 				shearDir = phys->shearDir; shearDir.normalize();
 
 				/* Get contact area */
 //				phys->prevJointLength = jointLength; //double prevContactArea = phys->contactArea;
-				phys->contactArea = getAreaPolygon2(cm1, state1, cm2, state2, shift2, contactPt, avgNormal,  smallerID, calJointLength, shearDir, jointLength, twoDimension); //polygon2
-//				phys->smallerID = smallerID; //TODO: Check whether we can use this parameter somehow, e.g. to identify active planes
-
-
-				if(twoDimension) { //TODO: We can move this inside the getAreaPolygon2, in the 2D branch: the unitWidth2D parameter will have to become variable in the getAreaPolygon2 function
-					if(jointLength < pow(10,-11) || std::isnan(jointLength)  || calJointLength == false ) {jointLength = 1.0; /*std::min(s1->R,s2->R);*/} //FIXME: Setting the jointLength equal to 1.0 if it is too small is not a good idea. We can alternativelly leave the jointLength as it is, decide a very small default value, set it equal to its previous value or to the distance "R" as in the comment above. But in any case, we need to output a warning as well, so that the user knows what's happening in the simulation.
-					phys->jointLength = jointLength;
-					phys->contactArea = unitWidth2D*phys->jointLength; // moved this from KnKsPBLaw.cpp
+				if(calContactArea) { //calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts
+					phys->contactArea = getAreaPolygon2(cm1, state1, cm2, state2, shift2, contactPt, avgNormal, smallerID, shearDir, jointLength, twoDimension, unitWidth2D);
+					/* phys->smallerID = smallerID; */
+					if(twoDimension) {
+						phys->jointLength = jointLength;
+					}
+				} else { //don't calculate jointLength or contactArea; assume constant linear stiffness in both normal and shear directions
+					phys->jointLength = 1.0;
+					if (twoDimension == true) {
+						phys->contactArea=phys->jointLength*unitWidth2D;
+					} else {
+						phys->contactArea = 1.0;
+					}
 				}
 
 				/* Get physical properties of the contact from the physical properties of the involved (intersecting) particle faces */
@@ -421,35 +426,36 @@ double Ig2_PB_PB_ScGeom::getSignedArea(const Vector3r pt1, const Vector3r pt2, c
 
 
 /* ***************************************************************************************************************************** */
-double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2,  const Vector3r& shift2, const Vector3r contactPoint, const Vector3r contactNormal, int& smaller, bool calJointLength, Vector3r shearDir, double& jointLength, const bool twoD){
+double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2,  const Vector3r& shift2, const Vector3r contactPoint, const Vector3r contactNormal, int& smaller, Vector3r shearDir, double& jointLength, const bool twoD, Real unitWidth2D){
 	//const double PI = 3.14159265358979323846;
-	int countParticleA = 0, countParticleB = 0; double areaTri = 0.0;
+	double areaTri = 0.0;
 	//PotentialBlock *s1=static_cast<PotentialBlock*>(cm1.get());
 	//PotentialBlock *s2=static_cast<PotentialBlock*>(cm2.get());
 	double bisectionStepSize = 1.0;//*std::min(s1->R, s2->R);
 
-	Vector3r ptOnBoundary = contactPoint;
-//	Matrix3r rotationMatrix; //int count = 1;
-	Vector3r orthogonalDir = Vector3r(contactNormal.y(), -contactNormal.x(), 0.0);
-
-	if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(contactNormal.z(), 0.0, -contactNormal.x()); } //TODO: Optimise these two ifs into a nested one
-	if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(0.0, contactNormal.z(), -contactNormal.y()); }
-	orthogonalDir.normalize();
-	double tol = pow(10,-8);
-	Vector3r orthogonalDir2 = contactNormal.cross(orthogonalDir); orthogonalDir2.normalize();
-
 	if(!twoD){ //3D contact - search counter-clockwise
+		int countParticleA = 0, countParticleB = 0; 
+		Vector3r ptOnBoundary = contactPoint;
+		// Matrix3r rotationMatrix; //int count = 1;
+		Vector3r orthogonalDir = Vector3r(contactNormal.y(), -contactNormal.x(), 0.0);
+
+		if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(contactNormal.z(), 0.0, -contactNormal.x()); } //TODO: Optimise these two ifs into a nested one
+		if(orthogonalDir.norm() < pow(10,-5)){ orthogonalDir = Vector3r(0.0, contactNormal.z(), -contactNormal.y()); }
+		orthogonalDir.normalize();
+		double tol = pow(10,-8);
+		Vector3r orthogonalDir2 = contactNormal.cross(orthogonalDir); orthogonalDir2.normalize();
+
 		Vector3r prevPoint = contactPoint;
 		Matrix3r area1; Matrix3r area2; Matrix3r area3;
 		//http://en.wikipedia.org/wiki/Triangle#Using_coordinates
-		area1(0,0) = ptOnBoundary.x();		area2(0,0) = ptOnBoundary.y();		area3(0,0) = ptOnBoundary.z();
-		area1(1,0) = ptOnBoundary.y();		area2(1,0) = ptOnBoundary.z();		area3(1,0) = ptOnBoundary.x();
+		area1(0,0) = contactPoint.x();		area2(0,0) = contactPoint.y();		area3(0,0) = contactPoint.z();
+		area1(1,0) = contactPoint.y();		area2(1,0) = contactPoint.z();		area3(1,0) = contactPoint.x();
 		area1(2,0) = 1.0;			area2(2,0) = 1.0;			area3(2,0) = 1.0;
 
 		Vector3r searchDirOri = orthogonalDir;
 		Vector3r normalDir(0,0,0);
 		Vector3r searchDir = searchDirOri;
-		prevPoint = ptOnBoundary;
+//		prevPoint = ptOnBoundary;
 		Vector3r ptOnP1(0,0,0); Vector3r ptOnP2(0,0,0);
 		int prevNoA = -1, prevNoB = -1; Vector3r searchDirA(0,0,0);
 		int newNoA  = -1, newNoB  = -1; Vector3r searchDirB(0,0,0);
@@ -476,7 +482,7 @@ double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const Sta
 		/* choose the direction which makes the largest angle between prevSearchDir & planeNormal */
 		Vector3r firstPoint = ptOnBoundary;
 		Vector3r newPt(0,0,0); int count = 0;
-		Vector3r firstAxis(0,0,0);
+//		Vector3r firstAxis(0,0,0);
 		Vector3r secondPoint(0,0,0);
 		Vector3r newSearchDir;
 		double distanceBackup = 0.0;
@@ -503,9 +509,9 @@ double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const Sta
 				newSearchDir = -newSearchDir;
 			}
 
-			if (count == 0){
-				firstAxis = searchDirOri.cross(newSearchDir);
-			}
+//			if (count == 0){
+//				firstAxis = searchDirOri.cross(newSearchDir);
+//			}
 
 			searchDirOri = newSearchDir;
 			searchDir = searchDirOri;//*bisectionStepSize;
@@ -575,7 +581,7 @@ double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const Sta
 				distanceBackup = (newPt-secondPoint).norm(); areaTri = 0.0;
 			}
 			if(count>12){
-				if ( fabs((newPt-secondPoint).norm() - distanceBackup )<pow(10,-7) ){break;}
+				if ( fabs((newPt-secondPoint).norm() - distanceBackup )<pow(10,-7) ){break;} //FIXME: Here we should output a warning if the calculation for the contactArea is stopped
 			}
 			//#endif
 			newPt = ptOnBoundary;
@@ -583,46 +589,50 @@ double Ig2_PB_PB_ScGeom::getAreaPolygon2(const shared_ptr<Shape>& cm1, const Sta
 			count++;
 			if(count>60){	std::cout<<"area polygon count: "<<count<<", distance: "<<(newPt-firstPoint).norm()<<", dist2nd: "<<(newPt-secondPoint).norm()<<", prevNoA: "<<prevNoA<<", prevNoB: "<<prevNoB<<endl;areaTri = 0.0; tol=100.0*tol; }
 			//std::cout<<"area polygon count: "<<count<<", distance: "<<(newPt-firstPoint).norm()<<", dist2nd: "<<(newPt-secondPoint).norm()<<endl;
-			if(count==70){break;}
+			if(count==70){break;} //FIXME: This can break the calculation of contactArea for particles with very complex shape, where the contact area is a polygon with more than 70 faces. Either increase the number or delete this line all together @vsangelidakis. EDIT: This check is supposed to prevent infinite loops, but anyway we should output a warning if we stop the calculation of the contactArea midway
 		}while(count<4 || /*( */ (newPt-secondPoint).norm() > tol);// && (newPt-secondPoint).norm() > tol) );
 		//std::cout<<"area polygon count: "<<count<<endl;
-
+		if(countParticleA > countParticleB){smaller = 1;}else{smaller = 2;}
 	} else { //2D contact (twoD=true)
 		Vector3r searchDir = shearDir;
 		Vector3r ptOnBoundary1(0,0,0), ptOnBoundary2(0,0,0);
-		if(calJointLength){
-			//if(searchDir.norm() < pow(10,-11)){
-				searchDir = contactNormal.cross(twoDdir);
-				if(searchDir.squaredNorm() < pow(10,-14) ){
-					Vector3r xDir = Vector3r(1,0,0);
-					searchDir = xDir.cross(twoDdir);
-				}
-			//}
-			searchDir.normalize();
-			searchDir *= bisectionStepSize;
-			//if(jointLength > pow(10,-5)){searchDir = jointLength*searchDir;}
-			Vector3r ptOnP1(0,0,0); Vector3r ptOnP2(0,0,0);
-			getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, searchDir, ptOnP1);
-			getPtOnParticle2(cm2, state2, shift2,          contactPoint, searchDir, ptOnP2);
 
-			if( (ptOnP1 - contactPoint).squaredNorm() < (ptOnP2 - contactPoint).squaredNorm() ){
-				ptOnBoundary1 = ptOnP1;
-			}else{
-				ptOnBoundary1 = ptOnP2;
+		//if(searchDir.norm() < pow(10,-11)){
+			searchDir = contactNormal.cross(twoDdir);
+			if(searchDir.squaredNorm() < pow(10,-14) ){
+				Vector3r xDir = Vector3r(1,0,0); //FIXME: Instead of the hardcoded Vector3r(1,0,0), here we should define a perpendicular direction to the twoDir attr in the 2D plane where the particles are defined.
+				searchDir = xDir.cross(twoDdir);
 			}
-			getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, -searchDir, ptOnP1);
-			getPtOnParticle2(cm2, state2, shift2,          contactPoint, -searchDir, ptOnP2);
+		//}
+		searchDir.normalize();
+		searchDir *= bisectionStepSize;
+		//if(jointLength > pow(10,-5)){searchDir = jointLength*searchDir;}
+		Vector3r ptOnP1(0,0,0); Vector3r ptOnP2(0,0,0);
+		getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, searchDir, ptOnP1);
+		getPtOnParticle2(cm2, state2, shift2,          contactPoint, searchDir, ptOnP2);
 
-			if( (ptOnP1 - contactPoint).squaredNorm() < (ptOnP2 - contactPoint).squaredNorm() ){
-				ptOnBoundary2 = ptOnP1;
-			}else{
-				ptOnBoundary2 = ptOnP2;
-			}
-			jointLength = (ptOnBoundary1- ptOnBoundary2).norm();
+		if( (ptOnP1 - contactPoint).squaredNorm() < (ptOnP2 - contactPoint).squaredNorm() ){
+			ptOnBoundary1 = ptOnP1;
+		}else{
+			ptOnBoundary1 = ptOnP2;
 		}
+		getPtOnParticle2(cm1, state1, Vector3r(0,0,0), contactPoint, -searchDir, ptOnP1);
+		getPtOnParticle2(cm2, state2, shift2,          contactPoint, -searchDir, ptOnP2);
+
+		if( (ptOnP1 - contactPoint).squaredNorm() < (ptOnP2 - contactPoint).squaredNorm() ){
+			ptOnBoundary2 = ptOnP1;
+		}else{
+			ptOnBoundary2 = ptOnP2;
+		}
+		jointLength = (ptOnBoundary1- ptOnBoundary2).norm();
+
+
+		if( std::isnan(jointLength) ) {jointLength = 1.0; /*std::min(s1->R,s2->R);*/} //FIXME: It's best we output a warning if this happens. Instead of setting the jointLength equal to 1.0,  we can alternativelly set it equal to its previous value or to the distance "R" of the smallest particle, as in the comment above.
+
+		areaTri = unitWidth2D*jointLength; //Contact area of 2-D contact
 	}
 	//std::cout<<"searchDir: "<<searchDir<<", calJointLength: "<<calJointLength<<", jointLength: "<<jointLength<<", ptOnBoundary1: "<<ptOnBoundary1<<", ptOnBoundary2: "<<ptOnBoundary2<<endl;
-	if(countParticleA > countParticleB){smaller = 1;}else{smaller = 2;}
+
 	return areaTri;
 }
 
@@ -1194,7 +1204,7 @@ double Ig2_PB_PB_ScGeom::evaluatePB(const shared_ptr<Shape>& cm1, const State& s
 
 	Real r = s1->r;  int insideCount = 0; Real plane;
 	for (int i=0; i<planeNo; i++){
-		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z - s1->d[i]-r; //-pow(10,-10);
+		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z - s1->d[i] - r; //-pow(10,-10);
 		if (Mathr::Sign(plane)*1.0<0.0){
 			insideCount++;
 		}
@@ -1224,21 +1234,21 @@ Vector3r Ig2_PB_PB_ScGeom::getNormal(const shared_ptr<Shape>& cm1, const State& 
 	int planeNo = s1->a.size();
 	vector<double>p; Real pSum2 = 0.0, plane; bool isSphere = true; int minNo = 0; double closestDistance = pow(10,12);
 	for (int i=0; i<planeNo; i++){
-		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z -s1-> d[i];
-		if (plane<pow(10,-15)){
-			if (fabs(plane)<closestDistance){
-				if (twoD){
+		plane = s1->a[i]*x + s1->b[i]*y + s1->c[i]*z -s1-> d[i]; //Distance aX-d: innerPP
+		if (plane<pow(10,-15)){ //if trial point inside the inner PP
+			if (fabs(plane)<closestDistance){ //find the plane closest to the contactPoint
+				if (twoD){ //2-D
 					Vector3r normal (s1->a[i],s1->b[i],s1->c[i]);
-					double dist = normal.dot(Vector3r(0,1,0));
+					double dist = normal.dot(Vector3r(0,1,0)); //FIXME: Instead of the hardcoded Vector3r(0,1,0), here we should use "twoDir"
 					if(fabs(dist)<0.99 ){minNo = i; closestDistance = fabs(plane); }
-				}else{
+				}else{ //3-D
 					minNo = i; closestDistance = fabs(plane);
 				}
 			}
 			plane = 0.0;
 
-		}else{isSphere = false;}
-		p.push_back(plane);
+		}else{isSphere = false;} //if the contactPoint is not fully inside the inner PP, isSphere=false and the contact normal is calculated as the normal of the plane closest to the contactPoint; to be revised @vsangelidakis
+		p.push_back(plane); //FIXME: Instead of saving the value of "plane" inside the vector "p" and iterate through "p[i]" in a different loop below, we can calculate pdxSum, pdySum, pdzSum directly here, and avoid storing all this information in the vector "p". In this way, we don't need "p"
 		pSum2 += pow(p[i],2);
 	}
 	//Real r = s1->r; Real R = s1->R; Real k = s1->k;
