@@ -818,7 +818,7 @@ void Ip2_FrictMat_FrictMat_KnKsPBPhys::go(const shared_ptr<Material>& b1, const 
 	//contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
 	//contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 	contactPhysics->prevNormal		= scg->normal; //This is also done in the Contact Law. It is not redundant because this class is only called ONCE!
-	contactPhysics->calJointLength = calJointLength;
+//	contactPhysics->calJointLength = calJointLength;
 //	contactPhysics->twoDimension = twoDimension;
 	contactPhysics->useFaceProperties = useFaceProperties;
 //	contactPhysics->brittleLength = brittleLength;
