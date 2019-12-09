@@ -234,7 +234,6 @@ void PeriodicFlowEngine::triangulate( FlowSolver& flow )
 {
         Tesselation& Tes = flow.tesselation();
 	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
-	cerr <<"PeriodicFlowEngine::triangulate at iter "<< scene->iter <<endl;
 	FOREACH ( const posData& b, buffer ) {
                 if ( !b.exists || !b.isSphere || b.id==ignoredBody) continue;
                 Vector3i period; Vector3r wpos;
