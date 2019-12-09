@@ -133,11 +133,11 @@ def makeColorScale(n=numThreads):
 	shuffle(scale)
 	return scale
 
-def mprint(*args): #this one will print regardless of VERBOSE_OUTPUT
+def mprint(*args,force=False): #this one will print regardless of VERBOSE_OUTPUT
 	"""
 	Print with rank-reflecting color regardless of mpy.VERBOSE_OUTPUT, still limited to rank<=mpy.MAX_RANK_OUTPUT
 	"""
-	if NO_OUTPUT or rank>MAX_RANK_OUTPUT: return
+	if (NO_OUTPUT or rank>MAX_RANK_OUTPUT) and not force: return
 	m=bcolors[min(rank,len(bcolors)-2)]  if COLOR_OUTPUT else ''
 	resetFont='\x1b[0m' if COLOR_OUTPUT else ''
 	if rank==0:
@@ -287,7 +287,7 @@ def spawnedProcessWaitCommand():
 			exec(command)
 		except:
 			comm.send(None,dest=s.source,tag=_RETURN_VALUE_)
-			mprint(sys.exc_info())
+			mprint(sys.exc_info(),force=True)
 			raise
 	waitingCommands = False
 	disconnect() # this will kill the workers
@@ -322,7 +322,7 @@ def sendCommand(executors,command,wait=True,workerToWorker=False):
 		try: resCommand = [eval(command)]
 		except:
 			resCommand = [None]
-			mprint(sys.exc_info())
+			mprint(sys.exc_info(),force=True)
 			raise
 	
 	if wait:
@@ -430,8 +430,8 @@ def receiveForces(subdomains):
 	'''
 	if 1: #non-blocking:
 		reqForces=[]
-		for sd in subdomains:#would be better as a loop on subdomains directly, but we don't have those
-			
+		#for sd in subdomains:
+		for sd in O.subD.intersections[0]:
 			#wprint( "master getting forces from "+str(b.subdomain)+"(id="+str(b.id)+")")		
 			reqForces.append(comm.irecv(None,sd, tag=_FORCES_))
 			#wprint( "master got forces from "+str(b.subdomain)+": "+str(forces))		
@@ -734,14 +734,13 @@ def isendRecvForces():
 	#TDOD: FORCES FROM FLUID DOMAIN BOXES!!!!
 	if ACCUMULATE_FORCES:
 		if rank!=0:
+			if not 0 in O.subD.intersections[rank]: break
 			if FLUID_COUPLING: 
 				forces0 = []
 				for id in O.subD.mirrorIntersections[0]: 
 					if not isinstance(O.bodies[id].shape, FluidDomainBbox): 
 						forces0.append([id, O.forces.f(id), O.forces.t(id)])
-				#forces0=[[id, O.forces.f(id), O.forces.t(id)] for id in O.subD.mirrorIntersections[0] and not isinstance(O.bodies[id].shape, FluidDomainBbox)]
-				
-			else: 
+			else:
 				forces0=[[id,O.forces.f(id),O.forces.t(id)] for id in  O.subD.mirrorIntersections[0]]
 			#wprint ("worker "+str(rank)+": sending "+str(len(forces0))+" "+str("forces to 0 "))
 			#O.freqs.append(comm.isend(forces0, dest=0, tag=_FORCES_))
@@ -1100,7 +1099,6 @@ def eraseRemote():
 				if not connected:
 					O.bodies.erase(b.id)
 
-
 ##### RUN MPI #########
 def mpirun(nSteps,np=None,withMerge=False):
 	'''
@@ -1166,8 +1164,7 @@ def mpirun(nSteps,np=None,withMerge=False):
 		mergeScene()
 	
 	# report performance
-
-	if YADE_TIMING and rank<=MAX_RANK_OUTPUT:
+	if YADE_TIMING and (rank<=MAX_RANK_OUTPUT or rank>=(numThreads-MAX_RANK_OUTPUT)):
 		timing_comm.print_all()
 		from yade import timing
 		time.sleep((numThreads-rank)*0.002) #avoid mixing the final output, timing.stats() is independent of the sleep
