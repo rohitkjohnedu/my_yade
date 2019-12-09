@@ -140,7 +140,7 @@ void PeriodicFlowEngine:: action()
         epsVolCumulative += epsVolMax;
 	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
-		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0  && retriangulationLastIter>meshUpdateInterval);
+		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0  && retriangulationLastIter>=meshUpdateInterval);
 
 	timingDeltas->checkpoint("Update_Volumes");
 
@@ -234,6 +234,7 @@ void PeriodicFlowEngine::triangulate( FlowSolver& flow )
 {
         Tesselation& Tes = flow.tesselation();
 	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
+	cerr <<"PeriodicFlowEngine::triangulate at iter "<< scene->iter <<endl;
 	FOREACH ( const posData& b, buffer ) {
                 if ( !b.exists || !b.isSphere || b.id==ignoredBody) continue;
                 Vector3i period; Vector3r wpos;
