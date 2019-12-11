@@ -18,8 +18,8 @@ if ('PotentialParticles' in features):
 		ForceResetter(),
 		InsertionSortCollider([PotentialParticle2AABB()],verletDist=verletDistance),
 		InteractionLoop(
-			[Ig2_PP_PP_ScGeom(twoDimension=True, unitWidth2D=1.0)],
-			[Ip2_FrictMat_FrictMat_KnKsPhys( kn_i=Kn, ks_i=Ks, Knormal=Kn, Kshear=Ks, useFaceProperties=False, calJointLength=False, viscousDamping=0.1)], 
+			[Ig2_PP_PP_ScGeom(twoDimension=False, calContactArea=True, areaStep=5)],
+			[Ip2_FrictMat_FrictMat_KnKsPhys( kn_i=Kn, ks_i=Ks, Knormal=Kn, Kshear=Ks, useFaceProperties=False, viscousDamping=0.1)], 
 			[Law2_SCG_KnKsPhys_KnKsLaw(label='law',neverErase=False)]
 		),
 		NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,0,0]), # Here we deactivate gravity
@@ -121,8 +121,8 @@ targetMin) +" , "+str(targetMax) +"\n" )
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
 	# IPhys and Law2 functor checks for Ip2_FrictMat_FrictMat_KnKsPhys & Law2_SCG_KnKsPhys_KnKsLaw
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
-	# Check contact area #FIXME: So far, a calculation for the contactArea does not exist for 3D Potential Particles. The contact area here is calculated for the 2D case, as the jointLength*unitWidth2D
-	target=1.0 #edge**2 # This value will be updated once a calculation for the contactArea is developed
+	# Check contact area
+	target=0.007397007611569197
 	tol=1e-6
 	if (abs(c.phys.contactArea-target)/abs(target)>tol):
 		errMsg+=str( "Wrong contact area: "+ str(c.phys.contactArea) +" , instead of: "+ str(target) +"\n" )
@@ -159,7 +159,7 @@ targetMin) +" , "+str(targetMax) +"\n" )
 
 	#TODO: We need to check: vertices/volume/inertia of the Potential Particles once an automatic calculation is developed for them
 	#TODO: We need to check the correct definition of a PotentialParticle which is not defined centered to its centroid or aligned to its principal axes, once an automatic calculation is developed
-	#TODO: We need to create a similar script for 2D contacts as well, with caljointLength=True & one for 3D contacts, once both these features are developed
+	#TODO: We need to create a similar script for 2D contacts as well, with calContactArea=True
 
 	if ('GUI' in features) or ('GUI-Qt5' in features): #refine visualisation of particle shape if gui is enabled
 		Gl1_PotentialParticle.sizeX=50

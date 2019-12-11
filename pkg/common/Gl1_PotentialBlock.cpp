@@ -131,7 +131,7 @@ namespace yade { // Cannot have #include directive inside.
 //		for(int i=0;i<sizeX;i++){
 //			for(int j=0;j<sizeY;j++){
 //				for(int k=0;k<sizeZ;k++){
-//					scalarField[i][j][k] = evaluateF(pp,  Min[0]+ double(i)*isoStep[0],  Min[1]+ double(j)*isoStep[1],  Min[2]+double(k)*isoStep[2]);//  
+//					scalarField[i][j][k] = evaluateF(pp,  Min[0]+ Real(i)*isoStep[0],  Min[1]+ Real(j)*isoStep[1],  Min[2]+Real(k)*isoStep[2]);//  
 //				}
 //			}
 //		}
@@ -249,7 +249,7 @@ namespace yade { // Cannot have #include directive inside.
 
 
 
-//	double Gl1_PotentialBlock::evaluateF(const PotentialBlock& pp, double x, double y, double z){
+//	Real Gl1_PotentialBlock::evaluateF(const PotentialBlock& pp, Real x, Real y, Real z){
 //		Real r = pp.r;
 //		int planeNo = pp.a.size();
 
@@ -260,7 +260,7 @@ namespace yade { // Cannot have #include directive inside.
 //		//xlocal[1] = rotationMatrix(1,0)*xori[0] + rotationMatrix(1,1)*xori[1] + rotationMatrix(1,2)*xori[2];
 //		//xlocal[2] = rotationMatrix(2,0)*xori[0] + rotationMatrix(2,1)*xori[1] + rotationMatrix(2,2)*xori[2];
 
-//		vector<double>a; vector<double>b; vector<double>c; vector<double>d; vector<double>p; Real pSum3 = 0.0;
+//		vector<Real>a; vector<Real>b; vector<Real>c; vector<Real>d; vector<Real>p; Real pSum3 = 0.0;
 //		for (int i=0; i<planeNo; i++){
 //			Vector3r planeOri(pp.a[i],pp.b[i],pp.c[i]);
 ///* PREVIOUS */ 		Vector3r planeRotated = planeOri; //rotationMatrix*planeOri; //FIXME
@@ -303,10 +303,10 @@ ImpFuncPB::~ImpFuncPB()
 }
 
 // Evaluate function
-double ImpFuncPB::FunctionValue(double x[3])
+Real ImpFuncPB::FunctionValue(Real x[3])
 {
    int planeNo = a.size();
-   vector<double>p; double pSum2 = 0.0;
+   vector<Real>p; Real pSum2 = 0.0;
 	if(clump==false){
 		Eigen::Vector3d xori(x[0],x[1],x[2]);
 		Eigen::Vector3d xlocal = rotationMatrix*xori;
@@ -317,11 +317,11 @@ double ImpFuncPB::FunctionValue(double x[3])
 		   //x[0]=xlocal[0]; x[1]=xlocal[1]; x[2]=xlocal[2];
 
 		   for (int i=0; i<planeNo; i++){
-			double plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i]; if (plane<pow(10,-15)){plane = 0.0;} 
+			Real plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i]; if (plane<pow(10,-15)){plane = 0.0;} 
 			p.push_back(plane);
 			pSum2 += pow(p[i],2);
 		   }			
-		 //  double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
+		 //  Real sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
 		 //  Real f = (1.0-k)*(pSum2/pow(r,2) - 1.0)+k*(sphere/pow(R,2)-1.0);
 		   Real f = (pSum2 - 1.0*pow(r,2) );
   		 return f;
@@ -337,11 +337,11 @@ double ImpFuncPB::FunctionValue(double x[3])
 		   //x[0]=xlocal[0]; x[1]=xlocal[1]; x[2]=xlocal[2];
 		
 		   for (int i=0; i<planeNo; i++){
-			double plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i]; if (plane<pow(10,-15)){plane = 0.0;} 
+			Real plane = a[i]*xlocal[0] + b[i]*xlocal[1] + c[i]*xlocal[2] - d[i]; if (plane<pow(10,-15)){plane = 0.0;} 
 			p.push_back(plane);
 			pSum2 += pow(p[i],2);
 		   }			
-		  // double sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
+		  // Real sphere  = (  pow(xlocal[0],2) + pow(xlocal[1],2) + pow(xlocal[2],2) ) ;
 		  // Real f = (1.0-k)*(pSum2/pow(r,2) - 1.0)+k*(sphere/pow(R,2)-1.0);
 		   Real f = (pSum2 - 1.5*pow(r,2) );
 		return f;
@@ -467,7 +467,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 			textActor[countID]->SetMapper(txtMapper[countID]);
 			textActor[countID]->RotateX(-90);
 			textActor[countID]->SetPosition(b->state->pos[0], b->state->pos[1], b->state->pos[2]);
-			double contactPtSize = 5.0;
+			Real contactPtSize = 5.0;
 			textActor[countID]->SetScale(3.0*contactPtSize);
 			textActor[countID]->GetProperty()->SetColor(0.0,0.0,0.0);
 			#endif
@@ -496,7 +496,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 		vtkSmartPointer<vtkImplicitBoolean> boolFunction = vtkSmartPointer<vtkImplicitBoolean>::New();
 		vtkSmartPointer<ImpFuncPB>* functionBool=nullptr;
 		int ImplicitBoolNo = 0;
-		double xmin = 0.0; double xmax = 0.0; double ymin = 0.0; double ymax = 0.0; double zmin = 0.0; double zmax =0.0;
+		Real xmin = 0.0; Real xmax = 0.0; Real ymin = 0.0; Real ymax = 0.0; Real zmin = 0.0; Real zmax =0.0;
 		Vector3r particleColour (0,0,0);
 		if(b->isClump() == false && b->isClumpMember() == false){
 			const PotentialBlock* pb=dynamic_cast<PotentialBlock*>(b->shape.get()); if (pb->isLining==true){continue;}
@@ -556,7 +556,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 				for (unsigned int j=0; j<pbShape->a.size();j++){
 									
 					Vector3r plane = rotation*Vector3r(pbShape->a[j], pbShape->b[j], pbShape->c[j]);
-					double d = pbShape->d[j]; //-1.0*(plane.x()*(b->state->pos.x()-clumpMember->state->pos.x() ) + plane.y()*(b->state->pos.y()-clumpMember->state->pos.y() ) + plane.z()*(b->state->pos.z()-clumpMember->state->pos.z() ) - pbShape->d[j]);
+					Real d = pbShape->d[j]; //-1.0*(plane.x()*(b->state->pos.x()-clumpMember->state->pos.x() ) + plane.y()*(b->state->pos.y()-clumpMember->state->pos.y() ) + plane.z()*(b->state->pos.z()-clumpMember->state->pos.z() ) - pbShape->d[j]);
 					functionBool[i]->a.push_back(plane.x() );
 					functionBool[i]->b.push_back(plane.y() );
 					functionBool[i]->c.push_back(plane.z() );
@@ -601,8 +601,8 @@ void PotentialBlockVTKRecorderTunnel::action(){
 			boolFunction->SetOperationTypeToUnion();
 		}
 		
-		//double xmin = -value; double xmax = value; double ymin = -value; double ymax=value; double zmin=-value; double zmax=value;
-		//double xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); double xmax = -xmin; double ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); double ymax=-ymin; double zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); double zmax=-zmin;
+		//Real xmin = -value; Real xmax = value; Real ymin = -value; Real ymax=value; Real zmin=-value; Real zmax=value;
+		//Real xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); Real xmax = -xmin; Real ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); Real ymax=-ymin; Real zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); Real zmax=-zmin;
 		if (twoDimension == true){
 			if(sampleY < 2){ ymin = 0.0; ymax = 0.0; }
 		   else if(sampleZ < 2){ zmin = 0.0; zmax = 0.0; }
@@ -611,9 +611,9 @@ void PotentialBlockVTKRecorderTunnel::action(){
  		sample->SetModelBounds(1.5*xmin, 1.5*xmax, 1.5*ymin, 1.5*ymax, 1.5*zmin, 1.5*zmax);
 		//sample->SetModelBounds(pb->minAabb.x(), pb->maxAabb.x(), pb->minAabb.y(), pb->maxAabb.y(), pb->minAabb.z(), pb->maxAabb.z());
 		int sampleXno = sampleX; int sampleYno = sampleY; int sampleZno = sampleZ;
-		if(fabs(xmax-xmin)/static_cast<double>(sampleX) > maxDimension) { sampleXno = static_cast<int>(fabs(xmax-xmin)/maxDimension); }
-		if(fabs(ymax-ymin)/static_cast<double>(sampleY) > maxDimension) { sampleYno = static_cast<int>(fabs(ymax-ymin)/maxDimension); }
-		if(fabs(zmax-zmin)/static_cast<double>(sampleZ) > maxDimension) { sampleZno = static_cast<int>(fabs(zmax-zmin)/maxDimension); }
+		if(fabs(xmax-xmin)/static_cast<Real>(sampleX) > maxDimension) { sampleXno = static_cast<int>(fabs(xmax-xmin)/maxDimension); }
+		if(fabs(ymax-ymin)/static_cast<Real>(sampleY) > maxDimension) { sampleYno = static_cast<int>(fabs(ymax-ymin)/maxDimension); }
+		if(fabs(zmax-zmin)/static_cast<Real>(sampleZ) > maxDimension) { sampleZno = static_cast<int>(fabs(zmax-zmin)/maxDimension); }
 
 		if (twoDimension == true){
 			if(sampleY < 2){ sampleYno = 1; }
@@ -651,7 +651,7 @@ void PotentialBlockVTKRecorderTunnel::action(){
 		
 		Vector3r centre (b->state->pos[0], b->state->pos[1], b->state->pos[2]);
 		Quaternionr orientation= b->state->ori; orientation.normalize();
-		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ double angle = aa.angle()/3.14159*180.0;	double xAxis = axis[0]; double yAxis = axis[1]; double zAxis = axis[2];	
+		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];	
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData( polydata );
 		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
@@ -949,7 +949,7 @@ void PotentialBlockVTKRecorder::action(){
 
 		vtkSmartPointer<vtkSampleFunction> sample = vtkSampleFunction::New();
 		sample->SetImplicitFunction(function);
-		//double value = 1.05*pb->R; 
+		//Real value = 1.05*pb->R; 
 		
 //		const Aabb* aabb = static_cast<Aabb*>(b->bound.get());
 //		Real xmin = aabb->min.x() - b->state->pos.x();
@@ -966,8 +966,8 @@ void PotentialBlockVTKRecorder::action(){
 		Real zmin = -std::max(pb->minAabb.z(),pb->maxAabb.z());
 		Real zmax = -zmin;
 
-		//double xmin = -value; double xmax = value; double ymin = -value; double ymax=value; double zmin=-value; double zmax=value;
-		//double xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); double xmax = -xmin; double ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); double ymax=-ymin; double zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); double zmax=-zmin;
+		//Real xmin = -value; Real xmax = value; Real ymin = -value; Real ymax=value; Real zmin=-value; Real zmax=value;
+		//Real xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); Real xmax = -xmin; Real ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); Real ymax=-ymin; Real zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); Real zmax=-zmin;
 
 		if (twoDimension == true){
 			if(sampleY < 2){ ymin = 0.0; ymax = 0.0; } 
@@ -977,9 +977,9 @@ void PotentialBlockVTKRecorder::action(){
  		sample->SetModelBounds(xmin, xmax, ymin, ymax, zmin, zmax);
 		//sample->SetModelBounds(pb->minAabb.x(), pb->maxAabb.x(), pb->minAabb.y(), pb->maxAabb.y(), pb->minAabb.z(), pb->maxAabb.z());
 		int sampleXno = sampleX; int sampleYno = sampleY; int sampleZno = sampleZ;
-		if(fabs(xmax-xmin)/static_cast<double>(sampleX) > maxDimension) { sampleXno = static_cast<int>(fabs(xmax-xmin)/maxDimension); }
-		if(fabs(ymax-ymin)/static_cast<double>(sampleY) > maxDimension) { sampleYno = static_cast<int>(fabs(ymax-ymin)/maxDimension); }
-		if(fabs(zmax-zmin)/static_cast<double>(sampleZ) > maxDimension) { sampleZno = static_cast<int>(fabs(zmax-zmin)/maxDimension); }
+		if(fabs(xmax-xmin)/static_cast<Real>(sampleX) > maxDimension) { sampleXno = static_cast<int>(fabs(xmax-xmin)/maxDimension); }
+		if(fabs(ymax-ymin)/static_cast<Real>(sampleY) > maxDimension) { sampleYno = static_cast<int>(fabs(ymax-ymin)/maxDimension); }
+		if(fabs(zmax-zmin)/static_cast<Real>(sampleZ) > maxDimension) { sampleZno = static_cast<int>(fabs(zmax-zmin)/maxDimension); }
 
 		if (twoDimension == true){
 			if(sampleY < 2){ sampleYno = 1; }
@@ -1020,7 +1020,7 @@ void PotentialBlockVTKRecorder::action(){
 
 		Vector3r centre (b->state->pos[0], b->state->pos[1], b->state->pos[2]);
 		Quaternionr orientation= b->state->ori; orientation.normalize();
-		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ double angle = aa.angle()/3.14159*180.0;	double xAxis = axis[0]; double yAxis = axis[1]; double zAxis = axis[2];	
+		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];	
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData( polydata );
 		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();

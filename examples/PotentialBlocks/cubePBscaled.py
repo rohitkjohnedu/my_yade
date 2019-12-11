@@ -33,8 +33,8 @@ O.engines=[
 	ForceResetter(),
 	InsertionSortCollider([PotentialBlock2AABB()],verletDist=0.01),
 	InteractionLoop(
-		[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0)],
-		[Ip2_FrictMat_FrictMat_KnKsPBPhys(kn_i=1e8, ks_i=1e7, Knormal=1e8, Kshear=1e7, useFaceProperties=False, calJointLength=False, viscousDamping=0.2)],
+		[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True)],
+		[Ip2_FrictMat_FrictMat_KnKsPBPhys(kn_i=1e8, ks_i=1e7, Knormal=1e8, Kshear=1e7, useFaceProperties=False, viscousDamping=0.2)],
 		[Law2_SCG_KnKsPBPhys_KnKsPBLaw(label='law',neverErase=False, allowViscousAttraction=True, traceEnergy=False)]
 	),
 	#GlobalStiffnessTimeStepper(),

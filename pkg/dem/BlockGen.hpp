@@ -45,7 +45,7 @@ class BlockGen : public FileGenerator {
 		~BlockGen ();
 		bool generate(string&);
 		template<class T>
-		double gen_normal_3(T &generator){ return generator(); }
+		Real gen_normal_3(T &generator){ return generator(); }
 
 		struct Discontinuity{
 			Vector3r centre;
@@ -62,22 +62,22 @@ class BlockGen : public FileGenerator {
 			bool isBoundary;
 			bool sliceBoundaries;
 			bool constructionJoints;
-			vector<double> persistence_a;
-			vector<double> persistence_b;
-			vector<double> persistence_c;
-			vector<double> persistence_d;
+			vector<Real> persistence_a;
+			vector<Real> persistence_b;
+			vector<Real> persistence_c;
+			vector<Real> persistence_d;
 			/* Joint properties */
-			double phi_b;
-			double phi_r;
-			double JRC;
-			double JCS;
-			double asperity;
-			double sigmaC;
-			double cohesion;
-			double tension;
-			double lambda0;
-			double heatCapacity;
-			double hwater;
+			Real phi_b;
+			Real phi_r;
+			Real JRC;
+			Real JCS;
+			Real asperity;
+			Real sigmaC;
+			Real cohesion;
+			Real tension;
+			Real lambda0;
+			Real heatCapacity;
+			Real hwater;
 			bool intactRock;
 			bool throughGoing;
 			int jointType;
@@ -89,10 +89,10 @@ class BlockGen : public FileGenerator {
 			Vector3r tempCentre;
 			Vector3r centre;
 			Block(Vector3r pos, Real kPP, Real rPP, Real RPP){centre = pos; k=kPP; r=rPP; R=RPP; tooSmall=false; isBoundary=false; tempCentre=pos;}
-			vector<double> a;
-			vector<double> b;
-			vector<double> c;
-			vector<double> d;
+			vector<Real> a;
+			vector<Real> b;
+			vector<Real> c;
+			vector<Real> d;
 			vector<bool> redundant;
 			vector<bool> isBoundaryPlane;
 			bool isBoundary;
@@ -104,17 +104,17 @@ class BlockGen : public FileGenerator {
 			Real k;
 			bool tooSmall;
 			/* Joint properties */
-			vector<double> phi_b;
-			vector<double> phi_r;
-			vector<double> JRC;
-			vector<double> JCS;
-			vector<double> asperity;
-			vector<double> sigmaC;
-			vector<double> cohesion;
-			vector<double> tension;
-			vector<double> lambda0;
-			vector<double> heatCapacity;
-			vector<double> hwater;
+			vector<Real> phi_b;
+			vector<Real> phi_r;
+			vector<Real> JRC;
+			vector<Real> JCS;
+			vector<Real> asperity;
+			vector<Real> sigmaC;
+			vector<Real> cohesion;
+			vector<Real> tension;
+			vector<Real> lambda0;
+			vector<Real> heatCapacity;
+			vector<Real> hwater;
 			vector<bool> intactRock;
 			vector<int> jointType;
 			vector<struct Planes> planes;
@@ -122,16 +122,16 @@ class BlockGen : public FileGenerator {
 			Vector3r color;
 		};
 
-//			double getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
-//			double getDet(const Eigen::MatrixXd A);
+//			Real getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
+//			Real getDet(const Eigen::MatrixXd A);
 		bool createBlock(shared_ptr<Body>& body, struct BlockGen::Block block, int no);
 		bool contactDetectionLPCLPglobal(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
 		bool checkRedundancyLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
-		double inscribedSphereCLP(struct BlockGen::Block block, Vector3r& initialPoint, bool twoDimension);
+		Real inscribedSphereCLP(struct BlockGen::Block block, Vector3r& initialPoint, bool twoDimension);
 		bool contactBoundaryLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
 
 		/* Functions that were not used */
-//			double getCentroidTetrahedron(const Eigen::MatrixXd A); //not used
+//			Real getCentroidTetrahedron(const Eigen::MatrixXd A); //not used
 //			bool contactDetection(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
 //			bool contactDetectionLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
 //			bool startingPointFeasibility(struct BlockGen::Block block, Vector3r& initialPoint); //not used
@@ -139,7 +139,7 @@ class BlockGen : public FileGenerator {
 //			Real evaluateFNoSphere(struct Block block, Vector3r presentTrial); //not used
 
 //			void calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
-//			Vector3r calCentroid(struct Block block, double & blockVol);
+//			Vector3r calCentroid(struct Block block, Real & blockVol);
 
 		bool checkCentroid(struct Block block, Vector3r presentTrial);
 
@@ -152,7 +152,7 @@ class BlockGen : public FileGenerator {
 		((Real, dampingMomentum,0.2,,"Coefficient of global damping"))
 //			((Real, maxClosure, 0.0002,,"not used"))
 //			((Real, peakDisplacement, 0.02,,"not used"))
-//			((double, brittleLength, 2.0,,"not used"))
+//			((Real, brittleLength, 2.0,,"not used"))
 //			((Real, damp3DEC,0.8,,"not used"))
 		((Real, unitWidth2D,1.0,,"Unit width in 2D (out of plane distance)"))
 		((Real, density,2600,,"Density of blocks"))
@@ -168,7 +168,8 @@ class BlockGen : public FileGenerator {
 		((bool, probabilisticOrientation,false,,"Whether to generate rock joints randomly"))
 		((bool, Talesnick,false,,"Whether to choose the Talesnick contact law, used for validating code previously against model test"))
 		((bool, neverErase,false,,"Whether to erase non interacting contacts"))
-		((bool, calJointLength,false,,"Whether to calculate jointLength"))
+//		((bool, calJointLength,false,,"Whether to calculate jointLength"))
+		((bool, calContactArea,true,,"Whether to calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts"))
 		((bool, twoDimension,false,,"Whether the model is 2D"))
 		((Real, shrinkFactor,1.0,,"Ratio to shrink r")) //FIXME: This parameter is used, but we need to revise if it is actually useful
 		((Real, viscousDamping,0.0,,"Viscous damping"))
@@ -203,10 +204,10 @@ class BlockGen : public FileGenerator {
 //			((bool, useOverlapVol,false,,"not used"))
 
 		/* Add joints from python*/
-		((vector<double>, joint_a, ,,"Introduce discontinuities from Python: List of a coefficients of plane normals"))
-		((vector<double>, joint_b, ,,"Introduce discontinuities from Python: List of b coefficients of plane normals"))
-		((vector<double>, joint_c, ,,"Introduce discontinuities from Python: List of c coefficients of plane normals"))
-		((vector<double>, joint_d, ,,"Introduce discontinuities from Python: List of d coefficients of plane equations"))
+		((vector<Real>, joint_a, ,,"Introduce discontinuities from Python: List of a coefficients of plane normals"))
+		((vector<Real>, joint_b, ,,"Introduce discontinuities from Python: List of b coefficients of plane normals"))
+		((vector<Real>, joint_c, ,,"Introduce discontinuities from Python: List of c coefficients of plane normals"))
+		((vector<Real>, joint_d, ,,"Introduce discontinuities from Python: List of d coefficients of plane equations"))
 
 		/* Add joints from .csv files: Check for different joint types */
 		((bool, persistentPlanes,false,,"Whether to check persistence"))
@@ -227,7 +228,7 @@ class BlockGen : public FileGenerator {
 		((Vector3r, color,Vector3r(-1,-1,-1),,"color of generated blocks (random color will be assigned to each sub-block if a color is not specified)"))
 		((bool, saveBlockGenData,false,,"Whether to write the data of the block generation in a text file (if true) or display on the terminal (if false)"))
 		((std::string,outputFile,"",,"Filename where the data of the block generation are saved. Leave blank if an output file is not needed"))
-		//((double*, array_a,,,"a"))
+		//((Real*, array_a,,,"a"))
 		, /* init */
 		, /* ctor */
 		/* constructor for private */
@@ -249,8 +250,8 @@ REGISTER_SERIALIZABLE(BlockGen);
 #ifdef __cplusplus
 extern "C" {
 #endif
-	void dgesv_(const int *N, const int *nrhs, double *Hessian, const int *lda, int *ipiv, double *gradient, const int *ldb, int *info);
-	void dsyev_(const char *jobz, const char *uplo, const int *N, double *A, const int *lda, double *W, double *work, int *lwork, int *info);
+	void dgesv_(const int *N, const int *nrhs, Real *Hessian, const int *lda, int *ipiv, Real *gradient, const int *ldb, int *info);
+	void dsyev_(const char *jobz, const char *uplo, const int *N, Real *A, const int *lda, Real *W, Real *work, int *lwork, int *info);
 #ifdef __cplusplus
 };
 #endif

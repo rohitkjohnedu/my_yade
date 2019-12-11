@@ -116,13 +116,13 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	Vector3r shearIncrement=incidentVs*dt;
 	phys->shearDir = shearIncrement;
 	phys->shearIncrementForCD += shearIncrement.norm();
-	double du = 0.0;
-	//double debugFn = 0.0;
-	//double u_prev = fabs(phys->u_cumulative);
+	Real du = 0.0;
+	//Real debugFn = 0.0;
+	//Real u_prev = fabs(phys->u_cumulative);
 	if(phys->shearDir.norm() > pow(10,-15)) {
 		phys->shearDir.normalize(); // FIXME: Maybe normalise the shearDir regardless of its magnitude?
 	}
-	double degradeLength = phys->brittleLength;  /*jointLength = 100u_peak */
+	Real degradeLength = phys->brittleLength;  /*jointLength = 100u_peak */
 	/* Elastic and plastic displacement can have negative signs but must be consistent throughout the simulation */
 	if(phys->initialShearDir.norm() < pow(10,-11)) {
 		phys->initialShearDir = phys->shearDir;
@@ -193,7 +193,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	shearIncrement=incidentVs*dt; //FIXME: Do we need to recalculate incidentV, incidentVn, incidentVs and shearIncrement here? Need to revise whether to subtract shift2 from c2x @vsangelidakis
 
 	if(!Talesnick) {
-		double Ks=0.0;
+		Real Ks=0.0;
 		if(phys->jointType == 3) {
 			Ks = phys->ks_i*pow(phys->prevSigma,0.6);
 		} else {
@@ -210,11 +210,11 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	Real Cn_crit = 2.*sqrt(mbar*phys->kn); // Critical damping coefficient (normal direction)
 	Real Cs_crit = 2.*sqrt(mbar*phys->ks); // Critical damping coefficient (shear direction)
 	// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
-	double cn = Cn_crit*phys->viscousDamping; // Damping normal coefficient
-	double cs = Cs_crit*phys->viscousDamping; // Damping tangential coefficient
+	Real cn = Cn_crit*phys->viscousDamping; // Damping normal coefficient
+	Real cs = Cs_crit*phys->viscousDamping; // Damping tangential coefficient
 
 	// add normal viscous component if damping is included
-	//double maxFnViscous = phys->normalForce.norm();
+	//Real maxFnViscous = phys->normalForce.norm();
 	phys->normalViscous = cn*incidentVn;
 	//if(phys->normalViscous.norm() > maxFnViscous){
 	//	phys->normalViscous = phys->normalViscous * maxFnViscous/phys->normalViscous.norm();
@@ -243,13 +243,13 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	}
 
 	phys->normalForce -= phys->normalViscous;
-	//double baseElevation =  geom->contactPoint.z();
+	//Real baseElevation =  geom->contactPoint.z();
 
 	/* Water pressure, heat effect */
 
 	/* strength degradation */
-//	const double PI = std::atan(1.0)*4;
-	double tan_effective_phi = 0.0;
+//	const Real PI = std::atan(1.0)*4;
+	Real tan_effective_phi = 0.0;
 
 
 
@@ -270,12 +270,12 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	Vector3r dampedShearForce = shearForce;
 	Real maxFs=0.0;
 	if (un>0.0 /*compression*/) {
-		double fN = phys->normalForce.norm();
+		Real fN = phys->normalForce.norm();
 		if(phys->intactRock == true) {
 			if (phys->cohesionBroken == true && allowBreakage == true) {
 				maxFs = std::max( fN,0.0)*tan_effective_phi;
 			} else {
-				double cohesiveForce = phys->cohesion*std::max(pow(10,-15),phys->contactArea);
+				Real cohesiveForce = phys->cohesion*std::max(pow(10,-15),phys->contactArea);
 				maxFs = cohesiveForce+std::max( fN,0.0)*tan_effective_phi;
 			}
 		} else {	maxFs = std::max( fN,0.0)*tan_effective_phi; }
@@ -369,7 +369,7 @@ CREATE_LOGGER(Ip2_FrictMat_FrictMat_KnKsPhys);
 
 void Ip2_FrictMat_FrictMat_KnKsPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction) {
 
-//	const double PI = 3.14159265358979323846;
+//	const Real PI = 3.14159265358979323846;
 	if(interaction->phys) return;
 
 	ScGeom* scg=YADE_CAST<ScGeom*>(interaction->geom.get()); assert(scg);
@@ -410,7 +410,7 @@ void Ip2_FrictMat_FrictMat_KnKsPhys::go(const shared_ptr<Material>& b1, const sh
 	//contactPhysics->initialOrientation1	= Body::byId(interaction->getId1())->state->ori;
 	//contactPhysics->initialOrientation2	= Body::byId(interaction->getId2())->state->ori;
 	contactPhysics->prevNormal 		= scg->normal; //This is also done in the Contact Law.  It is not redundant because this class is only called ONCE!
-	contactPhysics->calJointLength = calJointLength;
+//	contactPhysics->calJointLength = calJointLength;
 //	contactPhysics->twoDimension = twoDimension;
 	contactPhysics->useFaceProperties = useFaceProperties;
 	contactPhysics->brittleLength = brittleLength;

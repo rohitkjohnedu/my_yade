@@ -18,8 +18,8 @@ if ('PotentialBlocks' in features):
 		ForceResetter(),
 		InsertionSortCollider([PotentialBlock2AABB()],verletDist=verletDistance),
 		InteractionLoop(
-			[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0)],
-			[Ip2_FrictMat_FrictMat_KnKsPBPhys( kn_i=Kn, ks_i=Ks, Knormal=Kn, Kshear=Ks, useFaceProperties=False, calJointLength=False,  viscousDamping=0.1)], 
+			[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True)],
+			[Ip2_FrictMat_FrictMat_KnKsPBPhys( kn_i=Kn, ks_i=Ks, Knormal=Kn, Kshear=Ks, useFaceProperties=False, viscousDamping=0.1)], 
 			[Law2_SCG_KnKsPBPhys_KnKsPBLaw(label='law',neverErase=False, allowViscousAttraction=True)] # In this example, we do NOT use Talesnick
 		),
 		NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,0,0]), # Here we deactivate gravity
@@ -172,7 +172,7 @@ targetMin) +" , "+str(targetMax) +"\n" )
 	#TODO: We need to check the shear contact force calculation as well
 	#TODO: We need to check the contact behaviour of PotentialBlocks where "shape.isBoundary=True"
 	#TODO: We need to check particle vertices & bounding box when it is rotated
-	#TODO: We need to create a similar script for 2D contacts as well, with caljointLength=True
+	#TODO: We need to create a similar script for 2D contacts as well, with calContactArea=True
 	#TODO: We need to create a simple gravity deposition, where the vertical normal force should be equal to the weight of the particles
 	#TODO: We need to check the energies present in a simulation during a short collision
 	#TODO: We need to check the collision among Potential Blocks in a periodic box

@@ -110,7 +110,7 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 		if( fabs(Iyz) < pow(10,-15) ){Iyz = 0.0;}
 		if( fabs(Ixz) < pow(10,-15) ){Ixz = 0.0;}
 
-		char jobz = 'V'; char uplo = 'L'; int N=3; std::vector<double> A (9); int lda=3; std::vector<double> eigenValues (3); std::vector<double> work (102); int lwork = 102; int info = 0; //FIXME: jobz, uplo, N, lda, lwork could be defined as "const" variables
+		char jobz = 'V'; char uplo = 'L'; int N=3; std::vector<Real> A (9); int lda=3; std::vector<Real> eigenValues (3); std::vector<Real> work (102); int lwork = 102; int info = 0; //FIXME: jobz, uplo, N, lda, lwork could be defined as "const" variables
 		A[0] = Ixx; A[1] =-Ixy; A[2] =-Ixz;
 		A[3] =-Ixy; A[4] = Iyy; A[5] =-Iyz;
 		A[6] =-Ixz; A[7] =-Iyz; A[8] = Izz;
@@ -138,10 +138,10 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 		lapackEigenVal(0,0) = eigenValues[0]; lapackEigenVal(1,1) = eigenValues[1]; lapackEigenVal(2,2) = eigenValues[2];
 
 		Quaternionr q (lapackEigenVec);
-		double q0 = 0.5*sqrt(lapackEigenVec(0,0) + lapackEigenVec(1,1) + lapackEigenVec(2,2) + 1.0);
-		double q1 = ( lapackEigenVec(1,2) - lapackEigenVec(2,1) )/( 4*q0 );
-		double q2 = ( lapackEigenVec(2,0) - lapackEigenVec(0,2) )/( 4*q0 );
-		double q3 = ( lapackEigenVec(0,1) - lapackEigenVec(1,0) )/( 4*q0 );
+		Real q0 = 0.5*sqrt(lapackEigenVec(0,0) + lapackEigenVec(1,1) + lapackEigenVec(2,2) + 1.0);
+		Real q1 = ( lapackEigenVec(1,2) - lapackEigenVec(2,1) )/( 4*q0 );
+		Real q2 = ( lapackEigenVec(2,0) - lapackEigenVec(0,2) )/( 4*q0 );
+		Real q3 = ( lapackEigenVec(0,1) - lapackEigenVec(1,0) )/( 4*q0 );
 		q.w()=q0; q.x()=q1; q.y()=q2; q.z()=q3; q.normalize();
 
 		/* Principal inertia tensor and orientation*/
@@ -170,10 +170,10 @@ if (vertices.empty() and (not a.empty())) { // i.e. if the particle is not initi
 }
 
 
-double PotentialBlock::getDet(const Eigen::MatrixXd A){
+Real PotentialBlock::getDet(const Eigen::MatrixXd A){
 	/* if positive, counter clockwise, 2nd point makes a larger angle */
 	/* if negative, clockwise, 3rd point makes a larger angle */
-	int rowNo = A.rows();  double firstTerm = 0.0; double secondTerm = 0.0;
+	int rowNo = A.rows();  Real firstTerm = 0.0; Real secondTerm = 0.0;
 	for(int i=0; i<rowNo-1; i++){
 		firstTerm  += A(i,0)*A(i+1,1);
 		secondTerm += A(i,1)*A(i+1,0);
@@ -182,7 +182,7 @@ double PotentialBlock::getDet(const Eigen::MatrixXd A){
 }
 
 
-double PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3){
+Real PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3){
 	/* if positive, counter clockwise, 2nd point makes a larger angle */
 	/* if negative, clockwise, 3rd point makes a larger angle */
 	Eigen::MatrixXd triangle(4,2);
@@ -190,19 +190,19 @@ double PotentialBlock::getSignedArea(const Vector3r pt1, const Vector3r pt2, con
 	triangle(1,0) = pt2.x();  triangle(1,1) = pt2.y(); // triangle(1,2) = pt2.z();
 	triangle(2,0) = pt3.x();  triangle(2,1) = pt3.y(); // triangle(2,2) = pt3.z();
 	triangle(3,0) = pt1.x();  triangle(3,1) = pt1.y(); // triangle(3,2) = pt1.z();
-	double determinant = getDet(triangle);
+	Real determinant = getDet(triangle);
 	return determinant; //triangle.determinant();
 }
 
 
 void PotentialBlock::calculateVertices() {
-	std::vector<double> D (3); std::vector<double> Ax (9); Eigen::Matrix3d Aplanes;
-	double Distance;
+	std::vector<Real> D (3); std::vector<Real> Ax (9); Eigen::Matrix3d Aplanes;
+	Real Distance;
 	int vertCount=0; Real minDistance;
 	int planeNo = a.size();
 
 	Vector3r plane1, plane2, plane3;
-	double d1, d2, d3, detAplanes;
+	Real d1, d2, d3, detAplanes;
 
 	std::vector<int> ipiv (3); int bColNo; int info, three; //FIXME: bColNo, three could be defined as "const int", instead of "int"
 	bool inside; Vector3r vertex;
@@ -305,7 +305,7 @@ void PotentialBlock::calculateVertices() {
 									int v3b = vertexStruct[j].planeID[2];
 
 									if(  (v1a != v1b && v2a == v2b && v3a == v3b) || (v1a == v1b && v2a != v2b && v3a == v3b) || (v1a == v1b && v2a == v2b && v3a != v3b)  ){
-										double length = ( vertices[i] - vertices[j] ).norm();
+										Real length = ( vertices[i] - vertices[j] ).norm();
 										if(length<pow(10,-3) ){ continue; }
 										addEdgeStruct();
 										edgeStruct[edgeCount].vertexID.push_back(i); /* edges store information on vertexIDs */
@@ -368,8 +368,8 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 
 	Vector3r pointInside(0,0,0), vertex, planeNormal, oriNormal(0,0,1), crossProd, rotatedCoord;
 	Vector3r pt1, pt2, pt3, baseOnPolygon, oriBaseOnPolygon, centroidPyramid, centroidTetra, tempVert1, tempVert2, tempVert3, tempVert4;;
-	double totalVolume=0.0, /*plane,*/ det, area, height, vol, areaPyramid, volumePyramid, heightTetra, tempArea, areaTri, tetraVol;
-	double detJ, x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
+	Real totalVolume=0.0, /*plane,*/ det, area, height, vol, areaPyramid, volumePyramid, heightTetra, tempArea, areaTri, tetraVol;
+	Real detJ, x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
 	Quaternionr Qp;
 	unsigned int h, kk, m, counter;
 	int lastEntry;
@@ -459,8 +459,8 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 			oriBaseOnPolygon += oriOrderedVerticesOnPlane[i];
 		}
 
-		baseOnPolygon = baseOnPolygon/static_cast<double>(orderedVerticesOnPlane.size());
-		oriBaseOnPolygon = oriBaseOnPolygon/static_cast<double>(oriOrderedVerticesOnPlane.size());
+		baseOnPolygon = baseOnPolygon/static_cast<Real>(orderedVerticesOnPlane.size());
+		oriBaseOnPolygon = oriBaseOnPolygon/static_cast<Real>(oriOrderedVerticesOnPlane.size());
 		lastEntry = orderedVerticesOnPlane.size();
 		vertexOnPlane(lastEntry,0)=orderedVerticesOnPlane[0].x(); vertexOnPlane(lastEntry,1)=orderedVerticesOnPlane[0].y(); //vertexOnPlane(lastEntry,2)=orderedVerticesOnPlane[0].z();
 		//std::cout<<"vertexOnPlane0: "<<vertexOnPlane(lastEntry,0)<<", vertexOnPlane1: "<<vertexOnPlane(lastEntry,1)<<endl;

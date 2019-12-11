@@ -20,8 +20,17 @@ stages:
   - pages
   - deb
 
+.gitlab_runner_retry_template: &gitlab_runner_retry_definition
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+      - unknown_failure
+
 # If you want to compile everything also on merge_request, change this template.
 .plaftorms_template: &platforms_definition
+  <<: *gitlab_runner_retry_definition
   only:
     - master
     - merge_request
@@ -311,9 +320,7 @@ test_suse15:
 test_18_foam:
   stage: test
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04_foam
-  only:
-    - master
-    - merge_request
+  <<: *platforms_definition
   dependencies:
     - make_18_04
   needs: ["make_18_04"]
@@ -458,6 +465,7 @@ doc_18_04:
 pages:
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu18.04
   stage: pages
+  <<: *gitlab_runner_retry_definition
   only:
     - master
   script:
@@ -474,6 +482,7 @@ pages:
 # 6. build debian packages
 .deb_template: &deb_definition
   stage: deb
+  <<: *gitlab_runner_retry_definition
   only:
     - master
   script:

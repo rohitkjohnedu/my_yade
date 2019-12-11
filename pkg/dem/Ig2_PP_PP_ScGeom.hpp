@@ -21,10 +21,11 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		virtual bool goReverse(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
 		Real evaluatePP(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
-		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
+		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r searchDir, Vector3r& newlocalPoint);
 		bool customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPt, bool warmstart);
 		Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
 		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
+		Real getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, const Vector3r contactPt, const Vector3r contactNormal, int& smaller, Vector3r shearDir, Real& jointLength, const bool twoDimension, Real unitWidth2D, int areaStep);
 
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(Ig2_PP_PP_ScGeom,IGeomFunctor,"EXPERIMENTAL. IGeom functor for PotentialParticle - PotentialParticle pair",
@@ -33,6 +34,8 @@ class Ig2_PP_PP_ScGeom: public IGeomFunctor {
 			((Vector3r, twoDdir, Vector3r(0,1,0),, "Direction of 2D"))
 			((bool, twoDimension, false,,"Whether the contact is 2-D"))
 			((Real, unitWidth2D, 1.0, ,"Unit width in 2D"))
+			((bool, calContactArea, true,,"Whether to calculate jointLength for 2-D contacts and contactArea for 2-D and 3-D contacts"))
+			((int, areaStep, 5, ,"Angular step (degrees) to calculate :yref:`KnKsPhys.contactArea`. Must be a divisor of 360, e.g. 1,2,3,4,5,6,8,9 and so on, to form a closed loop. Must be smaller than 90 degrees. Smaller angles lead to more accurate calculations but are more expensive"))
 			, /* ctor */
 		);
 	// clang-format on
