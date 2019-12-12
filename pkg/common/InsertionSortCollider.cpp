@@ -88,8 +88,8 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	#pragma omp parallel for schedule(dynamic,1) num_threads(ompThreads>0 ? min(ompThreads,omp_get_max_threads()) : omp_get_max_threads())
 	for (unsigned k=0; k<nChunks;k++) {
 		int threadNum = omp_get_thread_num();
-		for(long i=chunks[k]+1; i<chunks[k+1]; i++){
-			const Bounds viInit=v[i]; long j=i-1;
+		for(auto i=chunks[k]+1; i<chunks[k+1]; i++){
+			const Bounds viInit=v[i]; auto j=i-1;
 			if (not (j>=chunks[k] && v[j]>viInit)) continue; //else we need to assign v[j+1] after the 'while'
 			const bool viInitBB=viInit.flags.hasBB;
 			const bool isMin=viInit.flags.isMin;
