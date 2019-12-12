@@ -81,7 +81,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
         epsVolCumulative += epsVolMax;
 	retriangulationLastIter++;
 	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
-		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0 && retriangulationLastIter>meshUpdateInterval);
+		(defTolerance>0 && epsVolCumulative > defTolerance) || (meshUpdateInterval>0 && retriangulationLastIter>=meshUpdateInterval);
 
 	// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
 	if (breakControlledRemesh) remeshForFreshlyBrokenBonds();
