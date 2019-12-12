@@ -10,13 +10,12 @@
 
 #include <lib/base/Logging.hpp>
 #include <atomic>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 
-namespace yade { // Cannot have #include directive inside.
-
+namespace yade {
 /*!
-\brief	ThreadRunner takes care of starting/stopping (executing) the
+    \brief	ThreadRunner takes care of starting/stopping (executing) the
 	ThreadWorker in the separate thread.
 
 	It is achieved by either:
@@ -42,16 +41,15 @@ namespace yade { // Cannot have #include directive inside.
 	So ThreadWorker(s) are running, while the user is interacting with the
 	UI frontend (doesn't matter whether the UI is graphical, ncurses or
 	any other).
-
- */
+*/
 
 class ThreadWorker;
 class ThreadRunner {
 private:
 	ThreadWorker*    m_thread_worker;
 	std::atomic_bool m_looping { false };
-	boost::mutex     m_callmutex;
-	boost::mutex     m_runmutex;
+	std::mutex       m_callmutex;
+	std::mutex       m_runmutex;
 	void             run();
 	void             call();
 

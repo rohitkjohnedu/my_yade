@@ -21,7 +21,7 @@ CREATE_LOGGER(ThreadRunner);
 void ThreadRunner::run()
 {
 	// this is the body of execution of separate thread
-	boost::mutex::scoped_lock lock(m_runmutex);
+	const std::lock_guard<std::mutex> lock(m_runmutex);
 	try {
 		workerThrew = false;
 		while (looping()) {
@@ -54,7 +54,7 @@ void ThreadRunner::call()
 	// will count the number of threads in the queue, and only after they
 	// all finish execution the destructor will be able to finish its work
 	//
-	boost::mutex::scoped_lock lock(m_callmutex);
+	const std::lock_guard<std::mutex> lock(m_callmutex);
 	m_thread_worker->setTerminate(false);
 	m_thread_worker->callSingleAction();
 }
@@ -63,9 +63,9 @@ void ThreadRunner::spawnSingleAction()
 {
 	if (m_looping)
 		return;
-	boost::mutex::scoped_lock calllock(m_callmutex);
-	boost::function0<void>    call(boost::bind(&ThreadRunner::call, this));
-	boost::thread             th(call);
+	const std::lock_guard<std::mutex> calllock(m_callmutex);
+	boost::function0<void>            call(boost::bind(&ThreadRunner::call, this));
+	boost::thread                     th(call);
 }
 
 void ThreadRunner::start()
@@ -83,7 +83,7 @@ bool ThreadRunner::looping() const { return m_looping; }
 ThreadRunner::~ThreadRunner()
 {
 	stop();
-	boost::mutex::scoped_lock lock(m_callmutex);
+	const std::lock_guard<std::mutex> lock(m_callmutex);
 	m_thread_worker->setTerminate(true);
 }
 
