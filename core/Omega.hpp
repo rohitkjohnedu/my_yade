@@ -20,6 +20,7 @@
 #include <lib/factory/ClassFactory.hpp>
 
 #include <lib/base/Singleton.hpp>
+#include <boost/thread/mutex.hpp>
 #include "SimulationFlow.hpp"
 
 namespace yade { // Cannot have #include directive inside.
@@ -47,7 +48,6 @@ class Omega: public Singleton<Omega>{
 	map<string,string> memSavedSimulations;
 
 	// to avoid accessing simulation when it is being loaded (should avoid crashes with the UI)
-	boost::mutex loadingSimulationMutex;
 	boost::mutex tmpFileCounterMutex;
 	long tmpFileCounter;
 	std::string tmpFileDir;

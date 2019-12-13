@@ -19,7 +19,7 @@ OpenGLManager::OpenGLManager(QObject* parent): QObject(parent){
 
 void OpenGLManager::timerEvent(QTimerEvent* /*event*/){
 	//cerr<<".";
-	boost::mutex::scoped_lock lock(viewsMutex);
+	const std::lock_guard<std::mutex> lock(viewsMutex);
 	// when sharing the 0th view widget, it should be enough to update the primary view only
 	//if(views.size()>0) views[0]->updateGLViewer();
 	#if 1
@@ -28,7 +28,7 @@ void OpenGLManager::timerEvent(QTimerEvent* /*event*/){
 }
 
 void OpenGLManager::createViewSlot(){
-	boost::mutex::scoped_lock lock(viewsMutex);
+	const std::lock_guard<std::mutex> lock(viewsMutex);
 	if(views.size()==0){
 		views.push_back(shared_ptr<GLViewer>(new GLViewer(0,renderer,/*shareWidget*/(QGLWidget*)0)));
 	} else {
@@ -42,7 +42,7 @@ void OpenGLManager::resizeViewSlot(int id, int wd, int ht){
 }
 
 void OpenGLManager::closeViewSlot(int id){
-	boost::mutex::scoped_lock lock(viewsMutex);
+	const std::lock_guard<std::mutex> lock(viewsMutex);
 	for(size_t i=views.size()-1; (!views[i]); i--){ views.resize(i); } // delete empty views from the end
 	if(id<0){ // close the last one existing
 		assert(*views.rbegin()); // this should have been sanitized by the loop above
@@ -55,7 +55,7 @@ void OpenGLManager::closeViewSlot(int id){
 	}
 }
 void OpenGLManager::centerAllViews(){
-	boost::mutex::scoped_lock lock(viewsMutex);
+	const std::lock_guard<std::mutex> lock(viewsMutex);
 	FOREACH(const shared_ptr<GLViewer>& g, views){ if(!g) continue; g->centerScene(); }
 }
 void OpenGLManager::startTimerSlot(){

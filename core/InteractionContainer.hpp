@@ -100,7 +100,7 @@ class InteractionContainer: public Serializable{
 		void eraseNonReal();
 
 		// mutual exclusion to avoid crashes in the rendering loop
-		boost::mutex drawloopmutex;
+		std::mutex drawloopmutex;
 		// sort interactions before serializations; useful if comparing XML files from different runs (false by default)
 		bool serializeSorted;
 		// iteration number when the collider was last run; set by the collider, if it wants interactions that were not encoutered in that step to be deleted by InteractionLoop (such as SpatialQuickSortCollider). Other colliders (such as InsertionSortCollider) set it it -1, which is the default

@@ -6,7 +6,7 @@
 #endif 
 
 #include<QObject>
-#include<boost/thread/mutex.hpp>
+#include<mutex>
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -45,7 +45,7 @@ class OpenGLManager: public QObject{
 		virtual void startTimerSlot();
 		void centerAllViews();
 	private:
-		boost::mutex viewsMutex;
+		std::mutex viewsMutex;
 };
 
 } // namespace yade

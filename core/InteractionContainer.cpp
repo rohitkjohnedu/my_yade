@@ -16,7 +16,7 @@ CREATE_LOGGER(InteractionContainer);
 
 bool InteractionContainer::insert(const shared_ptr<Interaction>& i){
 	assert(bodies);
-	boost::mutex::scoped_lock lock(drawloopmutex);
+	const std::lock_guard<std::mutex> lock(drawloopmutex);
 
 	Body::id_t id1=i->getId1();
 	Body::id_t id2=i->getId2();
@@ -60,7 +60,7 @@ bool InteractionContainer::insertInteractionMPI(shared_ptr<Interaction>& i){
 
 void InteractionContainer::clear(){
 	assert(bodies);
-	boost::mutex::scoped_lock lock(drawloopmutex);
+	const std::lock_guard<std::mutex> lock(drawloopmutex);
 	for (const auto & b : *bodies) {
 		if (b) b->intrs.clear();
 	}
@@ -72,7 +72,7 @@ void InteractionContainer::clear(){
 bool InteractionContainer::erase(Body::id_t id1,Body::id_t id2, int linPos){
 	assert(bodies);
 	#warning("is cpu cost of this mutex known?")
-	boost::mutex::scoped_lock lock(drawloopmutex);
+	const std::lock_guard<std::mutex> lock(drawloopmutex);
 	if (id1>id2) swap(id1,id2);
 	if(id2>=(Body::id_t)bodies->size()) return false;
 

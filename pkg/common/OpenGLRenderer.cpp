@@ -278,7 +278,7 @@ void OpenGLRenderer::renderDOF_ID(){
 void OpenGLRenderer::renderIGeom(){
 	geomDispatcher.scene=scene.get(); geomDispatcher.updateScenePtr();
 	{
-		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
+		const std::lock_guard<std::mutex> lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			if(!I->geom) continue; // avoid refcount manipulations if the interaction is not real anyway
 			shared_ptr<IGeom> ig(I->geom); // keep reference so that ig does not disappear suddenly while being rendered
@@ -293,7 +293,7 @@ void OpenGLRenderer::renderIGeom(){
 void OpenGLRenderer::renderIPhys(){
 	physDispatcher.scene=scene.get(); physDispatcher.updateScenePtr();
 	{
-		boost::mutex::scoped_lock lock(scene->interactions->drawloopmutex);
+		const std::lock_guard<std::mutex> lock(scene->interactions->drawloopmutex);
 		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions){
 			shared_ptr<IPhys> ip(I->phys);
 			if(!ip) continue;
