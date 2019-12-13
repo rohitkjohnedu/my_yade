@@ -5,7 +5,6 @@
 #pragma once
 
 #include<lib/serialization/Serializable.hpp>
-#include<boost/thread/mutex.hpp>
 
 #ifdef YADE_OPENMP
 	#include<omp.h>

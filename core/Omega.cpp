@@ -81,7 +81,7 @@ void Omega::cleanupTemps(){
 
 std::string Omega::tmpFilename(){
 	if(tmpFileDir.empty()) throw runtime_error("tmpFileDir empty; Omega::initTemps not yet called()?");
-	boost::mutex::scoped_lock lock(tmpFileCounterMutex);
+	const std::lock_guard<std::mutex> lock(tmpFileCounterMutex);
 	return tmpFileDir+"/tmp-"+boost::lexical_cast<string>(tmpFileCounter++);
 }
 

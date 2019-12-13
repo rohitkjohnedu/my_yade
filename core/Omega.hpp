@@ -15,6 +15,7 @@
 #include <fstream>
 #include <time.h>
 #include <iostream>
+#include <mutex>
 
 #include <lib/base/Math.hpp>
 #include <lib/factory/ClassFactory.hpp>
@@ -48,7 +49,7 @@ class Omega: public Singleton<Omega>{
 	map<string,string> memSavedSimulations;
 
 	// to avoid accessing simulation when it is being loaded (should avoid crashes with the UI)
-	boost::mutex tmpFileCounterMutex;
+	std::mutex tmpFileCounterMutex;
 	long tmpFileCounter;
 	std::string tmpFileDir;
 
