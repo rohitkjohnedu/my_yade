@@ -21,6 +21,7 @@
 #include <lib/factory/ClassFactory.hpp>
 
 #include <lib/base/Singleton.hpp>
+#include <boost/thread/mutex.hpp>
 #include "SimulationFlow.hpp"
 
 namespace yade { // Cannot have #include directive inside.
