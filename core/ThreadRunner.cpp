@@ -83,8 +83,9 @@ bool ThreadRunner::looping() const { return m_looping; }
 ThreadRunner::~ThreadRunner()
 {
 	stop();
-	const std::lock_guard<std::mutex> lock(m_callmutex);
 	m_thread_worker->setTerminate(true);
+	const std::lock_guard<std::mutex> runlock(m_runmutex);
+	const std::lock_guard<std::mutex> calllock(m_callmutex);
 }
 
 } // namespace yade
