@@ -10,7 +10,6 @@
 #pragma once
 
 #include <atomic>
-#include <mutex>
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -30,7 +29,6 @@ private:
 	friend class ThreadRunner;
 	std::atomic_bool m_should_terminate { false };
 	std::atomic_bool m_done { false };
-	std::mutex       m_mutex;
 	void             callSingleAction();
 
 protected:
