@@ -48,6 +48,7 @@ r=0.05*meanSize
 for s in sp:
 	b=Body()
 	b.mask=1
+	b.aspherical=True
 	wire=False
 	color=Vector3(random.random(),random.random(),random.random())
 	highlight=False
