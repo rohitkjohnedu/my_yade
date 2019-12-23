@@ -266,7 +266,7 @@ void PotentialBlock::calculateVertices() {
 									if (Distance < minDistance) { minDistance = Distance; closestVertex=n; }
 								}
 
-								if ( minDistance/(R > 0.0 ? R : 1.0) > 1.0e-6 ) {
+								if ( minDistance > (R > 0.0 ? R*1.0e-3 : 1.0e-6) ) {
 									vertices.push_back(vertex);
 									vertCount++;
 
@@ -367,7 +367,7 @@ void PotentialBlock::calculateVertices() {
 void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz){
 
 	Vector3r pointInside(0,0,0), vertex, planeNormal, oriNormal(0,0,1), crossProd, rotatedCoord;
-	Vector3r pt1, pt2, pt3, baseOnPolygon, oriBaseOnPolygon, centroidPyramid, centroidTetra, tempVert1, tempVert2, tempVert3, tempVert4;;
+	Vector3r pt1, pt2, pt3, baseOnPolygon, oriBaseOnPolygon, centroidPyramid, centroidTetra, tempVert1, tempVert2, tempVert3, tempVert4;
 	Real totalVolume=0.0, /*plane,*/ det, area, height, vol, areaPyramid, volumePyramid, heightTetra, tempArea, areaTri, tetraVol;
 	Real detJ, x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
 	Quaternionr Qp;
