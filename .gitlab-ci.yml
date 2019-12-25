@@ -147,6 +147,16 @@ make_no_mpi:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
+make_no_vtk:
+  <<: *make_definition
+  <<: *artifacts_definition
+  before_script:
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
+    - export EXTRA_CMAKE_ARGS="-DENABLE_VTK=OFF $EXTRA_CMAKE_ARGS"
+    - echo $EXTRA_CMAKE_ARGS
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+
 make_debug:
   <<: *make_definition
   artifacts:
@@ -292,6 +302,14 @@ test_no_mpi:
     - make_no_mpi
   needs: ["make_no_mpi"]
 
+test_no_vtk:
+  <<: *test_definition
+  <<: *skip_wip_test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_no_vtk
+  needs: ["make_no_vtk"]
+
 test_minimal:
   <<: *test_definition
   <<: *skip_wip_test_definition_nogui
@@ -408,6 +426,14 @@ check_no_mpi:
   dependencies:
     - make_no_mpi
   needs: ["make_no_mpi"]
+
+check_no_vtk:
+  <<: *check_definition
+  <<: *skip_wip_test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
+  dependencies:
+    - make_no_vtk
+  needs: ["make_no_vtk"]
 
 check_minimal:
   <<: *check_definition
