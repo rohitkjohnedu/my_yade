@@ -3,18 +3,18 @@
 
 #pragma once
 
-#include <vector>
 #include <lib/computational-geometry/MarchingCube.hpp>
+#include <vector>
 //#include <pkg/dem/PotentialBlock.hpp>
-#include <pkg/dem/PotentialBlock2AABB.hpp>
 #include <pkg/common/PeriodicEngines.hpp>
+#include <pkg/dem/PotentialBlock2AABB.hpp>
 
 #ifdef YADE_VTK
 
 #include <vtkImplicitFunction.h>
+#include <vtkPolyData.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkPolyData.h>
 
 // https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
 #pragma GCC diagnostic push
@@ -24,39 +24,39 @@
 // This method will work once g++ bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431#c34 is fixed.
 #include <vtkTriangle.h>
 #pragma GCC diagnostic pop
-#include <vtkSmartPointer.h>
-#include <vtkFloatArray.h>
+#include <vtkActor.h>
+#include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkCylinderSource.h>
+#include <vtkExtractVOI.h>
+#include <vtkFloatArray.h>
+#include <vtkLinearExtrusionFilter.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkSampleFunction.h>
+#include <vtkSmartPointer.h>
 #include <vtkStructuredPoints.h>
 #include <vtkStructuredPointsWriter.h>
+#include <vtkTextActor.h>
+#include <vtkTextActor3D.h>
+#include <vtkTextProperty.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkVectorText.h>
 #include <vtkWriter.h>
-#include <vtkExtractVOI.h>
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLStructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkTransform.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkActor.h>
-#include <vtkAppendPolyData.h>
-#include <vtkTextActor.h>
-#include <vtkTextProperty.h>
-#include <vtkVectorText.h>
-#include <vtkLinearExtrusionFilter.h>
-#include <vtkTextActor3D.h>
-#include <vtkCylinderSource.h>
 
 #endif //YADE_VTK
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifdef YADE_OPENGL
-	#include<pkg/common/GLDrawFunctors.hpp>
-	#include<lib/opengl/OpenGLWrapper.hpp>
-	#include<lib/opengl/GLUtils.hpp>
-	#include<GL/glu.h>
+#include <lib/opengl/GLUtils.hpp>
+#include <lib/opengl/OpenGLWrapper.hpp>
+#include <pkg/common/GLDrawFunctors.hpp>
+#include <GL/glu.h>
 #endif
 
 
@@ -65,20 +65,20 @@
 namespace yade { // Cannot have #include directive inside.
 
 #ifdef YADE_OPENGL
-	/* Draw PotentialBlocks using OpenGL */
-	class Gl1_PotentialBlock: public GlShapeFunctor{
-		public:
-			virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&,bool,const GLViewInfo&);
-			// clang-format off
+/* Draw PotentialBlocks using OpenGL */
+class Gl1_PotentialBlock : public GlShapeFunctor {
+public:
+	virtual void go(const shared_ptr<Shape>&, const shared_ptr<State>&, bool, const GLViewInfo&);
+	// clang-format off
 			YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialBlock,GlShapeFunctor,"Renders :yref:`PotentialBlock` object",
 				((bool,wire,false,,"Only show wireframe"))
 			);
-			// clang-format on
-			RENDERS(PotentialBlock);
-//		protected:
-//			Vector3r centroid;
-	};
-	REGISTER_SERIALIZABLE(Gl1_PotentialBlock);
+	// clang-format on
+	RENDERS(PotentialBlock);
+	//		protected:
+	//			Vector3r centroid;
+};
+REGISTER_SERIALIZABLE(Gl1_PotentialBlock);
 #endif // YADE_OPENGL
 
 } // namespace yade
@@ -92,7 +92,7 @@ namespace yade { // Cannot have #include directive inside.
 //#ifdef YADE_OPENGL
 
 //class Gl1_PotentialBlock : public GlShapeFunctor
-//{	
+//{
 //	private :
 //		MarchingCube mc;
 //		Vector3r Min,Max;
@@ -116,8 +116,8 @@ namespace yade { // Cannot have #include directive inside.
 //		Real evaluateF(const PotentialBlock& pp, Real x, Real y, Real z);
 //		static vector<scalarF> SF ;
 //		//void clearMemory();
-//		
-	// clang-format off
+//
+// clang-format off
 //	YADE_CLASS_BASE_DOC_STATICATTRS(Gl1_PotentialBlock,GlShapeFunctor,"Renders :yref:`PotentialBlock` object",
 //		((int,sizeX,30,,"Number of divisions in the X direction for triangulation"))
 //		((int,sizeY,30,,"Number of divisions in the Y direction for triangulation"))
@@ -128,7 +128,7 @@ namespace yade { // Cannot have #include directive inside.
 //		((bool,wire,false,,"Only show wireframe"))
 ////		((vector<scalarF>,SF,"Scalar field used by the Marching cubes algorithm"))
 //	);
-	// clang-format on
+// clang-format on
 //	RENDERS(PotentialBlock);
 
 
@@ -141,51 +141,60 @@ namespace yade { // Cannot have #include directive inside.
 namespace yade { // Cannot have #include directive inside.
 
 #ifdef YADE_VTK
-	class ImpFuncPB : public vtkImplicitFunction {
-		public:
-		    vtkTypeMacro(ImpFuncPB,vtkImplicitFunction);
-		    //void PrintSelf(ostream& os, vtkIndent indent);
+class ImpFuncPB : public vtkImplicitFunction {
+public:
+	vtkTypeMacro(ImpFuncPB, vtkImplicitFunction);
+	//void PrintSelf(ostream& os, vtkIndent indent);
 
-		    // Create a new function
-		    static ImpFuncPB * New(void);
-		    vector<Real>a; vector<Real>b; vector<Real>c; vector<Real>d;
-		    Real k; Real r; Real R; Eigen::Matrix3d rotationMatrix;
-		    bool clump;
-		    Real clumpMemberCentreX;
-		    Real clumpMemberCentreY;
-		    Real clumpMemberCentreZ;
+	// Create a new function
+	static ImpFuncPB* New(void);
+	vector<Real>      a;
+	vector<Real>      b;
+	vector<Real>      c;
+	vector<Real>      d;
+	Real              k;
+	Real              r;
+	Real              R;
+	Eigen::Matrix3d   rotationMatrix;
+	bool              clump;
+	Real              clumpMemberCentreX;
+	Real              clumpMemberCentreY;
+	Real              clumpMemberCentreZ;
 
-		    // Evaluate function
-		    Real FunctionValue(Real x[3]);
-		    Real EvaluateFunction(Real x[3]){ 
-			//return this->vtkImplicitFunction::EvaluateFunction(x);
-			return FunctionValue(x);
-		    };
-		    
-		    Real EvaluateFunction(Real x, Real y, Real z) {
-			return this->vtkImplicitFunction::EvaluateFunction(x, y, z);
-		    };
-
-		    // Evaluate gradient for function
-		   void EvaluateGradient(Real /*x*/[3], Real /*n*/[3]){ }; // FIXME - better use Vector3r here instead of Real[3] (here I only fix the unused parameter warning).
-
-		    // If you need to set parameters, add methods here
-
-		protected:
-		   ImpFuncPB();
-		   ~ImpFuncPB();
-		   ImpFuncPB(const ImpFuncPB&) : vtkImplicitFunction() {}
-		   void operator=(const ImpFuncPB&) {}
-
-		    // Add parameters/members here if you need
+	// Evaluate function
+	Real FunctionValue(Real x[3]);
+	Real EvaluateFunction(Real x[3])
+	{
+		//return this->vtkImplicitFunction::EvaluateFunction(x);
+		return FunctionValue(x);
 	};
 
-	/* PotentialBlockVTKRecorder */
-	class PotentialBlockVTKRecorder: public PeriodicEngine{	
-	  public:
-		vtkSmartPointer<ImpFuncPB> function;
-		
-	  virtual void action(void);
+	Real EvaluateFunction(Real x, Real y, Real z) { return this->vtkImplicitFunction::EvaluateFunction(x, y, z); };
+
+	// Evaluate gradient for function
+	void EvaluateGradient(
+	        Real /*x*/[3], Real /*n*/[3]) {}; // FIXME - better use Vector3r here instead of Real[3] (here I only fix the unused parameter warning).
+
+	// If you need to set parameters, add methods here
+
+protected:
+	ImpFuncPB();
+	~ImpFuncPB();
+	ImpFuncPB(const ImpFuncPB&)
+	        : vtkImplicitFunction()
+	{
+	}
+	void operator=(const ImpFuncPB&) {}
+
+	// Add parameters/members here if you need
+};
+
+/* PotentialBlockVTKRecorder */
+class PotentialBlockVTKRecorder : public PeriodicEngine {
+public:
+	vtkSmartPointer<ImpFuncPB> function;
+
+	virtual void action(void);
 	// clang-format off
 	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorder,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((string,fileName,,,"File prefix to save to"))
@@ -204,16 +213,16 @@ namespace yade { // Cannot have #include directive inside.
 		
 	  );
 	// clang-format on
-	};
-	REGISTER_SERIALIZABLE(PotentialBlockVTKRecorder);
+};
+REGISTER_SERIALIZABLE(PotentialBlockVTKRecorder);
 
 
-	/* PotentialBlockVTKRecorderTunnel */
-	class PotentialBlockVTKRecorderTunnel: public PeriodicEngine{	
-	  public:
-		vtkSmartPointer<ImpFuncPB> function;
-		
-	  virtual void action(void);
+/* PotentialBlockVTKRecorderTunnel */
+class PotentialBlockVTKRecorderTunnel : public PeriodicEngine {
+public:
+	vtkSmartPointer<ImpFuncPB> function;
+
+	virtual void action(void);
 	// clang-format off
 	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorderTunnel,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((string,fileName,,,"File prefix to save to"))
@@ -232,8 +241,8 @@ namespace yade { // Cannot have #include directive inside.
 		
 	  );
 	// clang-format on
-	};
-	REGISTER_SERIALIZABLE(PotentialBlockVTKRecorderTunnel);
+};
+REGISTER_SERIALIZABLE(PotentialBlockVTKRecorderTunnel);
 
 #endif //YADE_VTK
 
@@ -241,7 +250,4 @@ namespace yade { // Cannot have #include directive inside.
 
 
 #endif // YADE_POTENTIAL_BLOCKS
-
-
-
 

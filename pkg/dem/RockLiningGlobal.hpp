@@ -6,8 +6,8 @@
 #include <pkg/dem/PotentialBlock.hpp>
 #include <pkg/dem/PotentialBlock2AABB.hpp>
 
-#include <vector>
 #include <pkg/common/PeriodicEngines.hpp>
+#include <vector>
 
 #include <stdio.h>
 
@@ -22,37 +22,38 @@
 #include <vtkTriangle.h>
 #pragma GCC diagnostic pop
 
-#include <vtkSmartPointer.h>
-#include <vtkFloatArray.h>
+#include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
+#include <vtkCylinderSource.h>
+#include <vtkExtractVOI.h>
+#include <vtkFloatArray.h>
+#include <vtkSmartPointer.h>
 #include <vtkStructuredPoints.h>
 #include <vtkStructuredPointsWriter.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 #include <vtkWriter.h>
-#include <vtkExtractVOI.h>
 #include <vtkXMLImageDataWriter.h>
 #include <vtkXMLStructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkTransform.h>
-#include <vtkAppendPolyData.h>
-#include <vtkCylinderSource.h>
 
 #include <ClpSimplex.hpp>
-#include <CoinHelperFunctions.hpp>
-#include <CoinTime.hpp>
 #include <CoinBuild.hpp>
+#include <CoinHelperFunctions.hpp>
 #include <CoinModel.hpp>
+#include <CoinTime.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 
-class RockLiningGlobal: public PeriodicEngine{
-	protected:
-		Real stiffnessMatrix[36];
-		//Real * globalStiffnessMatrix;
-		Real globalStiffnessMatrix[3*3*200*200];
-  	public:
-		#if 0
+class RockLiningGlobal : public PeriodicEngine {
+protected:
+	Real stiffnessMatrix[36];
+	//Real * globalStiffnessMatrix;
+	Real globalStiffnessMatrix[3 * 3 * 200 * 200];
+
+public:
+#if 0
 		struct Bolts{
 			Bolts(Vector3r pt1, Vector3r  pt2){startingPoint = pt1; endPoint=pt2; }
 			Vector3r startingPoint;
@@ -64,14 +65,34 @@ class RockLiningGlobal: public PeriodicEngine{
 			vector<Real> initialLength;
 		};
 		vector<Bolts> bolt;
-		#endif
+#endif
 
-		Vector3r getNodeDistance(const PotentialBlock* cm1,const State* state1,const PotentialBlock* cm2,const State* state2, const Vector3r localPt1, const Vector3r localPt2);
-		bool installLining(const PotentialBlock* cm1,const State* state1,const Vector3r startingPt,const Vector3r direction, const Real length, Vector3r& intersectionPt);
-		int insertNode(Vector3r pos, Real mass, Real intervalLength);
-		Real evaluateFNoSphereVol(const PotentialBlock* s1,const State* state1, const Vector3r newTrial);
-		bool intersectPlane(const PotentialBlock* s1,const State* state1,const Vector3r startingPt,const Vector3r direction, const Real length, Vector3r& intersectionPt, const Vector3r plane, const Real planeD);
-  		virtual void action(void);
+	Vector3r getNodeDistance(
+	        const PotentialBlock* cm1,
+	        const State*          state1,
+	        const PotentialBlock* cm2,
+	        const State*          state2,
+	        const Vector3r        localPt1,
+	        const Vector3r        localPt2);
+	bool installLining(
+	        const PotentialBlock* cm1,
+	        const State*          state1,
+	        const Vector3r        startingPt,
+	        const Vector3r        direction,
+	        const Real            length,
+	        Vector3r&             intersectionPt);
+	int  insertNode(Vector3r pos, Real mass, Real intervalLength);
+	Real evaluateFNoSphereVol(const PotentialBlock* s1, const State* state1, const Vector3r newTrial);
+	bool intersectPlane(
+	        const PotentialBlock* s1,
+	        const State*          state1,
+	        const Vector3r        startingPt,
+	        const Vector3r        direction,
+	        const Real            length,
+	        Vector3r&             intersectionPt,
+	        const Vector3r        plane,
+	        const Real            planeD);
+	virtual void action(void);
 	// clang-format off
   	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(RockLiningGlobal,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
 		((bool,assembledKglobal,false ,,"global stiffness matrix"))
@@ -122,13 +143,12 @@ class RockLiningGlobal: public PeriodicEngine{
 		,
   	);
 	// clang-format on
-
-
 };
 REGISTER_SERIALIZABLE(RockLiningGlobal);
 
 } // namespace yade
 
+// clang-format off
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -168,4 +188,5 @@ extern "C" {
 #ifdef __cplusplus
 };
 #endif
+// clang-format on
 #endif // YADE_POTENTIAL_BLOCKS && YADE_VTK
