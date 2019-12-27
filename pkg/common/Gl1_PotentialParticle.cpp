@@ -1,5 +1,4 @@
 /*CWBoon 2015 */
-#include<lib/compatibility/VTKCompatibility.hpp> // fix InsertNextTupleValue → InsertNextTuple name change (and others in the future)
 #ifdef YADE_POTENTIAL_PARTICLES
 
 #include "Gl1_PotentialParticle.hpp"
@@ -7,6 +6,14 @@
 	#include <lib/opengl/OpenGLWrapper.hpp>
 #endif
 
+#include <pkg/dem/KnKsLaw.hpp>
+#include <pkg/dem/ScGeom.hpp>
+//#include<pkg/dem/Clump.hpp>
+#include <pkg/common/Aabb.hpp>
+
+#ifdef YADE_VTK
+
+#include<lib/compatibility/VTKCompatibility.hpp> // fix InsertNextTupleValue → InsertNextTuple name change (and others in the future)
 #include <vtkFloatArray.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkXMLUnstructuredGridWriter.h>
@@ -36,8 +43,6 @@
 #include <vtkLookupTable.h>
 #include <vtkXMLDataSetWriter.h>
 
-#include <pkg/dem/KnKsLaw.hpp>
-#include <pkg/dem/ScGeom.hpp>
 #include <vtkLine.h>
 #include <vtkSphereSource.h>
 #include <vtkDiskSource.h>
@@ -50,10 +55,10 @@
 #include <vtkLinearExtrusionFilter.h>
 #include <vtkConeSource.h>
 #include <vtkCamera.h>
-//#include<pkg/dem/Clump.hpp>
-#include <pkg/common/Aabb.hpp>
 #include <vtkImplicitBoolean.h>
 #include <vtkIntArray.h>
+
+#endif // YADE_VTK
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -219,7 +224,7 @@ YADE_PLUGIN((Gl1_PotentialParticle));
 
 #endif // YADE_OPENGL
 
-
+#ifdef YADE_VTK
 ImpFunc * ImpFunc::New() {
 	// Skip factory stuff - create class
 	return new ImpFunc;
@@ -628,6 +633,7 @@ void PotentialParticleVTKRecorder::action() {
 
 YADE_PLUGIN((PotentialParticleVTKRecorder));
 
+#endif // YADE_VTK
 } // namespace yade
 
 #endif // YADE_POTENTIAL_PARTICLES

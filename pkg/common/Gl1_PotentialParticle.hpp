@@ -8,21 +8,24 @@
 #include <vector>
 #include <pkg/common/PeriodicEngines.hpp>
 
-#include <vtkImplicitFunction.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
-#include <vtkPolyData.h>
-
-#include <vtkXMLUnstructuredGridWriter.h>
-
 // https://codeyarns.com/2014/03/11/how-to-selectively-ignore-a-gcc-warning/
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wcomment"
 // Code that generates this warning, Note: we cannot do this trick in yade. If we have a warning in yade, we have to fix it! See also https://gitlab.com/yade-dev/trunk/merge_requests/73
 // This method will work once g++ bug https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431#c34 is fixed.
-#include<vtkTriangle.h>
+
 #pragma GCC diagnostic pop
+
+#ifdef YADE_VTK
+
+#include <vtkImplicitFunction.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
+#include <vtkPolyData.h>
+
+#include <vtkXMLUnstructuredGridWriter.h>
+#include<vtkTriangle.h>
 
 #include <vtkSmartPointer.h>
 #include <vtkFloatArray.h>
@@ -49,8 +52,11 @@
 #include <vtkTextActor3D.h>
 #include <vtkCylinderSource.h>
 
+#endif // YADE_VTK
+
 namespace yade { // Cannot have #include directive inside.
 
+#ifdef YADE_VTK
 class ImpFunc : public vtkImplicitFunction {
 	public:
 		vtkTypeMacro(ImpFunc,vtkImplicitFunction);
@@ -101,6 +107,8 @@ class ImpFunc : public vtkImplicitFunction {
 		// Add parameters/members here if you need
 };
 
+#endif // YADE_VTK
+
 #ifdef YADE_OPENGL
 class Gl1_PotentialParticle : public GlShapeFunctor {
 	private :
@@ -137,7 +145,7 @@ class Gl1_PotentialParticle : public GlShapeFunctor {
 REGISTER_SERIALIZABLE(Gl1_PotentialParticle);
 #endif // YADE_OPENGL
 
-
+#ifdef YADE_VTK
 class PotentialParticleVTKRecorder: public PeriodicEngine {
 	public:
 		vtkSmartPointer<ImpFunc> function;
@@ -163,6 +171,8 @@ class PotentialParticleVTKRecorder: public PeriodicEngine {
 	// clang-format on
 };
 REGISTER_SERIALIZABLE(PotentialParticleVTKRecorder);
+
+#endif // YADE_VTK
 
 } // namespace yade
 

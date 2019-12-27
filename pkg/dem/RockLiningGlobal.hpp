@@ -1,7 +1,7 @@
 /*CWBoon 2016 */
 /* Please cite: */
 /* CW Boon, GT Houlsby, S Utili (2015).  Designing Tunnel Support in Jointed Rock Masses Via the DEM.  Rock Mechanics and Rock Engineering,  48 (2), 603-632. */
-#ifdef YADE_POTENTIAL_BLOCKS
+#if defined(YADE_POTENTIAL_BLOCKS) && defined(YADE_VTK)
 #pragma once
 #include <pkg/dem/PotentialBlock.hpp>
 #include <pkg/dem/PotentialBlock2AABB.hpp>
@@ -168,4 +168,4 @@ extern "C" {
 #ifdef __cplusplus
 };
 #endif
-#endif // YADE_POTENTIAL_BLOCKS
+#endif // YADE_POTENTIAL_BLOCKS && YADE_VTK

@@ -6,9 +6,11 @@
 #include<pkg/dem/ScGeom.hpp>
 #include<pkg/common/Aabb.hpp>
 
-#include <lib/compatibility/VTKCompatibility.hpp>
-
 #include "Gl1_PotentialBlock.hpp"
+
+#ifdef YADE_VTK
+
+#include <lib/compatibility/VTKCompatibility.hpp>
 #include <vtkFloatArray.h>
 #include<vtkUnstructuredGrid.h>
 #include<vtkXMLUnstructuredGridWriter.h>
@@ -53,6 +55,7 @@
 #include <vtkImplicitBoolean.h>
 #include <vtkIntArray.h>
 
+#endif // YADE_VTK
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -282,6 +285,7 @@ namespace yade { // Cannot have #include directive inside.
 //#endif // YADE_OPENGL
 
 
+#ifdef YADE_VTK
 
 ImpFuncPB * ImpFuncPB::New()
 {
@@ -1183,6 +1187,7 @@ void PotentialBlockVTKRecorder::action(){
 
 YADE_PLUGIN((PotentialBlockVTKRecorder)(PotentialBlockVTKRecorderTunnel));
 
+#endif // YADE_VTK
 
 } // namespace yade
 
