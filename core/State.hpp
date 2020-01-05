@@ -59,9 +59,9 @@ class State: public Serializable, public Indexable{
 		((bool,isDamped,true,,"Damping in :yref:`NewtonIntegrator` can be deactivated for individual particles by setting this variable to FALSE. E.g. damping is inappropriate for particles in free flight under gravity but it might still be applicable to other particles in the same simulation."))
 		((Real,densityScaling,-1,,"|yupdate| see :yref:`GlobalStiffnessTimeStepper::targetDt`."))
 #ifdef YADE_SPH
-		((Real,rho, -1.0,, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
-		((Real,rho0,-1.0,, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)
-		((Real,press,0.0,, "Pressure (only for SPH-model)"))             // [Mueller2003], (12)
+		((Real,rho, -1.0,/*Attr::readonly*/, "Current density (only for SPH-model)"))      // [Mueller2003], (12)
+		((Real,rho0,-1.0,/*Attr::readonly*/, "Rest density (only for SPH-model)"))         // [Mueller2003], (12)
+		((Real,press,0.0,/*Attr::readonly*/, "Pressure (only for SPH-model)"))             // [Mueller2003], (12)
 #endif
 #ifdef YADE_LIQMIGRATION
 		((Real,Vf, 0.0,,   "Individual amount of liquid"))
@@ -96,11 +96,6 @@ class State: public Serializable, public Indexable{
 		.add_property("ori",&State::ori_get,&State::ori_set,"Current orientation.")
 		.def("displ",&State::displ,"Displacement from :yref:`reference position<State.refPos>` (:yref:`pos<State.pos>` - :yref:`refPos<State.refPos>`)")
 		.def("rot",&State::rot,"Rotation from :yref:`reference orientation<State.refOri>` (as rotation vector)")
-#ifdef YADE_SPH
-		.add_property("rho",  &State::rho, "Returns the current density (only for SPH-model).")
-		.add_property("rho0", &State::rho0,"Returns the rest density (only for SPH-model).")
-		.add_property("press",&State::press,"Returns the pressure (only for SPH-model).")
-#endif
 	);
 	// clang-format on
 	REGISTER_INDEX_COUNTER(State);
