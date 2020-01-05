@@ -194,7 +194,7 @@ make_opposite:
   before_script:
     # there can be only one before_script:, so the line below cannot be in a separate template
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
-    - export EXTRA_CMAKE_ARGS="-DENABLE_LOGGER=OFF -DENABLE_MASK_ARBITRARY=ON -DENABLE_OPENMP=OFF -DLIQMIGRATION=ON -DPROFILING=ON -DSPH=ON -DDEFORM=ON $EXTRA_CMAKE_ARGS"
+    - export EXTRA_CMAKE_ARGS="-DENABLE_LOGGER=OFF -DENABLE_MASK_ARBITRARY=ON -DENABLE_OPENMP=OFF -DENABLE_LIQMIGRATION=ON -DENABLE_PROFILING=ON -DENABLE_SPH=ON -DENABLE_DEFORM=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
