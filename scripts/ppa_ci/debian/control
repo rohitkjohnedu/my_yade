@@ -10,6 +10,7 @@ X-Python-Version: current
 Build-Depends:
  cmake,
  debhelper (>= 9),
+ dh-python,
  freeglut3-dev,
  help2man,
  libboost-all-dev,
