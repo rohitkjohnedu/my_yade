@@ -398,7 +398,7 @@ void DeformControl::action()
   Scene* scene=Omega::instance().getScene().get();
   const BodyContainer& b = *scene->bodies;
 
-  for(int i = 0; i < b.size(); ++i)
+  for(size_t i = 0; i < b.size(); ++i)
   {
     vector<double> dsi;
     if ( Sphere* s1 = dynamic_cast<Sphere*>(b[i]->shape.get()) )
@@ -412,7 +412,7 @@ void DeformControl::action()
         if(!it->second->isReal()) continue;
 
         unsigned int partnerID;
-        if( it->second->getId1() == i )
+        if( it->second->getId1() == Body::id_t(i) )
         {
           partnerID = it->second->getId2();
         } else

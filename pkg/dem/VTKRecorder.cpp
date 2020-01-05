@@ -768,8 +768,8 @@ void VTKRecorder::action(){
 
 #ifdef YADE_DEFORM
                                 if (recActive[REC_DEFORM]){
-					const Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
-					spheresRealRad->InsertNextValue(b->state->dR + sphere->radius);
+					const Sphere* sphereDef = dynamic_cast<Sphere*>(b->shape.get());
+					spheresRealRad->InsertNextValue(b->state->dR + sphereDef->radius);
                                 }
 #endif
 
@@ -979,7 +979,7 @@ void VTKRecorder::action(){
 #endif
 
 #ifdef YADE_DEFORM
-                if (recACtive[REC_DEFORM]){
+                if (recActive[REC_DEFORM]){
 		spheresUg->GetPointData()->AddArray(spheresRealRad);
                 }
 #endif
