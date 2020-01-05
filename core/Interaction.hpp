@@ -48,7 +48,14 @@ class Interaction: public Serializable{
 		void reset();
 		//! common initialization called from both constructor and reset()
 		void init();
-			
+
+	        virtual ::boost::python::dict pyDictCustom() const
+	        {
+		        ::boost::python::dict ret;
+		        ret["isReal"] = ::boost::python::object(isReal());
+		        return ret;
+	        }
+
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
 		((Body::id_t,id1,0,Attr::readonly,":yref:`Id<Body::id>` of the first body in this interaction."))
@@ -63,8 +70,7 @@ class Interaction: public Serializable{
 		,
 		/* ctor */ init(),
 		/*py*/
-		// FIXME - Inspector does not show isReal in GUI, it should be there with Attr::readonly so that we could see it.
-		.add_property("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise.")
+		.def_readonly("isReal",&Interaction::isReal,"True if this interaction has both geom and phys; False otherwise. :yattrflags:`2` ")
 		.def_readwrite("isActive",&Interaction::isActive,"True if this interaction is active. Otherwise the forces from this interaction will not be taken into account. True by default.")
 	);
 	// clang-format on

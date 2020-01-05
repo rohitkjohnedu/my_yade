@@ -163,7 +163,7 @@ if(key==BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z))){ \
 #define _REGISTER_ATTRIBUTES_DEPREC(thisClass,baseClass,attrs,deprec)  _REGISTER_BOOST_ATTRIBUTES(baseClass,attrs) public: \
 	void pySetAttr(const std::string& key, const ::boost::python::object& value){BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR,~,attrs); BOOST_PP_SEQ_FOR_EACH(_PYSET_ATTR_DEPREC,thisClass,deprec); baseClass::pySetAttr(key,value); } \
 	/* list all attributes (except deprecated ones); could return ::boost::python::set instead*/ /* ::boost::python::list pyKeys() const {  ::boost::python::list ret; BOOST_PP_SEQ_FOR_EACH(_PYKEYS_ATTR,~,attrs); ret.extend(baseClass::pyKeys()); return ret; }  */ \
-	/* return dictionary of all acttributes and values; deprecated attributes omitted */ ::boost::python::dict pyDict() const { ::boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(baseClass::pyDict()); return ret; } \
+	/* return dictionary of all acttributes and values; deprecated attributes omitted */ ::boost::python::dict pyDict() const { ::boost::python::dict ret; BOOST_PP_SEQ_FOR_EACH(_PYDICT_ATTR,~,attrs); ret.update(this->pyDictCustom()); ret.update(baseClass::pyDict()); return ret; } \
 	virtual void callPostLoad(void){ baseClass::callPostLoad(); postLoad(*this); }
 
 
@@ -289,6 +289,7 @@ class Serializable: public Factorable {
 		virtual void pySetAttr(const std::string& key, const ::boost::python::object& /*value*/){ PyErr_SetString(PyExc_AttributeError,(std::string("No such attribute: ")+key+".").c_str()); ::boost::python::throw_error_already_set(); };
 		//virtual ::boost::python::list pyKeys() const { return ::boost::python::list(); };
 		virtual ::boost::python::dict pyDict() const { return ::boost::python::dict(); }
+		virtual ::boost::python::dict pyDictCustom() const { return ::boost::python::dict(); }
 		virtual void callPostLoad(void){ postLoad(*this); }
 		// check whether the class registers itself or whether it calls virtual function of some base class;
 		// that means that the class doesn't register itself properly
