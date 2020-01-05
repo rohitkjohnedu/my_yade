@@ -784,7 +784,7 @@ All (serializable) types in Yade are one of the following:
 
 Yade uses the excellent `boost::serialization <http://www.boost.org/doc/libs/release/libs/serialization/>`_ library internally for serialization of data.
 
-.. note:: ``YADE_CLASS_BASE_DOC_ATTRS`` also generates code for attribute access from python; this will be discussed later. Since this macro serves both purposes, the consequence is that attributes that are serialized can always be accessed from python.
+.. note:: ``YADE_CLASS_BASE_DOC_ATTRS`` also generates code for attribute access from python; this will be :ref:`discussed later <YADE_CLASS_BASE_DOC>`. Since this macro serves both purposes, the consequence is that attributes that are serialized can always be accessed from python.
 
 Yade also provides callback for before/after (de) serialization, virtual functions :yref:`Serializable::preProcessAttributes` and :yref:`Serializable::postProcessAttributes`, which receive one ``bool deserializing`` argument (``true`` when deserializing, ``false`` when serializing). Their default implementation in :yref:`Serializable` doesn't do anything, but their typical use is:
 
@@ -928,11 +928,15 @@ Expected parameters are indicated by macro name components separated with unders
 ``base``
 	(unquoted) name of the base class (used for RTTI and python)
 ``doc``
-	docstring of this class, written in the ReST syntax. This docstring will appear in generated documentation (such as :yref:`CpmMat`). It can be as long as necessary, but sequences interpreted by c++ compiler must be properly escaped (therefore some backslashes must be doubled, like in :math:`\sigma=\epsilon E`::
+	docstring of this class, written in the ReST syntax. This docstring will appear in generated documentation (such as :yref:`CpmMat`). It can be as long as necessary, use `string literal <https://en.cppreference.com/w/cpp/language/string_literal>`__ to avoid sequences interpreted by c++ compiler (so that some backslashes don't have to be doubled, like in :math:`\sigma=\epsilon E`) instead of writing this::
 	
 		":math:`\\sigma=\\epsilon E"
-		
-	Use ``\n`` and ``\t`` for indentation inside the docstring. Hyperlink the documentation abundantly with ``yref`` (all references to other classes should be hyperlinks).
+
+	Write following: ``R"""(:math:`\sigma=\epsilon E`)"""``. When the ``R"""(raw text)"""`` is used the escaped characters ``\n`` and ``\t`` do not have to be written. Newlines and tabs can be used instead. Hyperlink the documentation abundantly with ``yref`` (all references to other classes should be hyperlinks). See :ref:`previous section <sphinxdocumentation>` about syntax on using references and anchors.
+
+.. hint::
+	Use C++ `string literal <https://en.cppreference.com/w/cpp/language/string_literal>`__ when writing docstrings in C++. By convention the ``R"""(raw text)"""`` is used. For example see :ref:`here <debug-exceptions>` and :ysrccommit:`here<c5993a086/pkg/dem/VTKRecorder.hpp#L27>`.
+
 
 	See :ref:`sphinxdocumentation` for syntax details.
 ``attrs``
@@ -960,7 +964,7 @@ Expected parameters are indicated by macro name components separated with unders
 
 		No initial value will be assigned for attribute of which initial value is left empty (as is for attr2 in the above example). Note that you still have to write the commas.
 
-	#. Registration of the attribute in the serialization system (unless disabled by attrFlags -- see below)
+	#. Registration of the attribute in the serialization system (unless disabled by attrFlags -- :ref:`see below <attribute-flags>`)
 
 	#. Registration of the attribute in python (unless disabled by attrFlags), so that it can be accessed as ``klass().name1``.
 		The attribute is read-write by default, see attrFlags to change that.
@@ -974,6 +978,8 @@ Expected parameters are indicated by macro name components separated with unders
 		leading to :yref:`CpmMat::dmgTau`.
 
 		The attribute is registered via ``boost::python::add_property`` specifying ``return_by_value`` policy rather than ``return_internal_reference``, which is the default when using ``def_readwrite``. The reason is that we need to honor custom converters for those values; see note in :ref:`customconverters` for details.
+
+.. _attribute-flags:
 
 	.. admonition:: Attribute flags
 
@@ -1032,6 +1038,12 @@ Expected parameters are indicated by macro name components separated with unders
 		.def_readonly("Fn",&CpmPhys::Fn,"Magnitude of normal force.")
 
 	``def_readonly`` will not work for custom types (such as std::vector), as it bypasses conversion registry; see :ref:`customconverters` for details.
+
+
+Exposing function-attributes to GUI
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Usually to expose a more complex data a getter and setter functions are used, for example :yref:`Body::mask`. They are accessible from python. To make them visible in GUI without a corresponding variable at all a function ``virtual ::boost::python::dict pyDictCustom() const { …… };`` must be overridden. For example see :ysrc:`core/Interaction.hpp` where a special attribute ``isReal`` is exposed to GUI. To mark such :ysrccommit:`attribute as readonly <bf906f74a6/lib/serialization/Serializable.hpp#L33>` an extra information has to be added to its docstring: ``:yattrflags:`2```. Normally it is put there by the :ref:`class attribute registration macros <YADE_CLASS_BASE_DOC>`. But since it is not a variable, such attribute has to be added manually.
 
 
 Special python constructors
