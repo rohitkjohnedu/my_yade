@@ -932,13 +932,9 @@ Expected parameters are indicated by macro name components separated with unders
 	
 		":math:`\\sigma=\\epsilon E"
 
-	Write following: ``R"""(:math:`\sigma=\epsilon E`)"""``. When the ``R"""(raw text)"""`` is used the escaped characters ``\n`` and ``\t`` do not have to be written. Newlines and tabs can be used instead. Hyperlink the documentation abundantly with ``yref`` (all references to other classes should be hyperlinks). See :ref:`previous section <sphinxdocumentation>` about syntax on using references and anchors.
-
-.. hint::
-	Use C++ `string literal <https://en.cppreference.com/w/cpp/language/string_literal>`__ when writing docstrings in C++. By convention the ``R"""(raw text)"""`` is used. For example see :ref:`here <debug-exceptions>` and :ysrccommit:`here<c5993a086/pkg/dem/VTKRecorder.hpp#L27>`.
+	Write following: ``R"""(:math:`\sigma=\epsilon E`)"""``. When the ``R"""(raw text)"""`` is used the escaped characters ``\n`` and ``\t`` do not have to be written. Newlines and tabs can be used instead. For example see :ref:`here <debug-exceptions>` and :ysrccommit:`here<c5993a086/pkg/dem/VTKRecorder.hpp#L27>`. Hyperlink the documentation abundantly with ``yref`` (all references to other classes should be hyperlinks). See :ref:`previous section <sphinxdocumentation>` about syntax on using references and anchors.
 
 
-	See :ref:`sphinxdocumentation` for syntax details.
 ``attrs``
 	Attribute must be written in the form of parethesized list:
 
