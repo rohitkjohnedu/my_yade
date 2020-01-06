@@ -1039,7 +1039,7 @@ Expected parameters are indicated by macro name components separated with unders
 Exposing function-attributes to GUI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Usually to expose a more complex data a getter and setter functions are used, for example :yref:`Body::mask`. They are accessible from python. To make them visible in GUI without a corresponding variable at all a function ``virtual ::boost::python::dict pyDictCustom() const { …… };`` must be overridden. For example see :ysrc:`core/Interaction.hpp` where a special attribute ``isReal`` is exposed to GUI. To mark such :ysrccommit:`attribute as readonly <bf906f74a6/lib/serialization/Serializable.hpp#L33>` an extra information has to be added to its docstring: ``:yattrflags:`2```. Normally it is put there by the :ref:`class attribute registration macros <YADE_CLASS_BASE_DOC>`. But since it is not a variable, such attribute has to be added manually.
+Usually to expose a more complex data a getter and setter functions are used, for example :yref:`Body::mask`. They are accessible from python. To make them visible in GUI without a corresponding variable at all a function ``virtual ::boost::python::dict pyDictCustom() const { …… };`` must be overridden. For example see :ysrccommit:`Interaction.hpp <c5cb80a8ff9dcb4c90da1d2bbe86c0804c5a6276/core/Interaction.hpp#L52>` where a special attribute ``isReal`` is exposed to GUI. To mark such :ysrccommit:`attribute as readonly <bf906f74a6/lib/serialization/Serializable.hpp#L33>` an extra information has to be added to its docstring: ``:yattrflags:`2```. Normally it is put there by the :ref:`class attribute registration macros <YADE_CLASS_BASE_DOC>`. But since it is not a variable, such attribute has to be added manually.
 
 
 Special python constructors
