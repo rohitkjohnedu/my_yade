@@ -78,13 +78,10 @@ void FoamCoupling::insertBodyId(int bId){
 
 void FoamCoupling::eraseId(int bId){
 	auto it = std::find(bodyList.begin(), bodyList.end(), bId);
-	if (it != bodyList.end()){bodyList.erase(it); return true; }
+	if (it != bodyList.end()){bodyList.erase(it); bodyListModiFied=true; }
 	else {
 		LOG_ERROR("Id not found in list of ids in coupling"); 
-		return false; 
 	}
-	bodyListModified = true; 
-// FIXME: return true or false ??
 }
 
 
