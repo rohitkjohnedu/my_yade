@@ -457,7 +457,7 @@ int Subdomain::probeIncoming(int sourceRank, int tag) {
 	int sz;
 	MPI_Get_count(&status, MPI_CHAR, &sz);
 	return sz; mpiStatus.push_back(status);
-
+// suspicious push_back after return ??
 }
 
 void Subdomain::recvBuff(char* cbuf, int cbufsZ, int sourceRank, MPI_Request& request) {
