@@ -76,7 +76,7 @@ void FoamCoupling::insertBodyId(int bId){
 	bodyListModified = true; 
 }
 
-bool FoamCoupling::eraseId(int bId){
+void FoamCoupling::eraseId(int bId){
 	auto it = std::find(bodyList.begin(), bodyList.end(), bId);
 	if (it != bodyList.end()){bodyList.erase(it); return true; }
 	else {
