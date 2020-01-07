@@ -456,7 +456,6 @@ int Subdomain::probeIncoming(int sourceRank, int tag) {
 	}
 	int sz;
 	MPI_Get_count(&status, MPI_CHAR, &sz);
-	mpiStatus.push_back(status);
 	return sz;
 }
 
