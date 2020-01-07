@@ -76,7 +76,7 @@ class FoamCoupling : public GlobalEngine {
 		void buildLocalIds(); 
 		void exchangeDeltaTParallel(); 
 		void insertBodyId(int); 
-		bool eraseId(int);
+		void eraseId(int);
 		int getNumBodies(); 
 		std::vector<int> getIdList(); 
 		MPI_Comm *myComm_p; 
