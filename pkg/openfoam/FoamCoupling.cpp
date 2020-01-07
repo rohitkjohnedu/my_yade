@@ -84,6 +84,7 @@ bool FoamCoupling::eraseId(int bId){
 		return false; 
 	}
 	bodyListModified = true; 
+// FIXME: return true or false ??
 }
 
 
