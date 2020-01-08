@@ -494,3 +494,5 @@ Yubuntu
 If you are not running a Linux system there is a way to create an Ubuntu `live-usb <http://en.wikipedia.org/wiki/Live_USB>`_ on any usb mass-storage device (minimum size 10GB). It is a way to boot the computer on a linux system with Yadedaily pre-installed without affecting the original system. More informations about this alternative are available `here <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_ (see the README file first).
 
 Alternatively, images of a linux virtual machine can be downloaded, `here again <http://people.3sr-grenoble.fr/users/bchareyre/pubs/yubuntu/>`_, and they should run on any system with a virtualization software (tested with VirtualBox and VMWare).
+
+
