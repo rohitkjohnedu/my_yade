@@ -31,7 +31,7 @@ except OSError as exc:
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([PotentialBlock2AABB()],verletDist=0.01),
+	InsertionSortCollider([PotentialBlock2AABB()],verletDist=0.01, avoidSelfInteractionMask=2),
 	InteractionLoop(
 		[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True)],
 		[Ip2_FrictMat_FrictMat_KnKsPBPhys(kn_i=1e8, ks_i=1e7, Knormal=1e8, Kshear=1e7, useFaceProperties=False, viscousDamping=0.2)],

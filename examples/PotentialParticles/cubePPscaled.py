@@ -19,7 +19,7 @@ Gl1_PotentialParticle().store=True
 
 O.engines=[
 	ForceResetter(),
-	InsertionSortCollider([PotentialParticle2AABB()],verletDist=0.01),
+	InsertionSortCollider([PotentialParticle2AABB()],verletDist=0.01, avoidSelfInteractionMask=2),
 	InteractionLoop(
 		[Ig2_PP_PP_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True, areaStep=5)],
 		[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=1e8, ks_i=1e7, Knormal = 1e8, Kshear = 1e7, useFaceProperties=False, viscousDamping=0.05)],

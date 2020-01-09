@@ -79,6 +79,7 @@ p.saveBlockGenData=True #if True, data of the BlockGen are written in a file; if
 p.outputFile="BlockGen_Output.txt" #if empty, the block generation data are not written at all
 
 p.load()
+O.engines[1].avoidSelfInteractionMask=2
 O.engines[2].lawDispatcher.functors[0].initialOverlapDistance = p.initialOverlap - 1e-6
 O.engines[2].lawDispatcher.functors[0].allowBreakage = False
 O.engines[2].lawDispatcher.functors[0].allowViscousAttraction=True
@@ -130,6 +131,7 @@ rPP = p.rForPP
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Bottom plate
 bbb = Body()
+bbb.mask=3
 color=[0,0.5,1]
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
@@ -145,6 +147,7 @@ O.bodies.append(bbb)
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Lateral plate A
 bA = Body()
+bA.mask=3
 color=[0,0.5,1]
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
@@ -160,6 +163,7 @@ O.bodies.append(bA)
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Lateral plate B
 bB = Body()
+bB.mask=3
 color=[0,0.5,1]
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
@@ -175,6 +179,7 @@ O.bodies.append(bB)
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Lateral plate C
 bC = Body()
+bC.mask=3
 color=[0,0.5,1]
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
@@ -190,6 +195,7 @@ O.bodies.append(bC)
 # ----------------------------------------------------------------------------------------------------------------------------------------------- #
 # Lateral plate D
 bD = Body()
+bD.mask=3
 color=[0,0.5,1]
 aPP = [1,-1,0,0,0,0]
 bPP = [0,0,1,-1,0,0]
