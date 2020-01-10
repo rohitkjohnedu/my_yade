@@ -13,6 +13,7 @@ from yade import utils
 from yade import *
 from math import *
 from minieigen import *
+import yade.config
 
 ## TODO tests
 class TestForce(unittest.TestCase): pass
@@ -257,7 +258,11 @@ class TestMatchMaker(unittest.TestCase):
 		
 		O.step()
 		self.assertTrue((atan(O.interactions[id11,id12].phys.tangensOfFrictionAngle)-0.1)==0)
-		self.assertTrue((atan(O.interactions[id21,id22].phys.tangensOfFrictionAngle)-0.2)==0)
+		if(yade.config.highPrecisionMpmath):
+			# looks like with high precision there are some dangling bits at the end
+			self.assertAlmostEqual(atan(O.interactions[id21,id22].phys.tangensOfFrictionAngle),0.2)
+		else:
+			self.assertTrue((atan(O.interactions[id21,id22].phys.tangensOfFrictionAngle)-0.2)==0)
 		self.assertTrue((atan(O.interactions[id31,id32].phys.tangensOfFrictionAngle)-0.3)==0)
 		
 		self.assertTrue(round(O.interactions[id11,id12].phys.cn, 3) - 0.26 == 0)
