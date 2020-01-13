@@ -617,11 +617,11 @@ void ThermalEngine::computeFluidFluidConduction()
 	//		Real fluidToSolidRatio;
 	//		if (cell->info().isCavity && neighborCell->info().isCavity) fluidToSolidRatio = 1.;
 	//		else fluidToSolidRatio = cell->info().facetFluidSurfacesRatio[f_it->second];
-	//		area = fluidConductionAreaFactor * sqrt(cell->info().facetSurfaces[f_it->second].squared_length())*fluidToSolidRatio;
-	//		//area = sqrt(fluidSurfK.squared_length());
+	//		area = fluidConductionAreaFactor * math::sqrt(cell->info().facetSurfaces[f_it->second].squared_length())*fluidToSolidRatio;
+	//		//area = math::sqrt(fluidSurfK.squared_length());
 	//		//poreVector = cell->info() - neighborCell->info();
 	//		poreVector = cellBarycenter(cell) - cellBarycenter(neighborCell);  // voronoi was breaking for hexagonal packings
-	//		distance = sqrt(poreVector.squared_length());
+	//		distance = math::sqrt(poreVector.squared_length());
 	//		//cout << "conduction distance" << distance << endl;
 	//		//if (distance < area) continue;  // hexagonal packings result in extremely small distances that blow up the simulation
 	//		const Real thermalResist = fluidK*area/distance;
