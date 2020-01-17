@@ -113,6 +113,65 @@ using std::type_info;
 using std::vector;
 using boost::shared_ptr;
 
+// This is temporary - before finalizing high precision Real merge.
+// The functions will now appear in yade::math namespace. So all of the other code can be transitioned from using ::std:: to using ::yade::math::
+using Real = ::Real;
+namespace math {
+	using Real = ::yade::Real;
+	using ::std::abs;
+	using ::std::acos;
+	using ::std::acosh;
+	using ::std::asin;
+	using ::std::asinh;
+	using ::std::atan;
+	using ::std::atan2;
+	using ::std::atanh;
+	using ::std::cbrt;
+	using ::std::ceil;
+	using ::std::conj;
+	using ::std::cos;
+	using ::std::cosh;
+	using ::std::erf;
+	using ::std::erfc;
+	using ::std::exp;
+	using ::std::exp2;
+	using ::std::expm1;
+	using ::std::fabs;
+	using ::std::floor;
+	using ::std::fma;
+	using ::std::fmod;
+	using ::std::frexp;
+	using ::std::hypot;
+	using ::std::ilogb;
+	using ::std::imag;
+	using ::std::isfinite;
+	using ::std::isinf;
+	using ::std::isnan;
+	using ::std::ldexp;
+	using ::std::lgamma;
+	using ::std::log;
+	using ::std::log10;
+	using ::std::log1p;
+	using ::std::log2;
+	using ::std::logb;
+	using ::std::max;
+	using ::std::min;
+	using ::std::modf;
+	using ::std::pow;
+	using ::std::real;
+	using ::std::remainder;
+	using ::std::remquo;
+	using ::std::rint;
+	using ::std::round;
+	using ::std::sin;
+	using ::std::sinh;
+	using ::std::sqrt;
+	using ::std::tan;
+	using ::std::tanh;
+	using ::std::tgamma;
+	using ::std::trunc;
+}
+
 template<typename Scalar> using Vector2 = Eigen::Matrix<Scalar,2,1>;
 using Vector2i = Vector2<int>;
 using Vector2r = Vector2<Real>;
