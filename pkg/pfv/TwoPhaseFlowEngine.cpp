@@ -2223,7 +2223,7 @@ void TwoPhaseFlowEngine::getQuantities()
  	
     }
     
-    double areaAveragedPressureAcc = 0.0, areaSphere = 0.0;
+    Real areaAveragedPressureAcc = 0.0, areaSphere = 0.0;
     airWaterInterfacialArea = 0.0;
     for(unsigned int i = 0; i < numberOfPores; i++){
 	if(listOfPores[i]->info().hasInterface){
