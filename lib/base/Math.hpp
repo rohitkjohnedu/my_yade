@@ -171,6 +171,9 @@ namespace math {
 	using ::std::tgamma;
 	using ::std::trunc;
 }
+// Use those which argument dependent lookup (ADL) can't find (but only on ubuntu xenial 16.04 with gcc 5.3.1), because sometimes they are used with non-Real type, like int or float.
+// This saves writing `math::` before the calls. If they were used only with `Real` arguments (like all other mathematic functions) the ADL would find them.
+using math::abs;
 
 template<typename Scalar> using Vector2 = Eigen::Matrix<Scalar,2,1>;
 using Vector2i = Vector2<int>;
