@@ -12,16 +12,8 @@
 #include <lib/factory/ClassFactory.hpp>
 #include <lib/serialization/Serializable.hpp>
 
-#include <loki/Functor.h>
-#include <loki/Typelist.h>
-#include <loki/NullType.h>
-// compat with former yade's local Loki
-#define TYPELIST_1 LOKI_TYPELIST_1
-#define TYPELIST_2 LOKI_TYPELIST_2
-#define TYPELIST_3 LOKI_TYPELIST_3
-#define TYPELIST_4 LOKI_TYPELIST_4
-#define TYPELIST_5 LOKI_TYPELIST_5
-#define TYPELIST_7 LOKI_TYPELIST_7
+#include <lib/compatibility/LokiCompatibility.hpp>
+#include <boost/mpl/size.hpp>
 
 #include <vector>
 #include <list>
@@ -49,13 +41,13 @@ struct DynLibDispatcher_Item1D {
 
 template 
 <
-	class BaseClass,	//	a typelist with base classess involved in the dispatch (or single class, for 1D )
+	class BaseClassList,	//	a typelist with base classess involved in the dispatch (or single class, for 1D )
 				// 		FIXME: should use shared_ptr references, like this: DynLibDispatcher< TYPELIST_2( shared_ptr<PhysicalAction>& , shared_ptr<Body>& ) , ....
 	class Executor,		//	class which gives multivirtual function
 	class ResultType,	//	type returned by multivirtual function
 	class TList,
 				//	typelist of arguments passed to multivirtual function
-				//	WARNING: first arguments must be shared_ptr<BaseClass>, for details see FunctorWrapper
+				//	WARNING: first arguments must be shared_ptr<BaseClass1> and shared_ptr<BaseClass2>, for details see FunctorWrapper
 				
 	bool autoSymmetry=true
 				/*true - the function called is always the same,
@@ -71,39 +63,19 @@ class DynLibDispatcher
 {
 	// this template recursively defines a type for callBacks matrix, with required number of dimensions
 	private:
-		template<class T > struct Matrix {
-				using ResultIterator = Loki::NullType;
-				using ResultIteratorInt = Loki::NullType;
-			};
+	        template <typename T, size_t depth> struct RecursiveVector {
+		        using vec = std::vector<typename RecursiveVector<T, depth - 1>::vec>;
+	        };
+	        template <typename T> struct RecursiveVector<T, 0> {
+		        using vec = T;
+	        };
 
-	template<class Head > struct Matrix< Loki::Typelist< Head, Loki::NullType > > {
-				using Result = vector< shared_ptr< Executor > >;
-				using ResultInt = vector< int >;
-				using ResultIterator = typename vector< shared_ptr< Executor > >::iterator;
-				using ResultIteratorInt = vector< int >::iterator;
-		  };
+	typedef typename ::boost::mpl::at_c<BaseClassList, 0>::type BaseClass1; // 1D
+	typedef typename ::boost::mpl::at_c<BaseClassList, 1>::type BaseClass2; // 2D
 
-	template<class Head, class Tail >
-		  struct Matrix< Loki::Typelist< Head, Tail > > {
-				// recursive typedef to get matrix of required dimensions
-				using InsideType = typename Matrix< Tail >::Result;
-				using InsideTypeInt = typename Matrix< Tail >::ResultInt;
-				using Result = vector< InsideType >;
-				using ResultInt = vector< InsideTypeInt >;
-				using ResultIterator = typename vector< InsideType >::iterator;
-				using ResultIteratorInt = typename vector< InsideTypeInt >::iterator;
-		  };
+	using MatrixType    = typename RecursiveVector<shared_ptr<Executor>, boost::mpl::size<BaseClassList>::value >::vec;
+	using MatrixIntType = typename RecursiveVector<int, boost::mpl::size<BaseClassList>::value >::vec;
 
-	typedef typename Loki::TL::Append<  Loki::NullType , BaseClass >::Result BaseClassList;
-	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 0>::Result    BaseClass1;  // 1D
-	typedef typename Loki::TL::TypeAtNonStrict<BaseClassList , 1>::Result    BaseClass2;  // 2D
-	
-	
-	typedef typename Matrix< BaseClassList >::ResultIterator     Iterator2; // outer iterator 2D
-	typedef typename Matrix< BaseClassList >::ResultIteratorInt  IteratorInfo2;
-	
-	typedef typename Matrix< BaseClassList >::Result MatrixType;
-	typedef typename Matrix< BaseClassList >::ResultInt MatrixIntType;
 	MatrixType callBacks;        // multidimensional matrix that stores functors ( 1D, 2D, 3D, 4D, ....)
 	MatrixIntType callBacksInfo; // multidimensional matrix for extra information about functors in the matrix
 	                             // currently used to remember if it is reversed functor
@@ -233,9 +205,9 @@ class DynLibDispatcher
 
 			callBacks.resize( maxCurrentIndex1+1 );		// resizing callBacks table
 			callBacksInfo.resize( maxCurrentIndex1+1 );
-			for( Iterator2 ci = callBacks.begin() ; ci != callBacks.end() ; ++ci )
+			for( auto ci = callBacks.begin() ; ci != callBacks.end() ; ++ci )
 				ci->resize(maxCurrentIndex2+1);
-			for( IteratorInfo2 cii = callBacksInfo.begin() ; cii != callBacksInfo.end() ; ++cii )
+			for( auto cii = callBacksInfo.begin() ; cii != callBacksInfo.end() ; ++cii )
 				cii->resize(maxCurrentIndex2+1);
 	
 			if( typeid(BaseClass1) == typeid(BaseClass2) ) // both base classes are the same

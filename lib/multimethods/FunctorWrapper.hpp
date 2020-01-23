@@ -10,16 +10,10 @@
 
 
 #include<lib/serialization/Serializable.hpp>
+#include<lib/compatibility/LokiCompatibility.hpp>
 
-#include<loki/Typelist.h>
-#include<loki/Functor.h>
-// compat with former yade's local Loki
-#define TYPELIST_1 LOKI_TYPELIST_1
-#define TYPELIST_2 LOKI_TYPELIST_2
-#define TYPELIST_3 LOKI_TYPELIST_3
-#define TYPELIST_4 LOKI_TYPELIST_4
-#define TYPELIST_5 LOKI_TYPELIST_5
-#define TYPELIST_7 LOKI_TYPELIST_7
+#include <boost/mpl/vector.hpp>
+#include <boost/mpl/at.hpp>
 
 #include <string>
 
@@ -98,14 +92,13 @@ template
 class FunctorWrapper //: public Serializable // FIXME functor shouldn't be serializable
 {
 	private : 
-		typedef Loki::FunctorImpl<ResultType, ArgumentTypeList > Impl;
-		typedef typename Impl::Parm1 Parm1;
-		typedef typename Impl::Parm2 Parm2;
-		typedef typename Impl::Parm3 Parm3;
-		typedef typename Impl::Parm4 Parm4;
-		typedef typename Impl::Parm5 Parm5;
-		typedef typename Impl::Parm6 Parm6;
-		typedef typename Impl::Parm7 Parm7;
+		using Parm1 = typename boost::mpl::at_c< ArgumentTypeList ,0>::type;
+		using Parm2 = typename boost::mpl::at_c< ArgumentTypeList ,1>::type;
+		using Parm3 = typename boost::mpl::at_c< ArgumentTypeList ,2>::type;
+		using Parm4 = typename boost::mpl::at_c< ArgumentTypeList ,3>::type;
+		using Parm5 = typename boost::mpl::at_c< ArgumentTypeList ,4>::type;
+		using Parm6 = typename boost::mpl::at_c< ArgumentTypeList ,5>::type;
+		using Parm7 = typename boost::mpl::at_c< ArgumentTypeList ,6>::type;
 	
 		ResultType error(int n)
 		{
