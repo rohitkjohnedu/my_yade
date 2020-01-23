@@ -193,7 +193,11 @@ public:
     a = (PyArrayObject*)PyArray_FromObject(
         obj, detail::numpy_type_map<T>::typenum, NDims, NDims);
     if (a == NULL) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wterminate"
       throw boost::python::error_already_set();
+#pragma GCC diagnostic pop
     }
 
     init_from_array(a);
@@ -222,7 +226,11 @@ public:
     a = (PyArrayObject*)PyArray_SimpleNew(
         NDims, shape, detail::numpy_type_map<T>::typenum);
     if (a == NULL) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wterminate"
       throw boost::python::error_already_set();
+#pragma GCC diagnostic pop
     }
 
     init_from_array(a);
