@@ -467,17 +467,21 @@ void InsertionSortCollider::action()
 		/* each inversion in insertionSort calls may add interaction */
 		//1000 bodies is heuristic minimum above which parallel sort is called
 		if (!periodic)
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 3; i++)
+/*
 #ifdef YADE_OPENMP
+			{
 				if (ompThreads <= 1 || nBodies < 1000)
 					insertionSort(BB[i], interactions, scene);
 				else
 					insertionSortParallel(BB[i], interactions, scene);
 			}
 #else
+*/
+			{
 				insertionSort(BB[i], interactions, scene);
 			}
-#endif
+//#endif
 		else
 			for (int i = 0; i < 3; i++)
 				insertionSortPeri(BB[i], interactions, scene);
