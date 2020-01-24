@@ -38,11 +38,11 @@ numberTests = 3
 numThreads=os.environ['OMP_NUM_THREADS'] if (len(os.environ['OMP_NUM_THREADS'])==2) else ('0'+os.environ['OMP_NUM_THREADS'])
 
 if(yade.runtime.opts.stdperformance):
-	radRAD      = [80.91]
-	iterN       = [2000]
-	coefCor     = [2]
+	radRAD      = [30.77]
+	iterN       = [7000]
+	coefCor     = [9]
 	numberTests = 10
-	print("\033[93m Running --stdperformance test: 200000 spheres, "+str(iterN)+" iterations, average over "+str(numberTests)+" runs. Threads: "+str(numThreads)+"\033[0m")
+	print("\033[93m Running --stdperformance test: 10000 spheres, "+str(iterN)+" iterations, average over "+str(numberTests)+" runs. Threads: "+str(numThreads)+"\033[0m")
 elif(yade.runtime.opts.quickperformance):
 	radRAD      = [23.658]
 	iterN       = [2000]
@@ -108,7 +108,7 @@ while len(iterVel) < (numberTests*len(radRAD)):
 				[Ip2_ViscElMat_ViscElMat_ViscElPhys()],
 				[Law2_ScGeom_ViscElPhys_Basic()],
 			),
-			NewtonIntegrator(damping=0,gravity=[0,0,-9.81]),
+			NewtonIntegrator(damping=0,gravity=[0,-9.81,0]),
 		]
 		
 		print("number of bodies %d"%len(O.bodies))
@@ -131,12 +131,15 @@ while len(iterVel) < (numberTests*len(radRAD)):
 		iterVel += [nbIter/(tEnd-tStart)]
 		testTime += [tEnd-tStart]
 		particlesNumber += [len(O.bodies)]
-	if((len(radRAD) == 1) and yade.runtime.opts.stdperformance and ( numberTests >= 5 ) and ( len(iterVel) >= numberTests )):
-		# this loop will keep removing outliers which are too far away from average result. Must have have at least 5 results for this to work
-		iterVelNumpy , avgVel , dispVel = calcAverageSoFar( len(iterVel) , iterVel , len(radRAD) , 0 )
-		if (dispVel>2.0):
-			# standard deviation is too big, remove two largest outliers. Better to remove two, otherwise if the situation changed (another program was stopped) only the last result would be kept being removed.
-			for zz in range(2):
+	# in --stdperformance test an attempt is made to find an average with low standard deviation.
+	if((len(radRAD) == 1) and yade.runtime.opts.stdperformance and ( numberTests >= 7 ) and ( len(iterVel) >= numberTests )):
+		# this loop will keep removing outliers which are too far away from average result. Must have have at least 7 results for this to work
+		# If standard deviation is too big, then remove largest outliers. Better to check three times, otherwise if the situation changed
+		# (another program was stopped) only the last result would be kept being removed.
+		for outliers in range(3):
+			iterVelNumpy , avgVel , dispVel = calcAverageSoFar( len(iterVel) , iterVel , len(radRAD) , 0 )
+			# remove only if standard deviation is too big.
+			if (dispVel>2.0):
 				pos=None
 				maxDiff=0
 				for z in range(len(iterVel)):
@@ -146,7 +149,7 @@ while len(iterVel) < (numberTests*len(radRAD)):
 						pos     = z
 					#print("\033[93m maxDiff="+str(maxDiff)+" pos="+str(pos)+"\033[0m")
 				# will remove position 'pos' from the results.
-				print("\033[93m Standard deviation "+str(dispVel)+" too large, removing result number: "+str(pos)+"\033[0m")
+				print("\033[93m Standard deviation "+str(dispVel)+" too large, removing result number "+str(pos)+"\033[0m, current average vel: "+str(avgVel))
 				del iterVel[pos]
 				del testTime[pos]
 				del particlesNumber[pos]
