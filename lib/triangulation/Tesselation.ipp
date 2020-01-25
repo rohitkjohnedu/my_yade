@@ -17,8 +17,6 @@ namespace CGT {
 using std::cerr;
 using std::cout;
 using std::endl;
-using std::vector;
-using std::ifstream;
 
 template<class TT>
 _Tesselation<TT>::_Tesselation ( void )
