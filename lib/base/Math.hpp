@@ -75,7 +75,20 @@
 // This is temporary - before finalizing high precision Real merge.
 namespace yade {
 using Real    = ::Real;
+using Complex = ::std::complex<Real>; // complex is by default enabled in minieigen, this is needed for full interoperability.
+namespace math {
+	using Real           = ::yade::Real;
+	using UnderlyingReal = ::yade::Real;
 }
+}
+
+// The functions will now appear in yade::math namespace. So all of the other code can be transitioned from using ::std:: to using ::yade::math::
+// After transition to high precision this define YADE_REAL_MATH_NAMESPACE will depend on the type of the UnderlyingReal used
+// see https://gitlab.com/yade-dev/trunk/blob/highPrecisionReal/lib/high-precision/Real.hpp
+// It can be ::std or ::boost::multiprecision, also ::mpfr works but is not used (crrently)
+#define YADE_REAL_MATH_NAMESPACE ::std
+#include <lib/high-precision/MathFunctions.hpp>
+#undef YADE_REAL_MATH_NAMESPACE
 
 // https://en.cppreference.com/w/cpp/language/unqualified_lookup
 // https://en.cppreference.com/w/cpp/language/qualified_lookup
@@ -112,68 +125,6 @@ using std::swap;
 using std::type_info;
 using std::vector;
 using boost::shared_ptr;
-
-// This is temporary - before finalizing high precision Real merge.
-// The functions will now appear in yade::math namespace. So all of the other code can be transitioned from using ::std:: to using ::yade::math::
-using Real = ::Real;
-namespace math {
-	using Real = ::yade::Real;
-	using ::std::abs;
-	using ::std::acos;
-	using ::std::acosh;
-	using ::std::asin;
-	using ::std::asinh;
-	using ::std::atan;
-	using ::std::atan2;
-	using ::std::atanh;
-	using ::std::cbrt;
-	using ::std::ceil;
-	using ::std::conj;
-	using ::std::cos;
-	using ::std::cosh;
-	using ::std::erf;
-	using ::std::erfc;
-	using ::std::exp;
-	using ::std::exp2;
-	using ::std::expm1;
-	using ::std::fabs;
-	using ::std::floor;
-	using ::std::fma;
-	using ::std::fmod;
-	using ::std::frexp;
-	using ::std::hypot;
-	using ::std::ilogb;
-	using ::std::imag;
-	using ::std::isfinite;
-	using ::std::isinf;
-	using ::std::isnan;
-	using ::std::ldexp;
-	using ::std::lgamma;
-	using ::std::log;
-	using ::std::log10;
-	using ::std::log1p;
-	using ::std::log2;
-	using ::std::logb;
-	using ::std::max;
-	using ::std::min;
-	using ::std::modf;
-	using ::std::pow;
-	using ::std::real;
-	using ::std::remainder;
-	using ::std::remquo;
-	using ::std::rint;
-	using ::std::round;
-	using ::std::sin;
-	using ::std::sinh;
-	using ::std::sqrt;
-	using ::std::tan;
-	using ::std::tanh;
-	using ::std::tgamma;
-	using ::std::trunc;
-}
-// Use those which argument dependent lookup (ADL) can't find (but only on ubuntu xenial 16.04 with gcc 5.3.1), because sometimes they are used with non-Real type, like int or float.
-// This saves writing `math::` before the calls. If they were used only with `Real` arguments (like all other mathematic functions) the ADL would find them.
-using math::abs;
 
 template<typename Scalar> using Vector2 = Eigen::Matrix<Scalar,2,1>;
 using Vector2i = Vector2<int>;
