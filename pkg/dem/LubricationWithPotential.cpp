@@ -233,6 +233,7 @@ void LinExponentialPotential::computeParametersFromF0(Real const& F_0, Real cons
 
 void LinExponentialPotential::computeParametersFromF0Fe(Real const& x_e, Real const& F_e, Real const& F_0)
 {
+    using math::abs; // when used inside function it does not leak - it is safe.
     if(x_e == 0.) throw std::runtime_error("Extremum can't be at the origin.");
     if(F_e*F_0 < 0) {
         if(x_e < 0) throw std::runtime_error("When xe < 0, F0 and Fe must be same sign!");

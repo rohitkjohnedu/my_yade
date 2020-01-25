@@ -24,10 +24,6 @@ namespace yade { // Cannot have #include directive inside.
 
 namespace CGT {
 
-using std::string;
-using ::yade::math::min;
-using ::yade::math::max;
-
 class TriaxialState
 {
 public:

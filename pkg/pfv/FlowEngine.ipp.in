@@ -431,6 +431,8 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::addBoundary ( Solver& flow )
 {
+	using math::max; // when used inside function it does not leak - it is safe.
+	using math::min;
 	vector<posData>& buffer = multithread ? positionBufferParallel : positionBufferCurrent;
         solver->xMin = Mathr::MAX_REAL, solver->xMax = -Mathr::MAX_REAL, solver->yMin = Mathr::MAX_REAL, solver->yMax = -Mathr::MAX_REAL, solver->zMin = Mathr::MAX_REAL, solver->zMax = -Mathr::MAX_REAL;
         FOREACH ( const posData& b, buffer ) {
@@ -521,6 +523,8 @@ template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT 
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::initializeVolumes ( Solver& flow )
 {
 	//typedef typename Solver::FiniteVerticesIterator FiniteVerticesIterator;
+	using math::abs; // when used inside function it does not leak - it is safe.
+	using math::max;
 
 	FiniteVerticesIterator vertices_end = flow.tesselation().Triangulation().finite_vertices_end();
 	CGT::CVector Zero(0,0,0);
@@ -740,6 +744,7 @@ Real TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 template< class _CellInfo, class _VertexInfo, class _Tesselation, class solverT >
 void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,solverT>::computeViscousForces ( Solver& flow )
 {
+	using math::max; // when used inside function it does not leak - it is safe.
 	if (normalLubrication || shearLubrication || viscousShear){
 		if ( debug ) cout << "Application of viscous forces" << endl;
 		if ( debug ) cout << "Number of edges = " << flow.edgeIds.size() << endl;

@@ -18,6 +18,8 @@ namespace yade { // Cannot have #include directive inside.
 
 namespace CGT {
 
+using std::string; // inside .cpp file it does not leak.
+
 TriaxialState::TriaxialState(void) : NO_ZERO_ID(false), filter_distance(-0.1), tesselated(false) {}
 
 TriaxialState::~TriaxialState(void)
@@ -208,6 +210,8 @@ bool TriaxialState::from_file(const char* filename, bool bz2)
 		grains[Idg].rotation = rot;
 		grains[Idg].isSphere = isSphere;
 
+		using math::max; // when used inside function it does not leak - it is safe.
+		using math::min;
 		box.base = Point(min(box.base.x(), pos.x()-rad),
 						 min(box.base.y(), pos.y()-rad),
 						 min(box.base.z(), pos.z()-rad));

@@ -55,6 +55,7 @@ int Network<Tesselation>::detectFacetFictiousVertices (CellHandle& cell, int& j)
 template<class Tesselation>
 Real Network<Tesselation>::volumePoreVoronoiFraction (CellHandle& cell, int& j, bool reuseFacetData)
 {
+  using math::abs; // It has to be added because on ubuntu xenial 16.04 g++ 5.3.1 Argument Depended Lookup does not work in cases when function from one namespace is used inside another namespace to be found by ADL
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
   if (!reuseFacetData) facetNFictious = detectFacetFictiousVertices (cell,j);
@@ -108,6 +109,7 @@ Real Network<Tesselation>::volumeSolidPore (const CellHandle& cell)
 template<class Tesselation>
 Real Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1,  const Point& PV2, CVector& facetSurface)
 {
+	using math::abs; // when used inside function it does not leak - it is safe.
         Real A [3], B[3];
 	Boundary &bi1 = boundary(SV1->info().id());
 	
@@ -141,6 +143,7 @@ Real Network<Tesselation>::volumeSingleFictiousPore(const VertexHandle& SV1, con
 template<class Tesselation>
 Real Network<Tesselation>::volumeDoubleFictiousPore(const VertexHandle& SV1, const VertexHandle& SV2, const VertexHandle& SV3, const Point& PV1, const Point& PV2, CVector& facetSurface)
 {
+	using math::abs; // when used inside function it does not leak - it is safe.
         Real A [3], B[3];
 	Boundary &bi1 =  boundary(SV1->info().id());
         Boundary &bi2 =  boundary(SV2->info().id());
@@ -247,12 +250,13 @@ Real Network<Tesselation>::fastSolidAngle(const Point& STA1, const Point& PTA1, 
         Real cp23 = (M[0][1]*M[0][2]+M[1][1]*M[1][2]+M[2][1]*M[2][2]);
 
         Real ratio = detM/ (pv12N*pv13N*pv14N+cp12*pv14N+cp13*pv13N+cp23*pv12N);
-        return abs(2*atan(ratio));
+        return math::abs(2*atan(ratio));
 }
 
 template<class Tesselation>
 Real Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool slipBoundary, bool reuseFacetData)
 {
+  using math::abs; // when used inside function it does not leak - it is safe.
   if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
@@ -360,6 +364,7 @@ Real Network<Tesselation>::surfaceSolidThroat(CellHandle cell, int j, bool slipB
 template<class Tesselation>
 Real Network<Tesselation>::surfaceSolidThroatInPore(CellHandle cell, int j, bool slipBoundary, bool reuseFacetData)
 {
+  using math::abs; // inside function it does not leak.
   if (!reuseFacetData)  facetNFictious=detectFacetFictiousVertices(cell,j);
   Point& p1 = cell->info();
   Point& p2 = cell->neighbor(j)->info();
@@ -530,6 +535,7 @@ void Network<Tesselation>::addBoundingPlanes()
 template<class Tesselation>
 void Network<Tesselation>::addBoundingPlane (CVector Normal, int id_wall)
 {
+	  using math::abs; // when used inside function it does not leak - it is safe.
 // 	  Tesselation& Tes = T[currentTes];
 	  //FIXME: pre-condition: the normal is axis-aligned
 	  int Coordinate = int(math::round(math::abs(Normal[0])))*0 + int(math::round(math::abs(Normal[1])))*1 + int(math::round(math::abs(Normal[2])))*2;
@@ -547,6 +553,7 @@ void Network<Tesselation>::addBoundingPlane (CVector Normal, int id_wall)
 template<class Tesselation>
 void Network<Tesselation>::addBoundingPlane (Real center[3], Real thickness, CVector Normal, int id_wall )
 {
+	  using math::abs; // when used inside function it does not leak - it is safe.
 	  Tesselation& Tes = T[currentTes];
 	  
 	  int Coordinate = int(math::round(math::abs(Normal[0])))*0 + int(math::round(math::abs(Normal[1])))*1 + int(math::round(math::abs(Normal[2])))*2;
@@ -626,6 +633,7 @@ void Network<Tesselation>::defineFictiousCells()
 template<class Tesselation>
 void Network<Tesselation>::lineSolidPore(CellHandle cell, int j)
 {
+  using math::abs; // when used inside function it does not leak - it is safe.
   facetNFictious=detectFacetFictiousVertices(cell,j);
   Real lSolid = 0; //total of solidLine[j][0], solidLine[j][1], solidLine[j][2]. 
   Sphere v [3];

@@ -17,8 +17,6 @@ namespace CGT {
 using std::cerr;
 using std::cout;
 using std::endl;
-using ::yade::math::max;
-using ::yade::math::min;
 using std::vector;
 using std::ifstream;
 
@@ -218,6 +216,7 @@ template<class TT>
 void _Tesselation<TT>::testAlphaShape(double alpha)
 {
 // 	if (not computed) compute();
+	using math::max; // when used inside function it does not leak - it is safe.
 
 	RTriangulation temp(*Tri);
 	AlphaShape as (temp);
@@ -494,6 +493,7 @@ template<class TT>
 CVector _Tesselation<TT>::alphaVoronoiFaceArea (const Edge& ed_it, const AlphaShape& as, const RTriangulation& /*Tro*/)
 {
 	//Overall, we calculate the area vector of the polygonal Voronoi face between two spheres, this is done by integrating x×dx
+	using math::max; // when used inside function it does not leak - it is safe.
 
         double alpha = as.get_alpha();
 	CellCirculator cell0,cell1,cell2;
