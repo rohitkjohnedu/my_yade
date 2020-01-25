@@ -156,7 +156,8 @@ def getAllVersionsCmake():
 		pass
 	# 21. clp
 	# Note: this can be fixed in the same way as forced detection of freeglut, with file cMake/FindMissingVersions.cmake
-	addVer("clp",'${CLP_VERSION_MAJOR}','${CLP_VERSION_MINOR}','${CLP_VERSION_RELEASE}','${CLP_VERSION}')
+	addVer("clp",'${CLP_WORLD_VERSION}','${CLP_MAJOR_VERSION}','${CLP_MINOR_VERSION}','${CLP_VERSION}')
+	addVer("coinutils",'${COINUTILS_WORLD_VERSION}','${COINUTILS_MAJOR_VERSION}','${COINUTILS_MINOR_VERSION}','${COINUTILS_VERSION}')
 	# 22. PyMPI
 	try:
 		import mpi4py

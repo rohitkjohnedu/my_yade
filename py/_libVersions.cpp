@@ -304,8 +304,8 @@ py::list mpiVer() { return {}; }
 
 // 18. clp
 #ifdef YADE_POTENTIAL_BLOCKS
-//	#include <config_clp.h>
 #include <ClpConfig.h>
+#include <CoinUtilsConfig.h>
 py::list clpVer()
 {
 	py::list ret;
@@ -313,8 +313,16 @@ py::list clpVer()
 	ret.append(boost::lexical_cast<std::string>(CLP_VERSION));
 	return ret;
 }
+py::list coinutilsVer()
+{
+	py::list ret;
+	ret.append(py::make_tuple(COINUTILS_VERSION_MAJOR, COINUTILS_VERSION_MINOR, COINUTILS_VERSION_RELEASE));
+	ret.append(boost::lexical_cast<std::string>(COINUTILS_VERSION));
+	return ret;
+}
 #else
 py::list clpVer() { return {}; }
+py::list coinutilsVer() { return {}; }
 #endif
 
 
@@ -342,6 +350,7 @@ py::dict getAllVersionsCpp()
 	ret["mpi"]         = mpiVer();
 	//	ret["mpi4py"       ] = mpi4PyVer();
 	ret["clp"] = clpVer();
+	ret["coinutils"] = coinutilsVer();
 	return ret;
 }
 
