@@ -64,9 +64,6 @@
 #define YADE_WRAP_FUNC_2_TYPE2(func, SecondType)                                                                                                               \
 	inline Real func(const Real& a, SecondType b) { return YADE_REAL_MATH_NAMESPACE::func(static_cast<const UnderlyingReal&>(a), b); }
 
-#define YADE_WRAP_FUNC_2_TYPE2_STD_CAST(func, SecondType)                                                                                                      \
-	inline Real func(const Real& a, SecondType b) { return ::std::func(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
-
 #ifdef YADE_THIN_REAL_WRAPPER_HPP
 #define YADE_WRAP_FUNC_2_TYPE2_CAST(func, SecondType, CastType)                                                                                                \
 	inline Real func(const Real& a, SecondType b) { return YADE_REAL_MATH_NAMESPACE::func(static_cast<const UnderlyingReal&>(a), b->operator CastType()); }
@@ -182,13 +179,17 @@ namespace math {
 	// Both must be found by automatic lookup: the ones from ::std and the ones that accept non-double Real types.
 	using ::std::abs;
 	using ::std::fabs;
-	using ::std::max;
+	using ::std::max; // this is inside ::yade::math namespace. It is not found by ADL in ::yade namespace when applied to int type or other non-Real type.
 	using ::std::min;
 #if (defined(YADE_REAL_BIT) and (YADE_REAL_BIT != 64))
-	YADE_WRAP_FUNC_2_TYPE2_STD_CAST(min, const double&)
-	YADE_WRAP_FUNC_2_TYPE2_STD_CAST(max, const double&)
-	YADE_WRAP_FUNC_2_TYPE2_STD_CAST(min, const Real&)
-	YADE_WRAP_FUNC_2_TYPE2_STD_CAST(max, const Real&)
+	// It turns out that getting min, max to work properly is more tricky than it is for other math functions: https://svn.boost.org/trac10/ticket/11149
+	using YADE_REAL_MATH_NAMESPACE::max; // this refers to boost::multiprecision (or eventually to ::mpfr)
+	using YADE_REAL_MATH_NAMESPACE::min;
+	// make sure that min max can accept (double,Real) argument pairs such as: max(r,0.5);
+	inline Real max(const double& a, const Real& b) { return max(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+	inline Real min(const double& a, const Real& b) { return min(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+	inline Real max(const Real& a, const double& b) { return max(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+	inline Real min(const Real& a, const double& b) { return min(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
 #endif
 #if (defined(YADE_REAL_BIT) and (YADE_REAL_BIT > 64))
 	YADE_WRAP_FUNC_1(abs)
@@ -313,7 +314,6 @@ using math::min;
 #undef YADE_WRAP_FUNC_2
 #undef YADE_WRAP_FUNC_2_TYPE2
 #undef YADE_WRAP_FUNC_2_TYPE2_CAST
-#undef YADE_WRAP_FUNC_2_TYPE2_STD_CAST
 #undef YADE_WRAP_FUNC_3
 #undef YADE_WRAP_FUNC_3_TYPE3
 #undef YADE_WRAP_FUNC_1_COMPLEX
