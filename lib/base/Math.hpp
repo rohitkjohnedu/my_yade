@@ -109,8 +109,6 @@ using std::list;
 using std::logic_error;
 using std::make_pair;
 using std::map;
-using std::max;
-using std::min;
 using std::ofstream;
 using std::ostream;
 using std::ostringstream;
