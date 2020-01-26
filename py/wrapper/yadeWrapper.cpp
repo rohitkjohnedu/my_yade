@@ -43,6 +43,9 @@ CREATE_CPP_LOCAL_LOGGER("yadeWrapper.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min;  // using inside .cpp file is ok.
+using math::max;
+
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
 However, it will not skip removed bodies automatically, hence this iterator which does just that.

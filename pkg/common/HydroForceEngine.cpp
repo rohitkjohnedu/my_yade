@@ -17,6 +17,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min;
+using math::max;
+
 YADE_PLUGIN((HydroForceEngine));
 
 void HydroForceEngine::action(){

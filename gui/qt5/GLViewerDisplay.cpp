@@ -148,6 +148,8 @@ double GLViewer::displayedSceneRadius(){
 }
 
 void GLViewer::postDraw(){
+	using math::min; // when used inside function it does not leak
+	using math::max;
 	Real wholeDiameter=QGLViewer::camera()->sceneRadius()*2;
 
 	renderer->viewInfo.sceneRadius=QGLViewer::camera()->sceneRadius();

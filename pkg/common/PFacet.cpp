@@ -12,6 +12,10 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
+
 //!##################	IGeom Functors   #####################
 // Function used in order to calculate the projection of the sphere on the PFacet element. The function returns if the the porjection is on the inside the triangle and the barycentric coordinates of the projection P on PFacet the element.
 boost::tuple<Vector3r,bool, double, double,double> Ig2_Sphere_PFacet_ScGridCoGeom::projection(

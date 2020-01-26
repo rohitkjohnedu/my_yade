@@ -3,6 +3,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min;
+using math::max;
+
 ForceContainer::ForceContainer() {};
 void ForceContainer::ensureSize(Body::id_t id) {
   const Body::id_t idMaxTmp = max(id, _maxId);

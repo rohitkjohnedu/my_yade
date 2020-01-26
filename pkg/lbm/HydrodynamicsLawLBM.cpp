@@ -34,6 +34,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
 inline Vector3i vect3rToVect3i(Vector3r vect){Vector3i newvect((int)vect[0],(int)vect[1],(int)vect[2]);return(newvect);}
 
 

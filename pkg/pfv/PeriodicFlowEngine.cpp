@@ -17,6 +17,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min;
+using math::max;
+
 class PeriodicCellInfo : public FlowCellInfo_FlowEngine_PeriodicInfo
 {
 	public:

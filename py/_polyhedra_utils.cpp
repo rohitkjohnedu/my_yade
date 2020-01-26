@@ -18,6 +18,9 @@ CREATE_CPP_LOCAL_LOGGER("_polyhedra_utils.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min;
+using math::max;
+
 //**********************************************************************************
 //print polyhedron in basic position
 void PrintPolyhedra(const shared_ptr<Shape>& shape)
