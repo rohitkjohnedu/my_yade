@@ -19,6 +19,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
 YADE_PLUGIN((DomainLimiter)(LawTester)
 	#ifdef YADE_OPENGL
 		(GlExtra_LawTester)(GlExtra_OctreeCubes)

@@ -10,6 +10,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
 YADE_PLUGIN(/* self-contained in hpp: */ (Ig2_Polyhedra_Polyhedra_PolyhedraGeom) (Ig2_Wall_Polyhedra_PolyhedraGeom) (Ig2_Facet_Polyhedra_PolyhedraGeom) (Ig2_Sphere_Polyhedra_ScGeom) 
 	(Ig2_Polyhedra_Polyhedra_ScGeom) (Ig2_Polyhedra_Polyhedra_PolyhedraGeomOrScGeom)
 );

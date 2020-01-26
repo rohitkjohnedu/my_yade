@@ -2,6 +2,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
 YADE_PLUGIN((InelastCohFrictMat)(InelastCohFrictPhys)(Ip2_2xInelastCohFrictMat_InelastCohFrictPhys)(Law2_ScGeom6D_InelastCohFrictPhys_CohesionMoment));
 
 

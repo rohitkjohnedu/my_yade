@@ -37,6 +37,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
 CREATE_LOGGER(BlockGen);
 YADE_PLUGIN((BlockGen));
 

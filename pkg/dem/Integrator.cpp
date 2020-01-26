@@ -8,6 +8,9 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+using math::min; // using inside .cpp file is ok.
+using math::max;
+
 YADE_PLUGIN((Integrator));
 
 void observer::operator()( const stateVector&  x , Real  t ) const
