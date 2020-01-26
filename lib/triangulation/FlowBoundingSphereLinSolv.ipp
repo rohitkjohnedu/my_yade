@@ -529,6 +529,9 @@ int FlowBoundingSphereLinSolv<_Tesselation,FlowType>::setLinearSystemFullGS(Real
 template<class _Tesselation, class FlowType>
 void FlowBoundingSphereLinSolv<_Tesselation,FlowType>::vectorizedGaussSeidel(Real dt)
 {
+	using math::min;
+	using math::max;
+
 // 	cout<<"VectorizedGaussSeidel"<<endl;
 	if (!isFullLinearSystemGSSet || (isFullLinearSystemGSSet && reApplyBoundaryConditions())) setLinearSystemFullGS(dt);
 	copyCellsToGs(dt);

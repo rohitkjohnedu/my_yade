@@ -43,8 +43,8 @@ class FacetTopologyAnalyzer: public GlobalEngine{
 		long vertices[3];
 		//! facet id, for back reference
 		Body::id_t id;
-		long minVertex(){return min(vertices[0],min(vertices[1],vertices[2]));}
-		long maxVertex(){return max(vertices[0],max(vertices[1],vertices[2]));}
+		long minVertex(){return math::min(vertices[0],math::min(vertices[1],vertices[2]));}
+		long maxVertex(){return math::max(vertices[0],math::max(vertices[1],vertices[2]));}
 		struct MinVertexComparator{
 			bool operator()(const shared_ptr<FacetTopology>& t1, const shared_ptr<FacetTopology>& t2){ return t1->minVertex()<t2->minVertex();}
 		};

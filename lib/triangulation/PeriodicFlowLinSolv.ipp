@@ -55,6 +55,9 @@ PeriodicFlowLinSolv<_Tesselation>::PeriodicFlowLinSolv(): BaseFlowSolver() {}
 template<class _Tesselation>
 int PeriodicFlowLinSolv<_Tesselation>::setLinearSystem(Real dt)
 {
+	using math::min;
+	using math::max;
+
 //WARNING : boundary conditions (Pcondition, p values) must have been set for a correct definition of
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	vector<int> clen;

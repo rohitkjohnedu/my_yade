@@ -244,6 +244,9 @@ int FlowBoundingSphere<Tesselation>::getCell (Real X, Real Y, Real Z)
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::measurePressureProfile(Real WallUpy, Real WallDowny)
 {
+	using math::min;
+	using math::max;
+
 	if (noCache && T[!currentTes].Max_id()<=0) return;//the engine never solved anything
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
         CellHandle permeameter;
@@ -523,6 +526,9 @@ void FlowBoundingSphere<Tesselation>::setBlocked(CellHandle& cell)
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::computePermeability()
 {
+	using math::min;
+	using math::max;
+
 	if (debugOut)  cout << "----Computing_Permeability------" << endl;
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	VSolidTot = 0, Vtotalissimo = 0, vPoral = 0, sSolidTot = 0, vTotalPorosity=0, vPoralPorosity=0;
@@ -968,6 +974,9 @@ bool FlowBoundingSphere<Tesselation>::reApplyBoundaryConditions()
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::gaussSeidel(Real dt)
 {
+	using math::min;
+	using math::max;
+
 	reApplyBoundaryConditions();
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	int j = 0;
@@ -1326,6 +1335,9 @@ void FlowBoundingSphere<Tesselation>::adjustCavityCompressibility(Real pZero)
 template <class Tesselation>
 Real FlowBoundingSphere<Tesselation>::permeameter(Real PInf, Real PSup, Real Section, Real DeltaY, const char *file)
 {
+  using math::min;
+  using math::max;
+
   RTriangulation& Tri = T[currentTes].Triangulation();
   std::ofstream kFile(file, std::ios::out);
   Real Q2=0, Q1=0;
@@ -1541,6 +1553,8 @@ void FlowBoundingSphere<Tesselation>::saveVtk(const char* folder, bool withBound
 template <class Tesselation>
 void FlowBoundingSphere<Tesselation>::saveMesh(basicVTKwritter& vtkfile, bool withBoundaries,vector<int>& allIds, vector<int>& fictiousN, const char* filename)
 {
+	using math::min;
+	using math::max;
 
 	/*
 	Most of this code is actually to handle the special cases along the bounding walls/spheres, where irregular polyhedra needs to be decomposed in many tetrahedra for vtk display.
@@ -1866,6 +1880,9 @@ void FlowBoundingSphere<Tesselation>::sliceField(const char *filename)
 template <class Tesselation>
 void  FlowBoundingSphere<Tesselation>::computeEdgesSurfaces()
 {
+	using math::min;
+	using math::max;
+
 	RTriangulation& Tri = T[currentTes].Triangulation();
 	//first, copy interacting pairs and normal lub forces form prev. triangulation in a sorted structure for initializing the new lub. Forces
 	vector<vector<pair<unsigned int,Real> > > lubPairs;
@@ -1916,7 +1933,7 @@ Vector3r FlowBoundingSphere<Tesselation>::computeViscousShearForce(const Vector3
 template <class Tesselation>
 Vector3r FlowBoundingSphere<Tesselation>::computeShearLubricationForce(const Vector3r& deltaShearV, const Real& dist, const int& /*edge_id*/, const Real& eps, const Real& centerDist, const Real& meanRad )
 {
-    Real d = max(dist,0.) + 2.*eps*meanRad;
+    Real d = math::max(dist,0.) + 2.*eps*meanRad;
     Vector3r viscLubF = 0.5 * Mathr::PI * viscosity * (-2*meanRad + centerDist*log(centerDist/d)) * deltaShearV;
     return viscLubF;
 }
@@ -1924,7 +1941,7 @@ Vector3r FlowBoundingSphere<Tesselation>::computeShearLubricationForce(const Vec
 template <class Tesselation>
 Vector3r FlowBoundingSphere<Tesselation>::computePumpTorque(const Vector3r& deltaShearAngV, const Real& dist, const int& /*edge_id*/, const Real& eps, const Real& meanRad )
 {
-    Real d = max(dist,0.) + 2.*eps*meanRad;
+    Real d = math::max(dist,0.) + 2.*eps*meanRad;
     Vector3r viscPumpC = Mathr::PI * viscosity * pow(meanRad,3) *(3./20. * log(meanRad/d) + 63./500. * (d/meanRad) * log(meanRad/d)) * deltaShearAngV;
     return viscPumpC;
 }
@@ -1932,7 +1949,7 @@ Vector3r FlowBoundingSphere<Tesselation>::computePumpTorque(const Vector3r& delt
 template <class Tesselation>
 Vector3r FlowBoundingSphere<Tesselation>::computeTwistTorque(const Vector3r& deltaNormAngV, const Real& dist, const int& /*edge_id*/, const Real& eps, const Real& meanRad )
 {
-    Real d = max(dist,0.) + 2.*eps*meanRad;
+    Real d = math::max(dist,0.) + 2.*eps*meanRad;
     Vector3r twistC = Mathr::PI * viscosity * pow(meanRad,2) * d * log(meanRad/d) * deltaNormAngV;
     return twistC;
 }
@@ -1942,7 +1959,7 @@ template <class Tesselation>
 Real FlowBoundingSphere<Tesselation>::computeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt, const Real& meanRad)
 {
 	//FIXME: here introduce elasticity
-	Real d = max(dist,0.) + 2.*eps*meanRad;//account for grains roughness
+	Real d = math::max(dist,0.) + 2.*eps*meanRad;//account for grains roughness
 	if (stiffness>0) {
 		const Real k = stiffness*meanRad;
 		Real prevForce = edgeNormalLubF[edge_id];

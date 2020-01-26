@@ -273,9 +273,9 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		}
 
 		Vector3r getBoundaryNormal(int index) {
-		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); return normal[max(0,min(5,index))];}
+		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); return normal[math::max(0,math::min(5,index))];}
 		void setBoundaryNormal(int index, Vector3r v) {
-		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); normal[max(0,min(5,index))]=v;}
+		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); normal[math::max(0,math::min(5,index))]=v;}
 
 		Real averageSlicePressure(Real posY){return solver->averageSlicePressure(posY);}
 		Real averagePressure(){return solver->averagePressure();}

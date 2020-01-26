@@ -14,7 +14,7 @@ class FlatGridCollider: public Collider{
 		Vector3i pt2int(const Vector3r& pt){ Vector3i ret; for(int i=0;i<3;i++)ret[i]=int(math::floor((pt[i]-mn[1])/step)); return ret; }
 		std::vector<idVector> data;
 		// force integral coordinate inside (0,sz-1)
-		int fit(int i, int sz) const { return max(0,min(i,sz-1)); }
+		int fit(int i, int sz) const { return math::max(0,math::min(i,sz-1)); }
 		Vector3i fitGrid(const Vector3i& v){ return Vector3i(fit(v[0],size[0]),fit(v[1],size[1]),fit(v[2],size[2])); }
 		// linearize x,y,z → n in data vector
 		size_t lin(int x, int y, int z) const { return fit(x,size[0])+size[0]*fit(y,size[1])+size[0]*size[1]*fit(z,size[2]); }

@@ -229,7 +229,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 					Real fluidArea=0;
 					int test=0;
 					if (distance!=0) {
-						if (minPermLength>0 && distanceCorrection) distance=max(minPermLength*radius,distance);
+						if (minPermLength>0 && distanceCorrection) distance=math::max(minPermLength*radius,distance);
 						const CVector& Surfk = cell->info().facetSurfaces[j];
 						Real area = sqrt(Surfk.squared_length());
 						const CVector& crossSections = cell->info().facetSphereCrossSections[j];
@@ -297,7 +297,7 @@ void PeriodicFlow<_Tesselation>::computePermeability()
 			neighbourCell = cell->neighbor(j);
 			if (!Tri.is_infinite(neighbourCell) /*&& neighbour_cell->info().isvisited==ref*/) {
 				pass++;
-				(cell->info().kNorm())[j] = max(minKdivKmean*globalK, min((cell->info().kNorm())[j], maxKdivKmean*globalK));
+				(cell->info().kNorm())[j] = math::max(minKdivKmean*globalK, math::min((cell->info().kNorm())[j], maxKdivKmean*globalK));
 				(neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]=(cell->info().kNorm())[j];
 				if (!neighbourCell->info().isGhost) (neighbourCell->info().kNorm())[Tri.mirror_index(cell, j)]= (cell->info().kNorm())[j];
 					else {//find the real neighbor connected to our cell through periodicity, as we want exactly the same permeability without rounding errors
@@ -429,8 +429,8 @@ void PeriodicFlow<_Tesselation>::gaussSeidel(Real dt)
 			}
 		}
 		dp -= cell->info().p();
-		dp_max = max(dp_max, math::abs(dp));
-		p_max = max(p_max, math::abs(cell->info().shiftedP()));
+		dp_max = math::max(dp_max, math::abs(dp));
+		p_max = math::max(p_max, math::abs(cell->info().shiftedP()));
 		sum_p += cell->info().shiftedP();
 		sum_dp += math::abs(dp);
             }
