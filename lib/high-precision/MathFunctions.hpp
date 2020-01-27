@@ -44,6 +44,14 @@
 		return func(static_cast<const UnderlyingReal&>(a));                                                                                            \
 	}
 
+#define YADE_WRAP_FUNC_1_RET(ReturnType, func)                                                                                                                 \
+	inline ReturnType func(const Real& a)                                                                                                                  \
+	{                                                                                                                                                      \
+		using YADE_REAL_MATH_NAMESPACE::func;                                                                                                          \
+		using ::std::func;                                                                                                                             \
+		return func(static_cast<const UnderlyingReal&>(a));                                                                                            \
+	}
+
 #define YADE_WRAP_FUNC_1_RENAME(func1, func2)                                                                                                                  \
 	inline Real func1(const Real& a) { return YADE_REAL_MATH_NAMESPACE::func2(static_cast<const UnderlyingReal&>(a)); }
 
@@ -195,9 +203,9 @@ namespace math {
 	YADE_WRAP_FUNC_1(trunc)
 
 #ifndef YADE_IGNORE_IEEE_INFINITY_NAN
-	YADE_WRAP_FUNC_1(isnan)
-	YADE_WRAP_FUNC_1(isinf)
-	YADE_WRAP_FUNC_1(isfinite)
+	YADE_WRAP_FUNC_1_RET(bool, isnan)
+	YADE_WRAP_FUNC_1_RET(bool, isinf)
+	YADE_WRAP_FUNC_1_RET(bool, isfinite)
 #endif
 
 	/**********************                    Complex                     *********************/
@@ -300,6 +308,7 @@ using math::min;
 }
 
 #undef YADE_WRAP_FUNC_1
+#undef YADE_WRAP_FUNC_1_RET
 #undef YADE_WRAP_FUNC_1_RENAME
 #undef YADE_WRAP_FUNC_2
 #undef YADE_WRAP_FUNC_2_TYPE2
