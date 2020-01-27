@@ -85,15 +85,14 @@ O.bodies.append([
         sphere(center=(0,0,0),radius=table.a,material=mat,fixed=True),
         sphere(center=(0.0,(table.u0+2)*table.a,0),radius=table.a,material=mat)]);
 
-law = Law2_ScGeom_ImplicitLubricationPhys(activateNormalLubrication=True,
-                                                                activateTangencialLubrication=True,
-                                                                activateTwistLubrication=True,
-                                                                activateRollLubrication=True,
-                                                                theta=1.,
-                                                                resolution=2,
-                                                                MaxDist=50,
-                                                                SolutionTol=1.e-10,
-                                                                MaxIter=100);
+law = Law2_ScGeom_ImplicitLubricationPhys(  activateTangencialLubrication=True,
+                                            activateTwistLubrication=True,
+                                            activateRollLubrication=True,
+                                            theta=1.,
+                                            resolution=2,
+                                            MaxDist=50,
+                                            SolutionTol=1.e-10,
+                                            MaxIter=100);
 
 O.engines=[ForceResetter(),
            InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=3)]),

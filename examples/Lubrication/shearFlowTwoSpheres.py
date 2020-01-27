@@ -113,21 +113,19 @@ O.bodies.append([
         sphere(center=(mul/2.*table.a,(mul/2)*table.a,mul/2.*table.a),radius=table.a,material=mat),
         sphere(center=((mul/2.-6)*table.a,(mul/2.+dist)*table.a,mul/2.*table.a),radius=table.a,material=mat)]);
 
-law = Law2_ScGeom_ImplicitLubricationPhys(activateNormalLubrication=True,
-                                                                activateTangencialLubrication=True,
-                                                                activateTwistLubrication=True,
-                                                                activateRollLubrication=True,
-                                                                debug=False,
-                                                                theta=1.,
-                                                                resolution=2,
-                                                                MaxDist=4.0,
-                                                                SolutionTol=1.e-9,
-                                                                MaxIter=100);
+law = Law2_ScGeom_ImplicitLubricationPhys(  activateTangencialLubrication=True,
+                                            activateTwistLubrication=True,
+                                            activateRollLubrication=True,
+                                            theta=1.,
+                                            resolution=2,
+                                            MaxDist=4.0,
+                                            SolutionTol=1.e-9,
+                                            MaxIter=100);
 
 O.engines=[ForceResetter(),
            InsertionSortCollider([Bo1_Sphere_Aabb(aabbEnlargeFactor=10)]),
            InteractionLoop([Ig2_Sphere_Sphere_ScGeom(interactionDetectionFactor=10)],
-                           [Ip2_FrictMat_FrictMat_LubricationPhys(eta=table.eta,eps=table.roughness, Fadh=0.)],
+                           [Ip2_FrictMat_FrictMat_LubricationPhys(eta=table.eta,eps=table.roughness)],
                            #[Ip2_ElastMat_ElastMat_LubricationPhys(eta=100,eps=0.)],
                            [law]),
            NewtonIntegrator(damping=0., gravity=(0,0,0),label="newton" ),
