@@ -29,7 +29,6 @@ Build-Depends:
  libxmu-dev,
  pyqt5-dev-tools,
  python3-all-dev (>= 2.6.6-3~),
- python-gts,
  python3-matplotlib,
  python3-minieigen [!precise],
  python3-numpy,
