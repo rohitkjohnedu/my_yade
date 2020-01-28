@@ -379,14 +379,14 @@ At each step, given normal and shear displacements $u_N$, $\uT$, normal and shea
 		\vec{F}_T^t&=K_T \vec{u}_T
 	\end{align*}
 
-where $\vec{F}_N$ is normal force and $\vec{F}_T$ is trial shear force.  A simple non-associated stress return algorithm is applied to compute final shear force
+where $\vec{F}_N$ is normal force and $\vec{F}_T^t$ is trial shear force.  A simple non-associated stress return algorithm is applied to compute final shear force
 
 .. math::
 	:nowrap:
 	
 	\begin{align*}
 		\vec{F}_T=\begin{cases}
-			\vec{F}_T^t\frac{|\vec{F}_N|\tan\phi}{\vec{F}_T^t} & \hbox{if } |\vec{F}_T|>|\vec{F}_N|\tan\phi, \\
+			\vec{F}_T^t\frac{|\vec{F}_N|\tan\phi}{|\vec{F}_T^t|} & \hbox{if } |\vec{F}_T^t|>|\vec{F}_N|\tan\phi, \\
 			\vec{F}_T^t & \hbox{otherwise.}
 		\end{cases}
 	\end{align*}
