@@ -13,6 +13,7 @@ namespace yade { // Cannot have #include directive inside.
 
 namespace CGT {
 
+// FIXME - remove these
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -63,7 +64,7 @@ typename _Tesselation<TT>::VertexHandle _Tesselation<TT>::insert ( Real x, Real 
 		Vh->info().isFictious = isFictious;
 		assert (vertexHandles.size()>id);
 		vertexHandles[id] = Vh;
-		/*if ( !isFictious ) */maxId = std::max ( maxId, (int) id );
+		/*if ( !isFictious ) */maxId = math::max ( maxId, (int) id );
 	}
 	else cout << "Failed to triangulate body with id=" << id << " Point=" << Point ( x,y,z ) << " rad=" << rad << endl;
 	return Vh;
@@ -266,7 +267,7 @@ void _Tesselation<TT>::testAlphaShape(double alpha)
 		CVector surface = 0.5*cross_product(f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][1])->point().point(),
 			f->first->vertex(facetVertices[idx][0])->point().point()-f->first->vertex(facetVertices[idx][2])->point().point());
 		//largest sphere
-		double maxWeight = std::max(f->first->vertex(facetVertices[idx][0])->point().weight(),max(f->first->vertex(facetVertices[idx][1])->point().weight(), f->first->vertex(facetVertices[idx][2])->point().weight()));
+		double maxWeight = math::max(f->first->vertex(facetVertices[idx][0])->point().weight(),max(f->first->vertex(facetVertices[idx][1])->point().weight(), f->first->vertex(facetVertices[idx][2])->point().weight()));
 		Point pp;
 		Point vv;
  		if (as.classify(f->first)==AlphaShape::INTERIOR) {
@@ -531,7 +532,7 @@ CVector _Tesselation<TT>::alphaVoronoiFaceArea (const Edge& ed_it, const AlphaSh
 			CVector surface = 0.5*cross_product(baseCell->vertex(facetVertices[idx][0])->point().point()-baseCell->vertex(facetVertices[idx][1])->point().point(),
 			baseCell->vertex(facetVertices[idx][0])->point().point()-baseCell->vertex(facetVertices[idx][2])->point().point());
 			//largest sphere
-			double maxWeight = std::max(baseCell->vertex(facetVertices[idx][0])->point().weight(),max(baseCell->vertex(facetVertices[idx][1])->point().weight(), baseCell->vertex(facetVertices[idx][2])->point().weight()));
+			double maxWeight = math::max(baseCell->vertex(facetVertices[idx][0])->point().weight(),max(baseCell->vertex(facetVertices[idx][1])->point().weight(), baseCell->vertex(facetVertices[idx][2])->point().weight()));
 			//check if the surface vector is inward or outward
 			double dotP = surface*(baseCell->vertex(facetVertices[idx][0])->point().point()-baseCell->vertex(idx)->point().point());
 			if (dotP<0) surface=-surface;
@@ -1004,7 +1005,7 @@ Real _Tesselation<TT>::computeVFacetArea ( FiniteEdgesIterator ed_it )
 	Real area = 0;
 
 	while ( cell2!=cell0 ){
-		area+= sqrt(std::abs (( Triangle ( cell0->info(), cell1->info(), cell2->info() ) ).squared_area())) ;
+		area+= sqrt(math::abs (( Triangle ( cell0->info(), cell1->info(), cell2->info() ) ).squared_area())) ;
 		++cell1;
 		++cell2;
 	}
@@ -1034,13 +1035,13 @@ void _Tesselation<TT>::AssignPartialVolume ( FiniteEdgesIterator& ed_it )
 		{
 			if ( !isFictious1 )
 			{
-				r = std::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->second )->point().point(), cell0->info(), cell1->info(), cell2->info() ) ).volume() );
+				r = math::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->second )->point().point(), cell0->info(), cell1->info(), cell2->info() ) ).volume() );
 				( ed_it->first )->vertex ( ed_it->second )->info().v() += r;
 				TotalFiniteVoronoiVolume+=r;
 			}
 			if ( !isFictious2 )
 			{
-				r = std::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->third )->point().point(), cell0->info(),  cell1->info(), cell2->info() ) ).volume() );
+				r = math::abs ( ( Tetrahedron ( ed_it->first->vertex ( ed_it->third )->point().point(), cell0->info(),  cell1->info(), cell2->info() ) ).volume() );
 				ed_it->first->vertex ( ed_it->third )->info().v() +=r;
 				TotalFiniteVoronoiVolume+=r;
 			}
@@ -1078,7 +1079,7 @@ void _Tesselation<TT>::computePorosity ( void )  //WARNING : This function will 
 	{
 		if ( vIt->info().v() && !vIt->info().isFictious )
 		{
-			Real r = 4.188790 * std::pow ( ( vIt->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
+			Real r = 4.188790 * math::pow ( ( vIt->point().weight() ),1.5 );// 4/3*PI*R³ = 4.188...*R³
 			TotalInternalVoronoiPorosity+=r;
 			TotalInternalVoronoiVolume += vIt->info().v();
 			vIt->info().v() =
@@ -1111,7 +1112,7 @@ typename Tesselation::VertexHandle PeriodicTesselation<Tesselation>::insert(Real
 		if (duplicateOfId<0) {
 			assert (vertexHandles.size()>id);
 			vertexHandles[id] = Vh;
-			maxId = std::max ( maxId, (int) id );
+			maxId = math::max ( maxId, (int) id );
 			Vh->info().isGhost=0;
 		} else Vh->info().isGhost=1;
 	}
