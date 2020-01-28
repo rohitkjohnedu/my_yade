@@ -301,8 +301,6 @@ namespace math {
 // This saves writing `math::` before the calls. If they were used only with `Real` arguments (like all other mathematic functions) the ADL would find them.
 // Also, the ADL does not work properly for g++ ver. older than 6 in case when Real is a fundamental type (e.g. `double`) inside `math::`
 //    #if (__GNUC__ <= 6) …… #endif
-using math::abs;
-using math::fabs;
 using math::max;
 using math::min;
 
