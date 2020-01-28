@@ -365,11 +365,11 @@ void InsertionSortCollider::action()
 				continue;
 			minR = min(s->radius, minR);
 		}
-		if (std::isinf(minR))
+		if (math::isinf(minR))
 			LOG_WARN("verletDist is set to 0 because no spheres were found. It will result in suboptimal performances, consider setting a positive "
 			         "verletDist in your script.");
 		// if no spheres, disable stride
-		verletDist = std::isinf(minR) ? 0 : std::abs(verletDist) * minR;
+		verletDist = math::isinf(minR) ? 0 : math::abs(verletDist) * minR;
 	}
 	// if interactions are dirty, force reinitialization
 	if (scene->interactions->dirty) {
@@ -768,7 +768,7 @@ bool InsertionSortCollider::spatialOverlapPeri(Body::id_t id1, Body::id_t id2, S
 				throw runtime_error(__FILE__ ": Body larger than half of the cell size encountered.");
 			}
 		}
-		int period1 = int(std::floor(lmax));
+		int period1 = int(math::floor(lmax));
 
 		//overlap around zero, on the "+" side
 		if ((lmin - period1) <= overlapTolerance) {
