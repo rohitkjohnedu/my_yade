@@ -297,13 +297,6 @@ namespace math {
 //namespace m = ::yade::math;
 //namespace mth = ::yade::math;
 
-// Use those which argument dependent lookup (ADL) can't find, because sometimes they are used with non-Real type, like int or float.
-// This saves writing `math::` before the calls. If they were used only with `Real` arguments (like all other mathematic functions) the ADL would find them.
-// Also, the ADL does not work properly for g++ ver. older than 6 in case when Real is a fundamental type (e.g. `double`) inside `math::`
-//    #if (__GNUC__ <= 6) …… #endif
-using math::max;
-using math::min;
-
 }
 
 #undef YADE_WRAP_FUNC_1
