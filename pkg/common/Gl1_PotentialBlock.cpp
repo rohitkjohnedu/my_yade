@@ -367,7 +367,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 {
 	if (fileName.size() == 0)
 		return;
-	vtkSmartPointer<vtkPoints>         pbPos          = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPointsReal>     pbPos          = vtkSmartPointer<vtkPointsReal>::New();
 	vtkSmartPointer<vtkAppendPolyData> appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
 	vtkSmartPointer<vtkAppendPolyData> appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
 	//vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
@@ -385,7 +385,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 	// interactions ###############################################
 
 	// interaction contact point ###############################################
-	vtkSmartPointer<vtkPoints>     pbContactPoint = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPointsReal> pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
 	vtkSmartPointer<vtkCellArray>  pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkFloatArray> pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
 	pbNormalForce->SetNumberOfComponents(3);
@@ -432,7 +432,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 
 	// bodyId ##############################################################
 	//#if 0
-	vtkSmartPointer<vtkPoints>    pbPosID   = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPointsReal>pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
 	vtkSmartPointer<vtkCellArray> pbIdCells = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkIntArray>  blockId   = vtkSmartPointer<vtkIntArray>::New();
 	blockId->SetNumberOfComponents(1);
@@ -459,7 +459,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			blockId->InsertNextValue(b->getId());
 			vtkIdType pid[1];
 			Vector3r  pos(b->state->pos);
-			pid[0] = pbPosID->InsertNextPoint(pos[0], pos[1], pos[2]);
+			pid[0] = pbPosID->InsertNextPoint(pos);
 			pbIdCells->InsertNextCell(1, pid);
 			//#endif
 			/* ################# Display id VTK extrusion vector ############## */
@@ -621,7 +621,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			//zmax = zmax - b->state->pos.z();
 			boolFunction->SetOperationTypeToUnion();
 		}
-		vtkSmartPointer<vtkSampleFunction> sample = vtkSampleFunction::New();
+		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
 		if (b->isClump() == false && b->isClumpMember() == false) {
 			sample->SetImplicitFunction(function);
 		} else if (b->isClump() == true) {
@@ -641,7 +641,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			}
 		}
 
-		sample->SetModelBounds(1.5 * xmin, 1.5 * xmax, 1.5 * ymin, 1.5 * ymax, 1.5 * zmin, 1.5 * zmax);
+		sample->SetModelBounds(1.5 * Vector3r(xmin, ymin, zmin), 1.5 * Vector3r(xmax, ymax, zmax));
 		//sample->SetModelBounds(pb->minAabb.x(), pb->maxAabb.x(), pb->minAabb.y(), pb->maxAabb.y(), pb->minAabb.z(), pb->maxAabb.z());
 		int sampleXno = sampleX;
 		int sampleYno = sampleY;
@@ -701,12 +701,12 @@ void PotentialBlockVTKRecorderTunnel::action()
 		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData(polydata);
-		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+		vtkSmartPointer<vtkTransformReal> transform = vtkSmartPointer<vtkTransformReal>::New();
 
 		transformFilter->SetTransform(transform);
 		transform->PostMultiply();
 
-		transform->Translate(centre[0], centre[1], centre[2]);
+		transform->Translate(centre);
 		//transform->RotateWXYZ(angle,xAxis, yAxis, zAxis);
 		//transformFilter->Update();
 		appendFilter->AddInputConnection(transformFilter->GetOutputPort());
@@ -716,7 +716,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 		if (REC_VELOCITY == true) {
 			vtkIdType pid[1];
 			Vector3r  pos(b->state->pos);
-			pid[0] = pbPos->InsertNextPoint(pos[0], pos[1], pos[2]);
+			pid[0] = pbPos->InsertNextPoint(pos);
 			pbCells->InsertNextCell(1, pid);
 			const Vector3r& vel = b->state->vel;
 			float           v[3]; //v = { vel[0],vel[1],vel[2] };
@@ -834,7 +834,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			const ScGeom*     geom = YADE_CAST<ScGeom*>(I->geom.get());
 			vtkIdType         pid[1];
 			Vector3r          pos(geom->contactPoint);
-			pid[0] = pbContactPoint->InsertNextPoint(pos[0], pos[1], pos[2]);
+			pid[0] = pbContactPoint->InsertNextPoint(pos);
 			pbCellsContact->InsertNextCell(1, pid);
 			//intrBodyPos->InsertNextPoint(geom->contactPoint[0],geom->contactPoint[1],geom->contactPoint[2]);
 			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
@@ -903,7 +903,7 @@ void PotentialBlockVTKRecorder::action()
 {
 	if (fileName.size() == 0)
 		return;
-	vtkSmartPointer<vtkPoints>         pbPos          = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPointsReal>     pbPos          = vtkSmartPointer<vtkPointsReal>::New();
 	vtkSmartPointer<vtkAppendPolyData> appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
 	vtkSmartPointer<vtkAppendPolyData> appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
 	//vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
@@ -921,7 +921,7 @@ void PotentialBlockVTKRecorder::action()
 	// interactions ###############################################
 
 	// interaction contact point ###############################################
-	vtkSmartPointer<vtkPoints>     pbContactPoint = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPointsReal> pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
 	vtkSmartPointer<vtkCellArray>  pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkFloatArray> pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
 	pbNormalForce->SetNumberOfComponents(3);
@@ -953,7 +953,7 @@ void PotentialBlockVTKRecorder::action()
 
 	// bodyId ##############################################################
 	//#if 0
-	vtkSmartPointer<vtkPoints>    pbPosID   = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPointsReal>pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
 	vtkSmartPointer<vtkCellArray> pbIdCells = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkIntArray>  blockId   = vtkSmartPointer<vtkIntArray>::New();
 	blockId->SetNumberOfComponents(1);
@@ -981,7 +981,7 @@ void PotentialBlockVTKRecorder::action()
 			blockId->InsertNextValue(b->getId());
 			vtkIdType pid[1];
 			Vector3r  pos(b->state->pos);
-			pid[0] = pbPosID->InsertNextPoint(pos[0], pos[1], pos[2]);
+			pid[0] = pbPosID->InsertNextPoint(pos);
 			pbIdCells->InsertNextCell(1, pid);
 			//#endif
 
@@ -1005,7 +1005,7 @@ void PotentialBlockVTKRecorder::action()
 			}
 		}
 
-		vtkSmartPointer<vtkSampleFunction> sample = vtkSampleFunction::New();
+		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
 		sample->SetImplicitFunction(function);
 		//Real value = 1.05*pb->R;
 
@@ -1037,7 +1037,7 @@ void PotentialBlockVTKRecorder::action()
 			}
 		}
 
-		sample->SetModelBounds(xmin, xmax, ymin, ymax, zmin, zmax);
+		sample->SetModelBounds(Vector3r(xmin, ymin, zmin), Vector3r(xmax, ymax, zmax));
 		//sample->SetModelBounds(pb->minAabb.x(), pb->maxAabb.x(), pb->minAabb.y(), pb->maxAabb.y(), pb->minAabb.z(), pb->maxAabb.z());
 		int sampleXno = sampleX;
 		int sampleYno = sampleY;
@@ -1096,12 +1096,12 @@ void PotentialBlockVTKRecorder::action()
 		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];
 		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData(polydata);
-		vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+		vtkSmartPointer<vtkTransformReal> transform = vtkSmartPointer<vtkTransformReal>::New();
 
 		transformFilter->SetTransform(transform);
 		transform->PostMultiply();
 
-		transform->Translate(centre[0], centre[1], centre[2]);
+		transform->Translate(centre);
 		//transform->RotateWXYZ(angle,xAxis, yAxis, zAxis);
 		//transformFilter->Update();
 		appendFilter->AddInputConnection(transformFilter->GetOutputPort());
@@ -1111,7 +1111,7 @@ void PotentialBlockVTKRecorder::action()
 		if (REC_VELOCITY == true) {
 			vtkIdType pid[1];
 			Vector3r  pos(b->state->pos);
-			pid[0] = pbPos->InsertNextPoint(pos[0], pos[1], pos[2]);
+			pid[0] = pbPos->InsertNextPoint(pos);
 			pbCells->InsertNextCell(1, pid);
 			const Vector3r& vel = b->state->vel;
 			float           v[3]; //v = { vel[0],vel[1],vel[2] };
@@ -1197,7 +1197,7 @@ void PotentialBlockVTKRecorder::action()
 			const ScGeom*     geom = YADE_CAST<ScGeom*>(I->geom.get());
 			vtkIdType         pid[1];
 			Vector3r          pos(geom->contactPoint);
-			pid[0] = pbContactPoint->InsertNextPoint(pos[0], pos[1], pos[2]);
+			pid[0] = pbContactPoint->InsertNextPoint(pos);
 			pbCellsContact->InsertNextCell(1, pid);
 			//intrBodyPos->InsertNextPoint(geom->contactPoint[0],geom->contactPoint[1],geom->contactPoint[2]);
 			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
