@@ -22,6 +22,39 @@ And use a macro in these places:
 		#define INSERT_NEXT_TYPED_TUPLE(a) InsertNextTypedTuple(a)
 	#endif
 // (and others in the future)
+
+#include <lib/base/Math.hpp>
+#include <vtkDoubleArray.h>
+#include <vtkPoints.h>
+#include <vtkSampleFunction.h>
+#include <vtkTransform.h>
+
+// these classes serve the purpose of converting Real to double without macros.
+// Maybe VTK in the future will support non-double types. If that will be needed,
+// the interface can be updated below.
+
+struct vtkPointsReal : public vtkPoints {
+	static vtkPointsReal* New() { return new vtkPointsReal; }; // a design decision made by VTK developers
+	vtkIdType             InsertNextPoint(const ::yade::Vector3r&);
+};
+
+struct vtkSampleFunctionReal : public vtkSampleFunction {
+	static vtkSampleFunctionReal* New() { return new vtkSampleFunctionReal; }; // a design decision made by VTK developers
+	void                          SetModelBounds(const ::yade::Vector3r& min, const ::yade::Vector3r& max);
+};
+
+struct vtkTransformReal : public vtkTransform {
+	static vtkTransformReal* New() { return new vtkTransformReal; }; // a design decision made by VTK developers
+	void                     Translate(const ::yade::Vector3r&);
+};
+
+struct vtkDoubleArrayFromReal : public vtkDoubleArray {
+	static vtkDoubleArrayFromReal* New() { return new vtkDoubleArrayFromReal; }; // a design decision made by VTK developers
+	vtkIdType                      InsertNextTuple(const ::yade::Vector3r&);
+	vtkIdType                      InsertNextTuple(const ::yade::Matrix3r&);
+	vtkIdType                      InsertNextValue(const ::yade::Real&);
+};
+
 #endif
 
 
