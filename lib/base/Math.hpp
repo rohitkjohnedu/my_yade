@@ -72,6 +72,11 @@
 #include<boost/serialization/nvp.hpp>
 #include<boost/serialization/is_bitwise_serializable.hpp>
 
+// This is temporary - before finalizing high precision Real merge.
+namespace yade {
+using Real    = ::Real;
+}
+
 // https://en.cppreference.com/w/cpp/language/unqualified_lookup
 // https://en.cppreference.com/w/cpp/language/qualified_lookup
 // https://en.cppreference.com/w/cpp/language/namespace
