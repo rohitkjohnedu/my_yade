@@ -295,31 +295,28 @@ Polyhedron Simplify(Polyhedron P, Real limit){
 
 //**********************************************************************************
 //list of facets + edges
-void PrintPolyhedron2File(Polyhedron P,FILE* X){
+void PrintPolyhedron2File(Polyhedron P,std::ofstream X){
 	Vector3r A,B,C;
-	fprintf(X,"*** faces ***\n");
+	X << "*** faces ***\n";
  	for (Polyhedron::Facet_iterator fIter = P.facets_begin(); fIter!=P.facets_end(); ++fIter){
 		Polyhedron::Halfedge_around_facet_circulator hfc0;
 		hfc0 = fIter->facet_begin();
 		int n = fIter->facet_degree();	
 		A = FromCGALPoint(hfc0->vertex()->point());
 		C = FromCGALPoint(hfc0->next()->vertex()->point());
-		for (int i=2; i<n; i++){
+		for (int i = 2; i < n; i++) {
 			++hfc0;
 			B = C;
 			C = FromCGALPoint(hfc0->next()->vertex()->point());
-			fprintf(X,"%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",A[0],A[1],A[2],B[0],B[1],B[2],C[0],C[1],C[2]);
+			X << A[0] << "\t" << A[1] << "\t" << A[2] << "\t" << B[0] << "\t" << B[1] << "\t" << B[2] << "\t" << C[0] << "\t" << C[1] << "\t"
+			  << C[2] << "\n";
 		}
 	}
-	fprintf(X,"*** edges ***\n");
- 	for (Polyhedron::Edge_iterator hei = P.edges_begin(); hei!=P.edges_end(); ++hei){
-		fprintf(X,"%e\t%e\t%e\t%e\t%e\t%e\n",
-			hei->vertex()->point()[0],
-			hei->vertex()->point()[1],
-			hei->vertex()->point()[2],
-			hei->opposite()->vertex()->point()[0],
-			hei->opposite()->vertex()->point()[1],
-			hei->opposite()->vertex()->point()[2]);
+	X << "*** edges ***\n";
+	for (Polyhedron::Edge_iterator hei = P.edges_begin(); hei != P.edges_end(); ++hei) {
+		X << hei->vertex()->point()[0] << "\t" << hei->vertex()->point()[1] << "\t" << hei->vertex()->point()[2] << "\t"
+		  << hei->opposite()->vertex()->point()[0] << "\t" << hei->opposite()->vertex()->point()[1] << "\t" << hei->opposite()->vertex()->point()[2]
+		  << "\n";
 	}
 }
 
