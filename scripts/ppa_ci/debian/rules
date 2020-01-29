@@ -42,7 +42,7 @@ override_dh_auto_install-arch:
 	$(tmpInstall)/usr/bin/yadedaily --check
 	#Delete all pyc files
 	find . -name '*.pyc' -print0 | xargs -0 rm -f
-	dh_numpy
+	dh_numpy3
 
 override_dh_installchangelogs:
 	dh_installchangelogs ChangeLog
