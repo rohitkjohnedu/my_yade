@@ -351,7 +351,7 @@ void RockLiningGlobal::action()
 		int                                blockNo      = blockIDs.size();
 
 		/// lining FORCE //
-		vtkSmartPointer<vtkPoints>     liningNode        = vtkSmartPointer<vtkPoints>::New();
+		vtkSmartPointer<vtkPointsReal> liningNode        = vtkSmartPointer<vtkPointsReal>::New();
 		vtkSmartPointer<vtkCellArray>  liningNodeCells   = vtkSmartPointer<vtkCellArray>::New();
 		vtkSmartPointer<vtkFloatArray> liningNodalMoment = vtkSmartPointer<vtkFloatArray>::New();
 		liningNodalMoment->SetNumberOfComponents(3);
@@ -393,7 +393,7 @@ void RockLiningGlobal::action()
 			/* try to draw forces */
 			vtkIdType pid[1];
 			Vector3r  midPoint = globalPoint1; //  0.5*(globalPoint1+globalPoint2);
-			pid[0]             = liningNode->InsertNextPoint(midPoint[0], midPoint[1], midPoint[2]);
+			pid[0]             = liningNode->InsertNextPoint(midPoint);
 			liningNodeCells->InsertNextCell(1, pid);
 			Vector3r plotDirection = midPoint;
 			plotDirection.normalize();
