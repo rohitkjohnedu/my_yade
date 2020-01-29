@@ -1,5 +1,7 @@
 #include "PDFEngine.hpp"
 #include <type_traits>
+#include <iostream>
+#include <fstream>
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -59,12 +61,17 @@ void PDFEngine::getSpectrums(vector<PDFEngine::PDF> & pdfs)
 
 void PDFEngine::writeToFile(vector<PDFEngine::PDF> const& pdfs)
 {
-	FILE* fid = fopen(filename.c_str(), (firstRun) ? "w" : "a");
+	std::ofstream fid;
+	if(firstRun) {
+		fid.open(filename);
+	} else {
+		fid.open(filename,std::ios_base::app);
+	}
 	
-	if(fid) {
+	if(fid.good() and fid.is_open()) {
 		if(firstRun) {
 			
-			fprintf(fid, "# time\t");
+			fid << "# time\t";
 			for(uint i(0);i<pdfs.size();i++) {
 				uint nTheta = pdfs[i].shape()[0];
 				uint nPhi = pdfs[i].shape()[1];
@@ -76,34 +83,30 @@ void PDFEngine::writeToFile(vector<PDFEngine::PDF> const& pdfs)
 					
 					if(ss.size() > 1)
 						for(uint j(0);j<ss.size();j++)
-							fprintf(fid, "%s_%s(%f,%f)\t",pdfs[i][t][p]->name.c_str(),  ss[j].c_str(), double(((double)t + 0.5)*dTheta), double(((double)p + 0.5)*dPhi));
+							fid << pdfs[i][t][p]->name << "_" << ss[j] << "(" << ((static_cast<Real>(t) + 0.5)*dTheta)<<","<< ((static_cast<Real>(p) + 0.5)*dPhi)<<")\t";
 					else
-						fprintf(fid, "%s(%f,%f)\t", pdfs[i][t][p]->name.c_str(), double(((double)t+0.5)*dTheta), double(((double)p+0.5)*dPhi));
+						fid << pdfs[i][t][p]->name << "("<< ((static_cast<Real>(t)+0.5)*dTheta) <<","<< ((static_cast<Real>(p)+0.5)*dPhi) << ")\t";
 				}
 			}
 			firstRun = false;
-			fprintf(fid, "\n");
+			fid << "\n";
 		}
 		
-		fprintf(fid, "%f\t",double(scene->time));
+		fid << scene->time << "\t";
 		
 		for(uint i(0);i<pdfs.size();i++) for(uint t(0);t<pdfs[i].shape()[0];t++) for(uint p(0);p<pdfs[i].shape()[1];p++)
 			if(pdfs[i][t][p]) {
 				vector<string> dat = pdfs[i][t][p]->getDatas();
 
 				for(uint j(0);j<dat.size();j++)
-					fprintf(fid, "%s\t",dat[j].c_str());
+					fid << dat[j] << "\t";
 			}
-		fprintf(fid, "\n");
-		fclose(fid);
+		fid << "\n";
+		fid.close();
 	}
 	else {
 		if(!warnedOnce) LOG_ERROR("Unable to open " << filename << " for PDF writing");
 		warnedOnce = true;
-	}
-	if(not std::is_same< double , Real >::value) {
-		// fprintf has to be replaced with operator <<
-		LOG_WARN("writeToFile converted high precision Real to low precision 'double' type.");
 	}
 }
 
