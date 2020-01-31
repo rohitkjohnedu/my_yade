@@ -53,14 +53,14 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	VTKRecorder(fileName=vtkSaveDir,recorders=['all'], firstIterRun=10, iterPeriod=25 ,label="VtkRecorder", ascii=True, multiblock=True),
+	VTKRecorder(fileName=vtkSaveDir,recorders=['all'], firstIterRun=10, iterPeriod=2000 ,label="VtkRecorder", ascii=True, multiblock=True),
 	newton
 ]
 
 for b in O.bodies:
 	b.shape.color=Vector3(b.id%8/8.0,b.id%8/8.0,b.id%8/8.0)
 
-O.run( 100, True);
+O.run( 20, True);
 
 p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", vtkSaveDir , checksPath+"/data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 p.wait()
