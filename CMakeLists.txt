@@ -911,8 +911,7 @@ FILE(GLOB filesGUIChecks "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/g
 INSTALL(FILES ${filesGUIChecks} DESTINATION ${YADE_PY_PATH}/yade/tests/gui)
 FILE(GLOB filesGUItestHelper "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/gui/helper/*.py")
 INSTALL(FILES ${filesGUItestHelper} DESTINATION ${YADE_PY_PATH}/yade)
-FILE(GLOB filesPYChecksData "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/data/*")
-INSTALL(FILES ${filesPYChecksData} DESTINATION ${YADE_PY_PATH}/yade/tests/checks/data)
+INSTALL(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checks-and-tests/checks/data/" DESTINATION ${YADE_PY_PATH}/yade/tests/checks/data)
 INSTALL(FILES "${CMAKE_CURRENT_SOURCE_DIR}/doc/yade-logo-note.png" DESTINATION "${YADE_DOC_PATH}/img")
 
 INSTALL(TARGETS boot DESTINATION "${YADE_PY_PATH}/yade/")
