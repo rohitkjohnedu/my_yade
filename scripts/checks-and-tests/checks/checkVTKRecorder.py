@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 from yade import pack,export,plot
-import math,os,sys
+import math,os,sys,shutil,subprocess
 print('checkVTKRecorder')
 
 #### This is useful for printing the linenumber in the script
@@ -52,9 +52,12 @@ O.engines=[
 		[Ip2_FrictMat_FrictMat_FrictPhys()],
 		[Law2_ScGeom_FrictPhys_CundallStrack()]
 	),
-	VTKRecorder(fileName=vtkSaveDir,recorders=['all'], virtPeriod=25 ,label="VtkRecorder", ascii=True, multiblock=True),
+	VTKRecorder(fileName=vtkSaveDir,recorders=['all'], firstIterRun=10, iterPeriod=25 ,label="VtkRecorder", ascii=True, multiblock=True),
 	newton
 ]
+
+for b in O.bodies:
+	b.shape.color=Vector3(b.id%8/8.0,b.id%8/8.0,b.id%8/8.0)
 
 O.run( 100, True);
 
@@ -90,3 +93,29 @@ O.run( 100, True);
 #						resultFile.write("%.8f"%number+'\n')
 #
 #
+
+p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", "data/vtk_testing" , "data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+p.wait()
+diffResult = p.returncode
+diffOut, diffErr = p.communicate()
+if(diffErr == None):
+	diffErr = ""
+else:
+	diffErr = diffErr.decode()
+if(diffOut == None):
+	diffOut=""
+else:
+	diffOut = diffOut.decode()
+
+if(diffResult==0):
+	shutil.rmtree(vtkSaveDir, ignore_errors=True)
+else:
+	print('\033[91m --------------------------------------------- \033[0m')
+	print('diffResult=',diffResult)
+	print('\033[91m --------------------------------------------- \033[0m')
+	print(diffOut)
+	print('\033[91m --------------------------------------------- \033[0m')
+	print(diffErr)
+	print('\033[91m --------------------------------------------- \033[0m')
+	raise YadeCheckError("checkVTKRecorder.py failed.")
+
