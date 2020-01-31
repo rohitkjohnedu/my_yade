@@ -62,7 +62,7 @@ for b in O.bodies:
 
 O.run( 20, True);
 
-p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", vtkSaveDir , checksPath+"/data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+p=subprocess.Popen(["/usr/bin/diff", "-r" , vtkSaveDir , checksPath+"/data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 p.wait()
 diffResult = p.returncode
 diffOut, diffErr = p.communicate()
