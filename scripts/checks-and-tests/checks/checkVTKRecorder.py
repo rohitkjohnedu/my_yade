@@ -61,40 +61,7 @@ for b in O.bodies:
 
 O.run( 100, True);
 
-
-#### these text files have too high precision, and get too big. I think that 8 decimal places should be good to avoid any numerical errors arising on different architectures.
-# textFile=open("Output123___n.txt", "w");textFile.write(str([results[False][0],results[False][1],results[False][2]]));textFile.close()
-# textFile=open("Output123___p.txt", "w");textFile.write(str([results[True ][0],results[True ][1],results[True ][2]]));textFile.close()
-#
-#resultFile=None
-## careful, I used this loop to save the reference results in git revision 2bc5ac90b. When doing tests it must be readonly, and loading=True
-#loading=True
-#if(loading):
-#	resultFile=open( checksPath+'/data/checkColliderCorrect.txt', "r" )
-#else:
-#	resultFile=open( checksPath+'/data/checkColliderCorrect.txt', "w" )
-#lineCount=0
-#for per in sorted(results):
-#	for result in results[per]:
-#		for record in result:
-#			for number in record:
-#				# contents of this tuple is explained in file InsertionSortCollider.cpp line 518, function boost::python::tuple InsertionSortCollider::dumpBounds();
-#				#for number in tupl:
-#				lineCount+=1
-#				if(loading):
-#					line = resultFile.readline()
-#					tmp = int(line)
-#					if(tmp!=number):
-#						raise YadeCheckError("InsertionSortCollider check failed in file scripts/checks-and-tests/checks/data/checkColliderCorrect.txt line: %d"%lineCount)
-#				else:
-#					if(type(number) is int):
-#						resultFile.write(str(number)+'\n')
-#					else:
-#						resultFile.write("%.8f"%number+'\n')
-#
-#
-
-p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", "data/vtk_testing" , "data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", checksPath+"data/vtk_testing" , checksPath+"data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 p.wait()
 diffResult = p.returncode
 diffOut, diffErr = p.communicate()
