@@ -332,7 +332,7 @@ bool do_intersect(Polyhedron A, Polyhedron B, std::vector<int> &sep_plane);
 Polyhedron Simplify(Polyhedron P, Real lim);
 //list of facets and edges
 void PrintPolyhedron(Polyhedron P);
-void PrintPolyhedron2File(Polyhedron P,std::ofstream X);
+void PrintPolyhedron2File(Polyhedron P,std::ofstream& X);
 //normal by least square fitting of separating segments
 Vector3r FindNormal(Polyhedron Int, Polyhedron PA, Polyhedron PB);
 //split polyhedron

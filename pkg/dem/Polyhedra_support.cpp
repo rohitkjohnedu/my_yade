@@ -295,7 +295,7 @@ Polyhedron Simplify(Polyhedron P, Real limit){
 
 //**********************************************************************************
 //list of facets + edges
-void PrintPolyhedron2File(Polyhedron P,std::ofstream X){
+void PrintPolyhedron2File(Polyhedron P,std::ofstream& X){
 	Vector3r A,B,C;
 	X << "*** faces ***\n";
  	for (Polyhedron::Facet_iterator fIter = P.facets_begin(); fIter!=P.facets_end(); ++fIter){
