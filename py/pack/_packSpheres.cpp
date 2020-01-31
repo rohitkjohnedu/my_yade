@@ -51,9 +51,9 @@ try {
 	              boost::python::arg("seed")           = 0,
 	              boost::python::arg("hSize")          = Matrix3r(Matrix3r::Zero())),
 	             // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
-	             "Create random very loose packing enclosed in a parallelepiped (also works in 2D if minCorner[k]=maxCorner[k] for one coordinate). The "
-	             "resulting packing conforms in fact a gas-like state (see Cloud denomination) with no contacts between particles. Usually used as a first "
-	             "step for packing generation, before subsequent mechanical loading that will confer a solid-like nature to the packing."
+	             "Create a random cloud of particles enclosed in a parallelepiped (also works in 2D if minCorner[k]=maxCorner[k] for one coordinate). The "
+	             "resulting packing is a gas-like state with no contacts between particles initially. Usually used as a first "
+	             "step before reaching a dense packing."
 	             "\nSphere radius distribution can be specified using one of the following ways:\n\n#. *rMean*, *rRelFuzz* and *num* gives uniform radius "
 	             "distribution in *rMean×(1 ± rRelFuzz)*. Less than *num* spheres can be generated if it is too high.\n#. *rRelFuzz*, *num* and (optional) "
 	             "*porosity*, which estimates mean radius so that *porosity* is attained at the end.  *rMean* must be less than 0 (default). *porosity* is "
