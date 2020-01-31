@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 from yade import pack,export,plot
-import math,os,sys,shutil,subprocess
+import math,os,sys,shutil,subprocess,tempfile
 print('checkVTKRecorder')
 
 #### This is useful for printing the linenumber in the script
@@ -16,7 +16,8 @@ from yade import pack
 
 
 #checksPath="." # this line was used for working on this script locally.
-vtkSaveDir=checksPath+'/data/vtk_testing/'
+tmpSaveDir = tempfile.mkdtemp()
+vtkSaveDir = tmpSaveDir+'/vtk_testing/'
 if not os.path.exists(vtkSaveDir):
 	os.makedirs(vtkSaveDir);
 
@@ -61,7 +62,7 @@ for b in O.bodies:
 
 O.run( 100, True);
 
-p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", checksPath+"data/vtk_testing" , checksPath+"data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+p=subprocess.Popen(["/usr/bin/diff", "-r" , "-q", vtkSaveDir , checksPath+"/data/vtk_reference"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 p.wait()
 diffResult = p.returncode
 diffOut, diffErr = p.communicate()
@@ -75,6 +76,7 @@ else:
 	diffOut = diffOut.decode()
 
 if(diffResult==0):
+	print("OK, removing temporary directory: ",vtkSaveDir)
 	shutil.rmtree(vtkSaveDir, ignore_errors=True)
 else:
 	print('\033[91m --------------------------------------------- \033[0m')
@@ -84,5 +86,6 @@ else:
 	print('\033[91m --------------------------------------------- \033[0m')
 	print(diffErr)
 	print('\033[91m --------------------------------------------- \033[0m')
+	print("Wrong result, keeping temporary directory: ",vtkSaveDir)
 	raise YadeCheckError("checkVTKRecorder.py failed.")
 
