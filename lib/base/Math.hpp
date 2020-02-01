@@ -12,15 +12,8 @@
 #endif
 
 #include <cassert>
-#include <cmath>
-#include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <limits>
-#include <list>
-#include <map>
-#include <set>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -65,7 +58,6 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <Eigen/Eigenvalues>
-#include <float.h>
 
 #include<boost/serialization/nvp.hpp>
 #include<boost/serialization/is_bitwise_serializable.hpp>
@@ -97,22 +89,13 @@ namespace yade { // Cannot have #include directive inside.
 using std::cerr;
 using std::cout;
 using std::endl;
-using std::fstream;
-using std::ifstream;
 using std::invalid_argument;
 using std::ios;
 using std::ios_base;
-using std::istringstream;
-using std::list;
 using std::logic_error;
 using std::make_pair;
-using std::map;
-using std::ofstream;
-using std::ostream;
-using std::ostringstream;
 using std::pair;
 using std::runtime_error;
-using std::set;
 using std::setfill;
 using std::setprecision;
 using std::setw;

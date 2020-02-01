@@ -23,6 +23,8 @@
 #include <lib/base/Singleton.hpp>
 #include <boost/thread/mutex.hpp>
 #include "SimulationFlow.hpp"
+#include <set>
+#include <map>
 
 namespace yade { // Cannot have #include directive inside.
 
