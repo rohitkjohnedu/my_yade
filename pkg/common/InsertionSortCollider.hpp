@@ -150,7 +150,7 @@ class InsertionSortCollider : public Collider {
 		        , loIdx(0)
 		{
 		}
-		void dump(ostream& os)
+		void dump(std::ostream& os)
 		{
 			string ret;
 			for (size_t i = 0; i < vec.size(); i++)

@@ -12,7 +12,7 @@ class Recorder: public PeriodicEngine{
 		if (addIterNum) fileTemp+="-" + boost::lexical_cast<string>(scene->iter);
 		
 		if(fileTemp.empty()) throw ios_base::failure(__FILE__ ": Empty filename.");
-		out.open(fileTemp.c_str(), truncate ? fstream::trunc : fstream::app);
+		out.open(fileTemp.c_str(), truncate ? std::fstream::trunc : std::fstream::app);
 		if(!out.good()) throw ios_base::failure(__FILE__ ": I/O error opening file `"+fileTemp+"'.");
 	}
 	protected:

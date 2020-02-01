@@ -494,7 +494,7 @@ bool Ig2_GridConnection_PFacet_ScGeom::go( const shared_ptr<Shape>& cm1, const s
 	
 	for (int i=0; i<3; i++){ 
 		int entier=i;
-		ostringstream oss;
+		std::ostringstream oss;
 		string chaine = "scm";
 		oss << chaine << entier;
 		string chaine1=oss.str();
@@ -671,7 +671,7 @@ bool Ig2_PFacet_PFacet_ScGeom::go( const shared_ptr<Shape>& cm1, const shared_pt
 
 		if(	(isintriangle1==false) && (isintriangle2==false)  && (isintriangle3==false) && (isintriangle4==false) && (isintriangle5==false)  && (isintriangle6==false)){
 			if((c1!=-1)and (c2!=-1) and(Body::byId(c1)->getGroupMask()!=0)and(Body::byId(c2)->getGroupMask()!=0)){
-				ostringstream oss;
+				std::ostringstream oss;
 				string chaine = "scm";
 				if (!scene->interactions->found(c1,c2)){ 
 					shared_ptr<Interaction> chaine (new Interaction(c1,c2));
@@ -682,7 +682,7 @@ bool Ig2_PFacet_PFacet_ScGeom::go( const shared_ptr<Shape>& cm1, const shared_pt
 				for (int i=0; i<3; i++){ 
 					for (int j=0; j<3; j++){ 
 						int entier = j+i*3;
-						ostringstream oss;
+						std::ostringstream oss;
 						string chaine = "scm";
 						oss << chaine << entier;
 						string chaine1=oss.str();
@@ -747,7 +747,7 @@ bool Ig2_PFacet_PFacet_ScGeom::go( const shared_ptr<Shape>& cm1, const shared_pt
 			for (int i=0; i<3; i++){ 
 				for (int j=0; j<3; j++){ 
 					int entier = j+i*3;
-					ostringstream oss;
+					std::ostringstream oss;
 					string chaine = "scm";
 					oss << chaine << entier;
 					string chaine1=oss.str();
