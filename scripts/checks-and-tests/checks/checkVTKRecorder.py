@@ -82,6 +82,7 @@ for fname in ['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']:
 			else:
 				raise YadeCheckError("checkVTKRecorder cannot determine section name in file "+fname+" line: "+str(lineCount)+" with lines: \n"+line1+"\nvs.\n"+line2)
 		if(line1 != line2): # we have some differences, check if they are acceptable
+			# the sum is to flatten the list of lists. First they are split by space, then they are split by '"'
 			sp1 = sum([i.split('"') for i in line1.split()] , [])
 			sp2 = sum([i.split('"') for i in line2.split()] , [])
 			if(section in toSkip):
@@ -98,8 +99,8 @@ for fname in ['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']:
 						if( s1 != s2 ):
 							raise YadeCheckError("checkVTKRecorder failed string comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
 	
-print("skippedLines: ",skippedLines)
+print("non-matching lines: ",skippedLines)
 
 if(skippedLines > 100):
-	raise YadeCheckError("checkVTKRecorder failed at the end because there were over 100 skipped lines in sections where non-matching lines were allowed.")
+	raise YadeCheckError("checkVTKRecorder failed at the end because there were over 100 non-matching lines in sections where non-matching lines were allowed.")
 
