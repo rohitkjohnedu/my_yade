@@ -38,7 +38,7 @@ void GLViewer::useDisplayParameters(size_t n){
 	if(dispParams.size()<=(size_t)n){ throw std::invalid_argument(("Display parameters #"+boost::lexical_cast<string>(n)+" don't exist (number of entries "+boost::lexical_cast<string>(dispParams.size())+")").c_str());; return;}
 	const shared_ptr<DisplayParameters>& dp=dispParams[n];
 	string val;
-	if(dp->getValue("OpenGLRenderer",val)){ istringstream oglre(val);
+	if(dp->getValue("OpenGLRenderer",val)){ std::istringstream oglre(val);
 		yade::ObjectIO::load<decltype(renderer),boost::archive::xml_iarchive>(oglre,"renderer",renderer);
 	}
 	else { LOG_WARN("OpenGLRenderer configuration not found in display parameters, skipped.");}
@@ -51,7 +51,7 @@ void GLViewer::saveDisplayParameters(size_t n){
 	vector<shared_ptr<DisplayParameters> >& dispParams=Omega::instance().getScene()->dispParams;
 	if(dispParams.size()<=n){while(dispParams.size()<=n) dispParams.push_back(shared_ptr<DisplayParameters>(new DisplayParameters));} assert(n<dispParams.size());
 	shared_ptr<DisplayParameters>& dp=dispParams[n];
-	ostringstream oglre;
+	std::ostringstream oglre;
 	yade::ObjectIO::save<decltype(renderer),boost::archive::xml_oarchive>(oglre,"renderer",renderer);
 	dp->setValue("OpenGLRenderer",oglre.str());
 	dp->setValue("GLViewer",GLViewer::getState());
@@ -238,7 +238,7 @@ void GLViewer::postDraw(){
 		unsigned x=10,y=height()-3-lineHt*2;
 		glColor3v(Vector3r(1,1,1));
 		if(timeDispMask & GLViewer::TIME_VIRT){
-			ostringstream oss;
+			std::ostringstream oss;
 			const Real& t=Omega::instance().getScene()->time;
 			unsigned min=((unsigned)t/60),sec=(((unsigned)t)%60),msec=((unsigned)(1e3*t))%1000,usec=((unsigned long)(1e6*t))%1000,nsec=((unsigned long)(1e9*t))%1000;
 			if(min>0) oss<<_W2<<min<<":"<<_W2<<sec<<"."<<_W3<<msec<<"m"<<_W3<<usec<<"u"<<_W3<<nsec<<"n";
@@ -255,7 +255,7 @@ void GLViewer::postDraw(){
 			y-=lineHt;
 		}
 		if(timeDispMask & GLViewer::TIME_ITER){
-			ostringstream oss;
+			std::ostringstream oss;
 			oss<<"#"<<rb->iter;
 			if(rb->stopAtIter>rb->iter) oss<<" ("<<setiosflags(ios::fixed)<<setw(3)<<setprecision(1)<<setfill('0')<<(100.*rb->iter)/rb->stopAtIter<<"%)";
 			QGLViewer::drawText(x,y,oss.str().c_str());
@@ -263,7 +263,7 @@ void GLViewer::postDraw(){
 		}
 		if(drawGrid){
 			glColor3v(Vector3r(1,1,0));
-			ostringstream oss;
+			std::ostringstream oss;
 			oss<<"grid: "<<setprecision(4)<<gridStep;
 			if(gridSubdivide) oss<<" (minor "<<setprecision(3)<<gridStep*.1<<")";
 			QGLViewer::drawText(x,y,oss.str().c_str());

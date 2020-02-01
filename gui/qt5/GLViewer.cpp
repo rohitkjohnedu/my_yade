@@ -142,7 +142,7 @@ string GLViewer::getState(){
 	LOG_WARN("State saved to temp file "<<tmpFile);
 	// read tmp file contents and return it as string
 	// this will replace all whitespace by space (nowlines will disappear, which is what we want)
-	ifstream in(tmpFile.c_str()); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
+	std::ifstream in(tmpFile.c_str()); string ret; while(!in.eof()){string ss; in>>ss; ret+=" "+ss;}; in.close();
 	boost::filesystem::remove(boost::filesystem::path(tmpFile));
 	return ret;
 }
@@ -428,7 +428,7 @@ void GLViewer::endSelection(const QPoint &point){
 }
 
 string GLViewer::getRealTimeString(){
-	ostringstream oss;
+	std::ostringstream oss;
   boost::posix_time::time_duration t=Omega::instance().getRealTime_duration();
 	unsigned d=t.hours()/24,h=t.hours()%24,m=t.minutes(),s=t.seconds();
 	oss<<"clock ";

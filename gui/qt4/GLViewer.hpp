@@ -53,7 +53,7 @@ class GLViewer : public QGLViewer
 		bool			gridSubdivide;
 		long			last;
 		int manipulatedClipPlane;
-		set<int> boundClipPlanes;
+		std::set<int> boundClipPlanes;
 		shared_ptr<qglviewer::LocalConstraint> xyPlaneConstraint;
 		string strBoundGroup(){string ret;FOREACH(int i, boundClipPlanes) ret+=" "+boost::lexical_cast<string>(i+1);return ret;}
 		boost::posix_time::ptime last_user_event;
