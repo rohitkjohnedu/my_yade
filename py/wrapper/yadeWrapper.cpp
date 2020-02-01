@@ -1174,7 +1174,7 @@ public:
 	PyObject* sceneToString()
 	{
 #endif
-		ostringstream oss;
+		std::ostringstream oss;
 	yade::ObjectIO::save<decltype(OMEGA.getScene()), boost::archive::binary_oarchive>(oss, "scene", OMEGA.getScene());
 	oss.flush();
 #if PY_MAJOR_VERSION < 3
@@ -1291,7 +1291,7 @@ pyMaterialContainer materials_get(void) { return pyMaterialContainer(OMEGA.getSc
 py::list listChildClassesNonrecursive(const string& base)
 {
 	py::list ret;
-	for (map<string, DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
+	for (std::map<std::string, DynlibDescriptor>::const_iterator di = Omega::instance().getDynlibsDescriptor().begin();
 	     di != Omega::instance().getDynlibsDescriptor().end();
 	     ++di)
 		if (Omega::instance().isInheritingFrom((*di).first, base))
@@ -1303,7 +1303,7 @@ bool isChildClassOf(const string& child, const string& base) { return (Omega::in
 
 py::list plugins_get()
 {
-	const map<string, DynlibDescriptor>& plugins = Omega::instance().getDynlibsDescriptor();
+	const std::map<std::string, DynlibDescriptor>& plugins = Omega::instance().getDynlibsDescriptor();
 	std::pair<string, DynlibDescriptor>  p;
 	py::list                             ret;
 	for (const auto& p : plugins)

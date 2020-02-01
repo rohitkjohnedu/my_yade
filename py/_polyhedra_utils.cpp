@@ -223,7 +223,7 @@ void SieveCurve()
 	std::sort(sieve_volume.begin(), sieve_volume.end());
 	Real cumul_vol = 0;
 
-	ofstream myfile;
+	std::ofstream myfile;
 	myfile.open("sieve_curve.dat");
 	for (std::vector<std::pair<Real, Real>>::iterator i = sieve_volume.begin(); i != sieve_volume.end(); ++i) {
 		cumul_vol += i->second / total_volume;
@@ -238,7 +238,7 @@ void SizeRatio()
 {
 	const shared_ptr<Scene> _rb = shared_ptr<Scene>();
 	shared_ptr<Scene>       rb  = (_rb ? _rb : Omega::instance().getScene());
-	ofstream                myfile;
+	std::ofstream                myfile;
 	myfile.open("sizes.dat");
 	for (const auto& b : *rb->bodies) {
 		if (!b || !b->shape)

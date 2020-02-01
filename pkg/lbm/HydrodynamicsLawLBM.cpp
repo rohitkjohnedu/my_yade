@@ -1195,7 +1195,7 @@ void HydrodynamicsLawLBM::saveStats(int iter_number, Real timestep)
     cerr <<"START: HydrodynamicsLawLBM::saveStats()"<<endl;
     #endif
     cerr << "| Save stats ..."<<endl;
-    ofstream file(LBMmachFile.c_str(), ios::app);
+    std::ofstream file(LBMmachFile.c_str(), ios::app);
     file <<iter_number<<" "<<iter_number*timestep<<" "<<VmaxC<<" "<<VmaxC/c<<endl;
     #ifdef LBM_VERBOSE
     cerr <<"END: HydrodynamicsLawLBM::saveStats()"<<endl;
@@ -1206,7 +1206,7 @@ void HydrodynamicsLawLBM::saveStats(int iter_number, Real timestep)
 //{
 //
 //    cerr << "| Save Eroded Ptc ..."<<endl;
-//    ofstream file(RemovedPtcFile.c_str(), ios::app);
+//    std::ofstream file(RemovedPtcFile.c_str(), ios::app);
 //    file <<iter_number<<" "<<iter_number*timestep<<" "<<NumberPtcEroded<<" "<<Vr<<" "<<Vr/Vo<<" "<<FhTotale<<endl;
 //
 //    return;
@@ -1215,7 +1215,7 @@ void HydrodynamicsLawLBM::saveObservedPtc(int iter_number, Real timestep)
 {
 
     cerr << "| Save Observed Ptc ..."<<endl;
-    ofstream file(ObservedPtcFile.c_str(), ios::app);
+    std::ofstream file(ObservedPtcFile.c_str(), ios::app);
     file <<iter_number<<" "<<iter_number*timestep<<" ";
     file <<dx*LBbodies[ObservedPtc].pos.x()<<" "<<dx*LBbodies[ObservedPtc].pos.y()<<" "<<dx*LBbodies[ObservedPtc].pos.z()<<" ";
     file <<dx*LBbodies[ObservedPtc].radius<<" ";
@@ -1239,31 +1239,31 @@ void HydrodynamicsLawLBM::createNewFiles()
 
     //spherefile_name<<dem_dir<<"/spheres"; //Useless here
 
-    ofstream file(LBMmachFile.c_str());
+    std::ofstream file(LBMmachFile.c_str());
     file <<"#iter_number\t time\t VmaxC\t VmaxC/c"<<endl;
     file.close();
 
     if(removingCriterion!=0){
-        ofstream file2(RemovedPtcFile.c_str());
+        std::ofstream file2(RemovedPtcFile.c_str());
         file2 <<"#Iter time NumberPtcEroded Vr Vr/Vo FhTotale"<<endl;
         file2.close();
     }
 
     if(SAVE_CONTACTINFO){
-        ofstream file3(LBMcontactsFile.c_str());
+        std::ofstream file3(LBMcontactsFile.c_str());
         file3 <<"#Iter time NumberOfContact"<<endl;
         file3.close();
     }
     //if(NB_GRAINS>0) {ofstream file3(spherefile_name.str().c_str());file3.close();}  //For what this line is used for? It seems to work without
     
     if(SAVE_OBSERVEDPTC){  //Condition to create observedPtc file only if the recording is required by the operator
-    	ofstream file4(ObservedPtcFile.c_str());
+    	std::ofstream file4(ObservedPtcFile.c_str());
     	file4 <<"#iter t x y z r Vx Vy Vz Wx Wy Wz Fx Fy Fz Mx My Mz"<<endl;
     	file4.close();
     }
 
     if(SAVE_OBSERVEDNODE){ //Condition to create observedNode file only if the recording is required by the operator
-    	ofstream file5(ObservedNodeFile.c_str());file5.close();
+    	std::ofstream file5(ObservedNodeFile.c_str());file5.close();
     }
     
 
@@ -1285,7 +1285,7 @@ void HydrodynamicsLawLBM::createDirectories(bool dirLBM, bool dirDem, bool dirCn
 
 void HydrodynamicsLawLBM::writelogfile()
 {
-    ofstream file(LBMlogFile.c_str());
+    std::ofstream file(LBMlogFile.c_str());
     file <<"File format: 1"<<endl;
     file <<"System parameters: "<<endl;
         file <<"\t Lx0= "<<Lx0<<endl;

@@ -34,7 +34,7 @@ class RenderMutexLock: public boost::mutex::scoped_lock{
 
 CREATE_LOGGER(Omega);
 
-const map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
+const std::map<string,DynlibDescriptor>& Omega::getDynlibsDescriptor(){return dynlibs;}
 
 const shared_ptr<Scene>& Omega::getScene(){return scenes.at(currentSceneNb);}
 void Omega::resetCurrentScene(){ RenderMutexLock lock; scenes.at(currentSceneNb) = shared_ptr<Scene>(new Scene);}
@@ -178,11 +178,11 @@ void Omega::buildDynlibDatabase(const vector<string>& dynlibsList){
 		}
 	}
 
-	map<string,DynlibDescriptor>::iterator dli    = dynlibs.begin();
-	map<string,DynlibDescriptor>::iterator dliEnd = dynlibs.end();
+	std::map<string,DynlibDescriptor>::iterator dli    = dynlibs.begin();
+	std::map<string,DynlibDescriptor>::iterator dliEnd = dynlibs.end();
 	for( ; dli!=dliEnd ; ++dli){
-		set<string>::iterator bci    = (*dli).second.baseClasses.begin();
-		set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
+		std::set<string>::iterator bci    = (*dli).second.baseClasses.begin();
+		std::set<string>::iterator bciEnd = (*dli).second.baseClasses.end();
 		for( ; bci!=bciEnd ; ++bci){
 			string name = *bci;
 			if (name=="Dispatcher1D" || name=="Dispatcher2D") (*dli).second.baseClasses.insert("Dispatcher");
@@ -226,7 +226,7 @@ void Omega::loadPlugins(vector<string> pluginFiles){
 			abort();
 		}
 	}
-	list<string>& plugins(ClassFactory::instance().pluginClasses);
+	std::list<string>& plugins(ClassFactory::instance().pluginClasses);
 	plugins.sort(); plugins.unique();
 	buildDynlibDatabase(vector<string>(plugins.begin(),plugins.end()));
 }
@@ -243,7 +243,7 @@ void Omega::loadSimulation(const string& f, bool quiet){
 		resetScene();
 		RenderMutexLock lock;
 		if(isMem){
-			istringstream iss(memSavedSimulations[f]);
+			std::istringstream iss(memSavedSimulations[f]);
 			yade::ObjectIO::load<decltype(scene),boost::archive::binary_iarchive>(iss,"scene",scene);
 		} else {
 			yade::ObjectIO::load(f,"scene",scene);
@@ -266,7 +266,7 @@ void Omega::saveSimulation(const string& f, bool quiet){
 	shared_ptr<Scene>& scene = scenes[currentSceneNb];
 	if(boost::algorithm::starts_with(f,":memory:")){
 		if(memSavedSimulations.count(f)>0 && !quiet) LOG_INFO("Overwriting in-memory saved simulation "<<f);
-		ostringstream oss;
+		std::ostringstream oss;
 		yade::ObjectIO::save<decltype(scene),boost::archive::binary_oarchive>(oss,"scene",scene);
 		memSavedSimulations[f]=oss.str();
 	}

@@ -201,7 +201,7 @@ void UnsaturatedEngine::checkLatticeNodeY(double y)
         cerr<<"y is out of range! "<<"pleas set y between "<<solver->yMin<<" and "<<solver->yMax<<endl;}
     else {
         int N=100;// the default Node number for each slice is 100X100
-        ofstream file;
+        std::ofstream file;
         std::ostringstream fileNameStream(".txt");
         fileNameStream << "LatticeNodeY_"<< y;
         std::string fileName = fileNameStream.str();
