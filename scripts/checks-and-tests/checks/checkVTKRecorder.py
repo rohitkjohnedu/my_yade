@@ -74,13 +74,15 @@ for fname in ['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']:
 		lineCount+=1
 		t1 = line1.split('"')
 		t2 = line2.split('"')
+		isHeader=False
 		if(t1[0]=='        <DataArray type=' and t2[0]=='        <DataArray type='):
 			if(t1[3]==t2[3]):
 				section=t1[3]
 				print("checking section: ", section, ("(non-matching lines allowed)" if (section in toSkip) else ""))
 			else:
 				raise YadeCheckError("checkVTKRecorder cannot determine section name in file "+fname+" line: "+str(lineCount)+" with lines: \n"+line1+"\nvs.\n"+line2)
-		if(line1 != line2): # we have some differences, check if they are acceptable
+		if(t1[0]=='<VTKFile type='): isHeader=True # various VTK versions have different headers.
+		if((line1 != line2) and (not isHeader)): # we have some differences, check if they are acceptable
 			# the sum is to flatten the list of lists. First they are split by space, then they are split by '"'
 			sp1 = sum([i.split('"') for i in line1.split()] , [])
 			sp2 = sum([i.split('"') for i in line2.split()] , [])
@@ -95,7 +97,7 @@ for fname in ['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']:
 						if( abs( float(s1) - float(s2) ) > 1e-8 ):
 							raise YadeCheckError("checkVTKRecorder failed float comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
 					except ValueError:
-						if( s1 != s2 ):
+						if((s1 != s2) and (not (s1=='>' and s2=='/>'))):
 							raise YadeCheckError("checkVTKRecorder failed string comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
 	
 print("non-matching lines: ",skippedLines)
