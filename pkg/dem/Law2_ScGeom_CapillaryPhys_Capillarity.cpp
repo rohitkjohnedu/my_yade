@@ -243,7 +243,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 		}
 	}
 
-	list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
+	std::list< shared_ptr<Interaction> >::iterator firstMeniscus, lastMeniscus, currentMeniscus;
 	Real angle1 = -1.0; Real angle2 = -1.0;
 	
 	for ( int i=0; i< bodiesMenisciiList.size(); ++i ) { // i is the index (or id) of the body being tested
@@ -358,7 +358,7 @@ Tableau::Tableau()
 Tableau::Tableau(const char* filename)
 
 {
-        ifstream file (filename);
+        std::ifstream file (filename);
         file >> R;
         int n_D;	//number of D values
         file >> n_D;
@@ -422,7 +422,7 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
 TableauD::TableauD()
 {}
 
-TableauD::TableauD(ifstream& file)
+TableauD::TableauD(std::ifstream& file)
 {
         int i=0;
         Real x;
@@ -611,7 +611,7 @@ void BodiesMenisciiList::checkLengthBuffer(const shared_ptr<Interaction>& intera
 	}
 }
 
-list< shared_ptr<Interaction> >&  BodiesMenisciiList::operator[] (int index)
+std::list< shared_ptr<Interaction> >&  BodiesMenisciiList::operator[] (int index)
 {
 	return interactionsOnBody[index];
 }
@@ -623,8 +623,8 @@ int BodiesMenisciiList::size()
 
 void BodiesMenisciiList::display()
 {
-	list< shared_ptr<Interaction> >::iterator firstMeniscus;
-	list< shared_ptr<Interaction> >::iterator lastMeniscus;
+	std::list< shared_ptr<Interaction> >::iterator firstMeniscus;
+	std::list< shared_ptr<Interaction> >::iterator lastMeniscus;
 	for ( unsigned int i=0; i<interactionsOnBody.size(); ++i )
 	{
 		if ( !interactionsOnBody[i].empty() )

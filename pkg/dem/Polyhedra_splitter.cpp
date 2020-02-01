@@ -227,7 +227,7 @@ void SplitPolyMohrCoulomb::action() {
 	vector<Matrix3r> bStresses (scene->bodies->size(), Matrix3r::Zero());
 	getStressForEachBody(bStresses);
 
-	ofstream fileS;
+	std::ofstream fileS;
 	struct stat buffer;
 	if (stat (fileName.c_str(), &buffer) != 0) {
 		fileS.open (fileName, ios::out);

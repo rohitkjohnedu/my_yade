@@ -64,7 +64,7 @@ void MicroMacroAnalyser::action()
 		if (compDeformation) {
 			analyser->computeParticlesDeformation();
 			//for (int i=0; i<analyser->ParticleDeformation.size();i++) cerr<< analyser->ParticleDeformation[i]<<endl;
-			ostringstream oss;
+			std::ostringstream oss;
 			oss<<"deformation"<<incrtNumber++<<".vtk";
 			analyser->DefToFile(oss.str().c_str());
 		}
@@ -89,7 +89,7 @@ void MicroMacroAnalyser::setState(unsigned int state, bool save_states, bool com
 		}
 	}
 	if (save_states) {
-		ostringstream oss;
+		std::ostringstream oss;
 		//oss<<stateFileName<<"_"<<scene->iter;
 		oss<<stateFileName<<"_"<<stateNumber++;
 		TS.to_file(oss.str().c_str(),/*use bz2?*/ true);

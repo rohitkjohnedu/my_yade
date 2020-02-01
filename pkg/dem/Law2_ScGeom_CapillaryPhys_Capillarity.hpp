@@ -59,7 +59,7 @@ class Interaction;
 class BodiesMenisciiList
 {
 	private:
-		vector< list< shared_ptr<Interaction> > > interactionsOnBody; // would require use of OpenMPVector (lib/base/openmp-accu.hpp) for parallel coding, see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10842.html and msg11238.html
+		std::vector< std::list< shared_ptr<Interaction> > > interactionsOnBody; // would require use of OpenMPVector (lib/base/openmp-accu.hpp) for parallel coding, see http://www.mail-archive.com/yade-dev@lists.launchpad.net/msg10842.html and msg11238.html
 		
 		//shared_ptr<Interaction> empty;
 		
@@ -69,7 +69,7 @@ class BodiesMenisciiList
 		bool prepare(Scene*,bool);
 		bool insert(const shared_ptr<Interaction>&);
 		bool remove(const shared_ptr<Interaction>&);
-		list< shared_ptr<Interaction> >& operator[] (int);
+		std::list< shared_ptr<Interaction> >& operator[] (int);
 		int size();
 		void display();
 		void checkLengthBuffer(const shared_ptr<Interaction>&);

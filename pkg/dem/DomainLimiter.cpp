@@ -315,7 +315,7 @@ void GlExtra_LawTester::render(){
 void GlExtra_OctreeCubes::postLoad(GlExtra_OctreeCubes&){
 	if(boxesFile.empty()) return;
 	boxes.clear();
-	ifstream txt(boxesFile.c_str());
+	std::ifstream txt(boxesFile.c_str());
 	while(!txt.eof()){
 		Real data[8];
 		for(int i=0; i<8; i++){ if(i<7 && txt.eof()) goto done; txt>>data[i]; }

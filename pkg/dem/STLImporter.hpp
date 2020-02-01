@@ -124,7 +124,7 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
   while(getc(fp) != '\n');
   
   vector<Vrtx> vcs;
-  set<pair<int,int> > egs;
+  std::set<pair<int,int> > egs;
 
   /* Read a single facet from an ASCII .STL file 
    * ASCII file looks like:
@@ -186,7 +186,7 @@ bool STLReader::open_ascii(const char* filename,  OutV vertices, OutE edges, Out
     (vertices++) = (*it)[1];
     (vertices++) = (*it)[2];
   }
-  for(set<pair<int,int> >::iterator it=egs.begin(),end=egs.end(); it!=end; ++it)
+  for(std::set<pair<int,int> >::iterator it=egs.begin(),end=egs.end(); it!=end; ++it)
   {
     (edges++) = it->first;
     (edges++) = it->second;
@@ -209,7 +209,7 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
     int res=fread(&facenum, sizeof(int), 1, fp);
     
     vector<Vrtx> vcs;
-    set<pair<int,int> > egs;
+    std::set<pair<int,int> > egs;
     
     if (res)
     {
@@ -256,7 +256,7 @@ bool STLReader::open_binary(const char* filename,  OutV vertices, OutE edges, Ou
       (vertices++) = (*it)[1];
       (vertices++) = (*it)[2];
     }
-    for(set<pair<int,int> >::iterator it=egs.begin(),end=egs.end(); it!=end; ++it)
+    for(std::set<pair<int,int> >::iterator it=egs.begin(),end=egs.end(); it!=end; ++it)
     {
       (edges++) = it->first;
       (edges++) = it->second;

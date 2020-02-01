@@ -19,7 +19,7 @@ void SnapshotEngine::action(){
 		}
 	}
 	const shared_ptr<GLViewer>& glv=OpenGLManager::self->views[0];
-	ostringstream fss; fss<<fileBase<<setw(5)<<setfill('0')<<counter++<<"."<<boost::algorithm::to_lower_copy(format);
+	std::ostringstream fss; fss<<fileBase<<setw(5)<<setfill('0')<<counter++<<"."<<boost::algorithm::to_lower_copy(format);
 	LOG_DEBUG("GL view → "<<fss.str())
 	glv->setSnapshotFormat(QString(format.c_str()));
 	glv->nextFrameSnapshotFilename=fss.str();

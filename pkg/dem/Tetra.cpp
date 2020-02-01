@@ -684,7 +684,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 		tB=Tetra(Vector3r(0,0,0),Vector3r(1.5,1,1),Vector3r(0.5,1,1),Vector3r(1,1,.5));
 		tA=Tetra(Vector3r(0,0,0),Vector3r(1,0,0),Vector3r(0,1,0),Vector3r(0,0,1));
 	#endif
-	list<Tetra> tAB=Tetra2TetraIntersection(tA,tB);
+	std::list<Tetra> tAB=Tetra2TetraIntersection(tA,tB);
 	if (!interaction->isReal() && !force) {
 		if(tAB.size()==0) { /* LOG_DEBUG("No intersection."); */ return false;} //no intersecting volume
 	}
@@ -694,7 +694,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 
 	Vector3r tt[4]; for(int i=0; i<4; i++) tt[i]=tA.v[i];
 
-	for(list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	for(std::list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		Real dV=TetrahedronVolume(II->v);
 		V+=dV;
 		Sg+=dV*(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25;
@@ -704,7 +704,7 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
 		// I is purely geometrical (as if with unit density)
 	
 	// get total 
-	Vector3r dist;	for(list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
+	Vector3r dist;	for(std::list<Tetra>::iterator II=tAB.begin(); II!=tAB.end(); II++){
 		II->v[0]-=centroid; II->v[1]-=centroid; II->v[2]-=centroid; II->v[3]-=centroid;
 		dist=(II->v[0]+II->v[1]+II->v[2]+II->v[3])*.25-centroid;
 		/* use parallel axis theorem */ 
@@ -790,9 +790,9 @@ bool Ig2_Tetra_Tetra_TTetraGeom::go(const shared_ptr<Shape>& cm1,const shared_pt
  * return S
  *
  */
-list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, const Tetra& B){
+std::list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, const Tetra& B){
 	// list of 4hedra to split; initially A
-	list<Tetra> ret; ret.push_back(A);
+	std::list<Tetra> ret; ret.push_back(A);
 	/* I is vertex index at B;
 	 * clipping face is [i i1 i2], normal points away from i3 */
 	int i,i1,i2,i3;
@@ -806,8 +806,8 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, 
 		const Vector3r& P(B.v[i]); // reference point on the plane
 		normal=(B.v[i1]-P).cross(B.v[i2]-P); normal.normalize(); // normal
 		if((B.v[i3]-P).dot(normal)>0) normal*=-1; // outer normal
-		for(list<Tetra>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
-			list<Tetra> splitDecomposition=TetraClipByPlane(*I,P,normal);
+		for(std::list<Tetra>::iterator I=ret.begin(); I!=ret.end(); /* I++ */ ){
+			std::list<Tetra> splitDecomposition=TetraClipByPlane(*I,P,normal);
 			// replace current list element by the result of decomposition;
 			// I points after the erased one, so decomposed 4hedra will not be touched in this iteration, just as we want.
 			// Since it will be incremented by I++ at the end of the cycle, compensate for that by I--;
@@ -847,9 +847,9 @@ list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::Tetra2TetraIntersection(const Tetra& A, 
  *
  * http://members.tripod.com/~Paul_Kirby/vector/Vplanelineint.html
  */
-list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& normal){
+std::list<Tetra> Ig2_Tetra_Tetra_TTetraGeom::TetraClipByPlane(const Tetra& T, const Vector3r& P, const Vector3r& normal){
 	
-	list<Tetra> ret;
+	std::list<Tetra> ret;
 	// scaling factor for Mathr::EPSILON: average edge length
 	Real scaledEPSILON=Mathr::EPSILON*(1/6.)*((T.v[1]-T.v[0])+(T.v[2]-T.v[0])+(T.v[3]-T.v[0])+(T.v[2]-T.v[1])+(T.v[3]-T.v[1])+(T.v[3]-T.v[2])).norm();
 

@@ -122,7 +122,7 @@ bool BlockGen::generate(string& /*message*/)
 	if(boundaries){
 		/* Read csv file for info on discontinuities */
 		const char *filenameChar = filenameBoundaries.c_str();
-		ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+		std::ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
 		string value;
 		/* skip first line */
 		getline ( file, value);
@@ -182,7 +182,7 @@ bool BlockGen::generate(string& /*message*/)
 	if(sliceBoundaries){
 		/* Read csv file for info on discontinuities */
 		const char *filenameChar = filenameSliceBoundaries.c_str();
-		ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+		std::ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
 		string value;
 		/* skip first line */
 		getline ( file, value);
@@ -237,7 +237,7 @@ bool BlockGen::generate(string& /*message*/)
 	if(persistentPlanes){
 		/* Read csv file for info on discontinuities */
 		const char *filenameChar = filenamePersistentPlanes.c_str();
-		ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+		std::ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
 		string value;
 		/* skip first line */
 		getline ( file, value);
@@ -311,7 +311,7 @@ bool BlockGen::generate(string& /*message*/)
 	if(jointProbabilistic){
 		/* Read csv file for info on discontinuities */
 		const char *filenameChar = filenameProbabilistic.c_str();
-		ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+		std::ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
 		string value;
 		/* skip first line */
 		getline ( file, value);
@@ -467,7 +467,7 @@ bool BlockGen::generate(string& /*message*/)
 	if(slopeFace){
 		/* Read csv file for info on discontinuities */
 		const char *filenameChar = filenameSlopeFace.c_str();
-		ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+		std::ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
 		string value;
 		/* skip first line */
 		getline ( file, value);
@@ -546,7 +546,7 @@ bool BlockGen::generate(string& /*message*/)
 	if(opening){
 		/* Read csv file for info on discontinuities */
 		const char *filenameChar = filenameOpening.c_str();
-		ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
+		std::ifstream file ( filenameChar ); // declare file stream: http://www.cplusplus.com/reference/iostream/ifstream/
 		string value;
 		/* skip first line */
 		getline ( file, value);

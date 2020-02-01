@@ -77,7 +77,7 @@ void SpherePack::fromFile(const string& file)
 
 void SpherePack::toFile(const string& fname) const
 {
-	ofstream f(fname.c_str());
+	std::ofstream f(fname.c_str());
 	if (!f.good()) {
 		throw runtime_error("Unable to open file `" + fname + "'");
 	}
