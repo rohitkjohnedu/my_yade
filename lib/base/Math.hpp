@@ -13,8 +13,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <cstdlib>
-#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <iomanip>

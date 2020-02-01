@@ -11,7 +11,6 @@
 #include <pkg/common/ElastMat.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/Polyhedra.hpp>
-#include <cmath>
 #include <numpy/ndarraytypes.h>
 
 CREATE_CPP_LOCAL_LOGGER("_polyhedra_utils.cpp");

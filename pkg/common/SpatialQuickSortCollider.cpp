@@ -8,7 +8,6 @@
 #include "SpatialQuickSortCollider.hpp"
 #include <core/Scene.hpp>
 #include <core/BodyContainer.hpp>
-#include <cmath>
 #include <algorithm>
 
 namespace yade { // Cannot have #include directive inside.
