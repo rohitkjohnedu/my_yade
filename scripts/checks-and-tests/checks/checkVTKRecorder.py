@@ -13,6 +13,7 @@ if((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.
 	raise YadeCheckError("This test will only work on single core, because it must be fully reproducible, but -j "+str(opts.threads)+" or --cores "+str(opts.cores)+" is used.")
 
 from yade import pack
+import yade.libVersions
 
 if ('VTK' in features):
 #checksPath="." # this line was used for working on this script locally.
@@ -65,9 +66,14 @@ if ('VTK' in features):
 	toSkip=['dirI','dirII','dirIII'] # these values are too sensitive so ignore them.
 	section=""
 	skippedLines=0
-	for fname in ['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']:
+	vtkVer=yade.libVersions.getVersion('vtk')
+	if(vtkVer[0] not in [6,8]):
+		raise YadeCheckError("checkVTKRecorder does not have reference results for VTK version "+str(vtkVer)+", check files in "+vtkSaveDir+", if they are correct add them to: scripts/checks-and-tests/checks/data/vtk_reference_"+str(vtkVer[0])+'/')
+	if(vtkVer[0]==6): fileList=['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']
+	if(vtkVer[0]==8): fileList=['10.vtm','10/10_0.vtu','10/10_2.vtp']
+	for fname in fileList:
 		print("checking file: ",vtkSaveDir+fname)
-		referenceFile = open( checksPath+'/data/vtk_reference/'+fname, "r" )
+		referenceFile = open( checksPath+'/data/vtk_reference_'+str(vtkVer[0])+'/'+fname, "r" )
 		testedFile    = open( vtkSaveDir+fname, "r" )
 		lineCount=0
 		for line1, line2 in zip(referenceFile, testedFile):
