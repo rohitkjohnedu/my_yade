@@ -83,9 +83,9 @@ if ('VTK' in features):
 					raise YadeCheckError("checkVTKRecorder cannot determine section name in file "+fname+" line: "+str(lineCount)+" with lines: \n"+line1+"\nvs.\n"+line2)
 			if(t1[0]=='<VTKFile type='): isHeader=True # various VTK versions have different headers.
 			if((line1 != line2) and (not isHeader)): # we have some differences, check if they are acceptable
-				# the sum is to flatten the list of lists. First they are split by space, then they are split by '"'
-				sp1 = sum([i.split('"') for i in line1.split()] , [])
-				sp2 = sum([i.split('"') for i in line2.split()] , [])
+				# flatten the list of lists. First they are split by space, then they are split by '"'
+				sp1 = [val for sublist in [i.split('"') for i in line1.split()] for val in sublist]
+				sp2 = [val for sublist in [i.split('"') for i in line2.split()] for val in sublist]
 				if(section in toSkip):
 					skippedLines+=1
 					#print("skipping line: ",line1)
