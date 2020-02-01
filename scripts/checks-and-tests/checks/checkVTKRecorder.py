@@ -58,8 +58,7 @@ O.engines=[
 ]
 
 for b in O.bodies:
-	b.shape.color=Vector3(b.id%8/8.0,b.id%8/8.0,b.id%8/8.0)
-	#b.shape.color=Vector3(0.25,b.id%8/8.0,b.id%8/8.0)
+	b.shape.color=Vector3(b.id%8/8.0,b.id%8/8.0,0.5)
 
 O.run( 20, True);
 
