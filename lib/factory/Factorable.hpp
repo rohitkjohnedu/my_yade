@@ -31,7 +31,7 @@ namespace yade { // Cannot have #include directive inside.
 		string token;								\
 		vector<string> tokens;							\
 		string str=#bcn;							\
-		istringstream iss(str);							\
+		std::istringstream iss(str);						\
 		while (!iss.eof())							\
 		{									\
 			iss >> token;							\
@@ -47,7 +47,7 @@ namespace yade { // Cannot have #include directive inside.
 		string token;								\
 		vector<string> tokens;							\
 		string str=#bcn;							\
-		istringstream iss(str);							\
+		std::istringstream iss(str);						\
 		while (!iss.eof())							\
 		{									\
 			iss >> token;							\

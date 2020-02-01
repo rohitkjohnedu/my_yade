@@ -1703,7 +1703,7 @@ void FlowBoundingSphere<Tesselation>::saveMesh(basicVTKwritter& vtkfile, bool wi
 	//in presence of clumps vertex ids are not zero-based anymore
 	//to fix the vkt output vertex ids will be replaced by zero-based ones (CAUTION: output vertex ids != Yade vertex ids!)
 
-	map<int,int> vertexIdMap;
+	std::map<int,int> vertexIdMap;
 	int numVertices = 0;
 	unsigned int minId = 1;
 

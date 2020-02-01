@@ -144,7 +144,7 @@ class ClassFactory : public Singleton<ClassFactory>
 		std::string lastError();
 
 		void registerPluginClasses(const char* fileAndClasses[]);
-		list<string> pluginClasses;
+		std::list<string> pluginClasses;
 
 		virtual string getClassName() const { return "Factorable"; };
 		virtual string getBaseClassName(int ) const { return "";};

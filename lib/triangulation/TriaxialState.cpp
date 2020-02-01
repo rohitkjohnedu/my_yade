@@ -18,6 +18,7 @@ namespace yade { // Cannot have #include directive inside.
 namespace CGT {
 
 using std::string; // inside .cpp file it does not leak.
+using std::ifstream;
 
 TriaxialState::TriaxialState(void) : NO_ZERO_ID(false), filter_distance(-0.1), tesselated(false) {}
 

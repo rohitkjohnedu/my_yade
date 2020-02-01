@@ -75,7 +75,7 @@ public:
 	bool inside(Point p);
 	static Real find_parameter (const char* parameter_name, const char* filename);
 	static Real find_parameter (const char* parameter_name, boost::iostreams::filtering_istream& file);
-	static Real find_parameter (const char* parameter_name, ifstream& file);
+	static Real find_parameter (const char* parameter_name, std::ifstream& file);
 	void reset (void);
 
 	GrainIterator grains_begin (void);

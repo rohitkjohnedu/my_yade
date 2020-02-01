@@ -92,8 +92,8 @@ public:
 	std::vector<ETriplet> tripletList;//The list of non-zero components in Eigen sparse matrix
 	Eigen::CholmodDecomposition<Eigen::SparseMatrix<double>, Eigen::Lower > eSolver;
 	bool factorizedEigenSolver;
-	void exportMatrix(const char* filename) {ofstream f; f.open(filename); f<<A; f.close();};
-	void exportTriplets(const char* filename) {ofstream f; f.open(filename);
+	void exportMatrix(const char* filename) {std::ofstream f; f.open(filename); f<<A; f.close();};
+	void exportTriplets(const char* filename) {std::ofstream f; f.open(filename);
 		for (int k=0; k<A.outerSize(); ++k)
 		  	for (Eigen::SparseMatrix<Real>::InnerIterator it(A,k); it; ++it) f<< it.row()<<" "<< it.col()<<" "<<it.value()<<endl; f.close();};
 	//Multi-threading seems to work fine for Cholesky decomposition, but it fails for the solve phase in which -j1 is the fastest,

@@ -22,7 +22,7 @@ namespace CGT
 {
 using ::yade::math::min; // using inside .cpp file is ok.
 using ::yade::math::max;
-
+using std::ofstream;
 
 int n_debug = 0;
 std::string _itoa(int i)

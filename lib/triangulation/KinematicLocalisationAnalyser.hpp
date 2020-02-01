@@ -61,10 +61,10 @@ class KinematicLocalisationAnalyser
 		bool DefToFile (const char* state_file1, const char* state_file0, const char* output_file_name="deformation.vtk", bool usebz2=false);
 		///Save/Load states using bz2 compression
 		bool bz2;
-		ofstream& ContactDistributionToFile ( ofstream& output_file );
-		ofstream& AllNeighborDistributionToFile ( ofstream& output_file );
-		ofstream& StrictNeighborDistributionToFile ( ofstream& output_file );
-		ofstream& NormalDisplacementDistributionToFile ( vector<Edge_iterator>& edges, ofstream& output_file );
+		std::ofstream& ContactDistributionToFile ( std::ofstream& output_file );
+		std::ofstream& AllNeighborDistributionToFile ( std::ofstream& output_file );
+		std::ofstream& StrictNeighborDistributionToFile ( std::ofstream& output_file );
+		std::ofstream& NormalDisplacementDistributionToFile ( vector<Edge_iterator>& edges, std::ofstream& output_file );
 
 		long Filtered_contacts ( TriaxialState& state );
 		long Filtered_neighbors ( TriaxialState& state );
