@@ -10,14 +10,14 @@
 
 /* Theoretical framework and experimental validation presented in:
 
-Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8, Enschede Netherlands, July 2019. 
+Caulk, R. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8, Enschede Netherlands, July 2019.
 
 */
 
 //#define THERMAL
 #ifdef THERMAL
-#ifdef YADE_OPENMP  
-#pragma once 
+#ifdef YADE_OPENMP
+#pragma once
 
 #include<core/PartialEngine.hpp>
 #include<core/State.hpp>
@@ -69,7 +69,7 @@ class ThermalEngine : public PartialEngine
 		Real cavitySolidVolumeChange;
 		Real cavityVolume;
 		Real cavityDtemp;
-		
+
 		virtual ~ThermalEngine();
 		virtual void action();
 		void setReynoldsNumbers();
@@ -98,6 +98,7 @@ class ThermalEngine : public PartialEngine
         	Real getThermalDT() {return thermalDT;}
         	int getConductionIterPeriod() {return conductionIterPeriod;}
         	Real getMaxTimeStep() {return maxTimeStep;}
+		void applyBoundaryHeatFluxes();
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ThermalEngine,PartialEngine,"An engine typically used in combination with FlowEngine to simulate thermal-hydraulic-mechanical processes. Framework description and demonstration presented within the following paper [Caulk2019a]_ :Caulk, R.A. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8 International Conference for Discrete Element Methods, Enschede Netherlands, July 2019.",
 		/*attributes*/
@@ -150,7 +151,7 @@ class ThermalEngine : public PartialEngine
 	// clang-format on
 	DECLARE_LOGGER;
 
-	
+
 };
 REGISTER_SERIALIZABLE(ThermalEngine);
 
@@ -158,4 +159,3 @@ REGISTER_SERIALIZABLE(ThermalEngine);
 
 #endif//THERMAL
 #endif//YADE_OPENMP
-
