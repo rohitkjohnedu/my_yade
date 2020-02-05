@@ -87,7 +87,7 @@ class Body: public Serializable{
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Body,Serializable,"A particle, basic element of simulation; interacts with other bodies.",
 		((Body::id_t,id,Body::ID_NONE,Attr::readonly,"Unique id of this body."))
 
-		((mask_t,groupMask,1,,"Bitmask for determining interactions."))
+		((mask_t,groupMask,1,,"Bitmask for interaction detection purposes: it is required that two bodies have at least one bit in common in their groupMask for their interaction to be possible from the :yref:`Collider` point of view."))
 		((int,flags,FLAG_BOUNDED,Attr::readonly,"Bits of various body-related flags. *Do not access directly*. In c++, use isDynamic/setDynamic, isBounded/setBounded, isAspherical/setAspherical. In python, use :yref:`Body.dynamic`, :yref:`Body.bounded`, :yref:`Body.aspherical`."))
 #ifdef YADE_MPI
 		((int,subdomain,0,,"the subdomain this body belongs to."))
