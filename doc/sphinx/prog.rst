@@ -1036,6 +1036,8 @@ Expected parameters are indicated by macro name components separated with unders
 	``def_readonly`` will not work for custom types (such as std::vector), as it bypasses conversion registry; see :ref:`customconverters` for details.
 
 
+.. _exposeSpecialAttrs:
+
 Exposing function-attributes to GUI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1977,7 +1979,7 @@ and
 
 	Yade [3]: print(f2.dict())
 
-Wrapped classes also inherit from :yref:`Serializable` several special virtual methods: :yref:`dict()<Serializable::dict>` returning all registered class attributes as dictionary (shown above), :yref:`clone()<Serializable::clone>` returning copy of instance (by copying attribute values), :yref:`updateAttrs()<Serializable::updateAttrs>` and :yref:`updateExistingAttrs()<Serializable::updateExistingAttrs>` assigning attributes from given dictionary (the former thrown for unknown attribute, the latter doesn't).
+Wrapped classes also inherit from :yref:`Serializable` several special virtual methods: :yref:`dict()<Serializable::dict>` returning all registered class attributes as dictionary (shown above), :yref:`clone()<Serializable::clone>` returning copy of instance (by copying attribute values), :yref:`updateAttrs()<Serializable::updateAttrs>` and :yref:`updateExistingAttrs()<Serializable::updateExistingAttrs>` assigning attributes from given dictionary (the former thrown for unknown attribute, the latter doesn't). And :yref:`pyDictCustom()<Serializable::pyDictCustom>` explained also in :ref:`preceeding section<exposeSpecialAttrs>`.
 
 Read-only property ``name`` wraps c++ method ``getClassName()`` returning class name as string. (Since c++ class and the wrapper class always have the same name, getting python type using ``__class__`` and its property ``__name__`` will give the same value).
 
@@ -2026,10 +2028,8 @@ When an object is crossing c++/python boundary, boost::python's global "converte
 
 .. [#wrap]
 	Wrapped classes are automatically registered when the class wrapper is created. If wrapped class derives from another wrapped class (and if this dependency is declared with the ``boost::python::bases`` template, which Yade's classes do automatically), parent class must be registered before derived class, however. (This is handled via loop in ``Omega::buildDynlibDatabase``, which reiterates over classes, skipping failures, until they all successfully register)
-	Math classes (Vector3, Matrix3, Quaternion) are wrapped in minieigenHP. If yade is compiled with ``Real`` type being ``double`` type then it redirects to minieigen, which is available as a separate package. Use your package manager to install it. See :ref:`high precision section <high-precision>` for more details.
+	Math classes (Vector3, Matrix3, Quaternion) are wrapped in :yref:`yade.minieigenHP`. If yade is compiled with ``Real`` type being ``double`` type then it redirects to minieigen, which is available as a separate package. Use your package manager to install it. See :ref:`high precision documentation<highPrecisionReal>` for more details.
 
-
-.. comment: FIXME - write    .. _high-precision:   section.
 
 Adding a new python/C++ module
 ============================
