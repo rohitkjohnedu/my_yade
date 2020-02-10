@@ -478,10 +478,12 @@ To compile Yade with this type of sanitizer, use ENABLE_ASAN option::
 The compilation time, memory consumption during build and the size of build-files are much higher than during the normall build.
 Monitor RAM and disk usage during compilation to prevent out-of-RAM problems.
 
-To find the proper libasan library in your particular distribution, use the "find" command.
+To find the proper libasan library in your particular distribution, use the "locate" command. Then, launch your yade executable in connection with that libasan library, e.g.::
+
+    LD_PRELOAD=/some/path/to/libasan.so yade
 
 By default the leak detector is enabled in the asan build. Yade is producing a lot of leak warnings at the moment.
-To mute those warnings and concentrate on other memory errors, one can use detect_leaks=0 option. The full command
+To mute those warnings and concentrate on other memory errors, one can use detect_leaks=0 option. Accounting for the latter, the full command
 to run tests with the AddressSanitized-Yade on Debian 10 Buster is::
 
 	ASAN_OPTIONS=detect_leaks=0:verify_asan_link_order=false yade --test
