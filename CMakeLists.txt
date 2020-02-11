@@ -36,7 +36,6 @@
 #  USE_QT5: use QT5 for GUI (ON by default)
 #  CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 #  SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
-#  ENABLE_PYTHON3: enable python 3 compilation instead of python2.7 (OFF by default)
 #  PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system. (-1 by default)
 
 project(Yade C CXX)
