@@ -478,7 +478,7 @@ To compile Yade with this type of sanitizer, use ENABLE_ASAN option::
 The compilation time, memory consumption during build and the size of build-files are much higher than during the normall build.
 Monitor RAM and disk usage during compilation to prevent out-of-RAM problems.
 
-To find the proper libasan library in your particular distribution, use the "locate" command. Then, launch your yade executable in connection with that libasan library, e.g.::
+To find the proper libasan library in your particular distribution, use ``locate`` or ``find /usr -iname "libasan*so"`` command. Then, launch your yade executable in connection with that libasan library, e.g.::
 
     LD_PRELOAD=/some/path/to/libasan.so yade
 
