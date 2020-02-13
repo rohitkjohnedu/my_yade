@@ -202,12 +202,11 @@ make_asan_HP:
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
     - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE";
     # it is expensive to run 5 ASAN tests. So instead run only one, but pick from available decimal places based on the job id.
-    - export TEST_DECIMAL_PLACES=$(case $(( $(CI_BUILD_ID) % 5 )) in "0") echo "18"  ;; "1") echo "33"  ;; "2") echo "45" ;; "3") echo "150" ;; "4") echo "45"  ;; *) echo "6";; esac)
-    - export TEST_USE_MPFR=$(case       $(( $(CI_BUILD_ID) % 5 )) in "0") echo "OFF" ;; "1") echo "OFF" ;; "2") echo "ON" ;; "3") echo "ON"  ;; "4") echo "OFF" ;; *) echo "OFF";; esac)
-    - echo "JOBSNUM="$(JOBSNUM)
-    - echo "TEST_DECIMAL_PLACES="$(TEST_DECIMAL_PLACES)
-    - echo "TEST_USE_MPFR="$(TEST_USE_MPFR)
-    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=$(TEST_DECIMAL_PLACES) -DENABLE_MPFR=$(TEST_USE_MPFR) $EXTRA_CMAKE_ARGS"
+    - export TEST_DECIMAL_PLACES=$(case $(( $CI_BUILD_ID % 5 )) in "0") echo "18"  ;; "1") echo "33"  ;; "2") echo "45" ;; "3") echo "150" ;; "4") echo "45"  ;; *) echo "6";; esac)
+    - export TEST_USE_MPFR=$(case       $(( $CI_BUILD_ID % 5 )) in "0") echo "OFF" ;; "1") echo "OFF" ;; "2") echo "ON" ;; "3") echo "ON"  ;; "4") echo "OFF" ;; *) echo "OFF";; esac)
+    - echo "TEST_DECIMAL_PLACES="$TEST_DECIMAL_PLACES
+    - echo "TEST_USE_MPFR="$TEST_USE_MPFR
+    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=$TEST_DECIMAL_PLACES -DENABLE_MPFR=$TEST_USE_MPFR $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
     - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
