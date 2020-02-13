@@ -36,6 +36,11 @@
 #error "This file cannot be included alone, include Real.hpp instead"
 #endif
 
+// if cmake forgot to set YADE_IGNORE_IEEE_INFINITY_NAN along with -Ofast, set it here. To make sure that Infinity and NaN are not supported.
+// comment this out, if some brave runtime tests are to be performed.
+#if ((not(defined(YADE_IGNORE_IEEE_INFINITY_NAN))) and (defined(__FAST_MATH__)))
+#define YADE_IGNORE_IEEE_INFINITY_NAN
+#endif
 
 namespace yade {
 namespace math {
