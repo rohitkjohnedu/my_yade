@@ -13,15 +13,18 @@ The supported types are following:
 =============================================== =============== =============================== ==================================================================
 type						bits		decimal places			notes
 =============================================== =============== =============================== ==================================================================
-``float``					``32``		``6``				hardware accelerated (not useful, it is only for testing purposes)
-``double``					``64``		``15``				hardware accelerated
-``long double``					``80``		``18``				hardware accelerated
-``boost::multiprecision::float128``		``128``		``33``				depending on processor type it may be hardware accelerated, `wrapped by boost <https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/float128.html>`__
-``boost::multiprecision::mpfr``			``Nbit``	``Nbit/(log(2)/log(10))``	uses external mpfr library, `wrapped by boost <https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/mpfr_float.html>`__
-``boost::multiprecision::cpp_bin_float``	``Nbit``	``Nbit/(log(2)/log(10))``	uses boost only, but is slower
+  ``float``					``32``		``6``				hardware accelerated (not useful, it is only for testing purposes)
+  ``double``					``64``		``15``				hardware accelerated
+  ``long double``				``80``		``18``				hardware accelerated
+  ``boost::multiprecision::float128``		``128``		``33``				depending on processor type it may be hardware accelerated, `wrapped by boost <https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/float128.html>`__
+  ``boost::multiprecision::mpfr``		``Nbit``	``Nbit/(log(2)/log(10))``	uses external mpfr library, `wrapped by boost <https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/mpfr_float.html>`__
+  ``boost::multiprecision::cpp_bin_float``	``Nbit``	``Nbit/(log(2)/log(10))``	uses boost only, but is slower
 =============================================== =============== =============================== ==================================================================
 
 The last two types are arbitrary precision, and their number of bits ``Nbit`` or decimal places is specified as argument during compilation.
+
+.. note::
+	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details.
 
 Installation
 ===========================================
@@ -34,7 +37,7 @@ regular :ref:`installation instructions <install-from-source-code>`. With extra 
 
 2. The debian/ubuntu package ``python-minieigen`` must be of version 0.50.4 or higher. This package hasn't been prepared yet, hence currently following solutions are possible:
 
-	1. Patch the older ``python-minieigen`` debian package with `these patches <https://gitlab.com/cosurgi/minieigen-real/tree/master/patches>`__, the patches already included in the debian package are also required.
+	1. Patch the older ``python-minieigen`` debian package with `these patches <https://gitlab.com/cosurgi/minieigen-real/-/tree/master/patches-minieigen-minimal>`__, the patches already included in the debian package are also required.
 	2. Or copy `the patched minieigen files <https://gitlab.com/cosurgi/minieigen-real/tree/master/minieigen-local>`__ into local directory and pass the extra cmake argument ``MINIEIGEN_INCLUDE_PATH=…``, relative to this path the sources should reside inside ``minieigen`` subdirectory. The path ``/usr/include/minieigen`` is used by default to find the minieigen sources.
 
 3. A g++ compiler version 9.2.1 or higher is required. It shall be noted that upgrading only the compiler on an existing linux installation is difficult and it is not recommended. A simpler solution is to upgrade entire linux installation.
@@ -57,35 +60,35 @@ Supported modules
 ===========================================
 
 During :ref:`compilation <yadeCompilation>` several yade modules can be enabled or disabled by passing an ``ENABLE_*`` command line argument to cmake.
-The following table lists which modules are currently supported using high precision:
+The following table lists which modules are currently supported using high precision (those marked with "maybe" were not tested):
 
-=========================================== ============================= ========================
-``ENABLE_*`` module name                    HP support (cmake default)    module support status
-=========================================== ============================= ========================
-``ENABLE_GUI``                              ``ON``                        native support [#supp1]_
-``ENABLE_CGAL``                             ``ON``                        native support [#supp1]_
-``ENABLE_VTK``                              ``ON``                        supported [#supp3]_
-``ENABLE_OPENMP``                           ``ON if Nbits<=128``          conditionally supported [#supp5]_
-``ENABLE_MPI``                              ``OFF``                       not tested [#supp6]_
-``ENABLE_GTS``                              ``ON``                        supported [#supp2]_
-``ENABLE_GL2PS``                            ``ON``                        supported [#supp2]_
-``ENABLE_LINSOLV``                          ``OFF``                       not supported [#supp7]_
-``ENABLE_PFVFLOW``                          ``OFF``                       not supported [#supp7]_
-``ENABLE_TWOPHASEFLOW``                     ``OFF``                       not supported [#supp7]_
-``ENABLE_THERMAL``                          ``OFF``                       not supported [#supp7]_
-``ENABLE_LBMFLOW``                          ``ON``                        supported [#supp2]_
-``ENABLE_SPH``                              ``OFF``                       not tested [#supp9]_
-``ENABLE_LIQMIGRATION``                     ``OFF``                       not tested [#supp9]_
-``ENABLE_MASK_ARBITRARY``                   ``OFF``                       not tested [#supp9]_
-``ENABLE_PROFILING``                        ``OFF``                       not tested [#supp9]_
-``ENABLE_POTENTIAL_BLOCKS``                 ``OFF``                       not supported [#supp8]_
-``ENABLE_POTENTIAL_PARTICLES``              ``ON``                        supported [#supp4]_
-``ENABLE_DEFORM``                           ``OFF``                       not tested [#supp9]_
-``ENABLE_FEMLIKE``                          ``ON``                        supported [#supp2]_
-``ENABLE_OAR``                              ``OFF``                       not tested [#supp9]_
-``ENABLE_ASAN``                             ``OFF``                       supported [#supp2]_
-``ENABLE_MPFR``                             ``OFF``                       native support [#supp1]_
-=========================================== ============================= ========================
+=========================================== ============ ============================= ========================
+``ENABLE_*`` module name                    HP support   cmake default setting         notes
+=========================================== ============ ============================= ========================
+``ENABLE_GUI``                              yes          ``ON``                        native support [#supp1]_
+``ENABLE_CGAL``                             yes          ``ON``                        native support [#supp1]_
+``ENABLE_VTK``                              yes          ``ON``                        supported [#supp3]_
+``ENABLE_OPENMP``                           conditional  ``ON if Nbits<=128``          conditionally supported [#supp5]_
+``ENABLE_MPI``                              maybe        ``OFF``                       not tested [#supp6]_
+``ENABLE_GTS``                              yes          ``ON``                        supported [#supp2]_
+``ENABLE_GL2PS``                            yes          ``ON``                        supported [#supp2]_
+``ENABLE_LINSOLV``                          no           ``OFF``                       not supported [#supp7]_
+``ENABLE_PFVFLOW``                          no           ``OFF``                       not supported [#supp7]_
+``ENABLE_TWOPHASEFLOW``                     no           ``OFF``                       not supported [#supp7]_
+``ENABLE_THERMAL``                          no           ``OFF``                       not supported [#supp7]_
+``ENABLE_LBMFLOW``                          yes          ``ON``                        supported [#supp2]_
+``ENABLE_SPH``                              maybe        ``OFF``                       not tested [#supp9]_
+``ENABLE_LIQMIGRATION``                     maybe        ``OFF``                       not tested [#supp9]_
+``ENABLE_MASK_ARBITRARY``                   maybe        ``OFF``                       not tested [#supp9]_
+``ENABLE_PROFILING``                        maybe        ``OFF``                       not tested [#supp9]_
+``ENABLE_POTENTIAL_BLOCKS``                 no           ``OFF``                       not supported [#supp8]_
+``ENABLE_POTENTIAL_PARTICLES``              yes          ``ON``                        supported [#supp4]_
+``ENABLE_DEFORM``                           maybe        ``OFF``                       not tested [#supp9]_
+``ENABLE_FEMLIKE``                          yes          ``ON``                        supported [#supp2]_
+``ENABLE_OAR``                              maybe        ``OFF``                       not tested [#supp9]_
+``ENABLE_ASAN``                             yes          ``OFF``                       supported [#supp2]_
+``ENABLE_MPFR``                             yes          ``OFF``                       native support [#supp1]_
+=========================================== ============ ============================= ========================
 
 .. rubric:: Footnotes
 
@@ -138,7 +141,7 @@ Respectively ``import minieigen`` has to be replaced with ``import yade.minieige
 	else:
 		from minieigen import *
 
-So that high precision (binary compatibile) version of minieigen is used when non ``double`` types is used as ``Real``.
+So that high precision (binary compatibile) version of minieigen is used when non ``double`` type is used as ``Real``.
 
 
 C++
@@ -152,14 +155,14 @@ Mathematical functions of all high precision types are wrapped using file :ysrc:
 3. :ysrc:`py/tests/testMath.py`
 4. :ysrc:`py/tests/testMathHelper.py`
 
-The tests for a new function are to be added in :ysrc:`py/tests/testMath.py` in one of these functions: ``def oneArgMathCheck(self,r):``, ``def twoArgMathCheck(self,r1,r2):``, ``def threeArgMathCheck(self,r1,r2,r3):``. A table of expected errors in ``self.defaultTolerances`` is to be supplemented as well.
+The tests for a new function are to be added in :ysrc:`py/tests/testMath.py` in one of these functions: ``oneArgMathCheck(…):``, ``twoArgMathCheck(…):``, ``threeArgMathCheck(…):``. A table of expected error tolerances in ``self.defaultTolerances`` is to be supplemented as well. To determine tolerances with better confidence it is recommended to increase number of tests in the :ysrccommit:`test loop<1b4ae97583bd8a6efc74cb0d0/py/tests/testMath.py#L338>`, but scale the arguments ``a`` and ``b`` accordingly to avoid infinities cropping up. To determine tolerances for currently implemented functions a ``range(2000)`` in both loops was used.
 
 .. _HPtoString:
 
 String conversions
 ----------------------------------------------
 
-It is recommended to use ``math::toString(…)`` and ``math::fromStringReal(…)`` conversion functions instead of ``boost::lexical_cast<std::string>(…)``. The ``toString`` function (in file :ysrc:`RealIO.hpp <lib/high-precision/RealIO.hpp>` guarantees full precision during conversion. It is important to note that ``std::to_string`` does `not guarantee this <https://en.cppreference.com/w/cpp/string/basic_string/to_string>`__ and ``boost::lexical_cast`` does `not guarantee this either <https://www.boost.org/doc/libs/1_72_0/doc/html/boost_lexical_cast.html>`__.
+It is recommended to use ``math::toString(…)`` and ``math::fromStringReal(…)`` conversion functions instead of ``boost::lexical_cast<std::string>(…)``. The ``toString`` function (in file :ysrc:`RealIO.hpp<lib/high-precision/RealIO.hpp>` guarantees full precision during conversion. It is important to note that ``std::to_string`` does `not guarantee this <https://en.cppreference.com/w/cpp/string/basic_string/to_string>`__ and ``boost::lexical_cast`` does `not guarantee this either <https://www.boost.org/doc/libs/1_72_0/doc/html/boost_lexical_cast.html>`__.
 
 
 Eigen compatibility with high precision types
