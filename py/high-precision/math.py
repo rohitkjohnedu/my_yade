@@ -22,6 +22,7 @@ If another math function is needed it should be added to following files:
 1. :ysrc:`lib/high-precision/MathFunctions.hpp`
 2. :ysrc:`py/high-precision/_math.cpp`
 3. :ysrc:`py/tests/testMath.py`
+4. :ysrc:`py/tests/testMathHelper.py`
 
 """
 # all C++ functions are accessible now:
