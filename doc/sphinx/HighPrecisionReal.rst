@@ -4,7 +4,7 @@
 High precision calculations
 ***************************
 
-Yade supports high precision and arbitrary precision ``Real`` type for performing calculations. All tests and checks pass but still the current support is considered experimental.
+Yade supports high and arbitrary precision ``Real`` type for performing calculations. All tests and checks pass but still the current support is considered experimental.
 The backend library is `boost <https://github.com/boostorg/multiprecision>`__ `multiprecision <https://www.boost.org/doc/libs/1_72_0/libs/multiprecision/doc/html/index.html>`__
 along with corresponding `boost <https://github.com/boostorg/math>`__ `math toolkit <https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/index.html>`__.
 
@@ -151,6 +151,13 @@ Mathematical functions of all high precision types are wrapped using file :ysrc:
 4. :ysrc:`py/tests/testMathHelper.py`
 
 The tests for a new function are to be added in :ysrc:`py/tests/testMath.py` in one of these functions: ``def oneArgMathCheck(self,r):``, ``def twoArgMathCheck(self,r1,r2):``, ``def threeArgMathCheck(self,r1,r2,r3):``. A table of expected errors in ``self.defaultTolerances`` is to be supplemented as well.
+
+.. _HPtoString:
+
+String conversions
+----------------------------------------------
+
+It is recommended to use ``math::toString(…)`` and ``math::fromStringReal(…)`` conversion functions instead of ``boost::lexical_cast<std::string>(…)``. The ``toString`` function (in file :ysrc:`RealIO.hpp <lib/high-precision/RealIO.hpp>` guarantees full precision during conversion. It is important to note that ``std::to_string`` does `not guarantee this <https://en.cppreference.com/w/cpp/string/basic_string/to_string>`__ and ``boost::lexical_cast`` does `not guarantee this either <https://www.boost.org/doc/libs/1_72_0/doc/html/boost_lexical_cast.html>`__.
 
 
 Eigen compatibility with high precision types
