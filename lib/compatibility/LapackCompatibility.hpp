@@ -1,5 +1,6 @@
 // This file is used during transition from double to Real type.
 // TODO: all these functions should be replaced to use Eigen MatrixXr and VectorXr. Then this file should be removed.
+#if (defined(YADE_POTENTIAL_PARTICLES) or defined(YADE_POTENTIAL_BLOCKS))
 #pragma once
 
 #ifdef __cplusplus
@@ -69,5 +70,6 @@ void dscal_(const int *N, const ::yade::Real *alpha_Real, ::yade::Real *x_Real, 
 
 void dsyev_(const char *jobz, const char *uplo, const int *N, ::yade::Real *A_Real, const int *lda, ::yade::Real *W_Real, ::yade::Real *work_Real, int *lwork, int *info);
 
+#endif
 #endif
 
