@@ -195,67 +195,19 @@ make_asan:
     paths:
       - screenshots
 
-make_asan_long_double:
+make_asan_HP:
   <<: *make_definition
   before_script:
-#    # there can be only one before_script:, so the line below cannot be in a separate template
-#    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
     - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE";
-    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=18 $EXTRA_CMAKE_ARGS"
-    - echo $EXTRA_CMAKE_ARGS
-    - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
-  tags:
-    - debug
-  artifacts:
-    when: always
-    paths:
-      - screenshots
-  timeout: 6 hours
-
-make_asan_float128:
-  <<: *make_definition
-  before_script:
-#    # there can be only one before_script:, so the line below cannot be in a separate template
-#    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
-    - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE";
-    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=33 $EXTRA_CMAKE_ARGS"
-    - echo $EXTRA_CMAKE_ARGS
-    - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
-  tags:
-    - debug
-  artifacts:
-    when: always
-    paths:
-      - screenshots
-  timeout: 6 hours
-
-make_asan_mpfr45:
-  <<: *make_definition
-  before_script:
-#    # there can be only one before_script:, so the line below cannot be in a separate template
-#    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
-    - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE";
-    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=45 -DENABLE_MPFR=ON $EXTRA_CMAKE_ARGS"
-    - echo $EXTRA_CMAKE_ARGS
-    - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
-  tags:
-    - debug
-  artifacts:
-    when: always
-    paths:
-      - screenshots
-  timeout: 6 hours
-
-make_asan_bf45:
-  <<: *make_definition
-  before_script:
-#    # there can be only one before_script:, so the line below cannot be in a separate template
-#    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
-    - export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE";
-    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=45 -DENABLE_MPFR=OFF $EXTRA_CMAKE_ARGS"
+    # it is expensive to run 5 ASAN tests. So instead run only one, but pick from available decimal places based on the job id.
+    - export TEST_DECIMAL_PLACES=$(case $(( $(CI_BUILD_ID) % 5 )) in "0") echo "18"  ;; "1") echo "33"  ;; "2") echo "45" ;; "3") echo "150" ;; "4") echo "45"  ;; *) echo "6";; esac)
+    - export TEST_USE_MPFR=$(case       $(( $(CI_BUILD_ID) % 5 )) in "0") echo "OFF" ;; "1") echo "OFF" ;; "2") echo "ON" ;; "3") echo "ON"  ;; "4") echo "OFF" ;; *) echo "OFF";; esac)
+    - echo "JOBSNUM="$(JOBSNUM)
+    - echo "TEST_DECIMAL_PLACES="$(TEST_DECIMAL_PLACES)
+    - echo "TEST_USE_MPFR="$(TEST_USE_MPFR)
+    - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 -DENABLE_ASAN=1 -DREAL_DECIMAL_PLACES=$(TEST_DECIMAL_PLACES) -DENABLE_MPFR=$(TEST_USE_MPFR) $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
     - export ASAN_OPTIONS=detect_leaks=0:log_path=stdout:verify_asan_link_order=false
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
@@ -318,9 +270,6 @@ makeHP_long_double:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
-## Comment this for now, because that is the main reason for this branch.
-##  # there can be only one before_script:, so the line below cannot be in a separate template
-##  - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=18 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
@@ -329,9 +278,8 @@ makeHP_float128:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
-## Comment this for now, because that is the main reason for this branch.
-##  # there can be only one before_script:, so the line below cannot be in a separate template
-##  - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=33 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
@@ -340,9 +288,8 @@ makeHP_mpfr45:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
-## Comment this for now, because that is the main reason for this branch.
-##  # there can be only one before_script:, so the line below cannot be in a separate template
-##  - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=45 -DENABLE_MPFR=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
@@ -351,9 +298,8 @@ makeHP_bf45:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
-## Comment this for now, because that is the main reason for this branch.
-##  # there can be only one before_script:, so the line below cannot be in a separate template
-##  - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
+    # there can be only one before_script:, so the line below cannot be in a separate template
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=45 -DENABLE_MPFR=OFF $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
@@ -514,7 +460,6 @@ test_clang:
 
 testHP_long_double:
   <<: *test_definition
-##<<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_long_double
@@ -523,7 +468,7 @@ testHP_long_double:
 
 testHP_float128:
   <<: *test_definition
-##<<: *skip_wip_test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_float128
@@ -532,7 +477,7 @@ testHP_float128:
 
 testHP_mpfr45:
   <<: *test_definition
-##<<: *skip_wip_test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_mpfr45
@@ -541,7 +486,7 @@ testHP_mpfr45:
 
 testHP_bf45:
   <<: *test_definition
-##<<: *skip_wip_test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_bf45
@@ -669,7 +614,6 @@ check_clang:
 
 checkHP_long_double:
   <<: *check_definition
-##<<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_long_double
@@ -678,7 +622,7 @@ checkHP_long_double:
 
 checkHP_float128:
   <<: *check_definition
-##<<: *skip_wip_test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_float128
@@ -687,7 +631,7 @@ checkHP_float128:
 
 checkHP_mpfr45:
   <<: *check_definition
-##<<: *skip_wip_test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_mpfr45
@@ -696,7 +640,7 @@ checkHP_mpfr45:
 
 checkHP_bf45:
   <<: *check_definition
-##<<: *skip_wip_test_definition
+  <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-SMALLEST-PATCH-minieigen
   dependencies:
     - makeHP_bf45
