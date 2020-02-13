@@ -1,5 +1,4 @@
 #pragma once
-#include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/RealIO.hpp>
 #include <fstream>
 #include <iostream>
