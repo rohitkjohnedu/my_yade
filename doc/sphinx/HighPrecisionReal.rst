@@ -112,6 +112,8 @@ The unsupported modules are automatically disabled during the cmake stage.
 Compatibility
 ===========================================
 
+.. _PythonCompatibility:
+
 Python
 ----------------------------------------------
 
@@ -183,11 +185,17 @@ Hence all recording commands in ``C++`` convert ``Real`` type down to ``double``
 LAPACK compatibility with high precision types
 ----------------------------------------------
 
+.. _HPdebugging:
 
 Debugging
 ===========================================
 
-High precision is still in the experimental stages of implementation. Some errors may occur during use. Not all of these errors are caught by the checks and tests. An important example is `trying to use const references to Vector3r members <https://gitlab.com/yade-dev/trunk/-/merge_requests/406>`__ - a type of problem with results in a segmentation fault during runtime. The most flexibility in debugging is with ``long double`` type, because a special file :ysrc:`lib/high-precision/ThinRealWrapper.hpp` was written for that. A couple of ``#defines`` were introduced there to help debugging more difficult problems:
+High precision is still in the experimental stages of implementation. Some errors may occur during use. Not all of these errors are caught by the checks and tests. Following examples may be instructive:
+
+1. Trying to `use const references to Vector3r members <https://gitlab.com/yade-dev/trunk/-/merge_requests/406>`__ - a type of problem with results in a segmentation fault during runtime.
+2. A part of python code `does not cooperate with mpmath <https://gitlab.com/yade-dev/trunk/-/merge_requests/414>`__ - the checks and tests do not cover all lines of the python code (yet), so more errors like this one are expected.
+
+The most flexibility in debugging is with ``long double`` type, because a special file :ysrc:`lib/high-precision/ThinRealWrapper.hpp` was written for that. A couple of ``#defines`` were introduced there to help debugging more difficult problems:
 
 1. ``YADE_IGNORE_IEEE_INFINITY_NAN`` - it can be used to detect all occurrences when ``NaN`` or ``Inf`` are used. Also it is recommended to use this define when compiling yade with ``-Ofast`` flag, without  ``-fno-associative-math -fno-finite-math-only -fsigned-zeros``
 2. ``YADE_WRAPPER_THROW_ON_NAN_INF_REAL`` or ``YADE_WRAPPER_THROW_ON_NAN_INF_COMPLEX`` in :ysrc:`lib/high-precision/ThinComplexWrapper.hpp` - can be useful for debugging when calculations go all wrong for unknown reason.
