@@ -76,13 +76,13 @@ Performance enhancements
 .. toctree::
   :maxdepth: 2
 
-  HighPrecisionReal.rst
-
   GPUacceleration.rst
-..  
-  mpy.rst
 
   amazonEC2.rst
+
+  HighPrecisionReal.rst
+..  
+  mpy.rst
 
 ######################################
 Literature
