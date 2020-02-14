@@ -513,7 +513,6 @@ test_SSE:
     - make_SSE
   needs: ["make_SSE"]
 
-
 # 3.2. check stage
 .check_template: &check_definition
   <<: *platforms_definition
@@ -666,7 +665,6 @@ check_SSE:
   dependencies:
     - make_SSE
   needs: ["make_SSE"]
-
 
 .doc_template: &doc_definition
   <<: *platforms_definition
