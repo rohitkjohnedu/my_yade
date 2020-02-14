@@ -143,8 +143,10 @@ Respectively ``import minieigen`` has to be replaced with ``import yade.minieige
 	else:
 		from minieigen import *
 
-So that high precision (binary compatibile) version of minieigen is used when non ``double`` type is used as ``Real``.
+So that high precision (binary compatible) version of minieigen is used when non ``double`` type is used as ``Real``.
 
+
+.. warning:: There may be still some parts of python code that were not migrated to high precision and may not work well with ``mpmath`` module. See :ref:`debugging section <hp-debugging>` for details.
 
 .. _cpp-hp-compatibility:
 
