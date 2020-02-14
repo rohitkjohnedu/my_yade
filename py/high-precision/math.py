@@ -14,8 +14,8 @@ This module has following purposes:
 
 1. To reliably :ysrc:`test<py/tests/testMath.py>` all C++ math functions of arbitrary precision Real and Complex types against mpmath.
 2. To act as a "migration helper" for python scripts which call python mathematical functions that do not work
-   well with mpmath. As an example see :yref:`yade.math.linspace` below.
-3. To allow writing python math code in a way that mirrors C++ math code in yade. As a bonus it
+   well with mpmath. As an example see :yref:`yade.math.linspace` below and `this merge request <https://gitlab.com/yade-dev/trunk/-/merge_requests/414>`__
+3. To allow writing python math code in a way that mirrors C++ math code in Yade. As a bonus it
    will be faster than mpmath because mpmath is a purely python library (which was one of the main
    difficulties when writing :ysrc:`lib/high-precision/ToFromPythonConverter.hpp`)
 4. To test Eigen NumTraits
