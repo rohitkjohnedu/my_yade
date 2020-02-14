@@ -10,10 +10,10 @@
 #  MINIEIGENOVERRIDE_FOUND - new version of python3-minieigen found
 
 
-MESSAGE(STATUS "Checking /usr/include/minieigen provided by newer version of package python3-minieigen")
+MESSAGE(STATUS "Checking file ${MINIEIGEN_PREFIX_PATH}/minieigen/visitors.hpp provided by newer version of package python3-minieigen")
 
-IF((EXISTS "/usr/include/minieigen/visitors.hpp") AND (EXISTS "/usr/include/minieigen/common.hpp"))
-	FILE(READ "/usr/include/minieigen/common.hpp" COMMON_FILE)
+IF((EXISTS "${MINIEIGEN_PREFIX_PATH}/minieigen/visitors.hpp") AND (EXISTS "${MINIEIGEN_PREFIX_PATH}/minieigen/common.hpp"))
+	FILE(READ "${MINIEIGEN_PREFIX_PATH}/minieigen/common.hpp" COMMON_FILE)
 	STRING(FIND "${COMMON_FILE}" "#ifndef MINIEIGEN_OVERRIDE" IS_OVERRIDE_PRESENT)
 	IF(${IS_OVERRIDE_PRESENT} EQUAL -1)
 		SET(MINIEIGENOVERRIDE_FOUND FALSE)
