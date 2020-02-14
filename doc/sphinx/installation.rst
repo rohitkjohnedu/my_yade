@@ -455,7 +455,7 @@ The listed sanitizers are runtime-detectors. They can only find the problems in 
 is executed. If you have written a new C++ class (constitutive law, engine etc.) try to run your Python script with
 the sanitized software to check, whether the problem in your code exist.
 
-.. _addressSanitizer:
+.. _address-sanitizer:
 
 AddressSanitizer
 ^^^^^^^^^^^^^^^^^^^^^

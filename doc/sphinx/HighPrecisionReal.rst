@@ -54,7 +54,7 @@ regular :ref:`installation instructions <install-from-source-code>`. With extra 
 .. FIXME : MINIEIGEN_PATH is not used by cmake currently
 
 
-.. _supportedModules:
+.. _supported-hp-modules:
 
 Supported modules
 ===========================================
@@ -96,7 +96,7 @@ The following table lists which modules are currently supported using high preci
 
 .. [#supp2] The module was tested, the ``yade --test`` and ``yade --check`` pass, as well as most of examples are working. But it hasn't been tested extensively for all possible use cases.
 
-.. [#supp3] Supported via :ysrc:`compatibility layer <lib/compatibility/VTKCompatibility.hpp>` which converts all numbers down to ``double`` type. See :ref:`below <vtkRealCompatibility>`.
+.. [#supp3] Supported via :ysrc:`compatibility layer <lib/compatibility/VTKCompatibility.hpp>` which converts all numbers down to ``double`` type. See :ref:`below <vtk-real-compatibility>`.
 
 .. [#supp4] The module is enabled by default, the ``yade --test`` and ``yade --check`` pass, as well as most of examples are working. However the calculations are performed at lower ``double`` precision. A wrapper/converter layer for :ysrc:`LAPACK library <lib/compatibility/LapackCompatibility.hpp>` has been implemented. To make it work with full precision these routines should be reimplemented using Eigen.
 
@@ -115,12 +115,12 @@ The unsupported modules are automatically disabled during the cmake stage.
 Compatibility
 ===========================================
 
-.. _PythonCompatibility:
+.. _python-compatibility:
 
 Python
 ----------------------------------------------
 
-Python has :ysrc:`native support <lib/high-precision/ToFromPythonConverter.hpp>` for high precision types using ``mpmath`` package. Old yade scripts that use :ref:`supported modules <supportedModules>` can be immediately converted to high precision by switching to high precision version of minieigen. In order to do so, the following line:
+Python has :ysrc:`native support <lib/high-precision/ToFromPythonConverter.hpp>` for high precision types using ``mpmath`` package. Old yade scripts that use :ref:`supported modules <supported-hp-modules>` can be immediately converted to high precision by switching to high precision version of minieigen. In order to do so, the following line:
 
 .. code-block:: python
 
@@ -157,7 +157,7 @@ Mathematical functions of all high precision types are wrapped using file :ysrc:
 
 The tests for a new function are to be added in :ysrc:`py/tests/testMath.py` in one of these functions: ``oneArgMathCheck(…):``, ``twoArgMathCheck(…):``, ``threeArgMathCheck(…):``. A table of expected error tolerances in ``self.defaultTolerances`` is to be supplemented as well. To determine tolerances with better confidence it is recommended to increase number of tests in the :ysrccommit:`test loop<1b4ae97583bd8a6efc74cb0d0/py/tests/testMath.py#L338>`, but scale the arguments ``a`` and ``b`` accordingly to avoid infinities cropping up. To determine tolerances for currently implemented functions a ``range(2000)`` in both loops was used.
 
-.. _HPtoString:
+.. _hp-to-string:
 
 String conversions
 ----------------------------------------------
@@ -174,7 +174,7 @@ CGAL compatibility with high precision types
 ----------------------------------------------
 
 
-.. _vtkRealCompatibility:
+.. _vtk-real-compatibility:
 
 VTK compatibility with high precision types
 -------------------------------------------
@@ -188,7 +188,7 @@ Hence all recording commands in ``C++`` convert ``Real`` type down to ``double``
 LAPACK compatibility with high precision types
 ----------------------------------------------
 
-.. _HPdebugging:
+.. _hp-debugging:
 
 Debugging
 ===========================================
@@ -203,6 +203,6 @@ The most flexibility in debugging is with ``long double`` type, because a specia
 1. ``YADE_IGNORE_IEEE_INFINITY_NAN`` - it can be used to detect all occurrences when ``NaN`` or ``Inf`` are used. Also it is recommended to use this define when compiling yade with ``-Ofast`` flag, without  ``-fno-associative-math -fno-finite-math-only -fsigned-zeros``
 2. ``YADE_WRAPPER_THROW_ON_NAN_INF_REAL`` or ``YADE_WRAPPER_THROW_ON_NAN_INF_COMPLEX`` in :ysrc:`lib/high-precision/ThinComplexWrapper.hpp` - can be useful for debugging when calculations go all wrong for unknown reason.
 
-Also refer to :ref:`address sanitizer section <addressSanitizer>`, as it is most useful for debugging in many cases.
+Also refer to :ref:`address sanitizer section <address-sanitizer>`, as it is most useful for debugging in many cases.
 
 
