@@ -24,7 +24,7 @@ type						bits		decimal places			notes
 The last two types are arbitrary precision, and their number of bits ``Nbit`` or decimal places is specified as argument during compilation.
 
 .. note::
-	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details.
+	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details. All ``Real`` types pass the :ysrccommit:`real type concept<1b4ae97583bd8a6efc74cb0d0/py/high-precision/_math.cpp#L197>` test from `boost concepts <https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/real_concepts.html>`__.
 
 Installation
 ===========================================
@@ -212,10 +212,12 @@ High precision is still in the experimental stages of implementation. Some error
 1. Trying to `use const references to Vector3r members <https://gitlab.com/yade-dev/trunk/-/merge_requests/406>`__ - a type of problem with results in a segmentation fault during runtime.
 2. A part of python code `does not cooperate with mpmath <https://gitlab.com/yade-dev/trunk/-/merge_requests/414>`__ - the checks and tests do not cover all lines of the python code (yet), so more errors like this one are expected. The solution is to put the non compliant python functions into :ysrc:`py/high-precision/math.py`. Then replace original calls to this function with function in ``yade.math``, e.g. ``numpy.linspace(…)`` is replaced with ``yade.math.linspace(…)``.
 
-The most flexibility in debugging is with ``long double`` type, because a special file :ysrc:`lib/high-precision/ThinRealWrapper.hpp` was written for that. A couple of ``#defines`` were introduced there to help debugging more difficult problems:
+The most flexibility in debugging is with the ``long double`` type, because special files :ysrc:`ThinRealWrapper.hpp<lib/high-precision/ThinRealWrapper.hpp>`, :ysrc:`ThinComplexWrapper.hpp<lib/high-precision/ThinComplexWrapper.hpp>` were written for that. They are implemented with `boost::operators <https://www.boost.org/doc/libs/1_72_0/libs/utility/operators.htm>`__, using `partially ordered field <https://www.boost.org/doc/libs/1_72_0/libs/utility/operators.htm#ordered_field_operators1>`__. Note that they `do not provide operator++ <https://gitlab.com/yade-dev/trunk/-/merge_requests/407>`__.
+
+A couple of ``#defines`` were introduced in these two files to help debugging more difficult problems:
 
 1. ``YADE_IGNORE_IEEE_INFINITY_NAN`` - it can be used to detect all occurrences when ``NaN`` or ``Inf`` are used. Also it is recommended to use this define when compiling Yade with ``-Ofast`` flag, without  ``-fno-associative-math -fno-finite-math-only -fsigned-zeros``
-2. ``YADE_WRAPPER_THROW_ON_NAN_INF_REAL`` or ``YADE_WRAPPER_THROW_ON_NAN_INF_COMPLEX`` in :ysrc:`lib/high-precision/ThinComplexWrapper.hpp` - can be useful for debugging when calculations go all wrong for unknown reason.
+2. ``YADE_WRAPPER_THROW_ON_NAN_INF_REAL``, ``YADE_WRAPPER_THROW_ON_NAN_INF_COMPLEX`` - can be useful for debugging when calculations go all wrong for unknown reason.
 
 Also refer to :ref:`address sanitizer section <address-sanitizer>`, as it is most useful for debugging in many cases.
 
