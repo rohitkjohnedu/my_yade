@@ -221,4 +221,14 @@ A couple of ``#defines`` were introduced in these two files to help debugging mo
 
 Also refer to :ref:`address sanitizer section <address-sanitizer>`, as it is most useful for debugging in many cases.
 
+.. hint::
+	If crash is inside a macro, for example ``YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY``, it is useful to know where inside this macro the problem happens. For this purpose it is possible to use ``g++`` preprocessor to remove the macro and then compile the postprocessed code without the macro. Invoke the preprocessor with some variation of this command::
+
+		g++ -E -P core/Body.hpp -I ./ -I /usr/include/eigen3 -I /usr/include/python3.7m > /tmp/Body.hpp
+
+	Maybe use clang-format so that this file is more readable::
+
+		./scripts/clang-formatter.sh /tmp/Body.hpp
+
+	Be careful because such files tend to be large and clang-format is slow. So sometimes it is more useful to only use the last part of the file, where the macro was postprocessed. Then replace the macro in the original file in question, and then continue debugging. But this time it will be revealed where inside a macro the problem occurs.
 
