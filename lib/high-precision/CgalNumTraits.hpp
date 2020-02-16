@@ -164,6 +164,10 @@ namespace std {
 //  → https://www.boost.org/doc/libs/1_60_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/jel.html
 //  → https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/real_concepts.html
 // search for string 'unqualified'. Perhaps we should file a bugreport to CGAL.
+
+// OK, bug reported to  CGAL: https://github.com/CGAL/cgal/issues/4527
+//                     Eigen: https://gitlab.com/libeigen/eigen/issues/1823
+// we can disable this later by #ifdef-ing a CGAL version.
 using ::yade::math::pow;
 using ::yade::math::sqrt;
 
