@@ -1,4 +1,4 @@
-#ifdef MINIEIGEN_OVERRIDE
+#ifdef _HIGH_PRECISION_SUPPORT
 
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>

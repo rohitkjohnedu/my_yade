@@ -12,7 +12,7 @@
 // or mpfr take it as a compile-time argument. Hence such minieigenHP cannot be separately precompiled as a package.
 // Though it could be precompiled for some special types such as boost::multiprecision::float128
 
-#ifdef MINIEIGEN_OVERRIDE
+#ifdef _HIGH_PRECISION_SUPPORT
 
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
