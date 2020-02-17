@@ -481,7 +481,7 @@ ENDIF()
 
 IF(NOT ((${REAL_PRECISION_BITS} EQUAL 64)))
 # This means that new high-precision capabilities will be used. To make this work we need a patched version of /usr/include/miniegen
-  ADD_DEFINITIONS("-DMINIEIGEN_OVERRIDE")
+  ADD_DEFINITIONS("-D_HIGH_PRECISION_SUPPORT")
   IF(DEFINED MINIEIGEN_INCLUDE_PATH)
     set(MINIEIGEN_PREFIX_PATH ${MINIEIGEN_INCLUDE_PATH})
     INCLUDE_DIRECTORIES(${MINIEIGEN_INCLUDE_PATH})
@@ -492,7 +492,7 @@ IF(NOT ((${REAL_PRECISION_BITS} EQUAL 64)))
   ENDIF(DEFINED MINIEIGEN_INCLUDE_PATH)
   FIND_PACKAGE(MiniEigenOverride REQUIRED)
   IF(NOT MINIEIGENOVERRIDE_FOUND)
-    MESSAGE(FATAL_ERROR "Cannot find python3-minieigen version in /usr/include/miniegen which supports #ifndef MINIEIGEN_OVERRIDE, maybe you need to provide MINIEIGEN_INCLUDE_PATH=… ?")
+    MESSAGE(FATAL_ERROR "Cannot find python3-minieigen version in /usr/include/miniegen which supports #ifndef _HIGH_PRECISION_SUPPORT, maybe you need to provide MINIEIGEN_INCLUDE_PATH=… ?")
   ENDIF()
 
   MESSAGE(STATUS "Checking compiler version for ${REAL_PREC_NAME}")
