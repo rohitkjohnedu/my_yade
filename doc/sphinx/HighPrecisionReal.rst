@@ -35,12 +35,10 @@ regular :ref:`installation instructions <install-from-source-code>`. With extra 
 1. Additional packages are required to be installed: ``python-mpmath`` ``libmpfr-dev`` ``libmpfrc++-dev`` (the ``mpfr`` related
    packages are necessary only to use ``boost::multiprecision::mpfr`` type).
 
-.. comment: The debian/ubuntu package ``python-minieigen`` must be of version 0.50.4 or higher. This package hasn't been prepared yet.
-
-2. The high precision `merge request to minieigen <https://github.com/eudoxos/minieigen>`__ package was submitted and is awaiting approval. Until it becomes part of the official package the following solutions are possible:
+2. The debian/ubuntu package ``python-minieigen`` must be of version higher than 0.50.3. This package hasn't been prepared yet. The high precision `pull request to minieigen <https://github.com/eudoxos/minieigen>`__ package was merged with minieigen upstream. Until it becomes part of the debian/ubuntu package the following solutions are possible:
 
 	1. Patch the older ``python-minieigen`` debian package with `these patches <https://gitlab.com/cosurgi/minieigen-real/-/tree/master/patches>`__, the patches already included in the debian package are also required.
-	2. Or copy `the patched minieigen files <https://gitlab.com/cosurgi/minieigen-real/tree/master/minieigen-local>`__ into local directory and pass the extra cmake argument ``MINIEIGEN_INCLUDE_PATH=…``, relative to this path the sources should reside inside ``minieigen`` subdirectory. The path ``/usr/include/minieigen`` is used by default to find the minieigen sources.
+	2. Or copy the `minieigen files <https://github.com/eudoxos/minieigen>`__ (or from the `test repository <https://gitlab.com/cosurgi/minieigen-real/tree/master/minieigen-local>`__) into local directory and pass the extra cmake argument ``MINIEIGEN_INCLUDE_PATH=…``, relative to this path the sources should reside inside ``minieigen`` subdirectory. The path ``/usr/include/minieigen`` is used by default to find the minieigen sources.
 
 3. A g++ compiler version 9.2.1 or higher is required. It shall be noted that upgrading only the compiler on an existing linux installation is difficult and it is not recommended. A simpler solution is to upgrade entire linux installation.
 
