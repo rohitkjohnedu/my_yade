@@ -72,6 +72,7 @@ class ForceContainer {
 		bool syncedSizes = true;
 		int nThreads;
 		bool permForceUsed = false;
+		bool permForceSynced = false;
 		boost::mutex globalMutex;
 		const Vector3r _zero = Vector3r::Zero();
 		

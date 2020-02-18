@@ -88,6 +88,10 @@ void ForceContainer::addMaxId(Body::id_t id) {
 void ForceContainer::setPermForce(Body::id_t id, const Vector3r& f) {
   ensureSize(id,-1);
   synced=false;
+  if (permForceSynced) { // current permF has been accumulated already, substract it form total, the new one will be added at next sync()
+      addForce(id,-_permForce[id]);
+  }
+  permForceSynced=false;
   _permForce[id]=f;
   permForceUsed=true;
 }
@@ -95,6 +99,10 @@ void ForceContainer::setPermForce(Body::id_t id, const Vector3r& f) {
 void ForceContainer::setPermTorque(Body::id_t id, const Vector3r& t) {
   ensureSize(id,-1);
   synced=false;
+  if (permForceSynced) { // current permF has been accumulated already, substract it form total, the new one will be added at next sync()
+      addTorque(id,-_permTorque[id]);
+  }
+  permForceSynced=false;
   _permTorque[id]=t;
   permForceUsed=true;
 }
@@ -151,9 +159,12 @@ void ForceContainer::sync(){
     const Body::id_t& id = redirect ? realBodies[k] : k;
     Vector3r sumF(Vector3r::Zero()), sumT(Vector3r::Zero());
     for(int thread=0; thread<nThreads; thread++){ sumF+=_forceData[thread][id]; sumT+=_torqueData[thread][id];
-	    _forceData[thread][id]=Vector3r::Zero(); _torqueData[thread][id]=Vector3r::Zero(); }  //reset here so we don't have to do it later
-    _force[id]+=sumF; _torque[id]+=sumT;
-    if (permForceUsed) {_force[id]+=_permForce[id]; _torque[id]+=_permTorque[id];}
+        _forceData[thread][id]=Vector3r::Zero(); _torqueData[thread][id]=Vector3r::Zero(); }  //reset here so we don't have to do it later
+        _force[id]+=sumF; _torque[id]+=sumT;
+    if (permForceUsed and not permForceSynced) {
+        _force[id]+=_permForce[id]; _torque[id]+=_permTorque[id];
+        permForceSynced = true;
+    }
   }
   synced=true; syncCount++;
 }
@@ -191,9 +202,11 @@ void ForceContainer::reset(long iter, bool resetAll) {
 	if (resetAll and permForceUsed){
 		memset(&_permForce [0], 0,sizeof(Vector3r)*size);
 		memset(&_permTorque[0], 0,sizeof(Vector3r)*size);
-		permForceUsed = false;}
+		permForceUsed = false;
+	}
 		
 	if (!permForceUsed) synced=true; else synced=false;
+	permForceSynced = false;
 	lastReset=iter;
 }
 
