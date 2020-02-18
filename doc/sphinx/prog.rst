@@ -845,8 +845,8 @@ and this is the implementation:
 
 .. code-block:: c++
 
-	#include<pkg-common/GravityEngine.hpp>
-	#include<core/Scene.hpp>
+	#include <pkg/common/GravityEngine.hpp>
+	#include <core/Scene.hpp>
 
 	namespace yade {
 	// registering the plugin
@@ -1071,7 +1071,7 @@ additionally, you *have* to allocate memory for static data members in the ``.cp
 .. code-block: c++
 
 	/* in the .cpp file */
-	#include<pkg-something/HeaderFile.hpp>
+	#include <pkg/something/HeaderFile.hpp>
 	/* allocate memory for static attrs;
 	   no need to assign initial value, that is done from
 	   (hidden) initialization function at class registration
