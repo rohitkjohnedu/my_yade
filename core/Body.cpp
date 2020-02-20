@@ -7,6 +7,8 @@
 namespace yade { // Cannot have #include directive inside.
 
 //! This could be -1 if id_t is re-typedef'ed as `int'
+// note about possible switch to std::optional / boost::optional and std::nullopt / boost::none here:
+//    InsertionSortCollider::insertionSortParallel rests on assuption that this is signed. Negative values are used.
 const Body::id_t Body::ID_NONE=Body::id_t(-1);
 
 const shared_ptr<Body>& Body::byId(Body::id_t _id, Scene* rb){return (*((rb?rb:Omega::instance().getScene().get())->bodies))[_id];}
