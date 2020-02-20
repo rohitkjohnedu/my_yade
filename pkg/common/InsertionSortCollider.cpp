@@ -372,7 +372,6 @@ void InsertionSortCollider::action()
 			         "verletDist in your script.");
 		// if no spheres, disable stride
 		verletDist = math::isinf(minR) ? 0 : math::abs(verletDist) * minR;
-		LOG_INFO( "verletDist=" << verletDist );
 	}
 	// if interactions are dirty, force reinitialization
 	if (scene->interactions->dirty) {
