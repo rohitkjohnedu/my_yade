@@ -71,7 +71,6 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide)
 {
 	assert(!periodic);
-	//assert(v.size()==v.vec.size());
 	if (ompThreads <= 1)
 		return insertionSort(v, interactions, scene, doCollide);
 
@@ -81,7 +80,7 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 	}
 
 	///chunks defines subsets of the bounds lists, we make sure they are not too small wrt. verlet dist.
-	std::vector<unsigned> chunks;
+	std::vector<Body::id_t> chunks;
 	unsigned              nChunks   = ompThreads;
 	unsigned              chunkSize = unsigned(v.size() / nChunks) + 1;
 	for (unsigned n = 0; n < nChunks; n++)
@@ -373,6 +372,7 @@ void InsertionSortCollider::action()
 			         "verletDist in your script.");
 		// if no spheres, disable stride
 		verletDist = math::isinf(minR) ? 0 : math::abs(verletDist) * minR;
+                cerr<<"verletDist="<<verletDist<<endk;
 	}
 	// if interactions are dirty, force reinitialization
 	if (scene->interactions->dirty) {
