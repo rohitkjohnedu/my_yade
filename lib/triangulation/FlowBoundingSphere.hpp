@@ -28,7 +28,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		typedef _Tesselation			Tesselation;
 		typedef Network<Tesselation>		_N;
 		DECLARE_TESSELATION_TYPES(Network<Tesselation>)
-		
+
 		//painfull, but we need that for templates inheritance...
 		using _N::T; using _N::xMin; using _N::xMax; using _N::yMin; using _N::yMax; using _N::zMin; using _N::zMax; using _N::Rmoy; using _N::sectionArea; using _N::Height; using _N::vTotal; using _N::currentTes; using _N::debugOut; using _N::nOfSpheres; using _N::xMinId; using _N::xMaxId; using _N::yMinId; using _N::yMaxId; using _N::zMinId; using _N::zMaxId; using _N::boundsIds; using _N::cornerMin; using _N::cornerMax;  using _N::VSolidTot; using _N::Vtotalissimo; using _N::vPoral; using _N::sSolidTot; using _N::vPoralPorosity; using _N::vTotalPorosity; using _N::boundaries; using _N::idOffset; using _N::vtkInfiniteVertices; using _N::vtkInfiniteCells; using _N::num_particles; using _N::boundingCells; using _N::facetVertices; using _N::facetNFictious; using _N::thermalBoundingCells; using _N::conductionBoundingCells;
 		//same for functions
@@ -112,17 +112,17 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		vector <int> onlySpheresInteractions;
 		vector <Matrix3r> shearStressInteraction;
 		vector <Matrix3r> normalStressInteraction;
-		
+
 		void Localize();
 		void computePermeability();
 		virtual void gaussSeidel (Real dt=0);
 		virtual void resetNetwork();
-		virtual void resetLinearSystem();//reset both A and B in the linear system A*P=B, done typically after updating the mesh 
-		virtual void resetRHS() {};////reset only B in the linear system A*P=B, done typically after changing values of imposed pressures 
+		virtual void resetLinearSystem();//reset both A and B in the linear system A*P=B, done typically after updating the mesh
+		virtual void resetRHS() {};////reset only B in the linear system A*P=B, done typically after changing values of imposed pressures
 
 		Real kFactor; //permeability moltiplicator
 		Real cavityFactor; // permeability factor for cavity cell neighbors
-		bool tempDependentViscosity; 
+		bool tempDependentViscosity;
 		std::string key; //to give to consolidation files a name with iteration number
 // 		std::vector<Real> pressures; //for automatic write maximum pressures during consolidation
 		bool tessBasedForce; //allow the force computation method to be chosen from FlowEngine
@@ -136,7 +136,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		Real cavityFlux;
 		Real cavityFluidDensity;
 		bool multithread;
-		
+
 		void displayStatistics();
 		void initializePressure ( Real pZero );
 		void initializeTemperatures ( Real tZero );
@@ -144,7 +144,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void computeFacetForcesWithCache(bool onlyCache=false);
 		void saveVtk (const char* folder, bool withBoundaries);
 		//write vertices, cells, return ids and no. of fictious neighbors, allIds is an ordered list of cell ids (from begin() to end(), for vtk table lookup),
-		// some ids will appear multiple times if withBoundaries==true since boundary cells are splitted into multiple tetrahedra 
+		// some ids will appear multiple times if withBoundaries==true since boundary cells are splitted into multiple tetrahedra
 		void saveMesh(basicVTKwritter& writer, bool withBoundaries, vector<int>& allIds,  vector<int>& fictiousN, const char* folder);
 #ifdef XVIEW
 		void dessineTriangulation ( Vue3D &Vue, RTriangulation &T );
@@ -166,7 +166,7 @@ class FlowBoundingSphere : public Network<_Tesselation>
 
 		void printVertices();
 		void generateVoxelFile ( );
-		
+
 		void computeEdgesSurfaces();
 		Vector3r computeViscousShearForce(const Vector3r& deltaV, const int& edge_id, const Real& Rh);
 		Real computeNormalLubricationForce(const Real& deltaNormV, const Real& dist, const int& edge_id, const Real& eps, const Real& stiffness, const Real& dt, const Real& meanRad);
@@ -203,6 +203,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void adjustCavityVolumeChange(Real dt, int stepsSinceLastMesh, Real pZero);
 		void adjustCavityCompressibility(Real pZero);
 		Real getCavityFlux();
+		vector<Real> getCellVelocity (double X, double Y, double Z);
+		Real getCellVolume (double X, double Y, double Z);
 		vector<Real> averageFluidVelocityOnSphere(unsigned int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1:CHOLMOD)

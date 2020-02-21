@@ -1986,6 +1986,24 @@ Real FlowBoundingSphere<Tesselation>::fractionalSolidArea(CellHandle cell, int j
     return area;
 }
 
+template <class Tesselation>
+std::vector<Real> FlowBoundingSphere<Tesselation>::getCellVelocity (double X, double Y, double Z)
+{
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
+	std::vector<Real> velocityVector {cell->info().averageVelocity()[0], cell->info().averageVelocity()[1], cell->info().averageVelocity()[2]};
+	return velocityVector;
+}
+
+template <class Tesselation>
+Real FlowBoundingSphere<Tesselation>::getCellVolume (double X, double Y, double Z)
+{
+	if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
+	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
+	return cell->info().volume(); //sqrt( cell->info().averageVelocity().squared_length());
+}
+
 
 } //namespace CGT
 
