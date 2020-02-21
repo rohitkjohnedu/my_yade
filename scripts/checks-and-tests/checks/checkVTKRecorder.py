@@ -103,7 +103,11 @@ if ('VTK' in features):
 							if( abs( float(s1) - float(s2) ) > 1e-8 ):
 								raise YadeCheckError("checkVTKRecorder failed float comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
 						except ValueError:
-							if((s1 != s2) and (not (s1=='>' and s2=='/>'))):
+							if(s1=='>' and s2=='/>'):
+								pass
+							elif(s1=='Int64' and s2=='Int32'):
+								pass
+							elif(s1 != s2):
 								raise YadeCheckError("checkVTKRecorder failed string comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
 		
 	print("non-matching lines: ",skippedLines)
