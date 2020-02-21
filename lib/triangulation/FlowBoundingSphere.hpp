@@ -203,8 +203,8 @@ class FlowBoundingSphere : public Network<_Tesselation>
 		void adjustCavityVolumeChange(Real dt, int stepsSinceLastMesh, Real pZero);
 		void adjustCavityCompressibility(Real pZero);
 		Real getCavityFlux();
-		vector<Real> getCellVelocity (double X, double Y, double Z);
-		Real getCellVolume (double X, double Y, double Z);
+		vector<Real> getCellVelocity (Real X, Real Y, Real Z);
+		Real getCellVolume (Real X, Real Y, Real Z);
 		vector<Real> averageFluidVelocityOnSphere(unsigned int Id_sph);
 		//Solver?
 		int useSolver;//(0 : GaussSeidel, 1:CHOLMOD)
