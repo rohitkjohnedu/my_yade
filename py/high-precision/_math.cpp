@@ -137,13 +137,17 @@ void multVec(::yade::math::UnderlyingReal* array, const ::yade::math::Underlying
 namespace yade {
 void testArray()
 {
+	LOG_NOFILTER("sizeof Real        in bytes: " << sizeof(Real  ));
+	LOG_NOFILTER("sizeof float       in bytes: " << sizeof(float ));
+	LOG_NOFILTER("sizeof double      in bytes: " << sizeof(double));
+	LOG_NOFILTER("sizeof long double in bytes: " << sizeof(long double));
 	std::vector<Real> vec {};
 	int               i = 1000;
 	while (i-- > 0)
 		vec.push_back(math::random01());
 	compareVec(vec, math::constVectorData(vec));
 	auto copy = vec;
-	Real fac  = 3.33;
+	Real fac  = 0.25;
 	multVec(math::vectorData(vec), static_cast<::yade::math::UnderlyingReal>(fac), vec.size());
 	for (auto a : boost::combine(copy, vec)) {
 		if (a.get<0>() * fac != a.get<1>()) {
