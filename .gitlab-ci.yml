@@ -138,6 +138,11 @@ make_bullseye:
   <<: *artifacts_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
+make_32bit_bullseye:
+  <<: *make_definition
+  <<: *artifacts_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-bullseye
+
 make_no_mpi:
   <<: *make_definition
   <<: *artifacts_definition
@@ -306,6 +311,13 @@ test_bullseye:
     - make_bullseye
   needs: ["make_bullseye"]
 
+test_32bit_bullseye:
+  <<: *test_definition
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-bullseye
+  dependencies:
+    - make_32bit_bullseye
+  needs: ["make_32bit_bullseye"]
+
 test_no_mpi:
   <<: *test_definition
   <<: *skip_wip_test_definition
@@ -437,6 +449,14 @@ check_bullseye:
   dependencies:
     - make_bullseye
   needs: ["make_bullseye"]
+
+check_32bit_bullseye:
+  <<: *check_definition
+  before_script:
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-bullseye
+  dependencies:
+    - make_32bit_bullseye
+  needs: ["make_32bit_bullseye"]
 
 check_no_mpi:
   <<: *check_definition
