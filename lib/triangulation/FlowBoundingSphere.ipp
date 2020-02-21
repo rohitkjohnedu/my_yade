@@ -1987,7 +1987,7 @@ Real FlowBoundingSphere<Tesselation>::fractionalSolidArea(CellHandle cell, int j
 }
 
 template <class Tesselation>
-std::vector<Real> FlowBoundingSphere<Tesselation>::getCellVelocity (double X, double Y, double Z)
+std::vector<Real> FlowBoundingSphere<Tesselation>::getCellVelocity (Real X, Real Y, Real Z)
 {
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 	CellHandle cell = Tri.locate(CGT::Sphere(X,Y,Z));
@@ -1996,7 +1996,7 @@ std::vector<Real> FlowBoundingSphere<Tesselation>::getCellVelocity (double X, do
 }
 
 template <class Tesselation>
-Real FlowBoundingSphere<Tesselation>::getCellVolume (double X, double Y, double Z)
+Real FlowBoundingSphere<Tesselation>::getCellVolume (Real X, Real Y, Real Z)
 {
 	if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
 	RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
