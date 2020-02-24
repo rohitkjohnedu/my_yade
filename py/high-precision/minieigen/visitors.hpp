@@ -40,12 +40,12 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 	private:
 	template<class PyClass> static string name(PyClass& cl){ return py::extract<string>(cl.attr("__name__"))(); }
 	// for dynamic matrices/vectors
-	template<typename MatrixBaseT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::enable_if_c<MatrixBaseT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy = 0){
+	template<typename MatrixBaseT2, class PyClass> static void visit_fixed_or_dynamic(PyClass&   , typename boost::enable_if_c<MatrixBaseT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		//std::cerr<<"MatrixBaseVisitor: dynamic MatrixBaseT for "<<name(cl)<<std::endl;
 		;
 	}
 	// for static matrices/vectors
-	template<typename MatrixBaseT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::disable_if_c<MatrixBaseT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy = 0){
+	template<typename MatrixBaseT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::disable_if_c<MatrixBaseT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		//std::cerr<<"MatrixBaseVisitor: fixed MatrixBaseT for "<<name(cl)<<std::endl;
 		cl
 		.add_static_property("Ones",&MatrixBaseVisitor::Ones)
@@ -54,8 +54,8 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 		.add_static_property("Identity",&MatrixBaseVisitor::Identity)
 		;
 	}
-	template<typename Scalar, class PyClass> static	void visit_if_float(PyClass& cl, typename boost::enable_if<boost::is_integral<Scalar> >::type* dummy = 0){ /* do nothing */ }
-	template<typename Scalar, class PyClass> static void visit_if_float(PyClass& cl, typename boost::disable_if<boost::is_integral<Scalar> >::type* dummy = 0){
+	template<typename Scalar, class PyClass> static	void visit_if_float(PyClass&   , typename boost::enable_if<boost::is_integral<Scalar> >::type* = 0){ /* do nothing */ }
+	template<typename Scalar, class PyClass> static void visit_if_float(PyClass& cl, typename boost::disable_if<boost::is_integral<Scalar> >::type* = 0){
 		// operations with other scalars (Scalar is the floating type, long is the python integer type)
 		// __trudiv__ is for py3k
 		cl
@@ -109,8 +109,8 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 	template<typename Scalar2> static typename boost::enable_if <std::is_convertible<Scalar2,const Scalar&>,MatrixBaseT>::type __idiv__scalar(MatrixBaseT& a, const Scalar2& scalar){ a/=scalar; return a; }
 	template<typename Scalar2> static typename boost::disable_if<std::is_convertible<Scalar2,const Scalar&>,MatrixBaseT>::type __idiv__scalar(MatrixBaseT& a, const Scalar2& scalar){ a/=static_cast<Scalar>(scalar); return a; }
 
-	template<typename Scalar, class PyClass> static	void visit_reductions_noncomplex(PyClass& cl, typename boost::enable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* dummy = 0){ /* do nothing*/ }
-	template<typename Scalar, class PyClass> static	void visit_reductions_noncomplex(PyClass& cl, typename boost::disable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* dummy = 0){
+	template<typename Scalar, class PyClass> static	void visit_reductions_noncomplex(PyClass&   , typename boost::enable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* = 0){ /* do nothing*/ }
+	template<typename Scalar, class PyClass> static	void visit_reductions_noncomplex(PyClass& cl, typename boost::disable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* = 0){
 		// must be wrapped since there are overloads:
 		//   maxCoeff(), maxCoeff(IndexType*), maxCoeff(IndexType*,IndexType*)
 		cl
@@ -123,8 +123,8 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 
 	// we want to keep -0 (rather than replacing it by 0), but that does not work for complex numbers
 	// hence two versions
-	template<typename Scalar> static bool prune_element(const Scalar& num, RealScalar absTol, typename boost::disable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* dummy=0){using namespace std; return abs(num)<=absTol || num!=-0; }
-	template<typename Scalar> static bool prune_element(const Scalar& num, RealScalar absTol, typename boost::enable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* dummy=0){using namespace std; return abs(num)<=absTol; }
+	template<typename Scalar> static bool prune_element(const Scalar& num, RealScalar absTol, typename boost::disable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* =0){using namespace std; return abs(num)<=absTol || num!=-0; }
+	template<typename Scalar> static bool prune_element(const Scalar& num, RealScalar absTol, typename boost::enable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* =0){using namespace std; return abs(num)<=absTol; }
 	
 	static MatrixBaseT pruned(const MatrixBaseT& a, double absTol=1e-6){ // typename MatrixBaseT::Scalar absTol=1e-6){
 		MatrixBaseT ret(MatrixBaseT::Zero(a.rows(),a.cols()));
@@ -163,7 +163,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	};
 	private:
 	// for dynamic vectors
-	template<typename VectorT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy = 0){
+	template<typename VectorT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		//std::cerr<<"VectorVisitor: dynamic vector for "<<name()<<std::endl;
 		cl
 		.def("__len__",&VectorVisitor::dyn__len__)
@@ -175,7 +175,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 		;
 	}
 	// for fixed-size vectors
-	template<typename VectorT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::disable_if_c<VectorT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy = 0){
+	template<typename VectorT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::disable_if_c<VectorT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		//std::cerr<<"VectorVisitor: fixed vector for "<<name()<<std::endl;
 		cl.def("__len__",&VectorVisitor::__len__).staticmethod("__len__")
 		.def("Unit",&VectorVisitor::Unit).staticmethod("Unit")
@@ -185,7 +185,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	// handle specific sizes of vectors separately
 
 	// 2-vector
-	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==2>::type* dummy=0){
+	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==2>::type* =0){
 		cl
 		.def(py::init<typename VectorT2::Scalar,typename VectorT2::Scalar>((py::arg("x"),py::arg("y"))))
 		.add_static_property("UnitX",&VectorVisitor::Vec2_UnitX)
@@ -196,7 +196,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	static CompatVec2 Vec2_UnitY(){ return CompatVec2::UnitY(); }
 
 	// 3-vector
-	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==3>::type* dummy=0){
+	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==3>::type* =0){
 		cl
 		.def(py::init<typename VectorT2::Scalar,typename VectorT2::Scalar,typename VectorT2::Scalar>((py::arg("x"),py::arg("y"),py::arg("z"))))
 		.def("cross",&VectorVisitor::cross) // cross-product only meaningful for 3-sized vectors
@@ -220,14 +220,14 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	static CompatVec2 Vec3_zy(const CompatVec3& v){ return CompatVec2(v[2],v[1]); }
 	
 	// 4-vector
-	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==4>::type* dummy=0){
+	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==4>::type* =0){
 		cl
 		.def(py::init<typename VectorT2::Scalar,typename VectorT2::Scalar,typename VectorT2::Scalar,typename VectorT2::Scalar>((py::arg("v0"),py::arg("v1"),py::arg("v2"),py::arg("v3"))))
 		;
 	}
 
 	// 6-vector
-	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==6>::type* dummy=0){
+	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==6>::type* =0){
 		cl
 		.def("__init__",py::make_constructor(&VectorVisitor::Vec6_fromElements,py::default_call_policies(),(py::arg("v0"),py::arg("v1"),py::arg("v2"),py::arg("v3"),py::arg("v4"),py::arg("v5"))))
 		.def("__init__",py::make_constructor(&VectorVisitor::Vec6_fromHeadTail,py::default_call_policies(),(py::arg("head"),py::arg("tail"))))
@@ -241,7 +241,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	static CompatVec3 Vec6_tail(const CompatVec6& v){ return v.template tail<3>(); }
 
 	// ctor for dynamic vectors
-	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy=0){
+	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==Eigen::Dynamic>::type* =0){
 		cl
 		.def("__init__",py::make_constructor(&VecX_fromList,py::default_call_policies(),(py::arg("vv"))))
 		;
@@ -337,7 +337,7 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 	}
 	private:
 	// for dynamic matrices
-	template<typename MatrixT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::enable_if_c<MatrixT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy = 0){
+	template<typename MatrixT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::enable_if_c<MatrixT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		cl
 		.def("__len__",&MatrixVisitor::dyn__len__)
 		.def("resize",&MatrixVisitor::resize,"Change size of the matrix, keep values of elements which exist in the new matrix",(py::arg("rows"),py::arg("cols")))
@@ -348,13 +348,13 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 		;
 	}
 	// for fixed-size matrices
-	template<typename MatrixT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::disable_if_c<MatrixT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy = 0){
+	template<typename MatrixT2, class PyClass> static void visit_fixed_or_dynamic(PyClass& cl, typename boost::disable_if_c<MatrixT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		cl.def("__len__",&MatrixVisitor::__len__).staticmethod("__len__")
 		;
 	}
 
-	template<typename Scalar, class PyClass> static	void visit_if_float(PyClass& cl, typename boost::enable_if<boost::is_integral<Scalar> >::type* dummy = 0){ /* do nothing */ }
-	template<typename Scalar, class PyClass> static void visit_if_float(PyClass& cl, typename boost::disable_if<boost::is_integral<Scalar> >::type* dummy = 0){
+	template<typename Scalar, class PyClass> static	void visit_if_float(PyClass&   , typename boost::enable_if<boost::is_integral<Scalar> >::type* = 0){ /* do nothing */ }
+	template<typename Scalar, class PyClass> static void visit_if_float(PyClass& cl, typename boost::disable_if<boost::is_integral<Scalar> >::type* = 0){
 		cl
 		// matrix-matrix division?!
 		//.def("__div__",&MatrixBaseVisitor::__div__).def("__idiv__",&MatrixBaseVisitor::__idiv__)
@@ -363,9 +363,9 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 		visit_if_decompositions_meaningful<Scalar,PyClass>(cl);
 	}
 	// for complex numbers, do nothing
-	template<typename Scalar, class PyClass> static	void visit_if_decompositions_meaningful(PyClass& cl, typename boost::enable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* dummy = 0){ /* do nothing */ }
+	template<typename Scalar, class PyClass> static	void visit_if_decompositions_meaningful(PyClass&   , typename boost::enable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* = 0){ /* do nothing */ }
 	// for non-complex numbers, define decompositions
-	template<typename Scalar, class PyClass> static	void visit_if_decompositions_meaningful(PyClass& cl, typename boost::disable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* dummy = 0){
+	template<typename Scalar, class PyClass> static	void visit_if_decompositions_meaningful(PyClass& cl, typename boost::disable_if_c<Eigen::NumTraits<Scalar>::IsComplex >::type* = 0){
 		cl
 		.def("jacobiSVD",&MatrixVisitor::jacobiSVD,"Compute SVD decomposition of square matrix, retuns (U,S,V) such that self=U*S*V.transpose()")
 		.def("svd",&MatrixVisitor::jacobiSVD,"Alias for :obj:`jacobiSVD`.")
@@ -378,7 +378,7 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 
 	// handle specific matrix sizes
 	// 3x3
-	template<typename MatT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<MatT2::RowsAtCompileTime==3>::type* dummy=0){
+	template<typename MatT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<MatT2::RowsAtCompileTime==3>::type* =0){
 		cl
 		.def("__init__",py::make_constructor(&MatrixVisitor::Mat3_fromElements,py::default_call_policies(),(py::arg("m00"),py::arg("m01"),py::arg("m02"),py::arg("m10"),py::arg("m11"),py::arg("m12"),py::arg("m20"),py::arg("m21"),py::arg("m22"))))
 		.def("__init__",py::make_constructor(&MatrixVisitor::Mat3_fromRows,py::default_call_policies(),(py::arg("r0"),py::arg("r1"),py::arg("r2"),py::arg("cols")=false)))
@@ -388,7 +388,7 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 	static CompatMat3* Mat3_fromRows(const CompatVec3& l0, const CompatVec3& l1, const CompatVec3& l2, bool cols=false){ CompatMat3* m(new CompatMat3); if(cols){m->col(0)=l0; m->col(1)=l1; m->col(2)=l2; } else {m->row(0)=l0; m->row(1)=l1; m->row(2)=l2;} return m; }
 
 	// 6x6
-	template<typename MatT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<MatT2::RowsAtCompileTime==6>::type* dummy=0){
+	template<typename MatT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<MatT2::RowsAtCompileTime==6>::type* =0){
 		cl
 		.def("__init__",py::make_constructor(&MatrixVisitor::Mat6_fromBlocks,py::default_call_policies(),(py::arg("ul"),py::arg("ur"),py::arg("ll"),py::arg("lr"))))
 		.def("__init__",py::make_constructor(&MatrixVisitor::Mat6_fromRows,py::default_call_policies(),(py::arg("l0"),py::arg("l1"),py::arg("l2"),py::arg("l3"),py::arg("l4"),py::arg("l5"),py::arg("cols")=false)))
@@ -409,7 +409,7 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 		static CompatMat3 Mat6_lr(const CompatMat6& m){ return m.template bottomRightCorner<3,3>(); }
 
 	// XxX
-	template<typename MatT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<MatT2::RowsAtCompileTime==Eigen::Dynamic>::type* dummy=0){
+	template<typename MatT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<MatT2::RowsAtCompileTime==Eigen::Dynamic>::type* =0){
 		cl
 		.def("__init__",py::make_constructor(&MatrixVisitor::MatX_fromRows,py::default_call_policies(),(py::arg("r0")=CompatVecX(),py::arg("r1")=CompatVecX(),py::arg("r2")=CompatVecX(),py::arg("r3")=CompatVecX(),py::arg("r4")=CompatVecX(),py::arg("r5")=CompatVecX(),py::arg("r6")=CompatVecX(),py::arg("r7")=CompatVecX(),py::arg("r8")=CompatVecX(),py::arg("r9")=CompatVecX(),py::arg("cols")=false)))
 		.def("__init__",py::make_constructor(&MatrixVisitor::MatX_fromRowSeq,py::default_call_policies(),(py::arg("rows"),py::arg("cols")=false)))
