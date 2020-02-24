@@ -1,5 +1,5 @@
 #ifdef _HIGH_PRECISION_SUPPORT
-
+// wall clock time: 0:19.73
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 using namespace ::yade::MathEigenTypes;
