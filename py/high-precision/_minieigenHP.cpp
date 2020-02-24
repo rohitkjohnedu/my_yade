@@ -25,9 +25,9 @@
 #include <sstream>
 
 using namespace ::yade::MathEigenTypes;
-#include <minieigen/converters.hpp>
-#include <minieigen/expose.hpp>
-#include <minieigen/visitors.hpp>
+#include <py/high-precision/minieigen/converters.hpp>
+#include <py/high-precision/minieigen/expose.hpp>
+#include <py/high-precision/minieigen/visitors.hpp>
 
 CREATE_CPP_LOCAL_LOGGER("_minieigenHP.cpp")
 
@@ -62,9 +62,12 @@ try {
 	        .def(VectorVisitor<Eigen::Matrix<Real, 3, 1>>());
 #endif
 
-	expose_vectors();
-	expose_matrices(); // must come after vectors
-	expose_complex();
+	expose_vectors1();
+	expose_vectors2();
+	expose_matrices1(); // must come after vectors
+	expose_matrices2(); // must come after vectors
+	expose_complex1();
+	expose_complex2();
 	expose_quaternion();
 	expose_boxes();
 
