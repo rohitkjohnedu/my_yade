@@ -12,7 +12,7 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 	void visit(PyClass& cl) const {
 		cl
 		.def(py::init<MatrixBaseT>(py::arg("other")))
-		.def("__neg__",&MatrixBaseVisitor::__neg__)
+		.def("__neg__",&MatrixBaseVisitor::__neg__<MatrixBaseT>)
 		.def("__add__",&MatrixBaseVisitor::__add__).def("__iadd__",&MatrixBaseVisitor::__iadd__)
 		.def("__sub__",&MatrixBaseVisitor::__sub__).def("__isub__",&MatrixBaseVisitor::__isub__)
 		.def("__eq__",&MatrixBaseVisitor::__eq__).def("__ne__",&MatrixBaseVisitor::__ne__)
@@ -92,7 +92,15 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 	}
 	static bool isApprox(const MatrixBaseT& a, const MatrixBaseT& b, const RealScalar& prec){ return a.isApprox(b,prec); }
 	static bool __ne__(const MatrixBaseT& a, const MatrixBaseT& b){ return !__eq__(a,b); }
-	static MatrixBaseT __neg__(const MatrixBaseT& a){ return -a; };
+
+	// older compilers don't have std::void_t
+	template<typename... Ts> struct make_void { typedef void type;};
+	template<typename... Ts> using void_type = typename make_void<Ts...>::type;
+	template<typename T, class = void> struct HasNegation                                                        : std::false_type {};
+	template<typename T>               struct HasNegation<T, void_type<decltype(std::declval<T>().operator-())>> : std::true_type  {};
+	// in older versions of Eigen AlignedVector3 has no negation operator. Following detection if it's present means that it will be used if a newer version of Eigen is used.
+	template<typename MatrixBaseT2, typename boost::enable_if <HasNegation<MatrixBaseT2>, int>::type = 0> static MatrixBaseT __neg__(const MatrixBaseT& a){ return -a; };
+	template<typename MatrixBaseT2, typename boost::disable_if<HasNegation<MatrixBaseT2>, int>::type = 0> static MatrixBaseT __neg__(const MatrixBaseT& a){ return Eigen::AlignedVector3<Scalar>(-a.x(),-a.y(),-a.z()); };
 	static MatrixBaseT __add__(const MatrixBaseT& a, const MatrixBaseT& b){ return a+b; }
 	static MatrixBaseT __sub__(const MatrixBaseT& a, const MatrixBaseT& b){ return a-b; }
 	static MatrixBaseT __iadd__(MatrixBaseT& a, const MatrixBaseT& b){ a+=b; return a; };
@@ -198,7 +206,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	// 3-vector
 	template<typename VectorT2, class PyClass> static void visit_special_sizes(PyClass& cl, typename boost::enable_if_c<VectorT2::RowsAtCompileTime==3>::type* =0){
 		cl
-		.def(py::init<typename VectorT2::Scalar,typename VectorT2::Scalar,typename VectorT2::Scalar>((py::arg("x"),py::arg("y"),py::arg("z"))))
+		.def(py::init<typename VectorT2::Scalar,typename VectorT2::Scalar,typename VectorT2::Scalar>((py::arg("x")=Scalar(0),py::arg("y")=Scalar(0),py::arg("z")=Scalar(0))))
 		.def("cross",&VectorVisitor::cross) // cross-product only meaningful for 3-sized vectors
 		.add_static_property("UnitX",&VectorVisitor::Vec3_UnitX)
 		.add_static_property("UnitY",&VectorVisitor::Vec3_UnitY)
@@ -642,8 +650,8 @@ class QuaternionVisitor:  public py::def_visitor<QuaternionVisitor<QuaternionT> 
 	static QuaternionT* fromTwoVectors(const CompatVec3& u, const CompatVec3& v){ QuaternionT* q(new QuaternionT); q->setFromTwoVectors(u,v); return q; }
 
 	// those must be wrapped since "other" is declared as QuaternionBase<OtherDerived>; the type is then not inferred when using .def
-	static QuaternionT slerp(const QuaternionT& self, const Real& t, const QuaternionT& other){ return self.slerp(t,other); }
-	static Real angularDistance(const QuaternionT& self, const QuaternionT& other){ return self.angularDistance(other); }
+	static QuaternionT slerp(const QuaternionT& self, const Scalar& t, const QuaternionT& other){ return self.slerp(t,other); }
+	static Scalar angularDistance(const QuaternionT& self, const QuaternionT& other){ return self.angularDistance(other); }
 
 	struct QuaternionPickle: py::pickle_suite{static py::tuple getinitargs(const QuaternionT& x){ return py::make_tuple(x.w(),x.x(),x.y(),x.z());} };
 	static QuaternionT Identity(){ return QuaternionT::Identity(); }
@@ -651,14 +659,14 @@ class QuaternionVisitor:  public py::def_visitor<QuaternionVisitor<QuaternionT> 
 	static py::tuple toAxisAngle(const QuaternionT& self){ AngleAxisT aa(self); return py::make_tuple(aa.axis(),aa.angle());}
 	static py::tuple toAngleAxis(const QuaternionT& self){ AngleAxisT aa(self); return py::make_tuple(aa.angle(),aa.axis());}
 	static CompatVec3 toRotationVector(const QuaternionT& self){ AngleAxisT aa(self); return aa.angle()*aa.axis();}
-	static void setFromTwoVectors(QuaternionT& self, const Vector3r& u, const Vector3r& v){ self.setFromTwoVectors(u,v); /*return self;*/ }
+	static void setFromTwoVectors(QuaternionT& self, const CompatVec3& u, const CompatVec3& v){ self.setFromTwoVectors(u,v); /*return self;*/ }
 
 	static bool __eq__(const QuaternionT& u, const QuaternionT& v){ return u.x()==v.x() && u.y()==v.y() && u.z()==v.z() && u.w()==v.w(); }
 	static bool __ne__(const QuaternionT& u, const QuaternionT& v){ return !__eq__(u,v); }
 	static CompatVecX __sub__(const QuaternionT& a, const QuaternionT& b){ CompatVecX r(4); r<<a.w()-b.w(),a.x()-b.x(),a.y()-b.y(),a.z()-b.z(); return r; }
 
 	static Scalar __getitem__(const QuaternionT & self, Index idx){ IDX_CHECK(idx,4); if(idx==0) return self.x(); if(idx==1) return self.y(); if(idx==2) return self.z(); return self.w(); }
-	static void __setitem__(QuaternionT& self, Index idx, Real value){ IDX_CHECK(idx,4); if(idx==0) self.x()=value; else if(idx==1) self.y()=value; else if(idx==2) self.z()=value; else if(idx==3) self.w()=value; }
+	static void __setitem__(QuaternionT& self, Index idx, Scalar value){ IDX_CHECK(idx,4); if(idx==0) self.x()=value; else if(idx==1) self.y()=value; else if(idx==2) self.z()=value; else if(idx==3) self.w()=value; }
 	static string __str__(const py::object& obj){
 		const QuaternionT& self=py::extract<QuaternionT>(obj)();
 		AngleAxisT aa(self);
