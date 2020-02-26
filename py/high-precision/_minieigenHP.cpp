@@ -36,11 +36,13 @@ try {
 	YADE_SET_DOCSTRING_OPTS;
 
 	// arbitrary Real specific stuff: start
+#if YADE_REAL_BIT > 64
 	ArbitraryComplex_from_python<Complex>();
 	py::to_python_converter<Complex, ArbitraryComplex_to_python<Complex>>();
 
 	ArbitraryReal_from_python<Real>();
 	py::to_python_converter<Real, ArbitraryReal_to_python<Real>>();
+#endif
 
 	expose_storage_ordering();
 	// arbitrary Real specific stuff: end

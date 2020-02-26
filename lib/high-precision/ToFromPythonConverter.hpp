@@ -12,6 +12,11 @@
 
 #include <lib/high-precision/RealIO.hpp>
 
+namespace forCtags {
+struct ToFromPythonConverter {
+}; // for ctags
+}
+
 /*************************************************************************/
 /*************************        Real          **************************/
 /*************************************************************************/
@@ -19,14 +24,11 @@
 template <typename ArbitraryReal> struct ArbitraryReal_to_python {
 	static PyObject* convert(const ArbitraryReal& val)
 	{
-		std::stringstream ss {};
-		// the '+1' is to make sure that there are no conversion errors in the last bit.
-		constexpr const auto digs1 = std::numeric_limits<ArbitraryReal>::digits10 + 1;
-		ss << std::setprecision(digs1) << val;
-		::boost::python::object mpmath = ::boost::python::import("mpmath");
 		// http://mpmath.org/doc/current/technical.html
-		mpmath.attr("mp").attr("dps")  = int(digs1);
-		::boost::python::object result = mpmath.attr("mpf")(ss.str());
+		// the '+1' is to make sure that there are no conversion errors in the last bit.
+		::boost::python::object mpmath = ::boost::python::import("mpmath");
+		mpmath.attr("mp").attr("dps")  = int(std::numeric_limits<ArbitraryReal>::digits10 + 1);
+		::boost::python::object result = mpmath.attr("mpf")(::yade::math::toString(val));
 		return boost::python::incref(result.ptr());
 	}
 };
@@ -72,15 +74,12 @@ template <typename ArbitraryReal> struct ArbitraryReal_from_python {
 
 template <typename T> std::string num_to_string(const T& num, int = 0)
 {
-	constexpr const auto digs1 = std::numeric_limits<T>::digits10 + 1;
-	std::stringstream    ss {};
-	if (digs1 <= 16) {
-		ss << std::setprecision(digs1) << num;
+	if (std::numeric_limits<T>::digits10 <= 16) {
+		return ::yade::math::toString(num);
 	} else {
 		// The only way to make sure that it is copy-pasteable without loss of precision is to put it inside "…"
-		ss << "\"" << std::setprecision(digs1) << num << "\"";
+		return "\"" + ::yade::math::toString(num) + "\"";
 	}
-	return ss.str();
 }
 
 
