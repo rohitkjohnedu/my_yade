@@ -72,17 +72,6 @@ template <typename ArbitraryReal> struct ArbitraryReal_from_python {
 	}
 };
 
-template <typename T> std::string num_to_string(const T& num, int = 0)
-{
-	if (std::numeric_limits<T>::digits10 <= 16) {
-		return ::yade::math::toString(num);
-	} else {
-		// The only way to make sure that it is copy-pasteable without loss of precision is to put it inside "…"
-		return "\"" + ::yade::math::toString(num) + "\"";
-	}
-}
-
-
 /*************************************************************************/
 /*************************       Complex        **************************/
 /*************************************************************************/
@@ -140,40 +129,61 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 	}
 };
 
-template <typename T> inline std::string num_to_string(const std::complex<T>& num, int = 0)
-{
-	constexpr const auto digs1 = std::numeric_limits<T>::digits10 + 1;
-	std::string          ret;
-	if (num.real() != 0 && num.imag() != 0) {
-		if (digs1 <= 16) {
-			// don't add "+" in the middle if imag is negative and will start with "-"
-			return num_to_string(num.real()) + (num.imag() > 0 ? "+" : "") + num_to_string(num.imag()) + "j";
+/*************************************************************************/
+/************************* minieigenHP → string **************************/
+/*************************************************************************/
+
+// these are used by py/high-precision/minieigen/visitors.hpp
+namespace yade {
+namespace minieigenHP {
+	template <typename T> std::string numToString(const T& num, int = 0)
+	{
+		if (std::numeric_limits<T>::digits10 <= 16) {
+			return ::yade::math::toString(num);
 		} else {
-			// make sure it is copy-pasteable without loss of precision
-			return "mpc(" + num_to_string(num.real()) + "," + num_to_string(num.imag()) + ")";
+			// The only way to make sure that it is copy-pasteable without loss of precision is to put it inside "…"
+			return "\"" + ::yade::math::toString(num) + "\"";
 		}
 	}
-	// only imaginary is non-zero: skip the real part, and decrease padding to accomoadate the trailing "j"
-	if (num.imag() != 0) {
+
+
+	template <typename T> inline std::string numToString(const std::complex<T>& num, int = 0)
+	{
+		constexpr const auto digs1 = std::numeric_limits<T>::digits10 + 1;
+		std::string          ret;
+		if (num.real() != 0 && num.imag() != 0) {
+			if (digs1 <= 16) {
+				// don't add "+" in the middle if imag is negative and will start with "-"
+				return numToString(num.real()) + (num.imag() > 0 ? "+" : "") + numToString(num.imag()) + "j";
+			} else {
+				// make sure it is copy-pasteable without loss of precision
+				return "mpc(" + numToString(num.real()) + "," + numToString(num.imag()) + ")";
+			}
+		}
+		// only imaginary is non-zero: skip the real part, and decrease padding to accomoadate the trailing "j"
+		if (num.imag() != 0) {
+			if (digs1 <= 16) {
+				return numToString(num.imag()) + "j";
+			} else {
+				return "mpc(\"0\"," + numToString(num.imag()) + ")";
+			}
+		}
 		if (digs1 <= 16) {
-			return num_to_string(num.imag()) + "j";
+			return numToString(num.real());
 		} else {
-			return "mpc(\"0\"," + num_to_string(num.imag()) + ")";
+			return "mpc(" + numToString(num.real()) + ",\"0\")";
 		}
 	}
-	if (digs1 <= 16) {
-		return num_to_string(num.real());
-	} else {
-		return "mpc(" + num_to_string(num.real()) + ",\"0\")";
-	}
-}
 
 #ifdef YADE_THIN_REAL_WRAPPER_HPP
-template <> inline std::string num_to_string<::yade::Complex>(const ::yade::Complex& num, int)
-{
-	return num_to_string(static_cast<std::complex<::yade::math::UnderlyingReal>>(num));
-}
+	template <> inline std::string numToString<::yade::Complex>(const ::yade::Complex& num, int)
+	{
+		return numToString(static_cast<std::complex<::yade::math::UnderlyingReal>>(num));
+	}
 #endif
+
+}
+}
 
 #endif
 

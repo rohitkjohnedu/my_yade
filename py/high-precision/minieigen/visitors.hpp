@@ -306,7 +306,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	// not sure why this must be templated now?!
 	template<typename VectorType>
 	static void Vector_data_stream(const VectorType& self, std::ostringstream& oss, int pad=0){
-		for(Index i=0; i<self.size(); i++) oss<<(i==0?"":(((i%3)!=0 || pad>0)?",":", "))<<num_to_string(self.row(i/self.cols())[i%self.cols()],/*pad*/pad);
+		for(Index i=0; i<self.size(); i++) oss<<(i==0?"":(((i%3)!=0 || pad>0)?",":", "))<<::yade::minieigenHP::numToString(self.row(i/self.cols())[i%self.cols()],/*pad*/pad);
 	}
 };
 
@@ -678,7 +678,7 @@ class QuaternionVisitor:  public py::def_visitor<QuaternionVisitor<QuaternionT> 
 	static string __str__(const py::object& obj){
 		const QuaternionT& self=py::extract<QuaternionT>(obj)();
 		AngleAxisT aa(self);
-		return string(object_class_name(obj)+"((")+num_to_string(aa.axis()[0])+","+num_to_string(aa.axis()[1])+","+num_to_string(aa.axis()[2])+"),"+num_to_string(aa.angle())+")";
+		return string(object_class_name(obj)+"((")+::yade::minieigenHP::numToString(aa.axis()[0])+","+::yade::minieigenHP::numToString(aa.axis()[1])+","+::yade::minieigenHP::numToString(aa.axis()[2])+"),"+::yade::minieigen::numToString(aa.angle())+")";
 	}
 	static Index __len__(){return 4;}
 };
