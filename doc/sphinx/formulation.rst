@@ -450,7 +450,7 @@ The algorithm can then be written down by first computing current mean velocity 
 		\nextpos&=\currpos+\nnextvel\Dt.
 	\end{align*}
 
-Positions are known at times $i\Delta t$ (if $\Delta t$ is constant) while velocities are known at $i\Delta t+\frac{\Delta t}{2}$. The facet that they interleave (jump over each other) in such way gave rise to the colloquial name "leapfrog" scheme.
+Positions are known at times $i\Delta t$ (if $\Delta t$ is constant) while velocities are known at $i\Delta t+\frac{\Delta t}{2}$. The fact that they interleave (jump over each other) in such way gave rise to the colloquial name "leapfrog" scheme.
 
 Orientation (spherical)
 ------------------------
