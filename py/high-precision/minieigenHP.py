@@ -6,7 +6,12 @@
 ##########################################################################
 
 """
-When yade uses high-precision number as ``Real`` type the usual (old) ``from minieigen import *``
+When yade uses high-precision number as ``Real`` type the usual (old):
+
+.. code-block:: python
+
+	from minieigen import *
+
 has to be replaced with:
 
 .. code-block:: python
