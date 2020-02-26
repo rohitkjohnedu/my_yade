@@ -6,7 +6,6 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifdef _HIGH_PRECISION_SUPPORT
 // compilation wall clock time: 0:19.73 → split into two files → 0:12.70
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
@@ -47,5 +46,4 @@ void expose_vectors1(){
 #undef UNDEF_EIGEN_DONT_ALIGN
 #endif
 
-#endif
 

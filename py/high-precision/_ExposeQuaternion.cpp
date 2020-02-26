@@ -6,7 +6,6 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifdef _HIGH_PRECISION_SUPPORT
 // compilation wall clock time: 0:13.29
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
@@ -19,5 +18,4 @@ void expose_quaternion(){
 	;
 }
 
-#endif
 

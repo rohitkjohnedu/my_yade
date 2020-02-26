@@ -12,8 +12,6 @@
 // or mpfr take it as a compile-time argument. Hence such minieigenHP cannot be separately precompiled as a package.
 // Though it could be precompiled for some special types such as boost::multiprecision::float128
 
-#ifdef _HIGH_PRECISION_SUPPORT
-
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
@@ -37,6 +35,7 @@ try {
 
 	// arbitrary Real specific stuff: start
 #if YADE_REAL_BIT > 64
+	// these are needed only for high precision. The float and double are covered by default converters.
 	ArbitraryComplex_from_python<Complex>();
 	py::to_python_converter<Complex, ArbitraryComplex_to_python<Complex>>();
 
@@ -88,6 +87,4 @@ try {
 	boost::python::handle_exception();
 	throw;
 }
-
-#endif
 
