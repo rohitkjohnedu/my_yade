@@ -113,7 +113,7 @@ Compatibility
 Python
 ----------------------------------------------
 
-Python has :ysrc:`native support <lib/high-precision/ToFromPythonConverter.hpp>` for high precision types using ``mpmath`` package. Old Yade scripts that use :ref:`supported modules <supported-hp-modules>` can be immediately converted to high precision by switching to high precision version of minieigen. In order to do so, the following line:
+Python has :ysrc:`native support <lib/high-precision/ToFromPythonConverter.hpp>` for high precision types using ``mpmath`` package. Old Yade scripts that use :ref:`supported modules <supported-hp-modules>` can be immediately converted to high precision by switching to ``yade.minieigenHP``. In order to do so, the following line:
 
 .. code-block:: python
 
@@ -125,17 +125,7 @@ has to be replaced with:
 
 	from yade.minieigenHP import *
 
-Respectively ``import minieigen`` has to be replaced with ``import yade.minieigenHP as minieigen``. The :yref:`minieigenHP module<yade.minieigenHP>` has only these four lines inside:
-
-.. code-block:: python
-
-	if(yade.config.highPrecisionBits != 64):
-		from yade._minieigenHP import *
-	else:
-		from minieigen import *
-
-So that high precision (binary compatible) version of minieigen is used when non ``double`` type is used as ``Real``.
-
+Respectively ``import minieigen`` has to be replaced with ``import yade.minieigenHP as minieigen``, the old name ``as minieigen`` being used only for the sake of backward compatibility. Then high precision (binary compatible) version of minieigen is used when non ``double`` type is used as ``Real``.
 
 .. warning:: There may be still some parts of python code that were not migrated to high precision and may not work well with ``mpmath`` module. See :ref:`debugging section <hp-debugging>` for details.
 

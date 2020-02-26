@@ -6,34 +6,21 @@
 ##########################################################################
 
 """
-When yade uses high-precision number as ``Real`` type the usual (old) ``import minieigen``
+When yade uses high-precision number as ``Real`` type the usual (old) ``from minieigen import *``
 has to be replaced with:
 
 .. code-block:: python
 
-	import yade.minieigenHP as minieigen
+	from yade.minieigenHP import *
 
-This command ensures backward compatibility between both because this module contains only these four lines:
+This command ensures backward compatibility between both. It is then guaranteed that python uses the same number of decimal places as yade is using everywhere else.
 
-.. code-block:: python
-
-	if(yade.config.highPrecisionBits != 64):
-		from yade._minieigenHP import *
-	else:
-		from minieigen import *
-
-This approach guarantees that minieigenHP library uses exactly the same number of decimal places as yade is using everywhere else.
-
-Please note that such precision can be very arbitrary, because ``cpp_bin_float``
-or ``mpfr`` take it as a :ref:`compile-time argument <highPrecisionReal>`. Hence such ``minieigenHP`` cannot be separately precompiled as a package.
+Please note that used precision can be very arbitrary, because ``cpp_bin_float``
+or ``mpfr`` take it as a :ref:`compile-time argument <highPrecisionReal>`. Hence such ``yade.minieigenHP`` cannot be separately precompiled as a package.
 Though it could be precompiled for some special types such as ``boost::multiprecision::float128``.
 """
 
 # all C++ functions are accessible now:
 import yade
-
-if(yade.config.highPrecisionBits != 64):
-	from yade._minieigenHP import *
-else:
-	from minieigen import *
+from yade._minieigenHP import *
 
