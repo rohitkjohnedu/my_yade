@@ -481,16 +481,6 @@ ENDIF()
 
 IF(NOT ((${REAL_PRECISION_BITS} EQUAL 64)))
 # This means that new high-precision capabilities will be used. To make this work we need a patched version of /usr/include/miniegen
-  ADD_DEFINITIONS("-D_HIGH_PRECISION_SUPPORT")
-  IF(DEFINED MINIEIGEN_INCLUDE_PATH)
-    set(MINIEIGEN_PREFIX_PATH ${MINIEIGEN_INCLUDE_PATH})
-    INCLUDE_DIRECTORIES(${MINIEIGEN_INCLUDE_PATH})
-    MESSAGE(STATUS "Using custom minieigen path " ${MINIEIGEN_PREFIX_PATH})
-  ELSE(DEFINED MINIEIGEN_INCLUDE_PATH)
-    set(MINIEIGEN_PREFIX_PATH /usr/include)
-    MESSAGE(STATUS "Using typical minieigen path " ${MINIEIGEN_PREFIX_PATH})
-  ENDIF(DEFINED MINIEIGEN_INCLUDE_PATH)
-
   MESSAGE(STATUS "Checking compiler version for ${REAL_PREC_NAME}")
   IF(NOT ALLOW_CRASHES)
     IF(REAL_USE_ARBITRARY AND ENABLE_MPFR)
