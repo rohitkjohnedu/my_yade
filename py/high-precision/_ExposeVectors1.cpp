@@ -1,3 +1,11 @@
+/*************************************************************************
+*  2012-2020 Václav Šmilauer                                             *
+*  2020      Janek Kozicki                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
 #ifdef _HIGH_PRECISION_SUPPORT
 // compilation wall clock time: 0:19.73 → split into two files → 0:12.70
 #include <lib/high-precision/Real.hpp>

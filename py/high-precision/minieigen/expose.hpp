@@ -1,3 +1,11 @@
+/*************************************************************************
+*  2012-2020 Václav Šmilauer                                             *
+*  2020      Janek Kozicki                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
 // functions defined in the respective .cpp files
 void expose_matrices1();
 void expose_matrices2();
