@@ -46,7 +46,7 @@ class MatrixBaseVisitor: public py::def_visitor<MatrixBaseVisitor<MatrixBaseT> >
 		
 	};
 	private:
-	template<class PyClass> static string name(PyClass& cl){ return py::extract<string>(cl.attr("__name__"))(); }
+	template<class PyClass> static std::string name(PyClass& cl){ return py::extract<std::string>(cl.attr("__name__"))(); }
 	// for dynamic matrices/vectors
 	template<typename MatrixBaseT2, class PyClass> static void visit_fixed_or_dynamic(PyClass&   , typename boost::enable_if_c<MatrixBaseT2::RowsAtCompileTime==Eigen::Dynamic>::type* = 0){
 		//std::cerr<<"MatrixBaseVisitor: dynamic MatrixBaseT for "<<name(cl)<<std::endl;
@@ -293,7 +293,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 		};
 	};
 	public:
-	static string __str__(const py::object& obj){
+	static std::string __str__(const py::object& obj){
 		std::ostringstream oss;
 		const VectorT& self=py::extract<VectorT>(obj)();
 		bool list=(Dim==Eigen::Dynamic && self.size()>0);
@@ -440,7 +440,7 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 			if(rows>=0 && rr[i].size()>0) throw std::invalid_argument("Matrix6r: non-empty rows not allowed after first empty row, which marks end of the matrix.");
 		}
 		cols=(rows>0?rr[0].size():0);
-		for(int i=1; i<rows; i++) if(rr[i].size()!=cols) throw std::invalid_argument(("Matrix6: all non-empty rows must have the same length (0th row has "+lexical_cast<string>(rr[0].size())+" items, "+lexical_cast<string>(i)+"th row has "+lexical_cast<string>(rr[i].size())+" items)").c_str());
+		for(int i=1; i<rows; i++) if(rr[i].size()!=cols) throw std::invalid_argument(("Matrix6: all non-empty rows must have the same length (0th row has "+boost::lexical_cast<std::string>(rr[0].size())+" items, "+boost::lexical_cast<std::string>(i)+"th row has "+boost::lexical_cast<std::string>(rr[i].size())+" items)").c_str());
 		CompatMatX* m;
 		m=setCols?new CompatMatX(cols,rows):new CompatMatX(rows,cols);
 		for(int i=0; i<rows; i++){ if(setCols) m->col(i)=rr[i]; else m->row(i)=rr[i]; }
@@ -503,7 +503,7 @@ class MatrixVisitor: public py::def_visitor<MatrixVisitor<MatrixT> >{
 		return py::make_tuple(a.eigenvectors(),a.eigenvalues());
 	}
 	static bool dyn(){ return Dim==Eigen::Dynamic; }
-	static string __str__(const py::object& obj){
+	static std::string __str__(const py::object& obj){
 		std::ostringstream oss;
 		const MatrixT& m=py::extract<MatrixT>(obj)();
 		oss<<object_class_name(obj)<<"(";
@@ -593,7 +593,7 @@ class AabbVisitor: public py::def_visitor<AabbVisitor<Box> >{
 	static void set_item(Box& self, py::tuple _idx, Scalar value){ Index idx[2]; Index mx[2]={2,Box::AmbientDimAtCompileTime}; IDX2_CHECKED_TUPLE_INTS(_idx,mx,idx); if(idx[0]==0) self.min()[idx[1]]=value; else self.max()[idx[1]]=value; }
 	static VectorType get_minmax(const Box& self, Index idx){ IDX_CHECK(idx,2); if(idx==0) return self.min(); return self.max(); }
 	static void set_minmax(Box& self, Index idx, const VectorType& value){ IDX_CHECK(idx,2); if(idx==0) self.min()=value; else self.max()=value; }
-	static string __str__(const py::object& obj){
+	static std::string __str__(const py::object& obj){
 		const Box& self=py::extract<Box>(obj)();
 		std::ostringstream oss; oss<<object_class_name(obj)<<"((";
 		VectorVisitor<VectorType>::template Vector_data_stream<VectorType>(self.min(),oss);
@@ -675,10 +675,10 @@ class QuaternionVisitor:  public py::def_visitor<QuaternionVisitor<QuaternionT> 
 
 	static Scalar __getitem__(const QuaternionT & self, Index idx){ IDX_CHECK(idx,4); if(idx==0) return self.x(); if(idx==1) return self.y(); if(idx==2) return self.z(); return self.w(); }
 	static void __setitem__(QuaternionT& self, Index idx, Scalar value){ IDX_CHECK(idx,4); if(idx==0) self.x()=value; else if(idx==1) self.y()=value; else if(idx==2) self.z()=value; else if(idx==3) self.w()=value; }
-	static string __str__(const py::object& obj){
+	static std::string __str__(const py::object& obj){
 		const QuaternionT& self=py::extract<QuaternionT>(obj)();
 		AngleAxisT aa(self);
-		return string(object_class_name(obj)+"((")+::yade::minieigenHP::numToString(aa.axis()[0])+","+::yade::minieigenHP::numToString(aa.axis()[1])+","+::yade::minieigenHP::numToString(aa.axis()[2])+"),"+::yade::minieigen::numToString(aa.angle())+")";
+		return std::string(object_class_name(obj)+"((")+::yade::minieigenHP::numToString(aa.axis()[0])+","+::yade::minieigenHP::numToString(aa.axis()[1])+","+::yade::minieigenHP::numToString(aa.axis()[2])+"),"+::yade::minieigenHP::numToString(aa.angle())+")";
 	}
 	static Index __len__(){return 4;}
 };

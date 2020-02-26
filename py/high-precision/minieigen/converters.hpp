@@ -90,16 +90,16 @@ struct custom_MatrixAnyAny_from_sequence{
 			}
 		}
 		if(isFlat){
-			if(sz!=mx.rows()*mx.cols()) throw std::runtime_error("Assigning matrix "+lexical_cast<string>(mx.rows())+"x"+lexical_cast<string>(mx.cols())+" from flat vector of size "+lexical_cast<string>(sz));
+			if(sz!=mx.rows()*mx.cols()) throw std::runtime_error("Assigning matrix "+boost::lexical_cast<std::string>(mx.rows())+"x"+boost::lexical_cast<std::string>(mx.cols())+" from flat vector of size "+boost::lexical_cast<std::string>(sz));
 			for(int i=0; i<sz; i++){
 				mx(i/mx.rows(),i%mx.cols())=pySeqItemExtract<typename MT::Scalar>(obj_ptr,i);
 			}
 		} else {
 			for(Index row=0; row<mx.rows(); row++){
-				if(row>=PySequence_Size(obj_ptr)) throw std::runtime_error("Sequence rows of size "+lexical_cast<string>(sz)+" too short for assigning matrix with "+lexical_cast<string>(mx.rows())+" rows.");
+				if(row>=PySequence_Size(obj_ptr)) throw std::runtime_error("Sequence rows of size "+boost::lexical_cast<std::string>(sz)+" too short for assigning matrix with "+boost::lexical_cast<std::string>(mx.rows())+" rows.");
 				py::handle<> rowSeq(PySequence_GetItem(obj_ptr,row));
 				if(!PySequence_Check(rowSeq.get())) throw std::runtime_error("Element of row sequence not a sequence.");
-				if(mx.cols()!=PySequence_Size(rowSeq.get())) throw std::runtime_error("Row "+lexical_cast<string>(row)+": should specify exactly "+lexical_cast<string>(mx.cols())+" numbers, has "+lexical_cast<string>(PySequence_Size(rowSeq.get())));
+				if(mx.cols()!=PySequence_Size(rowSeq.get())) throw std::runtime_error("Row "+boost::lexical_cast<std::string>(row)+": should specify exactly "+boost::lexical_cast<std::string>(mx.cols())+" numbers, has "+boost::lexical_cast<std::string>(PySequence_Size(rowSeq.get())));
 				for(Index col=0; col<mx.cols(); col++){
 					mx(row,col)=pySeqItemExtract<typename MT::Scalar>(rowSeq.get(),col);
 				}
