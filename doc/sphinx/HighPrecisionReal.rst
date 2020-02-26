@@ -32,26 +32,19 @@ Installation
 The precompiled Yade package uses ``double`` type by default. In order to use high precision type Yade has to be compiled and installed from source code by following the
 regular :ref:`installation instructions <install-from-source-code>`. With extra following caveats:
 
-1. Additional packages are required to be installed: ``python-mpmath`` ``libmpfr-dev`` ``libmpfrc++-dev`` (the ``mpfr`` related
-   packages are necessary only to use ``boost::multiprecision::mpfr`` type).
+1. Following packages are required to be installed: ``python3-mpmath`` ``libmpfr-dev`` ``libmpfrc++-dev`` (the ``mpfr`` related
+   packages are necessary only to use ``boost::multiprecision::mpfr`` type). These packages are already listed in the :ref:`default requirements <prerequisites>`.
 
-2. The debian/ubuntu package ``python-minieigen`` must be of version higher than 0.50.3. This package hasn't been prepared yet. The high precision `pull request to minieigen <https://github.com/eudoxos/minieigen>`__ package was merged with minieigen upstream. Until it becomes part of the debian/ubuntu package the following solutions are possible:
+2. A g++ compiler version 9.2.1 or higher is required. It shall be noted that upgrading only the compiler on an existing linux installation is difficult and it is not recommended. A simpler solution is to upgrade entire linux installation.
 
-	1. Patch the older ``python-minieigen`` debian package with `these patches <https://gitlab.com/cosurgi/minieigen-real/-/tree/master/patches>`__, the patches already included in the debian package are also required.
-	2. Or copy the `minieigen files <https://github.com/eudoxos/minieigen>`__ (or from the `test repository <https://gitlab.com/cosurgi/minieigen-real/tree/master/minieigen-local>`__) into local directory and pass the extra cmake argument ``MINIEIGEN_INCLUDE_PATH=…``, relative to this path the sources should reside inside ``minieigen`` subdirectory. The path ``/usr/include/minieigen`` is used by default to find the minieigen sources.
-
-3. A g++ compiler version 9.2.1 or higher is required. It shall be noted that upgrading only the compiler on an existing linux installation is difficult and it is not recommended. A simpler solution is to upgrade entire linux installation.
-
-4. During cmake invocation specify:
+3. During cmake invocation specify:
 
 	1. either number of bits as ``REAL_PRECISION_BITS=……``,
 	2. or number of requested decimal places as ``REAL_DECIMAL_PLACES=……``, but not both
 	3. to use MPFR specify ``ENABLE_MPFR=ON``.
 
    The arbitrary precision (``mpfr`` or ``cpp_bin_float``) types are used only when more than 128 bits or more than 39 decimal places are requested. In such case if ``ENABLE_MPFR=OFF`` then
-   the slower ``cpp_bin_float`` type is used. The difference in decimal places between 39 and 33 stems from the fact that `15 bits are used for exponent <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__.
-
-.. FIXME : MINIEIGEN_PATH is not used by cmake currently
+   the slower ``cpp_bin_float`` type is used. The difference in decimal places between 39 and 33 stems from the fact that `15 bits are used for exponent <https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format>`__. Note: a fast quad-double (debian package ``libqd-dev``) implementation with 62 decimal places is `in the works <https://github.com/boostorg/multiprecision/issues/184>`__ with boost multiprecision team.
 
 
 .. _supported-hp-modules:
