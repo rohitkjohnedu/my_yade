@@ -279,7 +279,7 @@ make_clang:
     - export EXTRA_CMAKE_ARGS="-DENABLE_USEFUL_ERRORS=0 $EXTRA_CMAKE_ARGS"
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
-makeHP_long_double:
+mkHP_long_double:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -287,7 +287,7 @@ makeHP_long_double:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
-makeHP_float128:
+mkHP_20_04_float128:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -297,7 +297,7 @@ makeHP_float128:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
 
-makeHP_mpfr150:
+mkHP_20_04_mpfr150:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -307,7 +307,7 @@ makeHP_mpfr150:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
 
-makeHP_bf45:
+mkHP_bf45:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -471,39 +471,39 @@ test_clang:
     - make_clang
   needs: ["make_clang"]
 
-testHP_long_double:
+tstHP_long_double:
   <<: *test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - makeHP_long_double
-  needs: ["makeHP_long_double"]
+    - mkHP_long_double
+  needs: ["mkHP_long_double"]
   timeout: 4 hours
 
-testHP_float128:
+tstHP_20_04_float128:
   <<: *test_definition
   <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
   dependencies:
-    - makeHP_float128
-  needs: ["makeHP_float128"]
+    - mkHP_20_04_float128
+  needs: ["mkHP_20_04_float128"]
   timeout: 4 hours
 
-testHP_mpfr150:
+tstHP_20_04_mpfr150:
   <<: *test_definition
   <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
   dependencies:
-    - makeHP_mpfr150
-  needs: ["makeHP_mpfr150"]
+    - mkHP_20_04_mpfr150
+  needs: ["mkHP_20_04_mpfr150"]
   timeout: 4 hours
 
-testHP_bf45:
+tstHP_bf45:
   <<: *test_definition
   <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - makeHP_bf45
-  needs: ["makeHP_bf45"]
+    - mkHP_bf45
+  needs: ["mkHP_bf45"]
   timeout: 4 hours
 
 test_SSE:
@@ -624,39 +624,39 @@ check_clang:
     - make_clang
   needs: ["make_clang"]
 
-checkHP_long_double:
+ckHP_long_double:
   <<: *check_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - makeHP_long_double
-  needs: ["makeHP_long_double"]
+    - mkHP_long_double
+  needs: ["mkHP_long_double"]
   timeout: 4 hours
 
-checkHP_float128:
+ckHP_20_04_float128:
   <<: *check_definition
   <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
   dependencies:
-    - makeHP_float128
-  needs: ["makeHP_float128"]
+    - mkHP_20_04_float128
+  needs: ["mkHP_20_04_float128"]
   timeout: 4 hours
 
-checkHP_mpfr150:
+ckHP_20_04_mpfr150:
   <<: *check_definition
   <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
   dependencies:
-    - makeHP_mpfr150
-  needs: ["makeHP_mpfr150"]
+    - mkHP_20_04_mpfr150
+  needs: ["mkHP_20_04_mpfr150"]
   timeout: 4 hours
 
-checkHP_bf45:
+ckHP_bf45:
   <<: *check_definition
   <<: *skip_wip_test_definition
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - makeHP_bf45
-  needs: ["makeHP_bf45"]
+    - mkHP_bf45
+  needs: ["mkHP_bf45"]
   timeout: 8 hours
 
 check_SSE:
