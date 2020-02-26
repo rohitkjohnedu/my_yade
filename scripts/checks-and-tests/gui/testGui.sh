@@ -26,8 +26,12 @@ testTool () {
 		if [[ $2 == "${WHICHtool}" ]] ; then
 			echo " OK."
 		else
-			echo "ERROR: $2 is not \"${WHICHtool}\", this script is too stupid for that, aborting."
-			exit 1
+			if [[ $3 == "${WHICHtool}" ]] ; then
+				echo " OK (second path)"
+			else
+				echo "ERROR: $2 is not \"${WHICHtool}\", this script is too stupid for that, aborting."
+				exit 1
+			fi
 		fi
 		if [[ ! -f $2 ]] ; then
 			echo "ERROR: $2 is missing, aborting."
@@ -39,7 +43,7 @@ testTool () {
 testTool "xterm"   "/usr/bin/xterm"
 testTool "scrot"   "/usr/bin/scrot"
 testTool "xdotool" "/usr/bin/xdotool"
-testTool "bash"    "/bin/bash"
+testTool "bash"    "/bin/bash"        "/usr/bin/bash"
 testTool "gdb"     "/usr/bin/gdb"     "ERROR_OK"
 
 echo -e "\n\n=== Will now test inside xterm, all usefull output, including gdb crash backtrace, will be on screenshots ===\n\n"
