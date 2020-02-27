@@ -49,7 +49,7 @@ try {
 	              boost::python::arg("psdSizes")       = std::vector<Real>(),
 	              boost::python::arg("psdCumm")        = std::vector<Real>(),
 	              boost::python::arg("distributeMass") = false,
-	              boost::python::arg("seed")           = 0,
+	              boost::python::arg("seed")           = -1,
 	              boost::python::arg("hSize")          = Matrix3r(Matrix3r::Zero())),
 	             // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
 	             "Create a random cloud of particles enclosed in a parallelepiped (also works in 2D if minCorner[k]=maxCorner[k] for one coordinate). The "

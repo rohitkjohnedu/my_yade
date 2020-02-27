@@ -125,7 +125,7 @@ long SpherePack::makeCloud(
 	isPeriodic = periodic;
 
 	std::random_device               rd;
-	std::mt19937                     gen(rd());
+	std::mt19937                     gen(seed >= 0 ? seed : rd());
 	std::uniform_real_distribution<> dis(0.0, 1.0);
 
 	vector<Real> psdRadii; // holds plain radii (rather than diameters), scaled down in some situations to get the target number
