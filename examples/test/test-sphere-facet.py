@@ -24,7 +24,7 @@ Poisson = 0.2
 Density=2700
 
 # Append a material
-mat=O.materials.append(FrictMat(young=Young,poisson=Poisson,density=Density,frictionAngle=26))
+mat=O.materials.append(FrictMat(young=Young,poisson=Poisson,density=Density,frictionAngle=radians(26)))
 
 O.engines=[
 	ForceResetter(),

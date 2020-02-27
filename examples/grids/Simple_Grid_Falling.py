@@ -20,7 +20,7 @@ O.engines=[
 ]
 
 
-O.materials.append(CohFrictMat(young=3e2,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='spheremat'))
+O.materials.append(CohFrictMat(young=3e2,poisson=0.3,density=1e1,frictionAngle=radians(10),normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='spheremat'))
 
 
 ### Parameters of a rectangular grid ###

@@ -8,7 +8,7 @@ Poisson = 0.2
 Density=2700
 
 # Append a material
-mat=O.materials.append(FrictMat(young=Young,poisson=Poisson,density=Density,frictionAngle=26))
+mat=O.materials.append(FrictMat(young=Young,poisson=Poisson,density=Density,frictionAngle=radians(26)))
 
 O.bodies.append([
         sphere([0,0,0.6],0.25,material=mat),

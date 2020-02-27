@@ -17,7 +17,7 @@ extents=[r2/2.,3*r2,3*r2] # half edge lenght [m]
 young=600.0e6 # [N/m^2]
 poisson=0.6 
 density=2.60e3 # [kg/m^3]
-frictionAngle=26 # [°]
+frictionAngle=radians(26) # [rad]
 
 # Append geometry and material
 O.materials.append(FrictMat(young=young,poisson=poisson,density=density,frictionAngle=frictionAngle))

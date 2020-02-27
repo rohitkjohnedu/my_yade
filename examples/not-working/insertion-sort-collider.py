@@ -11,7 +11,7 @@ O.engines=[
 	InteractionLoop([Ig2_Facet_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()],),
 	NewtonIntegrator(damping=0.01,gravity=[0,0,-10]),
 ]
-mat=O.materials.append(FrictMat(young=1e3,poisson=.2,density=1000,frictionAngle=20))
+mat=O.materials.append(FrictMat(young=1e3,poisson=.2,density=1000,frictionAngle=radians(20)))
 O.bodies.append([
 	facet([[-1,-1,0],[1,-1,0],[0,1,0]],fixed=True,color=[1,0,0],material=mat),
 	facet([[1,-1,0],[0,1,0,],[1,.5,.5]],fixed=True,material=mat)

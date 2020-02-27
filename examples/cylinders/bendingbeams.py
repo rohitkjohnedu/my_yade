@@ -22,10 +22,10 @@ O.engines=[
 ]
 
 #### Create materials and set different properties ####
-O.materials.append(CohFrictMat(young=1e6,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=False,label='mat1'))
-O.materials.append(CohFrictMat(young=1e6,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat2'))
-O.materials.append(CohFrictMat(young=3e6,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat3'))
-O.materials.append(CohFrictMat(young=1e7,poisson=0.3,density=1e1,frictionAngle=10,normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat4'))
+O.materials.append(CohFrictMat(young=1e6,poisson=0.3,density=1e1,frictionAngle=radians(10),normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=False,label='mat1'))
+O.materials.append(CohFrictMat(young=1e6,poisson=0.3,density=1e1,frictionAngle=radians(10),normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat2'))
+O.materials.append(CohFrictMat(young=3e6,poisson=0.3,density=1e1,frictionAngle=radians(10),normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat3'))
+O.materials.append(CohFrictMat(young=1e7,poisson=0.3,density=1e1,frictionAngle=radians(10),normalCohesion=1e7,shearCohesion=1e7,momentRotationLaw=True,label='mat4'))
 
 #### Vertices ####
 vertices1=[]

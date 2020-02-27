@@ -22,7 +22,7 @@ O.engines=[
 ]
 
 ## define and append material
-mat=FrictMat(young=600.0e6,poisson=0.6,density=2.60e3,frictionAngle=26,label='Friction')
+mat=FrictMat(young=600.0e6,poisson=0.6,density=2.60e3,frictionAngle=radians(26),label='Friction')
 O.materials.append(mat)
 
 ## create two spheres (one will be fixed) and append them
