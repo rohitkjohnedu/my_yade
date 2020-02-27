@@ -185,8 +185,6 @@ need root privileges.
 		libmetis-dev python3-bibtexparser python3-future coinor-clp coinor-libclp-dev \
 		python3-mpmath libmpfr-dev libmpfrc++-dev
 
-.. comment FIXME: remove minieigen from above list when master will compile without minieigen. If all works out as expected the double-conversion package won't be used either.
-
 * For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev`` and ``python3-ipython`` by ``ipython3``.
 
 * The packages ``python3-mpmath libmpfr-dev libmpfrc++-dev`` in above list are required only if one wants to use high precision calculations. The latter two only if `mpfr <https://www.mpfr.org/>`_ will be used. See :ref:`high precision documentation<highPrecisionReal>` for more details.
