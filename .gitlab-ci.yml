@@ -59,7 +59,6 @@ stages:
     - mkdir build && cd build
     - echo $EXTRA_CMAKE_ARGS
     - cmake -DSUFFIX=-ci -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=../install  $EXTRA_CMAKE_ARGS -DPYTHON_VERSION=3 -DDISABLE_SAVE_TEMPS=1 ..
-    - ccache -s
     - export LINK_GOLD=$(case    $CI_PIPELINE_SOURCE in "merge_request_event") echo "20" ;; *) echo "10";; esac)
     - export LINK_REGULAR=$(case $CI_PIPELINE_SOURCE in "merge_request_event") echo "10" ;; *) echo "20";; esac)
     - ld --version
@@ -84,7 +83,9 @@ stages:
         *) echo "8";;
         esac)
     - echo $JOBSNUM
-    - echo "max_size = 200.0G" > ~/.ccache/ccache.conf
+    - if [[ ${CI_RUNNER_DESCRIPTION} == "y8pak" || ${CI_RUNNER_DESCRIPTION} == "c8pak" ]] ; then export MAX_CCACHE="500.0G"; else export MAX_CCACHE="200.0G"; fi
+    - echo "max_size = ${MAX_CCACHE}" > ~/.ccache/ccache.conf
+    - ccache -s
     - echo $SKIP_TEST
     - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this build, because it's a WIP merge request.\n===\e[0m\n"; else make install -j $JOBSNUM; fi
     - make clean
