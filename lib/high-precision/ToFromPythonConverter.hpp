@@ -11,6 +11,7 @@
 #include <boost/python.hpp>
 
 #include <lib/high-precision/RealIO.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace forCtags {
 struct ToFromPythonConverter {
@@ -136,9 +137,12 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 // these are used by py/high-precision/minieigen/visitors.hpp
 namespace yade {
 namespace minieigenHP {
-	template <typename T> std::string numToString(const T& num, int = 0)
+	inline std::string numToString(const int& num) { return ::boost::lexical_cast<::std::string>(num); } // ignore padding for now.
+
+	inline std::string numToString(const ::yade::Real& num)
 	{
-		if (std::numeric_limits<T>::digits10 <= 16) {
+		constexpr const auto digs1 = std::numeric_limits<::yade::Real>::digits10 + 1;
+		if (digs1 <= 16) {
 			return ::yade::math::toString(num);
 		} else {
 			// The only way to make sure that it is copy-pasteable without loss of precision is to put it inside "…"
@@ -146,10 +150,9 @@ namespace minieigenHP {
 		}
 	}
 
-
-	template <typename T> inline std::string numToString(const std::complex<T>& num, int = 0)
+	inline std::string numToString(const ::yade::Complex& num)
 	{
-		constexpr const auto digs1 = std::numeric_limits<T>::digits10 + 1;
+		constexpr const auto digs1 = std::numeric_limits<::yade::Complex::value_type>::digits10 + 1;
 		std::string          ret;
 		if (num.real() != 0 && num.imag() != 0) {
 			if (digs1 <= 16) {
@@ -174,13 +177,6 @@ namespace minieigenHP {
 			return "mpc(" + numToString(num.real()) + ",\"0\")";
 		}
 	}
-
-#ifdef YADE_THIN_REAL_WRAPPER_HPP
-	template <> inline std::string numToString<::yade::Complex>(const ::yade::Complex& num, int)
-	{
-		return numToString(static_cast<std::complex<::yade::math::UnderlyingReal>>(num));
-	}
-#endif
 
 }
 }

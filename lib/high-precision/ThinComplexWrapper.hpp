@@ -206,8 +206,8 @@ public:
 	}
 
 	// member functions specific to Complex type, as in https://en.cppreference.com/w/cpp/numeric/complex
-	template <typename OtherType = WrappedComplex, typename = EnableIfIsComplex<OtherType>> NonComplex real() const { return val.real(); };
-	template <typename OtherType = WrappedComplex, typename = EnableIfIsComplex<OtherType>> NonComplex imag() const { return val.imag(); };
+	template <typename OtherType = WrappedComplex, typename = EnableIfIsComplex<OtherType>> value_type real() const { return val.real(); };
+	template <typename OtherType = WrappedComplex, typename = EnableIfIsComplex<OtherType>> value_type imag() const { return val.imag(); };
 };
 
 } // namespace math

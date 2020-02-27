@@ -306,7 +306,7 @@ class VectorVisitor: public py::def_visitor<VectorVisitor<VectorT> >{
 	// not sure why this must be templated now?!
 	template<typename VectorType>
 	static void Vector_data_stream(const VectorType& self, std::ostringstream& oss, int pad=0){
-		for(Index i=0; i<self.size(); i++) oss<<(i==0?"":(((i%3)!=0 || pad>0)?",":", "))<<::yade::minieigenHP::numToString(self.row(i/self.cols())[i%self.cols()],/*pad*/pad);
+		for(Index i=0; i<self.size(); i++) oss<<(i==0?"":(((i%3)!=0 || pad>0)?",":", "))<<::yade::minieigenHP::numToString(self.row(i/self.cols())[i%self.cols()]/*,pad*/);
 	}
 };
 
