@@ -17,6 +17,7 @@ from builtins import range
 from builtins import object
 import math,random,doctest,numpy
 from yade import *
+import yade.math
 from yade.wrapper import *
 try: # use psyco if available
 	import psyco
@@ -567,12 +568,7 @@ def uniaxialTestFeatures(filename=None,areaSections=10,axis=-1,distFactor=2.2,**
 	dim=aabbDim();
 	if axis<0: axis=list(dim).index(max(dim)) # list(dim) for compat with python 2.5 which didn't have index defined for tuples yet (appeared in 2.6 first)
 	assert(axis in (0,1,2))
-	if(yade.config.highPrecisionMpmath):
-		import mpmath
-		areas=[approxSectionArea(coord,axis) for coord in mpmath.linspace(mm[axis],mx[axis],10)[1:-1]]
-	else:
-		import numpy
-		areas=[approxSectionArea(coord,axis) for coord in numpy.linspace(mm[axis],mx[axis],num=10)[1:-1]]
+	areas=[approxSectionArea(coord,axis) for coord in yade.math.linspace(mm[axis],mx[axis],num=10)[1:-1]]
 	negIds,posIds=negPosExtremeIds(axis=axis,distFactor=distFactor)
 	return {'negIds':negIds,'posIds':posIds,'axis':axis,'area':min(areas)}
 
