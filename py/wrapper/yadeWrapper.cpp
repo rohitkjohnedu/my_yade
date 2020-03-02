@@ -1413,7 +1413,9 @@ public:
 	{
 		TRACE;
 		gilLock lock;
+#if PY_MAJOR_VERSION >= 3
 		LOG_TRACE("GIL State: " << PyGILState_Check());
+#endif
 		return static_cast<Real>(get_override("contactForce")(u, a));
 	}
 
