@@ -621,7 +621,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			//zmax = zmax - b->state->pos.z();
 			boolFunction->SetOperationTypeToUnion();
 		}
-		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
+		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSampleFunctionReal::New();
 		if (b->isClump() == false && b->isClumpMember() == false) {
 			sample->SetImplicitFunction(function);
 		} else if (b->isClump() == true) {
@@ -1005,7 +1005,7 @@ void PotentialBlockVTKRecorder::action()
 			}
 		}
 
-		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
+		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSampleFunctionReal::New();
 		sample->SetImplicitFunction(function);
 		//Real value = 1.05*pb->R;
 
