@@ -367,64 +367,64 @@ void PotentialBlockVTKRecorderTunnel::action()
 {
 	if (fileName.size() == 0)
 		return;
-	vtkSmartPointer<vtkPointsReal>     pbPos          = vtkSmartPointer<vtkPointsReal>::New();
-	vtkSmartPointer<vtkAppendPolyData> appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
-	vtkSmartPointer<vtkAppendPolyData> appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
-	//vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-	//vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+	auto pbPos          = vtkSmartPointer<vtkPointsReal>::New();
+	auto appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
+	auto appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
+	//auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+	//auto transform = vtkSmartPointer<vtkTransform>::New();
 
 	// interactions ###############################################
-	vtkSmartPointer<vtkPoints>     intrBodyPos = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray>  intrCells   = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> intrForceN  = vtkSmartPointer<vtkFloatArray>::New();
+	auto intrBodyPos = vtkSmartPointer<vtkPoints>::New();
+	auto intrCells   = vtkSmartPointer<vtkCellArray>::New();
+	auto intrForceN  = vtkSmartPointer<vtkFloatArray>::New();
 	intrForceN->SetNumberOfComponents(3);
 	intrForceN->SetName("forceN");
-	vtkSmartPointer<vtkFloatArray> intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
+	auto intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
 	intrAbsForceT->SetNumberOfComponents(1);
 	intrAbsForceT->SetName("absForceT");
 	// interactions ###############################################
 
 	// interaction contact point ###############################################
-	vtkSmartPointer<vtkPointsReal> pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
-	vtkSmartPointer<vtkCellArray>  pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
+	auto pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
+	auto pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
 	pbNormalForce->SetNumberOfComponents(3);
 	pbNormalForce->SetName("normalForce"); //Linear velocity in Vector3 form
-	vtkSmartPointer<vtkFloatArray> pbShearForce = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbShearForce = vtkSmartPointer<vtkFloatArray>::New();
 	pbShearForce->SetNumberOfComponents(3);
 	pbShearForce->SetName("shearForce"); //Angular velocity in Vector3 form
-	vtkSmartPointer<vtkFloatArray> pbTotalForce = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbTotalForce = vtkSmartPointer<vtkFloatArray>::New();
 	pbTotalForce->SetNumberOfComponents(3);
 	pbTotalForce->SetName("totalForce");
-	vtkSmartPointer<vtkFloatArray> pbTotalStress = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbTotalStress = vtkSmartPointer<vtkFloatArray>::New();
 	pbTotalStress->SetNumberOfComponents(3);
 	pbTotalStress->SetName("totalStress");
-	vtkSmartPointer<vtkFloatArray> pbMobilizedShear = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbMobilizedShear = vtkSmartPointer<vtkFloatArray>::New();
 	pbMobilizedShear->SetNumberOfComponents(1);
 	pbMobilizedShear->SetName("mobilizedShear");
 	// interactions contact point###############################################
 
 
 	// velocity ###################################################
-	vtkSmartPointer<vtkCellArray>  pbCells     = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> pbLinVelVec = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbCells     = vtkSmartPointer<vtkCellArray>::New();
+	auto pbLinVelVec = vtkSmartPointer<vtkFloatArray>::New();
 	pbLinVelVec->SetNumberOfComponents(3);
 	pbLinVelVec->SetName("linVelVec"); //Linear velocity in Vector3 form
 
-	vtkSmartPointer<vtkFloatArray> pbLinVelLen = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbLinVelLen = vtkSmartPointer<vtkFloatArray>::New();
 	pbLinVelLen->SetNumberOfComponents(1);
 	pbLinVelLen->SetName("linVelLen"); //Length (magnitude) of linear velocity
 
-	vtkSmartPointer<vtkFloatArray> pbAngVelVec = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbAngVelVec = vtkSmartPointer<vtkFloatArray>::New();
 	pbAngVelVec->SetNumberOfComponents(3);
 	pbAngVelVec->SetName("angVelVec"); //Angular velocity in Vector3 form
 
-	vtkSmartPointer<vtkFloatArray> pbAngVelLen = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbAngVelLen = vtkSmartPointer<vtkFloatArray>::New();
 	pbAngVelLen->SetNumberOfComponents(1);
 	pbAngVelLen->SetName("angVelLen"); //Length (magnitude) of angular velocity
 
 
-	vtkSmartPointer<vtkFloatArray> pbDisplacementVec = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbDisplacementVec = vtkSmartPointer<vtkFloatArray>::New();
 	pbDisplacementVec->SetNumberOfComponents(3);
 	pbDisplacementVec->SetName("Displacement"); //Linear velocity in Vector3 form
 
@@ -432,9 +432,9 @@ void PotentialBlockVTKRecorderTunnel::action()
 
 	// bodyId ##############################################################
 	//#if 0
-	vtkSmartPointer<vtkPointsReal>pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
-	vtkSmartPointer<vtkCellArray> pbIdCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkIntArray>  blockId   = vtkSmartPointer<vtkIntArray>::New();
+	auto pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
+	auto pbIdCells = vtkSmartPointer<vtkCellArray>::New();
+	auto blockId   = vtkSmartPointer<vtkIntArray>::New();
 	blockId->SetNumberOfComponents(1);
 	blockId->SetName("id");
 	// bodyId ##############################################################
@@ -491,12 +491,12 @@ void PotentialBlockVTKRecorderTunnel::action()
 			//txtMapper[countID] = vtkPolyDataMapper::New();
 			//txtMapper[countID]->SetInputConnection( extrude[count]->GetOutputPort());
 			//appendFilterID->AddInputConnection(extrude[countID]-> GetOutputPort());
-			//vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+			//auto polydata = vtkSmartPointer<vtkPolyData>::New();
 			//polydata->DeepCopy(extrude[countID]-> GetOutput());
 			Vector3r centre (b->state->pos[0], b->state->pos[1], b->state->pos[2]);
-			vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+			auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 			transformFilter->SetInput( extrude[countID]-> GetOutput() );
-			vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+			auto transform = vtkSmartPointer<vtkTransform>::New();
 			transformFilter->SetTransform( transform );
 			transform->PostMultiply();
 			transform->Translate (centre[0], centre[1],centre[2]);
@@ -621,7 +621,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			//zmax = zmax - b->state->pos.z();
 			boolFunction->SetOperationTypeToUnion();
 		}
-		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
+		auto sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
 		if (b->isClump() == false && b->isClumpMember() == false) {
 			sample->SetImplicitFunction(function);
 		} else if (b->isClump() == true) {
@@ -667,16 +667,16 @@ void PotentialBlockVTKRecorderTunnel::action()
 		sample->SetSampleDimensions(sampleXno, sampleYno, sampleZno);
 		sample->ComputeNormalsOff();
 		//sample->Update();
-		vtkSmartPointer<vtkContourFilter> contours = vtkSmartPointer<vtkContourFilter>::New();
+		auto contours = vtkSmartPointer<vtkContourFilter>::New();
 		contours->SetInputConnection(sample->GetOutputPort());
 		contours->SetNumberOfContours(1);
 		contours->SetValue(0, 0.0);
-		vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+		auto polydata = vtkSmartPointer<vtkPolyData>::New();
 		contours->Update();
 		polydata->DeepCopy(contours->GetOutput());
 		//polydata->Update();
 
-		vtkSmartPointer<vtkUnsignedCharArray> pbColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+		auto pbColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
 		pbColors->SetName("pbColors");
 		pbColors->SetNumberOfComponents(3);
 		Vector3r color = particleColour; //Vector3r(0,100,0);
@@ -699,9 +699,9 @@ void PotentialBlockVTKRecorderTunnel::action()
 		Quaternionr orientation = b->state->ori;
 		orientation.normalize();
 		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];
-		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+		auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData(polydata);
-		vtkSmartPointer<vtkTransformReal> transform = vtkSmartPointer<vtkTransformReal>::New();
+		auto transform = vtkSmartPointer<vtkTransformReal>::New();
 
 		transformFilter->SetTransform(transform);
 		transform->PostMultiply();
@@ -744,8 +744,6 @@ void PotentialBlockVTKRecorderTunnel::action()
 		}
 		// ################ velocity ###########################
 		polydata->DeleteCells();
-//		sample->Delete();
-//		contours->Delete();
 		//function->Delete();
 		//#if 0
 		if (b->isClump() == true) {
@@ -756,12 +754,10 @@ void PotentialBlockVTKRecorderTunnel::action()
 			//boolFunction = NULL;
 		}
 		//#endif
-//		sample   = NULL;
-//		contours = NULL;
 	}
 
 	if (REC_VELOCITY == true) {
-		vtkSmartPointer<vtkUnstructuredGrid> pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		auto pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		pbUg->SetPoints(pbPos);
 		pbUg->SetCells(VTK_VERTEX, pbCells);
 		pbUg->GetPointData()->AddArray(pbLinVelVec);
@@ -769,7 +765,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 		pbUg->GetPointData()->AddArray(pbLinVelLen);
 		pbUg->GetPointData()->AddArray(pbAngVelLen);
 		pbUg->GetPointData()->AddArray(pbDisplacementVec);
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+		auto writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		writerA->SetDataModeToAscii();
 		string fv = fileName + "vel." + std::to_string(scene->iter) + ".vtu";
 		writerA->SetFileName(fv.c_str());
@@ -783,7 +779,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 	//###################### bodyId ###############################
 	if (REC_ID == true) {
 #if 0
-			vtkSmartPointer<vtkXMLPolyDataWriter> writerA = vtkXMLPolyDataWriter::New();
+			auto writerA = vtkXMLPolyDataWriter::New();
 			writerA->SetDataModeToAscii();
 			string fn=fileName+"-Id."+std::to_string(scene->iter)+".vtp";
 			writerA->SetFileName(fn.c_str());
@@ -793,11 +789,11 @@ void PotentialBlockVTKRecorderTunnel::action()
 			writerA->Delete();
 #endif
 		//#if 0
-		vtkSmartPointer<vtkUnstructuredGrid> pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		auto pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		pbUg->SetPoints(pbPosID);
 		pbUg->SetCells(VTK_VERTEX, pbIdCells);
 		pbUg->GetPointData()->AddArray(blockId);
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+		auto writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		writerA->SetDataModeToAscii();
 		string fv = fileName + "Id." + std::to_string(scene->iter) + ".vtu";
 		writerA->SetFileName(fv.c_str());
@@ -852,7 +848,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			count++;
 		}
 		if (count > 0) {
-			vtkSmartPointer<vtkUnstructuredGrid> pbUgCP = vtkSmartPointer<vtkUnstructuredGrid>::New();
+			auto pbUgCP = vtkSmartPointer<vtkUnstructuredGrid>::New();
 			pbUgCP->SetPoints(pbContactPoint);
 			pbUgCP->SetCells(VTK_VERTEX, pbCellsContact);
 			pbUgCP->GetPointData()->AddArray(pbNormalForce);
@@ -860,7 +856,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 			pbUgCP->GetPointData()->AddArray(pbTotalForce);
 			pbUgCP->GetPointData()->AddArray(pbMobilizedShear);
 			pbUgCP->GetPointData()->AddArray(pbTotalStress);
-			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerB = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			auto writerB = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			writerB->SetDataModeToAscii();
 			string fcontact = fileName + "contactPoint." + std::to_string(scene->iter) + ".vtu";
 			writerB->SetFileName(fcontact.c_str());
@@ -875,14 +871,12 @@ void PotentialBlockVTKRecorderTunnel::action()
 	// ################ contact point ###########################
 
 
-	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	auto writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 	writer->SetDataModeToAscii();
 	string fn = fileName + "-pb." + std::to_string(scene->iter) + ".vtp";
 	writer->SetFileName(fn.c_str());
 	writer->SetInputConnection(appendFilter->GetOutputPort());
 	writer->Write();
-
-//	writer->Delete();
 
 	//intrBodyPos->Delete();
 	//intrForceN->Delete();
@@ -903,59 +897,59 @@ void PotentialBlockVTKRecorder::action()
 {
 	if (fileName.size() == 0)
 		return;
-	vtkSmartPointer<vtkPointsReal>     pbPos          = vtkSmartPointer<vtkPointsReal>::New();
-	vtkSmartPointer<vtkAppendPolyData> appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
-	vtkSmartPointer<vtkAppendPolyData> appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
-	//vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-	//vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
+	auto pbPos          = vtkSmartPointer<vtkPointsReal>::New();
+	auto appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
+	auto appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
+	//auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+	//auto transform = vtkSmartPointer<vtkTransform>::New();
 
 	// interactions ###############################################
-	vtkSmartPointer<vtkPoints>     intrBodyPos = vtkSmartPointer<vtkPoints>::New();
-	vtkSmartPointer<vtkCellArray>  intrCells   = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> intrForceN  = vtkSmartPointer<vtkFloatArray>::New();
+	auto intrBodyPos = vtkSmartPointer<vtkPoints>::New();
+	auto intrCells   = vtkSmartPointer<vtkCellArray>::New();
+	auto intrForceN  = vtkSmartPointer<vtkFloatArray>::New();
 	intrForceN->SetNumberOfComponents(3);
 	intrForceN->SetName("forceN");
-	vtkSmartPointer<vtkFloatArray> intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
+	auto intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
 	intrAbsForceT->SetNumberOfComponents(1);
 	intrAbsForceT->SetName("absForceT");
 	// interactions ###############################################
 
 	// interaction contact point ###############################################
-	vtkSmartPointer<vtkPointsReal> pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
-	vtkSmartPointer<vtkCellArray>  pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
+	auto pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
+	auto pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
 	pbNormalForce->SetNumberOfComponents(3);
 	pbNormalForce->SetName("normalForce"); //Linear velocity in Vector3 form
-	vtkSmartPointer<vtkFloatArray> pbShearForce = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbShearForce = vtkSmartPointer<vtkFloatArray>::New();
 	pbShearForce->SetNumberOfComponents(3);
 	pbShearForce->SetName("shearForce"); //Angular velocity in Vector3 form
 	// interactions contact point###############################################
 
 
 	// velocity ###################################################
-	vtkSmartPointer<vtkCellArray>  pbCells     = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkFloatArray> pbLinVelVec = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbCells     = vtkSmartPointer<vtkCellArray>::New();
+	auto pbLinVelVec = vtkSmartPointer<vtkFloatArray>::New();
 	pbLinVelVec->SetNumberOfComponents(3);
 	pbLinVelVec->SetName("linVelVec"); //Linear velocity in Vector3 form
 
-	vtkSmartPointer<vtkFloatArray> pbLinVelLen = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbLinVelLen = vtkSmartPointer<vtkFloatArray>::New();
 	pbLinVelLen->SetNumberOfComponents(1);
 	pbLinVelLen->SetName("linVelLen"); //Length (magnitude) of linear velocity
 
-	vtkSmartPointer<vtkFloatArray> pbAngVelVec = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbAngVelVec = vtkSmartPointer<vtkFloatArray>::New();
 	pbAngVelVec->SetNumberOfComponents(3);
 	pbAngVelVec->SetName("angVelVec"); //Angular velocity in Vector3 form
 
-	vtkSmartPointer<vtkFloatArray> pbAngVelLen = vtkSmartPointer<vtkFloatArray>::New();
+	auto pbAngVelLen = vtkSmartPointer<vtkFloatArray>::New();
 	pbAngVelLen->SetNumberOfComponents(1);
 	pbAngVelLen->SetName("angVelLen"); //Length (magnitude) of angular velocity
 	// velocity ####################################################
 
 	// bodyId ##############################################################
 	//#if 0
-	vtkSmartPointer<vtkPointsReal>pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
-	vtkSmartPointer<vtkCellArray> pbIdCells = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkIntArray>  blockId   = vtkSmartPointer<vtkIntArray>::New();
+	auto pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
+	auto pbIdCells = vtkSmartPointer<vtkCellArray>::New();
+	auto blockId   = vtkSmartPointer<vtkIntArray>::New();
 	blockId->SetNumberOfComponents(1);
 	blockId->SetName("id");
 	// bodyId ##############################################################
@@ -1005,7 +999,7 @@ void PotentialBlockVTKRecorder::action()
 			}
 		}
 
-		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
+		auto sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
 		sample->SetImplicitFunction(function);
 		//Real value = 1.05*pb->R;
 
@@ -1063,16 +1057,16 @@ void PotentialBlockVTKRecorder::action()
 		sample->SetSampleDimensions(sampleXno, sampleYno, sampleZno);
 		sample->ComputeNormalsOff();
 		//sample->Update();
-		vtkSmartPointer<vtkContourFilter> contours = vtkSmartPointer<vtkContourFilter>::New();
+		auto contours = vtkSmartPointer<vtkContourFilter>::New();
 		contours->SetInputConnection(sample->GetOutputPort());
 		contours->SetNumberOfContours(1);
 		contours->SetValue(0, 0.0);
-		vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
+		auto polydata = vtkSmartPointer<vtkPolyData>::New();
 		contours->Update();
 		polydata->DeepCopy(contours->GetOutput());
 		//polydata->Update();
 
-		vtkSmartPointer<vtkUnsignedCharArray> pbColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+		auto pbColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
 		pbColors->SetName("pbColors");
 		pbColors->SetNumberOfComponents(3);
 		Vector3r color = pb->color; //Vector3r(0,100,0);
@@ -1094,9 +1088,9 @@ void PotentialBlockVTKRecorder::action()
 		Quaternionr orientation = b->state->ori;
 		orientation.normalize();
 		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];
-		vtkSmartPointer<vtkTransformPolyDataFilter> transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+		auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
 		transformFilter->SetInputData(polydata);
-		vtkSmartPointer<vtkTransformReal> transform = vtkSmartPointer<vtkTransformReal>::New();
+		auto transform = vtkSmartPointer<vtkTransformReal>::New();
 
 		transformFilter->SetTransform(transform);
 		transform->PostMultiply();
@@ -1130,22 +1124,18 @@ void PotentialBlockVTKRecorder::action()
 		}
 		// ################ velocity ###########################
 		polydata->DeleteCells();
-//		sample->Delete();
-//		contours->Delete();
 		//function->Delete();
-//		sample   = NULL;
-//		contours = NULL;
 	}
 
 	if (REC_VELOCITY == true) {
-		vtkSmartPointer<vtkUnstructuredGrid> pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		auto pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		pbUg->SetPoints(pbPos);
 		pbUg->SetCells(VTK_VERTEX, pbCells);
 		pbUg->GetPointData()->AddArray(pbLinVelVec);
 		pbUg->GetPointData()->AddArray(pbAngVelVec);
 		pbUg->GetPointData()->AddArray(pbLinVelLen);
 		pbUg->GetPointData()->AddArray(pbAngVelLen);
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+		auto writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		writerA->SetDataModeToAscii();
 		string fv = fileName + "vel." + std::to_string(scene->iter) + ".vtu";
 		writerA->SetFileName(fv.c_str());
@@ -1158,7 +1148,7 @@ void PotentialBlockVTKRecorder::action()
 	//###################### bodyId ###############################
 	if (REC_ID == true) {
 #if 0
-			vtkSmartPointer<vtkXMLPolyDataWriter> writerA = vtkXMLPolyDataWriter::New();
+			auto writerA = vtkXMLPolyDataWriter::New();
 			writerA->SetDataModeToAscii();
 			string fn=fileName+"-Id."+std::to_string(scene->iter)+".vtp";
 			writerA->SetFileName(fn.c_str());
@@ -1168,11 +1158,11 @@ void PotentialBlockVTKRecorder::action()
 			writerA->Delete();
 #endif
 		//#if 0
-		vtkSmartPointer<vtkUnstructuredGrid> pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
+		auto pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
 		pbUg->SetPoints(pbPosID);
 		pbUg->SetCells(VTK_VERTEX, pbIdCells);
 		pbUg->GetPointData()->AddArray(blockId);
-		vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+		auto writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 		writerA->SetDataModeToAscii();
 		string fv = fileName + "Id." + std::to_string(scene->iter) + ".vtu";
 		writerA->SetFileName(fv.c_str());
@@ -1208,12 +1198,12 @@ void PotentialBlockVTKRecorder::action()
 			count++;
 		}
 		if (count > 0) {
-			vtkSmartPointer<vtkUnstructuredGrid> pbUgCP = vtkSmartPointer<vtkUnstructuredGrid>::New();
+			auto pbUgCP = vtkSmartPointer<vtkUnstructuredGrid>::New();
 			pbUgCP->SetPoints(pbContactPoint);
 			pbUgCP->SetCells(VTK_VERTEX, pbCellsContact);
 			pbUgCP->GetPointData()->AddArray(pbNormalForce);
 			pbUgCP->GetPointData()->AddArray(pbShearForce);
-			vtkSmartPointer<vtkXMLUnstructuredGridWriter> writerB = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+			auto writerB = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
 			writerB->SetDataModeToAscii();
 			string fcontact = fileName + "contactPoint." + std::to_string(scene->iter) + ".vtu";
 			writerB->SetFileName(fcontact.c_str());
@@ -1229,14 +1219,12 @@ void PotentialBlockVTKRecorder::action()
 	// ################ contact point ###########################
 
 
-	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
+	auto writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 	writer->SetDataModeToAscii();
 	string fn = fileName + "-pb." + std::to_string(scene->iter) + ".vtp";
 	writer->SetFileName(fn.c_str());
 	writer->SetInputConnection(appendFilter->GetOutputPort());
 	writer->Write();
-
-//	writer->Delete();
 
 	//intrBodyPos->Delete();
 	//intrForceN->Delete();
