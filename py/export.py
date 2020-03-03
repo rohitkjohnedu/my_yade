@@ -337,6 +337,7 @@ class VTKExporter(object):
 	* spheres
 	* facets
 	* polyhedra
+	* PotentialBlocks
 	* interactions
 	* contact points
 	* periodic cell
@@ -358,6 +359,7 @@ class VTKExporter(object):
 		self.facetsSnapCount = startSnap
 		self.intrsSnapCount = startSnap
 		self.polyhedraSnapCount = startSnap
+		self.PotentialBlocksSnapCount = startSnap
 		self.contactPointsSnapCount = startSnap
 		self.baseName = baseName
 
@@ -897,7 +899,99 @@ class VTKExporter(object):
 		outFile.close()
 		self.polyhedraSnapCount += 1
 
-	
+	def exportPotentialBlocks(self,ids='all',what={},comment="comment",numLabel=None,useRef=False):
+		"""Exports Potential Blocks and defined properties.
+		
+		:param ids: if "all", then export all Potential Blocks, otherwise only Potential Blocks from integer list
+		:type ids: [int] | "all"
+		:param dictionary what: which additional quantities (in addition to the positions) to export. parameter is name->command dictionary. Name is string under which it is saved to vtk, command is string to evaluate. Note that the bodies are labeled as b in this function. Scalar, vector and tensor variables are supported. For example, to export velocity (named as particleVelocity) and the distance from point (0,0,0) (named as dist) you should write: ``what=dict(particleVelocity='b.state.vel',dist='b.state.pos.norm()', ... )``
+		:param string comment: comment to add to vtk file
+		:param int numLabel: number of file (e.g. time step), if unspecified, the last used value + 1 will be used
+		"""
+		# TODO useRef?
+		# get list of bodies to export
+		bodies = self._getBodies(ids,PotentialBlock) # TODO
+		if not bodies: return
+		# number of vertices
+		nVertices = sum(len(b.shape.vertices) for b in bodies)
+		# export triangulation of particle face
+		bodyFaces = []
+		for b in bodies:
+			ff = []
+			for f in b.shape.connectivity:
+				for i in range(1,len(f)-1):
+					ff.append([f[0], f[i], f[i+1]])
+			bodyFaces.append(ff)
+		# output file
+		nFaces = sum(len(f) for f in bodyFaces)
+		fName = self.baseName+'-PotentialBlocks-%08d'%(numLabel if numLabel else self.PotentialBlocksSnapCount)+'.vtk'
+		outFile = open(fName, 'w')
+		# head
+		outFile.write("# vtk DataFile Version 3.0.\n%s\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n"%(comment,nVertices))
+		# write position of vertices
+		if useRef:
+			dspls = []
+			for b in bodies:
+				bPos = b.state.pos
+				bOri = b.state.ori
+				brPos = b.state.refPos
+				brOri = b.state.refOri
+				for v in b.shape.vertices:
+					rPos = brPos + brOri*v
+					pos = bPos + bOri*v
+					outFile.write("%g %g %g\n"%(rPos[0],rPos[1],rPos[2]))
+					dspls.append(pos-rPos)
+		else:
+			for b in bodies:
+				bPos = b.state.pos
+				bOri = b.state.ori
+				for v in b.shape.vertices:
+					pos = bPos + bOri*v
+					outFile.write("%g %g %g\n"%(pos[0],pos[1],pos[2]))
+		# write triangle faces
+		outFile.write("\nPOLYGONS %d %d\n"%(nFaces,4*nFaces))
+		j = 0
+		for i,b in enumerate(bodies):
+			faces = bodyFaces[i]
+			for face in faces:
+				t = tuple([j+ii for ii in face])
+				outFile.write("3 %d %d %d\n"%t)
+			j += len(b.shape.vertices)
+		# checks what argument
+		self._checkWhatArgumentIsDict(what,"exportPotentialBlocks")
+		# write additional data from 'what' param
+		if useRef:
+			outFile.write("\nPOINT_DATA %d\n"%(len(dspls)))
+			outFile.write("\nVECTORS displacement double\n")
+			for v in dspls:
+				outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+		if what:
+			outFile.write("\nCELL_DATA %d"%(nFaces))
+		# see exportSpheres for explanation of this code block
+		for name,command in what.items():
+			test = eval(command)
+			if isinstance(test,Matrix3):
+				outFile.write("\nTENSORS %s double\n"%(name))
+				for i,b in enumerate(bodies):
+					t = eval(command)
+					for f in bodyFaces[i]:
+						outFile.write("%g %g %g\n%g %g %g\n%g %g %g\n\n"%(t[0,0],t[0,1],t[0,2],t[1,0],t[1,1],t[1,2],t[2,0],t[2,1],t[2,2]))
+			elif isinstance(test,Vector3):
+				outFile.write("\nVECTORS %s double\n"%(name))
+				for i,b in enumerate(bodies):
+					v = eval(command)
+					for f in bodyFaces[i]:
+						outFile.write("%g %g %g\n"%(v[0],v[1],v[2]))
+			elif isinstance(test,(int,float)):
+				outFile.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(name))
+				for i,b in enumerate(bodies):
+					e = eval(command)
+					for f in bodyFaces[i]:
+						outFile.write("%g\n"%e)
+			else:
+				self._warn("exportPotentialBlocks: wrong 'what' parameter, vtk output might be corrupted")
+		outFile.close()
+		self.PotentialBlocksSnapCount += 1
 
 
 #gmshGeoExport===============================================================
