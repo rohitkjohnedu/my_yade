@@ -409,7 +409,7 @@ void PotentialParticleVTKRecorder::action()
 		}
 
 
-		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSampleFunctionReal::New();
+		vtkSmartPointer<vtkSampleFunctionReal> sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
 		sample->SetImplicitFunction(function);
 
 		Real xmin = -std::max(pb->minAabb.x(), pb->maxAabb.x());
@@ -455,7 +455,7 @@ void PotentialParticleVTKRecorder::action()
 		sample->SetSampleDimensions(sampleXno, sampleYno, sampleZno);
 		sample->ComputeNormalsOff();
 		//sample->Update();
-		vtkSmartPointer<vtkContourFilter> contours = vtkContourFilter::New();
+		vtkSmartPointer<vtkContourFilter> contours = vtkSmartPointer<vtkContourFilter>::New();
 		//#ifdef YADE_VTK6
 		contours->SetInputConnection(sample->GetOutputPort());
 		// #else
@@ -534,11 +534,11 @@ void PotentialParticleVTKRecorder::action()
 		}
 		// ################ velocity ###########################
 		polydata->DeleteCells();
-		sample->Delete();
-		contours->Delete();
+//		sample->Delete();
+//		contours->Delete();
 		//function->Delete();
-		sample   = NULL;
-		contours = NULL;
+//		sample   = NULL;
+//		contours = NULL;
 	}
 
 	if (REC_VELOCITY == true) {
@@ -630,14 +630,14 @@ void PotentialParticleVTKRecorder::action()
 	// ################ contact point ###########################
 
 
-	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkXMLPolyDataWriter::New();
+	vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
 	writer->SetDataModeToAscii();
 	string fn = fileName + "-pb." + std::to_string(scene->iter) + ".vtp";
 	writer->SetFileName(fn.c_str());
 	writer->SetInputConnection(appendFilter->GetOutputPort());
 	writer->Write();
 
-	writer->Delete();
+//	writer->Delete();
 
 	//intrBodyPos->Delete();
 	//intrForceN->Delete();
