@@ -296,7 +296,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* USE_QT5: use QT5 for GUI (ON by default)
 	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 	* SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
-	* PYTHON_VERSION: force python version to the given one, set -1 to automatically use the last version on the system (-1 by default)
+	* PYTHON_VERSION: force python version to the given one, e.g. ``-DPYTHON_VERSION=3.5``. Set to -1 to automatically use the last version on the system (-1 by default)
 
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_.
@@ -393,28 +393,9 @@ These instructions use ``ccache`` and ``ld.gold`` to :ref:`speed-up compilation 
 Python 2 backward compatibility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Python 2 support ends at the beginning of 2020. However, Yade can be compiled and used with python 2:
+Following the end of Python 2 support (beginning of 2020), Yade compilation on a Python 2 ecosystem is no longer garanteed since the `6e097e95 trunk version <https://gitlab.com/yade-dev/trunk/-/tree/6e097e95368a9c63ce169a040f418d30c7ba307c>`_. Compilation of the latter is possible thanks to the above ``PYTHON_VERSION`` cmake option, and it requires Python 2 version of prerequisites packages whose list can be found in the corresponding paragraph (Python 2 backward compatibility) of the `historical doc <https://gitlab.com/yade-dev/trunk/-/blob/6e097e95368a9c63ce169a040f418d30c7ba307c/doc/sphinx/installation.rst>_.
 
-* On **Ubuntu 18.04, 18.10**, **Debian 9, 10** and their derivatives install the python 2 version of the packages (and other required packages)::
-
-		sudo apt install cmake git freeglut3-dev libloki-dev libboost-all-dev fakeroot \
-		dpkg-dev build-essential g++ python-dev ipython python-matplotlib python-mpi4py \
-		libsqlite3-dev python-numpy python-tk gnuplot libgts-dev python-pygraphviz \
-		libvtk6-dev python-numpy libeigen3-dev python-xlib python-pyqt5 pyqt5-dev-tools \
-		python-pyqt5.qtwebkit gtk2-engines-pixbuf python-argparse python-pyqt5.qtsvg \
-		libqglviewer-dev-qt5 python-pil libjs-jquery python-sphinx python-git python-bibtex \
-		libxmu-dev libxi-dev libcgal-dev help2man libbz2-dev zlib1g-dev python-minieigen \
-		libopenblas-dev libsuitesparse-dev libmetis-dev libopenmpi-dev openmpi-bin \
-		openmpi-common python-bibtexparser python3-future python-future python-gts \
-		coinor-clp coinor-libclp-dev python-mpmath libmpfr-dev libmpfrc++-dev
-
-* For **Ubuntu 16.04** ``libqglviewer-dev-qt5`` is to be replaced by ``libqglviewer-dev``, ``python-pil`` is to be replaced by ``python-imaging``.
-
-* force python 2 in the cmake command line: ``cmake -DPYTHON_VERSION=2 -DCMAKE_INSTALL_PREFIX=../install ../trunk``
-
-Note that the cmake ``PYTHON_VERSION`` option can be set to force any python version, for example ``-DPYTHON_VERSION=3.5`` is valid.
-
-Also see notes about :ref:`converting python 2 scripts into python 3<convert-python2-to3>`.
+Yade nowadays relies on a Python 3 ecosystem, and you may refer to some notes about :ref:`converting python 2 scripts into python 3<convert-python2-to3>`.
 
 .. _speed-up:
 
