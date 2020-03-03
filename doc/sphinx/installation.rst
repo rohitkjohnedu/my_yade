@@ -296,7 +296,7 @@ As of Yade version git-2315bd8 (or 2018.02b release), the following options are 
 	* USE_QT5: use QT5 for GUI (ON by default)
 	* CHOLMOD_GPU link Yade to custom SuiteSparse installation and activate GPU accelerated PFV (OFF by default)
 	* SUITESPARSEPATH: define this variable with the path to a custom suitesparse install
-	* PYTHON_VERSION: force python version to the given one, e.g. ``-DPYTHON_VERSION=3.5``. Set to -1 to automatically use the last version on the system (-1 by default)
+	* PYTHON_VERSION: force Python version to the given one, e.g. ``-DPYTHON_VERSION=3.5``. Set to -1 to automatically use the last version on the system (-1 by default)
 
 For using more extended parameters of cmake, please follow the corresponding
 documentation on `https://cmake.org/documentation <https://cmake.org/documentation/>`_.
@@ -393,9 +393,9 @@ These instructions use ``ccache`` and ``ld.gold`` to :ref:`speed-up compilation 
 Python 2 backward compatibility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Following the end of Python 2 support (beginning of 2020), Yade compilation on a Python 2 ecosystem is no longer garanteed since the `6e097e95 trunk version <https://gitlab.com/yade-dev/trunk/-/tree/6e097e95368a9c63ce169a040f418d30c7ba307c>`_. Compilation of the latter is possible thanks to the above ``PYTHON_VERSION`` cmake option, and it requires Python 2 version of prerequisites packages whose list can be found in the corresponding paragraph (Python 2 backward compatibility) of the `historical doc <https://gitlab.com/yade-dev/trunk/-/blob/6e097e95368a9c63ce169a040f418d30c7ba307c/doc/sphinx/installation.rst>_.
+Following the end of Python 2 support (beginning of 2020), Yade compilation on a Python 2 ecosystem is no longer garanteed since the `6e097e95 <https://gitlab.com/yade-dev/trunk/-/tree/6e097e95368a9c63ce169a040f418d30c7ba307c>`_ trunk version. Python 2-compilation of the latter is still possible using the above ``PYTHON_VERSION`` cmake option, requiring Python 2 version of prerequisites packages whose list can be found in the corresponding paragraph (Python 2 backward compatibility) of the `historical doc <https://gitlab.com/yade-dev/trunk/-/blob/6e097e95368a9c63ce169a040f418d30c7ba307c/doc/sphinx/installation.rst>`_.
 
-Yade nowadays relies on a Python 3 ecosystem, and you may refer to some notes about :ref:`converting python 2 scripts into python 3<convert-python2-to3>`.
+Ongoing development of Yade now assumes a Python 3 environment, and you may refer to some notes about :ref:`converting Python 2 scripts into Python 3<convert-python2-to3>` if needed.
 
 .. _speed-up:
 
@@ -451,7 +451,7 @@ The software can be compiled by a special way to find some specific bugs and pro
 
 
 The listed sanitizers are runtime-detectors. They can only find the problems in the code, if the particular part of the code
-is executed. If you have written a new C++ class (constitutive law, engine etc.) try to run your python script with
+is executed. If you have written a new C++ class (constitutive law, engine etc.) try to run your Python script with
 the sanitized software to check, whether the problem in your code exist.
 
 AddressSanitizer
