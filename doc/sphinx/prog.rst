@@ -2028,7 +2028,7 @@ When an object is crossing c++/python boundary, boost::python's global "converte
 
 .. [#wrap]
 	Wrapped classes are automatically registered when the class wrapper is created. If wrapped class derives from another wrapped class (and if this dependency is declared with the ``boost::python::bases`` template, which Yade's classes do automatically), parent class must be registered before derived class, however. (This is handled via loop in ``Omega::buildDynlibDatabase``, which reiterates over classes, skipping failures, until they all successfully register)
-	Math classes (Vector3, Matrix3, Quaternion) are wrapped in :yref:`yade.minieigenHP`. If yade is compiled with ``Real`` type being ``double`` type then it redirects to minieigen, which is available as a separate package. Use your package manager to install it. See :ref:`high precision documentation<highPrecisionReal>` for more details.
+	Math classes (Vector3, Matrix3, Quaternion) are wrapped in :yref:`yade.minieigenHP`. See :ref:`high precision documentation<highPrecisionReal>` for more details.
 
 
 Adding a new python/C++ module
