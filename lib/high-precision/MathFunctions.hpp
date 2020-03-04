@@ -36,8 +36,16 @@
 #error "This file cannot be included alone, include Real.hpp instead"
 #endif
 
-// if cmake forgot to set YADE_IGNORE_IEEE_INFINITY_NAN along with -Ofast, set it here. To make sure that Infinity and NaN are not supported.
-// comment this out, if some brave runtime tests are to be performed.
+namespace forCtags {
+struct MathFunctions {
+}; // for ctags
+}
+
+// If cmake forgot to set YADE_IGNORE_IEEE_INFINITY_NAN along with -Ofast then set it here. It is to make sure that Infinity and NaN are supported only when available.
+// It's is here for safety only, because if someone used -Ofast compilation flag (currently not available in CMakeLists.txt), then NaN Inf will not work unless
+// these flags are used: -Ofast -fno-associative-math -fno-finite-math-only -fsigned-zeros (and maybe -march=native -mtune=native)
+// The #if defined(__FAST_MATH__) detects if compiler -ffinite-math-only flag was passed, it is turned on by -Ofast.
+// Comment this out, if some brave runtime speed -Ofast tests are to be performed.
 #if ((not(defined(YADE_IGNORE_IEEE_INFINITY_NAN))) and (defined(__FAST_MATH__)))
 #define YADE_IGNORE_IEEE_INFINITY_NAN
 #endif
