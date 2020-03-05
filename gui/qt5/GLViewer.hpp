@@ -54,6 +54,7 @@ class GLViewer : public QGLViewer
 		bool			displayGridNumbers;
 		bool			autoGrid;
 		Real			prevGridStep;
+		int			prevSegments;
 		long			last;
 		int manipulatedClipPlane;
 		std::set<int> boundClipPlanes;
