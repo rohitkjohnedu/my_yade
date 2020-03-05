@@ -64,6 +64,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	displayGridNumbers = true;
 	autoGrid=true;
 	prevGridStep=1;
+	prevSegments=2;
 	resize(550,550);
 	last=-1;
 	if(viewId==0) setWindowTitle("Primary view");
@@ -386,10 +387,17 @@ void GLViewer::centerScene(Real suggestedRadius){
 	LOG_DEBUG("Got scene box min="<<min<<" and max="<<max);
 	Vector3r center = (max+min)*0.5;
 	Vector3r halfSize = (max-min)*0.5;
-	Real radius=math::max(halfSize[0],math::max(halfSize[1],halfSize[2])); if(radius<=suggestedRadius) radius=(suggestedRadius>0)?suggestedRadius:1;
-	LOG_DEBUG("Scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
+	Real radius=math::max(halfSize[0],math::max(halfSize[1],halfSize[2]));
+	LOG_DEBUG("Scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius<<", suggestedRadius="<<suggestedRadius);
+	// set scene center after all these calculations.
 	setSceneCenter(qglviewer::Vec((static_cast<double>(center[0])), (static_cast<double>(center[1])), (static_cast<double>(center[2]))));
-	setSceneRadius(static_cast<double>(radius*1.5));
+	// if positive radius was suggested, then use it.
+	if(suggestedRadius>0) {
+		setSceneRadius(static_cast<double>(suggestedRadius));
+	} else {
+		// the heurestics in finding a useful radius: use 1.5 times larger value than the scene boundaries.
+		setSceneRadius(static_cast<double>(radius*1.5));
+	}
 	showEntireScene();
 }
 

@@ -169,6 +169,11 @@ void GLViewer::postDraw(){
 	glPushMatrix();
 
 	int nSegments   = static_cast<int>(2*nHalfSegments);
+	if(nSegments > 15000) {
+		LOG_WARN("More than 15000 grid segments (currently: "<< nSegments <<") take too long to draw, using previous value: " << prevSegments << ". If you need denser grid try calling: yade.qt.center(someRadius); to reduce scene grid radius. Current scene radius is: " << QGLViewer::camera()->sceneRadius());
+		nSegments = prevSegments;
+	}
+	prevSegments = nSegments;
 	// XYZ grids
 	glLineWidth(.5);
 	if(drawGrid & 1) {glColor3(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
