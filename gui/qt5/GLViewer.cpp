@@ -14,6 +14,7 @@
 #include<lib/opengl/OpenGLWrapper.hpp>
 #include<core/Body.hpp>
 #include<core/Scene.hpp>
+#include<core/Bound.hpp>
 #include<core/Interaction.hpp>
 #include<core/DisplayParameters.hpp>
 #include<boost/algorithm/string.hpp>
@@ -59,7 +60,10 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	timeDispMask=TIME_REAL|TIME_VIRT|TIME_ITER;
 	cut_plane = 0;
 	cut_plane_delta = -2;
-	gridSubdivide = false;
+	gridSubdivide = true;
+	displayGridNumbers = true;
+	autoGrid=true;
+	prevGridStep=1;
 	resize(550,550);
 	last=-1;
 	if(viewId==0) setWindowTitle("Primary view");
@@ -78,12 +82,15 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_C & Qt::AltModifier,"Set scene center to median body position (same as space)");
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
 	setKeyDescription(Qt::Key_G,"Toggle grid visibility; g turns on and cycles");
+	setKeyDescription(Qt::Key_Minus,"Make grid less dense 10 times and disable automatic grid change");
+	setKeyDescription(Qt::Key_Plus, "Make grid more dense 10 times and disable automatic grid change");
+	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
+	setKeyDescription(Qt::Key_Comma,"Toggle display coordinates on grid");
 	setKeyDescription(Qt::Key_G & Qt::ShiftModifier ,"Hide grid.");
 	setKeyDescription(Qt::Key_M, "Move selected object.");
 	setKeyDescription(Qt::Key_X,"Show the xz [shift: xy] (up-right) plane (clip plane: align normal with +x)");
 	setKeyDescription(Qt::Key_Y,"Show the yx [shift: yz] (up-right) plane (clip plane: align normal with +y)");
 	setKeyDescription(Qt::Key_Z,"Show the zy [shift: zx] (up-right) plane (clip plane: align normal with +z)");
-	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
 	setKeyDescription(Qt::Key_S,"Save QGLViewer state to /tmp/qglviewerState.xml");
 	setKeyDescription(Qt::Key_T,"Switch orthographic / perspective camera");
 	setKeyDescription(Qt::Key_O,"Set narrower field of view");
@@ -109,7 +116,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_Space,"Center scene (same as Alt-C); clip plane: activate/deactivate");
 
 	mouseMovesCamera();
-	centerScene();
+	centerScene(-1);
 	show();
 }
 
@@ -204,7 +211,7 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		// center around selected body
 		if(selectedName() >= 0 && (*(Omega::instance().getScene()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 		// make all bodies visible
-		else centerScene();
+		else centerScene(-1);
 	}
 	else if(e->key()==Qt::Key_D &&(e->modifiers() & Qt::AltModifier)){ Body::id_t id; if((id=Omega::instance().getScene()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->setDynamic(!b->isDynamic()); LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic()?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
@@ -263,6 +270,9 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		}
 	}
 	else if(e->key()==Qt::Key_Period) gridSubdivide = !gridSubdivide;
+	else if(e->key()==Qt::Key_Comma) displayGridNumbers = !displayGridNumbers;
+	else if(e->key()==Qt::Key_Plus)  {autoGrid=false;prevGridStep/=10;}
+	else if(e->key()==Qt::Key_Minus) {autoGrid=false;prevGridStep*=10;}
 	else if(e->key()==Qt::Key_Return){
 		if (Omega::instance().isRunning()) Omega::instance().pause();
 		else Omega::instance().run();
@@ -324,7 +334,7 @@ void GLViewer::centerMedianQuartile(){
 	long nBodies=scene->bodies->size();
 	if(nBodies<4) {
 		LOG_DEBUG("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
-		return centerScene();
+		return centerScene(-1);
 	}
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
@@ -344,7 +354,7 @@ void GLViewer::centerMedianQuartile(){
 	showEntireScene();
 }
 
-void GLViewer::centerScene(){
+void GLViewer::centerScene(Real suggestedRadius){
 	Scene* rb=Omega::instance().getScene().get();
 	if (!rb) return;
 	if(rb->isPeriodic){ centerPeriodic(); return; }
@@ -364,6 +374,11 @@ void GLViewer::centerScene(){
 			if(!b) continue;
 			max=max.cwiseMax(b->state->pos);
 			min=min.cwiseMin(b->state->pos);
+			Bound* aabb=dynamic_cast<Bound*>(b->bound.get());
+			if(aabb){
+				max=max.cwiseMax(b->state->pos+aabb->max);
+				min=min.cwiseMin(b->state->pos+aabb->min);
+			}
 		}
 		if(math::isinf(min[0])||math::isinf(min[1])||math::isinf(min[2])||math::isinf(max[0])||math::isinf(max[1])||math::isinf(max[2])){ LOG_DEBUG("No min/max computed from bodies either, setting cube (-1,-1,-1)×(1,1,1)"); min=-Vector3r::Ones(); max=Vector3r::Ones(); }
 	} else {LOG_DEBUG("Using scene's Aabb");}
@@ -371,7 +386,7 @@ void GLViewer::centerScene(){
 	LOG_DEBUG("Got scene box min="<<min<<" and max="<<max);
 	Vector3r center = (max+min)*0.5;
 	Vector3r halfSize = (max-min)*0.5;
-	Real radius=math::max(halfSize[0],math::max(halfSize[1],halfSize[2])); if(radius<=0) radius=1;
+	Real radius=math::max(halfSize[0],math::max(halfSize[1],halfSize[2])); if(radius<=suggestedRadius) radius=(suggestedRadius>0)?suggestedRadius:1;
 	LOG_DEBUG("Scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius);
 	setSceneCenter(qglviewer::Vec((static_cast<double>(center[0])), (static_cast<double>(center[1])), (static_cast<double>(center[2]))));
 	setSceneRadius(static_cast<double>(radius*1.5));

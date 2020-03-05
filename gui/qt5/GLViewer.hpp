@@ -51,6 +51,9 @@ class GLViewer : public QGLViewer
 		float			cut_plane;
 		int			cut_plane_delta;
 		bool			gridSubdivide;
+		bool			displayGridNumbers;
+		bool			autoGrid;
+		Real			prevGridStep;
 		long			last;
 		int manipulatedClipPlane;
 		std::set<int> boundClipPlanes;
@@ -83,7 +86,7 @@ class GLViewer : public QGLViewer
 		virtual void draw();
 		virtual void drawWithNames();
 		void displayMessage(const std::string& s){ QGLViewer::displayMessage(QString(s.c_str()));}
-		void centerScene();
+		void centerScene(Real suggestedRadius);
 		void centerPeriodic();
 		void mouseMovesCamera();
 		void mouseMovesManipulatedFrame(qglviewer::Constraint* c=NULL);

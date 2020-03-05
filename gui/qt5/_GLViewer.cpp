@@ -65,7 +65,7 @@ public:
 	void set_##property(const Vector3r& t)                                                                                                                 \
 	{                                                                                                                                                      \
 		GLV;                                                                                                                                           \
-		setter(qglviewer::Vec((static_cast<double>(t[0])), (static_cast<double>( t[1])), (static_cast<double>( t[2]))));                                                                                                      \
+		setter(qglviewer::Vec((static_cast<double>(t[0])), (static_cast<double>(t[1])), (static_cast<double>(t[2]))));                                 \
 	}
 	VEC_GET_SET(upVector, glv->camera()->upVector, glv->camera()->setUpVector);
 	VEC_GET_SET(lookAt, glv->camera()->position() + glv->camera()->viewDirection, glv->camera()->lookAt);
@@ -129,25 +129,29 @@ public:
 	void fitAABB(const Vector3r& min, const Vector3r& max)
 	{
 		GLV;
-		glv->camera()->fitBoundingBox(qglviewer::Vec((static_cast<double>(min[0])), (static_cast<double>( min[1])), (static_cast<double>( min[2]))), qglviewer::Vec((static_cast<double>(max[0])), (static_cast<double>( max[1])), (static_cast<double>( max[2]))));
+		glv->camera()->fitBoundingBox(
+		        qglviewer::Vec((static_cast<double>(min[0])), (static_cast<double>(min[1])), (static_cast<double>(min[2]))),
+		        qglviewer::Vec((static_cast<double>(max[0])), (static_cast<double>(max[1])), (static_cast<double>(max[2]))));
 	}
 	void fitSphere(const Vector3r& center, Real radius)
 	{
 		GLV;
-		glv->camera()->fitSphere(qglviewer::Vec((static_cast<double>(center[0])), (static_cast<double>( center[1])), (static_cast<double>( center[2]))), static_cast<double>(radius));
+		glv->camera()->fitSphere(
+		        qglviewer::Vec((static_cast<double>(center[0])), (static_cast<double>(center[1])), (static_cast<double>(center[2]))),
+		        static_cast<double>(radius));
 	}
 	void showEntireScene()
 	{
 		GLV;
 		glv->camera()->showEntireScene();
 	}
-	void center(bool median)
+	void center(bool median, Real suggestedRadius)
 	{
 		GLV;
 		if (median)
 			glv->centerMedianQuartile();
 		else
-			glv->centerScene();
+			glv->centerScene(suggestedRadius);
 	}
 	Vector2i get_screenSize()
 	{
@@ -256,7 +260,7 @@ py::list getAllViews()
 	}
 	return ret;
 };
-void centerViews(void) { OpenGLManager::self->centerAllViews(); }
+void centerViews(Real suggestedRadius) { OpenGLManager::self->centerAllViews(suggestedRadius); }
 
 shared_ptr<OpenGLRenderer> getRenderer() { return OpenGLManager::self->renderer; }
 
@@ -274,7 +278,7 @@ try {
 	glm->emitStartTimer();
 
 	py::def("View", y::createView, "Create a new 3d view.");
-	py::def("center", y::centerViews, "Center all views.");
+	py::def("center", y::centerViews, ":param suggestedRadius: centers all views with suggestedRadius, which is used only if radius cannot be calculated.");
 	py::def("views", y::getAllViews, "Return list of all open :yref:`yade.qt.GLViewer` objects");
 
 	py::def("Renderer", &y::getRenderer, "Return the active :yref:`OpenGLRenderer` object.");
@@ -315,9 +319,9 @@ try {
 	        .def("showEntireScene", &pyGLViewer::showEntireScene)
 	        .def("center",
 	             &pyGLViewer::center,
-	             (py::arg("median") = true),
+	             (py::arg("median") = true, py::arg("suggestedRadius") = -1.0f),
 	             "Center view. View is centered either so that all bodies fit inside (*median* = False), or so that 75\% of bodies fit inside (*median* = "
-	             "True).")
+	             "True). If radius cannot be determined automatically then suggestedRadius is used.")
 	        .def("saveState",
 	             &pyGLViewer::saveState,
 	             (py::arg("stateFilename") = ".qglviewer.xml"),
