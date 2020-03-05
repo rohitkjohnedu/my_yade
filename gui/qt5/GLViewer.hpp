@@ -137,6 +137,11 @@ class GLViewer : public QGLViewer
 		virtual void mouseMoveEvent(QMouseEvent *e);
 		virtual void mousePressEvent(QMouseEvent *e);
 		virtual QString helpString() const;
+
+		// Draws text, where each letter has a shifted background letter of opposite color.
+		void drawReadableNum(const Real& n, const Vector3r& pos, const Vector3r& color = Vector3r(1, 1, 1), unsigned precision = 4);
+		void drawReadableText(const std::string& txt, const Vector3r& pos, const Vector3r& color = Vector3r(1, 1, 1));
+		void drawTextWithPixelShift(const std::string& txt, const Vector3r& pos, const Vector2i& shift, const Vector3r& color = Vector3r(1, 1, 1));
 };
 
 /*! Get unconditional lock on a GL view.

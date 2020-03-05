@@ -148,6 +148,30 @@ double GLViewer::displayedSceneRadius(){
 	return (camera()->unprojectedCoordinatesOf(qglviewer::Vec(width()/2,height()/2,.5))-camera()->unprojectedCoordinatesOf(qglviewer::Vec(0,0,.5))).norm();
 }
 
+void GLViewer::drawReadableNum(const Real& n, const Vector3r& pos, const Vector3r& color, unsigned precision)
+{
+	// Also XOR-ing is possible with these commands: glEnable(GL_COLOR_LOGIC_OP); glLogicOp(GL_XOR); ………… glDisable(GL_COLOR_LOGIC_OP);
+	std::ostringstream oss;
+	oss << std::setprecision(precision) << n;
+	drawReadableText(oss.str(), pos, color);
+}
+
+void GLViewer::drawReadableText(const std::string& txt, const Vector3r& pos, const Vector3r& color)
+{
+	auto opposite = Vector3r::Ones()-color;
+	// draw shifted text
+	drawTextWithPixelShift(txt, pos, Vector2i( 1, 0), opposite);
+	// draw the real text
+	drawTextWithPixelShift(txt, pos, Vector2i( 0, 0), color);
+}
+
+void GLViewer::drawTextWithPixelShift(const std::string& txt, const Vector3r& pos, const Vector2i& pixelShift, const Vector3r& color)
+{
+	glColor3v(color);
+	qglviewer::Vec p = QGLViewer::camera()->projectedCoordinatesOf(qglviewer::Vec((static_cast<double>(pos[0])), (static_cast<double>(pos[1])), (static_cast<double>(pos[2]))));
+	QGLViewer::drawText(static_cast<int>(p[0]+pixelShift[0]),static_cast<int>(p[1]+pixelShift[1]),txt.c_str());
+}
+
 void GLViewer::postDraw(){
 	using math::min; // when used inside function it does not leak
 	using math::max;
@@ -169,8 +193,8 @@ void GLViewer::postDraw(){
 	glPushMatrix();
 
 	int nSegments   = static_cast<int>(2*nHalfSegments);
-	if(nSegments > 15000) {
-		LOG_WARN("More than 15000 grid segments (currently: "<< nSegments <<") take too long to draw, using previous value: " << prevSegments << ". If you need denser grid try calling: yade.qt.center(someRadius); to reduce scene grid radius. Current scene radius is: " << QGLViewer::camera()->sceneRadius());
+	if(nSegments > 5000) {
+		LOG_WARN("More than 5000 grid segments (currently: "<< nSegments <<") take too long to draw, using previous value: " << prevSegments << ". If you need denser grid try calling: yade.qt.center(someRadius); to reduce scene grid radius. Current scene radius is: " << QGLViewer::camera()->sceneRadius());
 		nSegments = prevSegments;
 	}
 	prevSegments = nSegments;
@@ -188,25 +212,20 @@ void GLViewer::postDraw(){
 		// disabling lighting & depth test makes sure that text is always above everything, readable.
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
-		const Vector3r& h(Vector3r(1,1,1));
 		for(int xyz(-nHalfSegments) ; xyz<=nHalfSegments ; xyz++)
 		{ // write text - coordinate numbers on grid
 			Real pos=xyz*gridStep;
-			std::ostringstream oss;
-			oss<<setprecision(4)<<pos;
-			std::string str = oss.str();
-			glColor3v(h);
-			if((drawGrid & 2) or (drawGrid & 4)) GLUtils::GLDrawText(str,Vector3r(pos,0,0),h);
-			if((drawGrid & 1) or (drawGrid & 4)) GLUtils::GLDrawText(str,Vector3r(0,pos,0),h);
-			if((drawGrid & 1) or (drawGrid & 2)) GLUtils::GLDrawText(str,Vector3r(0,0,pos),h);
+			if((drawGrid & 2) or (drawGrid & 4)) drawReadableNum(pos,Vector3r(pos,0,0));
+			if((drawGrid & 1) or (drawGrid & 4)) drawReadableNum(pos,Vector3r(0,pos,0));
+			if((drawGrid & 1) or (drawGrid & 2)) drawReadableNum(pos,Vector3r(0,0,pos));
 		}
 		Real pos=nHalfSegments*gridStep+gridStep*0.1;
-		if((drawGrid & 2) or (drawGrid & 4)) GLUtils::GLDrawText("X",Vector3r(pos,0,0),h);
-		if((drawGrid & 1) or (drawGrid & 4)) GLUtils::GLDrawText("Y",Vector3r(0,pos,0),h);
-		if((drawGrid & 1) or (drawGrid & 2)) GLUtils::GLDrawText("Z",Vector3r(0,0,pos),h);
-		if((drawGrid & 2) or (drawGrid & 4)) GLUtils::GLDrawText("-X",Vector3r(-pos,0,0),h);
-		if((drawGrid & 1) or (drawGrid & 4)) GLUtils::GLDrawText("-Y",Vector3r(0,-pos,0),h);
-		if((drawGrid & 1) or (drawGrid & 2)) GLUtils::GLDrawText("-Z",Vector3r(0,0,-pos),h);
+		if((drawGrid & 2) or (drawGrid & 4)) drawReadableText("X",Vector3r(pos,0,0));
+		if((drawGrid & 1) or (drawGrid & 4)) drawReadableText("Y",Vector3r(0,pos,0));
+		if((drawGrid & 1) or (drawGrid & 2)) drawReadableText("Z",Vector3r(0,0,pos));
+		if((drawGrid & 2) or (drawGrid & 4)) drawReadableText("-X",Vector3r(-pos,0,0));
+		if((drawGrid & 1) or (drawGrid & 4)) drawReadableText("-Y",Vector3r(0,-pos,0));
+		if((drawGrid & 1) or (drawGrid & 2)) drawReadableText("-Z",Vector3r(0,0,-pos));
 		// enable back lighting & depth test
 		glEnable(GL_LIGHTING);
 		glEnable(GL_DEPTH_TEST);
