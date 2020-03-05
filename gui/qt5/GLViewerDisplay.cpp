@@ -168,7 +168,7 @@ void GLViewer::postDraw(){
 	//LOG_TRACE("nHalfSegments="<<nHalfSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	glPushMatrix();
 
-	Real nSegments = 2*nHalfSegments;
+	int nSegments   = static_cast<int>(2*nHalfSegments);
 	// XYZ grids
 	glLineWidth(.5);
 	if(drawGrid & 1) {glColor3(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
@@ -189,7 +189,7 @@ void GLViewer::postDraw(){
 		for(int xyz(-nHalfSegments) ; xyz<=nHalfSegments ; xyz++)
 		{ // write text - coordinate numbers on grid
 			Real pos=xyz*gridStep;
-			ostringstream oss;
+			std::ostringstream oss;
 			oss<<setprecision(4)<<pos;
 			std::string str = oss.str();
 			glColor3v(h);
