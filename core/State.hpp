@@ -3,7 +3,6 @@
 #include<lib/serialization/Serializable.hpp>
 #include<lib/multimethods/Indexable.hpp>
 #include<core/Dispatcher.hpp>
-#include<boost/thread/mutex.hpp> // FIXME - remove that.
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -15,7 +14,7 @@ class State: public Serializable, public Indexable{
 		Quaternionr& ori;
 
 		//! mutex for updating the parameters from within the interaction loop (only used rarely)
-		boost::mutex updateMutex;
+		std::mutex updateMutex;
 
 		// bits for blockedDOFs
 		enum {DOF_NONE=0,DOF_X=1,DOF_Y=2,DOF_Z=4,DOF_RX=8,DOF_RY=16,DOF_RZ=32};

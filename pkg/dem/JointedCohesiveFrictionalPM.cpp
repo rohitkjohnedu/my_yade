@@ -22,8 +22,8 @@ YADE_PLUGIN((JCFpmMat)(JCFpmState)(JCFpmPhys)(Ip2_JCFpmMat_JCFpmMat_JCFpmPhys)(L
 /********************** Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM ****************************/
 CREATE_LOGGER(Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM);
 
-static boost::mutex nearbyInts_mutex;
-static boost::mutex clusterInts_mutex;
+static std::mutex nearbyInts_mutex;
+static std::mutex clusterInts_mutex;
 
 bool Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip, Interaction* contact){
 
@@ -326,7 +326,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::addUniqueIntsToList(JCFp
 				break;
 			}
 		}
-		boost::mutex::scoped_lock lock(nearbyInts_mutex);
+		const std::lock_guard<std::mutex> lock(nearbyInts_mutex);
 		if (pushBack && nearbyPhys->nearbyInts[i]){
 			phys->nearbyInts.push_back(nearbyPhys->nearbyInts[i]);
 			JCFpmPhys* nrgPhys = YADE_CAST<JCFpmPhys*> (nearbyPhys->nearbyInts[i]->phys.get()); 
@@ -348,7 +348,7 @@ void Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM::clusterInteractions(JCFp
 	//originalPhys->firstMomentCalc=true; // do we need a new reference strain energy for the calculation of strain energy change?
 	phys->momentMagnitude = 0; // dirty way to avoid recording these clustered events twice? maybe dont need this if proper recording is applied
 	originalPhys->computedCentroid=false;  // set flag to compute a new centroid since we added more ints
-	boost::mutex::scoped_lock lock(clusterInts_mutex);
+	const std::lock_guard<std::mutex> lock(clusterInts_mutex);
 	originalPhys->clusterInts.push_back(scene->interactions->find(contact->getId1(),contact->getId2()));  // add this broken interaction to list of broken bonds in this event
 } 
 

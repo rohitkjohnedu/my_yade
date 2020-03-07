@@ -145,7 +145,7 @@ const Vector3r ForceContainer::getTorqueSingle(Body::id_t id) {
 
 void ForceContainer::sync(){
   if(synced) return;
-  boost::mutex::scoped_lock lock(globalMutex);
+  const std::lock_guard<std::mutex> lock(globalMutex);
   if(synced) return; // if synced meanwhile
 
   syncSizesOfContainers();
