@@ -260,7 +260,19 @@ py::list getAllViews()
 	}
 	return ret;
 };
-void centerViews(Real suggestedRadius) { OpenGLManager::self->centerAllViews(suggestedRadius); }
+void centerViews(const Real& suggestedRadius, const Vector3r& gridOrigin, const Vector3r& suggestedCenter, int gridDecimalPlaces)
+{
+	OpenGLManager::self->centerAllViews(suggestedRadius, gridOrigin, suggestedCenter, gridDecimalPlaces);
+}
+py::dict centerValues()
+{
+	py::dict ret;
+	ret["suggestedRadius"]   = OpenGLManager::self->getSuggestedRadius();
+	ret["gridOrigin"]        = OpenGLManager::self->getGridOrigin();
+	ret["suggestedCenter"]   = OpenGLManager::self->getSuggestedCenter();
+	ret["gridDecimalPlaces"] = OpenGLManager::self->getGridDecimalPlaces();
+	return ret;
+}
 
 shared_ptr<OpenGLRenderer> getRenderer() { return OpenGLManager::self->renderer; }
 
@@ -278,7 +290,21 @@ try {
 	glm->emitStartTimer();
 
 	py::def("View", y::createView, "Create a new 3d view.");
-	py::def("center", y::centerViews, ":param suggestedRadius: centers all views with suggestedRadius, which is used only if radius cannot be calculated.");
+	py::def("centerValues", y::centerValues, ":return: a dictionary with all parameters currently used by yade.qt.center(…), see yade.qt.center? for details. Returns zeros if view is closed.");
+	py::def("center",
+	        y::centerViews,
+	        (py::arg("suggestedRadius") = -1.0, py::arg("gridOrigin") = y::Vector3r(0, 0, 0), py::arg("suggestedCenter") = y::Vector3r(0, 0, 0), py::arg("gridDecimalPlaces") = 4),
+	        R"""(
+Center all views.
+
+:param suggestedRadius:   optional parameter, if provided and positive then it will be used instead of automatic radius detection. This parameter affects the (1) size of grid being drawn (2) the Z-clipping distance in OpenGL, it means that if clipping is too large and some of your scene is not being drawn but is "cut" or "sliced" then this parameter needs to be bigger.
+:param gridOrigin:        optional parameter, if provided it will be used as the origin for drawing the grid. Meaning the intersection of all three grids will not be at 0,0,0; but at the provided coordinate rounded to the nearest gridStep.
+:param suggestedCenter:   optional parameter, if provided other than (0,0,0) then it will be used instead of automatic calculation of scene center using bounding boxes. This parameter affects the drawn rotation-center. If you try to rotate the view, and the rotation is around some strange point, then this parameter needs to be changed.
+:param gridDecimalPlaces: default value=4, determines the number of decimal places to be shown on grid labels using stringstream (extra zeros are not shown).
+
+.. hint:: You can get the current values of all these four arguments by invoking command: yade.qt.centerValues()
+
+)""");
 	py::def("views", y::getAllViews, "Return list of all open :yref:`yade.qt.GLViewer` objects");
 
 	py::def("Renderer", &y::getRenderer, "Return the active :yref:`OpenGLRenderer` object.");

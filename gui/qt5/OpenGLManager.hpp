@@ -31,6 +31,11 @@ class OpenGLManager: public QObject{
 		// create a new view and wait for it to become available; return the view number
 		// if timout (in seconds) elapses without the view to come up, reports error and returns -1
 		int waitForNewView(double timeout=5., bool center=true);
+		// for commands yade.qt.center(…) and yade.qt.centerValues()
+		Real getSuggestedRadius() const;
+		Vector3r getGridOrigin() const;
+		Vector3r getSuggestedCenter() const;
+		int getGridDecimalPlaces() const;
 	signals:
 		void createView();
 		void resizeView(int id, int wd, int ht);
@@ -43,9 +48,9 @@ class OpenGLManager: public QObject{
 		virtual void closeViewSlot(int id=-1);
 		virtual void timerEvent(QTimerEvent* event);
 		virtual void startTimerSlot();
-		void centerAllViews(Real suggestedRadius);
+		void centerAllViews(const Real& suggestedRadius, const Vector3r& gridOrigin, const Vector3r& suggestedCenter, int gridDecimalPlaces);
 	private:
-		std::mutex viewsMutex;
+		mutable std::mutex viewsMutex;
 };
 
 } // namespace yade

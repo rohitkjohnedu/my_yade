@@ -147,7 +147,7 @@ double GLViewer::displayedSceneRadius(){
 	return (camera()->unprojectedCoordinatesOf(qglviewer::Vec(width()/2,height()/2,.5))-camera()->unprojectedCoordinatesOf(qglviewer::Vec(0,0,.5))).norm();
 }
 
-void GLViewer::drawReadableNum(const Real& n, const Vector3r& pos, const Vector3r& color, unsigned precision)
+void GLViewer::drawReadableNum(const Real& n, const Vector3r& pos, unsigned precision, const Vector3r& color)
 {
 	// Also XOR-ing is possible with these commands: glEnable(GL_COLOR_LOGIC_OP); glLogicOp(GL_XOR); ………… glDisable(GL_COLOR_LOGIC_OP);
 	std::ostringstream oss;
@@ -192,20 +192,28 @@ void GLViewer::postDraw(){
 	glPushMatrix();
 
 	int nSegments   = static_cast<int>(2*nHalfSegments);
-	if(nSegments > 5000) {
-		LOG_WARN("More than 5000 grid segments (currently: "<< nSegments <<") take too long to draw, using previous value: " << prevSegments << ". If you need denser grid try calling: yade.qt.center(someRadius); to reduce scene grid radius. Current scene radius is: " << QGLViewer::camera()->sceneRadius());
+	if(nSegments > 500) {
+		LOG_WARN("More than 500 grid segments (currently: "<< nSegments <<") take too long to draw, using previous value: " << prevSegments << ". If you need denser grid try calling: yade.qt.center(suggestedRadius,gridOrigin,suggestedCenter,gridDecimalPlaces); (each parameter is optional) to reduce scene grid radius. Current values are: yade.qt.center(suggestedRadius=" << QGLViewer::camera()->sceneRadius() << ",gridOrigin=(" << gridOrigin[0] << "," << gridOrigin[1] << "," << gridOrigin[2] << "),suggestedCenter=(" << QGLViewer::camera()->sceneCenter()[0] << "," << QGLViewer::camera()->sceneCenter()[1] << "," << QGLViewer::camera()->sceneCenter()[2] << "),gridDecimalPlaces=" << gridDecimalPlaces << ")");
 		nSegments = prevSegments;
 	}
 	prevSegments = nSegments;
+	// round requested gridOrigin to nearest nicely-readable value
+	Vector3r gridCen = Vector3r(0, 0, 0);
+	if (gridOrigin != Vector3r(0, 0, 0)) {
+		gridCen = Vector3r(
+		        gridOrigin[0] - math::remainder(gridOrigin[0], gridStep ),
+		        gridOrigin[1] - math::remainder(gridOrigin[1], gridStep ),
+		        gridOrigin[2] - math::remainder(gridOrigin[2], gridStep ));
+	}
 	// XYZ grids
 	glLineWidth(.5);
-	if(drawGrid & 1) {glColor3(0.6,0.3,0.3); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
-	if(drawGrid & 2) {glColor3(0.3,0.6,0.3); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
-	if(drawGrid & 4) {glColor3(0.3,0.3,0.6); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
+	if(drawGrid & 1) {glColor3(0.6,0.3,0.3); glPushMatrix(); glTranslatev(gridCen); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
+	if(drawGrid & 2) {glColor3(0.3,0.6,0.3); glPushMatrix(); glTranslatev(gridCen); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
+	if(drawGrid & 4) {glColor3(0.3,0.3,0.6); glPushMatrix(); glTranslatev(gridCen); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(static_cast<double>(realSize),nSegments); glPopMatrix();}
 	if(gridSubdivide){
-		if(drawGrid & 1) {glColor3(0.4,0.1,0.1); glPushMatrix(); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
-		if(drawGrid & 2) {glColor3(0.1,0.4,0.1); glPushMatrix(); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
-		if(drawGrid & 4) {glColor3(0.1,0.1,0.4); glPushMatrix(); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
+		if(drawGrid & 1) {glColor3(0.4,0.1,0.1); glPushMatrix(); glTranslatev(gridCen); glRotated(90.,0.,1.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
+		if(drawGrid & 2) {glColor3(0.1,0.4,0.1); glPushMatrix(); glTranslatev(gridCen); glRotated(90.,1.,0.,0.); QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
+		if(drawGrid & 4) {glColor3(0.1,0.1,0.4); glPushMatrix(); glTranslatev(gridCen); /*glRotated(90.,0.,1.,0.);*/ QGLViewer::drawGrid(static_cast<double>(realSize),nSegments*10); glPopMatrix();}
 	}
 	if(displayGridNumbers and drawGrid){
 		// disabling lighting & depth test makes sure that text is always above everything, readable.
@@ -214,17 +222,17 @@ void GLViewer::postDraw(){
 		for(int xyz(-nHalfSegments) ; xyz<=nHalfSegments ; xyz++)
 		{ // write text - coordinate numbers on grid
 			Real pos=xyz*gridStep;
-			if((drawGrid & 2) or (drawGrid & 4)) drawReadableNum(pos,Vector3r(pos,0,0));
-			if((drawGrid & 1) or (drawGrid & 4)) drawReadableNum(pos,Vector3r(0,pos,0));
-			if((drawGrid & 1) or (drawGrid & 2)) drawReadableNum(pos,Vector3r(0,0,pos));
+			if((drawGrid & 2) or (drawGrid & 4)) drawReadableNum(pos+gridCen[0],Vector3r(pos,0,0)+gridCen,gridDecimalPlaces);
+			if((drawGrid & 1) or (drawGrid & 4)) drawReadableNum(pos+gridCen[1],Vector3r(0,pos,0)+gridCen,gridDecimalPlaces);
+			if((drawGrid & 1) or (drawGrid & 2)) drawReadableNum(pos+gridCen[2],Vector3r(0,0,pos)+gridCen,gridDecimalPlaces);
 		}
 		Real pos=nHalfSegments*gridStep+gridStep*0.1;
-		if((drawGrid & 2) or (drawGrid & 4)) drawReadableText("X",Vector3r(pos,0,0));
-		if((drawGrid & 1) or (drawGrid & 4)) drawReadableText("Y",Vector3r(0,pos,0));
-		if((drawGrid & 1) or (drawGrid & 2)) drawReadableText("Z",Vector3r(0,0,pos));
-		if((drawGrid & 2) or (drawGrid & 4)) drawReadableText("-X",Vector3r(-pos,0,0));
-		if((drawGrid & 1) or (drawGrid & 4)) drawReadableText("-Y",Vector3r(0,-pos,0));
-		if((drawGrid & 1) or (drawGrid & 2)) drawReadableText("-Z",Vector3r(0,0,-pos));
+		if((drawGrid & 2) or (drawGrid & 4)) drawReadableText("X",Vector3r(pos,0,0)+gridCen);
+		if((drawGrid & 1) or (drawGrid & 4)) drawReadableText("Y",Vector3r(0,pos,0)+gridCen);
+		if((drawGrid & 1) or (drawGrid & 2)) drawReadableText("Z",Vector3r(0,0,pos)+gridCen);
+		if((drawGrid & 2) or (drawGrid & 4)) drawReadableText("-X",Vector3r(-pos,0,0)+gridCen);
+		if((drawGrid & 1) or (drawGrid & 4)) drawReadableText("-Y",Vector3r(0,-pos,0)+gridCen);
+		if((drawGrid & 1) or (drawGrid & 2)) drawReadableText("-Z",Vector3r(0,0,-pos)+gridCen);
 		// enable back lighting & depth test
 		glEnable(GL_LIGHTING);
 		glEnable(GL_DEPTH_TEST);

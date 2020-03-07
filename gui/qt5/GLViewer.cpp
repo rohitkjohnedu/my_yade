@@ -65,6 +65,8 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	autoGrid=true;
 	prevGridStep=1;
 	prevSegments=2;
+	gridOrigin=Vector3r(0,0,0);
+	gridDecimalPlaces=4;
 	resize(550,550);
 	last=-1;
 	if(viewId==0) setWindowTitle("Primary view");
@@ -82,12 +84,12 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_C,"Set scene center so that all bodies are visible; if a body is selected, center around this body.");
 	setKeyDescription(Qt::Key_C & Qt::AltModifier,"Set scene center to median body position (same as space)");
 	setKeyDescription(Qt::Key_D,"Toggle time display mask");
-	setKeyDescription(Qt::Key_G,"Toggle grid visibility; g turns on and cycles");
+	setKeyDescription(Qt::Key_G,"Toggle grid visibility; g turns on and cycles; Shift-G hides grid and resets other settings from python call yade.qt.center(…). Type `yade.qt.center?` for details.");
 	setKeyDescription(Qt::Key_Minus,"Make grid less dense 10 times and disable automatic grid change");
 	setKeyDescription(Qt::Key_Plus, "Make grid more dense 10 times and disable automatic grid change");
 	setKeyDescription(Qt::Key_Period,"Toggle grid subdivision by 10");
 	setKeyDescription(Qt::Key_Comma,"Toggle display coordinates on grid");
-	setKeyDescription(Qt::Key_G & Qt::ShiftModifier ,"Hide grid and enable automatic grid change.");
+	setKeyDescription(Qt::Key_G & Qt::ShiftModifier ,"Hide grid and enable automatic grid change, reset other settings from python call yade.qt.center(…).");
 	setKeyDescription(Qt::Key_M, "Move selected object.");
 	setKeyDescription(Qt::Key_X,"Show the xz [shift: xy] (up-right) plane (clip plane: align normal with +x)");
 	setKeyDescription(Qt::Key_Y,"Show the yx [shift: yz] (up-right) plane (clip plane: align normal with +y)");
@@ -117,7 +119,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	setKeyDescription(Qt::Key_Space,"Center scene (same as Alt-C); clip plane: activate/deactivate");
 
 	mouseMovesCamera();
-	centerScene(-1);
+	centerScene();
 	show();
 }
 
@@ -212,11 +214,11 @@ void GLViewer::keyPressEvent(QKeyEvent *e)
 		// center around selected body
 		if(selectedName() >= 0 && (*(Omega::instance().getScene()->bodies)).exists(selectedName())) setSceneCenter(manipulatedFrame()->position());
 		// make all bodies visible
-		else centerScene(-1);
+		else centerScene();
 	}
 	else if(e->key()==Qt::Key_D &&(e->modifiers() & Qt::AltModifier)){ Body::id_t id; if((id=Omega::instance().getScene()->selectedBody)>=0){ const shared_ptr<Body>& b=Body::byId(id); b->setDynamic(!b->isDynamic()); LOG_INFO("Body #"<<id<<" now "<<(b->isDynamic()?"":"NOT")<<" dynamic"); } }
 	else if(e->key()==Qt::Key_D) {timeDispMask+=1; if(timeDispMask>(TIME_REAL|TIME_VIRT|TIME_ITER))timeDispMask=0; }
-	else if(e->key()==Qt::Key_G) { if(e->modifiers() & Qt::ShiftModifier){ drawGrid=0; autoGrid=true; return; } else drawGrid++; if(drawGrid>=8) drawGrid=0; }
+	else if(e->key()==Qt::Key_G) { if(e->modifiers() & Qt::ShiftModifier){ drawGrid=0; autoGrid=true; gridOrigin=Vector3r(0,0,0); gridDecimalPlaces=4; return; } else drawGrid++; if(drawGrid>=8) drawGrid=0; }
 	else if (e->key()==Qt::Key_M && selectedName() >= 0){ 
 		if(!(isMoving=!isMoving)){
 			displayMessage("Moving done.");
@@ -335,7 +337,7 @@ void GLViewer::centerMedianQuartile(){
 	long nBodies=scene->bodies->size();
 	if(nBodies<4) {
 		LOG_DEBUG("Less than 4 bodies, median makes no sense; calling centerScene() instead.");
-		return centerScene(-1);
+		return centerScene();
 	}
 	std::vector<Real> coords[3];
 	for(int i=0;i<3;i++)coords[i].reserve(nBodies);
@@ -355,7 +357,7 @@ void GLViewer::centerMedianQuartile(){
 	showEntireScene();
 }
 
-void GLViewer::centerScene(Real suggestedRadius){
+void GLViewer::centerScene(const Real& suggestedRadius, const Vector3r& setGridOrigin, const Vector3r& suggestedCenter, int setGridDecimalPlaces){
 	Scene* rb=Omega::instance().getScene().get();
 	if (!rb) return;
 	if(rb->isPeriodic){ centerPeriodic(); return; }
@@ -389,8 +391,12 @@ void GLViewer::centerScene(Real suggestedRadius){
 	Vector3r halfSize = (max-min)*0.5;
 	Real radius=math::max(halfSize[0],math::max(halfSize[1],halfSize[2]));
 	LOG_DEBUG("Scene center="<<center<<", halfSize="<<halfSize<<", radius="<<radius<<", suggestedRadius="<<suggestedRadius);
-	// set scene center after all these calculations.
-	setSceneCenter(qglviewer::Vec((static_cast<double>(center[0])), (static_cast<double>(center[1])), (static_cast<double>(center[2]))));
+	// set scene center after all these calculations. This is not grid origin. Grid origin is for drawing only.
+	if(suggestedCenter != Vector3r(0,0,0)) {
+		setSceneCenter(qglviewer::Vec((static_cast<double>(suggestedCenter[0])), (static_cast<double>(suggestedCenter[1])), (static_cast<double>(suggestedCenter[2]))));
+	} else {
+		setSceneCenter(qglviewer::Vec((static_cast<double>(center[0])), (static_cast<double>(center[1])), (static_cast<double>(center[2]))));
+	}
 	// if positive radius was suggested, then use it.
 	if(suggestedRadius>0) {
 		setSceneRadius(static_cast<double>(suggestedRadius));
@@ -398,8 +404,18 @@ void GLViewer::centerScene(Real suggestedRadius){
 		// the heurestics in finding a useful radius: use 1.5 times larger value than the scene boundaries.
 		setSceneRadius(static_cast<double>(radius*1.5));
 	}
+	gridDecimalPlaces=math::max(1,math::min(setGridDecimalPlaces,std::numeric_limits<Real>::digits10));
+	gridOrigin=setGridOrigin;
 	showEntireScene();
 }
+
+Real     GLViewer::getSuggestedRadius() const { return QGLViewer::camera()->sceneRadius(); };
+Vector3r GLViewer::getGridOrigin() const { return gridOrigin; };
+Vector3r GLViewer::getSuggestedCenter() const
+{
+	return Vector3r(QGLViewer::camera()->sceneCenter()[0], QGLViewer::camera()->sceneCenter()[1], QGLViewer::camera()->sceneCenter()[2]);
+};
+int GLViewer::getGridDecimalPlaces() const { return gridDecimalPlaces; };
 
 // new object selected.
 // set frame coordinates, and isDynamic=false;
