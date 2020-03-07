@@ -30,7 +30,7 @@ void OpenGLManager::timerEvent(QTimerEvent* /*event*/){
 void OpenGLManager::createViewSlot(){
 	const std::lock_guard<std::mutex> lock(viewsMutex);
 	if(views.size()==0){
-		views.push_back(shared_ptr<GLViewer>(new GLViewer(0,renderer,/*shareWidget*/(QGLWidget*)0)));
+		views.push_back(shared_ptr<GLViewer>(boost::make_shared<GLViewer>(0,renderer,/*shareWidget*/(QGLWidget*)0)));
 	} else {
 		throw runtime_error("Secondary views not supported");
 		//views.push_back(shared_ptr<GLViewer>(new GLViewer(views.size(),renderer,views[0].get())));
@@ -50,7 +50,13 @@ void OpenGLManager::closeViewSlot(int id){
 	}
 	if(id==0){
 		LOG_DEBUG("Closing primary view.");
-		if(views.size()==1) views.clear();
+		if(views.size()==1) {
+			LOG_DEBUG("Removing previously closed (unused) view.");
+			viewsLater.clear();
+			LOG_DEBUG("The currently closed view will be destroyed later. (QWindow insists on accessing the about to be destroyed instance)");
+			viewsLater.push_back(views[0]);
+			views.clear();
+		}
 		else{ LOG_INFO("Cannot close primary view, secondary views still exist."); }
 	}
 }
