@@ -55,6 +55,8 @@ class GLViewer : public QGLViewer
 		bool			autoGrid;
 		Real			prevGridStep;
 		int			prevSegments;
+		int			gridDecimalPlaces;
+		Vector3r		gridOrigin;
 		long			last;
 		int manipulatedClipPlane;
 		std::set<int> boundClipPlanes;
@@ -87,13 +89,17 @@ class GLViewer : public QGLViewer
 		virtual void draw();
 		virtual void drawWithNames();
 		void displayMessage(const std::string& s){ QGLViewer::displayMessage(QString(s.c_str()));}
-		void centerScene(Real suggestedRadius);
+		void centerScene(const Real& suggestedRadius=-1, const Vector3r& setGridOrigin=Vector3r(0,0,0), const Vector3r& suggestedCenter=Vector3r(0,0,0), int setGridDecimalPlaces=4);
 		void centerPeriodic();
 		void mouseMovesCamera();
 		void mouseMovesManipulatedFrame(qglviewer::Constraint* c=NULL);
 		void resetManipulation();
 		bool isManipulating();
 		void startClipPlaneManipulation(int planeNo);
+		Real getSuggestedRadius() const;
+		Vector3r getGridOrigin() const;
+		Vector3r getSuggestedCenter() const;
+		int getGridDecimalPlaces() const;
 		//! get QGLViewer state as string (XML); QGLViewer normally only supports saving state to file.
 		string getState();
 		//! set QGLViewer state from string (XML); QGLVIewer normally only supports loading state from file.
@@ -139,7 +145,7 @@ class GLViewer : public QGLViewer
 		virtual QString helpString() const;
 
 		// Draws text, where each letter has a shifted background letter of opposite color.
-		void drawReadableNum(const Real& n, const Vector3r& pos, const Vector3r& color = Vector3r(1, 1, 1), unsigned precision = 4);
+		void drawReadableNum(const Real& n, const Vector3r& pos, unsigned precision = 4, const Vector3r& color = Vector3r(1, 1, 1));
 		void drawReadableText(const std::string& txt, const Vector3r& pos, const Vector3r& color = Vector3r(1, 1, 1));
 		void drawTextWithPixelShift(const std::string& txt, const Vector3r& pos, const Vector2i& shift, const Vector3r& color = Vector3r(1, 1, 1));
 };

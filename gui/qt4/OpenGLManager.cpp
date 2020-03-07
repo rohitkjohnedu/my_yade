@@ -54,10 +54,16 @@ void OpenGLManager::closeViewSlot(int id){
 		else{ LOG_INFO("Cannot close primary view, secondary views still exist."); }
 	}
 }
-void OpenGLManager::centerAllViews(Real suggestedRadius){
+void OpenGLManager::centerAllViews(const Real& suggestedRadius, const Vector3r& gridOrigin, const Vector3r& suggestedCenter, int gridDecimalPlaces){
 	const std::lock_guard<std::mutex> lock(viewsMutex);
-	FOREACH(const shared_ptr<GLViewer>& g, views){ if(!g) continue; g->centerScene(suggestedRadius); }
+	for(const auto& g : views){ if(!g) continue; g->centerScene(suggestedRadius,gridOrigin,suggestedCenter,gridDecimalPlaces); }
 }
+
+Real     OpenGLManager::getSuggestedRadius()   const { const std::lock_guard<std::mutex> lock(viewsMutex);for(const auto& g:views){ if(!g) continue; return g->getSuggestedRadius();  };return -1;}
+Vector3r OpenGLManager::getGridOrigin()        const { const std::lock_guard<std::mutex> lock(viewsMutex);for(const auto& g:views){ if(!g) continue; return g->getGridOrigin();       };return Vector3r(0,0,0);}
+Vector3r OpenGLManager::getSuggestedCenter()   const { const std::lock_guard<std::mutex> lock(viewsMutex);for(const auto& g:views){ if(!g) continue; return g->getSuggestedCenter();  };return Vector3r(0,0,0);}
+int      OpenGLManager::getGridDecimalPlaces() const { const std::lock_guard<std::mutex> lock(viewsMutex);for(const auto& g:views){ if(!g) continue; return g->getGridDecimalPlaces();};return 4;}
+
 void OpenGLManager::startTimerSlot(){
 	startTimer(50);
 }
@@ -73,7 +79,7 @@ int OpenGLManager::waitForNewView(double timeout,bool center){
 			LOG_ERROR("Timeout waiting for the new view to open, giving up."); return -1;
 		}
 	}
-	if(center)(*views.rbegin())->centerScene(-1);
+	if(center)(*views.rbegin())->centerScene();
 	return (*views.rbegin())->viewId; 
 }
 
