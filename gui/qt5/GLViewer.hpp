@@ -150,20 +150,6 @@ class GLViewer : public QGLViewer
 		void drawTextWithPixelShift(const std::string& txt, const Vector3r& pos, const Vector2i& shift, const Vector3r& color = Vector3r(1, 1, 1));
 };
 
-/*! Get unconditional lock on a GL view.
-
-Use if you need to manipulate GL context in some way.
-The ctor doesn't return until the lock has been acquired
-and the lock is released when the GLLock object is desctructed;
-*/
-class GLLock: public boost::try_mutex::scoped_lock{
-	GLViewer* glv;
-	public:
-		GLLock(GLViewer* _glv);
-		~GLLock(); 
-};
-
-
 class YadeCamera : public qglviewer::Camera
 {	
 	Q_OBJECT 

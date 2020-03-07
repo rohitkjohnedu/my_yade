@@ -37,15 +37,15 @@ static unsigned initBlocked(State::DOF_NONE);
 
 CREATE_LOGGER(GLViewer);
 
-GLLock::GLLock(GLViewer* _glv): boost::try_mutex::scoped_lock(Omega::instance().renderMutex), glv(_glv){
-	glv->makeCurrent();
-}
-GLLock::~GLLock(){ glv->doneCurrent(); }
-
-
 #define _W3 setw(3)<<setfill('0')
 #define _W2 setw(2)<<setfill('0')
-GLViewer::~GLViewer(){ /* get the GL mutex when closing */ GLLock lock(this); /* cerr<<"Destructing view #"<<viewId<<endl;*/ }
+GLViewer::~GLViewer(){
+	LOG_DEBUG("Closing "<<viewId);
+	const std::lock_guard<std::mutex> lock(Omega::instance().renderMutex);
+	makeCurrent();
+	LOG_DEBUG("Acquired lock, releasing OpenGL context.");
+	doneCurrent();
+}
 
 void GLViewer::closeEvent(QCloseEvent *e){
 	LOG_DEBUG("Will emit closeView for view #"<<viewId);

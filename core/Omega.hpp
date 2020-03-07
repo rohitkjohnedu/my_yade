@@ -21,7 +21,6 @@
 #include <lib/factory/ClassFactory.hpp>
 
 #include <lib/base/Singleton.hpp>
-#include <boost/thread/mutex.hpp>
 #include "SimulationFlow.hpp"
 #include <set>
 #include <map>
@@ -75,7 +74,7 @@ class Omega: public Singleton<Omega>{
 		* 1. GLViewer::paintGL (deffered lock: if fails, no GL painting is done)
 		* 2. other threads that wish to manipulate GL
 		* 3. Omega when substantial changes to the scene are being made (bodies being deleted, simulation loaded etc) so that GL doesn't access those and crash */
-		boost::try_mutex renderMutex;
+		std::mutex renderMutex;
 
 		void run();
 		void pause();

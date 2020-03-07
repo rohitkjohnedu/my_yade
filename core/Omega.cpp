@@ -26,9 +26,9 @@ SINGLETON_SELF(yade::Omega);
 
 namespace yade { // Cannot have #include directive inside.
 
-class RenderMutexLock: public boost::mutex::scoped_lock{
+class RenderMutexLock: public std::lock_guard<std::mutex>{
 	public:
-	RenderMutexLock(): boost::mutex::scoped_lock(Omega::instance().renderMutex){}
+	RenderMutexLock(): std::lock_guard<std::mutex>(Omega::instance().renderMutex){}
 	~RenderMutexLock(){}
 };
 

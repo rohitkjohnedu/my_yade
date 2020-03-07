@@ -3,6 +3,7 @@
 #include<lib/serialization/Serializable.hpp>
 #include<lib/multimethods/Indexable.hpp>
 #include<core/Dispatcher.hpp>
+#include<boost/thread/mutex.hpp> // FIXME - remove that.
 
 namespace yade { // Cannot have #include directive inside.
 
