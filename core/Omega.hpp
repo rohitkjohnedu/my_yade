@@ -21,6 +21,7 @@
 #include <lib/factory/ClassFactory.hpp>
 
 #include <lib/base/Singleton.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "SimulationFlow.hpp"
 #include <set>
 #include <map>
