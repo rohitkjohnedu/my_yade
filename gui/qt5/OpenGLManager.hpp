@@ -44,6 +44,7 @@ class OpenGLManager: public QObject{
 		// this is used to start timer from the main thread via postEvent (ugly)
 		void startTimerSignal();
 	public slots:
+		virtual void cleanupViewsSlot();
 		virtual void createViewSlot();
 		virtual void resizeViewSlot(int id, int wd, int ht);
 		virtual void closeViewSlot(int id=-1);

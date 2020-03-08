@@ -47,10 +47,19 @@ GLViewer::~GLViewer(){
 	doneCurrent();
 }
 
-void GLViewer::closeEvent(QCloseEvent *e){
-	LOG_DEBUG("Will emit closeView for view #"<<viewId);
-	OpenGLManager::self->emitCloseView(viewId);
+void GLViewer::staticCloseEvent(QCloseEvent* e, const int viewId)
+{
+	LOG_DEBUG("Accept this event: Will emit closeView for view #" << viewId);
 	e->accept();
+	LOG_DEBUG("Call OpenGLManager::self->emitCloseView for view #" << viewId);
+	OpenGLManager::self->emitCloseView(viewId);
+	// The instance of *this is now already destroyed. This is why these last operations must be done from a static function.
+	// The destructor ~GLViewer() has already been executed from another QT thread.
+	LOG_DEBUG("Finished OpenGLManager::self->emitCloseView for view #" << viewId);
+}
+
+void GLViewer::closeEvent(QCloseEvent* e) {
+	GLViewer::staticCloseEvent(e, viewId);
 }
 
 GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGLWidget* shareWidget): QGLViewer(/*parent*/(QWidget*)NULL,shareWidget), renderer(_renderer), viewId(_viewId) {

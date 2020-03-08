@@ -27,6 +27,19 @@ void OpenGLManager::timerEvent(QTimerEvent* /*event*/){
 	#endif
 }
 
+void OpenGLManager::cleanupViewsSlot()
+{
+	const std::lock_guard<std::mutex> lock(viewsMutex);
+	LOG_DEBUG("mutex locked, now calling: if(not viewsLater.empty()) { ... }");
+	if(not viewsLater.empty()) {
+		// cannot use viewsLater.clear(), because after removing each one of the views the QT event loop needs to do some cleanup, see https://wiki.qt.io/Threads_Events_QObjects
+		viewsLater.resize(viewsLater.size()-1);
+		if(not viewsLater.empty()) {
+			QTimer::singleShot(250, this, SLOT(cleanupViewsSlot()));
+		}
+	}
+}
+
 void OpenGLManager::createViewSlot(){
 	const std::lock_guard<std::mutex> lock(viewsMutex);
 	if(views.size()==0){
@@ -51,11 +64,10 @@ void OpenGLManager::closeViewSlot(int id){
 	if(id==0){
 		LOG_DEBUG("Closing primary view.");
 		if(views.size()==1) {
-			LOG_DEBUG("Removing previously closed (unused) view.");
-			viewsLater.clear();
 			LOG_DEBUG("The currently closed view will be destroyed later. (QWindow insists on accessing the about to be destroyed instance)");
 			viewsLater.push_back(views[0]);
 			views.clear();
+			QTimer::singleShot(250, this, SLOT(cleanupViewsSlot())); // let QObject::deleteLater() do its job during these 250ms, see https://wiki.qt.io/Threads_Events_QObjects
 		}
 		else{ LOG_INFO("Cannot close primary view, secondary views still exist."); }
 	}

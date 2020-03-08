@@ -64,6 +64,7 @@ class GLViewer : public QGLViewer
 		string strBoundGroup(){string ret;FOREACH(int i, boundClipPlanes) ret+=" "+boost::lexical_cast<string>(i+1);return ret;}
 		boost::posix_time::ptime last_user_event;
 
+		static void staticCloseEvent(QCloseEvent *e, const int);
      public:
 		void updateGLViewer() {
 			#if QGLVIEWER_VERSION < 0x020700
