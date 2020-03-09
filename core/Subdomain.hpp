@@ -319,6 +319,7 @@ class Subdomain: public Shape {
 	 void getMirrorIntersections();
 	 
 	 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Subdomain,Shape,"The bounding box of a mpi subdomain. Stores internals and provides optimized functions for communications between workers. This class may not be used directly. Instead, Subdomains are appended automatically to the scene bodies when using :yref:`mpy.mpirun`",
 // 		((testType, testArray,testType({0,0}),,""))
 		((Real,extraLength,0,,"verlet dist for the subdomain, added to bodies verletDist"))
