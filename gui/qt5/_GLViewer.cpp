@@ -290,10 +290,16 @@ try {
 	glm->emitStartTimer();
 
 	py::def("View", y::createView, "Create a new 3d view.");
-	py::def("centerValues", y::centerValues, ":return: a dictionary with all parameters currently used by yade.qt.center(…), see yade.qt.center? for details. Returns zeros if view is closed.");
+	py::def("centerValues",
+	        y::centerValues,
+	        ":return: a dictionary with all parameters currently used by yade.qt.center(…), see yade.qt.center? for details. Returns zeros if view is "
+	        "closed.");
 	py::def("center",
 	        y::centerViews,
-	        (py::arg("suggestedRadius") = -1.0, py::arg("gridOrigin") = y::Vector3r(0, 0, 0), py::arg("suggestedCenter") = y::Vector3r(0, 0, 0), py::arg("gridDecimalPlaces") = 4),
+	        (py::arg("suggestedRadius")   = -1.0,
+	         py::arg("gridOrigin")        = y::Vector3r(0, 0, 0),
+	         py::arg("suggestedCenter")   = y::Vector3r(0, 0, 0),
+	         py::arg("gridDecimalPlaces") = 4),
 	        R"""(
 Center all views.
 
@@ -369,4 +375,3 @@ Center all views.
 	boost::python::handle_exception();
 	throw;
 }
-
