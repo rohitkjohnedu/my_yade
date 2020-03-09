@@ -40,6 +40,7 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		virtual ~UnsaturatedEngine();
 		virtual void action();
 		
+		// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(UnsaturatedEngine,TwoPhaseFlowEngine,"Preliminary version engine of a drainage model for unsaturated soils. Note:Air reservoir is on the top; water reservoir is on the bottom.(deprecated engine, use TwoPhaseFlowEngine instead)",
 
 		((int, windowsNo, 10,, "Number of genrated windows(or zoomed samples)."))
@@ -55,6 +56,7 @@ class UnsaturatedEngine : public TwoPhaseFlowEngine
 		.def("initializeCellWindowsID",&UnsaturatedEngine::initializeCellWindowsID,"Initialize cell windows index. A temporary function for comparison with experiments, will delete soon")
 		.def("printSomething",&UnsaturatedEngine::printSomething,"print debug.")
 		)
+		// clang-format on
 		DECLARE_LOGGER;
 };
 

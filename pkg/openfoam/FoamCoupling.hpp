@@ -131,6 +131,7 @@ class FoamCoupling : public GlobalEngine {
 		bool initDone; 
       
 
+	// clang-format off
     YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(FoamCoupling,GlobalEngine, "An engine for coupling Yade with the finite volume fluid solver OpenFOAM in parallel." " \n Requirements : Yade compiled with MPI libs, OpenFOAM-6 (openfoam is not required for compilation)." "Yade is executed under MPI environment with OpenFOAM simultaneously, and using MPI communication  routines data is exchanged between the solvers."
    " \n \n 1. Yade broadcasts the particle data -> position, velocity, ang-velocity, radius to all the foam processes as in :yref:`castParticle <FoamCoupling::castParticle>` \n"
   "2. In each foam process, particle is searched.Yade keeps a vector(cpp) of the rank of the openfoam process containing that particular particle (FoamCoupling::procList), using :yref:`updateProcList <FoamCoupling::updateProcList>`\n"
@@ -186,6 +187,7 @@ class FluidDomainBbox : public Shape{
 			
 		}
 		virtual ~FluidDomainBbox() {}; 
+		// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(FluidDomainBbox,Shape,"The bounding box of a fluid grid from one OpenFOAM/YALES2 proc",
 		((int,domainRank,-1,,"rank of the OpenFOAM/YALES2 proc"))
 		((bool,minMaxisSet,false,,"flag to check if the min max bounds of this body are set."))
@@ -197,6 +199,7 @@ class FluidDomainBbox : public Shape{
 		createIndex(); 
 		,
 		); 
+		// clang-format on
 		DECLARE_LOGGER;
 		REGISTER_CLASS_INDEX(FluidDomainBbox, Shape);   
 }; 

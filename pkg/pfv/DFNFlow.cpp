@@ -158,6 +158,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 	Real totalFractureArea; /// Trying to get fracture's surface
 //	CELL_SCALAR_GETTER(double,.crackArea,crackArea)
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DFNFlowEngine,DFNFlowEngineT,"This is an enhancement of the FlowEngine for intact and fractured rocks that takes into acount pre-existing discontinuities and bond breakage between particles. The local conductivity around the broken link is calculated according to parallel plates model",
 	((Real,jointsResidualAperture,1.e-6,,"residual aperture of joints"))
 // 	/// ROBERT
@@ -176,6 +177,7 @@ class DFNFlowEngine : public DFNFlowEngineT
 // 	.def("computeTotalFractureArea",&DFNFlowEngineT::computeTotalFractureArea,"Compute and print the total fracture area of the network") /// Trying to get fracture's surface
 // 	.def("trickPermeability",&DFNFlowEngineT::trickPermeability,"measure the mean trickPermeability in the period")
 	)
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(DFNFlowEngine);

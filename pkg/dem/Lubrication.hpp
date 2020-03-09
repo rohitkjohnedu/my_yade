@@ -88,7 +88,8 @@ class Law2_ScGeom_VirtualLubricationPhys: public LawFunctor{
 			void computeShearForceAndTorques(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
 			void computeShearForceAndTorques_log(LubricationPhys *phys, ScGeom* geom, State * s1, State *s2, Vector3r & Cr, Vector3r & Ct);
 		
-                YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_VirtualLubricationPhys,
+		// clang-format off
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_VirtualLubricationPhys,
 			LawFunctor,
 			"Virtual class for sheared lubrication functions. This don't do any computation and shouldn't be used directly!",
 			// ATTR
@@ -102,7 +103,8 @@ class Law2_ScGeom_VirtualLubricationPhys: public LawFunctor{
 			.staticmethod("getStressForEachBody")
 			.def("getTotalStresses",&Law2_ScGeom_VirtualLubricationPhys::PyGetTotalStresses,"Get total stresses tensors: normal contact stress, shear contact stress, normal lubrication stress, shear lubrication stress, stress from additionnal potential forces.")
 			.staticmethod("getTotalStresses")
-                );
+		);
+		// clang-format on
                 DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_VirtualLubricationPhys);
@@ -128,7 +130,8 @@ class Law2_ScGeom_ImplicitLubricationPhys: public Law2_ScGeom_VirtualLubrication
 			Real DichoAdimExp_integrate_u(Real const& un, Real const& eps, Real const& alpha, Real & prevDotU, Real const& dt, Real const& prev_d, Real const& undot);
 			Real ObjF(Real const& un, Real const& eps, Real const& alpha, Real const& prevDotU, Real const& dt, Real const& prev_d, Real const& undot, Real const& d);
 
-            YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
+		// clang-format off
+		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_ScGeom_ImplicitLubricationPhys,
 			Law2_ScGeom_VirtualLubricationPhys,
 			"Material law for lubrication and contact between two spheres, solved using implicit method. Several resolution methods are available. Iterative exact, solving the 2nd order polynomia. Other resolutions methods are numerical (Newton-Rafson and Dichotomy) with a variable change $\\delta=\\log(u)$, solved in dimentionless coordinates.",
 			// ATTR
@@ -140,7 +143,7 @@ class Law2_ScGeom_ImplicitLubricationPhys: public Law2_ScGeom_VirtualLubrication
 			,// CTOR
 			,// PY
                 );
-	// clang-format on
+		// clang-format on
                 DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Law2_ScGeom_ImplicitLubricationPhys);

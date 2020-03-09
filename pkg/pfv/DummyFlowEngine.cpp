@@ -46,12 +46,14 @@ class DummyFlowEngine : public DummyFlowEngineT
 	//if it is useful for everyone
 	void fancyFunction(Real what);
 
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(DummyFlowEngine,DummyFlowEngineT,"documentation here",
 	((Real, myNewAttribute, 0,,"useless example"))
 	,/*DummyFlowEngineT()*/,
 	,
 	.def("fancyFunction",&DummyFlowEngine::fancyFunction,(boost::python::arg("what")=0),"test function")
 	)
+	// clang-format on
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(DummyFlowEngine);

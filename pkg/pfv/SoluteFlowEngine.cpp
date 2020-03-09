@@ -44,6 +44,7 @@ class SoluteFlowEngine : public SoluteFlowEngineT
 		double getConcentrationPlane (double Yobs,double Yr, int xyz);
                 double getAverageConcentration();
 		///Elaborate the description as you wish
+		// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(SoluteFlowEngine,SoluteFlowEngineT,"A variant of :yref:`FlowEngine` with solute transport).",
 		///No additional variable yet, else input here
 // 		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
@@ -58,6 +59,7 @@ class SoluteFlowEngine : public SoluteFlowEngineT
                 .def("getAverageConcentration",&SoluteFlowEngine::getAverageConcentration,"The the volume averaged concentration")
 
 		)
+		// clang-format on
 };
 REGISTER_SERIALIZABLE(SoluteFlowEngine);
 

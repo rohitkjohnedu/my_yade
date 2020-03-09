@@ -96,6 +96,7 @@ class PeriodicFlowEngine : public FlowEngine_PeriodicInfo
 		//Cache precomputed values for pressure shifts, based on current hSize and pGrad
 		void preparePShifts();
 
+		// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PeriodicFlowEngine,FlowEngine_PeriodicInfo,"A variant of :yref:`FlowEngine` implementing periodic boundary conditions. The API is very similar.",
 		((Real,duplicateThreshold, 0.06,,"distance from cell borders that will triger periodic duplication in the triangulation |yupdate|"))
 		((Vector3r, gradP, Vector3r::Zero(),,"Macroscopic pressure gradient"))
@@ -109,6 +110,7 @@ class PeriodicFlowEngine : public FlowEngine_PeriodicInfo
 		//nothing special to define, we re-use FlowEngine methods
 		//.def("meanVelocity",&PeriodicFlowEngine::meanVelocity,"measure the mean velocity in the period")
 		)
+		// clang-format on
 		DECLARE_LOGGER;
 
 
