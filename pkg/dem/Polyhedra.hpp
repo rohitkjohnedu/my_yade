@@ -278,7 +278,7 @@ class Law2_PolyhedraGeom_PolyhedraPhys_Volumetric: public LawFunctor{
 	Real getPlasticDissipation();
 	void initPlasticDissipation(Real initVal=0);
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric,LawFunctor,"Calculate physical response of 2 :yref:`vector<Polyhedra>` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`. Normal force is proportional to the volume of intersection",
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Law2_PolyhedraGeom_PolyhedraPhys_Volumetric,LawFunctor,"Calculate physical response of 2 :yref:`Polyhedra` in interaction, based on penetration configuration given by :yref:`PolyhedraGeom`. Normal force is proportional to the volume of intersection",
 	((Real,volumePower,1.,,"Power of volume used in evaluation of normal force. Default is 1.0 - normal force is linearly proportional to volume. 1.0/3.0 would mean that normal force is proportional to the cube root of volume, approximation of penetration depth."))
 	((Vector3r,shearForce,Vector3r::Zero(),,"Shear force from last step"))
 	((bool,traceEnergy,false,,"Define the total energy dissipated in plastic slips at all contacts. This will trace only plastic energy in this law, see O.trackEnergy for a more complete energies tracing"))
