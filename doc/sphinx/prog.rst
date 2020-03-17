@@ -674,7 +674,7 @@ Yade uses the `Eigen <http://eigen.tuxfamily.org>`_ library for computations. It
 
 Yade additionally defines a class named :yref:`Se3r`, which contains spatial position (``Vector3r Se3r::position``) and orientation (``Quaternionr Se3r::orientation``), since they are frequently used one with another, and it is convenient to pass them as single parameter to functions.
 
-.. [#real] Historically, it was thought that Yade could be also run with single precision based on build-time parameter; it turned out however that the impact on numerical stability was such disastrous that this option is not available now. There is, however, ``QUAD_PRECISION`` parameter to scons, which will make ``Real`` a typedef for ``long double`` (extended precision; quad precision in the proper sense on IA64 processors); this option is experimental and is unlikely to be used in near future, though.
+.. [#real] By default ``double`` (64 bits, 15 decimal places) precision is used as ``Real`` type. See :ref:`high precision documentation<highPrecisionReal>` for additional details.
 
 Eigen provides full rich linear algebra functionality. Some code further uses the [cgal]_ library for computational geometry.
 
