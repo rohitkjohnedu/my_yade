@@ -112,8 +112,8 @@ and `GitLab <https://gitlab.com/yade-dev/>`__:
 
 * `source code on gitlab <https://gitlab.com/yade-dev/trunk>`__
 * `issue and bug tracking on gitlab <https://gitlab.com/yade-dev/trunk/issues>`__
-* `package downloads on launchpad <https://launchpad.net/yade/+download>`__
-* `yade-dev mailing list on launchpad <https://launchpad.net/~yade-dev>`__: yade-users@lists.launchpad.net
+* `release downloads on launchpad <https://launchpad.net/yade/+download>`__
+* `yade-dev mailing list on launchpad <https://launchpad.net/~yade-dev>`__: yade-dev@lists.launchpad.net
 * `yade-users mailing list on launchpad <https://launchpad.net/~yade-users>`__: yade-users@lists.launchpad.net
 * `questions and answers on launchpad <https://answers.launchpad.net/yade/>`__
 
@@ -121,7 +121,7 @@ The versioning software used is `GIT <http://git-scm.com/>`__, for which a short
 tutorial can be found in :ref:`yade-gitrepo-label`.
 GIT is a distributed revision control system. It is available packaged for all major linux distributions.
 
-The `suorce code <https://gitlab.com/yade-dev/>`__ is periodically
+The `source code <https://gitlab.com/yade-dev/>`__ is periodically
 imported to Launchpad for building PPA-packages.
 The repository `can be http-browsed <https://gitlab.com/yade-dev/trunk>`__.
 
@@ -676,7 +676,7 @@ Yade additionally defines a class named :yref:`Se3r`, which contains spatial pos
 
 .. [#real] Historically, it was thought that Yade could be also run with single precision based on build-time parameter; it turned out however that the impact on numerical stability was such disastrous that this option is not available now. There is, however, ``QUAD_PRECISION`` parameter to scons, which will make ``Real`` a typedef for ``long double`` (extended precision; quad precision in the proper sense on IA64 processors); this option is experimental and is unlikely to be used in near future, though.
 
-Eigen provides full rich linear algebra functionality. Some code firther uses the [cgal]_ library for computational geometry.
+Eigen provides full rich linear algebra functionality. Some code further uses the [cgal]_ library for computational geometry.
 
 In Python, basic numeric types are wrapped and imported from the ``yade.minieigenHP`` module; the types drop the ``r`` type qualifier at the end, the syntax is otherwise similar. ``Se3r`` is not wrapped at all, only converted automatically, rarely as it is needed, from/to a ``(Vector3,Quaternion)`` tuple/list. See :ref:`high precision section <high-precision>` for more details.
 
@@ -703,7 +703,7 @@ Run-time type identification (RTTI)
 
 Since serialization and dispatchers need extended type and inheritance information, which is not sufficiently provided by standard RTTI. Each yade class is therefore derived from ``Factorable`` and it must use macro to override its virtual functions providing this extended RTTI:
 
-``YADE_CLASS_BASE_DOC(Foo,Bar Baz,"Docstring)`` creates the following virtual methods (mediated via the ``REGISTER_CLASS_AND_BASE`` macro, which is not user-visible and should not be used directly):
+``YADE_CLASS_BASE_DOC(Foo,Bar Baz,"Docstring")`` creates the following virtual methods (mediated via the ``REGISTER_CLASS_AND_BASE`` macro, which is not user-visible and should not be used directly):
 
 * ``std::string getClassName()`` returning class name (``Foo``) as string. (There is the ``typeid(instanceOrType).name()`` standard c++ construct, but the name returned is compiler-dependent.)
 * ``unsigned getBaseClassNumber()`` returning number of base classes (in this case, 2).
@@ -774,7 +774,7 @@ All (serializable) types in Yade are one of the following:
 
 	YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"class documentation",((type1,attribute1,initValue1,,"Documentation for attribute 1"))((type2,attribute2,initValue2,,"Documentation for attribute 2")));
 
-  Note that attributes are encodes in double parentheses, not separated by commas. Empty attribute list can be given simply by ``YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"documentation",)`` (the last comma is mandatory), or by omiting ``ATTRS`` from macro name and last parameter altogether.
+  Note that attributes are encoded in double parentheses, not separated by commas. Empty attribute list can be given simply by ``YADE_CLASS_BASE_DOC_ATTRS(ThisClass,BaseClass,"documentation",)`` (the last comma is mandatory), or by omiting ``ATTRS`` from macro name and last parameter altogether.
 
 * Fundamental type: strings, various number types, booleans, ``Vector3r`` and others. Their "handlers" (serializers and deserializers) are defined in ``lib/serialization``.
 
@@ -867,7 +867,7 @@ We can create a mini-simulation (with only one GravityEngine):
 	Yade [2]: O.save('abc.xml')
 
 
-and the XML looks like this:
+and the XML save looks like this:
 
 .. literalinclude:: abc.xml
 	:language: xml
@@ -1117,7 +1117,7 @@ The way of passing attributes given to ``YADE_CLASS_BASE_DOC_ATTRS`` in the ``at
 
 Multiple dispatch
 ------------------
-Multiple dispatch is generalization of virtual methods: a :yref:`Dispatcher` decides based on type(s) of its argument(s) which of its :yref:`Functors<Functor>` to call. Numer of arguments (currently 1 or 2) determines *arity* of the dispatcher (and of the functor): unary or binary. For example:
+Multiple dispatch is generalization of virtual methods: a :yref:`Dispatcher` decides based on type(s) of its argument(s) which of its :yref:`Functors<Functor>` to call. Number of arguments (currently 1 or 2) determines *arity* of the dispatcher (and of the functor): unary or binary. For example:
 
 .. code-block:: python
 
@@ -1131,7 +1131,7 @@ creates :yref:`InsertionSortCollider`, which internally contains :yref:`Collider
 	collider->boundDispatcher->add(new Bo1_Sphere_Aabb());
 	collider->boundDispatcher->add(new Bo1_Facet_Aabb());
 
-There are currenly 4 predefined dispatchers (see `dispatcher-names`_) and corresponding functor types. They are inherit from template instantiations of ``Dispatcher1D`` or ``Dispatcher2D`` (for functors, ``Functor1D`` or ``Functor2D``). These templates themselves derive from ``DynlibDispatcher`` (for dispatchers) and ``FunctorWrapper`` (for functors).
+There are currenly 4 predefined dispatchers (see `dispatcher-names`_) and corresponding functor types. They are inherited from template instantiations of ``Dispatcher1D`` or ``Dispatcher2D`` (for functors, ``Functor1D`` or ``Functor2D``). These templates themselves derive from ``DynlibDispatcher`` (for dispatchers) and ``FunctorWrapper`` (for functors).
 
 Example: IGeomDispatcher
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
