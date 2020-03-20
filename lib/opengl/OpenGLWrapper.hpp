@@ -383,4 +383,3 @@ template <typename Type> inline void glOneFace(Type& t, unsigned int a, unsigned
 }
 
 //} // namespace yade
-
