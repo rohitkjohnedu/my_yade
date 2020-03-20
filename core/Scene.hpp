@@ -11,77 +11,82 @@
 #pragma once
 
 #include <core/Body.hpp>
-#include <core/Cell.hpp>
 #include <core/BodyContainer.hpp>
-#include <core/Engine.hpp>
-#include <core/Material.hpp>
+#include <core/Cell.hpp>
 #include <core/DisplayParameters.hpp>
+#include <core/EnergyTracker.hpp>
+#include <core/Engine.hpp>
 #include <core/ForceContainer.hpp>
 #include <core/InteractionContainer.hpp>
-#include <core/EnergyTracker.hpp>
-#ifdef YADE_MPI 
-	#include<mpi.h>
+#include <core/Material.hpp>
+#ifdef YADE_MPI
+#include <mpi.h>
 #endif
 
 #ifdef YADE_OPENMP
-	#include<omp.h>
+#include <omp.h>
 #endif
 
 
 namespace yade { // Cannot have #include directive inside.
-class Shape; 
+class Shape;
 class Bound;
 #ifdef YADE_OPENGL
-	class OpenGLRenderer;
+class OpenGLRenderer;
 #endif
 
-class Scene: public Serializable{
+class Scene : public Serializable {
 	const unsigned int hostNameMax = 255;
-	
-	public:
-		//! Adds material to Scene::materials. It also sets id of the material accordingly and returns it.
-		int addMaterial(shared_ptr<Material> m){ materials.push_back(m); m->id=(int)materials.size()-1; return m->id; }
-		//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundDispatcher the first time it runs)
-		void checkStateTypes();
-		//! update our bound; used directly instead of a BoundFunctor, since we don't derive from Body anymore
-		void updateBound();
 
-		// neither serialized, nor accessible from python (at least not directly)
-		ForceContainer forces;
+public:
+	//! Adds material to Scene::materials. It also sets id of the material accordingly and returns it.
+	int addMaterial(shared_ptr<Material> m)
+	{
+		materials.push_back(m);
+		m->id = (int)materials.size() - 1;
+		return m->id;
+	}
+	//! Checks that type of Body::state satisfies Material::stateTypeOk. Throws runtime_error if not. (Is called from BoundDispatcher the first time it runs)
+	void checkStateTypes();
+	//! update our bound; used directly instead of a BoundFunctor, since we don't derive from Body anymore
+	void updateBound();
 
-		// initialize tags (author, date, time)
-		void fillDefaultTags();
-		// advance by one iteration by running all engines
-		void moveToNextTimeStep();
+	// neither serialized, nor accessible from python (at least not directly)
+	ForceContainer forces;
 
-		/* Functions operating on TimeStepper; they all throw exception if there is more than 1 */
-		// return whether a TimeStepper is present
-		bool timeStepperPresent();
-		// true if TimeStepper is present and active, false otherwise
-		bool timeStepperActive();
-		// (de)activate TimeStepper; returns whether the operation was successful (i.e. whether a TimeStepper was found)
-		bool timeStepperActivate(bool activate);
-		static const int nSpeedIter = 10;       //Number of iterations, which are taking into account for speed calculation
-		Eigen::Matrix<Real,nSpeedIter,1> SpeedElements; //Array for saving speed-values for last "nSpeedIter"-iterations
+	// initialize tags (author, date, time)
+	void fillDefaultTags();
+	// advance by one iteration by running all engines
+	void moveToNextTimeStep();
 
-		shared_ptr<Engine> engineByName(const string& s);
+	/* Functions operating on TimeStepper; they all throw exception if there is more than 1 */
+	// return whether a TimeStepper is present
+	bool timeStepperPresent();
+	// true if TimeStepper is present and active, false otherwise
+	bool timeStepperActive();
+	// (de)activate TimeStepper; returns whether the operation was successful (i.e. whether a TimeStepper was found)
+	bool                               timeStepperActivate(bool activate);
+	static const int                   nSpeedIter = 10; //Number of iterations, which are taking into account for speed calculation
+	Eigen::Matrix<Real, nSpeedIter, 1> SpeedElements;   //Array for saving speed-values for last "nSpeedIter"-iterations
 
-		#ifdef YADE_LIQMIGRATION
-			OpenMPVector<Interaction* > addIntrs;             //Array of added interactions, needed for liquid migration.
-			OpenMPVector<std::pair<id_t, Real > > delIntrs;   //Array of deleted interactions, needed for liquid migration.
-		#endif
+	shared_ptr<Engine> engineByName(const string& s);
 
-		#ifdef YADE_OPENGL
-			shared_ptr<OpenGLRenderer> renderer;
-		#endif
-			
-		#ifdef YADE_MPI
-			MPI_Comm getComm(); 
-		#endif 
-		
-		void postLoad(Scene&);
-		
-		boost::posix_time::ptime prevTime; //Time value on the previous step
+#ifdef YADE_LIQMIGRATION
+	OpenMPVector<Interaction*>          addIntrs; //Array of added interactions, needed for liquid migration.
+	OpenMPVector<std::pair<id_t, Real>> delIntrs; //Array of deleted interactions, needed for liquid migration.
+#endif
+
+#ifdef YADE_OPENGL
+	shared_ptr<OpenGLRenderer> renderer;
+#endif
+
+#ifdef YADE_MPI
+	MPI_Comm getComm();
+#endif
+
+	void postLoad(Scene&);
+
+	boost::posix_time::ptime prevTime; //Time value on the previous step
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Scene,Serializable,"Object comprising the whole simulation.",
@@ -129,5 +134,3 @@ class Scene: public Serializable{
 REGISTER_SERIALIZABLE(Scene);
 
 } // namespace yade
-
-
