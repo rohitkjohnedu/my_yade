@@ -28,7 +28,7 @@ bool pyGaussAverage::pointInsidePolygon(const Vector2r& pt, const vector<Vector2
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
 BOOST_PYTHON_MODULE(WeightedAverage2d)
 try {
-	using pyGaussAverage                   = ::yade::pyGaussAverage;
+	using pyGaussAverage = ::yade::pyGaussAverage;
 	using ::yade::Real;
 	boost::python::scope().attr("__doc__") = "Smoothing (2d gauss-weighted average) for postprocessing scalars in 2d.";
 	boost::python::class_<pyGaussAverage>(
@@ -58,4 +58,3 @@ try {
 	boost::python::handle_exception();
 	throw;
 }
-
