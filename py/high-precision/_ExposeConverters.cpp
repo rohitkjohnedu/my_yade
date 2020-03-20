@@ -14,7 +14,8 @@ using namespace ::yade::MathEigenTypes;
 #define _COMPLEX_SUPPORT
 // file minieigen/expose-converters.cpp
 #include <py/high-precision/minieigen/converters.hpp>
-void expose_converters(){
+void expose_converters()
+{
 	custom_VectorAnyAny_from_sequence<VectorXr>();
 	custom_VectorAnyAny_from_sequence<Vector6r>();
 	custom_VectorAnyAny_from_sequence<Vector6i>();
@@ -30,15 +31,13 @@ void expose_converters(){
 	custom_MatrixAnyAny_from_sequence<Matrix6r>();
 	custom_MatrixAnyAny_from_sequence<MatrixXr>();
 
-	#ifdef _COMPLEX_SUPPORT
-		custom_VectorAnyAny_from_sequence<Vector2cr>();
-		custom_VectorAnyAny_from_sequence<Vector3cr>();
-		custom_VectorAnyAny_from_sequence<Vector6cr>();
-		custom_VectorAnyAny_from_sequence<VectorXcr>();
-		custom_MatrixAnyAny_from_sequence<Matrix3cr>();
-		custom_MatrixAnyAny_from_sequence<Matrix6cr>();
-		custom_MatrixAnyAny_from_sequence<MatrixXcr>();
-	#endif
+#ifdef _COMPLEX_SUPPORT
+	custom_VectorAnyAny_from_sequence<Vector2cr>();
+	custom_VectorAnyAny_from_sequence<Vector3cr>();
+	custom_VectorAnyAny_from_sequence<Vector6cr>();
+	custom_VectorAnyAny_from_sequence<VectorXcr>();
+	custom_MatrixAnyAny_from_sequence<Matrix3cr>();
+	custom_MatrixAnyAny_from_sequence<Matrix6cr>();
+	custom_MatrixAnyAny_from_sequence<MatrixXcr>();
+#endif
 }
-
-

@@ -14,12 +14,11 @@ using namespace ::yade::MathEigenTypes;
 #define _COMPLEX_SUPPORT
 // half of minieigen/expose-complex.cpp file
 #include <py/high-precision/minieigen/visitors.hpp>
-void expose_complex2(){
-	#ifdef _COMPLEX_SUPPORT
-		py::class_<Matrix3cr>("Matrix3c","/*TODO*/",py::init<>()).def(MatrixVisitor<Matrix3cr>());
-		py::class_<Matrix6cr>("Matrix6c","/*TODO*/",py::init<>()).def(MatrixVisitor<Matrix6cr>());
-		py::class_<MatrixXcr>("MatrixXc","/*TODO*/",py::init<>()).def(MatrixVisitor<MatrixXcr>());
-	#endif
+void expose_complex2()
+{
+#ifdef _COMPLEX_SUPPORT
+	py::class_<Matrix3cr>("Matrix3c", "/*TODO*/", py::init<>()).def(MatrixVisitor<Matrix3cr>());
+	py::class_<Matrix6cr>("Matrix6c", "/*TODO*/", py::init<>()).def(MatrixVisitor<Matrix6cr>());
+	py::class_<MatrixXcr>("MatrixXc", "/*TODO*/", py::init<>()).def(MatrixVisitor<MatrixXcr>());
+#endif
 }
-
-

@@ -21,29 +21,42 @@ using namespace ::yade::MathEigenTypes;
 
 // half of minieigen/expose-vectors.cpp
 #include <py/high-precision/minieigen/visitors.hpp>
-void expose_vectors1(){
-	py::class_<VectorXr>("VectorX","Dynamic-sized float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a VectorX): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of X floats.",py::init<>())
-		.def(VectorVisitor<VectorXr>())
-	;
+void expose_vectors1()
+{
+	py::class_<VectorXr>(
+	        "VectorX",
+	        "Dynamic-sized float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a VectorX): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
+	        "``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of X floats.",
+	        py::init<>())
+	        .def(VectorVisitor<VectorXr>());
 
 
-	py::class_<Vector6r>("Vector6","6-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector6): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 6 floats.\n\nStatic attributes: ``Zero``, ``Ones``.",py::init<>())
-		.def(VectorVisitor<Vector6r>())
-	;
+	py::class_<Vector6r>(
+	        "Vector6",
+	        "6-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector6): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
+	        "``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 6 "
+	        "floats.\n\nStatic attributes: ``Zero``, ``Ones``.",
+	        py::init<>())
+	        .def(VectorVisitor<Vector6r>());
 
-	py::class_<Vector6i>("Vector6i","6-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector6): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 6 floats.\n\nStatic attributes: ``Zero``, ``Ones``.",py::init<>())
-		.def(VectorVisitor<Vector6i>())
-	;
+	py::class_<Vector6i>(
+	        "Vector6i",
+	        "6-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector6): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
+	        "``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 6 "
+	        "floats.\n\nStatic attributes: ``Zero``, ``Ones``.",
+	        py::init<>())
+	        .def(VectorVisitor<Vector6i>());
 
-		py::class_<Vector4r>("Vector4","4-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 4 floats.\n\nStatic attributes: ``Zero``, ``Ones``.",py::init<>())
-			.def(VectorVisitor<Vector4r>())
-		;
-
+	py::class_<Vector4r>(
+	        "Vector4",
+	        "4-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
+	        "``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 4 "
+	        "floats.\n\nStatic attributes: ``Zero``, ``Ones``.",
+	        py::init<>())
+	        .def(VectorVisitor<Vector4r>());
 }
 
 #ifdef UNDEF_EIGEN_DONT_ALIGN
 #undef EIGEN_DONT_ALIGN
 #undef UNDEF_EIGEN_DONT_ALIGN
 #endif
-
-

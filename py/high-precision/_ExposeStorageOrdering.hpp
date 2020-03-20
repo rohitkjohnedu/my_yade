@@ -11,4 +11,3 @@
 void expose_storage_ordering();
 
 #endif
-

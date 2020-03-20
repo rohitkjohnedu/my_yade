@@ -95,5 +95,3 @@ void expose_storage_ordering()
 :return: A python dictionary listing flags for all types, see: https://eigen.tuxfamily.org/dox/group__flags.html
 	)""");
 }
-
-

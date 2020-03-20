@@ -137,8 +137,8 @@ void multVec(::yade::math::UnderlyingReal* array, const ::yade::math::Underlying
 namespace yade {
 void testArray()
 {
-	LOG_NOFILTER("sizeof Real        in bytes: " << sizeof(Real  ));
-	LOG_NOFILTER("sizeof float       in bytes: " << sizeof(float ));
+	LOG_NOFILTER("sizeof Real        in bytes: " << sizeof(Real));
+	LOG_NOFILTER("sizeof float       in bytes: " << sizeof(float));
 	LOG_NOFILTER("sizeof double      in bytes: " << sizeof(double));
 	LOG_NOFILTER("sizeof long double in bytes: " << sizeof(long double));
 	std::vector<Real> vec {};
@@ -806,4 +806,3 @@ Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's s
 	boost::python::handle_exception();
 	throw;
 }
-
