@@ -9,45 +9,111 @@
 // XXX never do #include<Python.h>, see https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/building/include_issues.html
 #include <boost/python/detail/wrap_python.hpp>
 
-#include <lib/serialization/Serializable.hpp>
 #include <lib/compatibility/LapackCompatibility.hpp>
-#include <pkg/dem/PotentialBlock.hpp>
+#include <lib/serialization/Serializable.hpp>
 #include <pkg/common/Dispatching.hpp>
 #include <pkg/common/Sphere.hpp>
+#include <pkg/dem/PotentialBlock.hpp>
 #include <Eigen/Core>
 #include <stdio.h>
 
 #include <ClpSimplex.hpp>
-#include <CoinHelperFunctions.hpp>
-#include <CoinTime.hpp>
 #include <CoinBuild.hpp>
+#include <CoinHelperFunctions.hpp>
 #include <CoinModel.hpp>
+#include <CoinTime.hpp>
 
-#include <iomanip>
 #include <cassert>
+#include <iomanip>
 
 namespace yade { // Cannot have #include directive inside.
 
-class Ig2_PB_PB_ScGeom: public IGeomFunctor
-{
+class Ig2_PB_PB_ScGeom : public IGeomFunctor {
 	//protected:
 
-	public :
-		virtual bool go(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-		virtual bool goReverse(const shared_ptr<Shape>& cm1, const shared_ptr<Shape>& cm2, const State& state1, const State& state2, const Vector3r& shift2, const bool& force, const shared_ptr<Interaction>& c);
-		Real getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
-		Real evaluatePB(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
-		void getPtOnParticle2(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r searchDir, Vector3r& newlocalPoint);
-//		void getPtOnParticleArea(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
-		bool getPtOnParticleAreaNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r previousPt, const Vector3r prevDir, const int prevNo, Vector3r& newlocalPoint, Vector3r& newNormal, int& newNo);
-		Real getDet(const MatrixXr A);
-		bool customSolve(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPt, bool warmstart);
-		Real evaluatePhys(const shared_ptr<Shape>& cm1,  const State& state1, const Vector3r& shift2, const Vector3r newTrial, Real& phi_b, Real& phi_r, /* Real& JRC, Real& JSC, */ Real& cohesion, /* Real& ks, Real& kn, */ Real& tension, /* Real &lambda0, Real &heatCapacity, Real &hwater, */ bool &intactRock, int &activePlanesNo, int &jointType);
-		Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial, const bool twoDimension);
-		void BrentZeroSurf(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
-		bool startingPointFeasibilityCLP(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r &contactPoint/*, bool &convergeFeasibility*/);
-		bool customSolveAnalyticCentre(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, Vector3r& contactPt);
-		Real getAreaPolygon2(const shared_ptr<Shape>& cm1, const State& state1, const shared_ptr<Shape>& cm2, const State& state2, const Vector3r& shift2, const Vector3r contactPt, const Vector3r contactNormal, int& smaller, Vector3r shearDir, Real& jointLength, const bool twoDimension, Real unitWidth2D);
+public:
+	virtual bool
+	             go(const shared_ptr<Shape>&       cm1,
+	                const shared_ptr<Shape>&       cm2,
+	                const State&                   state1,
+	                const State&                   state2,
+	                const Vector3r&                shift2,
+	                const bool&                    force,
+	                const shared_ptr<Interaction>& c);
+	virtual bool goReverse(
+	        const shared_ptr<Shape>&       cm1,
+	        const shared_ptr<Shape>&       cm2,
+	        const State&                   state1,
+	        const State&                   state2,
+	        const Vector3r&                shift2,
+	        const bool&                    force,
+	        const shared_ptr<Interaction>& c);
+	Real getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3);
+	Real evaluatePB(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial);
+	void getPtOnParticle2(
+	        const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r searchDir, Vector3r& newlocalPoint);
+	//		void getPtOnParticleArea(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, Vector3r previousPt, Vector3r normal, Vector3r& newlocalPoint);
+	bool getPtOnParticleAreaNormal(
+	        const shared_ptr<Shape>& cm1,
+	        const State&             state1,
+	        const Vector3r&          shift2,
+	        const Vector3r           previousPt,
+	        const Vector3r           prevDir,
+	        const int                prevNo,
+	        Vector3r&                newlocalPoint,
+	        Vector3r&                newNormal,
+	        int&                     newNo);
+	Real getDet(const MatrixXr A);
+	bool customSolve(
+	        const shared_ptr<Shape>& cm1,
+	        const State&             state1,
+	        const shared_ptr<Shape>& cm2,
+	        const State&             state2,
+	        const Vector3r&          shift2,
+	        Vector3r&                contactPt,
+	        bool                     warmstart);
+	Real evaluatePhys(
+	        const shared_ptr<Shape>&                                     cm1,
+	        const State&                                                 state1,
+	        const Vector3r&                                              shift2,
+	        const Vector3r                                               newTrial,
+	        Real&                                                        phi_b,
+	        Real&                                                        phi_r,
+	        /* Real& JRC, Real& JSC, */ Real&                            cohesion,
+	        /* Real& ks, Real& kn, */ Real&                              tension,
+	        /* Real &lambda0, Real &heatCapacity, Real &hwater, */ bool& intactRock,
+	        int&                                                         activePlanesNo,
+	        int&                                                         jointType);
+	Vector3r getNormal(const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r newTrial, const bool twoDimension);
+	void     BrentZeroSurf(
+	            const shared_ptr<Shape>& cm1, const State& state1, const Vector3r& shift2, const Vector3r bracketA, const Vector3r bracketB, Vector3r& zero);
+	bool startingPointFeasibilityCLP(
+	        const shared_ptr<Shape>& cm1,
+	        const State&             state1,
+	        const shared_ptr<Shape>& cm2,
+	        const State&             state2,
+	        const Vector3r&          shift2,
+	        Vector3r&                contactPoint /*, bool &convergeFeasibility*/);
+	bool customSolveAnalyticCentre(
+	        const shared_ptr<Shape>& cm1,
+	        const State&             state1,
+	        const shared_ptr<Shape>& cm2,
+	        const State&             state2,
+	        const Vector3r&          shift2,
+	        Vector3r&                contactPt);
+	Real getAreaPolygon2(
+	        const shared_ptr<Shape>& cm1,
+	        const State&             state1,
+	        const shared_ptr<Shape>& cm2,
+	        const State&             state2,
+	        const Vector3r&          shift2,
+	        const Vector3r           contactPt,
+	        const Vector3r           contactNormal,
+	        int&                     smaller,
+	        Vector3r                 shearDir,
+	        Real&                    jointLength,
+	        const bool               twoDimension,
+	        Real                     unitWidth2D);
 
 
 	// clang-format off
@@ -63,11 +129,10 @@ class Ig2_PB_PB_ScGeom: public IGeomFunctor
 	);
 	// clang-format on
 
-	FUNCTOR2D(PotentialBlock,PotentialBlock);
+	FUNCTOR2D(PotentialBlock, PotentialBlock);
 	// needed for the dispatcher, even if it is symmetric
-	DEFINE_FUNCTOR_ORDER_2D(PotentialBlock,PotentialBlock);
+	DEFINE_FUNCTOR_ORDER_2D(PotentialBlock, PotentialBlock);
 	DECLARE_LOGGER;
-
 };
 
 REGISTER_SERIALIZABLE(Ig2_PB_PB_ScGeom);
@@ -75,4 +140,3 @@ REGISTER_SERIALIZABLE(Ig2_PB_PB_ScGeom);
 } // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS
-
