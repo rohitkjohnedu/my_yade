@@ -589,4 +589,3 @@ try {
 	boost::python::handle_exception();
 	throw;
 }
-
