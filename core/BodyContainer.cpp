@@ -42,7 +42,7 @@ Body::id_t BodyContainer::insertAtId(shared_ptr<Body> b, Body::id_t candidate)
 		checkedByCollider = false;
 		useRedirection    = true;
 		insertedBodies.push_back(candidate); /*realBodies.push_back(candidate); */
-	} // if that special insertion is used, switch to algorithm optimized for non-full body container
+	}                                            // if that special insertion is used, switch to algorithm optimized for non-full body container
 	if (unsigned(candidate) >= size()) {
 		body.resize(candidate + 1, nullptr);
 		scene->forces.addMaxId(candidate);
@@ -148,10 +148,10 @@ void BodyContainer::updateShortLists()
 		if (not b)
 			continue;
 		realBodies.push_back(b->getId());
-	#ifdef YADE_MPI
-		if (b->subdomain == subdomain and not b->getIsSubdomain()) subdomainBodies.push_back(b->id);
-	#endif
-
+#ifdef YADE_MPI
+		if (b->subdomain == subdomain and not b->getIsSubdomain())
+			subdomainBodies.push_back(b->id);
+#endif
 	}
 	dirty = false;
 }
