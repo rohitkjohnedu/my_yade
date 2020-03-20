@@ -1247,4 +1247,3 @@ YADE_PLUGIN((PotentialBlockVTKRecorder)(PotentialBlockVTKRecorderTunnel));
 } // namespace yade
 
 #endif // YADE_POTENTIAL_BLOCKS
-

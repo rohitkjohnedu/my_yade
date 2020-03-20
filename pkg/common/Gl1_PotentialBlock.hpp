@@ -250,4 +250,3 @@ REGISTER_SERIALIZABLE(PotentialBlockVTKRecorderTunnel);
 
 
 #endif // YADE_POTENTIAL_BLOCKS
-

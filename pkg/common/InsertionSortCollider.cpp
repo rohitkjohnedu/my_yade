@@ -15,8 +15,8 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-using math::min; // using inside .cpp file is ok.
 using math::max;
+using math::min; // using inside .cpp file is ok.
 
 YADE_PLUGIN((InsertionSortCollider))
 CREATE_LOGGER(InsertionSortCollider);
@@ -81,8 +81,8 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 
 	///chunks defines subsets of the bounds lists, we make sure they are not too small wrt. verlet dist.
 	std::vector<Body::id_t> chunks;
-	unsigned              nChunks   = ompThreads;
-	unsigned              chunkSize = unsigned(v.size() / nChunks) + 1;
+	unsigned                nChunks   = ompThreads;
+	unsigned                chunkSize = unsigned(v.size() / nChunks) + 1;
 	for (unsigned n = 0; n < nChunks; n++)
 		chunks.push_back(n * chunkSize);
 	chunks.push_back(v.size());
@@ -439,8 +439,8 @@ void InsertionSortCollider::action()
 				// if initializing periodic, shift coords & record the period into BBj[i].period
 				if (doInitSort && periodic)
 					BBji.coord = cellWrap(BBji.coord, 0, BBj.cellDim, BBji.period);
-				// for each body, copy its minima and maxima, for quick checks of overlaps later
-				//bounds have been all updated when j==0, we can safely copy them here when j==1
+					// for each body, copy its minima and maxima, for quick checks of overlaps later
+					//bounds have been all updated when j==0, we can safely copy them here when j==1
 #if (YADE_REAL_BIT <= 64)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -557,13 +557,13 @@ void InsertionSortCollider::action()
 						continue;
 					if (spatialOverlap(iid, jid)
 					    && Collider::mayCollide(
-					            Body::byId(iid, scene).get(),
-					            Body::byId(jid, scene).get()
+					               Body::byId(iid, scene).get(),
+					               Body::byId(jid, scene).get()
 #ifdef YADE_MPI
-					                    ,
-					            scene->subdomain
+					                       ,
+					               scene->subdomain
 #endif
-					            )) {
+					               )) {
 #ifdef YADE_OPENMP
 						unsigned int threadNum = omp_get_thread_num();
 						newInts[threadNum].push_back(std::pair<Body::id_t, Body::id_t>(iid, jid));
@@ -712,13 +712,13 @@ void InsertionSortCollider::handleBoundInversionPeri(Body::id_t id1, Body::id_t 
 	bool     overlap = spatialOverlapPeri(id1, id2, scene, periods);
 	if (overlap
 	    && Collider::mayCollide(
-	            Body::byId(id1, scene).get(),
-	            Body::byId(id2, scene).get()
+	               Body::byId(id1, scene).get(),
+	               Body::byId(id2, scene).get()
 #ifdef YADE_MPI
-	                    ,
-	            scene->subdomain
+	                       ,
+	               scene->subdomain
 #endif
-	            )) {
+	               )) {
 		shared_ptr<Interaction> newI = shared_ptr<Interaction>(new Interaction(id1, id2));
 		newI->cellDist               = periods;
 		interactions->insert(newI);
