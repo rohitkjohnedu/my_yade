@@ -12,8 +12,8 @@ CREATE_CPP_LOCAL_LOGGER("_utils.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
-using math::min;  // using inside .cpp file is ok.
 using math::max;
+using math::min; // using inside .cpp file is ok.
 
 py::tuple negPosExtremeIds(int axis, Real distFactor)
 {
@@ -973,4 +973,3 @@ try {
 	boost::python::handle_exception();
 	throw;
 }
-

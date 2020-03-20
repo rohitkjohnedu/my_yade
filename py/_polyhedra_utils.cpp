@@ -17,8 +17,8 @@ CREATE_CPP_LOCAL_LOGGER("_polyhedra_utils.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
-using math::min;
 using math::max;
+using math::min;
 
 //**********************************************************************************
 //print polyhedron in basic position
@@ -206,10 +206,10 @@ Vector3r SizeOfPolyhedra(const shared_ptr<Shape>& cm1)
 //save sieve curve points into a file
 void SieveCurve()
 {
-	const shared_ptr<Scene>                _rb = shared_ptr<Scene>();
-	shared_ptr<Scene>                      rb  = (_rb ? _rb : Omega::instance().getScene());
+	const shared_ptr<Scene>            _rb = shared_ptr<Scene>();
+	shared_ptr<Scene>                  rb  = (_rb ? _rb : Omega::instance().getScene());
 	std::vector<std::pair<Real, Real>> sieve_volume;
-	Real                                   total_volume = 0;
+	Real                               total_volume = 0;
 	for (const auto& b : *rb->bodies) {
 		if (!b || !b->shape)
 			continue;
@@ -238,7 +238,7 @@ void SizeRatio()
 {
 	const shared_ptr<Scene> _rb = shared_ptr<Scene>();
 	shared_ptr<Scene>       rb  = (_rb ? _rb : Omega::instance().getScene());
-	std::ofstream                myfile;
+	std::ofstream           myfile;
 	myfile.open("sizes.dat");
 	for (const auto& b : *rb->bodies) {
 		if (!b || !b->shape)
@@ -435,7 +435,7 @@ vector<Vector3r> TruncIcosaHedPoints(Vector3r radii)
 {
 	vector<Vector3r> v;
 
-	Real   p = (1. + sqrt(5.)) / 2.;
+	Real     p = (1. + sqrt(5.)) / 2.;
 	Vector3r f, c, b;
 	f = radii / sqrt(9. * p + 1.);
 	vector<Vector3r> A, B;
@@ -511,7 +511,7 @@ vector<Vector3r> BallPoints(Vector3r radii, int NumFacets, int seed)
 	if (NumFacets == 24)
 		v = SnubCubePoints(radii);
 	else {
-		Real   inc = Mathr::PI * (3. - pow(5., 0.5));
+		Real inc = Mathr::PI * (3. - pow(5., 0.5));
 		Real off = 2. / double(NumFacets);
 		Real y, r, phi;
 		for (int k = 0; k < NumFacets; k++) {
@@ -566,7 +566,7 @@ fillBoxByBalls_cpp(Vector3r minCoord, Vector3r maxCoord, Vector3r sizemin, Vecto
 		if (it == 1) {
 			if (fixed_ratio) {
 				Real rrr = (rand() * (sizemax[0] - sizemin[0]) / RAND_MAX + sizemin[0]) / 2.;
-				radii      = Vector3r(rrr, rrr, rrr);
+				radii    = Vector3r(rrr, rrr, rrr);
 			} else {
 				radii = Vector3r(
 				                rand() * (sizemax[0] - sizemin[0]) / 2.,
@@ -695,4 +695,3 @@ try {
 }
 
 #endif // YADE_CGAL
-

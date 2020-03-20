@@ -406,4 +406,3 @@ As an example the dict below reflects what libraries this documentation was comp
 	boost::python::handle_exception();
 	throw;
 }
-

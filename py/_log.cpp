@@ -251,4 +251,3 @@ Saves log config to specified file.
 	boost::python::handle_exception();
 	throw;
 }
-
