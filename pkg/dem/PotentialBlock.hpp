@@ -3,39 +3,41 @@
 #pragma once
 
 #include <lib/compatibility/LapackCompatibility.hpp>
-#include <vector>
 #include <core/Shape.hpp>
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/QR>
+#include <vector>
 //#include <lib/base/openmp-accu.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 
 
 class PotentialBlock : public Shape {
-	public:
-		struct Planes{ vector<int> vertexID; };
-//		struct Vertices{ vector<int> edgeID;  vector<int> planeID; };
-//		struct Edges{ vector<int> vertexID; };
+public:
+	struct Planes {
+		vector<int> vertexID;
+	};
+	//		struct Vertices{ vector<int> edgeID;  vector<int> planeID; };
+	//		struct Edges{ vector<int> vertexID; };
 
-		void addPlaneStruct();
-//		void addVertexStruct();
-//		void addEdgeStruct();
+	void addPlaneStruct();
+	//		void addVertexStruct();
+	//		void addEdgeStruct();
 
-		vector<Planes> planeStruct;
-//		vector<Vertices> vertexStruct;
-//		vector<Edges> edgeStruct;
+	vector<Planes> planeStruct;
+	//		vector<Vertices> vertexStruct;
+	//		vector<Edges> edgeStruct;
 
-//		MatrixXr Amatrix;
-//		MatrixXr Dmatrix;
-		virtual ~PotentialBlock ();
-		void postLoad(PotentialBlock&);
+	//		MatrixXr Amatrix;
+	//		MatrixXr Dmatrix;
+	virtual ~PotentialBlock();
+	void postLoad(PotentialBlock&);
 
-		Real getDet(const MatrixXr A);
-		Real getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
-		void calculateVertices();
-		void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
+	Real getDet(const MatrixXr A);
+	Real getSignedArea(const Vector3r pt1, const Vector3r pt2, const Vector3r pt3);
+	void calculateVertices();
+	void calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, Real& Izz, Real& Ixy, Real& Ixz, Real& Iyz);
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialBlock,Shape,"Geometry of PotentialBlock.",
@@ -107,7 +109,7 @@ class PotentialBlock : public Shape {
 	);
 	// clang-format on
 	//#endif
-	REGISTER_CLASS_INDEX(PotentialBlock,Shape);
+	REGISTER_CLASS_INDEX(PotentialBlock, Shape);
 };
 
 REGISTER_SERIALIZABLE(PotentialBlock);

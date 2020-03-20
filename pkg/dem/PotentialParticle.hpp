@@ -3,21 +3,21 @@
 #pragma once
 #ifdef YADE_POTENTIAL_PARTICLES
 
+#include <lib/base/openmp-accu.hpp>
 #include <lib/compatibility/LapackCompatibility.hpp>
-#include <vector>
 #include <core/Shape.hpp>
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <Eigen/QR>
-#include <lib/base/openmp-accu.hpp>
+#include <vector>
 //#include <lib/base/openmp-accu.hpp>
 
 
 namespace yade { // Cannot have #include directive inside.
 
 class PotentialParticle : public Shape {
-	public:
-		virtual ~PotentialParticle ();
+public:
+	virtual ~PotentialParticle();
 
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR(PotentialParticle,Shape,"EXPERIMENTAL. Geometry of PotentialParticle.",
@@ -53,8 +53,8 @@ class PotentialParticle : public Shape {
 #endif
 		);
 	// clang-format on
-		//#endif
-		REGISTER_CLASS_INDEX(PotentialParticle,Shape);
+	//#endif
+	REGISTER_CLASS_INDEX(PotentialParticle, Shape);
 };
 
 REGISTER_SERIALIZABLE(PotentialParticle);
