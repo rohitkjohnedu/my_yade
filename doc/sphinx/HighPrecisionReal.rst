@@ -11,7 +11,7 @@ along with corresponding `boost <https://github.com/boostorg/math>`__ `math tool
 The supported types are following:
 
 =============================================== =============== =============================== ==================================================================
-type						bits		decimal places			notes
+type						bits		decimal places [#prec]_		notes
 =============================================== =============== =============================== ==================================================================
   ``float``					``32``		``6``				hardware accelerated (not useful, it is only for testing purposes)
   ``double``					``64``		``15``				hardware accelerated
@@ -25,6 +25,8 @@ The last two types are arbitrary precision, and their number of bits ``Nbit`` or
 
 .. note::
 	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details. All ``Real`` types pass the :ysrccommit:`real type concept<1b4ae97583bd8a6efc74cb0d0/py/high-precision/_math.cpp#L197>` test from `boost concepts <https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/real_concepts.html>`__. The supoprt for :ysrc:`Eigen<lib/high-precision/EigenNumTraits.hpp>` and :ysrc:`CGAL <lib/high-precision/CgalNumTraits.hpp>` is done with numerical traits.
+
+.. [#prec] The amount of decimal places in this table is the amount of places which are completely determined by the binary represenation. One additional decimal digit (or two if rounding down is used, which is not the case by default) is necessary to fully reconstruct binary representation. A simple python example to demonstrate this fact: ``for a in range(16): print(1./pow(2.,a))``, shows that every binary digit produces "extra" ``…25`` at the end of decimal representation, but these decimal digits are not completely determined by the binary representation, because for example ``…37`` is impossible to obtain there. More binary bits are necessary to represent ``…37``, but the ``…25`` was produced by the last available bit.
 
 Installation
 ===========================================
