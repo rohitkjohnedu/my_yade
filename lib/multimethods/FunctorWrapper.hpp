@@ -9,11 +9,11 @@
 #pragma once
 
 
-#include<lib/serialization/Serializable.hpp>
-#include<lib/compatibility/LokiCompatibility.hpp>
+#include <lib/compatibility/LokiCompatibility.hpp>
+#include <lib/serialization/Serializable.hpp>
 
-#include <boost/mpl/vector.hpp>
 #include <boost/mpl/at.hpp>
+#include <boost/mpl/vector.hpp>
 
 #include <string>
 
@@ -72,7 +72,7 @@ namespace yade { // Cannot have #include directive inside.
 ///
 /// [*]
 /// Note about virtual function arguents ArgumentTypeList - all functions take arguments by value
-/// only for fundametal types and pure pointers, all other types are passed by referece. For details look 
+/// only for fundametal types and pure pointers, all other types are passed by referece. For details look
 /// into Loki::TypeTraits::ParameterType. For example if you your class is:
 ///
 /// class ShapeDraw : public FunctorWrapper< std::string , TYPELIST_4(boost::shared_ptr<Shape>,double,char,const std::string) >
@@ -85,65 +85,59 @@ namespace yade { // Cannot have #include directive inside.
 /// So pay attention when you overload this function.
 ///
 
-template
-<	class ResultType, 		// type returned by multivirtual function
-	class ArgumentTypeList		// TypeList of arguments accepted by multivirtual function,
->
+template <
+        class ResultType,      // type returned by multivirtual function
+        class ArgumentTypeList // TypeList of arguments accepted by multivirtual function,
+        >
 class FunctorWrapper //: public Serializable // FIXME functor shouldn't be serializable
 {
-	private : 
-		using Parm1 = typename boost::mpl::at_c< ArgumentTypeList ,0>::type;
-		using Parm2 = typename boost::mpl::at_c< ArgumentTypeList ,1>::type;
-		using Parm3 = typename boost::mpl::at_c< ArgumentTypeList ,2>::type;
-		using Parm4 = typename boost::mpl::at_c< ArgumentTypeList ,3>::type;
-		using Parm5 = typename boost::mpl::at_c< ArgumentTypeList ,4>::type;
-		using Parm6 = typename boost::mpl::at_c< ArgumentTypeList ,5>::type;
-		using Parm7 = typename boost::mpl::at_c< ArgumentTypeList ,6>::type;
-	
-		ResultType error(int n)
-		{
-			throw std::runtime_error(("Multimethods: bad virtual call (probably go/goReverse was not overridden with the same argument types; only fundamental types and pure pointers are passed by value, all other types (including shared_ptr<>) are passed by reference); types in the call were:\n" 
-			+ string("1. ") + typeid(Parm1).name() + "\n" 
-			+ "2. " + typeid(Parm2).name() + "\n"
-			+ "3. " + typeid(Parm3).name() + "\n"
-			+ "4. " + typeid(Parm4).name() + "\n"
-			+ "5. " + typeid(Parm5).name() + "\n"
-			+ "6. " + typeid(Parm6).name() + "\n"
-			+ "7. " + typeid(Parm7).name() + "\n"
-			+ "number of types used in the call: " + boost::lexical_cast<string>(n) + "\n").c_str());
-		}
+private:
+	using Parm1 = typename boost::mpl::at_c<ArgumentTypeList, 0>::type;
+	using Parm2 = typename boost::mpl::at_c<ArgumentTypeList, 1>::type;
+	using Parm3 = typename boost::mpl::at_c<ArgumentTypeList, 2>::type;
+	using Parm4 = typename boost::mpl::at_c<ArgumentTypeList, 3>::type;
+	using Parm5 = typename boost::mpl::at_c<ArgumentTypeList, 4>::type;
+	using Parm6 = typename boost::mpl::at_c<ArgumentTypeList, 5>::type;
+	using Parm7 = typename boost::mpl::at_c<ArgumentTypeList, 6>::type;
 
-	public :
-		FunctorWrapper () {};
-		virtual ~FunctorWrapper () {};
-		virtual string checkOrder() const { return ""; };
+	ResultType error(int n)
+	{
+		throw std::runtime_error(
+		        ("Multimethods: bad virtual call (probably go/goReverse was not overridden with the same argument types; only fundamental types and "
+		         "pure pointers are passed by value, all other types (including shared_ptr<>) are passed by reference); types in the call were:\n"
+		         + string("1. ") + typeid(Parm1).name() + "\n" + "2. " + typeid(Parm2).name() + "\n" + "3. " + typeid(Parm3).name() + "\n" + "4. "
+		         + typeid(Parm4).name() + "\n" + "5. " + typeid(Parm5).name() + "\n" + "6. " + typeid(Parm6).name() + "\n" + "7. "
+		         + typeid(Parm7).name() + "\n" + "number of types used in the call: " + boost::lexical_cast<string>(n) + "\n")
+		                .c_str());
+	}
+
+public:
+	FunctorWrapper() {};
+	virtual ~FunctorWrapper() {};
+	virtual string checkOrder() const { return ""; };
 
 	// in following functions a second throw was added - just to bypass compiler warnings - it will never be executed.
 
-		virtual ResultType go	(	Parm1) 							{ return error(1); };
-		virtual ResultType go	(	Parm1,Parm2) 						{ return error(2); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3) 					{ return error(3); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
-		virtual ResultType go	(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 			{ return error(7); };
-		
-		virtual ResultType goReverse(	Parm1) 							{ return error(1); };
-		virtual ResultType goReverse(	Parm1,Parm2) 						{ return error(2); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3) 					{ return error(3); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4) 				{ return error(4); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5) 				{ return error(5); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6) 			{ return error(6); };
-		virtual ResultType goReverse(	Parm1,Parm2,Parm3,Parm4,Parm5,Parm6,Parm7) 			{ return error(7); };
+	virtual ResultType go(Parm1) { return error(1); };
+	virtual ResultType go(Parm1, Parm2) { return error(2); };
+	virtual ResultType go(Parm1, Parm2, Parm3) { return error(3); };
+	virtual ResultType go(Parm1, Parm2, Parm3, Parm4) { return error(4); };
+	virtual ResultType go(Parm1, Parm2, Parm3, Parm4, Parm5) { return error(5); };
+	virtual ResultType go(Parm1, Parm2, Parm3, Parm4, Parm5, Parm6) { return error(6); };
+	virtual ResultType go(Parm1, Parm2, Parm3, Parm4, Parm5, Parm6, Parm7) { return error(7); };
+
+	virtual ResultType goReverse(Parm1) { return error(1); };
+	virtual ResultType goReverse(Parm1, Parm2) { return error(2); };
+	virtual ResultType goReverse(Parm1, Parm2, Parm3) { return error(3); };
+	virtual ResultType goReverse(Parm1, Parm2, Parm3, Parm4) { return error(4); };
+	virtual ResultType goReverse(Parm1, Parm2, Parm3, Parm4, Parm5) { return error(5); };
+	virtual ResultType goReverse(Parm1, Parm2, Parm3, Parm4, Parm5, Parm6) { return error(6); };
+	virtual ResultType goReverse(Parm1, Parm2, Parm3, Parm4, Parm5, Parm6, Parm7) { return error(7); };
 };
 
-#define DEFINE_FUNCTOR_ORDER_2D(class1,class2)							\
-	public : virtual std::string checkOrder() const						\
-	{											\
-		return (string(#class1)+" "+string(#class2));					\
-	}											\
-
+#define DEFINE_FUNCTOR_ORDER_2D(class1, class2)                                                                                                                \
+public:                                                                                                                                                        \
+	virtual std::string checkOrder() const { return (string(#class1) + " " + string(#class2)); }
 
 
 }; // namespace yade
-
