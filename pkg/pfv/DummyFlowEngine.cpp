@@ -1,4 +1,4 @@
- 
+
 /*************************************************************************
 *  Copyright (C) 2014 by Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>     *
 *                                                                        *
@@ -19,29 +19,27 @@
 namespace yade { // Cannot have #include directive inside.
 
 /// We can add data to the Info types by inheritance
-class DummyCellInfo : public FlowCellInfo_DummyFlowEngineT
-{
-	public:
+class DummyCellInfo : public FlowCellInfo_DummyFlowEngineT {
+public:
 	Real anotherVariable;
 	void anotherFunction() {};
 };
 
 class DummyVertexInfo : public FlowVertexInfo_DummyFlowEngineT {
-	public:
+public:
 	//same here if needed
 };
 
-typedef TemplateFlowEngine_DummyFlowEngineT<DummyCellInfo,DummyVertexInfo> DummyFlowEngineT;
+typedef TemplateFlowEngine_DummyFlowEngineT<DummyCellInfo, DummyVertexInfo> DummyFlowEngineT;
 REGISTER_SERIALIZABLE(DummyFlowEngineT);
 YADE_PLUGIN((DummyFlowEngineT));
 
-class DummyFlowEngine : public DummyFlowEngineT
-{
-	public :
+class DummyFlowEngine : public DummyFlowEngineT {
+public:
 	//We can overload every functions of the base engine to make it behave differently
 	//if we overload action() like this, this engine is doing nothing in a standard timestep, it can still have useful functions
 	virtual void action() {};
-	
+
 	//If a new function is specific to the derived engine, put it here, else go to the base TemplateFlowEngine
 	//if it is useful for everyone
 	void fancyFunction(Real what);
@@ -59,7 +57,7 @@ class DummyFlowEngine : public DummyFlowEngineT
 REGISTER_SERIALIZABLE(DummyFlowEngine);
 YADE_PLUGIN((DummyFlowEngine));
 
-void DummyFlowEngine::fancyFunction(Real what) {std::cerr<<"yes, I'm a new function"<<std::endl;}
+void DummyFlowEngine::fancyFunction(Real what) { std::cerr << "yes, I'm a new function" << std::endl; }
 
 } // namespace yade
 
