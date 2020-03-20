@@ -1,9 +1,9 @@
 #pragma once
-#include<lib/serialization/Serializable.hpp>
+#include <lib/serialization/Serializable.hpp>
 // keep those two here, template instantiation & boost::python gets broken otherwise, e.g. (old site, fixed bug) https://bugs.launchpad.net/bugs/618766
-#include<core/IGeom.hpp> 
-#include<core/IPhys.hpp>
-#include<core/Body.hpp>
+#include <core/Body.hpp>
+#include <core/IGeom.hpp>
+#include <core/IPhys.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 
@@ -12,49 +12,50 @@ class IPhysFunctor;
 class LawFunctor;
 class Scene;
 
-class Interaction: public Serializable{
-	private:
-		friend class IPhysDispatcher;
-		friend class InteractionLoop;
-	public:
-		bool isReal() const {return (bool)geom && (bool)phys;}
-		//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
-		bool isFresh(Scene* rb);
-		// FIXME - it is set to true, and never set to false. What is the purpose to have it? just try: grep -E "\<isActive\>" . -rn --include='*pp' --color
-		//         It looks like it can be removed, after stable release.
-		bool isActive;
+class Interaction : public Serializable {
+private:
+	friend class IPhysDispatcher;
+	friend class InteractionLoop;
 
-		Interaction(Body::id_t newId1,Body::id_t newId2);
+public:
+	bool isReal() const { return (bool)geom && (bool)phys; }
+	//! If this interaction was just created in this step (for the constitutive law, to know that it is the first time there)
+	bool isFresh(Scene* rb);
+	// FIXME - it is set to true, and never set to false. What is the purpose to have it? just try: grep -E "\<isActive\>" . -rn --include='*pp' --color
+	//         It looks like it can be removed, after stable release.
+	bool isActive;
 
-		const Body::id_t& getId1() const {return id1;};
-		const Body::id_t& getId2() const {return id2;};
+	Interaction(Body::id_t newId1, Body::id_t newId2);
 
-		//! swaps order of bodies within the interaction
-		void swapOrder();
+	const Body::id_t& getId1() const { return id1; };
+	const Body::id_t& getId2() const { return id2; };
 
-		bool operator<(const Interaction& other) const { return getId1()<other.getId1() || (getId1()==other.getId1() && getId2()<other.getId2()); }
+	//! swaps order of bodies within the interaction
+	void swapOrder();
 
-		//! cache functors that are called for this interaction. Currently used by InteractionLoop.
-		struct {
-			// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
-			// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
-			bool geomExists;
-			shared_ptr<IGeomFunctor> geom = nullptr;
-			shared_ptr<IPhysFunctor> phys = nullptr;
-			shared_ptr<LawFunctor> constLaw = nullptr;
-		} functorCache;
+	bool operator<(const Interaction& other) const { return getId1() < other.getId1() || (getId1() == other.getId1() && getId2() < other.getId2()); }
 
-		//! Reset interaction to the intial state (keep only body ids)
-		void reset();
-		//! common initialization called from both constructor and reset()
-		void init();
+	//! cache functors that are called for this interaction. Currently used by InteractionLoop.
+	struct {
+		// Whether geometry dispatcher exists at all; this is different from !geom, since that can mean we haven't populated the cache yet.
+		// Therefore, geomExists must be initialized to true first (done in Interaction::reset() called from ctor).
+		bool                     geomExists;
+		shared_ptr<IGeomFunctor> geom     = nullptr;
+		shared_ptr<IPhysFunctor> phys     = nullptr;
+		shared_ptr<LawFunctor>   constLaw = nullptr;
+	} functorCache;
 
-	        virtual ::boost::python::dict pyDictCustom() const
-	        {
-		        ::boost::python::dict ret;
-		        ret["isReal"] = ::boost::python::object(isReal());
-		        return ret;
-	        }
+	//! Reset interaction to the intial state (keep only body ids)
+	void reset();
+	//! common initialization called from both constructor and reset()
+	void init();
+
+	virtual ::boost::python::dict pyDictCustom() const
+	{
+		::boost::python::dict ret;
+		ret["isReal"] = ::boost::python::object(isReal());
+		return ret;
+	}
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Interaction,Serializable,"Interaction between pair of bodies.",
@@ -79,4 +80,3 @@ class Interaction: public Serializable{
 REGISTER_SERIALIZABLE(Interaction);
 
 } // namespace yade
-
