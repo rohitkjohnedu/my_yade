@@ -59,4 +59,3 @@ vtkIdType vtkDoubleArrayFromReal::InsertNextTuple(const ::yade::Matrix3r& m)
 vtkIdType vtkDoubleArrayFromReal::InsertNextValue(const ::yade::Real& v) { return vtkDoubleArray::InsertNextValue(static_cast<double>(v)); }
 
 #endif
-

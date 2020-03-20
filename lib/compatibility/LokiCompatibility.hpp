@@ -10,15 +10,14 @@
 
 #pragma once
 
-#include <boost/mpl/vector.hpp>
 #include <boost/mpl/at.hpp>
+#include <boost/mpl/vector.hpp>
 
 // compat with former yade's local Loki
 
-#define TYPELIST_1( T1                         ) ::boost::mpl::vector< T1                         >
-#define TYPELIST_2( T1, T2                     ) ::boost::mpl::vector< T1, T2                     >
-#define TYPELIST_3( T1, T2, T3                 ) ::boost::mpl::vector< T1, T2, T3                 >
-#define TYPELIST_4( T1, T2, T3, T4             ) ::boost::mpl::vector< T1, T2, T3, T4             >
-#define TYPELIST_5( T1, T2, T3, T4, T5         ) ::boost::mpl::vector< T1, T2, T3, T4, T5         >
-#define TYPELIST_7( T1, T2, T3, T4, T5, T6, T7 ) ::boost::mpl::vector< T1, T2, T3, T4, T5, T6, T7 >
-
+#define TYPELIST_1(T1) ::boost::mpl::vector<T1>
+#define TYPELIST_2(T1, T2) ::boost::mpl::vector<T1, T2>
+#define TYPELIST_3(T1, T2, T3) ::boost::mpl::vector<T1, T2, T3>
+#define TYPELIST_4(T1, T2, T3, T4) ::boost::mpl::vector<T1, T2, T3, T4>
+#define TYPELIST_5(T1, T2, T3, T4, T5) ::boost::mpl::vector<T1, T2, T3, T4, T5>
+#define TYPELIST_7(T1, T2, T3, T4, T5, T6, T7) ::boost::mpl::vector<T1, T2, T3, T4, T5, T6, T7>
