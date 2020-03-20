@@ -663,7 +663,7 @@ To have both speed and safety, Yade provides 2 macros:
 
 Basic numerics
 ---------------
-The floating point type to use in Yade ``Real``, which is by default typedef for ``double``. [#real]_ 
+The floating point type to use in Yade ``Real``, which is by default typedef for ``double`` (64 bits, 15 decimal places). [#real]_ 
 
 Yade uses the `Eigen <http://eigen.tuxfamily.org>`_ library for computations. It provides classes for 2d and 3d vectors, quaternions and 3x3 matrices templated by number type; their specialization for the ``Real`` type are typedef'ed with the "r" suffix, and occasionally useful integer types with the "i" suffix:
 
@@ -674,7 +674,7 @@ Yade uses the `Eigen <http://eigen.tuxfamily.org>`_ library for computations. It
 
 Yade additionally defines a class named :yref:`Se3r`, which contains spatial position (``Vector3r Se3r::position``) and orientation (``Quaternionr Se3r::orientation``), since they are frequently used one with another, and it is convenient to pass them as single parameter to functions.
 
-.. [#real] By default ``double`` (64 bits, 15 decimal places) precision is used as ``Real`` type. See :ref:`high precision documentation<highPrecisionReal>` for additional details.
+.. [#real] See :ref:`high precision documentation<highPrecisionReal>` for additional details.
 
 Eigen provides full rich linear algebra functionality. Some code further uses the [cgal]_ library for computational geometry.
 
