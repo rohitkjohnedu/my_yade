@@ -7,142 +7,171 @@
 // XXX never do #include<Python.h>, see https://www.boost.org/doc/libs/1_71_0/libs/python/doc/html/building/include_issues.html
 #include <boost/python/detail/wrap_python.hpp>
 
-#include<core/FileGenerator.hpp>
+#include <core/FileGenerator.hpp>
 
 
-#include<lib/base/Math.hpp>
-#include<lib/serialization/Serializable.hpp>
-#include<lib/multimethods/Indexable.hpp>
+#include <lib/base/Math.hpp>
 #include <lib/compatibility/LapackCompatibility.hpp>
+#include <lib/multimethods/Indexable.hpp>
+#include <lib/serialization/Serializable.hpp>
 
-#include <ClpSimplexDual.hpp>
 #include <ClpSimplex.hpp>
-#include <CoinHelperFunctions.hpp>
-#include <CoinTime.hpp>
+#include <ClpSimplexDual.hpp>
 #include <CoinBuild.hpp>
+#include <CoinHelperFunctions.hpp>
 #include <CoinModel.hpp>
-#include <iomanip>
+#include <CoinTime.hpp>
 #include <cassert>
+#include <iomanip>
 
 namespace yade { // Cannot have #include directive inside.
 
 class GlobalStiffnessTimeStepper;
 
 class BlockGen : public FileGenerator {
-	private	:
-		void createActors(shared_ptr<Scene>& scene);
-//		void positionRootBody(shared_ptr<Scene>& scene); //not used
+private:
+	void createActors(shared_ptr<Scene>& scene);
+	//		void positionRootBody(shared_ptr<Scene>& scene); //not used
 
-		shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper;
-		std::ofstream myfile;
+	shared_ptr<GlobalStiffnessTimeStepper> globalStiffnessTimeStepper;
+	std::ofstream                          myfile;
 
-	protected :
-//		std::ofstream output2;        // it was always creating files "BlkGen" "BlockGenFindExtreme.txt", but they are not used in the code, so I commented this out, Janek
-//		std::string myfile;
-//		std::string Key;
-//		static std::ofstream output;
+protected:
+	//		std::ofstream output2;        // it was always creating files "BlkGen" "BlockGenFindExtreme.txt", but they are not used in the code, so I commented this out, Janek
+	//		std::string myfile;
+	//		std::string Key;
+	//		static std::ofstream output;
 
-	public :
-		~BlockGen ();
-		bool generate(string&);
-		template<class T>
-		Real gen_normal_3(T &generator){ return generator(); }
+public:
+	~BlockGen();
+	bool                    generate(string&);
+	template <class T> Real gen_normal_3(T& generator) { return generator(); }
 
-		struct Discontinuity{
-			Vector3r centre;
-			Discontinuity(Vector3r pos){centre = pos; a=b=c=d=0; /*persistence = false;*/ isBoundary= false; sliceBoundaries=false; constructionJoints=false; phi_b = 30.0; phi_r= 30.0; JRC=15; JCS = pow(10,6); asperity = 5; sigmaC = JCS; cohesion=0; tension=0; lambda0=0.0; heatCapacity=0.0; hwater=-1.0; intactRock=false; throughGoing = false; jointType=0;}
-			Real a;
-			Real b;
-			Real c;
-			Real d;
-//			Real a_p;
-//			Real b_p;
-//			Real c_p;
-//			Real d_p;
-//			bool persistence;
-			bool isBoundary;
-			bool sliceBoundaries;
-			bool constructionJoints;
-			vector<Real> persistence_a;
-			vector<Real> persistence_b;
-			vector<Real> persistence_c;
-			vector<Real> persistence_d;
-			/* Joint properties */
-			Real phi_b;
-			Real phi_r;
-			Real JRC;
-			Real JCS;
-			Real asperity;
-			Real sigmaC;
-			Real cohesion;
-			Real tension;
-			Real lambda0;
-			Real heatCapacity;
-			Real hwater;
-			bool intactRock;
-			bool throughGoing;
-			int jointType;
-		};
-		struct Planes{
-			vector<int> vertexID;
-		};
-		struct Block{
-			Vector3r tempCentre;
-			Vector3r centre;
-			Block(Vector3r pos, Real kPP, Real rPP, Real RPP){centre = pos; k=kPP; r=rPP; R=RPP; tooSmall=false; isBoundary=false; tempCentre=pos;}
-			vector<Real> a;
-			vector<Real> b;
-			vector<Real> c;
-			vector<Real> d;
-			vector<bool> redundant;
-			vector<bool> isBoundaryPlane;
-			bool isBoundary;
-			vector<struct Block> subMembers;
-			vector<Vector3r> falseVertex;
-//			vector<Vector3r> node; Real gridVol;
-			Real r;
-			Real R;
-			Real k;
-			bool tooSmall;
-			/* Joint properties */
-			vector<Real> phi_b;
-			vector<Real> phi_r;
-			vector<Real> JRC;
-			vector<Real> JCS;
-			vector<Real> asperity;
-			vector<Real> sigmaC;
-			vector<Real> cohesion;
-			vector<Real> tension;
-			vector<Real> lambda0;
-			vector<Real> heatCapacity;
-			vector<Real> hwater;
-			vector<bool> intactRock;
-			vector<int> jointType;
-			vector<struct Planes> planes;
+	struct Discontinuity {
+		Vector3r centre;
+		Discontinuity(Vector3r pos)
+		{
+			centre = pos;
+			a = b = c = d      = 0; /*persistence = false;*/
+			isBoundary         = false;
+			sliceBoundaries    = false;
+			constructionJoints = false;
+			phi_b              = 30.0;
+			phi_r              = 30.0;
+			JRC                = 15;
+			JCS                = pow(10, 6);
+			asperity           = 5;
+			sigmaC             = JCS;
+			cohesion           = 0;
+			tension            = 0;
+			lambda0            = 0.0;
+			heatCapacity       = 0.0;
+			hwater             = -1.0;
+			intactRock         = false;
+			throughGoing       = false;
+			jointType          = 0;
+		}
+		Real a;
+		Real b;
+		Real c;
+		Real d;
+		//			Real a_p;
+		//			Real b_p;
+		//			Real c_p;
+		//			Real d_p;
+		//			bool persistence;
+		bool         isBoundary;
+		bool         sliceBoundaries;
+		bool         constructionJoints;
+		vector<Real> persistence_a;
+		vector<Real> persistence_b;
+		vector<Real> persistence_c;
+		vector<Real> persistence_d;
+		/* Joint properties */
+		Real phi_b;
+		Real phi_r;
+		Real JRC;
+		Real JCS;
+		Real asperity;
+		Real sigmaC;
+		Real cohesion;
+		Real tension;
+		Real lambda0;
+		Real heatCapacity;
+		Real hwater;
+		bool intactRock;
+		bool throughGoing;
+		int  jointType;
+	};
+	struct Planes {
+		vector<int> vertexID;
+	};
+	struct Block {
+		Vector3r tempCentre;
+		Vector3r centre;
+		Block(Vector3r pos, Real kPP, Real rPP, Real RPP)
+		{
+			centre     = pos;
+			k          = kPP;
+			r          = rPP;
+			R          = RPP;
+			tooSmall   = false;
+			isBoundary = false;
+			tempCentre = pos;
+		}
+		vector<Real>         a;
+		vector<Real>         b;
+		vector<Real>         c;
+		vector<Real>         d;
+		vector<bool>         redundant;
+		vector<bool>         isBoundaryPlane;
+		bool                 isBoundary;
+		vector<struct Block> subMembers;
+		vector<Vector3r>     falseVertex;
+		//			vector<Vector3r> node; Real gridVol;
+		Real r;
+		Real R;
+		Real k;
+		bool tooSmall;
+		/* Joint properties */
+		vector<Real>          phi_b;
+		vector<Real>          phi_r;
+		vector<Real>          JRC;
+		vector<Real>          JCS;
+		vector<Real>          asperity;
+		vector<Real>          sigmaC;
+		vector<Real>          cohesion;
+		vector<Real>          tension;
+		vector<Real>          lambda0;
+		vector<Real>          heatCapacity;
+		vector<Real>          hwater;
+		vector<bool>          intactRock;
+		vector<int>           jointType;
+		vector<struct Planes> planes;
 
-			Vector3r color;
-		};
+		Vector3r color;
+	};
 
-//			Real getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
-//			Real getDet(const MatrixXr A);
-		bool createBlock(shared_ptr<Body>& body, struct BlockGen::Block block, int no);
-		bool contactDetectionLPCLPglobal(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
-		bool checkRedundancyLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
-		Real inscribedSphereCLP(struct BlockGen::Block block, Vector3r& initialPoint, bool twoDimension);
-		bool contactBoundaryLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
+	//			Real getSignedArea(const Vector3r pt1,const Vector3r pt2, const Vector3r pt3);
+	//			Real getDet(const MatrixXr A);
+	bool createBlock(shared_ptr<Body>& body, struct BlockGen::Block block, int no);
+	bool contactDetectionLPCLPglobal(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
+	bool checkRedundancyLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
+	Real inscribedSphereCLP(struct BlockGen::Block block, Vector3r& initialPoint, bool twoDimension);
+	bool contactBoundaryLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt);
 
-		/* Functions that were not used */
-//			Real getCentroidTetrahedron(const MatrixXr A); //not used
-//			bool contactDetection(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
-//			bool contactDetectionLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
-//			bool startingPointFeasibility(struct BlockGen::Block block, Vector3r& initialPoint); //not used
-//			bool contactBoundaryLPCLPslack(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
-//			Real evaluateFNoSphere(struct Block block, Vector3r presentTrial); //not used
+	/* Functions that were not used */
+	//			Real getCentroidTetrahedron(const MatrixXr A); //not used
+	//			bool contactDetection(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
+	//			bool contactDetectionLPCLP(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
+	//			bool startingPointFeasibility(struct BlockGen::Block block, Vector3r& initialPoint); //not used
+	//			bool contactBoundaryLPCLPslack(struct BlockGen::Discontinuity joint, struct BlockGen::Block block, Vector3r& touchingPt); //not used
+	//			Real evaluateFNoSphere(struct Block block, Vector3r presentTrial); //not used
 
-//			void calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
-//			Vector3r calCentroid(struct Block block, Real & blockVol);
+	//			void calculateInertia(struct Block block, Real& Ixx, Real& Iyy, Real& Izz,Real& Ixy, Real& Ixz, Real& Iyz);
+	//			Vector3r calCentroid(struct Block block, Real & blockVol);
 
-		bool checkCentroid(struct Block block, Vector3r presentTrial);
+	bool checkCentroid(struct Block block, Vector3r presentTrial);
 
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(
