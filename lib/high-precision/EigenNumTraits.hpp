@@ -165,4 +165,3 @@ inline ::yade::math::Real abs2(const ::yade::math::Real& x) { return x * x; }
 */
 
 #endif
-

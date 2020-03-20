@@ -233,4 +233,3 @@ static_assert(sizeof(Complex) == sizeof(std::complex<math::UnderlyingReal>), "Th
 #endif
 
 #endif
-

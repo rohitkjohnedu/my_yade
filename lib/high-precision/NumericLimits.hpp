@@ -18,8 +18,8 @@
 
 namespace std {
 template <> struct numeric_limits<::yade::math::ThinRealWrapper<::yade::math::UnderlyingReal>> {
-	using UnderlyingReal = ::yade::math::UnderlyingReal;
-	using ThinWrapper = ::yade::math::ThinRealWrapper<UnderlyingReal>;
+	using UnderlyingReal                           = ::yade::math::UnderlyingReal;
+	using ThinWrapper                              = ::yade::math::ThinRealWrapper<UnderlyingReal>;
 	constexpr static const auto& is_specialized    = std::numeric_limits<UnderlyingReal>::is_specialized;
 	constexpr static const auto& is_signed         = std::numeric_limits<UnderlyingReal>::is_signed;
 	constexpr static const auto& is_integer        = std::numeric_limits<UnderlyingReal>::is_integer;
@@ -62,4 +62,3 @@ template <> struct is_floating_point<::yade::math::ThinRealWrapper<::yade::math:
 }
 
 #endif
-

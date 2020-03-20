@@ -190,4 +190,3 @@ namespace MathEigenTypes {
 }
 
 #endif
-

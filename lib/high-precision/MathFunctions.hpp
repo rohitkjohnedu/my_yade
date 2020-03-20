@@ -494,4 +494,3 @@ namespace math {
 }
 
 #endif
-

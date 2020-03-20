@@ -51,8 +51,8 @@ namespace math {
 	inline Real fromStringReal(const std::string& st)
 	{
 #if (YADE_REAL_BIT > 80)
-		Real ret;
-		std::stringstream s{st};
+		Real              ret;
+		std::stringstream s { st };
 		s >> ret;
 		return ret;
 #else
@@ -63,18 +63,16 @@ namespace math {
 	inline Complex fromStringComplex(const std::string& st)
 	{
 #if (YADE_REAL_BIT <= 80)
-// NOTE: if reading complex is needed, the lack of standard approach to nonfinite numbers will need a workaround here.
-//       fortunately ArbitraryComplex_from_python does not use this. It uses fromStringReal separately for each component.
-//       and we usually deal only with input from python. So that's good. And probably we will never see following message:
-LOG_NOFILTER(R"""(Warning: Reading complex number "(nan,nan)" or "(inf,0)" is not handled correctly by stringstream)""");
+		// NOTE: if reading complex is needed, the lack of standard approach to nonfinite numbers will need a workaround here.
+		//       fortunately ArbitraryComplex_from_python does not use this. It uses fromStringReal separately for each component.
+		//       and we usually deal only with input from python. So that's good. And probably we will never see following message:
+		LOG_NOFILTER(R"""(Warning: Reading complex number "(nan,nan)" or "(inf,0)" is not handled correctly by stringstream)""");
 #endif
-		Complex ret;
-		std::stringstream s{st};
+		Complex           ret;
+		std::stringstream s { st };
 		s >> ret;
 		return ret;
 	};
 
 }
 }
-
-

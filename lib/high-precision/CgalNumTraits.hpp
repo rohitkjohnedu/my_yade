@@ -45,7 +45,7 @@ public:
 #if defined(CGAL_CFG_IEEE_754_BUG) and (YADE_REAL_BIT == 80)
 		return Is_valid<long double>()(static_cast<long double>(x));
 #else
-		return not ::yade::math::isnan(x);
+		return not::yade::math::isnan(x);
 #endif
 	}
 };
@@ -55,7 +55,7 @@ public:
 	typedef Tag_false Is_exact;
 	typedef Tag_true  Is_numerical_sensitive;
 
-/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
+	/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
 	class IsZero : public CGAL::cpp98::unary_function<Type, bool> {
 	public:
 		bool operator()(const Type& x) const { return x == 0; }
@@ -102,7 +102,7 @@ public:
 		std::pair<double, double> operator()(const Type& x) const { return (Interval_nt<>(static_cast<double>(x)) + Interval_nt<>::smallest()).pair(); }
 	};
 
-/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
+	/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
 	class Abs : public CGAL::cpp98::unary_function<Type, Type> {
 	public:
 		Type operator()(const Type& x) const { return ::yade::math::abs(x); }
@@ -175,4 +175,3 @@ using ::yade::math::sqrt;
 
 #endif // CGAL_NUM_TRAITS_HPP
 #endif // (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
-

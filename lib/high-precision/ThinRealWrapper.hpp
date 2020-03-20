@@ -49,139 +49,142 @@
 
 namespace yade {
 namespace math {
-template <typename WrappedReal>
+	template <typename WrappedReal>
 #ifdef YADE_IGNORE_IEEE_INFINITY_NAN
-class ThinRealWrapper
-        : boost::ordered_field_operators1<ThinRealWrapper<WrappedReal>, boost::ordered_field_operators2<ThinRealWrapper<WrappedReal>, WrappedReal>> {
+	class ThinRealWrapper
+	        : boost::ordered_field_operators1<ThinRealWrapper<WrappedReal>, boost::ordered_field_operators2<ThinRealWrapper<WrappedReal>, WrappedReal>> {
 #else
-class ThinRealWrapper : boost::partially_ordered1<
-                                ThinRealWrapper<WrappedReal>,
-                                boost::partially_ordered2<ThinRealWrapper<WrappedReal>, WrappedReal, boost::field_operators1<ThinRealWrapper<WrappedReal>>>> {
+	class ThinRealWrapper
+	        : boost::partially_ordered1<
+	                  ThinRealWrapper<WrappedReal>,
+	                  boost::partially_ordered2<ThinRealWrapper<WrappedReal>, WrappedReal, boost::field_operators1<ThinRealWrapper<WrappedReal>>>> {
 #endif
-private:
-	WrappedReal val;
+	private:
+		WrappedReal val;
 
-	// detect types which are convertible to WrappedReal
-	template <typename OtherType> using EnableIfConvertible = std::enable_if_t<std::is_convertible<OtherType, WrappedReal>::value>;
+		// detect types which are convertible to WrappedReal
+		template <typename OtherType> using EnableIfConvertible = std::enable_if_t<std::is_convertible<OtherType, WrappedReal>::value>;
 
-	static_assert(boost::is_complex<WrappedReal>::value == false, "WrappedReal cannot be complex");
+		static_assert(boost::is_complex<WrappedReal>::value == false, "WrappedReal cannot be complex");
 
-public:
-	// default constructor
-	ThinRealWrapper() BOOST_NOEXCEPT_IF(boost::has_nothrow_default_constructor<WrappedReal>::value) = default;
-	// copy constructor
-	ThinRealWrapper(const ThinRealWrapper& initVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_copy_constructor<WrappedReal>::value) = default;
-	// copy assignment operator
-	ThinRealWrapper& operator=(const ThinRealWrapper& rhs) BOOST_NOEXCEPT_IF(boost::has_nothrow_assign<WrappedReal>::value) = default;
-	// move constructor
-	ThinRealWrapper(ThinRealWrapper&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value) = default;
-	// move assignment operator
-	ThinRealWrapper& operator=(ThinRealWrapper&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value) = default;
-	// destructor
-	~ThinRealWrapper() noexcept = default;
+	public:
+		// default constructor
+		ThinRealWrapper() BOOST_NOEXCEPT_IF(boost::has_nothrow_default_constructor<WrappedReal>::value) = default;
+		// copy constructor
+		ThinRealWrapper(const ThinRealWrapper& initVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_copy_constructor<WrappedReal>::value) = default;
+		// copy assignment operator
+		ThinRealWrapper& operator=(const ThinRealWrapper& rhs) BOOST_NOEXCEPT_IF(boost::has_nothrow_assign<WrappedReal>::value) = default;
+		// move constructor
+		ThinRealWrapper(ThinRealWrapper&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value) = default;
+		// move assignment operator
+		ThinRealWrapper& operator=(ThinRealWrapper&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value) = default;
+		// destructor
+		~ThinRealWrapper() noexcept = default;
 
-	// NOTE: copy and assignment constructors are implemened below as templated move/copy constructors.
+		// NOTE: copy and assignment constructors are implemened below as templated move/copy constructors.
 
-	// move/copy constructor from OtherType which is_convertible to WrappedReal
-	template <typename OtherType, typename = EnableIfConvertible<OtherType>>
-	ThinRealWrapper(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value)
-	        : val(static_cast<WrappedReal>(std::forward<OtherType>(moveVal)))
-	{
-	}
-
-	// move/copy assignment from OtherType which is_convertible to WrappedReal
-	template <typename OtherType, typename = EnableIfConvertible<OtherType>>
-	ThinRealWrapper& operator=(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value)
-	{
-		val = std::forward<OtherType>(moveVal);
-		return *this;
-	}
-
-	// conversion operator to other types
-	template <typename OtherType, typename = EnableIfConvertible<OtherType>> explicit operator OtherType() const { return static_cast<OtherType>(val); }
-	explicit                                                                          operator const WrappedReal&() const { return val; }
-	explicit                                                                          operator       WrappedReal&()       { return val; }
-
-	// https://en.cppreference.com/w/cpp/language/cast_operator
-	explicit operator WrappedReal*() { return &val; };
-	explicit operator const WrappedReal*() const { return &val; };
-
-	// field operators
-	ThinRealWrapper& operator+=(const ThinRealWrapper& x)
-	{
-		val += x.val;
-		return *this;
-	}
-	ThinRealWrapper& operator-=(const ThinRealWrapper& x)
-	{
-		val -= x.val;
-		return *this;
-	}
-	ThinRealWrapper& operator*=(const ThinRealWrapper& x)
-	{
-		val *= x.val;
-		return *this;
-	}
-	ThinRealWrapper& operator/=(const ThinRealWrapper& x)
-	{
-		val /= x.val;
-		return *this;
-	}
-	const ThinRealWrapper  operator-() const { return -val; }
-	const ThinRealWrapper& operator+() const { return *this; }
-
-	// ordering operators
-	bool operator<(const ThinRealWrapper& rhs) const { return val < rhs.val; }
-#ifdef YADE_IGNORE_IEEE_INFINITY_NAN
-	bool operator==(const ThinRealWrapper& rhs) const { return val == rhs.val; }
-#else
-	bool operator==(const ThinRealWrapper& rhs) const
-	{
-		check(rhs);
-		return val == rhs.val;
-	}
-	bool operator!=(const ThinRealWrapper& rhs) const
-	{
-		check(rhs);
-		return val != rhs.val;
-	}
-
-	template <typename OtherType, typename = EnableIfConvertible<OtherType>> friend inline bool operator==(OtherType rhs, const ThinRealWrapper& th)
-	{
-		th.check(rhs);
-		return th.val == rhs;
-	}
-	template <typename OtherType, typename = EnableIfConvertible<OtherType>> friend inline bool operator!=(OtherType rhs, const ThinRealWrapper& th)
-	{
-		th.check(rhs);
-		return th.val != rhs;
-	}
-#ifdef YADE_WRAPPER_THROW_ON_NAN_INF_REAL
-	// this can be useful sometimes for debugging when calculations go all wrong.
-	void check(const ThinRealWrapper& rhs) const
-	{
-		// boost::partially_ordered takes into account that some numbers cannot be compared with each other
-		if (std::isnan(rhs.val) or std::isnan(val) or std::isinf(rhs.val) or std::isinf(val)) {
-			throw std::runtime_error("cannot compare NaN, Inf numbers.");
+		// move/copy constructor from OtherType which is_convertible to WrappedReal
+		template <typename OtherType, typename = EnableIfConvertible<OtherType>>
+		ThinRealWrapper(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value)
+		        : val(static_cast<WrappedReal>(std::forward<OtherType>(moveVal)))
+		{
 		}
-	}
+
+		// move/copy assignment from OtherType which is_convertible to WrappedReal
+		template <typename OtherType, typename = EnableIfConvertible<OtherType>>
+		ThinRealWrapper& operator=(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value)
+		{
+			val = std::forward<OtherType>(moveVal);
+			return *this;
+		}
+
+		// conversion operator to other types
+		template <typename OtherType, typename = EnableIfConvertible<OtherType>> explicit operator OtherType() const
+		{
+			return static_cast<OtherType>(val);
+		}
+		explicit operator const WrappedReal&() const { return val; }
+		explicit operator WrappedReal&() { return val; }
+
+		// https://en.cppreference.com/w/cpp/language/cast_operator
+		explicit operator WrappedReal*() { return &val; };
+		explicit operator const WrappedReal*() const { return &val; };
+
+		// field operators
+		ThinRealWrapper& operator+=(const ThinRealWrapper& x)
+		{
+			val += x.val;
+			return *this;
+		}
+		ThinRealWrapper& operator-=(const ThinRealWrapper& x)
+		{
+			val -= x.val;
+			return *this;
+		}
+		ThinRealWrapper& operator*=(const ThinRealWrapper& x)
+		{
+			val *= x.val;
+			return *this;
+		}
+		ThinRealWrapper& operator/=(const ThinRealWrapper& x)
+		{
+			val /= x.val;
+			return *this;
+		}
+		const ThinRealWrapper  operator-() const { return -val; }
+		const ThinRealWrapper& operator+() const { return *this; }
+
+		// ordering operators
+		bool operator<(const ThinRealWrapper& rhs) const { return val < rhs.val; }
+#ifdef YADE_IGNORE_IEEE_INFINITY_NAN
+		bool operator==(const ThinRealWrapper& rhs) const { return val == rhs.val; }
 #else
-	// this one is optimized away
-	void check(const ThinRealWrapper&) const {};
+		bool operator==(const ThinRealWrapper& rhs) const
+		{
+			check(rhs);
+			return val == rhs.val;
+		}
+		bool operator!=(const ThinRealWrapper& rhs) const
+		{
+			check(rhs);
+			return val != rhs.val;
+		}
+
+		template <typename OtherType, typename = EnableIfConvertible<OtherType>> friend inline bool operator==(OtherType rhs, const ThinRealWrapper& th)
+		{
+			th.check(rhs);
+			return th.val == rhs;
+		}
+		template <typename OtherType, typename = EnableIfConvertible<OtherType>> friend inline bool operator!=(OtherType rhs, const ThinRealWrapper& th)
+		{
+			th.check(rhs);
+			return th.val != rhs;
+		}
+#ifdef YADE_WRAPPER_THROW_ON_NAN_INF_REAL
+		// this can be useful sometimes for debugging when calculations go all wrong.
+		void check(const ThinRealWrapper& rhs) const
+		{
+			// boost::partially_ordered takes into account that some numbers cannot be compared with each other
+			if (std::isnan(rhs.val) or std::isnan(val) or std::isinf(rhs.val) or std::isinf(val)) {
+				throw std::runtime_error("cannot compare NaN, Inf numbers.");
+			}
+		}
+#else
+		// this one is optimized away
+		void check(const ThinRealWrapper&) const {};
 #endif
 #endif
 
-	// Output/ Input
-	friend inline std::ostream& operator<<(std::ostream& os, const ThinRealWrapper& v) { return os << v.val; }
-	friend inline std::istream& operator>>(std::istream& is, ThinRealWrapper& v)
-	{
-		is >> v.val;
-		return is;
-	}
-};
+		// Output/ Input
+		friend inline std::ostream& operator<<(std::ostream& os, const ThinRealWrapper& v) { return os << v.val; }
+		friend inline std::istream& operator>>(std::istream& is, ThinRealWrapper& v)
+		{
+			is >> v.val;
+			return is;
+		}
+	};
 
 } // namespace math
 } // namespace yade
 
 #endif
-
