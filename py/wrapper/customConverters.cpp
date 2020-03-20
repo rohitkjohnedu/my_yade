@@ -110,7 +110,7 @@ struct custom_OpenMPAccumulator_to_int {
 #if PY_MAJOR_VERSION >= 3
 		return boost::python::incref(PyLong_FromLong((long)acc.get()));
 #else
-		return boost::python::incref(PyInt_FromLong((long)acc.get()));
+                return boost::python::incref(PyInt_FromLong((long)acc.get()));
 #endif
 	}
 };
@@ -125,7 +125,7 @@ struct custom_OpenMPAccumulator_from_int {
 #if PY_MAJOR_VERSION >= 3
 		return PyLong_Check(obj_ptr) ? obj_ptr : 0;
 #else
-		return PyInt_Check(obj_ptr) ? obj_ptr : 0;
+                return PyInt_Check(obj_ptr) ? obj_ptr : 0;
 #endif
 	}
 	static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
@@ -347,4 +347,3 @@ try {
 	boost::python::handle_exception();
 	throw;
 }
-

@@ -43,8 +43,8 @@ CREATE_CPP_LOCAL_LOGGER("yadeWrapper.cpp");
 
 namespace yade { // Cannot have #include directive inside.
 
-using math::min;  // using inside .cpp file is ok.
 using math::max;
+using math::min; // using inside .cpp file is ok.
 
 /*
 Python normally iterates over object it is has __getitem__ and __len__, which BodyContainer does.
@@ -138,7 +138,7 @@ public:
 	vector<Body::id_t> appendList(vector<shared_ptr<Body>> bb)
 	{
 		const std::lock_guard<std::mutex> lock(Omega::instance().renderMutex);
-		vector<Body::id_t>        ret;
+		vector<Body::id_t>                ret;
 		FOREACH(shared_ptr<Body> & b, bb) { ret.push_back(append(b)); }
 		return ret;
 	}
@@ -1027,10 +1027,10 @@ public:
 		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
 		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
 		LOG_DEBUG(
-		        "RUN"
-		        << ((scene->stopAtIter - scene->iter) > 0 ? string(" (" + boost::lexical_cast<string>(scene->stopAtIter - scene->iter) + " to go)")
-		                                                  : string(""))
-		        << "!");
+		        "RUN" << ((scene->stopAtIter - scene->iter) > 0
+		                          ? string(" (" + boost::lexical_cast<string>(scene->stopAtIter - scene->iter) + " to go)")
+		                          : string(""))
+		              << "!");
 		if (doWait)
 			wait();
 	}
@@ -1304,8 +1304,8 @@ bool isChildClassOf(const string& child, const string& base) { return (Omega::in
 py::list plugins_get()
 {
 	const std::map<std::string, DynlibDescriptor>& plugins = Omega::instance().getDynlibsDescriptor();
-	std::pair<string, DynlibDescriptor>  p;
-	py::list                             ret;
+	std::pair<string, DynlibDescriptor>            p;
+	py::list                                       ret;
 	for (const auto& p : plugins)
 		ret.append(p.first);
 	return ret;
