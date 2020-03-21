@@ -76,3 +76,52 @@ namespace math {
 
 }
 }
+
+namespace Eigen {
+// These operator<< specialisations have to be in Eigen namespace because ::boost::log
+// namespace can perform ADL lookup only into ::std and ::Eigen namespaces when
+// searching for an overlaod of std::ostream& operator<<(std::ostream& os,const ::yade::Vector3<Scalar>& v)
+// and others. This is because our ::yade::Vector* typedefs in fact resolve into types from ::Eigen.
+//
+// So without putting these operator<< inside ::Eigen namespace the default Eigen operator<<(…)
+// are used by ::boost::log
+//
+// This is clearly a bug. However I am not sure what is to blame:
+// (1) The ADL not flexible enough, and ignoring ::yade entirely?
+// (2) The ::boost::log, because the ADL allows it to check only ::std and ::Eigen and has no opportunity
+//     to check ::yade?
+// (3) The Logger.hpp, because writing some variation of 'namespace boost{namespace log{ using ::yade::operator<<; }}'
+//     in Logger.hpp probably could also make it work? But Logger.hpp has no idea about Eigen at all. Putting it
+//     there is causing an #include-dependency cycle.
+//
+// This interesting problem was brought to you by four namespaces:
+//
+//                                    ( g l o b a l   n a m e s a p a c e )
+//                                      /          |         |          \
+//                             ::boost::log     ::Eigen     :std       ::yade
+
+template <class Scalar>::std::ostream& operator<<(::std::ostream& os, const ::yade::Vector2<Scalar>& v)
+{
+	os << v.x() << " " << v.y();
+	return os;
+}
+
+template <class Scalar>::std::ostream& operator<<(::std::ostream& os, const ::yade::Vector3<Scalar>& v)
+{
+	os << v.x() << " " << v.y() << " " << v.z();
+	return os;
+}
+
+template <class Scalar>::std::ostream& operator<<(::std::ostream& os, const ::yade::Vector6<Scalar>& v)
+{
+	os << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5];
+	return os;
+}
+
+template <class Scalar>::std::ostream& operator<<(::std::ostream& os, const ::Eigen::Quaternion<Scalar>& q)
+{
+	os << q.w() << " " << q.x() << " " << q.y() << " " << q.z();
+	return os;
+}
+}
+
