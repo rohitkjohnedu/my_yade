@@ -92,31 +92,6 @@ template <typename EigenMatrix> EigenMatrix ZeroInitializer() { return EigenMatr
 template <> int                             ZeroInitializer<int>();
 template <> Real                            ZeroInitializer<Real>();
 
-// io
-template <class Scalar> std::ostream& operator<<(std::ostream& os, const Vector2<Scalar>& v)
-{
-	os << v.x() << " " << v.y();
-	return os;
-}
-
-template <class Scalar> std::ostream& operator<<(std::ostream& os, const Vector3<Scalar>& v)
-{
-	os << v.x() << " " << v.y() << " " << v.z();
-	return os;
-}
-
-template <class Scalar> std::ostream& operator<<(std::ostream& os, const Vector6<Scalar>& v)
-{
-	os << v[0] << " " << v[1] << " " << v[2] << " " << v[3] << " " << v[4] << " " << v[5];
-	return os;
-}
-
-template <class Scalar> std::ostream& operator<<(std::ostream& os, const Eigen::Quaternion<Scalar>& q)
-{
-	os << q.w() << " " << q.x() << " " << q.y() << " " << q.z();
-	return os;
-}
-
 template <typename Scalar> struct Math {
 	static const Scalar PI;
 	static const Scalar HALF_PI;
