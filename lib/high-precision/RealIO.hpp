@@ -98,7 +98,7 @@ namespace Eigen {
 //
 //                                    ( g l o b a l   n a m e s a p a c e )
 //                                      /          |         |          \
-//                             ::boost::log     ::Eigen     :std       ::yade
+//                             ::boost::log     ::Eigen    ::std       ::yade
 
 template <class Scalar>::std::ostream& operator<<(::std::ostream& os, const ::yade::Vector2<Scalar>& v)
 {
