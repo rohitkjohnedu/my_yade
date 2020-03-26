@@ -457,10 +457,9 @@ def ele(nodeFileName,eleFileName,shift=(0,0,0),scale=1.0,**kw):
 	return tetras
 
 def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Quaternion((0,1,0),0.0),**kw):
-	from yade import polyhedra_utils
 	"""Load polyhedra from a text file.
 	
-	:param str filename: file name
+	:param str filename: file name. Expected file format is the one output by export.textPolyhedra.
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
 	:param float scale: factor scales the given data.
 	:param quaternion orientation:  orientation of the imported polyhedra
@@ -469,6 +468,7 @@ def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Qua
 
 	Lines starting with # are skipped
 	"""
+	from yade import polyhedra_utils
 	infile = open(fileName,"r")
 	lines = infile.readlines()
 	infile.close()
@@ -484,7 +484,7 @@ def textPolyhedra(fileName,material,shift=Vector3.Zero,scale=1.0,orientation=Qua
 			raise RuntimeError("Check polyhedra input file! Number of parameters in the first line is not 3!");
 		else:
 			vertLoad = []
-			ids = int(data[0])
+#			ids = int(data[0])
 			verts = int(data[1])
 			surfs = int(data[2])
 			i+=1
