@@ -19,7 +19,6 @@ Build-Depends:
  libeigen3-dev (>=3.2.1-1),
  libgl1-mesa-dev,
  libgts-dev,
- libloki-dev,
  libmetis-dev [amd64 i386 ia64 kfreebsd-amd64 kfreebsd-i386 powerpc],
  libopenblas-dev [amd64 i386 ia64 kfreebsd-amd64 kfreebsd-i386 powerpc],
  libqglviewer-dev-qt5,
