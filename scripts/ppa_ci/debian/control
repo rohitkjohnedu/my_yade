@@ -17,7 +17,7 @@ Build-Depends:
  libbz2-dev,
  libcgal-dev [!armel],
  libeigen3-dev (>=3.2.1-1),
- libgl1-mesa-dev,
+ libgl1-mesa-dev | libgl-dev,
  libgts-dev,
  libmetis-dev [amd64 i386 ia64 kfreebsd-amd64 kfreebsd-i386 powerpc],
  libopenblas-dev [amd64 i386 ia64 kfreebsd-amd64 kfreebsd-i386 powerpc],
