@@ -766,6 +766,7 @@ pages:
   stage: deb
   <<: *gitlab_runner_retry_definition
   only:
+    - master
     - merge_requests
   script:
     - cd $CI_PROJECT_DIR/deb/yadedaily
