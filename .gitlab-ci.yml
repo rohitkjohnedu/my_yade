@@ -328,7 +328,7 @@ mkHP_long_double:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
-mkHP_20_04_float128:
+mkHP_float128:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -336,9 +336,9 @@ mkHP_20_04_float128:
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=33 $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
+  image: registry.gitlab.com/yade-dev/docker-yade:-bullseye
 
-mkHP_20_04_mpfr150:
+mkHP_mpfr150:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -346,7 +346,7 @@ mkHP_20_04_mpfr150:
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=150 -DENABLE_MPFR=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
+  image: registry.gitlab.com/yade-dev/docker-yade:-bullseye
 
 mkHP_bf45:
   <<: *make_definition
