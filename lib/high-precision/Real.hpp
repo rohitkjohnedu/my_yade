@@ -232,4 +232,11 @@ static_assert(sizeof(Complex) == sizeof(std::complex<math::UnderlyingReal>), "Th
 #warning "Intel compiler notes: about using flags -Qoption,cpp,--extended_float_type"
 #endif
 
+/*************************************************************************/
+/**  workaround odeint bug https://github.com/boostorg/odeint/issues/40 **/
+/*************************************************************************/
+#if BOOST_VERSION >= 106800
+#include "WorkaroundBoostOdeIntBug.hpp"
+#endif
+
 #endif
