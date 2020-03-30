@@ -15,7 +15,7 @@
 # setup the periodic boundary
 from __future__ import print_function
 O.periodic=True
-O.cell.refSize=(2,2,2)
+O.cell.hSize=Matrix3(2,0,0, 0,2,0, 0,0,2)
 
 from yade import pack,plot
 
@@ -68,10 +68,10 @@ limitMeanStress=-5e5
 def checkStress():
 	# stress tensor as the sum of normal and shear contributions
 	# Matrix3.Zero is the intial value for sum(...)
-	stress=sum(normalShearStressTensors(),Matrix3.Zero)
-	print('mean stress',stress.trace()/3.)
+	stress=getStress().trace()/3.
+	print('mean stress',stress)
 	# if mean stress is below (bigger in absolute value) limitMeanStress, start shearing
-	if stress.trace()/3.<limitMeanStress:
+	if stress<limitMeanStress:
 		# apply constant-rate distorsion on the periodic cell
 		O.cell.velGrad=Matrix3(0,0,.1, 0,0,0, 0,0,0)
 		# change the function called by the checker engine
@@ -109,7 +109,7 @@ def addData():
 	# get the stress tensor (as 3x3 matrix)
 	stress=sum(normalShearStressTensors(),Matrix3.Zero)
 	# give names to values we are interested in and save them
-	plot.addData(exz=O.cell.trsf[0,2],szz=stress[2,2],sxz=stress[0,2],tanPhi=stress[0,2]/stress[2,2],i=O.iter)
+	plot.addData(exz=O.cell.trsf[0,2],szz=stress[2,2],sxz=stress[0,2],tanPhi=(stress[0,2]/stress[2,2]) if stress[2,2]!=0 else 0,i=O.iter)
 	# color particles based on rotation amount
 	for b in O.bodies:
 		# rot() gives rotation vector between reference and current position
