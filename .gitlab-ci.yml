@@ -338,7 +338,7 @@ mkHP_20_04_float128:
     - echo $EXTRA_CMAKE_ARGS
   image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
 
-mkHP_20_04_mpfr150:
+mkHP_mpfr150:
   <<: *make_definition
   <<: *artifacts_definition
   before_script:
@@ -346,7 +346,7 @@ mkHP_20_04_mpfr150:
     - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
     - export EXTRA_CMAKE_ARGS="-DREAL_DECIMAL_PLACES=150 -DENABLE_MPFR=ON $EXTRA_CMAKE_ARGS"
     - echo $EXTRA_CMAKE_ARGS
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 
 mkHP_bf45:
   <<: *make_definition
@@ -536,13 +536,13 @@ tstHP_20_04_float128:
   needs: ["mkHP_20_04_float128"]
   timeout: 4 hours
 
-tstHP_20_04_mpfr150:
+tstHP_mpfr150:
   <<: *test_definition
   <<: *skip_wip_test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - mkHP_20_04_mpfr150
-  needs: ["mkHP_20_04_mpfr150"]
+    - mkHP_mpfr150
+  needs: ["mkHP_mpfr150"]
   timeout: 4 hours
 
 tstHP_bf45:
@@ -696,13 +696,13 @@ ckHP_20_04_float128:
   needs: ["mkHP_20_04_float128"]
   timeout: 4 hours
 
-ckHP_20_04_mpfr150:
+ckHP_mpfr150:
   <<: *check_definition
   <<: *skip_wip_test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:ubuntu20.04
+  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
   dependencies:
-    - mkHP_20_04_mpfr150
-  needs: ["mkHP_20_04_mpfr150"]
+    - mkHP_mpfr150
+  needs: ["mkHP_mpfr150"]
   timeout: 4 hours
 
 ckHP_bf45:
