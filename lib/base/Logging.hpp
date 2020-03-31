@@ -1,5 +1,11 @@
-// 2006-2008 © Václav Šmilauer <eudoxos@arcig.cz>
-// 2019        Janek Kozicki
+/*************************************************************************
+*  2006-2008 Václav Šmilauer                                             *
+*  2019      Janek Kozicki                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
 #pragma once
 /*
  * This file defines various useful logging-related macros. For full description see https://yade-dem.org/doc/prog.html#debugging
