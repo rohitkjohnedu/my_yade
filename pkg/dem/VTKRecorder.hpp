@@ -60,7 +60,7 @@ public:
 		#ifdef YADE_MPI 
 			((bool,parallelMode,false,,"For MPI parallel runs, each proc writes their own vtu/vtp files. Master proc writes a pvtu/pvtp file containing metadata about worker vtu files. load the pvtu/pvtp in paraview for visualization."))
 		#endif
-		((string,fileName,"",,"Base file name; it will be appended with {spheres,intrs,facets}-243100.vtu (unless *multiblock* is ``True``) depending on active recorders and step number (243100 in this case). It can contain slashes, but the directory must exist already."))
+		((string,fileName,"",,"Base file name; it will be appended with {spheres,intrs,facets}.243100.vtu (unless *multiblock* is ``True``) depending on active recorders and step number (243100 in this case). It can contain slashes, but the directory must exist already."))
 		((vector<string>,recorders,vector<string>(1,string("all")),,R"""(List of active recorders (as strings). ``all`` (the default value) enables all base and generic recorders.
 
 **Base recorders**
