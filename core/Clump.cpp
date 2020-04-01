@@ -208,8 +208,8 @@ void Clump::updateProperties(const shared_ptr<Body>& clumpBody, unsigned int dis
 								Ig += m
 								        * (x.dot(x) * Matrix3r::Identity() - x * x.transpose() /*dist^2*/
 								           + Matrix3r(
-								                     Vector3r::Constant(pow(dx, 2) / 6.)
-								                             .asDiagonal())) /*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/
+								                   Vector3r::Constant(pow(dx, 2) / 6.)
+								                           .asDiagonal())) /*I_s/m = d^2: along princial axes of dv; perhaps negligible?*/
 								        ;
 								break;
 							}

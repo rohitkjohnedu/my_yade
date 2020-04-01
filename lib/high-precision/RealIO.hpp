@@ -124,4 +124,3 @@ template <class Scalar>::std::ostream& operator<<(::std::ostream& os, const ::Ei
 	return os;
 }
 }
-

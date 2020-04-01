@@ -1081,12 +1081,12 @@ void HydrodynamicsLawLBM::action()
 				///FIXME
 				I = nodes[nidx1].i
 				        + int(math::round(
-				                  eib[dndx1]
-				                          .x())); // XXX: this is suspicious. Anyway, you have to select the int(…) conversion policy: math::floor, math::ceil, math::round
+				                eib[dndx1]
+				                        .x())); // XXX: this is suspicious. Anyway, you have to select the int(…) conversion policy: math::floor, math::ceil, math::round
 				J = nodes[nidx1].j
 				        + int(math::round(
-				                  eib[dndx1]
-				                          .y())); //      It is quite frequent that you can have e.g. 11.99999999993 and it should be int==12. But it becomes 11.
+				                eib[dndx1]
+				                        .y())); //      It is quite frequent that you can have e.g. 11.99999999993 and it should be int==12. But it becomes 11.
 				if (Xperiodicity) {
 					if (I == Nx) {
 						I = 0;

@@ -115,7 +115,8 @@ private:
 
 class PDFSpheresIntrsCalculator : public PDFEngine::PDFCalculator {
 public:
-	PDFSpheresIntrsCalculator(string name, bool (*)(shared_ptr<Interaction> const&) = [](shared_ptr<Interaction> const&) { return true; });
+	PDFSpheresIntrsCalculator(
+	        string name, bool (*)(shared_ptr<Interaction> const&) = [](shared_ptr<Interaction> const&) { return true; });
 	vector<string> getDatas() const;
 	void           cleanData();
 	bool           addData(const shared_ptr<Interaction>&, Real const& dS, Real const& V, int const& N, bool inversed);

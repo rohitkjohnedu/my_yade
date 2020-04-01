@@ -35,4 +35,3 @@ namespace numeric {
 
 #endif
 #endif
-

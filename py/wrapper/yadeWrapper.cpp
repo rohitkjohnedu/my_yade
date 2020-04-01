@@ -1027,10 +1027,10 @@ public:
 		// timespec t1,t2; t1.tv_sec=0; t1.tv_nsec=40000000; /* 40 ms */
 		// while(!OMEGA.isRunning()) nanosleep(&t1,&t2); // wait till we start, so that calling wait() immediately afterwards doesn't return immediately
 		LOG_DEBUG(
-		        "RUN" << ((scene->stopAtIter - scene->iter) > 0
-		                          ? string(" (" + boost::lexical_cast<string>(scene->stopAtIter - scene->iter) + " to go)")
-		                          : string(""))
-		              << "!");
+		        "RUN"
+		        << ((scene->stopAtIter - scene->iter) > 0 ? string(" (" + boost::lexical_cast<string>(scene->stopAtIter - scene->iter) + " to go)")
+		                                                  : string(""))
+		        << "!");
 		if (doWait)
 			wait();
 	}

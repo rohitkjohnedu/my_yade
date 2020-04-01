@@ -349,8 +349,8 @@ public:
 					if (foundIx1 != -1
 					    && callBacks[foundIx1][foundIx2]
 					            != callBacks
-					                       [ix1]
-					                       [ix2]) { // we found a callback, but there already was one at this distance and it was different from the current one
+					                    [ix1]
+					                    [ix2]) { // we found a callback, but there already was one at this distance and it was different from the current one
 						cerr << __FILE__ << ":" << __LINE__ << ": ambiguous 2d dispatch ("
 						     << "arg1=" << base1->getClassName() << ", arg2=" << base2->getClassName() << ", distance=" << dist
 						     << "), dispatch matrix:" << endl;

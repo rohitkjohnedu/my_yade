@@ -134,7 +134,7 @@ template <class C, typename T, T C::*A> void make_setter_postLoad(C& instance, c
 			_classObj._DEF_READONLY_BY_VALUE(thisClass, _ATTR_NAM(attr), docStr.c_str());                                                          \
 		if (_ro && _post)                                                                                                                              \
 			std::cerr << "WARN: " BOOST_PP_STRINGIZE(thisClass) "::" _ATTR_NAM_STR(                                                                \
-			                     attr) " with the yade::Attr::readonly flag also uselessly sets yade::Attr::triggerPostLoad."                      \
+			        attr) " with the yade::Attr::readonly flag also uselessly sets yade::Attr::triggerPostLoad."                                   \
 			          << std::endl;                                                                                                                \
 	}
 #define _DEF_READWRITE_CUSTOM_STATIC(thisClass, attr, doc)                                                                                                     \

@@ -200,7 +200,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 	incidentV    = (de2->vel + de2->angVel.cross(c2x))
 	        - (de1->vel
 	           + de1->angVel.cross(
-	                     c1x)); //FIXME: If we need to recalculate the relative velocity here, we should add shiftVel manually in this line, to handle periodicity @vsangelidakis
+	                   c1x)); //FIXME: If we need to recalculate the relative velocity here, we should add shiftVel manually in this line, to handle periodicity @vsangelidakis
 	incidentVn     = geom->normal.dot(incidentV) * geom->normal; // contact normal velocity
 	incidentVs     = incidentV - incidentVn;                     // contact shear velocity
 	shearIncrement = incidentVs
