@@ -35,7 +35,7 @@ public:
 			((Real,kr,0.0,,"Rotational stiffness"))
 			((Real,ktw,0.0,,"Rotational stiffness"))
 			((Real,maxBendPl,0.0,,"Coefficient to determine the maximum plastic moment to apply at the contact"))
-			
+
 			((Vector3r,normalViscous,Vector3r::Zero(),,"Normal viscous component"))
 			((Vector3r,shearViscous,Vector3r::Zero(),,"Shear viscous component"))
 			((Vector3r,shearElastic,Vector3r::Zero(),,"Total elastic shear force"))
@@ -60,10 +60,14 @@ public:
 
 			// Contact damping ratio for non-linear elastic contact law (of Hertz-Mindlin type)
 			((Real,alpha,0.0,,"Constant coefficient to define contact viscous damping for non-linear elastic force-displacement relationship."))
-			
+
 			// temporary
 			((Vector3r,prevU,Vector3r::Zero(),,"Previous local displacement; only used with :yref:`Law2_L3Geom_FrictPhys_HertzMindlin`."))
 			((Vector2r,Fs,Vector2r::Zero(),,"Shear force in local axes (computed incrementally)"))
+#ifdef PARTIALSAT
+			((Real,initD,0,,"initial penetration distance, used for crackaperture estimate"))
+			((bool,isBroken,0,,"bool to keep a bond flagged as broken (only useful when displacement criteria is used in partial sat for cracked cell estimates) "))
+#endif
 			,
 			createIndex());
 	// clang-format on
@@ -161,7 +165,7 @@ public:
 			((bool,neverErase,false,,"Keep interactions even if particles go away from each other (only in case another constitutive law is in the scene, e.g. :yref:`Law2_ScGeom_CapillaryPhys_Capillarity`)"))
 			//((bool,LinDamp,true,,"bool to activate linear viscous damping (if false, en and es have to be defined in place of betan and betas)"))
 
-			((OpenMPAccumulator<Real>,frictionDissipation,,Attr::noSave,"Energy dissipation due to sliding"))		
+			((OpenMPAccumulator<Real>,frictionDissipation,,Attr::noSave,"Energy dissipation due to sliding"))
 			((OpenMPAccumulator<Real>,shearEnergy,,Attr::noSave,"Shear elastic potential energy"))
 			((OpenMPAccumulator<Real>,normDampDissip,,Attr::noSave,"Energy dissipated by normal damping"))
 			((OpenMPAccumulator<Real>,shearDampDissip,,Attr::noSave,"Energy dissipated by tangential damping"))
@@ -170,7 +174,7 @@ public:
 			, /* py */
 			.def("contactsAdhesive",&Law2_ScGeom_MindlinPhys_Mindlin::contactsAdhesive,"Compute total number of adhesive contacts.")
 			.def("ratioSlidingContacts",&Law2_ScGeom_MindlinPhys_Mindlin::ratioSlidingContacts,"Return the ratio between the number of contacts sliding to the total number at a given time.")
-			.def("normElastEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy,"Compute normal elastic potential energy. It handles the DMT formulation if :yref:`Law2_ScGeom_MindlinPhys_Mindlin::includeAdhesion` is set to true.")	
+			.def("normElastEnergy",&Law2_ScGeom_MindlinPhys_Mindlin::normElastEnergy,"Compute normal elastic potential energy. It handles the DMT formulation if :yref:`Law2_ScGeom_MindlinPhys_Mindlin::includeAdhesion` is set to true.")
 	);
 	// clang-format on
 	DECLARE_LOGGER;
@@ -224,5 +228,46 @@ public:
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(Ip2_FrictMat_FrictMat_MindlinCapillaryPhys);
+
+#ifdef PARTIALSAT
+
+class PartialSatState : public State {
+	// clang-format off
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PartialSatState,State,"Hertz mindlin state information about each body. Only active if partially saturated clay model is active.",
+
+		((Real,suctionSum,0,,"sum of suctions associated with incident cells"))
+		((Real,suction,0,,"suction computed for particle (sum(sat of inc. cells)/num inc. cells)"))
+		((Real,radiiChange,0,,"total change of particle radius due to swelling"))
+		((Real,radiiOriginal,0,,"original particle radius prior to swelling"))
+		((int,incidentCells,0,,"number of incident cells"))
+		((Real,volumeOriginal,0,,"original particle volume stored for strain increments"))
+
+		,
+		createIndex();
+	);
+	// clang-format on
+	REGISTER_CLASS_INDEX(PartialSatState, State);
+
+};
+REGISTER_SERIALIZABLE(PartialSatState);
+
+class PartialSatMat : public FrictMat {
+public:
+	virtual shared_ptr<State> newAssocState() const { return shared_ptr<State>(new PartialSatState); }
+	virtual bool              stateTypeOk(State* s) const { return (bool)dynamic_cast<PartialSatState*>(s); }
+
+	// clang-format off
+	YADE_CLASS_BASE_DOC_ATTRS_CTOR(PartialSatMat,FrictMat,"Material used for :yref:`PartialSatClayEngine`. Necessary for the custom PartialSatState.",
+		((int,num,0,,"Particle number"))
+		,
+		createIndex();
+	);
+	// clang-format on
+	REGISTER_CLASS_INDEX(PartialSatMat, FrictMat);
+};
+REGISTER_SERIALIZABLE(PartialSatMat);
+
+#endif
+
 
 } // namespace yade

@@ -104,6 +104,23 @@ namespace CGT {
 		bool sphericalVertexAreaCalculated = 0;
 		Real thermalPorosity;
 
+#ifdef PARTIALSAT
+		// partialsat engine necessities for proper inheritence
+		bool partialSatEngine;
+		Real pAir;
+		bool freeSwelling;
+		Real matricSuctionRatio;
+		Real nUnsatPerm;
+		Real SrM, SsM;
+		bool freezePorosity;
+		bool useKeq;
+		bool useKozeny;
+		Real bIntrinsicPerm;
+		Real meanInitialPorosity;
+		bool freezeSaturation;
+		Real permClamp;
+#endif
+
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point
 		vector<pair<Point, Real>> imposedP;
 		vector<CellHandle>        IPCells;
@@ -155,7 +172,7 @@ namespace CGT {
 		vector<Matrix3r>                                   normalStressInteraction;
 
 		void         Localize();
-		void         computePermeability();
+		virtual void         computePermeability();
 		virtual void gaussSeidel(Real dt = 0);
 		virtual void resetNetwork();
 		virtual void resetLinearSystem(); //reset both A and B in the linear system A*P=B, done typically after updating the mesh
@@ -182,7 +199,7 @@ namespace CGT {
 		void initializePressure(Real pZero);
 		void initializeTemperatures(Real tZero);
 		bool reApplyBoundaryConditions();
-		void computeFacetForcesWithCache(bool onlyCache = false);
+		virtual void computeFacetForcesWithCache(bool onlyCache = false);
 		void saveVtk(const char* folder, bool withBoundaries);
 		//write vertices, cells, return ids and no. of fictious neighbors, allIds is an ordered list of cell ids (from begin() to end(), for vtk table lookup),
 		// some ids will appear multiple times if withBoundaries==true since boundary cells are splitted into multiple tetrahedra
@@ -231,7 +248,7 @@ namespace CGT {
 		void sliceField(const char* filename);
 		void comsolField();
 
-		void                           interpolate(Tesselation& Tes, Tesselation& NewTes);
+		virtual void                           interpolate(Tesselation& Tes, Tesselation& NewTes);
 		virtual void                   averageRelativeCellVelocity();
 		void                           averageFluidVelocity();
 		void                           applySinusoidalPressure(RTriangulation& Tri, Real amplitude, Real averagePressure, Real loadIntervals);

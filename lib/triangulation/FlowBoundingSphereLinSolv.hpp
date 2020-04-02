@@ -93,6 +93,9 @@ namespace CGT {
 		using FlowType::useSolver;
 		using FlowType::yMaxId;
 		using FlowType::yMinId;
+#ifdef PARTIALSAT
+		using FlowType::partialSatEngine;
+#endif
 
 		//! TAUCS DECs
 		vector<FiniteCellsIterator> orderedCells;

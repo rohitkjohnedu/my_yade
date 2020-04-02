@@ -45,7 +45,9 @@ public:
 	       REC_SPH,
 	       REC_DEFORM,
 	       REC_LUBRICATION,
-	       REC_SUBDOMAIN };
+	       REC_SUBDOMAIN,
+               REC_PARTIALSAT,
+               REC_HERTZMINDLIN };
 	virtual void action();
 	void addWallVTK(vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<vtkPointsReal>& boxesPos, Vector3r& W1, Vector3r& W2, Vector3r& W3, Vector3r& W4);
 	// clang-format off
@@ -57,7 +59,7 @@ public:
 		#ifdef YADE_VTK_MULTIBLOCK
 			((bool,multiblock,false,,"Use multi-block (``.vtm``) files to store data, rather than separate ``.vtu`` files."))
 		#endif
-		#ifdef YADE_MPI 
+		#ifdef YADE_MPI
 			((bool,parallelMode,false,,"For MPI parallel runs, each proc writes their own vtu/vtp files. Master proc writes a pvtu/pvtp file containing metadata about worker vtu files. load the pvtu/pvtp in paraview for visualization."))
 		#endif
 		((string,fileName,"",,"Base file name; it will be appended with {spheres,intrs,facets}.243100.vtu (unless *multiblock* is ``True``) depending on active recorders and step number (243100 in this case). It can contain slashes, but the directory must exist already."))
@@ -129,8 +131,12 @@ public:
 		Saves sphere information associated with Yade's SPH module.
 	``deform``
 		Saves interaction information associated with Yade's deformation module.
-    ``lubrication``
-        Saves lubrications stress from :yref:`LubricationPhys`. ``spheres`` must be active.
+	``lubrication``
+		Saves lubrications stress from :yref:`LubricationPhys`. ``spheres`` must be active.
+	``partialsat``
+		Saves suction and radii changes of spheres associated with :yref:`PartialSatClayEngine`. ``spheres`` must be active.
+	``hertz``
+		Saves bond data from hertzmindlin such as displacement or 'broken' where broken follows a displacement criteria set by user in :yref:`Law2_ScGeom_MindlinPhys_Mindlin`.
 )"""))
 		((string,Key,"",,"Necessary if :yref:`recorders<VTKRecorder.recorders>` contains 'cracks' or 'moments'. A string specifying the name of file 'cracks___.txt' that is considered in this case (see :yref:`corresponding attribute<Law2_ScGeom_JCFpmPhys_JointedCohesiveFrictionalPM.Key>`)."))
 		((int,mask,0,,"If mask defined, only bodies with corresponding groupMask will be exported. If 0, all bodies will be exported.")),

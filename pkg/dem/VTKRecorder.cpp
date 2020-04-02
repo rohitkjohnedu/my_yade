@@ -53,7 +53,7 @@
 #ifdef YADE_LIQMIGRATION
 #include <pkg/dem/ViscoelasticCapillarPM.hpp>
 #endif
-
+#include <pkg/dem/HertzMindlin.hpp>
 #include <boost/fusion/include/pair.hpp>
 #include <boost/fusion/support/pair.hpp>
 #include <boost/unordered_map.hpp>
@@ -155,6 +155,10 @@ void VTKRecorder::action()
 			recActive[REC_DEFORM] = true;
 		else if (rec == "lubrication")
 			recActive[REC_LUBRICATION] = true;
+		else if (rec=="hertz")
+			recActive[REC_HERTZMINDLIN]=true;
+		else if (rec=="partialSat")
+			recActive[REC_PARTIALSAT]=true;
 		else
 			LOG_ERROR(
 			        "Unknown recorder named `" << rec
@@ -539,6 +543,25 @@ void VTKRecorder::action()
 	wpmLimitFactor->SetNumberOfComponents(1);
 	wpmLimitFactor->SetName("wpmLimitFactor");
 
+#ifdef PARTIALSAT
+        // extras for hertzmindlin
+        vtkSmartPointer<vtkDoubleArrayFromReal> intrBrokenHertz = vtkSmartPointer<vtkDoubleArrayFromReal>::New();
+        intrBrokenHertz->SetNumberOfComponents(1);
+        intrBrokenHertz->SetName("broken");
+        vtkSmartPointer<vtkDoubleArray> intrDisp = vtkSmartPointer<vtkDoubleArrayFromReal>::New();
+        intrDisp->SetNumberOfComponents(1);
+        intrDisp->SetName("disp");
+
+
+	vtkSmartPointer<vtkDoubleArrayFromReal> spheresRadiiChange = vtkSmartPointer<vtkDoubleArrayFromReal>::New();
+	spheresRadiiChange->SetNumberOfComponents(1);
+	spheresRadiiChange->SetName("radiiChange");
+
+	vtkSmartPointer<vtkDoubleArrayFromReal> spheresSuction = vtkSmartPointer<vtkDoubleArrayFromReal>::New();
+	spheresSuction->SetNumberOfComponents(1);
+	spheresSuction->SetName("suction");
+#endif
+
 	if (recActive[REC_INTR]) {
 		// holds information about cell distance between spatial and displayed position of each particle
 		vector<Vector3i> wrapCellDist;
@@ -651,6 +674,14 @@ void VTKRecorder::action()
 					intrIsOnJoint->InsertNextValue(jcfpmphys->isOnJoint);
 					intrForceN->InsertNextValue(fn);
 					eventNumber->InsertNextValue(jcfpmphys->eventNumber);
+				} else if (recActive[REC_HERTZMINDLIN]){
+#ifdef PARTIALSAT
+                                        const auto mindlinphys = YADE_CAST<MindlinPhys*>(I->phys.get());
+                                        const auto mindlingeom = YADE_CAST<ScGeom*>(I->geom.get());
+					intrBrokenHertz->InsertNextValue(mindlinphys->isBroken);
+                                        intrDisp->InsertNextValue(mindlingeom->penetrationDepth - mindlinphys->initD);
+#endif
+                                        intrForceN->InsertNextValue(fn);
 				} else {
 					intrForceN->InsertNextValue(fn);
 				}
@@ -735,6 +766,13 @@ void VTKRecorder::action()
 				if (recActive[REC_TEMP]) {
 					auto* thState = b->state.get();
 					spheresTemp->InsertNextValue(thState->temp);
+				}
+#endif
+#ifdef PARTIALSAT
+				if (recActive[REC_PARTIALSAT]) {
+					PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
+					spheresRadiiChange->InsertNextValue(state->radiiChange);
+					spheresSuction->InsertNextValue(state->suction);
 				}
 #endif
 				if (recActive[REC_CLUMPID])
@@ -1042,6 +1080,13 @@ void VTKRecorder::action()
 			spheresUg->GetPointData()->AddArray(spheresLiqVolTotal);
 		}
 #endif
+
+#ifdef PARTIALSAT
+		if (recActive[REC_PARTIALSAT]) {
+			spheresUg->GetPointData()->AddArray(spheresRadiiChange);
+			spheresUg->GetPointData()->AddArray(spheresSuction);
+		}
+#endif
 		if (recActive[REC_STRESS]) {
 			spheresUg->GetPointData()->AddArray(spheresNormalStressVec);
 			spheresUg->GetPointData()->AddArray(spheresShearStressVec);
@@ -1295,6 +1340,12 @@ void VTKRecorder::action()
 			intrPd->GetCellData()->AddArray(wpmNormalForce);
 			intrPd->GetCellData()->AddArray(wpmLimitFactor);
 		}
+                if (recActive[REC_HERTZMINDLIN]){
+#ifdef PARTIALSAT
+                        intrPd->GetCellData()->AddArray(intrBrokenHertz);
+                        intrPd->GetCellData()->AddArray(intrDisp);
+#endif
+                }
 #ifdef YADE_VTK_MULTIBLOCK
 		if (!multiblock)
 #endif

@@ -8,7 +8,11 @@
 namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((MindlinPhys)(Ip2_FrictMat_FrictMat_MindlinPhys)(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz)(Law2_ScGeom_MindlinPhys_HertzWithLinearShear)(
-        Law2_ScGeom_MindlinPhys_Mindlin)(MindlinCapillaryPhys)(Ip2_FrictMat_FrictMat_MindlinCapillaryPhys));
+        Law2_ScGeom_MindlinPhys_Mindlin)(MindlinCapillaryPhys)(Ip2_FrictMat_FrictMat_MindlinCapillaryPhys)
+#ifdef PARTIALSAT
+(PartialSatMat)
+#endif
+);
 
 Real Law2_ScGeom_MindlinPhys_Mindlin::getfrictionDissipation() { return (Real)frictionDissipation; }
 Real Law2_ScGeom_MindlinPhys_Mindlin::getshearEnergy() { return (Real)shearEnergy; }
@@ -237,7 +241,7 @@ bool Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	Real      ks = nonLin > 0 ? phys->kso * math::pow(uN, 0.5) : phys->kso;
 	Vector3r  shearIncrement;
 	if (nonLin > 1) {
-		State *  de1 = Body::byId(id1, scene)->state.get(), *de2 = Body::byId(id2, scene)->state.get();
+		auto *  de1 = Body::byId(id1, scene)->state.get(), *de2 = Body::byId(id2, scene)->state.get();
 		Vector3r shiftVel = scene->isPeriodic ? Vector3r(scene->cell->velGrad * scene->cell->hSize * contact->cellDist.cast<Real>()) : Vector3r::Zero();
 		Vector3r shift2   = scene->isPeriodic ? Vector3r(scene->cell->hSize * contact->cellDist.cast<Real>()) : Vector3r::Zero();
 
@@ -276,8 +280,8 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 	Body::id_t id1 = contact->getId1(); // get id body 1
 	Body::id_t id2 = contact->getId2(); // get id body 2
 
-	State* de1 = Body::byId(id1, scene)->state.get();
-	State* de2 = Body::byId(id2, scene)->state.get();
+	auto* de1 = Body::byId(id1, scene)->state.get();
+	auto* de2 = Body::byId(id2, scene)->state.get();
 
 	ScGeom*      scg  = static_cast<ScGeom*>(ig.get());
 	MindlinPhys* phys = static_cast<MindlinPhys*>(ip.get());
@@ -291,6 +295,11 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 		LinDamp = false;
 	} // use non linear damping
 
+#ifdef PARTIALSAT
+	if (contact->isFresh(scene)) {
+		phys->initD = scg->penetrationDepth; // only useful for partialsat break criteria
+	}
+#endif
 	// tangential and normal stiffness coefficients, recomputed from betan,betas at every step
 	Real cn = 0, cs = 0;
 
@@ -307,7 +316,7 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 		} else
 			return false;
 	}
-	/* Hertz-Mindlin's formulation (PFC) 
+	/* Hertz-Mindlin's formulation (PFC)
 	Note that the normal stiffness here is a secant value (so as it is cannot be used in the GSTS)
 	In the first place we get the normal force and then we store kn to be passed to the GSTS */
 	Real Fn = phys->kno * math::pow(uN, 1.5); // normal Force (scalar)
@@ -568,17 +577,17 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 		// relative position of the old contact point with respect to the new one
 		Vector3r relPosC1 = duS1+duR1;
 		Vector3r relPosC2 = duS2+duR2;
-		
+
 		Vector3r duR = (relPosC1+relPosC2)/2.; // incremental displacement vector (same radius is temporarily assumed)
 
 		// check wheter rolling will be present, if not do nothing
 		Vector3r x=scg->normal.cross(duR);
-		Vector3r normdThetaR(Vector3r::Zero()); // initialize 
+		Vector3r normdThetaR(Vector3r::Zero()); // initialize
 		if(x.squaredNorm()==0) { /* no rolling */ }
 		else {
 				Vector3r normdThetaR = x/x.norm(); // moment unit vector
 				phys->dThetaR = duR.norm()/rMean*normdThetaR;} // incremental rolling
-		
+
 		// incremental formulation for the bending moment (as for the shear part)
 		Vector3r& momentBend = phys->momentBend;
 		momentBend = scg->rotate(momentBend); // rotate moment vector

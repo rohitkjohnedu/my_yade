@@ -65,6 +65,7 @@ namespace CGT {
 		vector<CellHandle> boundingCells[6];
 		vector<CellHandle> thermalBoundingCells[6];
 		vector<CellHandle> conductionBoundingCells[6];
+		vector<CellHandle> alphaBoundingCells;
 		Point              cornerMin;
 		Point              cornerMax;
 		Real               VSolidTot, Vtotalissimo, vPoral, sSolidTot, vPoralPorosity, vTotalPorosity;

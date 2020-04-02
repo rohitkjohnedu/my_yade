@@ -38,6 +38,9 @@ The files are
 // #include<pkg/dem/TesselationWrapper.hpp>
 #include<lib/triangulation/FlowBoundingSphere.hpp>
 #include<lib/triangulation/PeriodicFlow.hpp>
+#ifdef PARTIALSAT
+#include<lib/triangulation/PartialSatLinSolv.hpp>
+#endif
 #include<pkg/pfv/FlowEngine.hpp>
 #include<pkg/common/Sphere.hpp>
 #include<core/Clump.hpp>
@@ -88,7 +91,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		int ReTrg;
 		int ellapsedIter;
 		int permUpdateIters;
-		void initSolver (FlowSolver& flow);
+		virtual void initSolver (FlowSolver& flow);
 		#ifdef LINSOLV
 		void setForceMetis (bool force);
 		bool getForceMetis ();
@@ -97,7 +100,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		#endif
 		void triangulate (Solver& flow);
 		void addBoundary (Solver& flow);
-		void buildTriangulation (Real pZero, Solver& flow);
+		virtual void buildTriangulation (Real pZero, Solver& flow);
 		void buildTriangulation (Solver& flow);
 		void updateVolumes (Solver& flow);
 		void applyForces (Solver& flow);
