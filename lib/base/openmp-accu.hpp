@@ -11,7 +11,12 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-#ifdef YADE_OPENMP
+// due to the memcpy(…) invocation below only POD types are compatible with multithreaded accumulator.
+// Later we might find a correct replacement, e.g. something like following line:
+//     std::copy_n((T*)oldChunk, (nCL * CLS) / sizeof(T), chunks[th]);
+// instead of memcpy(…)
+// but it hasn't been properly tested yet.
+#if defined(YADE_OPENMP) and (YADE_REAL_BIT <= 128)
 // O(1) access container which stores data in contiguous chunks of memory
 // each chunk belonging to one thread
 template <typename T> class OpenMPArrayAccumulator {
