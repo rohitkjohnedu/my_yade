@@ -24,7 +24,7 @@ template <typename T> class OpenMPArrayAccumulator {
 	size_t          nThreads; // number of threads
 	int             perCL;    // number of elements fitting inside cache line
 	std::vector<T*> chunks;   /* array with pointers to the chunks of memory we have allocated; each item for one thread
-	                             Each pointer *T inside chunks[th] is to be interpreted as an old C-style array with (nCL_new * CLS) / sizeof(T) elements in there
+	                             Each pointer *T inside chunks[th] is to be interpreted as an old C-style array with sz elements in there
 	                             They are accessed with chunks[th][i], where always th<nThreads and i<sz */
 	size_t          sz;       // current number of elements
 	size_t          nCL;      // current number of allocated cache lines
