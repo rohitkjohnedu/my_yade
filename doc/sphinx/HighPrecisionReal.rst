@@ -63,7 +63,7 @@ The following table lists which modules are currently working with high precisio
 ``ENABLE_GUI``                              yes          ``ON``                        native support [#supp1]_
 ``ENABLE_CGAL``                             yes          ``ON``                        native support [#supp1]_
 ``ENABLE_VTK``                              yes          ``ON``                        supported [#supp3]_
-``ENABLE_OPENMP``                           conditional  ``ON if Nbits<=128``          conditionally supported [#supp5]_
+``ENABLE_OPENMP``                           partial      ``ON``                        partial support [#supp5]_
 ``ENABLE_MPI``                              maybe        ``OFF``                       not tested [#supp6]_
 ``ENABLE_GTS``                              yes          ``ON``                        supported [#supp2]_
 ``ENABLE_GL2PS``                            yes          ``ON``                        supported [#supp2]_
@@ -93,7 +93,7 @@ The unsupported modules are automatically disabled during the cmake stage.
 
 .. [#supp3] VTK is supported via the :ysrc:`compatibility layer <lib/compatibility/VTKCompatibility.hpp>` which converts all numbers down to ``double`` type. See :ref:`below <vtk-real-compatibility>`.
 
-.. [#supp5] Experimentally supported for ``long double`` and ``float128``. Not supported for ``mpfr`` and ``cpp_bin_float``. File :ysrc:`lib/base/openmp-accu.hpp` needs further testing. If in doubt, compile yade with ``ENABLE_OPENMP=OFF``.
+.. [#supp5] The OpenMPArrayAccumulator is experimentally supported for ``long double`` and ``float128``. For types ``mpfr`` and ``cpp_bin_float`` the single-threaded version of accumulator is used. File :ysrc:`lib/base/openmp-accu.hpp` needs further testing. If in doubt, compile yade with ``ENABLE_OPENMP=OFF``. In all other places OpenMP multithreading should work correctly.
 
 .. [#supp6] MPI support has not been tested and sending data over network hasn't been tested yet.
 
