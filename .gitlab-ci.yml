@@ -66,6 +66,7 @@ stages:
                           echo -e "\n\e[96m===\n*** NOTE *** if your formatting is better that what clang-format provides, you can use:\n\n    // clang-format off\n    ......\n    // clang-format on\n\nlike it is done with YADE_CLASS_* macros in all .hpp files.\n===\e[0m\n" ;
                           echo -e "\n \n\e[95m*** See the most affected files below ***\e[0m\n \n" ;
                           git diff --stat ;
+                          git diff -w --stat ;
                           echo -e "\n \n\e[95mLines\nAdded | Removed\e[0m\n" ;
                           git diff --numstat ;
                           echo -e "\n \n\e[95m*** Full 'git diff' is in artifacts path ./install/reformat.txt ***\e[0m\n" ;
@@ -81,9 +82,9 @@ stages:
           fi;
       else
           echo -e "\n\e[93m===\nSkipping  clang-format check (can't find clang-format)\n===\e[0m\n" ;
-      fi
+      fi;
     # remove any clang formatting changes
-    - git diff
+    - git diff -w
     - git reset --hard
     - git diff
     - git status
