@@ -65,6 +65,11 @@ To install the daily-version you need to add the repository to your
 	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ bionic main" >> /etc/apt/sources.list'
 
 
+- Ubuntu 20.04 **focal**::
+
+	sudo bash -c 'echo "deb http://www.yade-dem.org/packages/ focal main" >> /etc/apt/sources.list'
+
+
 Add the PGP-key AA915EEB as trusted and install ``yadedaily``::
 
 	wget -O - http://www.yade-dem.org/packages/yadedev_pub.gpg | sudo apt-key add -
@@ -196,12 +201,8 @@ are optional. Watch for notes and warnings/errors, which are shown
 by ``cmake`` during the configuration step. If the missing package is optional,
 some of Yade features will be disabled (see the messages at the end of the configuration).
 
-Additional packages, which can become mandatory later::
-
-		sudo apt-get install python-gts
-
 Some packages listed here are relatively new and they can be absent
-in your distribution (for example, libmetis-dev or python-gts). They can be
+in your distribution (for example, libmetis-dev). They can be
 installed from `yade-dem.org/packages <http://yade-dem.org/packages/>`_ or
 from our `external PPA <https://launchpad.net/~yade-users/+archive/external/>`_.
 If not installed the related features will be disabled automatically.
