@@ -103,7 +103,6 @@ Pre-Depends:
 Multi-Arch: foreign
 Depends:
  libyadedaily (= ${binary:Version}),
- python-gts,
  python3-matplotlib,
  python3-pil,
  python3-pyqt5,
