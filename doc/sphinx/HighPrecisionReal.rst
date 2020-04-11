@@ -24,7 +24,7 @@ type						bits		decimal places [#prec]_		notes
 The last two types are arbitrary precision, and their number of bits ``Nbit`` or decimal places is specified as argument during compilation.
 
 .. note::
-	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details. All ``Real`` types pass the :ysrccommit:`real type concept<1b4ae97583bd8a6efc74cb0d0/py/high-precision/_math.cpp#L197>` test from `boost concepts <https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/real_concepts.html>`__. The supoprt for :ysrc:`Eigen<lib/high-precision/EigenNumTraits.hpp>` and :ysrc:`CGAL <lib/high-precision/CgalNumTraits.hpp>` is done with numerical traits.
+	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details. All ``Real`` types pass the :ysrccommit:`real type concept<1b4ae97583bd8a6efc74cb0d0/py/high-precision/_math.cpp#L197>` test from `boost concepts <https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/real_concepts.html>`__. The support for :ysrc:`Eigen<lib/high-precision/EigenNumTraits.hpp>` and :ysrc:`CGAL <lib/high-precision/CgalNumTraits.hpp>` is done with numerical traits.
 
 .. [#prec] The amount of decimal places in this table is the amount of places which are completely determined by the binary represenation. One additional decimal digit (or two if rounding down is used, which is not the case by default) is necessary to fully reconstruct binary representation. A simple python example to demonstrate this fact: ``for a in range(16): print(1./pow(2.,a))``, shows that every binary digit produces "extra" ``…25`` at the end of decimal representation, but these decimal digits are not completely determined by the binary representation, because for example ``…37`` is impossible to obtain there. More binary bits are necessary to represent ``…37``, but the ``…25`` was produced by the last available bit.
 
@@ -143,7 +143,7 @@ All remaining ``double`` were replaced with ``Real`` and any attempts to use ``d
 Mathematical functions of all high precision types are wrapped using file :ysrc:`MathFunctions.hpp<lib/high-precision/MathFunctions.hpp>`, these are the inline redirections to respective functions of the type that Yade is currently being compiled with. The code will not pass the pipeline checks if ``std::`` is used. All functions that take ``Real`` argument should now call these functions in ``yade::math::`` namespace. Functions which take *only* ``Real`` arguments may omit ``math::`` specifier and use `ADL <https://en.cppreference.com/w/cpp/language/adl>`__ instead. Examples:
 
 1. Call to ``std::min(a,b)`` is replaced with ``math::min(a,b)``, because ``a`` or ``b`` may be non ``Real`` the ``math::`` is necessary.
-2. Call to ``std::sqrt(a)``  is replaced with ``math::sqrt(a)``. Since ``a`` is always ``Real`` the ``sqrt(a)`` may be written without ``math::`` as well, thanks to `ADL <https://en.cppreference.com/w/cpp/language/adl>`__.
+2. Call to ``std::sqrt(a)``  can be replaced with either ``sqrt(a)`` or ``math::sqrt(a)`` thanks to `ADL <https://en.cppreference.com/w/cpp/language/adl>`__, because ``a`` is always ``Real``.
 
 If a new mathematical function is needed it has to be added in the following places:
 
