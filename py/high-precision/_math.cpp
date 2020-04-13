@@ -210,7 +210,9 @@ try {
 	// Below all functions from lib/high-precision/MathFunctions.hpp are exported for tests.
 	// Some of these functions return two element tuples: frexp, modf, remquo, CGAL_To_interval
 	std_pair_to_python_converter<Real, Real>();
-	std_pair_to_python_converter<double, double>();
+	if (not std::is_same<Real, double>::value) {
+		std_pair_to_python_converter<double, double>();
+	}
 	std_pair_to_python_converter<Real, long>();
 	std_pair_to_python_converter<Real, int>();
 	/********************************************************************************************/
