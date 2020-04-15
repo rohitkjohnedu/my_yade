@@ -173,7 +173,7 @@ public:
 
 	// Evaluate gradient for function
 	void EvaluateGradient(
-	        Real /*x*/[3], Real /*n*/[3]) {}; // FIXME - better use Vector3r here instead of Real[3] (here I only fix the unused parameter warning).
+	        Real /*x*/[3], Real /*n*/[3]){}; // FIXME - better use Vector3r here instead of Real[3] (here I only fix the unused parameter warning).
 
 	// If you need to set parameters, add methods here
 
@@ -215,34 +215,6 @@ public:
 	// clang-format on
 };
 REGISTER_SERIALIZABLE(PotentialBlockVTKRecorder);
-
-
-/* PotentialBlockVTKRecorderTunnel */
-class PotentialBlockVTKRecorderTunnel : public PeriodicEngine {
-public:
-	vtkSmartPointer<ImpFuncPB> function;
-
-	virtual void action(void);
-	// clang-format off
-	  YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(PotentialBlockVTKRecorderTunnel,PeriodicEngine,"Engine recording potential blocks as surfaces into files with given periodicity.",
-		((string,fileName,,,"File prefix to save to"))
-		((int,sampleX,30,,"Number of divisions in the X direction for triangulation"))
-		((int,sampleY,30,,"Number of divisions in the Y direction for triangulation"))
-		((int,sampleZ,30,,"Number of divisions in the Z direction for triangulation"))
-		((Real,maxDimension,30,,"Maximum allowed distance between consecutive grid lines"))
-		((bool,twoDimension,false,,"Whether to render the particles as 2-D"))
-		((bool,REC_INTERACTION,false,,"Whether to record contact point and forces"))
-		((bool,REC_COLORS,false,,"Whether to record colors"))
-		((bool,REC_VELOCITY,false,,"Whether to record velocity"))
-		((bool,REC_ID,true,,"Whether to record id"))
-		,
-		function = ImpFuncPB::New();
-		,
-		
-	  );
-	// clang-format on
-};
-REGISTER_SERIALIZABLE(PotentialBlockVTKRecorderTunnel);
 
 #endif //YADE_VTK
 

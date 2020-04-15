@@ -15,6 +15,9 @@
         <DataArray type="Float32" Name="angVelLen" format="ascii" RangeMin="0" RangeMax="0">
           0 0
         </DataArray>
+        <DataArray type="Float32" Name="Displacement" NumberOfComponents="3" format="ascii" RangeMin="4.5832718176e-10" RangeMax="0.066666670144">
+          -4.5832718176e-10 0 0 0.066666670144 0 0
+        </DataArray>
       </PointData>
       <CellData>
       </CellData>

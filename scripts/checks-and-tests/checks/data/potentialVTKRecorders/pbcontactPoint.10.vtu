@@ -9,6 +9,15 @@
         <DataArray type="Float32" Name="shearForce" NumberOfComponents="3" format="ascii" RangeMin="0" RangeMax="0">
           0 0 0
         </DataArray>
+        <DataArray type="Float32" Name="totalForce" NumberOfComponents="3" format="ascii" RangeMin="166659.95312" RangeMax="166659.95312">
+          166659.95312 0 0
+        </DataArray>
+        <DataArray type="Float32" Name="mobilizedShear" format="ascii" RangeMin="1" RangeMax="1">
+          1
+        </DataArray>
+        <DataArray type="Float32" Name="totalStress" NumberOfComponents="3" format="ascii" RangeMin="0" RangeMax="0">
+          0 0 0
+        </DataArray>
       </PointData>
       <CellData>
       </CellData>

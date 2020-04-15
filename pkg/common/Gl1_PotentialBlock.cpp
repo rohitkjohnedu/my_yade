@@ -64,18 +64,16 @@ void Gl1_PotentialBlock::go(const shared_ptr<Shape>& cm, const shared_ptr<State>
 	PotentialBlock* pb = static_cast<PotentialBlock*>(cm.get());
 
 	if (wire || wire2) {
-		glDisable(GL_CULL_FACE); //FIXME: This may not be needed: It's the default choice
+		glDisable(GL_CULL_FACE);
 		glDisable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); //Turn on wireframe mode. Render front and back faces of the wireframe
 	} else {
 		glMaterialv(
 		        GL_FRONT, GL_AMBIENT_AND_DIFFUSE, Vector3r(cm->color[0], cm->color[1], cm->color[2])); //glMaterialv is used when lighting is enabled
-		glDisable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_LIGHTING);
 		glPolygonMode(GL_FRONT, GL_FILL); // Turn off wireframe mode. Render only front faces
-		                                  //			glEnable(GL_NORMALIZE); //I don't need this. The normals are normalised inside the shape class
 	}
 
 	vector<vector<int>> con = pb->connectivity;
@@ -363,7 +361,7 @@ Real ImpFuncPB::FunctionValue(Real x[3])
 }
 
 
-void PotentialBlockVTKRecorderTunnel::action()
+void PotentialBlockVTKRecorder::action()
 {
 	if (fileName.size() == 0)
 		return;
@@ -507,7 +505,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 #endif
 			countID++;
 		}
-		//vtkSmartPointer<ImpFunc> function = ImpFunc::New();
+		//vtkSmartPointer<ImpFuncPB> function = ImpFuncPB::New();
 		vtkSmartPointer<vtkImplicitBoolean> boolFunction   = vtkSmartPointer<vtkImplicitBoolean>::New();
 		vtkSmartPointer<ImpFuncPB>*         functionBool   = nullptr;
 		int                                 ImplicitBoolNo = 0;
@@ -541,28 +539,35 @@ void PotentialBlockVTKRecorderTunnel::action()
 					count++;
 				}
 			}
-#if 0
-			xmin = -pb->minAabbRotated.x();  
-			xmax = pb->maxAabbRotated.x();
-			ymin = -pb->minAabbRotated.y();
-			ymax = pb->maxAabbRotated.y();
-			zmin = -pb->minAabbRotated.z();
-			zmax = pb->maxAabbRotated.z();
-#endif
-			//# if 0
-			const Aabb* aabb = static_cast<Aabb*>(b->bound.get());
-			xmin             = aabb->min.x() - b->state->pos.x();
-			xmax             = aabb->max.x() - b->state->pos.x();
-			ymin             = aabb->min.y() - b->state->pos.y();
-			ymax             = aabb->max.y() - b->state->pos.y();
-			zmin             = aabb->min.z() - b->state->pos.z();
-			zmax             = aabb->max.z() - b->state->pos.z();
-			//#endif
+
+			if (pb->minAabb.norm() > 0 and pb->maxAabb.norm() > 0) {
+				xmin = -pb->minAabb.x();
+				xmax = pb->maxAabb.x();
+				ymin = -pb->minAabb.y();
+				ymax = pb->maxAabb.y();
+				zmin = -pb->minAabb.z();
+				zmax = pb->maxAabb.z();
+			} else {
+				const Aabb* aabb = static_cast<Aabb*>(b->bound.get());
+				xmin             = aabb->min.x() - b->state->pos.x();
+				xmax             = aabb->max.x() - b->state->pos.x();
+				ymin             = aabb->min.y() - b->state->pos.y();
+				ymax             = aabb->max.y() - b->state->pos.y();
+				zmin             = aabb->min.z() - b->state->pos.z();
+				zmax             = aabb->max.z() - b->state->pos.z();
+
+				xmin *= 1.2;
+				xmax *= 1.2;
+				ymin *= 1.2;
+				ymax *= 1.2;
+				zmin *= 1.2;
+				zmax *= 1.2;
+			}
 			particleColour = pb->color;
+
 		} else if (b->isClump() == true) {
 			//const Clump* clump = dynamic_cast<Clump*>(b->shape.get());
 			const shared_ptr<Clump> clump(YADE_PTR_CAST<Clump>(b->shape));
-			//bool firstBound = true;
 
 			//vtkSmartPointer<ImpFunc> functionBool [clump->ids.size()];
 			functionBool   = new vtkSmartPointer<ImpFuncPB>[clump->ids.size()];
@@ -584,8 +589,8 @@ void PotentialBlockVTKRecorderTunnel::action()
 				Matrix3r rotation = clumpMember->state->ori.toRotationMatrix(); //*pbShape->oriAabb.conjugate();
 				for (unsigned int j = 0; j < pbShape->a.size(); j++) {
 					Vector3r plane = rotation * Vector3r(pbShape->a[j], pbShape->b[j], pbShape->c[j]);
-					Real     d     = pbShape->d
-					                 [j]; //-1.0*(plane.x()*(b->state->pos.x()-clumpMember->state->pos.x() ) + plane.y()*(b->state->pos.y()-clumpMember->state->pos.y() ) + plane.z()*(b->state->pos.z()-clumpMember->state->pos.z() ) - pbShape->d[j]);
+					Real     d     = pbShape->d[j];
+					//Real     d     = -1.0*(plane.x()*(b->state->pos.x()-clumpMember->state->pos.x() ) + plane.y()*(b->state->pos.y()-clumpMember->state->pos.y() ) + plane.z()*(b->state->pos.z()-clumpMember->state->pos.z() ) - pbShape->d[j]);
 					functionBool[i]->a.push_back(plane.x());
 					functionBool[i]->b.push_back(plane.y());
 					functionBool[i]->c.push_back(plane.z());
@@ -593,32 +598,25 @@ void PotentialBlockVTKRecorderTunnel::action()
 				}
 
 				const Aabb* aabb = static_cast<Aabb*>(clumpMember->bound.get());
-				//if (firstBound == true){
-				//xmin = aabb->min.x();
-				//xmax = aabb->max.x();
-				//ymin = aabb->min.y();
-				//ymax = aabb->max.y();
-				//zmin = aabb->min.z();
-				//zmax = aabb->max.z();
-				//firstBound = false;
-				particleColour = pbShape->color;
-				//}else{
+
 				xmin = std::min(xmin, aabb->min.x() - b->state->pos.x());
 				xmax = std::max(xmax, aabb->max.x() - b->state->pos.x());
 				ymin = std::min(ymin, aabb->min.y() - b->state->pos.y());
 				ymax = std::max(ymax, aabb->max.y() - b->state->pos.y());
 				zmin = std::min(zmin, aabb->min.z() - b->state->pos.z());
 				zmax = std::max(zmax, aabb->max.z() - b->state->pos.z());
-				//}
+
+				xmin *= 1.2;
+				xmax *= 1.2;
+				ymin *= 1.2;
+				ymax *= 1.2;
+				zmin *= 1.2;
+				zmax *= 1.2;
+
+				particleColour = pbShape->color;
+
 				boolFunction->AddFunction(functionBool[i]);
 			}
-
-			//xmin = xmin - b->state->pos.x();
-			//xmax = xmax - b->state->pos.x();
-			//ymin = ymin - b->state->pos.y();
-			//ymax = ymax - b->state->pos.y();
-			//zmin = zmin - b->state->pos.z();
-			//zmax = zmax - b->state->pos.z();
 			boolFunction->SetOperationTypeToUnion();
 		}
 		auto sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
@@ -629,8 +627,6 @@ void PotentialBlockVTKRecorderTunnel::action()
 			boolFunction->SetOperationTypeToUnion();
 		}
 
-		//Real xmin = -value; Real xmax = value; Real ymin = -value; Real ymax=value; Real zmin=-value; Real zmax=value;
-		//Real xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); Real xmax = -xmin; Real ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); Real ymax=-ymin; Real zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); Real zmax=-zmin;
 		if (twoDimension == true) {
 			if (sampleY < 2) {
 				ymin = 0.0;
@@ -641,8 +637,8 @@ void PotentialBlockVTKRecorderTunnel::action()
 			}
 		}
 
-		sample->SetModelBounds(1.5 * Vector3r(xmin, ymin, zmin), 1.5 * Vector3r(xmax, ymax, zmax));
-		//sample->SetModelBounds(pb->minAabb.x(), pb->maxAabb.x(), pb->minAabb.y(), pb->maxAabb.y(), pb->minAabb.z(), pb->maxAabb.z());
+		sample->SetModelBounds(Vector3r(xmin, ymin, zmin), Vector3r(xmax, ymax, zmax));
+
 		int sampleXno = sampleX;
 		int sampleYno = sampleY;
 		int sampleZno = sampleZ;
@@ -679,14 +675,13 @@ void PotentialBlockVTKRecorderTunnel::action()
 		auto pbColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
 		pbColors->SetName("pbColors");
 		pbColors->SetNumberOfComponents(3);
-		Vector3r color = particleColour; //Vector3r(0,100,0);
-		if (b->isDynamic() == false) {
-			color = Vector3r(157, 157, 157);
-		}
+
+		Vector3r      color = particleColour;
 		unsigned char c[3]; //c = {color[0],color[1],color[2]};
-		c[0]        = (unsigned char)(color[0]);
-		c[1]        = (unsigned char)(color[1]);
-		c[2]        = (unsigned char)(color[2]);
+		c[0] = (unsigned char)(color[0]);
+		c[1] = (unsigned char)(color[1]);
+		c[2] = (unsigned char)(color[2]);
+
 		int nbCells = polydata->GetNumberOfPoints();
 		for (int i = 0; i < nbCells; i++) {
 			pbColors->INSERT_NEXT_TUPLE(c);
@@ -744,7 +739,6 @@ void PotentialBlockVTKRecorderTunnel::action()
 		}
 		// ################ velocity ###########################
 		polydata->DeleteCells();
-		//function->Delete();
 		//#if 0
 		if (b->isClump() == true) {
 			//boolFunction->Delete();
@@ -771,10 +765,7 @@ void PotentialBlockVTKRecorderTunnel::action()
 		writerA->SetFileName(fv.c_str());
 		writerA->SetInputData(pbUg);
 		writerA->Write();
-		//writerA->Delete();
-		//pbUg->Delete();
 	}
-
 
 	//###################### bodyId ###############################
 	if (REC_ID == true) {
@@ -799,8 +790,6 @@ void PotentialBlockVTKRecorderTunnel::action()
 		writerA->SetFileName(fv.c_str());
 		writerA->SetInputData(pbUg);
 		writerA->Write();
-		//writerA->Delete();
-		//pbUg->Delete();
 		//#endif
 	}
 
@@ -862,8 +851,6 @@ void PotentialBlockVTKRecorderTunnel::action()
 			writerB->SetFileName(fcontact.c_str());
 			writerB->SetInputData(pbUgCP);
 			writerB->Write();
-			//writerB->Delete();
-			//pbUgCP->Delete();
 		}
 	}
 
@@ -877,370 +864,9 @@ void PotentialBlockVTKRecorderTunnel::action()
 	writer->SetFileName(fn.c_str());
 	writer->SetInputConnection(appendFilter->GetOutputPort());
 	writer->Write();
-
-	//intrBodyPos->Delete();
-	//intrForceN->Delete();
-	//intrAbsForceT->Delete();
-	//pbContactPoint->Delete();
-	//pbCellsContact->Delete();
-	//pbNormalForce->Delete();
-	//pbShearForce->Delete();
-	//pbCells->Delete();
-	//pbLinVelVec->Delete();
-	//pbLinVelLen->Delete();
-	//pbAngVelVec->Delete();
-	//pbAngVelLen->Delete();
 }
 
-
-void PotentialBlockVTKRecorder::action()
-{
-	if (fileName.size() == 0)
-		return;
-	auto pbPos          = vtkSmartPointer<vtkPointsReal>::New();
-	auto appendFilter   = vtkSmartPointer<vtkAppendPolyData>::New();
-	auto appendFilterID = vtkSmartPointer<vtkAppendPolyData>::New();
-	//auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-	//auto transform = vtkSmartPointer<vtkTransform>::New();
-
-	// interactions ###############################################
-	auto intrBodyPos = vtkSmartPointer<vtkPoints>::New();
-	auto intrCells   = vtkSmartPointer<vtkCellArray>::New();
-	auto intrForceN  = vtkSmartPointer<vtkFloatArray>::New();
-	intrForceN->SetNumberOfComponents(3);
-	intrForceN->SetName("forceN");
-	auto intrAbsForceT = vtkSmartPointer<vtkFloatArray>::New();
-	intrAbsForceT->SetNumberOfComponents(1);
-	intrAbsForceT->SetName("absForceT");
-	// interactions ###############################################
-
-	// interaction contact point ###############################################
-	auto pbContactPoint = vtkSmartPointer<vtkPointsReal>::New();
-	auto pbCellsContact = vtkSmartPointer<vtkCellArray>::New();
-	auto pbNormalForce  = vtkSmartPointer<vtkFloatArray>::New();
-	pbNormalForce->SetNumberOfComponents(3);
-	pbNormalForce->SetName("normalForce"); //Linear velocity in Vector3 form
-	auto pbShearForce = vtkSmartPointer<vtkFloatArray>::New();
-	pbShearForce->SetNumberOfComponents(3);
-	pbShearForce->SetName("shearForce"); //Angular velocity in Vector3 form
-	// interactions contact point###############################################
-
-
-	// velocity ###################################################
-	auto pbCells     = vtkSmartPointer<vtkCellArray>::New();
-	auto pbLinVelVec = vtkSmartPointer<vtkFloatArray>::New();
-	pbLinVelVec->SetNumberOfComponents(3);
-	pbLinVelVec->SetName("linVelVec"); //Linear velocity in Vector3 form
-
-	auto pbLinVelLen = vtkSmartPointer<vtkFloatArray>::New();
-	pbLinVelLen->SetNumberOfComponents(1);
-	pbLinVelLen->SetName("linVelLen"); //Length (magnitude) of linear velocity
-
-	auto pbAngVelVec = vtkSmartPointer<vtkFloatArray>::New();
-	pbAngVelVec->SetNumberOfComponents(3);
-	pbAngVelVec->SetName("angVelVec"); //Angular velocity in Vector3 form
-
-	auto pbAngVelLen = vtkSmartPointer<vtkFloatArray>::New();
-	pbAngVelLen->SetNumberOfComponents(1);
-	pbAngVelLen->SetName("angVelLen"); //Length (magnitude) of angular velocity
-	// velocity ####################################################
-
-	// bodyId ##############################################################
-	//#if 0
-	auto pbPosID   = vtkSmartPointer<vtkPointsReal>::New();
-	auto pbIdCells = vtkSmartPointer<vtkCellArray>::New();
-	auto blockId   = vtkSmartPointer<vtkIntArray>::New();
-	blockId->SetNumberOfComponents(1);
-	blockId->SetName("id");
-	// bodyId ##############################################################
-	//#endif
-	int                                       countID = 0;
-	vtkSmartPointer<vtkVectorText>            textArray2[scene->bodies->size()];
-	vtkSmartPointer<vtkPolyDataMapper>        txtMapper[scene->bodies->size()];
-	vtkSmartPointer<vtkLinearExtrusionFilter> extrude[scene->bodies->size()];
-	vtkSmartPointer<vtkActor>                 textActor[scene->bodies->size()];
-
-
-	for (const auto& b : *scene->bodies) {
-		if (!b)
-			continue;
-		if (b->isClump() == true)
-			continue;
-		const PotentialBlock* pb = dynamic_cast<PotentialBlock*>(b->shape.get());
-		if (!pb)
-			continue;
-
-		if (REC_ID == true) {
-			//#if 0
-			blockId->InsertNextValue(b->getId());
-			vtkIdType pid[1];
-			Vector3r  pos(b->state->pos);
-			pid[0] = pbPosID->InsertNextPoint(pos);
-			pbIdCells->InsertNextCell(1, pid);
-			//#endif
-
-			countID++;
-		}
-		//vtkSmartPointer<ImpFuncPB> function = ImpFuncPB::New();
-		function->a           = pb->a;
-		function->b           = pb->b;
-		function->c           = pb->c;
-		function->d           = pb->d;
-		function->R           = pb->R;
-		function->r           = pb->r;
-		function->k           = pb->k;
-		Matrix3r directionCos = b->state->ori.conjugate().toRotationMatrix();
-		int      count        = 0;
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				//function->rotationMatrix[count] = directionCos(j,i);
-				function->rotationMatrix(i, j) = directionCos(j, i);
-				count++;
-			}
-		}
-
-		auto sample = vtkSmartPointer<vtkSampleFunctionReal>::New();
-		sample->SetImplicitFunction(function);
-		//Real value = 1.05*pb->R;
-
-		//		const Aabb* aabb = static_cast<Aabb*>(b->bound.get());
-		//		Real xmin = aabb->min.x() - b->state->pos.x();
-		//		Real xmax = aabb->max.x() - b->state->pos.x();
-		//		Real ymin = aabb->min.y() - b->state->pos.y();
-		//		Real ymax = aabb->max.y() - b->state->pos.y();
-		//		Real zmin = aabb->min.z() - b->state->pos.z();
-		//		Real zmax = aabb->max.z() - b->state->pos.z();
-
-		Real xmin = -std::max(pb->minAabb.x(), pb->maxAabb.x());
-		Real xmax = -xmin;
-		Real ymin = -std::max(pb->minAabb.y(), pb->maxAabb.y());
-		Real ymax = -ymin;
-		Real zmin = -std::max(pb->minAabb.z(), pb->maxAabb.z());
-		Real zmax = -zmin;
-
-		//Real xmin = -value; Real xmax = value; Real ymin = -value; Real ymax=value; Real zmin=-value; Real zmax=value;
-		//Real xmin = -std::max(pb->minAabb.x(),pb->maxAabb.x()); Real xmax = -xmin; Real ymin = -std::max(pb->minAabb.y(),pb->maxAabb.y()); Real ymax=-ymin; Real zmin=-std::max(pb->minAabb.z(),pb->maxAabb.z()); Real zmax=-zmin;
-
-		if (twoDimension == true) {
-			if (sampleY < 2) {
-				ymin = 0.0;
-				ymax = 0.0;
-			} else if (sampleZ < 2) {
-				zmin = 0.0;
-				zmax = 0.0;
-			}
-		}
-
-		sample->SetModelBounds(Vector3r(xmin, ymin, zmin), Vector3r(xmax, ymax, zmax));
-		//sample->SetModelBounds(pb->minAabb.x(), pb->maxAabb.x(), pb->minAabb.y(), pb->maxAabb.y(), pb->minAabb.z(), pb->maxAabb.z());
-		int sampleXno = sampleX;
-		int sampleYno = sampleY;
-		int sampleZno = sampleZ;
-		if (fabs(xmax - xmin) / static_cast<Real>(sampleX) > maxDimension) {
-			sampleXno = static_cast<int>(fabs(xmax - xmin) / maxDimension);
-		}
-		if (fabs(ymax - ymin) / static_cast<Real>(sampleY) > maxDimension) {
-			sampleYno = static_cast<int>(fabs(ymax - ymin) / maxDimension);
-		}
-		if (fabs(zmax - zmin) / static_cast<Real>(sampleZ) > maxDimension) {
-			sampleZno = static_cast<int>(fabs(zmax - zmin) / maxDimension);
-		}
-
-		if (twoDimension == true) {
-			if (sampleY < 2) {
-				sampleYno = 1;
-			} else if (sampleZ < 2) {
-				sampleZno = 1;
-			}
-		}
-
-		sample->SetSampleDimensions(sampleXno, sampleYno, sampleZno);
-		sample->ComputeNormalsOff();
-		//sample->Update();
-		auto contours = vtkSmartPointer<vtkContourFilter>::New();
-		contours->SetInputConnection(sample->GetOutputPort());
-		contours->SetNumberOfContours(1);
-		contours->SetValue(0, 0.0);
-		auto polydata = vtkSmartPointer<vtkPolyData>::New();
-		contours->Update();
-		polydata->DeepCopy(contours->GetOutput());
-		//polydata->Update();
-
-		auto pbColors = vtkSmartPointer<vtkUnsignedCharArray>::New();
-		pbColors->SetName("pbColors");
-		pbColors->SetNumberOfComponents(3);
-		Vector3r color = pb->color; //Vector3r(0,100,0);
-		//if (b->isDynamic() == false){ color = Vector3r(157,157,157); }
-		//		color = Vector3r(157,157,157);
-		unsigned char c[3]; //c = {color[0],color[1],color[2]};
-		c[0]        = (unsigned char)(color[0]);
-		c[1]        = (unsigned char)(color[1]);
-		c[2]        = (unsigned char)(color[2]);
-		int nbCells = polydata->GetNumberOfPoints();
-		for (int i = 0; i < nbCells; i++) {
-			pbColors->INSERT_NEXT_TUPLE(c);
-		}
-		polydata->GetPointData()->SetScalars(pbColors);
-		//polydata->Update();
-
-
-		Vector3r    centre(b->state->pos[0], b->state->pos[1], b->state->pos[2]);
-		Quaternionr orientation = b->state->ori;
-		orientation.normalize();
-		//AngleAxisr aa(orientation); Vector3r axis = aa.axis(); /* axis.normalize(); */ Real angle = aa.angle()/3.14159*180.0;	Real xAxis = axis[0]; Real yAxis = axis[1]; Real zAxis = axis[2];
-		auto transformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-		transformFilter->SetInputData(polydata);
-		auto transform = vtkSmartPointer<vtkTransformReal>::New();
-
-		transformFilter->SetTransform(transform);
-		transform->PostMultiply();
-
-		transform->Translate(centre);
-		//transform->RotateWXYZ(angle,xAxis, yAxis, zAxis);
-		//transformFilter->Update();
-		appendFilter->AddInputConnection(transformFilter->GetOutputPort());
-
-
-		// ################## velocity ####################
-		if (REC_VELOCITY == true) {
-			vtkIdType pid[1];
-			Vector3r  pos(b->state->pos);
-			pid[0] = pbPos->InsertNextPoint(pos);
-			pbCells->InsertNextCell(1, pid);
-			const Vector3r& vel = b->state->vel;
-			float           v[3]; //v = { vel[0],vel[1],vel[2] };
-			v[0] = float(vel[0]);
-			v[1] = float(vel[1]);
-			v[2] = float(vel[2]);
-			pbLinVelVec->INSERT_NEXT_TUPLE(v);
-			pbLinVelLen->InsertNextValue(float(vel.norm()));
-			const Vector3r& angVel = b->state->angVel;
-			float           av[3]; //av = { angVel[0],angVel[1],angVel[2] };
-			av[0] = float(angVel[0]);
-			av[1] = float(angVel[1]);
-			av[2] = float(angVel[2]);
-			pbAngVelVec->INSERT_NEXT_TUPLE(av);
-			pbAngVelLen->InsertNextValue(float(angVel.norm()));
-		}
-		// ################ velocity ###########################
-		polydata->DeleteCells();
-		//function->Delete();
-	}
-
-	if (REC_VELOCITY == true) {
-		auto pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
-		pbUg->SetPoints(pbPos);
-		pbUg->SetCells(VTK_VERTEX, pbCells);
-		pbUg->GetPointData()->AddArray(pbLinVelVec);
-		pbUg->GetPointData()->AddArray(pbAngVelVec);
-		pbUg->GetPointData()->AddArray(pbLinVelLen);
-		pbUg->GetPointData()->AddArray(pbAngVelLen);
-		auto writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-		writerA->SetDataModeToAscii();
-		string fv = fileName + "vel." + std::to_string(scene->iter) + ".vtu";
-		writerA->SetFileName(fv.c_str());
-		writerA->SetInputData(pbUg);
-		writerA->Write();
-		//writerA->Delete();
-		//pbUg->Delete();
-	}
-
-	//###################### bodyId ###############################
-	if (REC_ID == true) {
-#if 0
-			auto writerA = vtkXMLPolyDataWriter::New();
-			writerA->SetDataModeToAscii();
-			string fn=fileName+"-Id."+std::to_string(scene->iter)+".vtp";
-			writerA->SetFileName(fn.c_str());
-			writerA->SetInputConnection(appendFilterID->GetOutputPort());//(extrude->GetOutputPort());
-			writerA->Write();
-	
-			writerA->Delete();
-#endif
-		//#if 0
-		auto pbUg = vtkSmartPointer<vtkUnstructuredGrid>::New();
-		pbUg->SetPoints(pbPosID);
-		pbUg->SetCells(VTK_VERTEX, pbIdCells);
-		pbUg->GetPointData()->AddArray(blockId);
-		auto writerA = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-		writerA->SetDataModeToAscii();
-		string fv = fileName + "Id." + std::to_string(scene->iter) + ".vtu";
-		writerA->SetFileName(fv.c_str());
-		writerA->SetInputData(pbUg);
-		writerA->Write();
-		//writerA->Delete();
-		//pbUg->Delete();
-		//#endif
-	}
-
-
-	//#if 0
-	// ################## contact point ####################
-	if (REC_INTERACTION == true) {
-		int count = 0;
-		FOREACH(const shared_ptr<Interaction>& I, *scene->interactions)
-		{
-			if (!I->isReal()) {
-				continue;
-			}
-			const KnKsPBPhys* phys = YADE_CAST<KnKsPBPhys*>(I->phys.get());
-			const ScGeom*     geom = YADE_CAST<ScGeom*>(I->geom.get());
-			vtkIdType         pid[1];
-			Vector3r          pos(geom->contactPoint);
-			pid[0] = pbContactPoint->InsertNextPoint(pos);
-			pbCellsContact->InsertNextCell(1, pid);
-			//intrBodyPos->InsertNextPoint(geom->contactPoint[0],geom->contactPoint[1],geom->contactPoint[2]);
-			// gives _signed_ scalar of normal force, following the convention used in the respective constitutive law
-			float fn[3] = { (float)phys->normalForce[0], (float)phys->normalForce[1], (float)phys->normalForce[2] };
-			float fs[3] = { (float)phys->shearForce[0], (float)phys->shearForce[1], (float)phys->shearForce[2] };
-			pbNormalForce->INSERT_NEXT_TUPLE(fn);
-			pbShearForce->INSERT_NEXT_TUPLE(fs);
-			count++;
-		}
-		if (count > 0) {
-			auto pbUgCP = vtkSmartPointer<vtkUnstructuredGrid>::New();
-			pbUgCP->SetPoints(pbContactPoint);
-			pbUgCP->SetCells(VTK_VERTEX, pbCellsContact);
-			pbUgCP->GetPointData()->AddArray(pbNormalForce);
-			pbUgCP->GetPointData()->AddArray(pbShearForce);
-			auto writerB = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
-			writerB->SetDataModeToAscii();
-			string fcontact = fileName + "contactPoint." + std::to_string(scene->iter) + ".vtu";
-			writerB->SetFileName(fcontact.c_str());
-			writerB->SetInputData(pbUgCP);
-			writerB->Write();
-			//writerB->Delete();
-			//pbUgCP->Delete();
-		}
-	}
-	//#endif
-
-
-	// ################ contact point ###########################
-
-
-	auto writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-	writer->SetDataModeToAscii();
-	string fn = fileName + "-pb." + std::to_string(scene->iter) + ".vtp";
-	writer->SetFileName(fn.c_str());
-	writer->SetInputConnection(appendFilter->GetOutputPort());
-	writer->Write();
-
-	//intrBodyPos->Delete();
-	//intrForceN->Delete();
-	//intrAbsForceT->Delete();
-	//pbContactPoint->Delete();
-	//pbCellsContact->Delete();
-	//pbNormalForce->Delete();
-	//pbShearForce->Delete();
-	//pbCells->Delete();
-	//pbLinVelVec->Delete();
-	//pbLinVelLen->Delete();
-	//pbAngVelVec->Delete();
-	//pbAngVelLen->Delete();
-}
-
-YADE_PLUGIN((PotentialBlockVTKRecorder)(PotentialBlockVTKRecorderTunnel));
+YADE_PLUGIN((PotentialBlockVTKRecorder));
 
 #endif // YADE_VTK
 

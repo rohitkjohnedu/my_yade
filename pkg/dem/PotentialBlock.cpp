@@ -83,12 +83,6 @@ void PotentialBlock::postLoad(PotentialBlock&)
 		}
 		assert(R > 0.0);
 
-		/* Set a default value for the attrs minAabb, maxAabb, used for visualisation in vtk, if they are left undefined */
-		if (minAabb.norm() == 0 and maxAabb.norm() == 0) {
-			minAabb = Vector3r(R, R, R);
-			maxAabb = Vector3r(R, R, R);
-		}
-
 		// Calculate geometric properties: volume, centroid, inertia, principal orientation (inertia is calculated after the particle is centered to its centroid)
 		Vector3r centr = Vector3r::Zero();
 		Real     Ixx, Iyy, Izz, Ixy, Ixz, Iyz;

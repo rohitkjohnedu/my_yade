@@ -1,6 +1,6 @@
 # encoding: utf-8
 # 2020 © Vasileios Angelidakis <v.angelidakis2@ncl.ac.uk>
-# A script to check the PotentialBlockVTKRecorder, PotentialBlockVTKRecorderTunnel and PotentialParticleVTKRecorder engines.
+# A script to check the PotentialBlockVTKRecorder and PotentialParticleVTKRecorder engines.
 # This script was written based on the existing check-script: checkVTKRecorder.py.
 
 from __future__ import print_function
@@ -99,7 +99,7 @@ if ('PotentialParticles' in features) and ('VTK' in features):
 	k=k, r=r, R=R, a=[1, -1, 0, 0, 0, 0], b=[0, 0, 1, -1, 0, 0], c=[0, 0, 0, 0, 1,-1], d=[edge/2.-r]*6,
 	id=len(O.bodies), isBoundary=False, color=[0, 1, .2], wire=False, highlight=False, AabbMinMax=True, fixedNormal=False,
 	minAabb=Vector3(edge/2., edge/2., edge/2.)*2, minAabbRotated=Vector3(edge/2., edge/2., edge/2.),
-	maxAabb=Vector3(edge/2., edge/2., edge/2.)*2, maxAabbRotated=Vector3(edge/2., edge/2., edge/2.) )
+	maxAabb=Vector3(edge/2., edge/2., edge/2.)*2, maxAabbRotated=Vector3(edge/2., edge/2., edge/2.))
 	V=edge**3
 	geomInertia=1/6.*V*edge**2.
 	utils._commonBodySetup(pp1,V,Vector3(geomInertia, geomInertia, geomInertia), material='frictional', pos=[0,0,0], fixed=False)
@@ -113,7 +113,7 @@ if ('PotentialParticles' in features) and ('VTK' in features):
 	k=k, r=r, R=R, a=[1, -1, 0, 0, 0, 0], b=[0, 0, 1, -1, 0, 0], c=[0, 0, 0, 0, 1, -1], d=[edge/2.-r]*6,
 	id=len(O.bodies), isBoundary=False, color=[1, .2, 0], wire=False, highlight=False, AabbMinMax=True, fixedNormal=False,
 	minAabb=Vector3(edge/2., edge/2., edge/2.)*2, minAabbRotated=Vector3(edge/2., edge/2., edge/2.),
-	maxAabb=Vector3(edge/2., edge/2., edge/2.)*2, maxAabbRotated=Vector3(edge/2., edge/2., edge/2.) )
+	maxAabb=Vector3(edge/2., edge/2., edge/2.)*2, maxAabbRotated=Vector3(edge/2., edge/2., edge/2.))
 	V=edge**3
 	geomInertia=1/6.*V*edge**2.
 	utils._commonBodySetup(pp2,V,Vector3(geomInertia, geomInertia, geomInertia), material='frictional', pos=[0,0,0], fixed=False)
@@ -125,7 +125,7 @@ if ('PotentialParticles' in features) and ('VTK' in features):
 else:
 	print("skip PotentialParticleVTKRecorder check, PotentialParticles or VTK not available")
 
-# check PotentialBlockVTKRecorder and PotentialBlockVTKRecorderTunnel
+# check PotentialBlockVTKRecorder
 if ('PotentialBlocks' in features) and ('VTK' in features):
 	O.resetThisScene()
 	if not os.path.exists(vtkSaveDir):
@@ -134,15 +134,14 @@ if ('PotentialBlocks' in features) and ('VTK' in features):
 	# Engines
 	O.engines=[
 		ForceResetter(),
-		InsertionSortCollider([PotentialBlock2AABB()],verletDist=0.01),
+		InsertionSortCollider([PotentialBlock2AABB()],verletDist=0.00),
 		InteractionLoop(
 			[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True)],
 			[Ip2_FrictMat_FrictMat_KnKsPBPhys(kn_i=5e8, ks_i=5e7, Knormal=5e8, Kshear=5e7, useFaceProperties=False, viscousDamping=0.1)], 
 			[Law2_SCG_KnKsPBPhys_KnKsPBLaw(label='PBlaw',neverErase=False, allowViscousAttraction=True)] # In this example, we do NOT use Talesnick
 		),
 		NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,0,0]), # Here we deactivate gravity
-		PotentialBlockVTKRecorder(fileName=vtkSaveDir+'pb', firstIterRun=10, iterPeriod=2000, twoDimension=False, sampleX=10, sampleY=10, sampleZ=10, maxDimension=0.2, REC_INTERACTION=True, REC_COLORS=True, REC_VELOCITY=True, REC_ID=True, label='vtkRecorder'),
-		PotentialBlockVTKRecorderTunnel(fileName=vtkSaveDir+'pb-tunnel', firstIterRun=10, iterPeriod=2000, twoDimension=False, sampleX=10, sampleY=10, sampleZ=10, maxDimension=0.2, REC_INTERACTION=True, REC_COLORS=True, REC_VELOCITY=True, REC_ID=True, label='vtkRecorder')
+		PotentialBlockVTKRecorder(fileName=vtkSaveDir+'pb', firstIterRun=10, iterPeriod=2000, twoDimension=False, sampleX=10, sampleY=10, sampleZ=10, maxDimension=0.2, REC_INTERACTION=True, REC_COLORS=True, REC_VELOCITY=True, REC_ID=True, label='vtkRecorder')
 	]
 
 	# ----------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -159,7 +158,8 @@ if ('PotentialBlocks' in features) and ('VTK' in features):
 	pb1.aspherical=True
 	pb1.shape=PotentialBlock(
 	k=0.0, r=r, R=0.0, a=[1, -1, 0, 0, 0, 0], b=[0, 0, 1, -1, 0, 0], c=[0, 0, 0, 0, 1,-1], d=[edge/2.-r]*6,
-	id=len(O.bodies), isBoundary=False, color=[0, 1, .2], wire=False, highlight=False, AabbMinMax=True, fixedNormal=False)
+	id=len(O.bodies), isBoundary=False, color=[0, 1, .2], wire=False, highlight=False, AabbMinMax=True, fixedNormal=False,
+	minAabb=1.2*Vector3(edge/2., edge/2., edge/2.), maxAabb=1.2*Vector3(edge/2., edge/2., edge/2.))
 	utils._commonBodySetup(pb1,pb1.shape.volume,pb1.shape.inertia, material='frictional', pos=[0,0,0], fixed=False)
 	pb1.state.pos = [0,0,0]
 	O.bodies.append(pb1)
@@ -176,9 +176,8 @@ if ('PotentialBlocks' in features) and ('VTK' in features):
 
 	O.run(20, True);
 	checkVTK('pb')
-	checkVTK('pb-tunnel')
 else:
-	print("skip PotentialBlockVTKRecorder and PotentialBlockVTKRecorderTunnel check, PotentialBlocks or VTK not available")
+	print("skip PotentialBlockVTKRecorder check, PotentialBlocks or VTK not available")
 
 
 
