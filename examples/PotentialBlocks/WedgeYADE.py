@@ -109,7 +109,7 @@ velocityDependency = False
 # Engines
 O.engines[3].label='integration'
 O.dt = 10.0e-5 #10e-4
-O.engines = O.engines + [PotentialBlockVTKRecorderTunnel(fileName='./vtk/Wedge', iterPeriod=2000, twoDimension=False, sampleX=70, sampleY=70, sampleZ=70, maxDimension=100.0, REC_INTERACTION=True, REC_VELOCITY=True, label='vtkRecorder')]
+O.engines = O.engines + [PotentialBlockVTKRecorder(fileName='./vtk/Wedge', iterPeriod=2000, twoDimension=False, sampleX=70, sampleY=70, sampleZ=70, maxDimension=100.0, REC_INTERACTION=True, REC_VELOCITY=True, label='vtkRecorder')]
 O.engines = O.engines+ [PyRunner(iterPeriod=2000,command='calTimeStep()')] 
 O.engines=O.engines+[PyRunner(iterPeriod=200,command='myAddPlotData()')]
 O.engines = O.engines+ [PyRunner(iterPeriod=200,command='goToNextStage2()',label='dispChecker')] 
