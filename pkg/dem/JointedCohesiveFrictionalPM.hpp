@@ -65,6 +65,7 @@ REGISTER_SERIALIZABLE(JCFpmMat);
 class JCFpmPhys : public NormShearPhys {
 public:
 	virtual ~JCFpmPhys();
+	bool breakOccurred = 0; // flag used to trigger retriangulation as soon as a cohesive bond breaks in flowengine (for DFNFlow use only)
 
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(JCFpmPhys,NormShearPhys,"Representation of a single interaction of the JCFpm type, storage for relevant parameters",
@@ -83,7 +84,7 @@ public:
 			((Real,tanDilationAngle,0.,,"tangent of the angle defining the dilatancy of the joint surface (auto. computed from :yref:`JCFpmMat.jointDilationAngle`). [-]"))
 			((Real,dilation,0.,,"defines the normal displacement in the joint after sliding treshold. [m]"))
 			((Real,crackJointAperture,0.,,"Relative displacement between 2 spheres (in case of a crack it is equivalent of the crack aperture)"))
-			((bool,breakOccurred,0,,"Flag used to trigger retriangulation as soon as a cohesive bond breaks in FlowEngine (for DFNFlow use only)"))
+			//((bool,breakOccurred,0,,"Flag used to trigger retriangulation as soon as a cohesive bond breaks in FlowEngine (for DFNFlow use only)"))
 			((Real,momentEnergy,0,,"reference strain (or kinetic) energy of surrounding interactions (particles)"))
 			((Real,momentEnergyChange,0,,"storage of the maximum strain (or kinetic) energy change for surrounding interactions (particles)"))
 			((Real,momentMagnitude,0,,"Moment magnitude of a failed interaction"))
