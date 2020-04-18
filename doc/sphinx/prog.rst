@@ -561,7 +561,7 @@ Linking to ``inheritanceGraph*``
 
 	and rendered via LaTeX. To write a single dollar sign, escape it with backslash ``\\$``.
 	
-	Displayed mathematics (standalone equations) can be inserted as explained in `Math support in Sphinx <http://sphinx.pocoo.org/ext/math.html>`_.
+	Displayed mathematics (standalone equations) can be inserted as explained in `Math support for HTML outputs in Sphinx <http://www.sphinx-doc.org/en/master/usage/extensions/math.html>`_.
 
 
 .. _global-rst-anchors:
