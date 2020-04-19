@@ -363,12 +363,17 @@ def setup(app):
 	lexers['python'] = PythonLexer(tabsize=3) 
 
 	app.connect('source-read',fixSrc)
-	
+
 	app.connect('autodoc-skip-member',customExclude)
 	app.connect('autodoc-process-signature',fixSignature)
 	app.connect('autodoc-process-docstring',fixDocstring)
-	app.add_description_unit('ystaticattr',None,objname='static attribute',indextemplate='pair: %s; static method',parse_node=parse_ystaticattr)
 
+	import sphinx.versioning
+	if (sphinx.version_info[0] == 1):
+		# In newer sphinx version add_description_unit was deprecated. Keep for backcompatability
+		app.add_description_unit('ystaticattr',None,objname='static attribute',indextemplate='pair: %s; static method',parse_node=parse_ystaticattr)
+	else:
+		app.add_object_type('ystaticattr',None,objname='static attribute',indextemplate='pair: %s; static method',parse_node=parse_ystaticattr)
 
 import sys, os
 

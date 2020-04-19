@@ -305,12 +305,14 @@ for bib in ('references','yade-articles','yade-theses','yade-conferences','citin
 # Workaround: launch this script as many times as needed (3 times for doc compilations and 1 time for post workarounds), see CMakeLists.txt.
 if(writer != "workarounds"):
 	genWrapperRst()
-	# HACK: must rewrite sys.argv, since reference generator in conf.py determines if we output latex/html by inspecting it
-	sys.argv=['sphinx-build','-a','-v','-T','-P','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
-	try:
-		sphinx.main(sys.argv)
-	except  Exception:
-		pass
+	runBuildParams=['sphinx-build','-a','-v','-T','-P','-E','-b','%s'%writer,'-d',outDir+'/doctrees','.',outDir+'/%s'%writer]
+
+	if (sphinx.version_info[0] == 1):
+		# In newer sphinx version sphinx.main was deprecated. Keep for backcompatability
+		sphinx.main(runBuildParams)
+	else:
+		import sphinx.cmd.build
+		sphinx.cmd.build.main(runBuildParams[1:])
 else:
 	#HTML FIXES:
 	makeBaseClassesClickable((outDir+'/html/yade.wrapper.html'),"html")
