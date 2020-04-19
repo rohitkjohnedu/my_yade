@@ -803,6 +803,8 @@ pages:
     - ls -l $CI_PROJECT_DIR/deb
     - ccache -s
   dependencies: []
+  # this line is to trigger deb building earlier; the "make_minimal" is supposed to finish fastest of all builds.
+  needs: ["make_minimal"]
   artifacts:
     paths:
       - ./deb
