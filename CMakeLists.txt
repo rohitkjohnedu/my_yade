@@ -278,7 +278,7 @@ if(ENABLE_USEFUL_ERRORS)
   # Notes:
   #  -Wfloat-conversion warning: you have to select the int(…) conversion policy: std::floor(…), std::ceil(…), std::round(…), e.g. with int(std::ceil(11.9999999999999993))
 
-  # g++ ver < 10 ; all workarounds are for g++ < ver.10; When version 10 appears I hope that there will be fewer warnigs to disable. This 'IF' is to trigger the re-evealuation when g++ v.10 appears.
+  # g++ ver < 11 ; all workarounds are for g++ < ver.11; When version 11 appears I hope that there will be fewer warnigs to disable. This 'IF' is to trigger the re-evealuation when g++ v.11 appears.
   IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0 )
     SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized -Wno-comment")
     # g++ ver >= 8
