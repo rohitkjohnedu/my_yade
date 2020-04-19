@@ -281,10 +281,6 @@ if(ENABLE_USEFUL_ERRORS)
   # g++ ver < 10 ; all workarounds are for g++ < ver.10; When version 10 appears I hope that there will be fewer warnigs to disable. This 'IF' is to trigger the re-evealuation when g++ v.10 appears.
   IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0 )
     SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized -Wno-comment")
-    # g++ ver == 10
-    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 10.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 10.0)
-      SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-cast-function-type")
-    ENDif()
     # g++ ver >= 8
     IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
       SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-cast-function-type")
