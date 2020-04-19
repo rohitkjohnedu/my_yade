@@ -107,11 +107,6 @@ public:
 		position    = rkP;
 		orientation = qR;
 	}
-	Se3(const Se3<Scalar>& s)
-	{
-		position    = s.position;
-		orientation = s.orientation;
-	}
 	Se3(Se3<Scalar>& a, Se3<Scalar>& b)
 	{
 		position    = b.orientation.inverse() * (a.position - b.position);
