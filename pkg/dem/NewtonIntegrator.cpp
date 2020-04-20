@@ -59,7 +59,7 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	assert(b->isStandalone() || b->isClump());
 	// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
 	if (damping != 0. && state->isDamped) {
-		scene->energy->add(fluctVel.cwiseAbs().dot(f.cwiseAbs()) * damping * scene->dt, "nonviscDamp", nonviscDampIx, /*non-incremental*/ false);
+		scene->energy->add(fluctVel.cwiseAbs().dot((f+state->mass*gravity).cwiseAbs()) * damping * scene->dt, "nonviscDamp", nonviscDampIx, /*non-incremental*/ false);
 		// when the aspherical integrator is used, torque is damped instead of ang acceleration; this code is only approximate
 		scene->energy->add(state->angVel.cwiseAbs().dot(m.cwiseAbs()) * damping * scene->dt, "nonviscDamp", nonviscDampIx, false);
 	}
@@ -221,7 +221,7 @@ void NewtonIntegrator::action()
 		if (trackEnergy)
 			updateEnergy(b, state, fluctVel, f, m);
 
-		// whether to use aspherical rotation integration for this body; as soon as one axis of roation is blocked the spherical integrator is "exact" (and faster),
+		// whether to use aspherical rotation integration for this body; as soon as one axis of rotation is blocked the spherical integrator is "exact" (and faster),
 		// we then switch to it. It also enables imposing clumps angVel directly (rather than momentum of the aspherical case)
 		bool useAspherical = (exactAsphericalRot && b->isAspherical() && ((state->blockedDOFs & State::DOF_RXRYRZ) == State::DOF_NONE));
 
