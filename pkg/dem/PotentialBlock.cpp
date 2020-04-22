@@ -14,7 +14,6 @@ void PotentialBlock::addPlaneStruct() { planeStruct.push_back(Planes()); }
 //void PotentialBlock::addVertexStruct()   { vertexStruct.push_back(Vertices()); }
 //void PotentialBlock::addEdgeStruct()     { edgeStruct.push_back(Edges());      }
 
-//TODO: We can use the ordered (cwise or ccwise) vertices belonging to each plane, stored in the planeStruct for: 1. Visualisation without using CGAL and 2. Calculation of volume and inertia (more specifically, to create the pyramids and subsequently tetrahedra, used to calculate the volume and inertia below). By saving the ordered vertices for each plane, it is trivial to create a triangulation of them without needing the convex hull of CGAL.
 //TODO: We need a check to merge duplicate faces during initialisation, so that when we write the plane coefficients a,b,c,d in the shape class, we don't allow duplicate combinations. This means that the planeNo will change, and we need to ensure it is updated everywhere, after we remove the duplicate faces
 
 
@@ -29,11 +28,12 @@ void PotentialBlock::postLoad(PotentialBlock&)
 		for (int i = 0; i < planeNo; i++) {
 			planeNormVec = Vector3r(a[i], b[i], c[i]);
 			if (math::abs(planeNormVec.norm() - 1.0) > 1e-3) { /* Normalize only if the normal vectors are not normalized already */
-				//		if (planeNormVec.norm() > 1+1e-3) { /* Normalize only if the normal vectors are not normalized already */
+				d[i] += r; // We need to add "r" and subtract it after normalisation takes place. The d[i] values represent the distances of the planes to the local origin only when the normal vectors (a[i],b[i],c[i] are normalised)
 				a[i] /= planeNormVec.norm();
 				b[i] /= planeNormVec.norm();
 				c[i] /= planeNormVec.norm();
 				d[i] /= planeNormVec.norm();
+				d[i] -= r;
 			}
 		}
 
@@ -42,13 +42,24 @@ void PotentialBlock::postLoad(PotentialBlock&)
 			std::cout << "The planes do not have the same number of coefficients. Check the input geometry!" << endl;
 		}
 
-		/* Make sure the d[i] values given by the user are positive (i.e. the normal vectors of the faces point outwards) */
-		for (int i = 0; i < planeNo; i++) {
-			if (d[i] < 0) {
-				a[i] *= -1;
-				b[i] *= -1;
-				c[i] *= -1;
-				d[i] *= -1;
+		/* Make sure r is positive */
+		assert(r > 0.0);
+
+		/* Make sure the d[i] values given by the user are positive (i.e. the normal vectors of the faces point outwards)
+		   In Python we set d equal to d-r, so here, d reflects these reduced values, which can be negative for two reasons:
+		   1. The normal vectors of one or more planes were initially oriented inwards (i.e. min(d)<0 and min(d)+r<0)
+		   2. The chosen radius r is larger than the distance of one or more planes to the local origin (i.e. min(d)<=0 and min(d)+r>=0) -> This check is done after centering the particle to its centroid, later on
+		*/
+		auto dMin = *std::min_element(d.begin(), d.end());
+		if (dMin < 0 and dMin + r < 0) { // i.e. when r is not the problem, but the normal vector of at least one plane is oriented inwards
+			for (int i = 0; i < planeNo; i++) {
+				if (d[i] < 0 and d[i] + r < 0) {
+					d[i] += 2 * r;
+					a[i] *= -1;
+					b[i] *= -1;
+					c[i] *= -1;
+					d[i] *= -1;
+				}
 			}
 		}
 
@@ -76,7 +87,7 @@ void PotentialBlock::postLoad(PotentialBlock&)
 			if (maxDistance > 0.0) {
 				R = maxDistance / 2.;
 			}
-			calculateVertices(); //Recalculate vertices after calculating R: Not strictly necessary to recalculate, but kept for consistency
+			calculateVertices(); //Recalculate vertices after calculating R to improve the check for duplicate vertices
 			if (R == 0) {
 				std::cout << "R must be positive. Incorrect automatic calculation from the vertices." << endl;
 			}
@@ -111,107 +122,76 @@ void PotentialBlock::postLoad(PotentialBlock&)
 			calculateInertia(centr, Ixx, Iyy, Izz, Ixy, Ixz, Iyz); // Calculate inertia for the centered particle
 		}
 
+		/* Reduce r if it results to negative d values, to ensure the existence of an inner potential particle */
+		dMin = *std::min_element(d.begin(), d.end());
+		if (dMin <= 0 and dMin + r >= 0) {
+			std::for_each(d.begin(), d.end(), [this](Real& dTemp) { dTemp += r; });
+			r = 0.5 * (dMin + r);
+			std::cout << "Reduced r to half the smallest d value (r=" << r << ") so that min(d)>0." << endl;
+			std::for_each(d.begin(), d.end(), [this](Real& dTemp) { dTemp -= r; });
+		}
+
 		/* ------------------------------------------------------------------------------------------------------------------------------ */
 		if (math::abs(Ixy) + math::abs(Ixz) + math::abs(Iyz) < 1e-15) {
 			inertia = Vector3r(Ixx, Iyy, Izz);
 		} else { //rotate the planes to the principal axes if they are not already rotated
-			if (fabs(Ixx) < pow(10, -15)) {
-				Ixx = 0.0;
-			} //TODO: Check whether I should keep/modify these or if there is a case where they introduce bugs
-			if (fabs(Iyy) < pow(10, -15)) {
-				Iyy = 0.0;
-			} // TODO: Maybe I could just check only the non-diagonal terms Ixy, Iyz, Ixz?
-			if (fabs(Izz) < pow(10, -15)) {
-				Izz = 0.0;
-			} // Or I could normalise the checked inertia values to make them dimensionless, by dividing with pow(R,5) or V*pow(R,2) or something similar
-			if (fabs(Ixy) < pow(10, -15)) {
-				Ixy = 0.0;
+			// calculate eigenvectors of I
+			Matrix3r inertia_tensor(Matrix3r::Zero());
+			inertia_tensor << Ixx, -Ixy, -Ixz, -Ixy, Iyy, -Iyz, -Ixz, -Iyz, Izz;
+			Vector3r rot;
+			Matrix3r I_rot(Matrix3r::Zero()), I_new(Matrix3r::Zero());
+			matrixEigenDecomposition(inertia_tensor, I_rot, I_new);
+
+			// Here I use the same convension for the positive direction of the principal orientations as for Polyhedra @vsangelidakis
+			// I_rot = eigenvectors of inertia_tensors in columns
+			// I_new = eigenvalues on diagonal
+			// set positive direction of vectors - otherwise reloading does not work
+			Matrix3r sign(Matrix3r::Zero());
+			Real     max_v_signed = I_rot(0, 0);
+			Real     max_v        = std::abs(I_rot(0, 0));
+			if (max_v < std::abs(I_rot(1, 0))) {
+				max_v_signed = I_rot(1, 0);
+				max_v        = std::abs(I_rot(1, 0));
 			}
-			if (fabs(Iyz) < pow(10, -15)) {
-				Iyz = 0.0;
+			if (max_v < std::abs(I_rot(2, 0))) {
+				max_v_signed = I_rot(2, 0);
+				max_v        = std::abs(I_rot(2, 0));
 			}
-			if (fabs(Ixz) < pow(10, -15)) {
-				Ixz = 0.0;
+			sign(0, 0)   = max_v_signed / max_v;
+			max_v_signed = I_rot(0, 1);
+			max_v        = std::abs(I_rot(0, 1));
+			if (max_v < std::abs(I_rot(1, 1))) {
+				max_v_signed = I_rot(1, 1);
+				max_v        = std::abs(I_rot(1, 1));
 			}
+			if (max_v < std::abs(I_rot(2, 1))) {
+				max_v_signed = I_rot(2, 1);
+				max_v        = std::abs(I_rot(2, 1));
+			}
+			sign(1, 1) = max_v_signed / max_v;
+			sign(2, 2) = 1.;
+			I_rot      = I_rot * sign;
+			// force the eigenvectors to be right-hand oriented
+			Vector3r third = (I_rot.col(0)).cross(I_rot.col(1));
+			I_rot(0, 2)    = third[0];
+			I_rot(1, 2)    = third[1];
+			I_rot(2, 2)    = third[2];
 
-			char              jobz = 'V';
-			char              uplo = 'L';
-			int               N    = 3;
-			std::vector<Real> A(9);
-			int               lda = 3;
-			std::vector<Real> eigenValues(3);
-			std::vector<Real> work(102);
-			int               lwork = 102;
-			int               info  = 0; //FIXME: jobz, uplo, N, lda, lwork could be defined as "const" variables
-			A[0]                    = Ixx;
-			A[1]                    = -Ixy;
-			A[2]                    = -Ixz;
-			A[3]                    = -Ixy;
-			A[4]                    = Iyy;
-			A[5]                    = -Iyz;
-			A[6]                    = -Ixz;
-			A[7]                    = -Iyz;
-			A[8]                    = Izz;
-			dsyev_(&jobz, &uplo, &N, &A[0], &lda, &eigenValues[0], &work[0], &lwork, &info);
+			inertia     = Vector3r(I_new(0, 0), I_new(1, 1), I_new(2, 2));
+			orientation = Quaternionr(I_rot);
+			//rotate the particle so that x - is maximal inertia axis and z - is minimal inertia axis
+			//orientation.normalize();  //not needed
 
-			Vector3r eigenVec1(A[0], A[1], A[2]);
-			eigenVec1.normalize();
-			Vector3r eigenVec2(A[3], A[4], A[5]);
-			eigenVec2.normalize();
-			Vector3r eigenVec3(A[6], A[7], A[8]);
-			eigenVec3.normalize();
-
-			Matrix3r lapackEigenVec;
-			lapackEigenVec(0, 0) = eigenVec1[0];
-			lapackEigenVec(0, 1) = eigenVec2[0];
-			lapackEigenVec(0, 2) = eigenVec3[0];
-			lapackEigenVec(1, 0) = eigenVec1[1];
-			lapackEigenVec(1, 1) = eigenVec2[1];
-			lapackEigenVec(1, 2) = eigenVec3[1];
-			lapackEigenVec(2, 0) = eigenVec1[2];
-			lapackEigenVec(2, 1) = eigenVec2[2];
-			lapackEigenVec(2, 2) = eigenVec3[2];
-
-			/* make sure diagonals are positive */
-			for (int i = 0; i < 3; i++) {
-				if (lapackEigenVec(i, i) < 0) {
-					lapackEigenVec(0, i) *= -1;
-					lapackEigenVec(1, i) *= -1;
-					lapackEigenVec(2, i) *= -1;
-				}
+			for (int i = 0; i < (int)vertices.size(); i++) {
+				vertices[i] = orientation.conjugate() * vertices[i];
 			}
 
-			Matrix3r lapackEigenVal = Matrix3r::Zero();
-			lapackEigenVal(0, 0)    = eigenValues[0];
-			lapackEigenVal(1, 1)    = eigenValues[1];
-			lapackEigenVal(2, 2)    = eigenValues[2];
-
-			Quaternionr q(lapackEigenVec);
-			Real        q0 = 0.5 * sqrt(lapackEigenVec(0, 0) + lapackEigenVec(1, 1) + lapackEigenVec(2, 2) + 1.0);
-			Real        q1 = (lapackEigenVec(1, 2) - lapackEigenVec(2, 1)) / (4 * q0);
-			Real        q2 = (lapackEigenVec(2, 0) - lapackEigenVec(0, 2)) / (4 * q0);
-			Real        q3 = (lapackEigenVec(0, 1) - lapackEigenVec(1, 0)) / (4 * q0);
-			q.w()          = q0;
-			q.x()          = q1;
-			q.y()          = q2;
-			q.z()          = q3;
-			q.normalize();
-
-			/* Principal inertia tensor and orientation*/
-			inertia     = Vector3r(lapackEigenVal(0, 0), lapackEigenVal(1, 1), lapackEigenVal(2, 2));
-			orientation = q.conjugate();
-
-			/* Orient faces & vertices to the principal directions */
 			Vector3r plane4;
 			for (unsigned int i = 0; i < a.size(); i++) {
-				plane4 = q * Vector3r(a[i], b[i], c[i]);
+				plane4 = orientation.conjugate() * Vector3r(a[i], b[i], c[i]);
 				a[i]   = plane4.x();
 				b[i]   = plane4.y();
 				c[i]   = plane4.z();
-			}
-
-			for (unsigned int i = 0; i < vertices.size(); i++) {
-				vertices[i] = q * vertices[i];
 			}
 		}
 
@@ -564,9 +544,6 @@ void PotentialBlock::calculateInertia(Vector3r& centroid, Real& Ixx, Real& Iyy, 
 			}
 			counter++;
 		}
-
-		/* Save the IDs of the vertices of each face in an ordered sequence. Can be used to triangulate each face */
-		std::vector<int> tempPlanes = planeStruct[j].vertexID;
 
 		planeStruct[j].vertexID.clear();
 		for (unsigned int i = 0; i < oriOrderedVerticesOnPlane.size(); i++) {
