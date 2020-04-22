@@ -21,8 +21,7 @@ void GravityEngine::action()
 {
 	if (warnOnce) {
 		warnOnce = false;
-		LOG_WARN("GravityEngine is deprecated, consider using Newton::gravity instead (unless gravitational energy has to be tracked - not implemented "
-		         "with the newton attribute).")
+		LOG_WARN("GravityEngine is deprecated, consider using Newton::gravity instead.")
 	}
 	const bool trackEnergy(scene->trackEnergy);
 	const Real dt(scene->dt);
