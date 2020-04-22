@@ -1752,7 +1752,7 @@ try {
 	        .def("f",
 	             &pyForceContainer::force_get,
 	             (py::arg("id"), py::arg("sync") = false),
-	             "Force applied on body. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
+	             "Resultant force on body, excluding :yref:`gravity<NewtonIntegrator.gravity>`. For clumps in openMP, synchronize the force container with sync=True, else the value will be wrong.")
 	        .def("t",
 	             &pyForceContainer::torque_get,
 	             (py::arg("id"), py::arg("sync") = false),
