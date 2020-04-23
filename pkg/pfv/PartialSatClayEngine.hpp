@@ -158,6 +158,7 @@ public:
 	void       addIncidentParticleIdsToClumpList(CellHandle cell, std::vector<Body::id_t>& clumpIds);
 	Body::id_t clump(vector<Body::id_t> ids, unsigned int discretization);
 	void       printPorosityToFile(string file);
+	void       addPermanentForces(FlowSolver& flow);
 
 	// fracture network
 	//void crackCellsAbovePoroThreshold(FlowSolver& flow);
@@ -174,6 +175,7 @@ public:
 	void removeForceOnVertices(RTriangulation::Facet_circulator& facet, RTriangulation::Finite_edges_iterator& ed_it);
 	void circulateFacetstoRemoveForces(RTriangulation::Finite_edges_iterator& edge);
 	void removeForcesOnBrokenBonds();
+	void timeStepControl();
 	//	void setPositionsBuffer(bool current);
 	Real leakOffRate;
 	Real averageAperture;
@@ -182,12 +184,19 @@ public:
 	Real crackArea;
 	Real crackVolume;
 	Real totalFractureArea;
+	Real solverDT;
+	bool emulatingAction;
 
 	virtual void initializeVolumes(FlowSolver& flow);
 	virtual void updateVolumes(FlowSolver& flow);
 	virtual void buildTriangulation(Real pZero, Solver& flow);
 	virtual void initSolver(FlowSolver& flow);
 	virtual void action();
+	virtual void emulateAction(){
+		scene = Omega::instance().getScene().get();
+		emulatingAction=true;
+		action();
+		emulatingAction=false;}
 
 	void reloadSolver(FlowSolver& flow) { this->initSolver(flow); }
 
@@ -285,7 +294,9 @@ public:
 	((bool,blockIsoCells,true,,"search for cells that might be surrounded by blocked (minerals or cracks) and block them to avoid numerical instabilities."))
 	((bool,brokenBondsRemoveCapillaryforces,false,,"if true, broken bonds will also remove any capillary forces associated with the area of the crack"))
 	((bool,directlyModifySatFromPoro,false,,"if true, changes in porosity are used to directly change porosity. Normally, the water retention curve is taking care of this on its own."))
-	((Real,partialSatDT,0,,"time step used for partial sat engine. The engine will only activate once every partialSatDT/scene->dt steps. Hydromechanical forces estimated and added as persistant forces to particles during non partial sat time steps."))
+	((Real,partialSatDT,0,,"time step used for partial sat engine. If >0, the engine will only activate once every partialSatDT/scene->dt steps. Hydromechanical forces estimated and added as persistant forces to particles during non partial sat time steps. This value is not exact, see :yref:`PartialSatClayEngine.collectedDT`"))
+	((int,elapsedIters,0,,"number of mechanical iters since last flow iter."))
+	((Real,collectedDT,0,,"this is the exact time step that is computed, it enables the stiffness timestep estimate to change dynamically while maintaining an exact match for the flow timestep"))
 	,/*PartialSatClayEngineT()*/,
 	solver = shared_ptr<FlowSolver> (new FlowSolver);
 	,

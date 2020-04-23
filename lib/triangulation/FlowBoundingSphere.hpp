@@ -119,6 +119,7 @@ namespace CGT {
 		Real meanInitialPorosity;
 		bool freezeSaturation;
 		Real permClamp;
+		Real manualCrackPerm;
 #endif
 
 		//Handling imposed pressures/fluxes on elements in the form of {point,value} pairs, IPCells contains the cell handles corresponding to point

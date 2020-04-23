@@ -24,8 +24,8 @@ PartialSatClayEngine::~PartialSatClayEngine() { }
 void PartialSatClayEngine::action()
 {
 	//if (debug) cout << "Entering partialSatEngineAction "<<endl;
-	//if (elapsedIters > int(partialSatDT/scene->dt) isActivated=true;
-	//else isActivated=false;
+	if (partialSatDT!=0) timeStepControl();
+
 	if (!isActivated)
 		return;
 	timingDeltas->start();
@@ -116,10 +116,11 @@ void PartialSatClayEngine::action()
 	timingDeltas->checkpoint("Update_Volumes");
 
 	epsVolCumulative += epsVolMax;
-	retriangulationLastIter++;
+	if (partialSatDT==0) retriangulationLastIter++;
 	if (!updateTriangulation)
 		updateTriangulation = // If not already set true by another function of by the user, check conditions
-		        (defTolerance > 0 && epsVolCumulative > defTolerance) || (meshUpdateInterval > 0 && retriangulationLastIter > meshUpdateInterval);
+		        (defTolerance > 0 && epsVolCumulative > defTolerance) ||
+			(meshUpdateInterval > 0 && retriangulationLastIter > meshUpdateInterval);
 
 	// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
 	if (breakControlledRemesh)
@@ -134,7 +135,7 @@ void PartialSatClayEngine::action()
 #endif
 		if (partialSatEngine)
 			setCellsDSDP(*solver);
-		solver->gaussSeidel(scene->dt);
+		solver->gaussSeidel(partialSatDT==0 ? scene->dt : solverDT);
 		timingDeltas->checkpoint("Factorize + Solve");
 		if (partialSatEngine) {
 			//initializeSaturations(*solver);
@@ -163,8 +164,10 @@ void PartialSatClayEngine::action()
 	timingDeltas->checkpoint("forces.sync()");
 	//if (!decoupleForces) computeViscousForces ( *solver );
 	timingDeltas->checkpoint("viscous forces");
-	if (!decoupleForces)
-		applyForces(*solver);
+	if (!decoupleForces) {
+		if (partialSatDT!=0) addPermanentForces(*solver);
+		else applyForces(*solver);
+	}
 	timingDeltas->checkpoint("Applying Forces");
 	if (debug)
 		cout << "finished computing forces and applying" << endl;
@@ -260,7 +263,41 @@ void PartialSatClayEngine::action()
 
 
 /////// Partial Sat Tools /////////
+void PartialSatClayEngine::timeStepControl() {
+	if (((elapsedIters > int(partialSatDT/scene->dt)) and partialSatDT != 0) or first) {
+		isActivated = true;
+		retriangulationLastIter+=elapsedIters;
+		elapsedIters = 0;
+		if (first) {
+			collectedDT = scene->dt;
+			solverDT = scene->dt;
 
+		} else {
+			solverDT = collectedDT;
+			collectedDT = 0;
+		}
+		if (debug) cout << "using flowtime step =" << solverDT << endl;
+	} else {
+		if (partialSatDT != 0) {
+			elapsedIters++;
+			collectedDT += scene->dt;
+			isActivated = true;
+		}
+		isActivated = emulatingAction ? true : false;
+		solverDT = scene->dt;
+	}
+}
+
+void PartialSatClayEngine::addPermanentForces(FlowSolver& flow)
+{
+	typedef typename Solver::FiniteVerticesIterator FiniteVerticesIterator;
+
+	FiniteVerticesIterator vertices_end = flow.tesselation().Triangulation().finite_vertices_end();
+
+	for (FiniteVerticesIterator V_it = flow.tesselation().Triangulation().finite_vertices_begin(); V_it != vertices_end; V_it++) {
+		scene->forces.setPermForce(V_it->info().id(), makeVector3r(V_it->info().forces));
+	}
+}
 
 void PartialSatClayEngine::blockLowPoroRegions(FlowSolver& flow)
 {
@@ -378,8 +415,9 @@ void PartialSatClayEngine::updatePorosity(FlowSolver& flow)
 				if (poro > maxPoroClamp)
 					poro = maxPoroClamp;
 				if (!freezeSaturation and directlyModifySatFromPoro) { // updatesaturation with respect to volume change
+					Real dt = partialSatDT==0 ? scene->dt : solverDT;
 					Real volWater_o
-					        = (cell->info().volume() - cell->info().dv() * scene->dt) * cell->info().porosity * cell->info().saturation;
+						= (cell->info().volume() - cell->info().dv() * dt) * cell->info().porosity * cell->info().saturation;
 					cell->info().saturation
 					        = volWater_o / (poro * cell->info().volume()); // update the saturation with respect to new porosity and volume
 				}
@@ -1104,6 +1142,7 @@ void PartialSatClayEngine::initSolver(FlowSolver& flow)
 	flow.meanInitialPorosity = meanInitialPorosity;
 	flow.freezeSaturation    = freezeSaturation;
 	flow.permClamp           = permClamp;
+	flow.manualCrackPerm     = manualCrackPerm;
 }
 
 void PartialSatClayEngine::buildTriangulation(Real pZero, Solver& flow)
@@ -1233,6 +1272,7 @@ void PartialSatClayEngine::initializeVolumes(FlowSolver& flow)
 		if (flow.fluidBulkModulus > 0 || thermalEngine || iniVoidVolumes) {
 			cell->info().invVoidVolume() = 1 / (std::abs(cell->info().volume()) - volumeCorrection * flow.volumeSolidPore(cell));
 		} else if (partialSatEngine) {
+			if (cell->info().volume() <= 0) cerr << "cell volume zero, bound to be issues" << endl;
 			cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
 		}
 		if (!cell->info().isAlpha and !cell->info().isFictious)
@@ -1246,7 +1286,7 @@ void PartialSatClayEngine::updateVolumes(FlowSolver& flow)
 {
 	if (debug)
 		cout << "Updating volumes.............." << endl;
-	Real invDeltaT      = 1 / scene->dt;
+	Real invDeltaT      = 1 / (partialSatDT==0 ? scene->dt : solverDT);
 	epsVolMax           = 0;
 	Real totVol         = 0;
 	Real totDVol        = 0;

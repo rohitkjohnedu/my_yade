@@ -285,7 +285,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Real averageSlicePressure(Real posY){return solver->averageSlicePressure(posY);}
 		Real averagePressure(){return solver->averagePressure();}
 
-		void emulateAction(){
+		virtual void emulateAction(){
 			scene = Omega::instance().getScene().get();
 			action();}
 		#ifdef LINSOLV

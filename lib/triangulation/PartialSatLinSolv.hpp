@@ -74,6 +74,7 @@ namespace CGT {
 		using _N::surfaceSolidThroatInPore;
 		using _N::tesselation;
 
+		using BaseFlowSolver::manualCrackPerm;
 		using BaseFlowSolver::bIntrinsicPerm;
 		using BaseFlowSolver::checkSphereFacetOverlap;
 		using BaseFlowSolver::clampKValues;
