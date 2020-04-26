@@ -1110,32 +1110,32 @@ Line Loop(%d) = {%d, %d, %d}; Ruled Surface(%d) = {%d};\n\n\
 
 
 # external vtk manipulation ===============================================================
-def text2vtk(inFileName,outFileName):
+def text2vtk(inFileName,outFileName,comment="comment"):
 	"""Converts text file (created by :yref:`yade.export.textExt` function) into vtk file.
 	See :ysrc:`examples/test/paraview-spheres-solid-section/export_text.py` example
 
 	:param str inFileName: name of input text file
 	:param str outFileName: name of output vtk file
+	:param str comment: optional comment in vtk file
 	"""
-	fin  = open(inFileName)
-	fout = open(outFileName,'w')
-	lastLine = None
-	line = '#'
-	while line.startswith('#'):
-		lastLine = line
-		line = fin.readline()
-	columns = lastLine.split()[5:]
-	data = [line.split() for line in fin]
-	fin.close()
+	with open(inFileName) as fin:
+		lines = [line for line in fin]
+	for i,line in enumerate(lines):
+		if not line.startswith("#"):
+			break
+		lineColumnNames = line
+	columns = lineColumnNames[1:].strip().split()[4:]
+	lines = lines[i:]
+	data = [line.split() for line in lines]
 	n = len(data)
-	fout.write('# vtk DataFile Version 3.0.\ncomment\nASCII\n\nDATASET POLYDATA\nPOINTS %d double\n'%(n))
-	fout.writelines('%s %s %s\n'%(d[0],d[1],d[2]) for d in data)
-	fout.write("\nPOINT_DATA %d\nSCALARS radius double 1\nLOOKUP_TABLE default\n"%(n))
-	fout.writelines('%s\n'%(d[3]) for d in data)
-	for i,c in enumerate(columns):
-		fout.write("\nSCALARS %s double 1\nLOOKUP_TABLE default\n"%(c))
-		fout.writelines('%s\n'%(d[4+i]) for d in data)
-	fout.close()
+	with open(outFileName,"w") as fout:
+		fout.write('# vtk DataFile Version 3.0.\n{}\nASCII\n\nDATASET POLYDATA\nPOINTS {} double\n'.format(comment,n))
+		fout.writelines('{} {} {}\n'.format(*d) for d in data)
+		fout.write("\nPOINT_DATA {}\nSCALARS radius double 1\nLOOKUP_TABLE default\n".format(n))
+		fout.writelines('{}\n'.format(d[3]) for d in data)
+		for i,c in enumerate(columns):
+			fout.write("\nSCALARS {} double 1\nLOOKUP_TABLE default\n".format(c))
+			fout.writelines('{}\n'.format(d[4+i]) for d in data)
 
 def text2vtkSection(inFileName,outFileName,point,normal=(1,0,0)):
 	"""Converts section through spheres from text file (created by :yref:`yade.export.textExt` function) into vtk file.
