@@ -18,7 +18,7 @@ These two codes are independent, in the sense that either one of them can be com
 
 Potential Particles code (PP)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The concept of *Potential Particles* was introduced and developed by [Houlsby2009]_. The problem of contact detection between a pair of potential particles was cast as a constrained optimization problem, where the equations are solved using the Newton-Raphson method in 2-D. In [Boon2013]_ it was extended to 3-D and more robust solutions were proposed. Many numerical optimization solvers generally cannot cope with discontinuities, ill-conditioned gradients (Jacobians) or curvatures (Hessians), and these obstacles were overcome in [Boon2013]_, by re-formulating the problem and solving the equations using conic optimization solvers. Users can either make use of MOSEK (using its academic licence) or the simplified code written by [Boon2013]_, which is used by default in the source code.
+The concept of *Potential Particles* was introduced and developed by [Houlsby2009]_. The problem of contact detection between a pair of potential particles was cast as a constrained optimization problem, where the equations are solved using the Newton-Raphson method in 2-D. In [Boon2013]_ it was extended to 3-D and more robust solutions were proposed. Many numerical optimization solvers generally cannot cope with discontinuities, ill-conditioned gradients (Jacobians) or curvatures (Hessians), and these obstacles were overcome in [Boon2013]_, by re-formulating the problem and solving the equations using conic optimization solvers. Previous versions made use of MOSEK (using its academic licence), while currently an in-house code written by [Boon2013]_ is used to solve the conic optimization problem.
 A potential particle is defined as in :eq:`ppFormula` [Houlsby2009]_:
 
    .. math:: f=(1-k) \Bigg(\sum_{i=1}^{N} \langle a_{i}x+b_{i}y+c_{i}z-d_i\rangle ^2-r^2 \Bigg) +k (x^2+y^2+z^2-R^2)\\
@@ -243,7 +243,7 @@ To define a body using the :yref:`PotentialParticle` or :yref:`PotentialBlock` s
   b.aspherical=True # To be used in conjunction with exactAsphericalRot=True in the NewtonIntegrator
   # V: Volume
   # I11, I22, I33: Principal inertias
-  utils._commonBodySetup(b,V,Vector3(I11,I22,I33), material='frictionless', pos=(0,0,0), ori=Quaternion((1,0,0),0), fixed=False)
+  utils._commonBodySetup(b,V,Vector3(I11,I22,I33), material='frictionless', pos=(0,0,0), fixed=False)
   b.state.pos=Vector3(xPos,yPos,zPos)
   b.state.ori=Quaternion((random.random(),random.random(),random.random()),random.random())
   b.shape.volume=V;
@@ -264,7 +264,7 @@ For example, to define a :yref:`PotentialBlock`:
   b=Body()
   b.shape=PotentialBlock(R=0.0, ...) #here we set R=0.0 to trigger automatic calculation of R
   b.aspherical=True # To be used in conjunction with exactAsphericalRot=True
-  utils._commonBodySetup(b,b.shape.volume,b.shape.inertia, material='frictionless', pos=Vector3(xPos,yPos,zPos), ori=Quaternion((1,0,0),0), fixed=False)
+  utils._commonBodySetup(b,b.shape.volume,b.shape.inertia, material='frictionless', pos=Vector3(xPos,yPos,zPos), fixed=False)
   b.state.ori=b.shape.orientation # this will rotate the particle to its initial random system. If b.state.ori=Quaternion.Identity, the PB is oriented to its principal axes 
   O.bodies.append(b)
 
@@ -286,7 +286,7 @@ When ``isBoundary=True``, the :yref:`PotentialBlock` in question is handled to i
 
 Visualization
 ^^^^^^^^^^^^^
-Visualization of the :yref:`PotentialParticle` and :yref:`PotentialBlock` shape classes is offered using the qt environment (OpenGL). Additionally, the :yref:`yade.export.VTKExporter.exportPotentialBlocks` function and :yref:`PotentialParticleVTKRecorder` and :yref:`PotentialBlockVTKRecorder` engines can be used to export geometrical and interaction information of the analyses in vtk format (visualized in Paraview). It should be noted that currently the :yref:`PotentialBlockVTKRecorder` records the inner, rounded potential particle, rather than the actual particle with sharp edges and flat faces.
+Visualization of the :yref:`PotentialParticle` and :yref:`PotentialBlock` shape classes is offered using the qt environment (OpenGL). Additionally, the :yref:`yade.export.VTKExporter.exportPotentialBlocks` function and :yref:`PotentialParticleVTKRecorder` and :yref:`PotentialBlockVTKRecorder` engines can be used to export geometrical and interaction information of the analyses in vtk format (visualized in Paraview). It should be noted that currently the :yref:`PotentialBlockVTKRecorder` records a rounded approximation of the particle, rather than the actual particle with sharp corners and edges.
 
 In the qt environment, the :yref:`PotentialParticle` shape class is visualized using the Marching Cubes algorithm, and the level of display accuracy can be determined by the user. This is controlled by the parameters:
 
