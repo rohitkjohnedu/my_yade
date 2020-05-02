@@ -16,8 +16,22 @@
 #define YADE_THIN_COMPLEX_WRAPPER_HPP
 
 #include "ThinRealWrapper.hpp"
+#include <boost/type_traits/is_complex.hpp>
 
 // it is possible to #define YADE_IGNORE_IEEE_INFINITY_NAN  ← about that see https://www.boost.org/doc/libs/1_71_0/libs/utility/operators.htm#ordering
+
+// ComplexHP<…> note:
+//   If ComplexHP<N> is supported then ThinComplexWrapper needs explicit conversion operators to all other higher precision types, so provide them here.
+//   These include headers are necessary to make it work.
+//   If other types (e.g. boost quad_double) appear, they will have to be added here.
+#ifndef YADE_DISABLE_REAL_MULTI_HP
+#ifdef YADE_MPFR
+#include <boost/multiprecision/mpfr.hpp>
+#else
+#include <boost/multiprecision/cpp_bin_float.hpp>
+#endif
+#include <boost/multiprecision/float128.hpp>
+#endif
 
 namespace yade {
 namespace math {
@@ -131,6 +145,19 @@ namespace math {
 		{
 			return static_cast<OtherType>(val);
 		}
+// If ComplexHP<N> is supported then ThinComplexWrapper needs explicit conversion operators to all other higher precision types, so provide them here.
+#ifndef YADE_DISABLE_REAL_MULTI_HP
+#ifdef YADE_MPFR
+		template <unsigned int Dec> using HPBackend = boost::multiprecision::mpfr_float_backend<Dec, boost::multiprecision::allocate_stack>;
+#else
+		template <unsigned int Dec> using HPBackend = boost::multiprecision::cpp_bin_float<Dec>;
+#endif
+		template <unsigned int Num> explicit operator ::std::complex<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>() const
+		{
+			return static_cast<::std::complex<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>>(val);
+		}
+		explicit operator ::std::complex<::boost::multiprecision::float128>() const { return static_cast<::std::complex<::boost::multiprecision::float128>>(val); }
+#endif
 		explicit operator const WrappedComplex&() const { return val; }
 		explicit operator WrappedComplex&() { return val; }
 
@@ -220,5 +247,15 @@ namespace math {
 
 } // namespace math
 } // namespace yade
+
+// properly inform boost::is_complex about ThinComplexWrapper
+namespace boost {
+template <class T> struct is_complex<::yade::math::ThinComplexWrapper<std::complex<T>>> : public true_type {
+};
+}
+
+static_assert(
+        boost::is_complex<::yade::math::ThinComplexWrapper<std::complex<::yade::math::UnderlyingReal>>>::value == true,
+        "ThinComplexWrapper<std::complex<UnderlyingReal>> is not recognized by boost::is_complex, please report a bug.");
 
 #endif
