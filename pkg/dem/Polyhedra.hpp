@@ -255,7 +255,7 @@ public:
 	virtual void go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction);
 	FUNCTOR2D(PolyhedraMat, PolyhedraMat);
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys,IPhysFunctor,"",		
+	YADE_CLASS_BASE_DOC(Ip2_PolyhedraMat_PolyhedraMat_PolyhedraPhys,IPhysFunctor,"Computes the :yref:`interaction properties<PolyhedraPhys>` from the :yref:`material properties<PolyhedraMat>` of the two interacting bodies 1,2. Contact friction angle is taken as the minimum of the two :yref:`frictionAngle<PolyhedraMat.frictionAngle>`, and contact stiffnesses :yref:`kn<PolyhedraPhys.kn>` and :yref:`ks<PolyhedraPhys.ks>` obey $1/k_n = 1/Y_1 + 1/Y_2$ and $1/k_s = 1/(Y_1 P_1) + 1/(Y_2 P_2)$, with $Y_i$ and $P_i$ corresponding to :yref:`young<PolyhedraMat.young>` and :yref:`poisson<PolyhedraMat.poisson>` for 1 and 2. The unit system to interpret these equations and quantities depend on :yref:`Law2_PolyhedraGeom_PolyhedraPhys_Volumetric.volumePower`."
 	);
 	// clang-format on
 };
