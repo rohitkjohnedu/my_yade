@@ -174,7 +174,9 @@ namespace math {
 	}
 	inline Real atan2(const Real& a, const Real& b)
 	{
-		return YADE_REAL_MATH_NAMESPACE::atan2(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
+		using ::std::atan2;
+		using YADE_REAL_MATH_NAMESPACE::atan2;
+		return atan2(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
 	}
 
 	/********************************************************************************************/
@@ -216,9 +218,19 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::ilogb;
 		return ilogb(static_cast<const UnderlyingReal&>(a));
 	}
-	inline Real ldexp(const Real& a, int b) { return YADE_REAL_MATH_NAMESPACE::ldexp(static_cast<const UnderlyingReal&>(a), b); }
+	inline Real ldexp(const Real& a, int b)
+	{
+		using ::std::ldexp;
+		using YADE_REAL_MATH_NAMESPACE::ldexp;
+		return ldexp(static_cast<const UnderlyingReal&>(a), b);
+	}
 	// that's original C signature of this function
-	inline Real frexp(const Real& a, int* b) { return YADE_REAL_MATH_NAMESPACE::frexp(static_cast<const UnderlyingReal&>(a), b); }
+	inline Real frexp(const Real& a, int* b)
+	{
+		using ::std::frexp;
+		using YADE_REAL_MATH_NAMESPACE::frexp;
+		return frexp(static_cast<const UnderlyingReal&>(a), b);
+	}
 	inline Real exp(const Real& a)
 	{
 		using ::std::exp;
@@ -239,7 +251,9 @@ namespace math {
 	}
 	inline Real pow(const Real& a, const Real& b)
 	{
-		return YADE_REAL_MATH_NAMESPACE::pow(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
+		using ::std::pow;
+		using YADE_REAL_MATH_NAMESPACE::pow;
+		return pow(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
 	}
 	inline Real sqrt(const Real& a)
 	{
@@ -255,7 +269,9 @@ namespace math {
 	}
 	inline Real hypot(const Real& a, const Real& b)
 	{
-		return YADE_REAL_MATH_NAMESPACE::hypot(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
+		using ::std::hypot;
+		using YADE_REAL_MATH_NAMESPACE::hypot;
+		return hypot(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
 	}
 	//YADE_WRAP_FUNC_3(hypot) // since C++17, could be very useful for us
 
@@ -302,7 +318,7 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::abs;
 		return abs(static_cast<const UnderlyingReal&>(a));
 	}
-	inline Real fabs(const Real& a) { return YADE_REAL_MATH_NAMESPACE::abs(static_cast<const UnderlyingReal&>(a)); }
+	inline Real fabs(const Real& a) { return ::yade::math::abs(a); }
 #endif
 	template <typename T> int sgn(T val) { return (T(0) < val) - (val < T(0)); }
 	template <typename T> int sign(T val) { return (T(0) < val) - (val < T(0)); }
@@ -378,28 +394,42 @@ namespace math {
 	/********************************************************************************************/
 	inline Real fmod(const Real& a, const Real& b)
 	{
-		return YADE_REAL_MATH_NAMESPACE::fmod(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
+		using ::std::fmod;
+		using YADE_REAL_MATH_NAMESPACE::fmod;
+		return fmod(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
 	}
 	inline Real remainder(const Real& a, const Real& b)
 	{
-		return YADE_REAL_MATH_NAMESPACE::remainder(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
+		using ::std::remainder;
+		using YADE_REAL_MATH_NAMESPACE::remainder;
+		return remainder(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b));
 	}
 #ifdef YADE_THIN_REAL_WRAPPER_HPP
 	inline Real modf(const Real& a, Real* b)
 	{
-		return YADE_REAL_MATH_NAMESPACE::modf(static_cast<const UnderlyingReal&>(a), b->operator UnderlyingReal*());
+		using ::std::modf;
+		using YADE_REAL_MATH_NAMESPACE::modf;
+		return modf(static_cast<const UnderlyingReal&>(a), b->operator UnderlyingReal*());
 	}
 #else
-	inline Real modf(const Real& a, Real* b) { return YADE_REAL_MATH_NAMESPACE::modf(static_cast<const UnderlyingReal&>(a), b); }
+	inline Real modf(const Real& a, Real* b)
+	{
+		using ::std::modf;
+		using YADE_REAL_MATH_NAMESPACE::modf;
+		return modf(static_cast<const UnderlyingReal&>(a), b);
+	}
 #endif
 	inline Real fma(const Real& a, const Real& b, const Real& c)
 	{
-		return YADE_REAL_MATH_NAMESPACE::fma(
-		        static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b), static_cast<const UnderlyingReal&>(c));
+		using ::std::fma;
+		using YADE_REAL_MATH_NAMESPACE::fma;
+		return fma(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b), static_cast<const UnderlyingReal&>(c));
 	}
 	inline Real remquo(const Real& a, const Real& b, int* c)
 	{
-		return YADE_REAL_MATH_NAMESPACE::remquo(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b), c);
+		using ::std::remquo;
+		using YADE_REAL_MATH_NAMESPACE::remquo;
+		return remquo(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b), c);
 	}
 
 	/********************************************************************************************/
@@ -438,11 +468,12 @@ namespace math {
 	static_assert(std::is_same<UnderlyingReal, boost::multiprecision::float128>::value, "Incorrect type, please file a bug report.");
 	inline Real tgamma(const Real& a)
 	{
+		using ::std::tgamma;
+		using YADE_REAL_MATH_NAMESPACE::tgamma;
 		if (a >= 0) {
-			return YADE_REAL_MATH_NAMESPACE::tgamma(static_cast<UnderlyingReal>(a));
+			return tgamma(static_cast<UnderlyingReal>(a));
 		} else {
-			return abs(YADE_REAL_MATH_NAMESPACE::tgamma(static_cast<UnderlyingReal>(a)))
-			        * ((static_cast<unsigned long long>(floor(abs(a))) % 2 == 0) ? -1 : 1);
+			return abs(tgamma(static_cast<UnderlyingReal>(a))) * ((static_cast<unsigned long long>(floor(abs(a))) % 2 == 0) ? -1 : 1);
 		}
 	}
 #else
