@@ -79,7 +79,6 @@ namespace math {
 	using UnderlyingReal = boost::float_fast32_t;
 }
 }
-#define YADE_REAL_MATH_NAMESPACE ::std
 
 /*************************************************************************/
 /*************************   double 64 bits     **************************/
@@ -90,7 +89,6 @@ namespace math {
 	using UnderlyingReal = boost::float_fast64_t;
 }
 }
-#define YADE_REAL_MATH_NAMESPACE ::std
 
 /*************************************************************************/
 /************************* long double 80 bits  **************************/
@@ -100,10 +98,6 @@ namespace yade {
 namespace math {
 	using UnderlyingReal = boost::float_fast80_t;
 }
-}
-#define YADE_REAL_MATH_NAMESPACE ::std
-namespace EigenCostReal {
-enum { ReadCost = 1, AddCost = 1, MulCost = 1 };
 }
 
 /*************************************************************************/
@@ -118,10 +112,6 @@ namespace math {
 	using UnderlyingReal = boost::multiprecision::float128;
 }
 }
-#define YADE_REAL_MATH_NAMESPACE ::boost::multiprecision
-namespace EigenCostReal {
-enum { ReadCost = 1, AddCost = 2, MulCost = 2 };
-}
 
 /*************************************************************************/
 /*************************         MPFR         **************************/
@@ -135,10 +125,6 @@ namespace math {
 	using UnderlyingReal        = boost::multiprecision::number<UnderlyingRealBackend<YADE_REAL_DEC>, boost::multiprecision::et_off>;
 }
 }
-#define YADE_REAL_MATH_NAMESPACE ::boost::multiprecision
-namespace EigenCostReal {
-enum { ReadCost = Eigen::HugeCost, AddCost = Eigen::HugeCost, MulCost = Eigen::HugeCost };
-}
 
 /*************************************************************************/
 /************************* boost::cpp_bin_float **************************/
@@ -151,14 +137,21 @@ namespace math {
 	using UnderlyingReal = boost::multiprecision::number<UnderlyingRealBackend<YADE_REAL_DEC>, boost::multiprecision::et_off>;
 }
 }
-#define YADE_REAL_MATH_NAMESPACE ::boost::multiprecision
-namespace EigenCostReal {
-enum { ReadCost = Eigen::HugeCost, AddCost = Eigen::HugeCost, MulCost = Eigen::HugeCost };
-}
 
 /*************************************************************************/
 #else
 #error "Real precision is unspecified, there must be a mistake in CMakeLists.txt, the requested #defines should have been provided."
+#endif
+
+/*************************************************************************/
+/*********************** YADE_REAL_MATH_NAMESPACE ************************/
+/*************************************************************************/
+// The YADE_REAL_MATH_NAMESPACE macro makes sure that proper namespace is used for Real and eventual RealHP<…> types.
+// On older systems RealHP<…> can't work, so we need to check if it was explicitly disabled during cmake autodetection.
+#if ((YADE_REAL_BIT <= 80) and defined(YADE_DISABLE_REAL_MULTI_HP))
+#define YADE_REAL_MATH_NAMESPACE ::std
+#else
+#define YADE_REAL_MATH_NAMESPACE ::boost::multiprecision
 #endif
 
 /*************************************************************************/
@@ -173,7 +166,7 @@ enum { ReadCost = Eigen::HugeCost, AddCost = Eigen::HugeCost, MulCost = Eigen::H
 
 namespace yade {
 namespace math {
-	using Real    = ThinRealWrapper<UnderlyingReal>;
+	using Real    = ThinRealWrapper<UnderlyingReal/* FIXME: magic constant 'long double' could be named WrappedReal or WrappedRealHP<1> or UnderlyingReal<1> or RealHP<1>, think about this. */>;
 	using Complex = ThinComplexWrapper<std::complex<UnderlyingReal>>;
 }
 }
@@ -210,16 +203,17 @@ static_assert(sizeof(Complex) == sizeof(std::complex<math::UnderlyingReal>), "Th
 /*************************************************************************/
 /*************************   Eigen  NumTraits   **************************/
 /*************************************************************************/
-#if (YADE_REAL_BIT > 64)
+//#if (YADE_REAL_BIT > 64)
 #include "EigenNumTraits.hpp"
-#endif
+//#endif
 
 /*************************************************************************/
 /*************************    CGAL NumTraits    **************************/
 /*************************************************************************/
-#if (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
+//#if (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
+// FIXME - wewnątrz to samo zakomentowane. A chodzi o to, żeby dostarczać przeładowania tylko dla tych N dla których trzeba, zależnie od YADE_REAL_BIT inne N to jest double lub floaat128
 #include "CgalNumTraits.hpp"
-#endif
+//#endif
 
 /*************************************************************************/
 /************************* Vector3 Matrix3 etc  **************************/
