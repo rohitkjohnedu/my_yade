@@ -22,14 +22,18 @@ struct ToFromPythonConverter {
 /*************************        Real          **************************/
 /*************************************************************************/
 
+// The note at the end of http://mpmath.org/doc/current/basics.html#temporarily-changing-the-precision
+// indicates that having different mpmath variables with different precision is poorly supported.
+// So python conversions of RealHP<N> for different precisions is questionable.
+// Not a big problem, because N>=2 is supposed to be used only in critical C++ sections where better calculations are necessary.
+
 template <typename ArbitraryReal> struct ArbitraryReal_to_python {
 	static PyObject* convert(const ArbitraryReal& val)
 	{
 		// http://mpmath.org/doc/current/technical.html
-		// the '+1' is to make sure that there are no conversion errors in the last bit.
 		::boost::python::object mpmath = ::boost::python::import("mpmath");
-		mpmath.attr("mp").attr("dps")  = int(std::numeric_limits<ArbitraryReal>::digits10 + 1);
-		::boost::python::object result = mpmath.attr("mpf")(::yade::math::toString(val));
+		mpmath.attr("mp").attr("dps") = int(std::numeric_limits<ArbitraryReal>::digits10 + ::yade::math::extraDigits10NecessaryForStringRepresentation);
+		::boost::python::object result = mpmath.attr("mpf")(::yade::math::toStringHP<ArbitraryReal>(val));
 		return boost::python::incref(result.ptr());
 	}
 };
@@ -63,12 +67,8 @@ template <typename ArbitraryReal> struct ArbitraryReal_from_python {
 		void* storage = ((boost::python::converter::rvalue_from_python_storage<ArbitraryReal>*)(data))->storage.bytes;
 		new (storage) ArbitraryReal;
 		ArbitraryReal* val = (ArbitraryReal*)storage;
-		if (std::is_same<ArbitraryReal, ::yade::math::Real>::value) {
-			// ensure that "nan" "inf" are read correctly
-			*val = ::yade::math::fromStringReal(ss.str());
-		} else {
-			ss >> *val;
-		}
+		// ensure that "nan" "inf" are read correctly
+		*val              = ::yade::math::fromStringRealHP<ArbitraryReal>(ss.str());
 		data->convertible = storage;
 	}
 };
@@ -82,13 +82,12 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_to_python {
 	{
 		std::stringstream ss_real {};
 		std::stringstream ss_imag {};
-		// the '+1' is to make sure that there are no conversion errors in the last bit.
-		constexpr const auto digs1 = std::numeric_limits<typename ArbitraryComplex::value_type>::digits10 + 1;
-		ss_real << std::setprecision(digs1) << val.real();
-		ss_imag << std::setprecision(digs1) << val.imag();
+		ss_real << ::yade::math::toStringHP<typename ArbitraryComplex::value_type>(val.real());
+		ss_imag << ::yade::math::toStringHP<typename ArbitraryComplex::value_type>(val.imag());
 		::boost::python::object mpmath = ::boost::python::import("mpmath");
 		// http://mpmath.org/doc/current/technical.html
-		mpmath.attr("mp").attr("dps")  = int(digs1);
+		mpmath.attr("mp").attr("dps") = int(
+		        std::numeric_limits<typename ArbitraryComplex::value_type>::digits10 + ::yade::math::extraDigits10NecessaryForStringRepresentation);
 		::boost::python::object result = mpmath.attr("mpc")(ss_real.str(), ss_imag.str());
 		return boost::python::incref(result.ptr());
 	}
@@ -117,14 +116,9 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 		new (storage) ArbitraryComplex;
 		ArbitraryComplex*                     val = (ArbitraryComplex*)storage;
 		typename ArbitraryComplex::value_type re { 0 }, im { 0 };
-		if (std::is_same<typename ArbitraryComplex::value_type, ::yade::math::Real>::value) {
-			// ensure that "nan" "inf" are read correctly
-			re = ::yade::math::fromStringReal(ss_real.str());
-			im = ::yade::math::fromStringReal(ss_imag.str());
-		} else {
-			ss_real >> re;
-			ss_imag >> im;
-		}
+		// ensure that "nan" "inf" are read correctly
+		re                = ::yade::math::fromStringRealHP<typename ArbitraryComplex::value_type>(ss_real.str());
+		im                = ::yade::math::fromStringRealHP<typename ArbitraryComplex::value_type>(ss_imag.str());
 		*val              = ArbitraryComplex(re, im); // must explicitly call the constructor, static_cast won't work.
 		data->convertible = storage;
 	}
@@ -139,10 +133,11 @@ namespace yade {
 namespace minieigenHP {
 	inline std::string numToString(const int& num) { return ::boost::lexical_cast<::std::string>(num); } // ignore padding for now.
 
+	// FIXME : template <typename Rr, int Level = levelOfRealHP<Rr>>
 	inline std::string numToString(const ::yade::Real& num)
 	{
-		constexpr const auto digs1 = std::numeric_limits<::yade::Real>::digits10 + 1;
-		if (digs1 <= 16) {
+		constexpr bool isPythonPrecisionEnough = std::is_same<double, ::yade::Real>::value or std::is_same<float, ::yade::Real>::value;
+		if (isPythonPrecisionEnough) {
 			return ::yade::math::toString(num);
 		} else {
 			// The only way to make sure that it is copy-pasteable without loss of precision is to put it inside "…"
@@ -152,10 +147,11 @@ namespace minieigenHP {
 
 	inline std::string numToString(const ::yade::Complex& num)
 	{
-		constexpr const auto digs1 = std::numeric_limits<::yade::Complex::value_type>::digits10 + 1;
-		std::string          ret;
+		constexpr bool isPythonPrecisionEnough
+		        = std::is_same<double, ::yade::Complex::value_type>::value or std::is_same<float, ::yade::Complex::value_type>::value;
+		std::string ret;
 		if (num.real() != 0 && num.imag() != 0) {
-			if (digs1 <= 16) {
+			if (isPythonPrecisionEnough) {
 				// don't add "+" in the middle if imag is negative and will start with "-"
 				return numToString(num.real()) + (num.imag() > 0 ? "+" : "") + numToString(num.imag()) + "j";
 			} else {
@@ -165,13 +161,13 @@ namespace minieigenHP {
 		}
 		// only imaginary is non-zero: skip the real part, and decrease padding to accomoadate the trailing "j"
 		if (num.imag() != 0) {
-			if (digs1 <= 16) {
+			if (isPythonPrecisionEnough) {
 				return numToString(num.imag()) + "j";
 			} else {
 				return "mpc(\"0\"," + numToString(num.imag()) + ")";
 			}
 		}
-		if (digs1 <= 16) {
+		if (isPythonPrecisionEnough) {
 			return numToString(num.real());
 		} else {
 			return "mpc(" + numToString(num.real()) + ",\"0\")";
