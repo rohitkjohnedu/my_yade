@@ -12,7 +12,9 @@ from   testMathHelper import mpc
 
 class ExtendedMinieigenTests(unittest.TestCase):
 	def setUp(self):
-		self.digs1=yade.config.highPrecisionDecimalPlaces+1
+		self.digs1=${DEC_DIGITS}+1 # FIXME ? digs1 is incorrectly used?
+		#FIXME: self.digs1=mne        .highPrecisionDecimalPlaces+mne      .extraDigits10NecessaryForStringRepresentation
+		#FIXME: self.digs1=yade.config.highPrecisionDecimalPlaces+yade.math.extraDigits10NecessaryForStringRepresentation
 		mpmath.mp.dps=self.digs1
 		# tolerance = 1.001×10⁻ᵈ⁺¹, where ᵈ==yade.config.highPrecisionDecimalPlaces
 		# so basically we store one more decimal digit, and expect one less decimal digit. That amounts to ignoring one (actually two) least significant digits.
