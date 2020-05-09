@@ -374,7 +374,7 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::modf;
 		return modf(static_cast<const UnderlyingRealHP<Rr>&>(a), b->operator UnderlyingRealHP<Rr>*());
 	}
-	template <typename Rr, int Level = levelOfRealHP<Rr>, typename boost::disable_if_c<IsWrapped<Rr>, int>::type = 0> inline Rr modf(const Real& a, Rr* b)
+	template <typename Rr, int Level = levelOfRealHP<Rr>, typename boost::disable_if_c<IsWrapped<Rr>, int>::type = 0> inline Rr modf(const Rr& a, Rr* b)
 	{
 		using ::std::modf;
 		using YADE_REAL_MATH_NAMESPACE::modf;
@@ -477,16 +477,22 @@ namespace math {
 
 	// These random functions are necessary for Eigen library to for example write in python: Vector3.Random()
 	// generate random number [0,1)
-	// FIXME - adding EigenNumTraits support for RealHP<N> requires these to work with RealHP<N>
-	static inline Real random01()
+	template <int N> static inline RealHP<N> random01HP()
 	{
 		static ::boost::random::mt19937 gen;
-		return ::boost::random::generate_canonical<::yade::math::Real, std::numeric_limits<::yade::math::Real>::digits>(gen);
+		return ::boost::random::generate_canonical<::yade::math::RealHP<N>, std::numeric_limits<::yade::math::RealHP<N>>::digits>(gen);
 	}
 
+	// Convenience functions for Real == RealHP<1>
+	static inline Real random01()   { return random01HP<1>(); }
 	static inline Real unitRandom() { return random01(); }
 	static inline Real random() { return random01() * 2 - 1; }
 	static inline Real symmetricRandom() { return random(); }
+
+	// EigenNumTraits support for RealHP<N> requires random to work with RealHP<N>
+	template <int N> static inline RealHP<N> unitRandomHP() { return random01HP<N>(); }
+	template <int N> static inline RealHP<N> randomHP() { return random01HP<N>() * 2 - 1; }
+	template <int N> static inline RealHP<N> symmetricRandomHP() { return randomHP<N>(); }
 
 } // namespace math
 } // namespace yade
