@@ -58,6 +58,7 @@ stages:
     - if [[ -e "/usr/bin/clang-format" ]] ; then
           export CLANG_VERSION=`clang-format --version | sed -e 's/^.*version\s\([0-9]\+\).*$/\1/g'` ;
           if [[ ${CLANG_VERSION} -ge "7" ]] ; then
+                  echo -e "\n\e[92m===\nclang-format version is $CLANG_VERSION \n===\e[0m\n" ;
                   scripts/clang-formatter.sh ./ ;
                   export CHANGED_LINES=`git diff -w --shortstat | sed -e 's/^.*,\s\([0-9]\+\)\sdeletion.*$/\1/g'` ;
                   echo "CHANGED_LINES = "$CHANGED_LINES ;
