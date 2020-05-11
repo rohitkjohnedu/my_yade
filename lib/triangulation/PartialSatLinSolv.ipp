@@ -790,6 +790,23 @@ namespace CGT {
 		return saturationTotal / numCells; //sqrt( cell->info().averageVelocity().squared_length());
 	}
 
+	template <class _Tesselation> Real PartialSatLinSolv<_Tesselation>::getAverageSuction()
+	{
+		if (noCache && T[!currentTes].Max_id() <= 0)
+			return 0; //the engine never solved anything
+		//RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+		Real suctionTotal = 0;
+		int  numCells        = 0;
+		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
+			CellHandle& cell = *cellIt;
+			if (cell->info().Pcondition or cell->info().blocked)
+				continue;
+			suctionTotal += pAir - cell->info().p();
+			numCells += 1;
+		}
+		return suctionTotal / numCells; //sqrt( cell->info().averageVelocity().squared_length());
+	}
+
 
 	// need to make sure the flux considers the saturation change between pores
 	// template <class _Tesselation>

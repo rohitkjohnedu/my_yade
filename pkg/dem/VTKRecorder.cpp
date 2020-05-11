@@ -560,6 +560,10 @@ void VTKRecorder::action()
 	vtkSmartPointer<vtkDoubleArrayFromReal> spheresSuction = vtkSmartPointer<vtkDoubleArrayFromReal>::New();
 	spheresSuction->SetNumberOfComponents(1);
 	spheresSuction->SetName("suction");
+
+	vtkSmartPointer<vtkDoubleArrayFromReal> spheresIncidentCells = vtkSmartPointer<vtkDoubleArrayFromReal>::New();
+	spheresIncidentCells->SetNumberOfComponents(1);
+	spheresIncidentCells->SetName("incidentCells");
 #endif
 
 	if (recActive[REC_INTR]) {
@@ -773,6 +777,7 @@ void VTKRecorder::action()
 					PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
 					spheresRadiiChange->InsertNextValue(state->radiiChange);
 					spheresSuction->InsertNextValue(state->suction);
+					spheresIncidentCells->InsertNextValue(state->lastIncidentCells);
 				}
 #endif
 				if (recActive[REC_CLUMPID])
@@ -1085,6 +1090,7 @@ void VTKRecorder::action()
 		if (recActive[REC_PARTIALSAT]) {
 			spheresUg->GetPointData()->AddArray(spheresRadiiChange);
 			spheresUg->GetPointData()->AddArray(spheresSuction);
+			spheresUg->GetPointData()->AddArray(spheresIncidentCells);
 		}
 #endif
 		if (recActive[REC_STRESS]) {

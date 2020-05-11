@@ -240,6 +240,7 @@ class PartialSatState : public State {
 		((Real,radiiChange,0,,"total change of particle radius due to swelling"))
 		((Real,radiiOriginal,0,,"original particle radius prior to swelling"))
 		((int,incidentCells,0,,"number of incident cells"))
+		((int,lastIncidentCells,0,,"number of incident cells"))
 		((Real,volumeOriginal,0,,"original particle volume stored for strain increments"))
 
 		,

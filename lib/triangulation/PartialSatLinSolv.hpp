@@ -178,6 +178,7 @@ namespace CGT {
 		Real              getCellSaturation(Real x, Real y, Real z);
 		std::vector<Real> getCellVelocity(Real x, Real y, Real z);
 		Real              getAverageSaturation();
+		Real              getAverageSuction();
 		Real              getCellPorosity(Real x, Real y, Real z);
 		Real              getCellVolume(Real x, Real y, Real z);
 		bool              getCellCracked(Real x, Real y, Real z);

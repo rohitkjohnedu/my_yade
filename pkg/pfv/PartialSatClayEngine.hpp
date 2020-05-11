@@ -176,6 +176,9 @@ public:
 	void circulateFacetstoRemoveForces(RTriangulation::Finite_edges_iterator& edge);
 	void removeForcesOnBrokenBonds();
 	void timeStepControl();
+	void computeVertexSphericalArea();
+	void resetParticleSuctions();
+
 	//	void setPositionsBuffer(bool current);
 	Real leakOffRate;
 	Real averageAperture;
@@ -211,6 +214,7 @@ public:
 	Real              getCellVolume(Vector3r pos) { return solver->getCellVolume(pos[0], pos[1], pos[2]); }
 	bool              getCellCracked(Vector3r pos) { return solver->getCellCracked(pos[0], pos[1], pos[2]); }
 	Real              getAverageSaturation() { return solver->getAverageSaturation(); }
+	Real              getAverageSuction() { return solver->getAverageSuction(); }
 	Real            getTotalSpecimenVolume() { return getTotalVolume(); }
 	CELL_SCALAR_GETTER(Real, .sat(), cellSaturation);
 	CELL_SCALAR_SETTER(Real, .sat(), setCellSaturation);
@@ -297,6 +301,8 @@ public:
 	((Real,partialSatDT,0,,"time step used for partial sat engine. If >0, the engine will only activate once every partialSatDT/scene->dt steps. Hydromechanical forces estimated and added as persistant forces to particles during non partial sat time steps. This value is not exact, see :yref:`PartialSatClayEngine.collectedDT`"))
 	((int,elapsedIters,0,,"number of mechanical iters since last flow iter."))
 	((Real,collectedDT,0,,"this is the exact time step that is computed, it enables the stiffness timestep estimate to change dynamically while maintaining an exact match for the flow timestep"))
+	((bool,fracBasedPointSuctionCalc,0,,"if true, the suction per material point is computed based on fraction shared by incident cell."))
+	((Real,minCellVol,0,,"Use for avoiding 0 volume cells that will interupt solution of linear system."))
 	,/*PartialSatClayEngineT()*/,
 	solver = shared_ptr<FlowSolver> (new FlowSolver);
 	,
@@ -312,6 +318,7 @@ public:
 	.def("getCellCracked",&PartialSatClayEngine::getCellCracked,(boost::python::arg("pos")),"Get cell cracked in position pos[0],pos[1],pos[2].")
 //	.def("getCellSaturation",&TwoPhaseFlowEngine::getCellSaturation,"Get saturation of cell")
 	.def("getAverageSaturation",&PartialSatClayEngine::getAverageSaturation,"Get average saturation of entire specimen.")
+	.def("getAverageSuction",&PartialSatClayEngine::getAverageSuction,"Get average suction of entire specimen.")
 	.def("saveUnsatVtk",&PartialSatClayEngine::saveUnsatVtk,(boost::python::arg("folder")="./VTK",boost::python::arg("withBoundaries")=false),"Save pressure and saturation field in vtk format. Specify a folder name for output. The cells adjacent to the bounding spheres are generated conditionally based on :yref:`withBoundaries` (not compatible with periodic boundaries)")
 	.def("saveFractureNetworkVTK",&PartialSatClayEngine::saveFractureNetworkVTK,(boost::python::arg("fileName")="./VTK"),"Save fracturenetwork as connections between cell centers")
 	.def("savePermeabilityNetworkVTK",&PartialSatClayEngine::savePermeabilityNetworkVTK,(boost::python::arg("fileName")="./VTK"),"Save permeability network as connections between cell centers")

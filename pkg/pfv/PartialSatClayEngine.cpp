@@ -147,8 +147,9 @@ void PartialSatClayEngine::action()
 		if (!decoupleForces)
 			solver->computeFacetForcesWithCache();
 	}
-	if (particleSwelling) {
+	if (particleSwelling and (retriangulationLastIter==1 or partialSatDT!=0)) {
 		if (suction)
+			if (fracBasedPointSuctionCalc) computeVertexSphericalArea();
 			collectParticleSuction(*solver);
 		if (swelling)
 			swellParticles();
@@ -247,19 +248,6 @@ void PartialSatClayEngine::action()
 	timingDeltas->checkpoint("triangulate + init volumes");
 }
 
-// Real PartialSatClayEngine::diagonalSaturationContribution(CellHandle cell){
-// 	Real contr;
-// 	if (cell->info().saturation<1.0) contr = cell->info().dsdp/(cell->info().invVoidVolume()*scene->dt);
-// 	else contr = 0;
-// 	return contr;
-// }
-//
-// Real PartialSatClayEngine::RHSSaturationContribution(CellHandle cell){
-// 	Real contr;
-// 	if (cell->info().saturation<1.0) contr = cell->info().p() * cell->info().dsdp / (scene->dt * cell->info().invVoidVolume() );
-// 	else contr = 0;
-// 	return contr;
-// }
 
 
 /////// Partial Sat Tools /////////
@@ -619,12 +607,12 @@ Real PartialSatClayEngine::dsdp(CellHandle& cell)
 	//	Real dsdp = (saturation1 - saturation2) / (pc1-pc2);
 	//	return dsdp;
 	// analytical derivative of van genuchten
-	Real pc = pAir - cell->info().p(); // suction
+	const Real pc = pAir - cell->info().p(); // suction
 	if (pc <= 0)
 		return 0;
-	Real term1 = pow(pow(pc / cell->info().Po, 1. / (1. - cell->info().lambdao)) + 1., (-cell->info().lambdao - 1.));
-	Real term2 = cell->info().lambdao * pow(pc / cell->info().Po, 1. / (1. - cell->info().lambdao) - 1.);
-	Real term3 = cell->info().Po * (1. - cell->info().lambdao);
+	const Real term1 = pow(pow(pc / cell->info().Po, 1. / (1. - cell->info().lambdao)) + 1., (-cell->info().lambdao - 1.));
+	const Real term2 = cell->info().lambdao * pow(pc / cell->info().Po, 1. / (1. - cell->info().lambdao) - 1.);
+	const Real term3 = cell->info().Po * (1. - cell->info().lambdao);
 	return term1 * term2
 	        / term3; // techncially this derivative should be negative, but we use a van genuchten fit for suction, not water pressure. Within the numerical formulation, we want the change of saturation with respect to water pressure (not suction). Which essentially reverses the sign of the derivative.
 
@@ -747,10 +735,10 @@ void PartialSatClayEngine::updateSaturation(FlowSolver& flow)
 		if (cell->info().saturation > SsM)
 			cell->info().saturation = SsM;
 
-		if (cell->info().saturation < 1e-5) {
-			cell->info().saturation = 1e-5;
-			//cerr << "cell saturation dropped below threshold" << endl;
-		} // keep an ultra low minium value to avoid numerical issues?
+		// if (cell->info().saturation < 1e-5) {
+		// 	cell->info().saturation = 1e-5;
+		// 	//cerr << "cell saturation dropped below threshold" << endl;
+		// } // keep an ultra low minium value to avoid numerical issues?
 	}
 
 
@@ -767,15 +755,37 @@ void PartialSatClayEngine::updateSaturation(FlowSolver& flow)
 	//         }
 }
 
+void PartialSatClayEngine::resetParticleSuctions()
+{
+	const shared_ptr<BodyContainer>& bodies   = scene->bodies;
+	const long                       size     = bodies->size();
+
+#pragma omp parallel for
+	for (long i = 0; i < size; i++) {
+		const shared_ptr<Body>& b = (*bodies)[i];
+		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
+			continue;
+		if (!b->isStandalone())
+			continue;
+
+		PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
+		state->suction=0;
+	}
+
+
+}
+
 void PartialSatClayEngine::collectParticleSuction(FlowSolver& flow)
 {
+	resetParticleSuctions();
 	shared_ptr<BodyContainer>& bodies = scene->bodies;
 	Tesselation&               Tes    = flow.T[flow.currentTes];
 	const long                 size   = Tes.cellHandles.size();
 #pragma omp parallel for
 	for (long i = 0; i < size; i++) {
 		CellHandle& cell = Tes.cellHandles[i];
-		if (cell->info().isGhost || cell->info().Pcondition || cell->info().isFictious || cell->info().isAlpha || cell->info().blocked)
+
+		if (cell->info().isGhost || cell->info().blocked) //|| cell->info().Pcondition || cell->info().isFictious || cell->info().isAlpha
 			continue; // Do we need special cases for fictious cells? May need to consider boundary contriubtion to node saturation...
 		for (int v = 0; v < 4; v++) {
 			//if (cell->vertex(v)->info().isFictious) continue;
@@ -784,9 +794,16 @@ void PartialSatClayEngine::collectParticleSuction(FlowSolver& flow)
 			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 				continue;
 			PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
+			Sphere*          sphere = dynamic_cast<Sphere*>(b->shape.get());
 			//if (cell->info().isExposed) state->suctionSum+= pAir; // use different pressure for exposed cracks?
-			state->suctionSum += pAir - cell->info().p();
-			state->incidentCells += 1;
+			if (!fracBasedPointSuctionCalc){
+				state->suctionSum += pAir - cell->info().p();
+				state->incidentCells += 1;
+			} else {
+				Real areaFrac = cell->info().sphericalVertexSurface[v];
+				Real totalArea = 4 * M_PI * pow(sphere->radius,2);
+				state->suction += (areaFrac/totalArea)*(pAir - cell->info().p());
+			}
 		}
 	}
 }
@@ -825,9 +842,14 @@ void PartialSatClayEngine::swellParticles()
 		Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		//const Real volume = 4./3. * M_PI*pow(sphere->radius,3);
 		PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
-		state->suction         = state->suctionSum / state->incidentCells;
-		state->incidentCells   = 0; // reset to 0 for next time step
-		state->suctionSum      = 0; //
+
+		if (!fracBasedPointSuctionCalc) {
+			state->lastIncidentCells = state->incidentCells;
+			state->suction         = state->suctionSum / state->incidentCells;
+			state->incidentCells   = 0; // reset to 0 for next time step
+			state->suctionSum      = 0; //
+		}
+
 		const Real volStrain   = betam / alpham * (exp(-alpham * state->suction) - exp(-alpham * suction0));
 		//		const Real rOrig = pow(state->volumeOriginal * 3. / (4.*M_PI),1./3.);
 		//
@@ -1239,8 +1261,10 @@ void PartialSatClayEngine::buildTriangulation(Real pZero, Solver& flow)
 		determineFracturePaths();
 	if (blockIsoCells)
 		blockIsolatedCells(*solver);
-	if (partialSatEngine)
+	if (partialSatEngine) {
 		updateBoundarySaturation(flow);
+		flow.sphericalVertexAreaCalculated = false;
+	}
 	if (waveAction)
 		flow.applySinusoidalPressure(flow.tesselation().Triangulation(), sineMagnitude, sineAverage, 30);
 	else if (boundaryPressure.size() != 0)
@@ -1274,6 +1298,12 @@ void PartialSatClayEngine::initializeVolumes(FlowSolver& flow)
 		} else if (partialSatEngine) {
 			if (cell->info().volume() <= 0) cerr << "cell volume zero, bound to be issues" << endl;
 			cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
+			// cell->info().invVoidVolume()
+			//         = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
+			// if (cell->info().invVoidVolume() == 1./minCellVol) {
+			// 	cell->info().blocked=1;
+			// 	cout << "using minCellVolume, blocking cell" << endl;
+			// }
 		}
 		if (!cell->info().isAlpha and !cell->info().isFictious)
 			totalSpecimenVolume += cell->info().volume();
@@ -2089,6 +2119,45 @@ void PartialSatClayEngine::simulateConfinement()
 		}
 	}
 	forceConfinement = false;
+}
+
+void PartialSatClayEngine::computeVertexSphericalArea()
+{
+	Tesselation& Tes = solver->T[solver->currentTes];
+	//	#ifdef YADE_OPENMP
+	const long size = Tes.cellHandles.size();
+#pragma omp parallel for
+	for (long i = 0; i < size; i++) {
+		CellHandle& cell = Tes.cellHandles[i];
+		//	#else
+		if (cell->info().blocked)  //(cell->info().isFictious) ||
+			continue;
+
+		VertexHandle W[4];
+		for (int k = 0; k < 4; k++)
+			W[k] = cell->vertex(k);
+		if (cell->vertex(0)->info().isFictious)
+			cell->info().sphericalVertexSurface[0] = 0;
+		else
+			cell->info().sphericalVertexSurface[0]
+			        = solver->fastSphericalTriangleArea(W[0]->point(), W[1]->point().point(), W[2]->point().point(), W[3]->point().point());
+		if (cell->vertex(1)->info().isFictious)
+			cell->info().sphericalVertexSurface[1] = 0;
+		else
+			cell->info().sphericalVertexSurface[1]
+			        = solver->fastSphericalTriangleArea(W[1]->point(), W[0]->point().point(), W[2]->point().point(), W[3]->point().point());
+		if (cell->vertex(2)->info().isFictious)
+			cell->info().sphericalVertexSurface[2] = 0;
+		else
+			cell->info().sphericalVertexSurface[2]
+			        = solver->fastSphericalTriangleArea(W[2]->point(), W[1]->point().point(), W[0]->point().point(), W[3]->point().point());
+		if (cell->vertex(3)->info().isFictious)
+			cell->info().sphericalVertexSurface[3] = 0;
+		else
+			cell->info().sphericalVertexSurface[3]
+			        = solver->fastSphericalTriangleArea(W[3]->point(), W[1]->point().point(), W[2]->point().point(), W[0]->point().point());
+	}
+	solver->sphericalVertexAreaCalculated = true;
 }
 
 } //namespace yade
