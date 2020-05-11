@@ -1297,13 +1297,13 @@ void PartialSatClayEngine::initializeVolumes(FlowSolver& flow)
 			cell->info().invVoidVolume() = 1 / (std::abs(cell->info().volume()) - volumeCorrection * flow.volumeSolidPore(cell));
 		} else if (partialSatEngine) {
 			if (cell->info().volume() <= 0) cerr << "cell volume zero, bound to be issues" << endl;
-			cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
-			// cell->info().invVoidVolume()
-			//         = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
-			// if (cell->info().invVoidVolume() == 1./minCellVol) {
-			// 	cell->info().blocked=1;
-			// 	cout << "using minCellVolume, blocking cell" << endl;
-			// }
+			//cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
+			cell->info().invVoidVolume()
+			         = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
+			if (cell->info().invVoidVolume() == 1./minCellVol) {
+				cell->info().blocked=1;
+				cout << "using minCellVolume, blocking cell" << endl;
+			}
 		}
 		if (!cell->info().isAlpha and !cell->info().isFictious)
 			totalSpecimenVolume += cell->info().volume();
