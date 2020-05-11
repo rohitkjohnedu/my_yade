@@ -589,8 +589,11 @@ namespace CGT {
 							} else {
 								if (SeM < 0)
 									cerr << "negative equivalent saturation, linear system will be unstable" << endl;
-								Real kM = -kFactor * exp(bIntrinsicPerm * (avgPoro - meanInitialPorosity)); //avgPoroOrig)); consider making all perm relative to the mean instaed of the initial...
-								Real perm = kM * pow(SeM, nUnsatPerm) * area / distance;
+								Real kM = -kFactor
+								        * exp(bIntrinsicPerm
+								              * (avgPoro
+								                 - meanInitialPorosity)); //avgPoroOrig)); consider making all perm relative to the mean instaed of the initial...
+								Real perm               = kM * pow(SeM, nUnsatPerm) * area / distance;
 								cell->info().kNorm()[j] = (permClamp > 0 and perm > permClamp) ? permClamp : perm;
 								//cout << "id " << cell->info().id <<  " perm " << cell->info().kNorm()[j] << " SeM " << SeM << " kM " << kM << " avgPoro " << avgPoro << endl;
 							}
@@ -796,7 +799,7 @@ namespace CGT {
 			return 0; //the engine never solved anything
 		//RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
 		Real suctionTotal = 0;
-		int  numCells        = 0;
+		int  numCells     = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
 			if (cell->info().Pcondition or cell->info().blocked)

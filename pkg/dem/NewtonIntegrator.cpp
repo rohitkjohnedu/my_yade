@@ -59,7 +59,11 @@ void NewtonIntegrator::updateEnergy(const shared_ptr<Body>& b, const State* stat
 	assert(b->isStandalone() || b->isClump());
 	// always positive dissipation, by-component: |F_i|*|v_i|*damping*dt (|T_i|*|ω_i|*damping*dt for rotations)
 	if (damping != 0. && state->isDamped) {
-		scene->energy->add(fluctVel.cwiseAbs().dot((f+state->mass*gravity).cwiseAbs()) * damping * scene->dt, "nonviscDamp", nonviscDampIx, /*non-incremental*/ false);
+		scene->energy->add(
+		        fluctVel.cwiseAbs().dot((f + state->mass * gravity).cwiseAbs()) * damping * scene->dt,
+		        "nonviscDamp",
+		        nonviscDampIx,
+		        /*non-incremental*/ false);
 		// when the aspherical integrator is used, torque is damped instead of ang acceleration; this code is only approximate
 		scene->energy->add(state->angVel.cwiseAbs().dot(m.cwiseAbs()) * damping * scene->dt, "nonviscDamp", nonviscDampIx, false);
 	}

@@ -46,8 +46,8 @@ public:
 	       REC_DEFORM,
 	       REC_LUBRICATION,
 	       REC_SUBDOMAIN,
-               REC_PARTIALSAT,
-               REC_HERTZMINDLIN };
+	       REC_PARTIALSAT,
+	       REC_HERTZMINDLIN };
 	virtual void action();
 	void addWallVTK(vtkSmartPointer<vtkQuad>& boxes, vtkSmartPointer<vtkPointsReal>& boxesPos, Vector3r& W1, Vector3r& W2, Vector3r& W3, Vector3r& W4);
 	// clang-format off

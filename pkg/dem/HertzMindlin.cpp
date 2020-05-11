@@ -10,7 +10,7 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((MindlinPhys)(Ip2_FrictMat_FrictMat_MindlinPhys)(Law2_ScGeom_MindlinPhys_MindlinDeresiewitz)(Law2_ScGeom_MindlinPhys_HertzWithLinearShear)(
         Law2_ScGeom_MindlinPhys_Mindlin)(MindlinCapillaryPhys)(Ip2_FrictMat_FrictMat_MindlinCapillaryPhys)
 #ifdef PARTIALSAT
-(PartialSatMat)(PartialSatState)(Ip2_PartialSatMat_PartialSatMat_MindlinPhys)
+                    (PartialSatMat)(PartialSatState)(Ip2_PartialSatMat_PartialSatMat_MindlinPhys)
 #endif
 );
 
@@ -24,12 +24,12 @@ CREATE_LOGGER(Ip2_FrictMat_FrictMat_MindlinPhys);
 
 void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction)
 {
-        if (interaction->phys)
+	if (interaction->phys)
 		return; // no updates of an already existing contact necessary
 	shared_ptr<MindlinPhys> contactPhysics(new MindlinPhys());
 	interaction->phys = contactPhysics;
-	const auto mat1    = YADE_CAST<FrictMat*>(b1.get());
-	const auto mat2    = YADE_CAST<FrictMat*>(b2.get());
+	const auto mat1   = YADE_CAST<FrictMat*>(b1.get());
+	const auto mat2   = YADE_CAST<FrictMat*>(b2.get());
 
 	/* from interaction physics */
 	const Real Ea = mat1->young;
@@ -42,8 +42,8 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1, const
 
 	/* from interaction geometry */
 	const auto scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
-	const Real                   Da  = scg->refR1 > 0 ? scg->refR1 : scg->refR2;
-	const Real                   Db  = scg->refR2;
+	const Real Da  = scg->refR1 > 0 ? scg->refR1 : scg->refR2;
+	const Real Db  = scg->refR2;
 	//Vector3r normal=scg->normal;        //The variable set but not used
 
 
@@ -80,7 +80,7 @@ void Ip2_FrictMat_FrictMat_MindlinPhys::go(const shared_ptr<Material>& b1, const
 
 	// en or es specified, just compute alpha, otherwise alpha remains 0
 	if (en || es) {
-		const Real logE             = log((*en)(mat1->id, mat2->id));
+		const Real logE       = log((*en)(mat1->id, mat2->id));
 		contactPhysics->alpha = -sqrt(5 / 6.) * 2 * logE / sqrt(pow(logE, 2) + pow(Mathr::PI, 2))
 		        * sqrt(2 * E * sqrt(R)); // (see Tsuji, 1992), also [Antypov2011] eq. 17
 	}
@@ -241,7 +241,7 @@ bool Law2_ScGeom_MindlinPhys_HertzWithLinearShear::go(shared_ptr<IGeom>& ig, sha
 	Real      ks = nonLin > 0 ? phys->kso * math::pow(uN, 0.5) : phys->kso;
 	Vector3r  shearIncrement;
 	if (nonLin > 1) {
-		auto *  de1 = Body::byId(id1, scene)->state.get(), *de2 = Body::byId(id2, scene)->state.get();
+		auto *   de1 = Body::byId(id1, scene)->state.get(), *de2 = Body::byId(id2, scene)->state.get();
 		Vector3r shiftVel = scene->isPeriodic ? Vector3r(scene->cell->velGrad * scene->cell->hSize * contact->cellDist.cast<Real>()) : Vector3r::Zero();
 		Vector3r shift2   = scene->isPeriodic ? Vector3r(scene->cell->hSize * contact->cellDist.cast<Real>()) : Vector3r::Zero();
 
@@ -641,8 +641,8 @@ void Ip2_FrictMat_FrictMat_MindlinCapillaryPhys::go(
 
 	/* from interaction geometry */
 	const auto scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
-	const Real                   Da  = scg->refR1 > 0 ? scg->refR1 : scg->refR2;
-	const Real                   Db  = scg->refR2;
+	const Real Da  = scg->refR1 > 0 ? scg->refR1 : scg->refR2;
+	const Real Db  = scg->refR2;
 	//Vector3r normal=scg->normal;  //The variable set but not used
 
 	/* calculate stiffness coefficients */
@@ -678,7 +678,7 @@ void Ip2_FrictMat_FrictMat_MindlinCapillaryPhys::go(
 
 	// en or es specified, just compute alpha, otherwise alpha remains 0
 	if (en || es) {
-		const Real logE             = log((*en)(mat1->id, mat2->id));
+		const Real logE       = log((*en)(mat1->id, mat2->id));
 		contactPhysics->alpha = -sqrt(5 / 6.) * 2 * logE / sqrt(pow(logE, 2) + pow(Mathr::PI, 2)) * sqrt(2 * E * sqrt(R)); // (see Tsuji, 1992)
 	}
 
@@ -699,8 +699,8 @@ void Ip2_PartialSatMat_PartialSatMat_MindlinPhys::go(const shared_ptr<Material>&
 		return; // no updates of an already existing contact necessary
 	shared_ptr<MindlinPhys> contactPhysics(new MindlinPhys());
 	interaction->phys = contactPhysics;
-	const auto mat1    = YADE_CAST<FrictMat*>(b1.get());
-	const auto mat2    = YADE_CAST<FrictMat*>(b2.get());
+	const auto mat1   = YADE_CAST<FrictMat*>(b1.get());
+	const auto mat2   = YADE_CAST<FrictMat*>(b2.get());
 
 	/* from interaction physics */
 	const Real Ea = mat1->young;
@@ -713,8 +713,8 @@ void Ip2_PartialSatMat_PartialSatMat_MindlinPhys::go(const shared_ptr<Material>&
 
 	/* from interaction geometry */
 	const auto scg = YADE_CAST<GenericSpheresContact*>(interaction->geom.get());
-	const Real                   Da  = scg->refR1 > 0 ? scg->refR1 : scg->refR2;
-	const Real                   Db  = scg->refR2;
+	const Real Da  = scg->refR1 > 0 ? scg->refR1 : scg->refR2;
+	const Real Db  = scg->refR2;
 	//Vector3r normal=scg->normal;        //The variable set but not used
 
 
@@ -751,7 +751,7 @@ void Ip2_PartialSatMat_PartialSatMat_MindlinPhys::go(const shared_ptr<Material>&
 
 	// en or es specified, just compute alpha, otherwise alpha remains 0
 	if (en || es) {
-		const Real logE             = log((*en)(mat1->id, mat2->id));
+		const Real logE       = log((*en)(mat1->id, mat2->id));
 		contactPhysics->alpha = -sqrt(5 / 6.) * 2 * logE / sqrt(pow(logE, 2) + pow(Mathr::PI, 2))
 		        * sqrt(2 * E * sqrt(R)); // (see Tsuji, 1992), also [Antypov2011] eq. 17
 	}

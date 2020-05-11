@@ -173,7 +173,7 @@ namespace CGT {
 		vector<Matrix3r>                                   normalStressInteraction;
 
 		void         Localize();
-		virtual void         computePermeability();
+		virtual void computePermeability();
 		virtual void gaussSeidel(Real dt = 0);
 		virtual void resetNetwork();
 		virtual void resetLinearSystem(); //reset both A and B in the linear system A*P=B, done typically after updating the mesh
@@ -196,12 +196,12 @@ namespace CGT {
 		Real cavityFluidDensity;
 		bool multithread;
 
-		void displayStatistics();
-		void initializePressure(Real pZero);
-		void initializeTemperatures(Real tZero);
-		bool reApplyBoundaryConditions();
+		void         displayStatistics();
+		void         initializePressure(Real pZero);
+		void         initializeTemperatures(Real tZero);
+		bool         reApplyBoundaryConditions();
 		virtual void computeFacetForcesWithCache(bool onlyCache = false);
-		void saveVtk(const char* folder, bool withBoundaries);
+		void         saveVtk(const char* folder, bool withBoundaries);
 		//write vertices, cells, return ids and no. of fictious neighbors, allIds is an ordered list of cell ids (from begin() to end(), for vtk table lookup),
 		// some ids will appear multiple times if withBoundaries==true since boundary cells are splitted into multiple tetrahedra
 		void saveMesh(basicVTKwritter& writer, bool withBoundaries, vector<int>& allIds, vector<int>& fictiousN, const char* folder);
@@ -249,7 +249,7 @@ namespace CGT {
 		void sliceField(const char* filename);
 		void comsolField();
 
-		virtual void                           interpolate(Tesselation& Tes, Tesselation& NewTes);
+		virtual void                   interpolate(Tesselation& Tes, Tesselation& NewTes);
 		virtual void                   averageRelativeCellVelocity();
 		void                           averageFluidVelocity();
 		void                           applySinusoidalPressure(RTriangulation& Tri, Real amplitude, Real averagePressure, Real loadIntervals);

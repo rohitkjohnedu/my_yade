@@ -57,18 +57,18 @@ public:
 	Real saturation; //the saturation of single pore (will be used in quasi-static imbibition and dynamic flow)
 	Real porosity;
 	//Real solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for facet "i" and sphere (facetVertices)"[i][j]". Last component [i][3] for 1/sumLines in the facet "i" (used by chao).
-	Real    dsdp; // the change of saturation for given capillary pressure
+	Real      dsdp; // the change of saturation for given capillary pressure
 	bool      crack;
 	short int crackNum;
 	Real      crackArea;
 	bool      isExposed;
 	Real      initialPorosity;
 	Real      initialSaturation;
-	Real    Po;      // parameter for water retention curve, unique to cell
-	Real    lambdao; // parameter for water retention curve
-	Real    vSolids;
-	Real    equivalentBulkModulus;
-	Real    oldPressure;
+	Real      Po;      // parameter for water retention curve, unique to cell
+	Real      lambdao; // parameter for water retention curve
+	Real      vSolids;
+	Real      equivalentBulkModulus;
+	Real      oldPressure;
 	bool      clumped;
 	bool      initiallyCracked; // flag to continue computing initial crack perm during simulation without needing displacements or broken bonds
 
@@ -123,12 +123,12 @@ public:
 public:
 	//PartialSatClayEngineT* clayFlow;
 	Real dsdp(CellHandle& cell);
-	void   initializeSaturations(FlowSolver& flow);
-	void   setSaturationFromPcS(CellHandle& cell);
-	void   setCellsDSDP(FlowSolver& flow);
+	void initializeSaturations(FlowSolver& flow);
+	void setSaturationFromPcS(CellHandle& cell);
+	void setCellsDSDP(FlowSolver& flow);
 	Real getTotalVolume();
-	void   updateSaturation(FlowSolver& flow);
-	void   updateBoundarySaturation(FlowSolver& flow);
+	void updateSaturation(FlowSolver& flow);
+	void updateBoundarySaturation(FlowSolver& flow);
 	//	void triangulate(FlowSolver& flow);
 	//Real diagonalSaturationContribution(CellHandle cell);
 	//Real RHSSaturationContribution(CellHandle cell);
@@ -144,14 +144,14 @@ public:
 	Real exponentialDeviate(Real a, Real b);
 	Real weibullDeviate(Real lambda, Real k);
 	Real vanGenuchten(CellHandle& cell, Real pc);
-	void   exposureRecursion(CellHandle cell, Real bndPressure);
-	void   determineFracturePaths();
-	void   createSphere(shared_ptr<Body>& body, Vector3r position, Real radius);
-	void   insertMicroPores(const Real fracMicroPore);
-	bool   findInscribedRadiusAndLocation(CellHandle& cell, std::vector<Real>& coordAndRad);
-	bool   checkSphereContainedInTet(CellHandle& cell, std::vector<Real>& coordAndRad);
-	void   setPorosityWithImageryGrid(string imageryFilePath, FlowSolver& flow);
-	void   resetPoresVolumeSolids(FlowSolver& flow);
+	void exposureRecursion(CellHandle cell, Real bndPressure);
+	void determineFracturePaths();
+	void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius);
+	void insertMicroPores(const Real fracMicroPore);
+	bool findInscribedRadiusAndLocation(CellHandle& cell, std::vector<Real>& coordAndRad);
+	bool checkSphereContainedInTet(CellHandle& cell, std::vector<Real>& coordAndRad);
+	void setPorosityWithImageryGrid(string imageryFilePath, FlowSolver& flow);
+	void resetPoresVolumeSolids(FlowSolver& flow);
 
 	void       blockLowPoroRegions(FlowSolver& flow);
 	void       blockMineralCellRecursion(CellHandle cell, std::vector<Body::id_t>& clumpIds);
@@ -195,18 +195,20 @@ public:
 	virtual void buildTriangulation(Real pZero, Solver& flow);
 	virtual void initSolver(FlowSolver& flow);
 	virtual void action();
-	virtual void emulateAction(){
-		scene = Omega::instance().getScene().get();
-		emulatingAction=true;
+	virtual void emulateAction()
+	{
+		scene           = Omega::instance().getScene().get();
+		emulatingAction = true;
 		action();
-		emulatingAction=false;}
+		emulatingAction = false;
+	}
 
 	void reloadSolver(FlowSolver& flow) { this->initSolver(flow); }
 
 	virtual ~PartialSatClayEngine();
-	Real   getCrackArea() { return crackArea; }
-	Real   getCrackVolume() { return crackVolume; }
-	void   printPorosity(string file) { printPorosityToFile(file); }
+	Real getCrackArea() { return crackArea; }
+	Real getCrackVolume() { return crackVolume; }
+	void printPorosity(string file) { printPorosityToFile(file); }
 	Real getCellSaturation(Vector3r pos) { return solver->getCellSaturation(pos[0], pos[1], pos[2]); }
 	//Real getCellVelocity(Vector3r pos){return solver->getCellVelocity(pos[0], pos[1], pos[2]);}
 	std::vector<Real> getCellVelocity(Vector3r pos) { return solver->getCellVelocity(pos[0], pos[1], pos[2]); }
@@ -215,7 +217,7 @@ public:
 	bool              getCellCracked(Vector3r pos) { return solver->getCellCracked(pos[0], pos[1], pos[2]); }
 	Real              getAverageSaturation() { return solver->getAverageSaturation(); }
 	Real              getAverageSuction() { return solver->getAverageSuction(); }
-	Real            getTotalSpecimenVolume() { return getTotalVolume(); }
+	Real              getTotalSpecimenVolume() { return getTotalVolume(); }
 	CELL_SCALAR_GETTER(Real, .sat(), cellSaturation);
 	CELL_SCALAR_SETTER(Real, .sat(), setCellSaturation);
 
@@ -224,7 +226,7 @@ public:
 	//	PartialSatClayEngineT* flow;
 
 	void saveUnsatVtk(const char* folder, bool withBoundaries);
-// clang-format off
+	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PartialSatClayEngine,PartialSatClayEngineT,"Engine designed to simulate the partial saturation of clay and associated swelling.",
 	((Real,lmbda,0.2,,"Lambda parameter for Van Genuchten model. Free swelling 0.4. If porosity is distributed, this value becomes cell based."))
 	((Real,pAir,0,,"Air pressure for calculation of capillary pressure (Pair - Pwater)"))

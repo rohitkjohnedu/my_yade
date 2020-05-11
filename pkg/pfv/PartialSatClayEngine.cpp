@@ -18,13 +18,14 @@ namespace yade { // Cannot have #include directive inside.
 CREATE_LOGGER(PartialSatClayEngine);
 YADE_PLUGIN((PartialSatClayEngine));
 
-PartialSatClayEngine::~PartialSatClayEngine() { }
+PartialSatClayEngine::~PartialSatClayEngine() {}
 
 
 void PartialSatClayEngine::action()
 {
 	//if (debug) cout << "Entering partialSatEngineAction "<<endl;
-	if (partialSatDT!=0) timeStepControl();
+	if (partialSatDT != 0)
+		timeStepControl();
 
 	if (!isActivated)
 		return;
@@ -116,11 +117,11 @@ void PartialSatClayEngine::action()
 	timingDeltas->checkpoint("Update_Volumes");
 
 	epsVolCumulative += epsVolMax;
-	if (partialSatDT==0) retriangulationLastIter++;
+	if (partialSatDT == 0)
+		retriangulationLastIter++;
 	if (!updateTriangulation)
 		updateTriangulation = // If not already set true by another function of by the user, check conditions
-		        (defTolerance > 0 && epsVolCumulative > defTolerance) ||
-			(meshUpdateInterval > 0 && retriangulationLastIter > meshUpdateInterval);
+		        (defTolerance > 0 && epsVolCumulative > defTolerance) || (meshUpdateInterval > 0 && retriangulationLastIter > meshUpdateInterval);
 
 	// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
 	if (breakControlledRemesh)
@@ -135,7 +136,7 @@ void PartialSatClayEngine::action()
 #endif
 		if (partialSatEngine)
 			setCellsDSDP(*solver);
-		solver->gaussSeidel(partialSatDT==0 ? scene->dt : solverDT);
+		solver->gaussSeidel(partialSatDT == 0 ? scene->dt : solverDT);
 		timingDeltas->checkpoint("Factorize + Solve");
 		if (partialSatEngine) {
 			//initializeSaturations(*solver);
@@ -147,10 +148,11 @@ void PartialSatClayEngine::action()
 		if (!decoupleForces)
 			solver->computeFacetForcesWithCache();
 	}
-	if (particleSwelling and (retriangulationLastIter==1 or partialSatDT!=0)) {
+	if (particleSwelling and (retriangulationLastIter == 1 or partialSatDT != 0)) {
 		if (suction)
-			if (fracBasedPointSuctionCalc) computeVertexSphericalArea();
-			collectParticleSuction(*solver);
+			if (fracBasedPointSuctionCalc)
+				computeVertexSphericalArea();
+		collectParticleSuction(*solver);
 		if (swelling)
 			swellParticles();
 	}
@@ -166,8 +168,10 @@ void PartialSatClayEngine::action()
 	//if (!decoupleForces) computeViscousForces ( *solver );
 	timingDeltas->checkpoint("viscous forces");
 	if (!decoupleForces) {
-		if (partialSatDT!=0) addPermanentForces(*solver);
-		else applyForces(*solver);
+		if (partialSatDT != 0)
+			addPermanentForces(*solver);
+		else
+			applyForces(*solver);
 	}
 	timingDeltas->checkpoint("Applying Forces");
 	if (debug)
@@ -249,22 +253,23 @@ void PartialSatClayEngine::action()
 }
 
 
-
 /////// Partial Sat Tools /////////
-void PartialSatClayEngine::timeStepControl() {
-	if (((elapsedIters > int(partialSatDT/scene->dt)) and partialSatDT != 0) or first) {
+void PartialSatClayEngine::timeStepControl()
+{
+	if (((elapsedIters > int(partialSatDT / scene->dt)) and partialSatDT != 0) or first) {
 		isActivated = true;
-		retriangulationLastIter+=elapsedIters;
+		retriangulationLastIter += elapsedIters;
 		elapsedIters = 0;
 		if (first) {
 			collectedDT = scene->dt;
-			solverDT = scene->dt;
+			solverDT    = scene->dt;
 
 		} else {
-			solverDT = collectedDT;
+			solverDT    = collectedDT;
 			collectedDT = 0;
 		}
-		if (debug) cout << "using flowtime step =" << solverDT << endl;
+		if (debug)
+			cout << "using flowtime step =" << solverDT << endl;
 	} else {
 		if (partialSatDT != 0) {
 			elapsedIters++;
@@ -272,7 +277,7 @@ void PartialSatClayEngine::timeStepControl() {
 			isActivated = true;
 		}
 		isActivated = emulatingAction ? true : false;
-		solverDT = scene->dt;
+		solverDT    = scene->dt;
 	}
 }
 
@@ -393,8 +398,8 @@ void PartialSatClayEngine::updatePorosity(FlowSolver& flow)
 		if (!freezePorosity) {
 			if ((!onlyFractureExposedCracks and cell->info().crack) or cell->info().isExposed) {
 				crackedCellTotal++; //, cell->info().porosity=fracPorosity;
-				//crackCellAbovePoroThreshold(cell);
-			} //maxPoroClamp;
+				                    //crackCellAbovePoroThreshold(cell);
+			}                           //maxPoroClamp;
 			else {
 				Real poro = 1. - cell->info().vSolids / cell->info().volume();
 				//cout << "old poro" << cell->info().porosity << "new poro" << poro << endl;
@@ -403,9 +408,8 @@ void PartialSatClayEngine::updatePorosity(FlowSolver& flow)
 				if (poro > maxPoroClamp)
 					poro = maxPoroClamp;
 				if (!freezeSaturation and directlyModifySatFromPoro) { // updatesaturation with respect to volume change
-					Real dt = partialSatDT==0 ? scene->dt : solverDT;
-					Real volWater_o
-						= (cell->info().volume() - cell->info().dv() * dt) * cell->info().porosity * cell->info().saturation;
+					Real dt         = partialSatDT == 0 ? scene->dt : solverDT;
+					Real volWater_o = (cell->info().volume() - cell->info().dv() * dt) * cell->info().porosity * cell->info().saturation;
 					cell->info().saturation
 					        = volWater_o / (poro * cell->info().volume()); // update the saturation with respect to new porosity and volume
 				}
@@ -569,8 +573,8 @@ Real PartialSatClayEngine::laplaceDeviate(Real mu, Real b)
 	Real                                 x   = dist(rng);
 	Real                                 sgn = x > 0 ? 1. : -1.;
 	return mu - b * sgn * log(1. - 2. * fabs(x)); // inverse of laplace CDF
-	//	if (x<mu) return  1./2. * exp((x-mu)/b);
-	//	else return 1. - 1./2.*exp(-(x-mu)/b);
+	                                              //	if (x<mu) return  1./2. * exp((x-mu)/b);
+	                                              //	else return 1. - 1./2.*exp(-(x-mu)/b);
 }
 
 void PartialSatClayEngine::setCellsDSDP(FlowSolver& flow)
@@ -757,8 +761,8 @@ void PartialSatClayEngine::updateSaturation(FlowSolver& flow)
 
 void PartialSatClayEngine::resetParticleSuctions()
 {
-	const shared_ptr<BodyContainer>& bodies   = scene->bodies;
-	const long                       size     = bodies->size();
+	const shared_ptr<BodyContainer>& bodies = scene->bodies;
+	const long                       size   = bodies->size();
 
 #pragma omp parallel for
 	for (long i = 0; i < size; i++) {
@@ -769,10 +773,8 @@ void PartialSatClayEngine::resetParticleSuctions()
 			continue;
 
 		PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
-		state->suction=0;
+		state->suction         = 0;
 	}
-
-
 }
 
 void PartialSatClayEngine::collectParticleSuction(FlowSolver& flow)
@@ -793,16 +795,16 @@ void PartialSatClayEngine::collectParticleSuction(FlowSolver& flow)
 			const shared_ptr<Body>& b  = (*bodies)[id];
 			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 				continue;
-			PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
+			PartialSatState* state  = dynamic_cast<PartialSatState*>(b->state.get());
 			Sphere*          sphere = dynamic_cast<Sphere*>(b->shape.get());
 			//if (cell->info().isExposed) state->suctionSum+= pAir; // use different pressure for exposed cracks?
-			if (!fracBasedPointSuctionCalc){
+			if (!fracBasedPointSuctionCalc) {
 				state->suctionSum += pAir - cell->info().p();
 				state->incidentCells += 1;
 			} else {
-				Real areaFrac = cell->info().sphericalVertexSurface[v];
-				Real totalArea = 4 * M_PI * pow(sphere->radius,2);
-				state->suction += (areaFrac/totalArea)*(pAir - cell->info().p());
+				Real areaFrac  = cell->info().sphericalVertexSurface[v];
+				Real totalArea = 4 * M_PI * pow(sphere->radius, 2);
+				state->suction += (areaFrac / totalArea) * (pAir - cell->info().p());
 			}
 		}
 	}
@@ -845,12 +847,12 @@ void PartialSatClayEngine::swellParticles()
 
 		if (!fracBasedPointSuctionCalc) {
 			state->lastIncidentCells = state->incidentCells;
-			state->suction         = state->suctionSum / state->incidentCells;
-			state->incidentCells   = 0; // reset to 0 for next time step
-			state->suctionSum      = 0; //
+			state->suction           = state->suctionSum / state->incidentCells;
+			state->incidentCells     = 0; // reset to 0 for next time step
+			state->suctionSum        = 0; //
 		}
 
-		const Real volStrain   = betam / alpham * (exp(-alpham * state->suction) - exp(-alpham * suction0));
+		const Real volStrain = betam / alpham * (exp(-alpham * state->suction) - exp(-alpham * suction0));
 		//		const Real rOrig = pow(state->volumeOriginal * 3. / (4.*M_PI),1./3.);
 		//
 		const Real vNew = state->volumeOriginal * (volStrain + 1.);
@@ -1228,7 +1230,7 @@ void PartialSatClayEngine::buildTriangulation(Real pZero, Solver& flow)
 	//   std::cin.get();
 	if (multithread && (fluidBulkModulus > 0 || partialSatEngine))
 		initializeVolumes(flow); // needed for multithreaded compressible flow (old site, fixed bug https://bugs.launchpad.net/yade/+bug/1687355)
-	                                 //	if (crackModelActive) trickPermeability(&flow);
+		                         //	if (crackModelActive) trickPermeability(&flow);
 	porosity = flow.vPoralPorosity / flow.vTotalPorosity;
 
 	if (alphaBound < 0)
@@ -1296,12 +1298,12 @@ void PartialSatClayEngine::initializeVolumes(FlowSolver& flow)
 		if (flow.fluidBulkModulus > 0 || thermalEngine || iniVoidVolumes) {
 			cell->info().invVoidVolume() = 1 / (std::abs(cell->info().volume()) - volumeCorrection * flow.volumeSolidPore(cell));
 		} else if (partialSatEngine) {
-			if (cell->info().volume() <= 0) cerr << "cell volume zero, bound to be issues" << endl;
+			if (cell->info().volume() <= 0)
+				cerr << "cell volume zero, bound to be issues" << endl;
 			//cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
-			cell->info().invVoidVolume()
-			         = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
-			if (cell->info().invVoidVolume() == 1./minCellVol) {
-				cell->info().blocked=1;
+			cell->info().invVoidVolume() = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
+			if (cell->info().invVoidVolume() == 1. / minCellVol) {
+				cell->info().blocked = 1;
 				cout << "using minCellVolume, blocking cell" << endl;
 			}
 		}
@@ -1316,7 +1318,7 @@ void PartialSatClayEngine::updateVolumes(FlowSolver& flow)
 {
 	if (debug)
 		cout << "Updating volumes.............." << endl;
-	Real invDeltaT      = 1 / (partialSatDT==0 ? scene->dt : solverDT);
+	Real invDeltaT      = 1 / (partialSatDT == 0 ? scene->dt : solverDT);
 	epsVolMax           = 0;
 	Real totVol         = 0;
 	Real totDVol        = 0;
@@ -2130,7 +2132,7 @@ void PartialSatClayEngine::computeVertexSphericalArea()
 	for (long i = 0; i < size; i++) {
 		CellHandle& cell = Tes.cellHandles[i];
 		//	#else
-		if (cell->info().blocked)  //(cell->info().isFictious) ||
+		if (cell->info().blocked) //(cell->info().isFictious) ||
 			continue;
 
 		VertexHandle W[4];

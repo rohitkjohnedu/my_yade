@@ -248,7 +248,6 @@ class PartialSatState : public State {
 	);
 	// clang-format on
 	REGISTER_CLASS_INDEX(PartialSatState, State);
-
 };
 REGISTER_SERIALIZABLE(PartialSatState);
 

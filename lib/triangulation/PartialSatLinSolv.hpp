@@ -74,7 +74,6 @@ namespace CGT {
 		using _N::surfaceSolidThroatInPore;
 		using _N::tesselation;
 
-		using BaseFlowSolver::manualCrackPerm;
 		using BaseFlowSolver::bIntrinsicPerm;
 		using BaseFlowSolver::checkSphereFacetOverlap;
 		using BaseFlowSolver::clampKValues;
@@ -90,6 +89,7 @@ namespace CGT {
 		using BaseFlowSolver::freezeSaturation;
 		using BaseFlowSolver::kFactor;
 		using BaseFlowSolver::KOptFactor;
+		using BaseFlowSolver::manualCrackPerm;
 		using BaseFlowSolver::matricSuctionRatio;
 		using BaseFlowSolver::maxKdivKmean;
 		using BaseFlowSolver::meanInitialPorosity;

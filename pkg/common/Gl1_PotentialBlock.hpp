@@ -173,7 +173,7 @@ public:
 
 	// Evaluate gradient for function
 	void EvaluateGradient(
-	        Real /*x*/[3], Real /*n*/[3]){}; // FIXME - better use Vector3r here instead of Real[3] (here I only fix the unused parameter warning).
+	        Real /*x*/[3], Real /*n*/[3]) {}; // FIXME - better use Vector3r here instead of Real[3] (here I only fix the unused parameter warning).
 
 	// If you need to set parameters, add methods here
 
