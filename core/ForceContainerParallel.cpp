@@ -117,7 +117,7 @@ void ForceContainer::setPermTorque(Body::id_t id, const Vector3r& t)
 {
 	ensureSize(id, -1);
 	if (permForceSynced) { // current permF has been accumulated already, substract it form total then add new value; else just set the value below
-		addTorque(id, t -_permTorque[id] );
+		addTorqueUnsynced(id, t -_permTorque[id] );
 	}
 	_permTorque[id] = t;
 	if (not permForceUsed) {
