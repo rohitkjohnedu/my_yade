@@ -104,25 +104,25 @@ void ForceContainer::addMaxId(Body::id_t id)
 void ForceContainer::setPermForce(Body::id_t id, const Vector3r& f)
 {
 	ensureSize(id, -1);
-	synced = false;
-	if (permForceSynced) { // current permF has been accumulated already, substract it form total, the new one will be added at next sync()
-		addForce(id, -_permForce[id]);
+	if (permForceSynced) { // current permF has been accumulated already, substract it form total then add new value; else just set the value below
+		addForceUnsynced(id, f -_permForce[id] );
 	}
-	permForceSynced = false;
 	_permForce[id]  = f;
-	permForceUsed   = true;
+	if (not permForceUsed) {
+		synced = false;
+		permForceUsed = true;}
 }
 
 void ForceContainer::setPermTorque(Body::id_t id, const Vector3r& t)
 {
 	ensureSize(id, -1);
-	synced = false;
-	if (permForceSynced) { // current permF has been accumulated already, substract it form total, the new one will be added at next sync()
-		addTorque(id, -_permTorque[id]);
+	if (permForceSynced) { // current permF has been accumulated already, substract it form total then add new value; else just set the value below
+		addTorque(id, t -_permTorque[id] );
 	}
-	permForceSynced = false;
 	_permTorque[id] = t;
-	permForceUsed   = true;
+	if (not permForceUsed) {
+		synced = false;
+		permForceUsed = true;}
 }
 
 const Vector3r& ForceContainer::getPermForce(Body::id_t id) { return ((size_t)id < size) ? _permForce[id] : _zero; }
@@ -193,9 +193,9 @@ void ForceContainer::sync()
 		if (permForceUsed and not permForceSynced) {
 			_force[id] += _permForce[id];
 			_torque[id] += _permTorque[id];
-			permForceSynced = true;
 		}
 	}
+	permForceSynced = true;
 	synced = true;
 	syncCount++;
 }
