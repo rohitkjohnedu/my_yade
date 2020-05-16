@@ -9,6 +9,8 @@ globalDomain = Globaldomain(mn,mx,xDecomp=1,yDecomp=1,zDecomp=numThreads) # manu
 
 User can then find which subdomain a point = Point(x,y,z) is located within by running:
 subdomain = var.findSubdomain(point)
+
+Written by Robert Caulk for HPC Hackathon 2018: rob.caulk at gmail
 '''
 
 import sys
@@ -45,8 +47,8 @@ class GlobaldomainCloud(object):
 	## generate random points and select the most remote one to keep. Do this for num threads
 	def generateRandomCloud(self):
 		for i in range(self.numThreads):
+			pointSample = []
 			for j in range(self.realizations):
-				pointSample = []
 				x = rand.uniform(self.mn[0],self.mx[0])
 				y = rand.uniform(self.mn[1],self.mx[1])
 				z = rand.uniform(self.mn[2],self.mx[2])
@@ -76,17 +78,9 @@ class GlobaldomainCloud(object):
 		selectedPoint = None
 		for i in points:
 			nearestNeighborDist = 1000000
-			nearestPoint = None
-			if self.subdomainPoints:
-				for j in self.subdomainPoints:
-					dist = np.linalg.norm(i.vec - j.point.vec)
-					if dist < nearestNeighborDist:
-						nearestPoint = i
-						nearestNeighborDist = dist
-			for k in self.domainCornerPoints:
-				dist = np.linalg.norm(i.vec - k.vec)
+			for j in self.domainCornerPoints+[p.point for p in self.subdomainPoints]:
+				dist = np.linalg.norm(i.vec - j.vec)
 				if dist < nearestNeighborDist:
-					nearestPoint = i
 					nearestNeighborDist = dist
 			
 			if nearestNeighborDist > furthestNeighborDist:
