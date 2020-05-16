@@ -6,8 +6,8 @@ CODE = """\
         width="%(width)s"
         height="%(height)s"
         class="youtube-embed"
-        data="https://www.youtube.com/v/%(yid)s">
-    <param name="movie" value="https://www.youtube.com/v/%(yid)s"></param>
+        data="https://www.youtube.com/v/%(yid)s?rel=0">
+    <param name="movie" value="https://www.youtube.com/v/%(yid)s?rel=0"></param>
     <param name="wmode" value="transparent"></param>%(extra)s
 </object>
 """
