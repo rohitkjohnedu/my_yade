@@ -115,6 +115,50 @@ class ERealHP<6> : public Filtered_kernel_adaptor<
 {
 };
 
+template<>
+class ERealHP<7> : public Filtered_kernel_adaptor<
+                      Type_equality_wrapper<Simple_cartesian<::yade::RealHP<7>>::Base<ERealHP<7>>::Type, ERealHP<7>>,
+#ifdef CGAL_NO_STATIC_FILTERS
+                      false>
+#else
+                      true>
+#endif
+{
+};
+
+template<>
+class ERealHP<8> : public Filtered_kernel_adaptor<
+                      Type_equality_wrapper<Simple_cartesian<::yade::RealHP<8>>::Base<ERealHP<8>>::Type, ERealHP<8>>,
+#ifdef CGAL_NO_STATIC_FILTERS
+                      false>
+#else
+                      true>
+#endif
+{
+};
+
+template<>
+class ERealHP<9> : public Filtered_kernel_adaptor<
+                      Type_equality_wrapper<Simple_cartesian<::yade::RealHP<9>>::Base<ERealHP<9>>::Type, ERealHP<9>>,
+#ifdef CGAL_NO_STATIC_FILTERS
+                      false>
+#else
+                      true>
+#endif
+{
+};
+
+template<>
+class ERealHP<10> : public Filtered_kernel_adaptor<
+                      Type_equality_wrapper<Simple_cartesian<::yade::RealHP<10>>::Base<ERealHP<10>>::Type, ERealHP<10>>,
+#ifdef CGAL_NO_STATIC_FILTERS
+                      false>
+#else
+                      true>
+#endif
+{
+};
+
 
 using Exact_Real_predicates_inexact_constructions_kernel = ERealHP<1>;
 template <int N> using Exact_RealHP_predicates_inexact_constructions_kernel = ERealHP<N>;
@@ -140,6 +184,22 @@ template <> struct Triangulation_structural_filtering_traits<ERealHP<5>> { // FI
 };
 
 template <> struct Triangulation_structural_filtering_traits<ERealHP<6>> { // FIXME ←←← tu jest wymuszone 2
+	typedef Tag_true Use_structural_filtering_tag;
+};
+
+template <> struct Triangulation_structural_filtering_traits<ERealHP<7>> { // FIXME ←←← tu jest wymuszone 2
+	typedef Tag_true Use_structural_filtering_tag;
+};
+
+template <> struct Triangulation_structural_filtering_traits<ERealHP<8>> { // FIXME ←←← tu jest wymuszone 2
+	typedef Tag_true Use_structural_filtering_tag;
+};
+
+template <> struct Triangulation_structural_filtering_traits<ERealHP<9>> { // FIXME ←←← tu jest wymuszone 2
+	typedef Tag_true Use_structural_filtering_tag;
+};
+
+template <> struct Triangulation_structural_filtering_traits<ERealHP<10>> { // FIXME ←←← tu jest wymuszone 2
 	typedef Tag_true Use_structural_filtering_tag;
 };
 

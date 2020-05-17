@@ -168,6 +168,22 @@ template <> struct Is_valid<::yade::RealHP<6 >> : public RealHP_Is_valid<6 > {};
 template <> struct Algebraic_structure_traits<::yade::RealHP<6 >> : public RealHP_Algebraic_structure_traits<6 > {};
 template <> struct Real_embeddable_traits<::yade::RealHP<6 >> : public RealHP_embeddable_traits<6 > {};
 
+template <> struct Is_valid<::yade::RealHP<7 >> : public RealHP_Is_valid<7 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<7 >> : public RealHP_Algebraic_structure_traits<7 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<7 >> : public RealHP_embeddable_traits<7 > {};
+
+template <> struct Is_valid<::yade::RealHP<8 >> : public RealHP_Is_valid<8 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<8 >> : public RealHP_Algebraic_structure_traits<8 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<8 >> : public RealHP_embeddable_traits<8 > {};
+
+template <> struct Is_valid<::yade::RealHP<9 >> : public RealHP_Is_valid<9 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<9 >> : public RealHP_Algebraic_structure_traits<9 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<9 >> : public RealHP_embeddable_traits<9 > {};
+
+template <> struct Is_valid<::yade::RealHP<10>> : public RealHP_Is_valid<10> {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<10>> : public RealHP_Algebraic_structure_traits<10> {};
+template <> struct Real_embeddable_traits<::yade::RealHP<10>> : public RealHP_embeddable_traits<10> {};
+
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h
 
 // FIXME !!!!!!!! RealHP<…>
