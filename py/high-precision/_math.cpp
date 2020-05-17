@@ -35,9 +35,6 @@
 #include <boost/concept/assert.hpp>
 #include <boost/math/concepts/real_type_concept.hpp>
 
-#include <boost/mpl/for_each.hpp>
-#include <boost/mpl/range_c.hpp>
-
 CREATE_CPP_LOCAL_LOGGER("_math.cpp")
 
 namespace py = ::boost::python;
@@ -202,331 +199,15 @@ template <int N> struct Substitute {
 };
 //#endif
 
-template <int N, int skipSlowFunctionsAbove_N, bool registerConverters> void registerRealHP(const py::scope& topScope, const py::scope& scopeHP)
-{
-	LOG_NOFILTER("Registering RealHP<" << N << "> and ComplexHP<" << N << ">");
+// The 'if constexpr(…)' is not working for C++14. So I have to simulate it using templates. Otherwise the python 'import >>thisModule<<' is really slow.
+template <int, bool> struct IfConstexprForSlowFunctions {
+	static void work(const py::scope&) {};
+};
 
-	// Very important line: Verifies that Real type satisfies all the requirements of RealTypeConcept
-	BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<RealHP<N>>));
-
-	if (registerConverters) {
-		py::scope top(topScope);
-
-		// Below all functions from lib/high-precision/MathFunctions.hpp are exported for tests.
-		// Some of these functions return two element tuples: frexp, modf, remquo, CGAL_To_interval
-		// so the std::pair to python tuple converters must be registered
-		std_pair_to_python_converter<RealHP<N>, RealHP<N>>();
-		std_pair_to_python_converter<RealHP<N>, long>();
-		std_pair_to_python_converter<RealHP<N>, int>();
-	}
-
-	py::scope HPn(scopeHP);
-
-	py::class_<Var<N, registerConverters>>("Var", "The ``Var`` class is used to test to/from python converters for arbitrary precision ``Real``")
-	        .add_property("val", &Var<N, registerConverters>::get, &Var<N, registerConverters>::set, "one ``Real`` variable for testing.")
-	        .add_property(
-	                "cpl",
-	                &Var<N, registerConverters>::getComplex,
-	                &Var<N, registerConverters>::setComplex,
-	                "one ``Complex`` variable to test reading from and writing to it.");
-
-	/********************************************************************************************/
-	/**********************        complex trigonometric functions         **********************/
-	/********************************************************************************************/
-	// complex functions must be registered first, so that python will properly discover overloads
-	py::def("sin",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::sin),
-	        (py::arg("x")),
-	        R"""(:return: ``Complex`` the sine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sin(…)`` or `std::sin(…) <https://en.cppreference.com/w/cpp/numeric/complex/sin>`__ function.)""");
-	py::def("sinh",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::sinh),
-	        (py::arg("x")),
-	        R"""(:return: ``Complex`` the hyperbolic sine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sinh(…)`` or `std::sinh(…) <https://en.cppreference.com/w/cpp/numeric/complex/sinh>`__ function.)""");
-	py::def("cos",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::cos),
-	        (py::arg("x")),
-	        R"""(:return: ``Complex`` the cosine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cos(…)`` or `std::cos(…) <https://en.cppreference.com/w/cpp/numeric/complex/cos>`__ function.)""");
-	py::def("cosh",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::cosh),
-	        (py::arg("x")),
-	        R"""(:return: ``Complex`` the hyperbolic cosine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cosh(…)`` or `std::cosh(…) <https://en.cppreference.com/w/cpp/numeric/complex/cosh>`__ function.)""");
-	py::def("tan",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::tan),
-	        (py::arg("x")),
-	        R"""(:return: ``Complex`` the tangent of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tan(…)`` or `std::tan(…) <https://en.cppreference.com/w/cpp/numeric/complex/tan>`__ function.)""");
-	py::def("tanh",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::tanh),
-	        (py::arg("x")),
-	        R"""(:return: ``Complex`` the hyperbolic tangent of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tanh(…)`` or `std::tanh(…) <https://en.cppreference.com/w/cpp/numeric/complex/tanh>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************            trigonometric functions             **********************/
-	/********************************************************************************************/
-	// Real versions are registered afterwards
-	py::def("sin",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::sin),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the sine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sin(…)`` or `std::sin(…) <https://en.cppreference.com/w/cpp/numeric/math/sin>`__ function.)""");
-	py::def("sinh",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::sinh),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the hyperbolic sine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sinh(…)`` or `std::sinh(…) <https://en.cppreference.com/w/cpp/numeric/math/sinh>`__ function.)""");
-	py::def("cos",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::cos),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the cosine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cos(…)`` or `std::cos(…) <https://en.cppreference.com/w/cpp/numeric/math/cos>`__ function.)""");
-	py::def("cosh",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::cosh),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the hyperbolic cosine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cosh(…)`` or `std::cosh(…) <https://en.cppreference.com/w/cpp/numeric/math/cosh>`__ function.)""");
-	py::def("tan",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::tan),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the tangent of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tan(…)`` or `std::tan(…) <https://en.cppreference.com/w/cpp/numeric/math/tan>`__ function.)""");
-	py::def("tanh",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::tanh),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the hyperbolic tangent of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tanh(…)`` or `std::tanh(…) <https://en.cppreference.com/w/cpp/numeric/math/tanh>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************        inverse trigonometric functions         **********************/
-	/********************************************************************************************/
-	py::def("asin",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::asin),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the arcus sine of the argument. Depending on compilation options wraps ``::boost::multiprecision::asin(…)`` or `std::asin(…) <https://en.cppreference.com/w/cpp/numeric/math/asin>`__ function.)""");
-	py::def("asinh",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::asinh),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the hyperbolic arcus sine of the argument. Depending on compilation options wraps ``::boost::multiprecision::asinh(…)`` or `std::asinh(…) <https://en.cppreference.com/w/cpp/numeric/math/asinh>`__ function.)""");
-	py::def("acos",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::acos),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the arcus cosine of the argument. Depending on compilation options wraps ``::boost::multiprecision::acos(…)`` or `std::acos(…) <https://en.cppreference.com/w/cpp/numeric/math/acos>`__ function.)""");
-	py::def("acosh",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::acosh),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the hyperbolic arcus cosine of the argument. Depending on compilation options wraps ``::boost::multiprecision::acosh(…)`` or `std::acosh(…) <https://en.cppreference.com/w/cpp/numeric/math/acosh>`__ function.)""");
-	py::def("atan",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::atan),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the arcus tangent of the argument. Depending on compilation options wraps ``::boost::multiprecision::atan(…)`` or `std::atan(…) <https://en.cppreference.com/w/cpp/numeric/math/atan>`__ function.)""");
-	py::def("atanh",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::atanh),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the hyperbolic arcus tangent of the argument. Depending on compilation options wraps ``::boost::multiprecision::atanh(…)`` or `std::atanh(…) <https://en.cppreference.com/w/cpp/numeric/math/atanh>`__ function.)""");
-	py::def("atan2",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::atan2),
-	        (py::arg("x"), "y"),
-	        R"""(:return: ``Real`` the arc tangent of y/x using the signs of the arguments ``x`` and ``y`` to determine the correct quadrant. Depending on compilation options wraps ``::boost::multiprecision::atan2(…)`` or `std::atan2(…) <https://en.cppreference.com/w/cpp/numeric/math/atan2>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************        complex logarithm and exponential        *********************/
-	/********************************************************************************************/
-	// complex functions must be registered first, so that python will properly discover overloads
-	py::def("exp",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::exp),
-	        (py::arg("x")),
-	        R"""(:return: the base `e` exponential of a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::exp(…)`` or `std::exp(…) <https://en.cppreference.com/w/cpp/numeric/complex/exp>`__ function.)""");
-	py::def("log",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::log),
-	        (py::arg("x")),
-	        R"""(:return: the ``Complex`` natural (base `e`) logarithm of a complex value z with a branch cut along the negative real axis. Depending on compilation options wraps ``::boost::multiprecision::log(…)`` or `std::log(…) <https://en.cppreference.com/w/cpp/numeric/complex/log>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************   logarithm, exponential and power functions   **********************/
-	/********************************************************************************************/
-	py::def("log",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log),
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` natural (base `e`) logarithm of a real value. Depending on compilation options wraps ``::boost::multiprecision::log(…)`` or `std::log(…) <https://en.cppreference.com/w/cpp/numeric/math/log>`__ function.)""");
-	py::def("log10",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log10),
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` decimal (base ``10``) logarithm of a real value. Depending on compilation options wraps ``::boost::multiprecision::log10(…)`` or `std::log10(…) <https://en.cppreference.com/w/cpp/numeric/math/log10>`__ function.)""");
-	py::def("log1p",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log1p),
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` natural (base `e`) logarithm of ``1+argument``. Depending on compilation options wraps ``::boost::multiprecision::log1p(…)`` or `std::log1p(…) <https://en.cppreference.com/w/cpp/numeric/math/log1p>`__ function.)""");
-	py::def("log2",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log2),
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` binary (base ``2``) logarithm of a real value. Depending on compilation options wraps ``::boost::multiprecision::log2(…)`` or `std::log2(…) <https://en.cppreference.com/w/cpp/numeric/math/log2>`__ function.)""");
-	py::def("logb",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::logb),
-	        (py::arg("x")),
-	        R"""(:return: Extracts the value of the unbiased radix-independent exponent from the floating-point argument arg, and returns it as a floating-point value. Depending on compilation options wraps ``::boost::multiprecision::logb(…)`` or `std::logb(…) <https://en.cppreference.com/w/cpp/numeric/math/logb>`__ function.)""");
-	py::def("ilogb",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::ilogb),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` extracts the value of the unbiased exponent from the floating-point argument arg, and returns it as a signed integer value. Depending on compilation options wraps ``::boost::multiprecision::ilogb(…)`` or `std::ilogb(…) <https://en.cppreference.com/w/cpp/numeric/math/ilogb>`__ function.)""");
-	py::def("ldexp",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, int)>(&::yade::math::ldexp),
-	        (py::arg("x"), "y"),
-	        R"""(:return: Multiplies a floating point value ``x`` by the number 2 raised to the ``exp`` power. Depending on compilation options wraps ``::boost::multiprecision::ldexp(…)`` or `std::ldexp(…) <https://en.cppreference.com/w/cpp/numeric/math/ldexp>`__ function.)""");
-	py::def("frexp",
-	        test_frexp<N>,
-	        (py::arg("x")),
-	        R"""(:return: tuple of ``(Real,int)``, decomposes given floating point ``Real`` argument into a normalized fraction and an integral power of two. Depending on compilation options wraps ``::boost::multiprecision::frexp(…)`` or `std::frexp(…) <https://en.cppreference.com/w/cpp/numeric/math/frexp>`__ function.)""");
-	py::def("exp",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::exp),
-	        (py::arg("x")),
-	        R"""(:return: the base `e` exponential of a ``Real`` argument. Depending on compilation options wraps ``::boost::multiprecision::exp(…)`` or `std::exp(…) <https://en.cppreference.com/w/cpp/numeric/math/exp>`__ function.)""");
-	py::def("exp2",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::exp2),
-	        (py::arg("x")),
-	        R"""(:return: the base `2` exponential of a ``Real`` argument. Depending on compilation options wraps ``::boost::multiprecision::exp2(…)`` or `std::exp2(…) <https://en.cppreference.com/w/cpp/numeric/math/exp2>`__ function.)""");
-	py::def("expm1",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::expm1),
-	        (py::arg("x")),
-	        R"""(:return: the base `e` exponential of a ``Real`` argument minus ``1.0``. Depending on compilation options wraps ``::boost::multiprecision::expm1(…)`` or `std::expm1(…) <https://en.cppreference.com/w/cpp/numeric/math/expm1>`__ function.)""");
-	py::def("pow",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::pow),
-	        (py::arg("x"), "y"),
-	        R"""(:return: ``Real`` the value of ``base`` raised to the power ``exp``. Depending on compilation options wraps ``::boost::multiprecision::pow(…)`` or `std::pow(…) <https://en.cppreference.com/w/cpp/numeric/math/pow>`__ function.)""");
-	py::def("sqrt",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::sqrt),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` square root of the argument. Depending on compilation options wraps ``::boost::multiprecision::sqrt(…)`` or `std::sqrt(…) <https://en.cppreference.com/w/cpp/numeric/math/sqrt>`__ function.)""");
-	py::def("cbrt",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::cbrt),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` cubic root of the argument. Depending on compilation options wraps ``::boost::multiprecision::cbrt(…)`` or `std::cbrt(…) <https://en.cppreference.com/w/cpp/numeric/math/cbrt>`__ function.)""");
-	py::def("hypot",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::hypot),
-	        (py::arg("x"), "y"),
-	        R"""(:return: ``Real`` the square root of the sum of the squares of ``x`` and ``y``, without undue overflow or underflow at intermediate stages of the computation. Depending on compilation options wraps ``::boost::multiprecision::hypot(…)`` or `std::hypot(…) <https://en.cppreference.com/w/cpp/numeric/math/hypot>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************         complex conj, abs, real, imag          *********************/
-	/********************************************************************************************/
-	// complex functions must be registered first, so that python will properly discover overloads
-	py::def("conj",
-	        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::conj),
-	        (py::arg("x")),
-	        R"""(:return: the complex conjugation a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::conj(…)`` or `std::conj(…) <https://en.cppreference.com/w/cpp/numeric/complex/conj>`__ function.)""");
-	py::def("abs",
-	        // note …<ComplexHP<N>> at the end, to help compiler in the template overload resolution.
-	        static_cast<RealHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::abs<ComplexHP<N>>),
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` absolute value of the ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::abs(…)`` or `std::abs(…) <https://en.cppreference.com/w/cpp/numeric/complex/abs>`__ function.)""");
-	py::def("real",
-	        static_cast<RealHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::real),
-	        (py::arg("x")),
-	        R"""(:return: the real part of a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::real(…)`` or `std::real(…) <https://en.cppreference.com/w/cpp/numeric/complex/real2>`__ function.)""");
-	py::def("imag",
-	        static_cast<RealHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::imag),
-	        (py::arg("x")),
-	        R"""(:return: the imag part of a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::imag(…)`` or `std::imag(…) <https://en.cppreference.com/w/cpp/numeric/complex/imag2>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************    min, max, abs, sign, floor, ceil, etc...    **********************/
-	/********************************************************************************************/
-	py::def("abs",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::abs),
-	        //XXX note for YADE_REAL_BIT <= 64 different signature was used: static_cast<RealHP<N> (*)(Real)>(&::yade::math::abs); Is not needed anymore(?)
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` absolute value of the ``Real`` argument. Depending on compilation options wraps ``::boost::multiprecision::abs(…)`` or `std::abs(…) <https://en.cppreference.com/w/cpp/numeric/math/abs>`__ function.)""");
-	py::def("fabs",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::fabs),
-	        //XXX note for YADE_REAL_BIT <= 64 different signature was used: static_cast<RealHP<N> (*)(Real)>(&::yade::math::fabs; Is not needed anymore(?)
-	        (py::arg("x")),
-	        R"""(:return: the ``Real`` absolute value of the argument. Depending on compilation options wraps ``::boost::multiprecision::abs(…)`` or `std::abs(…) <https://en.cppreference.com/w/cpp/numeric/math/fabs>`__ function.)""");
-	py::def("max",
-	        static_cast<const RealHP<N>& (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::max),
-	        (py::arg("x"), "y"),
-	        py::return_value_policy<py::copy_const_reference>(),
-	        R"""(:return: ``Real`` larger of the two arguments. Depending on compilation options wraps ``::boost::multiprecision::max(…)`` or `std::max(…) <https://en.cppreference.com/w/cpp/numeric/math/max>`__ function.)""");
-	py::def("min",
-	        static_cast<const RealHP<N>& (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::min),
-	        (py::arg("x"), "y"),
-	        py::return_value_policy<py::copy_const_reference>(),
-	        R"""(:return: ``Real`` smaller of the two arguments. Depending on compilation options wraps ``::boost::multiprecision::min(…)`` or `std::min(…) <https://en.cppreference.com/w/cpp/numeric/math/min>`__ function.)""");
-	py::def("sgn",
-	        static_cast<int (*)(const RealHP<N>&)>(&::yade::math::sgn),
-	        (py::arg("x")),
-	        R"""(:return: ``int`` the sign of the argument: ``-1``, ``0`` or ``1``.)""");
-	py::def("sign",
-	        static_cast<int (*)(const RealHP<N>&)>(&::yade::math::sign),
-	        (py::arg("x")),
-	        R"""(:return: ``int`` the sign of the argument: ``-1``, ``0`` or ``1``.)""");
-	py::def("floor",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::floor),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` Computes the largest integer value not greater than arg. Depending on compilation options wraps ``::boost::multiprecision::floor(…)`` or `std::floor(…) <https://en.cppreference.com/w/cpp/numeric/math/floor>`__ function.)""");
-	py::def("ceil",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::ceil),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` Computes the smallest integer value not less than arg. Depending on compilation options wraps ``::boost::multiprecision::ceil(…)`` or `std::ceil(…) <https://en.cppreference.com/w/cpp/numeric/math/ceil>`__ function.)""");
-	py::def("round",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::round),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the nearest integer value to arg (in floating-point format), rounding halfway cases away from zero, regardless of the current rounding mode.. Depending on compilation options wraps ``::boost::multiprecision::round(…)`` or `std::round(…) <https://en.cppreference.com/w/cpp/numeric/math/round>`__ function.)""");
-	py::def("rint",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::rint),
-	        (py::arg("x")),
-	        R"""(:return: Rounds the floating-point argument arg to an integer value (in floating-point format), using the `current rounding mode <https://en.cppreference.com/w/cpp/numeric/fenv/FE_round>`__. Depending on compilation options wraps ``::boost::multiprecision::rint(…)`` or `std::rint(…) <https://en.cppreference.com/w/cpp/numeric/math/rint>`__ function.)""");
-	py::def("trunc",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::trunc),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` the nearest integer not greater in magnitude than arg. Depending on compilation options wraps ``::boost::multiprecision::trunc(…)`` or `std::trunc(…) <https://en.cppreference.com/w/cpp/numeric/math/trunc>`__ function.)""");
-#ifndef YADE_IGNORE_IEEE_INFINITY_NAN
-	py::def("isnan",
-	        static_cast<bool (*)(const RealHP<N>&)>(&::yade::math::isnan),
-	        (py::arg("x")),
-	        R"""(:return: ``bool`` indicating if the ``Real`` argument is NaN. Depending on compilation options wraps ``::boost::multiprecision::isnan(…)`` or `std::isnan(…) <https://en.cppreference.com/w/cpp/numeric/math/isnan>`__ function.)""");
-	py::def("isinf",
-	        static_cast<bool (*)(const RealHP<N>&)>(&::yade::math::isinf),
-	        (py::arg("x")),
-	        R"""(:return: ``bool`` indicating if the ``Real`` argument is Inf. Depending on compilation options wraps ``::boost::multiprecision::isinf(…)`` or `std::isinf(…) <https://en.cppreference.com/w/cpp/numeric/math/isinf>`__ function.)""");
-	py::def("isfinite",
-	        static_cast<bool (*)(const RealHP<N>&)>(&::yade::math::isfinite),
-	        (py::arg("x")),
-	        R"""(:return: ``bool`` indicating if the ``Real`` argument is Inf. Depending on compilation options wraps ``::boost::multiprecision::isfinite(…)`` or `std::isfinite(…) <https://en.cppreference.com/w/cpp/numeric/math/isfinite>`__ function.)""");
-	py::scope().attr("hasInfinityNan") = true;
-#else
-	py::scope().attr("hasInfinityNan") = false;
-#endif
-
-
-	/********************************************************************************************/
-	/**********************        integer division and remainder          **********************/
-	/********************************************************************************************/
-	py::def("fmod",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::fmod),
-	        (py::arg("x"), "y"),
-	        R"""(:return: ``Real`` the floating-point remainder of the division operation ``x/y`` of the arguments ``x`` and ``y``. Depending on compilation options wraps ``::boost::multiprecision::fmod(…)`` or `std::fmod(…) <https://en.cppreference.com/w/cpp/numeric/math/fmod>`__ function.)""");
-	py::def("remainder",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::remainder),
-	        (py::arg("x"), "y"),
-	        R"""(:return: ``Real`` the IEEE remainder of the floating point division operation ``x/y``. Depending on compilation options wraps ``::boost::multiprecision::remainder(…)`` or `std::remainder(…) <https://en.cppreference.com/w/cpp/numeric/math/remainder>`__ function.)""");
-	py::def("modf",
-	        test_modf<N>,
-	        (py::arg("x")),
-	        R"""(:return: tuple of ``(Real,Real)``, decomposes given floating point ``Real`` into integral and fractional parts, each having the same type and sign as x. Depending on compilation options wraps ``::boost::multiprecision::modf(…)`` or `std::modf(…) <https://en.cppreference.com/w/cpp/numeric/math/modf>`__ function.)""");
-	py::def("fma",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&::yade::math::fma),
-	        (py::arg("x"), "y", "z"),
-	        R"""(:return: ``Real`` - computes ``(x*y) + z`` as if to infinite precision and rounded only once to fit the result type. Depending on compilation options wraps ``::boost::multiprecision::fma(…)`` or `std::fma(…) <https://en.cppreference.com/w/cpp/numeric/math/fma>`__ function.)""");
-	py::def("remquo",
-	        test_remquo<N>,
-	        (py::arg("x"), "y"),
-	        R"""(:return: tuple of ``(Real,long)``, the floating-point remainder of the division operation ``x/y`` as the std::remainder() function does. Additionally, the sign and at least the three of the last bits of ``x/y`` are returned, sufficient to determine the octant of the result within a period. Depending on compilation options wraps ``::boost::multiprecision::remquo(…)`` or `std::remquo(…) <https://en.cppreference.com/w/cpp/numeric/math/remquo>`__ function.)""");
-
-
-	/********************************************************************************************/
-	/**********************         special mathematical functions         **********************/
-	/********************************************************************************************/
-	// remember that complex functions must be registered first.
-	// FIXME ? maybe use ↓
-	// https://www.boost.org/doc/libs/1_73_0/libs/config/doc/html/boost_config/boost_macro_reference.html#boost_config.boost_macro_reference.macros_that_describe_c__17_features_not_supported
-	if constexpr (N <= skipSlowFunctionsAbove_N) {
+template <int N> struct IfConstexprForSlowFunctions<N, true> {
+	static void work(const py::scope& scopeHP)
+	{
+		py::scope HPn(scopeHP);
 		py::def("erf",
 		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::erf),
 		        (py::arg("x")),
@@ -544,273 +225,620 @@ template <int N, int skipSlowFunctionsAbove_N, bool registerConverters> void reg
 		        (py::arg("x")),
 		        R"""(:return: ``Real`` Computes the `gamma function <https://en.wikipedia.org/wiki/Gamma_function>`__ of arg. Depending on compilation options wraps ``::boost::multiprecision::tgamma(…)`` or `std::tgamma(…) <https://en.cppreference.com/w/cpp/numeric/math/tgamma>`__ function.)""");
 	}
+};
+
+template <int, bool> struct IfConstexprForEigen;
+
+template <int N> struct IfConstexprForEigen<N, true> {
+	static void work(const py::scope& scopeHP, const long& defprec)
+	{
+		py::scope HPn(scopeHP);
+		py::def("highest",
+		        Eigen::NumTraits<RealHP<N>>::highest,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` returns the largest finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::max() <https://en.cppreference.com/w/cpp/types/numeric_limits/max>`__ function.)""");
+		py::def("lowest",
+		        Eigen::NumTraits<RealHP<N>>::lowest,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` returns the lowest (negative) finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::lowest() <https://en.cppreference.com/w/cpp/types/numeric_limits/lowest>`__ function.)""");
+
+		py::def("Pi",
+		        Eigen::NumTraits<RealHP<N>>::Pi,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` The `π constant <https://en.wikipedia.org/wiki/Pi>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+		py::def("Euler",
+		        Eigen::NumTraits<RealHP<N>>::Euler,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` The `Euler–Mascheroni constant <https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+		py::def("Log2",
+		        Eigen::NumTraits<RealHP<N>>::Log2,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` natural logarithm of 2, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+		py::def("Catalan",
+		        Eigen::NumTraits<RealHP<N>>::Catalan,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` The `catalan constant <https://en.wikipedia.org/wiki/Catalan%27s_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+
+		py::def("epsilon",
+		        static_cast<RealHP<N> (*)(long)>(&Eigen::NumTraits<RealHP<N>>::epsilon),
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
+		py::def("epsilon",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&Eigen::NumTraits<RealHP<N>>::epsilon),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
+		py::def("isEqualFuzzy",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isEqualFuzzy),
+		        R"""(:return: ``bool``, ``True`` if the absolute difference between two numbers is smaller than `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__)""");
+		py::def("smallest_positive",
+		        static_cast<RealHP<N> (*)()>(&Eigen::NumTraits<RealHP<N>>::smallest_positive),
+		        R"""(:return: ``Real`` the smallest number greater than zero. Wraps `std::numeric_limits<Real>::min() <https://en.cppreference.com/w/cpp/types/numeric_limits/min>`__)""");
+	}
+};
+
+template <int N> struct IfConstexprForEigen<N, false> {
+	static void work(const py::scope& scopeHP, const long& defprec)
+	{
+		py::scope HPn(scopeHP);
+		py::def("highest",
+		        Substitute<N>::highest,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` returns the largest finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::max() <https://en.cppreference.com/w/cpp/types/numeric_limits/max>`__ function.)""");
+		py::def("lowest",
+		        Substitute<N>::lowest,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` returns the lowest (negative) finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::lowest() <https://en.cppreference.com/w/cpp/types/numeric_limits/lowest>`__ function.)""");
+
+		py::def("Pi",
+		        Substitute<N>::Pi,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` The `π constant <https://en.wikipedia.org/wiki/Pi>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+		py::def("Euler",
+		        Substitute<N>::Euler,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` The `Euler–Mascheroni constant <https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+		py::def("Log2",
+		        Substitute<N>::Log2,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` natural logarithm of 2, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+		py::def("Catalan",
+		        Substitute<N>::Catalan,
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` The `catalan constant <https://en.wikipedia.org/wiki/Catalan%27s_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
+
+		py::def("epsilon",
+		        static_cast<RealHP<N> (*)(long)>(&Substitute<N>::epsilon),
+		        (py::arg("Precision") = defprec),
+		        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
+		py::def("epsilon",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&Substitute<N>::epsilon),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
+		py::def("smallest_positive",
+		        static_cast<RealHP<N> (*)()>(&smallest_positive<N>),
+		        R"""(:return: ``Real`` the smallest number greater than zero. Wraps `std::numeric_limits<Real>::min() <https://en.cppreference.com/w/cpp/types/numeric_limits/min>`__)""");
+		py::def("isEqualFuzzy",
+		        Substitute<N>::isEqualFuzzy,
+		        R"""(:return: ``bool``, ``True`` if the absolute difference between two numbers is smaller than `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__)""");
+	}
+};
+
+template <int N, bool registerConverters> struct RegisterRealHPMath {
+	// python 'import this_module' measured time: skipSlowFunctionsAbove_N==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
+	static const constexpr int skipSlowFunctionsAbove_N = 10;
+
+	static void work(const py::scope& topScope, const py::scope& scopeHP)
+	{
+		LOG_NOFILTER("Registering RealHP<" << N << "> and ComplexHP<" << N << ">");
+
+		// Very important line: Verifies that Real type satisfies all the requirements of RealTypeConcept
+		BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<RealHP<N>>));
+
+		if (registerConverters) {
+			py::scope top(topScope);
+
+			// Below all functions from lib/high-precision/MathFunctions.hpp are exported for tests.
+			// Some of these functions return two element tuples: frexp, modf, remquo, CGAL_To_interval
+			// so the std::pair to python tuple converters must be registered
+			std_pair_to_python_converter<RealHP<N>, RealHP<N>>();
+			std_pair_to_python_converter<RealHP<N>, long>();
+			std_pair_to_python_converter<RealHP<N>, int>();
+		}
+
+		py::scope HPn(scopeHP);
+
+		py::class_<Var<N, registerConverters>>("Var", "The ``Var`` class is used to test to/from python converters for arbitrary precision ``Real``")
+		        .add_property("val", &Var<N, registerConverters>::get, &Var<N, registerConverters>::set, "one ``Real`` variable for testing.")
+		        .add_property(
+		                "cpl",
+		                &Var<N, registerConverters>::getComplex,
+		                &Var<N, registerConverters>::setComplex,
+		                "one ``Complex`` variable to test reading from and writing to it.");
+
+		/********************************************************************************************/
+		/**********************        complex trigonometric functions         **********************/
+		/********************************************************************************************/
+		// complex functions must be registered first, so that python will properly discover overloads
+		py::def("sin",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::sin),
+		        (py::arg("x")),
+		        R"""(:return: ``Complex`` the sine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sin(…)`` or `std::sin(…) <https://en.cppreference.com/w/cpp/numeric/complex/sin>`__ function.)""");
+		py::def("sinh",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::sinh),
+		        (py::arg("x")),
+		        R"""(:return: ``Complex`` the hyperbolic sine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sinh(…)`` or `std::sinh(…) <https://en.cppreference.com/w/cpp/numeric/complex/sinh>`__ function.)""");
+		py::def("cos",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::cos),
+		        (py::arg("x")),
+		        R"""(:return: ``Complex`` the cosine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cos(…)`` or `std::cos(…) <https://en.cppreference.com/w/cpp/numeric/complex/cos>`__ function.)""");
+		py::def("cosh",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::cosh),
+		        (py::arg("x")),
+		        R"""(:return: ``Complex`` the hyperbolic cosine of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cosh(…)`` or `std::cosh(…) <https://en.cppreference.com/w/cpp/numeric/complex/cosh>`__ function.)""");
+		py::def("tan",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::tan),
+		        (py::arg("x")),
+		        R"""(:return: ``Complex`` the tangent of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tan(…)`` or `std::tan(…) <https://en.cppreference.com/w/cpp/numeric/complex/tan>`__ function.)""");
+		py::def("tanh",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::tanh),
+		        (py::arg("x")),
+		        R"""(:return: ``Complex`` the hyperbolic tangent of the ``Complex`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tanh(…)`` or `std::tanh(…) <https://en.cppreference.com/w/cpp/numeric/complex/tanh>`__ function.)""");
 
 
-	/********************************************************************************************/
-	/**********************        extract C-array from std::vector        **********************/
-	/********************************************************************************************/
-	py::def("testArray", ::yade::testArray<N>, R"""(This function tests call to ``std::vector::data(…)`` function in order to extract the array.)""");
+		/********************************************************************************************/
+		/**********************            trigonometric functions             **********************/
+		/********************************************************************************************/
+		// Real versions are registered afterwards
+		py::def("sin",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::sin),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the sine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sin(…)`` or `std::sin(…) <https://en.cppreference.com/w/cpp/numeric/math/sin>`__ function.)""");
+		py::def("sinh",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::sinh),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the hyperbolic sine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::sinh(…)`` or `std::sinh(…) <https://en.cppreference.com/w/cpp/numeric/math/sinh>`__ function.)""");
+		py::def("cos",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::cos),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the cosine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cos(…)`` or `std::cos(…) <https://en.cppreference.com/w/cpp/numeric/math/cos>`__ function.)""");
+		py::def("cosh",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::cosh),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the hyperbolic cosine of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::cosh(…)`` or `std::cosh(…) <https://en.cppreference.com/w/cpp/numeric/math/cosh>`__ function.)""");
+		py::def("tan",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::tan),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the tangent of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tan(…)`` or `std::tan(…) <https://en.cppreference.com/w/cpp/numeric/math/tan>`__ function.)""");
+		py::def("tanh",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::tanh),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the hyperbolic tangent of the ``Real`` argument in radians. Depending on compilation options wraps ``::boost::multiprecision::tanh(…)`` or `std::tanh(…) <https://en.cppreference.com/w/cpp/numeric/math/tanh>`__ function.)""");
 
 
-	/********************************************************************************************/
-	/**********************                     random                     **********************/
-	/********************************************************************************************/
-	// the random functions are exported for tests as a part of Eigen numerical traits, see below
+		/********************************************************************************************/
+		/**********************        inverse trigonometric functions         **********************/
+		/********************************************************************************************/
+		py::def("asin",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::asin),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the arcus sine of the argument. Depending on compilation options wraps ``::boost::multiprecision::asin(…)`` or `std::asin(…) <https://en.cppreference.com/w/cpp/numeric/math/asin>`__ function.)""");
+		py::def("asinh",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::asinh),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the hyperbolic arcus sine of the argument. Depending on compilation options wraps ``::boost::multiprecision::asinh(…)`` or `std::asinh(…) <https://en.cppreference.com/w/cpp/numeric/math/asinh>`__ function.)""");
+		py::def("acos",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::acos),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the arcus cosine of the argument. Depending on compilation options wraps ``::boost::multiprecision::acos(…)`` or `std::acos(…) <https://en.cppreference.com/w/cpp/numeric/math/acos>`__ function.)""");
+		py::def("acosh",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::acosh),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the hyperbolic arcus cosine of the argument. Depending on compilation options wraps ``::boost::multiprecision::acosh(…)`` or `std::acosh(…) <https://en.cppreference.com/w/cpp/numeric/math/acosh>`__ function.)""");
+		py::def("atan",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::atan),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the arcus tangent of the argument. Depending on compilation options wraps ``::boost::multiprecision::atan(…)`` or `std::atan(…) <https://en.cppreference.com/w/cpp/numeric/math/atan>`__ function.)""");
+		py::def("atanh",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::atanh),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the hyperbolic arcus tangent of the argument. Depending on compilation options wraps ``::boost::multiprecision::atanh(…)`` or `std::atanh(…) <https://en.cppreference.com/w/cpp/numeric/math/atanh>`__ function.)""");
+		py::def("atan2",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::atan2),
+		        (py::arg("x"), "y"),
+		        R"""(:return: ``Real`` the arc tangent of y/x using the signs of the arguments ``x`` and ``y`` to determine the correct quadrant. Depending on compilation options wraps ``::boost::multiprecision::atan2(…)`` or `std::atan2(…) <https://en.cppreference.com/w/cpp/numeric/math/atan2>`__ function.)""");
 
 
-	/********************************************************************************************/
-	/**********************            Eigen numerical traits              **********************/
-	/********************************************************************************************/
-	long defprec  = std::numeric_limits<RealHP<N>>::digits;
-	long max_exp2 = std::numeric_limits<RealHP<N>>::max_exponent;
+		/********************************************************************************************/
+		/**********************        complex logarithm and exponential        *********************/
+		/********************************************************************************************/
+		// complex functions must be registered first, so that python will properly discover overloads
+		py::def("exp",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::exp),
+		        (py::arg("x")),
+		        R"""(:return: the base `e` exponential of a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::exp(…)`` or `std::exp(…) <https://en.cppreference.com/w/cpp/numeric/complex/exp>`__ function.)""");
+		py::def("log",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::log),
+		        (py::arg("x")),
+		        R"""(:return: the ``Complex`` natural (base `e`) logarithm of a complex value z with a branch cut along the negative real axis. Depending on compilation options wraps ``::boost::multiprecision::log(…)`` or `std::log(…) <https://en.cppreference.com/w/cpp/numeric/complex/log>`__ function.)""");
 
-	py::scope().attr("defprec")  = defprec;
-	py::scope().attr("max_exp2") = max_exp2;
 
-	// it would work if this enum had a name.
-	//py::enum_<Eigen::NumTraits<RealHP<N>>::EnumName>("traits").value("IsInteger",Eigen::NumTraits<Real>::IsInteger).export_values();
+		/********************************************************************************************/
+		/**********************   logarithm, exponential and power functions   **********************/
+		/********************************************************************************************/
+		py::def("log",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log),
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` natural (base `e`) logarithm of a real value. Depending on compilation options wraps ``::boost::multiprecision::log(…)`` or `std::log(…) <https://en.cppreference.com/w/cpp/numeric/math/log>`__ function.)""");
+		py::def("log10",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log10),
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` decimal (base ``10``) logarithm of a real value. Depending on compilation options wraps ``::boost::multiprecision::log10(…)`` or `std::log10(…) <https://en.cppreference.com/w/cpp/numeric/math/log10>`__ function.)""");
+		py::def("log1p",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log1p),
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` natural (base `e`) logarithm of ``1+argument``. Depending on compilation options wraps ``::boost::multiprecision::log1p(…)`` or `std::log1p(…) <https://en.cppreference.com/w/cpp/numeric/math/log1p>`__ function.)""");
+		py::def("log2",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::log2),
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` binary (base ``2``) logarithm of a real value. Depending on compilation options wraps ``::boost::multiprecision::log2(…)`` or `std::log2(…) <https://en.cppreference.com/w/cpp/numeric/math/log2>`__ function.)""");
+		py::def("logb",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::logb),
+		        (py::arg("x")),
+		        R"""(:return: Extracts the value of the unbiased radix-independent exponent from the floating-point argument arg, and returns it as a floating-point value. Depending on compilation options wraps ``::boost::multiprecision::logb(…)`` or `std::logb(…) <https://en.cppreference.com/w/cpp/numeric/math/logb>`__ function.)""");
+		py::def("ilogb",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::ilogb),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` extracts the value of the unbiased exponent from the floating-point argument arg, and returns it as a signed integer value. Depending on compilation options wraps ``::boost::multiprecision::ilogb(…)`` or `std::ilogb(…) <https://en.cppreference.com/w/cpp/numeric/math/ilogb>`__ function.)""");
+		py::def("ldexp",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, int)>(&::yade::math::ldexp),
+		        (py::arg("x"), "y"),
+		        R"""(:return: Multiplies a floating point value ``x`` by the number 2 raised to the ``exp`` power. Depending on compilation options wraps ``::boost::multiprecision::ldexp(…)`` or `std::ldexp(…) <https://en.cppreference.com/w/cpp/numeric/math/ldexp>`__ function.)""");
+		py::def("frexp",
+		        test_frexp<N>,
+		        (py::arg("x")),
+		        R"""(:return: tuple of ``(Real,int)``, decomposes given floating point ``Real`` argument into a normalized fraction and an integral power of two. Depending on compilation options wraps ``::boost::multiprecision::frexp(…)`` or `std::frexp(…) <https://en.cppreference.com/w/cpp/numeric/math/frexp>`__ function.)""");
+		py::def("exp",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::exp),
+		        (py::arg("x")),
+		        R"""(:return: the base `e` exponential of a ``Real`` argument. Depending on compilation options wraps ``::boost::multiprecision::exp(…)`` or `std::exp(…) <https://en.cppreference.com/w/cpp/numeric/math/exp>`__ function.)""");
+		py::def("exp2",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::exp2),
+		        (py::arg("x")),
+		        R"""(:return: the base `2` exponential of a ``Real`` argument. Depending on compilation options wraps ``::boost::multiprecision::exp2(…)`` or `std::exp2(…) <https://en.cppreference.com/w/cpp/numeric/math/exp2>`__ function.)""");
+		py::def("expm1",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::expm1),
+		        (py::arg("x")),
+		        R"""(:return: the base `e` exponential of a ``Real`` argument minus ``1.0``. Depending on compilation options wraps ``::boost::multiprecision::expm1(…)`` or `std::expm1(…) <https://en.cppreference.com/w/cpp/numeric/math/expm1>`__ function.)""");
+		py::def("pow",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::pow),
+		        (py::arg("x"), "y"),
+		        R"""(:return: ``Real`` the value of ``base`` raised to the power ``exp``. Depending on compilation options wraps ``::boost::multiprecision::pow(…)`` or `std::pow(…) <https://en.cppreference.com/w/cpp/numeric/math/pow>`__ function.)""");
+		py::def("sqrt",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::sqrt),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` square root of the argument. Depending on compilation options wraps ``::boost::multiprecision::sqrt(…)`` or `std::sqrt(…) <https://en.cppreference.com/w/cpp/numeric/math/sqrt>`__ function.)""");
+		py::def("cbrt",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::cbrt),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` cubic root of the argument. Depending on compilation options wraps ``::boost::multiprecision::cbrt(…)`` or `std::cbrt(…) <https://en.cppreference.com/w/cpp/numeric/math/cbrt>`__ function.)""");
+		py::def("hypot",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::hypot),
+		        (py::arg("x"), "y"),
+		        R"""(:return: ``Real`` the square root of the sum of the squares of ``x`` and ``y``, without undue overflow or underflow at intermediate stages of the computation. Depending on compilation options wraps ``::boost::multiprecision::hypot(…)`` or `std::hypot(…) <https://en.cppreference.com/w/cpp/numeric/math/hypot>`__ function.)""");
 
-	py::scope().attr("IsInteger")             = int(Eigen::NumTraits<RealHP<N>>::IsInteger);
-	py::scope().attr("IsSigned")              = int(Eigen::NumTraits<RealHP<N>>::IsSigned);
-	py::scope().attr("IsComplex")             = int(Eigen::NumTraits<RealHP<N>>::IsComplex);
-	py::scope().attr("RequireInitialization") = int(Eigen::NumTraits<RealHP<N>>::RequireInitialization);
-	py::scope().attr("ReadCost")              = int(Eigen::NumTraits<RealHP<N>>::ReadCost);
-	py::scope().attr("AddCost")               = int(Eigen::NumTraits<RealHP<N>>::AddCost);
-	py::scope().attr("MulCost")               = int(Eigen::NumTraits<RealHP<N>>::MulCost);
 
-	//#if defined(YADE_EIGEN_NUM_TRAITS_HPP) or defined(EIGEN_MPREALSUPPORT_MODULE_H)
-	if constexpr (std::numeric_limits<RealHP<N>>::digits >= std::numeric_limits<long double>::digits) {
-	py::def("highest",
-	        Eigen::NumTraits<RealHP<N>>::highest,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` returns the largest finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::max() <https://en.cppreference.com/w/cpp/types/numeric_limits/max>`__ function.)""");
-	py::def("lowest",
-	        Eigen::NumTraits<RealHP<N>>::lowest,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` returns the lowest (negative) finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::lowest() <https://en.cppreference.com/w/cpp/types/numeric_limits/lowest>`__ function.)""");
+		/********************************************************************************************/
+		/**********************         complex conj, abs, real, imag          *********************/
+		/********************************************************************************************/
+		// complex functions must be registered first, so that python will properly discover overloads
+		py::def("conj",
+		        static_cast<ComplexHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::conj),
+		        (py::arg("x")),
+		        R"""(:return: the complex conjugation a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::conj(…)`` or `std::conj(…) <https://en.cppreference.com/w/cpp/numeric/complex/conj>`__ function.)""");
+		py::def("abs",
+		        // note …<ComplexHP<N>> at the end, to help compiler in the template overload resolution.
+		        static_cast<RealHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::abs<ComplexHP<N>>),
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` absolute value of the ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::abs(…)`` or `std::abs(…) <https://en.cppreference.com/w/cpp/numeric/complex/abs>`__ function.)""");
+		py::def("real",
+		        static_cast<RealHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::real),
+		        (py::arg("x")),
+		        R"""(:return: the real part of a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::real(…)`` or `std::real(…) <https://en.cppreference.com/w/cpp/numeric/complex/real2>`__ function.)""");
+		py::def("imag",
+		        static_cast<RealHP<N> (*)(const ComplexHP<N>&)>(&::yade::math::imag),
+		        (py::arg("x")),
+		        R"""(:return: the imag part of a ``Complex`` argument. Depending on compilation options wraps ``::boost::multiprecision::imag(…)`` or `std::imag(…) <https://en.cppreference.com/w/cpp/numeric/complex/imag2>`__ function.)""");
 
-	py::def("Pi",
-	        Eigen::NumTraits<RealHP<N>>::Pi,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` The `π constant <https://en.wikipedia.org/wiki/Pi>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-	py::def("Euler",
-	        Eigen::NumTraits<RealHP<N>>::Euler,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` The `Euler–Mascheroni constant <https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-	py::def("Log2",
-	        Eigen::NumTraits<RealHP<N>>::Log2,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` natural logarithm of 2, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-	py::def("Catalan",
-	        Eigen::NumTraits<RealHP<N>>::Catalan,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` The `catalan constant <https://en.wikipedia.org/wiki/Catalan%27s_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
 
-	py::def("epsilon",
-	        static_cast<RealHP<N> (*)(long)>(&Eigen::NumTraits<RealHP<N>>::epsilon),
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
-	py::def("epsilon",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&Eigen::NumTraits<RealHP<N>>::epsilon),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
-	py::def("isEqualFuzzy",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isEqualFuzzy),
-	        R"""(:return: ``bool``, ``True`` if the absolute difference between two numbers is smaller than `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__)""");
-	py::def("smallest_positive",
-	        static_cast<RealHP<N> (*)()>(&Eigen::NumTraits<RealHP<N>>::smallest_positive),
-	        R"""(:return: ``Real`` the smallest number greater than zero. Wraps `std::numeric_limits<Real>::min() <https://en.cppreference.com/w/cpp/types/numeric_limits/min>`__)""");
-	} else { // #else
-	py::def("highest",
-	        Substitute<N>::highest,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` returns the largest finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::max() <https://en.cppreference.com/w/cpp/types/numeric_limits/max>`__ function.)""");
-	py::def("lowest",
-	        Substitute<N>::lowest,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` returns the lowest (negative) finite value of the ``Real`` type. Wraps `std::numeric_limits<Real>::lowest() <https://en.cppreference.com/w/cpp/types/numeric_limits/lowest>`__ function.)""");
-
-	py::def("Pi",
-	        Substitute<N>::Pi,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` The `π constant <https://en.wikipedia.org/wiki/Pi>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-	py::def("Euler",
-	        Substitute<N>::Euler,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` The `Euler–Mascheroni constant <https://en.wikipedia.org/wiki/Euler%E2%80%93Mascheroni_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-	py::def("Log2",
-	        Substitute<N>::Log2,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` natural logarithm of 2, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-	py::def("Catalan",
-	        Substitute<N>::Catalan,
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` The `catalan constant <https://en.wikipedia.org/wiki/Catalan%27s_constant>`__, exposed to python for :ysrc:`testing <py/tests/testMath.py>` of :ysrc:`eigen numerical traits<lib/high-precision/EigenNumTraits.hpp>`.)""");
-
-	py::def("epsilon",
-	        static_cast<RealHP<N> (*)(long)>(&Substitute<N>::epsilon),
-	        (py::arg("Precision") = defprec),
-	        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
-	py::def("epsilon",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&Substitute<N>::epsilon),
-	        (py::arg("x")),
-	        R"""(:return: ``Real`` returns the difference between ``1.0`` and the next representable value of the ``Real`` type. Wraps `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__ function.)""");
-	py::def("smallest_positive",
-	        static_cast<RealHP<N> (*)()>(&smallest_positive<N>),
-	        R"""(:return: ``Real`` the smallest number greater than zero. Wraps `std::numeric_limits<Real>::min() <https://en.cppreference.com/w/cpp/types/numeric_limits/min>`__)""");
-	py::def("isEqualFuzzy",
-	        Substitute<N>::isEqualFuzzy,
-	        R"""(:return: ``bool``, ``True`` if the absolute difference between two numbers is smaller than `std::numeric_limits<Real>::epsilon() <https://en.cppreference.com/w/cpp/types/numeric_limits/epsilon>`__)""");
-	} // #endif
-
-	py::def("dummy_precision",
-	        Eigen::NumTraits<RealHP<N>>::dummy_precision,
-	        R"""(:return: similar to the function ``epsilon``, but assumes that last 10% of bits contain the numerical error only. This is sometimes used by Eigen when calling ``isEqualFuzzy`` to determine if values differ a lot or if they are vaguely close to each other.)""");
-
-	py::def("random",
-	        static_cast<RealHP<N> (*)()>(&Eigen::internal::random<RealHP<N>>),
-	        R"""(:return: ``Real`` a symmetric random number in interval ``(-1,1)``. Used by Eigen.)""");
-	py::def("random",
-	        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::random<RealHP<N>>),
-	        (py::arg("a"), "b"),
-	        R"""(:return: ``Real`` a random number in interval ``(a,b)``. Used by Eigen.)""");
-
-#if ((EIGEN_MAJOR_VERSION > 2) and (EIGEN_WORLD_VERSION >= 3)) or defined(YADE_EIGEN_NUM_TRAITS_HPP) or defined(EIGEN_MPREALSUPPORT_MODULE_H)
-	py::def("isMuchSmallerThan",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isMuchSmallerThan),
-	        (py::arg("a"), "b", "eps"),
-	        R"""(:return: ``bool``, True if ``a`` is less than ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
-	py::def("isApprox",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isApprox),
-	        (py::arg("a"), "b", "eps"),
-	        R"""(:return: ``bool``, True if ``a`` is approximately equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
-	py::def("isApproxOrLessThan",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isApproxOrLessThan),
-	        (py::arg("a"), "b", "eps"),
-	        R"""(:return: ``bool``, True if ``a`` is approximately less than or equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+		/********************************************************************************************/
+		/**********************    min, max, abs, sign, floor, ceil, etc...    **********************/
+		/********************************************************************************************/
+		py::def("abs",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::abs),
+		        //XXX note for YADE_REAL_BIT <= 64 different signature was used: static_cast<RealHP<N> (*)(Real)>(&::yade::math::abs); Is not needed anymore(?)
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` absolute value of the ``Real`` argument. Depending on compilation options wraps ``::boost::multiprecision::abs(…)`` or `std::abs(…) <https://en.cppreference.com/w/cpp/numeric/math/abs>`__ function.)""");
+		py::def("fabs",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::fabs),
+		        //XXX note for YADE_REAL_BIT <= 64 different signature was used: static_cast<RealHP<N> (*)(Real)>(&::yade::math::fabs; Is not needed anymore(?)
+		        (py::arg("x")),
+		        R"""(:return: the ``Real`` absolute value of the argument. Depending on compilation options wraps ``::boost::multiprecision::abs(…)`` or `std::abs(…) <https://en.cppreference.com/w/cpp/numeric/math/fabs>`__ function.)""");
+		py::def("max",
+		        static_cast<const RealHP<N>& (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::max),
+		        (py::arg("x"), "y"),
+		        py::return_value_policy<py::copy_const_reference>(),
+		        R"""(:return: ``Real`` larger of the two arguments. Depending on compilation options wraps ``::boost::multiprecision::max(…)`` or `std::max(…) <https://en.cppreference.com/w/cpp/numeric/math/max>`__ function.)""");
+		py::def("min",
+		        static_cast<const RealHP<N>& (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::min),
+		        (py::arg("x"), "y"),
+		        py::return_value_policy<py::copy_const_reference>(),
+		        R"""(:return: ``Real`` smaller of the two arguments. Depending on compilation options wraps ``::boost::multiprecision::min(…)`` or `std::min(…) <https://en.cppreference.com/w/cpp/numeric/math/min>`__ function.)""");
+		py::def("sgn",
+		        static_cast<int (*)(const RealHP<N>&)>(&::yade::math::sgn),
+		        (py::arg("x")),
+		        R"""(:return: ``int`` the sign of the argument: ``-1``, ``0`` or ``1``.)""");
+		py::def("sign",
+		        static_cast<int (*)(const RealHP<N>&)>(&::yade::math::sign),
+		        (py::arg("x")),
+		        R"""(:return: ``int`` the sign of the argument: ``-1``, ``0`` or ``1``.)""");
+		py::def("floor",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::floor),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` Computes the largest integer value not greater than arg. Depending on compilation options wraps ``::boost::multiprecision::floor(…)`` or `std::floor(…) <https://en.cppreference.com/w/cpp/numeric/math/floor>`__ function.)""");
+		py::def("ceil",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::ceil),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` Computes the smallest integer value not less than arg. Depending on compilation options wraps ``::boost::multiprecision::ceil(…)`` or `std::ceil(…) <https://en.cppreference.com/w/cpp/numeric/math/ceil>`__ function.)""");
+		py::def("round",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::round),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the nearest integer value to arg (in floating-point format), rounding halfway cases away from zero, regardless of the current rounding mode.. Depending on compilation options wraps ``::boost::multiprecision::round(…)`` or `std::round(…) <https://en.cppreference.com/w/cpp/numeric/math/round>`__ function.)""");
+		py::def("rint",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::rint),
+		        (py::arg("x")),
+		        R"""(:return: Rounds the floating-point argument arg to an integer value (in floating-point format), using the `current rounding mode <https://en.cppreference.com/w/cpp/numeric/fenv/FE_round>`__. Depending on compilation options wraps ``::boost::multiprecision::rint(…)`` or `std::rint(…) <https://en.cppreference.com/w/cpp/numeric/math/rint>`__ function.)""");
+		py::def("trunc",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&)>(&::yade::math::trunc),
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` the nearest integer not greater in magnitude than arg. Depending on compilation options wraps ``::boost::multiprecision::trunc(…)`` or `std::trunc(…) <https://en.cppreference.com/w/cpp/numeric/math/trunc>`__ function.)""");
+#ifndef YADE_IGNORE_IEEE_INFINITY_NAN
+		py::def("isnan",
+		        static_cast<bool (*)(const RealHP<N>&)>(&::yade::math::isnan),
+		        (py::arg("x")),
+		        R"""(:return: ``bool`` indicating if the ``Real`` argument is NaN. Depending on compilation options wraps ``::boost::multiprecision::isnan(…)`` or `std::isnan(…) <https://en.cppreference.com/w/cpp/numeric/math/isnan>`__ function.)""");
+		py::def("isinf",
+		        static_cast<bool (*)(const RealHP<N>&)>(&::yade::math::isinf),
+		        (py::arg("x")),
+		        R"""(:return: ``bool`` indicating if the ``Real`` argument is Inf. Depending on compilation options wraps ``::boost::multiprecision::isinf(…)`` or `std::isinf(…) <https://en.cppreference.com/w/cpp/numeric/math/isinf>`__ function.)""");
+		py::def("isfinite",
+		        static_cast<bool (*)(const RealHP<N>&)>(&::yade::math::isfinite),
+		        (py::arg("x")),
+		        R"""(:return: ``bool`` indicating if the ``Real`` argument is Inf. Depending on compilation options wraps ``::boost::multiprecision::isfinite(…)`` or `std::isfinite(…) <https://en.cppreference.com/w/cpp/numeric/math/isfinite>`__ function.)""");
+		py::scope().attr("hasInfinityNan") = true;
 #else
-	// older eigen 3.2 didn't use `const Real&` but was copying third argument by value `Real`
-	py::def("isMuchSmallerThan",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, RealHP<N>)>(&Eigen::internal::isMuchSmallerThan<RealHP<N>, RealHP<N>>),
-	        (py::arg("a"), "b", "eps"),
-	        R"""(:return: ``bool``, True if ``a`` is less than ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
-	py::def("isApprox",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, RealHP<N>)>(&Eigen::internal::isApprox<RealHP<N>>),
-	        (py::arg("a"), "b", "eps"),
-	        R"""(:return: ``bool``, True if ``a`` is approximately equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
-	py::def("isApproxOrLessThan",
-	        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, RealHP<N>)>(&Eigen::internal::isApproxOrLessThan<RealHP<N>>),
-	        (py::arg("a"), "b", "eps"),
-	        R"""(:return: ``bool``, True if ``a`` is approximately less than or equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+		py::scope().attr("hasInfinityNan") = false;
 #endif
 
-	py::def("toLongDouble",
-	        static_cast<long double (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, long double>),
-	        (py::arg("x")),
-	        R"""(:return: ``float`` converts ``Real`` type to ``long double`` and returns a native python ``float``.)""");
-	py::def("toDouble",
-	        static_cast<double (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, double>),
-	        (py::arg("x")),
-	        R"""(:return: ``float`` converts ``Real`` type to ``double`` and returns a native python ``float``.)""");
-	py::def("toLong",
-	        static_cast<long (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, long>),
-	        (py::arg("x")),
-	        R"""(:return: ``int`` converts ``Real`` type to ``long int`` and returns a native python ``int``.)""");
-	py::def("toInt",
-	        static_cast<int (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, int>),
-	        (py::arg("x")),
-	        R"""(:return: ``int`` converts ``Real`` type to ``int`` and returns a native python ``int``.)""");
+
+		/********************************************************************************************/
+		/**********************        integer division and remainder          **********************/
+		/********************************************************************************************/
+		py::def("fmod",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::fmod),
+		        (py::arg("x"), "y"),
+		        R"""(:return: ``Real`` the floating-point remainder of the division operation ``x/y`` of the arguments ``x`` and ``y``. Depending on compilation options wraps ``::boost::multiprecision::fmod(…)`` or `std::fmod(…) <https://en.cppreference.com/w/cpp/numeric/math/fmod>`__ function.)""");
+		py::def("remainder",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&::yade::math::remainder),
+		        (py::arg("x"), "y"),
+		        R"""(:return: ``Real`` the IEEE remainder of the floating point division operation ``x/y``. Depending on compilation options wraps ``::boost::multiprecision::remainder(…)`` or `std::remainder(…) <https://en.cppreference.com/w/cpp/numeric/math/remainder>`__ function.)""");
+		py::def("modf",
+		        test_modf<N>,
+		        (py::arg("x")),
+		        R"""(:return: tuple of ``(Real,Real)``, decomposes given floating point ``Real`` into integral and fractional parts, each having the same type and sign as x. Depending on compilation options wraps ``::boost::multiprecision::modf(…)`` or `std::modf(…) <https://en.cppreference.com/w/cpp/numeric/math/modf>`__ function.)""");
+		py::def("fma",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&::yade::math::fma),
+		        (py::arg("x"), "y", "z"),
+		        R"""(:return: ``Real`` - computes ``(x*y) + z`` as if to infinite precision and rounded only once to fit the result type. Depending on compilation options wraps ``::boost::multiprecision::fma(…)`` or `std::fma(…) <https://en.cppreference.com/w/cpp/numeric/math/fma>`__ function.)""");
+		py::def("remquo",
+		        test_remquo<N>,
+		        (py::arg("x"), "y"),
+		        R"""(:return: tuple of ``(Real,long)``, the floating-point remainder of the division operation ``x/y`` as the std::remainder() function does. Additionally, the sign and at least the three of the last bits of ``x/y`` are returned, sufficient to determine the octant of the result within a period. Depending on compilation options wraps ``::boost::multiprecision::remquo(…)`` or `std::remquo(…) <https://en.cppreference.com/w/cpp/numeric/math/remquo>`__ function.)""");
 
 
-	/********************************************************************************************/
-	/**********************             CGAL numerical traits              **********************/
-	/********************************************************************************************/
+		/********************************************************************************************/
+		/**********************         special mathematical functions         **********************/
+		/********************************************************************************************/
+		// remember that complex functions must be registered first.
+		// The 'if constexpr(…)' is not working for C++14. So I have to simulate it using templates. Otherwise the python 'import >>thisModule<<' is really slow.
+		IfConstexprForSlowFunctions<N, (N <= skipSlowFunctionsAbove_N)>::work(scopeHP);
+
+		/********************************************************************************************/
+		/**********************        extract C-array from std::vector        **********************/
+		/********************************************************************************************/
+		py::def("testArray",
+		        ::yade::testArray<N>,
+		        R"""(This function tests call to ``std::vector::data(…)`` function in order to extract the array.)""");
+
+
+		/********************************************************************************************/
+		/**********************                     random                     **********************/
+		/********************************************************************************************/
+		// the random functions are exported for tests as a part of Eigen numerical traits, see below
+
+
+		/********************************************************************************************/
+		/**********************            Eigen numerical traits              **********************/
+		/********************************************************************************************/
+		long defprec  = std::numeric_limits<RealHP<N>>::digits;
+		long max_exp2 = std::numeric_limits<RealHP<N>>::max_exponent;
+
+		py::scope().attr("defprec")  = defprec;
+		py::scope().attr("max_exp2") = max_exp2;
+
+		// it would work if this enum had a name.
+		//py::enum_<Eigen::NumTraits<RealHP<N>>::EnumName>("traits").value("IsInteger",Eigen::NumTraits<Real>::IsInteger).export_values();
+
+		py::scope().attr("IsInteger")             = int(Eigen::NumTraits<RealHP<N>>::IsInteger);
+		py::scope().attr("IsSigned")              = int(Eigen::NumTraits<RealHP<N>>::IsSigned);
+		py::scope().attr("IsComplex")             = int(Eigen::NumTraits<RealHP<N>>::IsComplex);
+		py::scope().attr("RequireInitialization") = int(Eigen::NumTraits<RealHP<N>>::RequireInitialization);
+		py::scope().attr("ReadCost")              = int(Eigen::NumTraits<RealHP<N>>::ReadCost);
+		py::scope().attr("AddCost")               = int(Eigen::NumTraits<RealHP<N>>::AddCost);
+		py::scope().attr("MulCost")               = int(Eigen::NumTraits<RealHP<N>>::MulCost);
+
+		//#if defined(YADE_EIGEN_NUM_TRAITS_HPP) or defined(EIGEN_MPREALSUPPORT_MODULE_H)
+		// The 'if constexpr(…)' is not working for C++14. So I have to simulate it using templates. Otherwise compiler will try to access non-existing types.
+		IfConstexprForEigen<N, (std::numeric_limits<RealHP<N>>::digits >= std::numeric_limits<long double>::digits)>::work(scopeHP, defprec);
+
+		py::def("dummy_precision",
+		        Eigen::NumTraits<RealHP<N>>::dummy_precision,
+		        R"""(:return: similar to the function ``epsilon``, but assumes that last 10% of bits contain the numerical error only. This is sometimes used by Eigen when calling ``isEqualFuzzy`` to determine if values differ a lot or if they are vaguely close to each other.)""");
+
+		py::def("random",
+		        static_cast<RealHP<N> (*)()>(&Eigen::internal::random<RealHP<N>>),
+		        R"""(:return: ``Real`` a symmetric random number in interval ``(-1,1)``. Used by Eigen.)""");
+		py::def("random",
+		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::random<RealHP<N>>),
+		        (py::arg("a"), "b"),
+		        R"""(:return: ``Real`` a random number in interval ``(a,b)``. Used by Eigen.)""");
+
+#if ((EIGEN_MAJOR_VERSION > 2) and (EIGEN_WORLD_VERSION >= 3)) or defined(YADE_EIGEN_NUM_TRAITS_HPP) or defined(EIGEN_MPREALSUPPORT_MODULE_H)
+		py::def("isMuchSmallerThan",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isMuchSmallerThan),
+		        (py::arg("a"), "b", "eps"),
+		        R"""(:return: ``bool``, True if ``a`` is less than ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+		py::def("isApprox",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isApprox),
+		        (py::arg("a"), "b", "eps"),
+		        R"""(:return: ``bool``, True if ``a`` is approximately equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+		py::def("isApproxOrLessThan",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isApproxOrLessThan),
+		        (py::arg("a"), "b", "eps"),
+		        R"""(:return: ``bool``, True if ``a`` is approximately less than or equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+#else
+		// older eigen 3.2 didn't use `const Real&` but was copying third argument by value `Real`
+		py::def("isMuchSmallerThan",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, RealHP<N>)>(&Eigen::internal::isMuchSmallerThan<RealHP<N>, RealHP<N>>),
+		        (py::arg("a"), "b", "eps"),
+		        R"""(:return: ``bool``, True if ``a`` is less than ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+		py::def("isApprox",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, RealHP<N>)>(&Eigen::internal::isApprox<RealHP<N>>),
+		        (py::arg("a"), "b", "eps"),
+		        R"""(:return: ``bool``, True if ``a`` is approximately equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+		py::def("isApproxOrLessThan",
+		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, RealHP<N>)>(&Eigen::internal::isApproxOrLessThan<RealHP<N>>),
+		        (py::arg("a"), "b", "eps"),
+		        R"""(:return: ``bool``, True if ``a`` is approximately less than or equal ``b`` with provided ``eps``, see also `here <https://stackoverflow.com/questions/15051367/how-to-compare-vectors-approximately-in-eigen>`__)""");
+#endif
+
+		py::def("toLongDouble",
+		        static_cast<long double (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, long double>),
+		        (py::arg("x")),
+		        R"""(:return: ``float`` converts ``Real`` type to ``long double`` and returns a native python ``float``.)""");
+		py::def("toDouble",
+		        static_cast<double (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, double>),
+		        (py::arg("x")),
+		        R"""(:return: ``float`` converts ``Real`` type to ``double`` and returns a native python ``float``.)""");
+		py::def("toLong",
+		        static_cast<long (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, long>),
+		        (py::arg("x")),
+		        R"""(:return: ``int`` converts ``Real`` type to ``long int`` and returns a native python ``int``.)""");
+		py::def("toInt",
+		        static_cast<int (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, int>),
+		        (py::arg("x")),
+		        R"""(:return: ``int`` converts ``Real`` type to ``int`` and returns a native python ``int``.)""");
+
+
+		/********************************************************************************************/
+		/**********************             CGAL numerical traits              **********************/
+		/********************************************************************************************/
 #ifdef YADE_CGAL
-	py::scope().attr("testCgalNumTraits") = true;
-	// https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html
-	py::def("CGAL_Is_valid",
-	        TestCGAL::Is_valid<N>,
-	        (py::arg("x")),
-	        R"""(
+		py::scope().attr("testCgalNumTraits") = true;
+		// https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html
+		py::def("CGAL_Is_valid",
+		        TestCGAL::Is_valid<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``Is_valid``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: ``bool`` indicating if the ``Real`` argument is valid. Checks are performed against NaN and Inf.
 )""");
-	// AlgebraicStructureTraits
-	py::def("CGAL_Square",
-	        TestCGAL::Square<N>,
-	        (py::arg("x")),
-	        R"""(
+		// AlgebraicStructureTraits
+		py::def("CGAL_Square",
+		        TestCGAL::Square<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``Square``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: ``Real`` the argument squared.
 )""");
-	py::def("CGAL_Sqrt",
-	        TestCGAL::Sqrt<N>,
-	        (py::arg("x")),
-	        R"""(
+		py::def("CGAL_Sqrt",
+		        TestCGAL::Sqrt<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``Sqrt``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: ``Real`` the square root of argument.
 )""");
-	py::def("CGAL_Kth_root",
-	        TestCGAL::K_root<N>,
-	        (py::arg("x")),
-	        R"""(
+		py::def("CGAL_Kth_root",
+		        TestCGAL::K_root<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``Kth_root``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: ``Real`` the k-th root of argument.
 )""");
-	// RealEmbeddableTraits
-	py::def("CGAL_To_interval",
-	        TestCGAL::To_interval<N>,
-	        (py::arg("x")),
-	        R"""(
+		// RealEmbeddableTraits
+		py::def("CGAL_To_interval",
+		        TestCGAL::To_interval<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``To_interval``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: ``(double,double)`` tuple inside which the high-precision ``Real`` argument resides.
 )""");
-	py::def("CGAL_Sgn",
-	        TestCGAL::Sgn<N>,
-	        (py::arg("x")),
-	        R"""(
+		py::def("CGAL_Sgn",
+		        TestCGAL::Sgn<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``Sgn``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: sign of the argument, can be ``-1``, ``0`` or ``1``. Not very useful in python. In C++ it is useful to obtain a sign of an expression with exact accuracy, CGAL starts using MPFR internally for this when the approximate interval contains zero inside it.
 )""");
-	py::def("CGAL_Is_finite",
-	        TestCGAL::Is_finite<N>,
-	        (py::arg("x")),
-	        R"""(
+		py::def("CGAL_Is_finite",
+		        TestCGAL::Is_finite<N>,
+		        (py::arg("x")),
+		        R"""(
 CGAL's function ``Is_finite``, as described in `CGAL algebraic <https://doc.cgal.org/latest/Algebraic_foundations/index.html>`__
 `foundations <https://doc.cgal.org/latest/Algebraic_foundations/group__PkgAlgebraicFoundationsRef.html>`__ :ysrc:`exposed<lib/high-precision/CgalNumTraits.hpp>`
 to python for :ysrccommit:`testing<ff600a80018d21c03626c720cda08967b043c1c8/py/tests/testMath.py#L207>` of CGAL numerical traits.
 
 :return: ``bool`` indicating if the ``Real`` argument is finite.
 )""");
-	py::def("CGAL_simpleTest",
-	        ::yade::simpleCgalNumTraitsCalculation<N>,
-	        R"""(
+		py::def("CGAL_simpleTest",
+		        ::yade::simpleCgalNumTraitsCalculation<N>,
+		        R"""(
 Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's sqrt and pow.
 
 :return: 3.0
 )""");
 #else
-	py::scope().attr("testCgalNumTraits") = false;
+		py::scope().attr("testCgalNumTraits") = false;
 #endif
-}
+	}
+};
 
 template <int N> int getNthDigits10() { return std::numeric_limits<RealHP<N>>::digits10; }
 
@@ -831,47 +859,20 @@ int digits10RealHP(int N)
 	}
 }
 
-template <int N> class DummyHP {
-};
-
-template <int N, int skip> void registerInScope(bool createInternalScopeHP)
-{
-	// FIXME - put this excerpt inside documentation.
-	// The math functions can be accessed in python like:
-	// import >>thisModule<< as math
-	// math.HP3.sqrt(2) # produces square root of 2 using RealHP<3> precision
-	// math.sqrt(2)     # without using HPn prefix it defaults to RealHP<1>
-	py::scope topScope;
-	if (createInternalScopeHP) {
-		// this creates internal python scope HP1 or HP2 or HP3 and so on. In each of them are the same math functions with respective precisions.
-		std::string name = "HP" + boost::lexical_cast<std::string>(N); // scope name: "HP1", "HP2", etc
-		py::scope   HPn  = py::class_<DummyHP<N>>(name.c_str());
-		registerRealHP<N, skip, true>(topScope, HPn);
-	} else {
-		// this one puts the 'base precision' RealHP<1> math functions in the top scope of this python module. They are duplicated inside HP1.
-		// Not sure which place is more convenient to use. Maybe both.
-		registerRealHP<N, skip, false>(topScope, topScope);
-	}
-}
-
-BOOST_PYTHON_MODULE(THE_CPP_NAME) try {
+BOOST_PYTHON_MODULE(_math) try {
 	YADE_SET_DOCSTRING_OPTS;
 
 	if (digits10RealHP(1) >= 18) {
 		std_pair_to_python_converter<double, double>();
 	}
-	const constexpr int highestPythonRegisteredHP_N = 3;
-	// python 'import this_module' measured time: skipSlowFunctionsAbove_N==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
-	const constexpr int skipSlowFunctionsAbove_N = 3;
-	registerInScope<1, skipSlowFunctionsAbove_N>(false);
-	boost::mpl::for_each<boost::mpl::range_c<int, 1, highestPythonRegisteredHP_N + 1>>([=]<typename N1>(N1) {
-		// this loop registers all python functions from 1 ... N == highestPythonRegisteredHP_N.
-		// For some functions at large N are extremely slow during python 'import yade.math', so they are not registered.
-		registerInScope<N1::value, skipSlowFunctionsAbove_N>(true);
-	});
+	// this loop registers all python functions from 1 ... N == highestPythonRegisteredHP_N.
+	// Some functions for large N are extremely slow during python 'import yade.math', so they are not registered, see struct IfConstexprForSlowFunctions
+	const constexpr int highestPythonRegisteredHP_N = 10;
+	::yade::math::detail::registerLoopForHPn<highestPythonRegisteredHP_N, RegisterRealHPMath>();
 
 	expose_storage_ordering();
 
+	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
 	py::def("digits10RealHP", digits10RealHP, (py::arg("N")));
