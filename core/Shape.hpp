@@ -26,8 +26,10 @@ public:
 #ifdef BV_FUNCTOR_CACHE
 	shared_ptr<BoundFunctor> boundFunctor;
 #endif
+#ifdef YADE_FEM
 	//! cache functor that are called for this type of DeformableElement. Used by FEInternalForceEngine
 	shared_ptr<InternalForceFunctor> internalforcefunctor;
+#endif
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(Shape,Serializable,"Geometry of a body",
