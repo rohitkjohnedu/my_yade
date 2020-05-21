@@ -27,7 +27,7 @@ void SimulationFlow::singleAction()
 	scene->moveToNextTimeStep();
 	if (scene->stopAtIter > 0 && scene->iter == scene->stopAtIter)
 		setTerminate(true);
-	if (scene->stopAtTime > 0 && scene->time == scene->stopAtTime)
+	if (scene->stopAtTime > 0 && scene->time >= scene->stopAtTime)
 		setTerminate(true);
 };
 
