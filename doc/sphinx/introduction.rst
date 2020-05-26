@@ -91,8 +91,18 @@ There is more command-line options than just ``-x``, run ``yade -h`` to see all 
 	                        unspecified exception.
 	  --check               Run a series of user-defined check tests as described
 	                        in :ysrc:`scripts/checks-and-tests/checks/README` and :ref:`regression-tests`
-	  --performance
-	                        Starts a test to measure the productivity
+	  --performance         Starts a test to measure the productivity.
+	  --stdperformance
+	                        Starts a standardized test to measure the productivity,
+	                        which will keep retrying to run the benchmark until standard
+	                        deviation of the performance is below 1%. A common type of
+	                        simulation is done: the spheres fall down in a box and are given
+	                        enough time to settle in there. Note: better to use this with
+	                        argument `-j THREADS` (explained above).
+	  --quickperformance
+	                        Starts a quick test to measure the productivity. Same as above,
+	                        but only two short runs are performed, without the attempts to find the
+	                        computer performance with small error.
 	  --no-gdb              Do not show backtrace when yade crashes (only
 	                        effective with \-\-debug) [#fdbg]_.
 
