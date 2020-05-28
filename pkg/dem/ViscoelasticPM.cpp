@@ -260,10 +260,12 @@ void Ip2_ViscElMat_ViscElMat_ViscElPhys::Calculate_ViscElMat_ViscElMat_ViscElPhy
 			cn2 = mat2->cn;
 			cs1 = mat1->cs;
 			cs2 = mat2->cs;
-		} else if (isfinite(mat1->en) and isfinite(mat1->et)) {
+		} else if (isfinite(mat1->en)) {
 			const Real En = (en) ? (*en)(mat1->id, mat2->id) : (mat1->en + mat2->en) / 2.0;
 			cn1 = cn2 = 2.0 * find_cn_from_en(En, massR, contactParameterCalculation(kn1, kn2), interaction);
 			cs1 = cs2 = 0;
+		} else {
+			throw runtime_error("Inconsistent material constants for ViscElMat's, please check input");
 		}
 	}
 
