@@ -31,7 +31,14 @@ If another ``C++`` :ref:`math function<cpp-hp-compatibility>` is needed it shoul
 If another ``python`` math function does not work well with ``mpmath`` it should be added below, and original
 calls to this function should call this function instead, e.g. ``numpy.linspace(…)`` is replaced with ``yade.math.linspace(…)``.
 
+The ``RealHP<n>`` :ref:`higher precision<higher-hp-precision>` math functions can be accessed in python by using the ``.HPn`` module scope. For example::
+
+	import yade.math as mth
+	mth.HP3.sqrt(2) # produces square root of 2 using RealHP<3> precision
+	mth.sqrt(2)     # without using HPn module scope it defaults to RealHP<1>
+
 """
+# FIXME: write in doc/sphinx/HighPrecisionReal.rst an anchor:  .. _higher-hp-precision:
 # all C++ functions are accessible now:
 from yade._math import *
 
