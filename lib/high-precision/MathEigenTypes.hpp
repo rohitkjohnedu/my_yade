@@ -50,48 +50,83 @@ using MatrixXi = Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>;
 /*************************        Real          **************************/
 /*************************************************************************/
 
+// First declare for RealHP<n>
+
 #ifdef EIGEN_DONT_ALIGN
-using Vector3r = Vector3<Real>;
+template <int N> using Vector3rHP = Vector3<RealHP<N>>;
 #else
 // For start let's try SSE vectorization without AlignedVector3.
 // Later we can improve performance by using AlignedVector3 instead of Vector3r.
 // AlignedVector3 will need a few tweaks to make it right.
-// using Vector3r = Eigen::AlignedVector3<Real>;
-using Vector3r = Vector3<Real>;
+// using Vector3rHP = Eigen::AlignedVector3<RealHP<N>>;
+template <int N> using Vector3rHP = Vector3<RealHP<N>>;
 #endif
 
-using Vector2r  = Vector2<Real>;
-using Vector3ra = Eigen::AlignedVector3<Real>;
-using Vector4r  = Vector4<Real>;
-using Vector6r  = Vector6<Real>;
-using VectorXr  = Eigen::Matrix<Real, Eigen::Dynamic, 1>;
+template <int N> using Vector2rHP  = Vector2<RealHP<N>>;
+template <int N> using Vector3raHP = Eigen::AlignedVector3<RealHP<N>>;
+template <int N> using Vector4rHP  = Vector4<RealHP<N>>;
+template <int N> using Vector6rHP  = Vector6<RealHP<N>>;
+template <int N> using VectorXrHP  = Eigen::Matrix<RealHP<N>, Eigen::Dynamic, 1>;
 
-using Matrix2r = Matrix2<Real>;
-using Matrix3r = Matrix3<Real>;
-using Matrix4r = Matrix4<Real>;
-using Matrix6r = Matrix6<Real>;
-using MatrixXr = Eigen::Matrix<Real, Eigen::Dynamic, Eigen::Dynamic>;
+template <int N> using Matrix2rHP = Matrix2<RealHP<N>>;
+template <int N> using Matrix3rHP = Matrix3<RealHP<N>>;
+template <int N> using Matrix4rHP = Matrix4<RealHP<N>>;
+template <int N> using Matrix6rHP = Matrix6<RealHP<N>>;
+template <int N> using MatrixXrHP = Eigen::Matrix<RealHP<N>, Eigen::Dynamic, Eigen::Dynamic>;
 
-using Quaternionr  = Eigen::Quaternion<Real>;
-using AngleAxisr   = Eigen::AngleAxis<Real>;
-using AlignedBox3r = Eigen::AlignedBox<Real, 3>;
-using AlignedBox2r = Eigen::AlignedBox<Real, 2>;
+template <int N> using QuaternionrHP  = Eigen::Quaternion<RealHP<N>>;
+template <int N> using AngleAxisrHP   = Eigen::AngleAxis<RealHP<N>>;
+template <int N> using AlignedBox3rHP = Eigen::AlignedBox<RealHP<N>, 3>;
+template <int N> using AlignedBox2rHP = Eigen::AlignedBox<RealHP<N>, 2>;
+
+// Then declare specialization for n==1 with the originally used names.
+
+using Vector3r = Vector3rHP<1>;
+
+using Vector2r  = Vector2rHP<1>;
+using Vector3ra = Vector3raHP<1>;
+using Vector4r  = Vector4rHP<1>;
+using Vector6r  = Vector6rHP<1>;
+using VectorXr  = VectorXrHP<1>;
+
+using Matrix2r = Matrix2rHP<1>;
+using Matrix3r = Matrix3rHP<1>;
+using Matrix4r = Matrix4rHP<1>;
+using Matrix6r = Matrix6rHP<1>;
+using MatrixXr = MatrixXrHP<1>;
+
+using Quaternionr  = QuaternionrHP<1>;
+using AngleAxisr   = AngleAxisrHP<1>;
+using AlignedBox3r = AlignedBox3rHP<1>;
+using AlignedBox2r = AlignedBox2rHP<1>;
 
 /*************************************************************************/
 /*************************       Complex        **************************/
 /*************************************************************************/
 
-using Vector2cr = Vector2<Complex>;
-using Vector3cr = Vector3<Complex>;
-using Vector4cr = Vector4<Complex>;
-using Vector6cr = Vector6<Complex>;
-using VectorXcr = Eigen::Matrix<Complex, Eigen::Dynamic, 1>;
+template <int N> using Vector2crHP = Vector2<ComplexHP<N>>;
+template <int N> using Vector3crHP = Vector3<ComplexHP<N>>;
+template <int N> using Vector4crHP = Vector4<ComplexHP<N>>;
+template <int N> using Vector6crHP = Vector6<ComplexHP<N>>;
+template <int N> using VectorXcrHP = Eigen::Matrix<ComplexHP<N>, Eigen::Dynamic, 1>;
 
-using Matrix2cr = Matrix2<Complex>;
-using Matrix3cr = Matrix3<Complex>;
-using Matrix4cr = Matrix4<Complex>;
-using Matrix6cr = Matrix6<Complex>;
-using MatrixXcr = Eigen::Matrix<Complex, Eigen::Dynamic, Eigen::Dynamic>;
+template <int N> using Matrix2crHP = Matrix2<ComplexHP<N>>;
+template <int N> using Matrix3crHP = Matrix3<ComplexHP<N>>;
+template <int N> using Matrix4crHP = Matrix4<ComplexHP<N>>;
+template <int N> using Matrix6crHP = Matrix6<ComplexHP<N>>;
+template <int N> using MatrixXcrHP = Eigen::Matrix<ComplexHP<N>, Eigen::Dynamic, Eigen::Dynamic>;
+
+using Vector2cr = Vector2crHP<1>;
+using Vector3cr = Vector3crHP<1>;
+using Vector4cr = Vector4crHP<1>;
+using Vector6cr = Vector6crHP<1>;
+using VectorXcr = VectorXcrHP<1>;
+
+using Matrix2cr = Matrix2crHP<1>;
+using Matrix3cr = Matrix3crHP<1>;
+using Matrix4cr = Matrix4crHP<1>;
+using Matrix6cr = Matrix6crHP<1>;
+using MatrixXcr = MatrixXcrHP<1>;
 
 /*************************************************************************/
 /*************************         Se3          **************************/
@@ -125,7 +160,8 @@ public:
 	Se3<Scalar>     operator*(const Se3<Scalar>& b) { return Se3<Scalar>(orientation * b.position + position, orientation * b.orientation); }
 };
 
-using Se3r = Se3<Real>;
+template <int N> using Se3rHP = Se3<RealHP<N>>;
+using Se3r                    = Se3rHP<1>;
 
 /*************************************************************************/
 /*************************   for external use   **************************/
@@ -134,32 +170,74 @@ using Se3r = Se3<Real>;
 // This is for external applications, shouldn't be normally used.
 // Use `using namespace ::yade::AllMathTypes;` only inside a .cpp file! Otherwise the types will leak outside which will cause compilation errors due to ambiguity.
 namespace MathEigenTypes {
+	// integer types
+	using ::yade::Index;
+
+	using ::yade::Vector2i;
+	using ::yade::Vector3i;
+	using ::yade::Vector4i;
+	using ::yade::Vector6i;
+	using ::yade::VectorXi;
+
+	using ::yade::Matrix2i;
+	using ::yade::Matrix3i;
+	using ::yade::Matrix4i;
+	using ::yade::Matrix6i;
+	using ::yade::MatrixXi;
+
+	// using all of the RealHP<N> kind.
+	using ::yade::RealHP;
+
+	using ::yade::ComplexHP;
+
+	using ::yade::Vector2rHP;
+	using ::yade::Vector3raHP;
+	using ::yade::Vector3rHP;
+	using ::yade::Vector4rHP;
+	using ::yade::Vector6rHP;
+	using ::yade::VectorXrHP;
+
+	using ::yade::Matrix2rHP;
+	using ::yade::Matrix3rHP;
+	using ::yade::Matrix4rHP;
+	using ::yade::Matrix6rHP;
+	using ::yade::MatrixXrHP;
+
+	using ::yade::AlignedBox2rHP;
+	using ::yade::AlignedBox3rHP;
+	using ::yade::AngleAxisrHP;
+	using ::yade::QuaternionrHP;
+
+	using ::yade::Vector2crHP;
+	using ::yade::Vector3crHP;
+	using ::yade::Vector4crHP;
+	using ::yade::Vector6crHP;
+	using ::yade::VectorXcrHP;
+
+	using ::yade::Matrix2crHP;
+	using ::yade::Matrix3crHP;
+	using ::yade::Matrix4crHP;
+	using ::yade::Matrix6crHP;
+	using ::yade::MatrixXcrHP;
+
+	using ::yade::Se3rHP;
+
+	// Then use the specialization for N==1 with the original names.
 	using ::yade::Real;
 
 	using ::yade::Complex;
 
-	using ::yade::Index;
-	using ::yade::Vector2i;
 	using ::yade::Vector2r;
-	using ::yade::Vector3i;
 	using ::yade::Vector3r;
 	using ::yade::Vector3ra;
-	using ::yade::Vector4i;
 	using ::yade::Vector4r;
-	using ::yade::Vector6i;
 	using ::yade::Vector6r;
-	using ::yade::VectorXi;
 	using ::yade::VectorXr;
 
-	using ::yade::Matrix2i;
 	using ::yade::Matrix2r;
-	using ::yade::Matrix3i;
 	using ::yade::Matrix3r;
-	using ::yade::Matrix4i;
 	using ::yade::Matrix4r;
-	using ::yade::Matrix6i;
 	using ::yade::Matrix6r;
-	using ::yade::MatrixXi;
 	using ::yade::MatrixXr;
 
 	using ::yade::AlignedBox2r;
