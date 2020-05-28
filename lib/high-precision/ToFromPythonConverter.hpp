@@ -12,6 +12,8 @@
 
 #include <lib/high-precision/RealIO.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/mpl/for_each.hpp>
+#include <boost/mpl/range_c.hpp>
 
 namespace forCtags {
 struct ToFromPythonConverter {
@@ -25,7 +27,7 @@ struct ToFromPythonConverter {
 // The note at the end of http://mpmath.org/doc/current/basics.html#temporarily-changing-the-precision
 // indicates that having different mpmath variables with different precision is poorly supported.
 // So python conversions of RealHP<N> for different precisions is questionable.
-// Not a big problem, because N>=2 is supposed to be used only in critical C++ sections where better calculations are necessary.
+// Not a big problem, because N>=2 is supposed to be used only in critical C++ sections where better calculations are necessary. And not much with python, only for debugging when necessary.
 
 template <typename ArbitraryReal> struct ArbitraryReal_to_python {
 	static PyObject* convert(const ArbitraryReal& val)
@@ -125,56 +127,125 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 };
 
 /*************************************************************************/
+/*************************   RealHP + python    **************************/
+/*************************************************************************/
+/*
+Each line in this macro generates an assembly code for a template instantination. It is used in files:
+
+  py/high-precision/_ExposeBoxes.cpp        py/high-precision/_ExposeConverters.cpp    py/high-precision/_ExposeQuaternion.cpp
+  py/high-precision/_ExposeComplex1.cpp     py/high-precision/_ExposeMatrices1.cpp     py/high-precision/_ExposeVectors1.cpp
+  py/high-precision/_ExposeComplex2.cpp     py/high-precision/_ExposeMatrices2.cpp     py/high-precision/_ExposeVectors2.cpp
+
+Each line in this macro makes compilation longer by 1 minute. So only put here the ones which are really needed to be accessed from python.
+Before adding RealHP<N>; only the first line for RealHP<1>; was there.
+*/
+#define YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(name)                                                                                         \
+	template void name<1>();                                                                                                                               \
+	template void name<2>();                                                                                                                               \
+	template void name<3>();                                                                                                                               \
+	template void name<4>();                                                                                                                               \
+	template void name<5>();                                                                                                                               \
+	template void name<6>();                                                                                                                               \
+	template void name<7>();                                                                                                                               \
+	template void name<8>();                                                                                                                               \
+	template void name<9>();                                                                                                                               \
+	template void name<10>();
+
+namespace yade {
+namespace math {
+	namespace detail {
+		template <int N> class ScopeHP { // separate class is needed to act as python scope identifier. Might become useful later.
+		};
+
+		template <int N, template <int, bool> class RegisterHPClass> void registerInScope(bool createInternalScopeHP)
+		{
+			boost::python::scope topScope;
+			if (createInternalScopeHP) {
+				// This creates internal python scope HP1 or HP2 or HP3 and so on. In each of them are the same math functions with respective precisions.
+				// The main moint is that all math functions, and minieigen classes are accessible e.g. for RealHP<4>, via:
+				//    yade.math.HP4.sin(10)
+				//    yade.minieigenHP.HP4.Vector3r(1,2,3)
+				// The original RealHP<1> are present in two places:
+				//    yade.math.sin(10)                             yade.math.HP1.sin(10)
+				//    yade.minieigenHP.Vector3r(1,2,3)              yade.minieigenHP.HP1.Vector3r(1,2,3)
+				std::string          name = "HP" + boost::lexical_cast<std::string>(N); // scope name: "HP1", "HP2", etc
+				boost::python::scope HPn  = boost::python::class_<ScopeHP<N>>(name.c_str());
+				RegisterHPClass<N, true>::work(topScope, HPn);
+			} else {
+				// this one puts the 'base precision' RealHP<1> math functions in the top scope of this python module. They are duplicated inside HP1.
+				// Not sure which place is more convenient to use. Maybe both.
+				RegisterHPClass<N, false>::work(topScope, topScope);
+			}
+		}
+
+		// this loop registers python functions from 1 ... maxN (including maxN) by calling the provided RegisterHPClass<int,bool>::work( , ); inside registerInScope above.
+		template <int maxN, template <int, bool> class RegisterHPClass> void registerLoopForHPn()
+		{
+			registerInScope<1, RegisterHPClass>(false);
+			boost::mpl::for_each<boost::mpl::range_c<int, 1, maxN + 1>>(
+			        [=]<typename N1>(N1) { registerInScope<N1::value, RegisterHPClass>(true); });
+		}
+
+	}
+}
+}
+
+/*************************************************************************/
 /************************* minieigenHP → string **************************/
 /*************************************************************************/
 
 // these are used by py/high-precision/minieigen/visitors.hpp
 namespace yade {
 namespace minieigenHP {
-	inline std::string numToString(const int& num) { return ::boost::lexical_cast<::std::string>(num); } // ignore padding for now.
-
-	// FIXME : template <typename Rr, int Level = levelOfRealHP<Rr>>
-	inline std::string numToString(const ::yade::Real& num)
+	template <typename Rr, typename boost::disable_if<boost::is_complex<Rr>, int>::type = 0, int Level = ::yade::math::levelOfRealHP<Rr>>
+	inline std::string numToStringHP(const Rr& num)
 	{
-		constexpr bool isPythonPrecisionEnough = std::is_same<double, ::yade::Real>::value or std::is_same<float, ::yade::Real>::value;
+		using R = typename std::decay<Rr>::type;
+		static_assert(std::is_same<R, ::yade::RealHP<Level>>::value, "RealHP problem here, please file a bug report.");
+		constexpr bool isPythonPrecisionEnough = std::is_same<double, R>::value or std::is_same<float, R>::value;
 		if (isPythonPrecisionEnough) {
-			return ::yade::math::toString(num);
+			return ::yade::math::toStringHP(num);
 		} else {
-			// The only way to make sure that it is copy-pasteable without loss of precision is to put it inside "…"
-			return "\"" + ::yade::math::toString(num) + "\"";
+			// The only way to make sure that it is copy-pasteable to/from python without loss of precision is to put the numbers inside "…"
+			return "\"" + ::yade::math::toStringHP(num) + "\"";
 		}
 	}
 
-	inline std::string numToString(const ::yade::Complex& num)
+	template <typename Cc, typename boost::enable_if<boost::is_complex<Cc>, int>::type = 0, int Level = ::yade::math::levelOfComplexHP<Cc>>
+	inline std::string numToStringHP(const Cc& num)
 	{
-		constexpr bool isPythonPrecisionEnough
-		        = std::is_same<double, ::yade::Complex::value_type>::value or std::is_same<float, ::yade::Complex::value_type>::value;
-		std::string ret;
+		using C = typename std::decay<Cc>::type;
+		using R = typename C::value_type;
+		static_assert(std::is_same<C, ::yade::ComplexHP<Level>>::value, "ComplexHP problem here, please file a bug report.");
+		constexpr bool isPythonPrecisionEnough = std::is_same<double, R>::value or std::is_same<float, R>::value;
+		std::string    ret;
 		if (num.real() != 0 && num.imag() != 0) {
 			if (isPythonPrecisionEnough) {
 				// don't add "+" in the middle if imag is negative and will start with "-"
-				return numToString(num.real()) + (num.imag() > 0 ? "+" : "") + numToString(num.imag()) + "j";
+				return numToStringHP(num.real()) + (num.imag() > 0 ? "+" : "") + numToStringHP(num.imag()) + "j";
 			} else {
 				// make sure it is copy-pasteable without loss of precision
-				return "mpc(" + numToString(num.real()) + "," + numToString(num.imag()) + ")";
+				return "mpc(" + numToStringHP(num.real()) + "," + numToStringHP(num.imag()) + ")";
 			}
 		}
-		// only imaginary is non-zero: skip the real part, and decrease padding to accomoadate the trailing "j"
+		// only imaginary is non-zero: skip the real part
 		if (num.imag() != 0) {
 			if (isPythonPrecisionEnough) {
-				return numToString(num.imag()) + "j";
+				return numToStringHP(num.imag()) + "j";
 			} else {
-				return "mpc(\"0\"," + numToString(num.imag()) + ")";
+				return "mpc(\"0\"," + numToStringHP(num.imag()) + ")";
 			}
 		}
 		if (isPythonPrecisionEnough) {
-			return numToString(num.real());
+			return numToStringHP(num.real());
 		} else {
-			return "mpc(" + numToString(num.real()) + ",\"0\")";
+			return "mpc(" + numToStringHP(num.real()) + ",\"0\")";
 		}
 	}
 
-}
-}
+	inline std::string numToStringHP(const int& num) { return ::boost::lexical_cast<::std::string>(num); } // ignore padding for now.
+
+} // namespace minieigenHP
+} // namespace yade
 
 #endif
