@@ -21,27 +21,27 @@ using namespace ::yade::MathEigenTypes;
 
 // half of minieigen/expose-vectors.cpp
 #include <py/high-precision/minieigen/visitors.hpp>
-void expose_vectors2()
+template <int N> void expose_vectors2()
 {
-	py::class_<Vector3r>(
+	py::class_<Vector3rHP<N>>(
 	        "Vector3",
 	        "3-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
 	        "``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit "
 	        "conversion from sequence (list, tuple, ...) of 3 floats.\n\nStatic attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``, ``UnitZ``.",
 	        py::init<>())
-	        .def(VectorVisitor<Vector3r>());
+	        .def(VectorVisitor<Vector3rHP<N>>());
 #ifndef EIGEN_DONT_ALIGN
-	py::class_<Vector3ra>(
+	py::class_<Vector3raHP<N>>(
 	        "Vector3a",
 	        "3-dimensional float vector; same as :obj:`Vector3`, but with alignment (``Eigen::AlignedVector3``).\n\nSupported operations (``f`` if a "
 	        "float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, "
 	        "``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion from sequence (list, tuple, ...) of 3 floats.\n\nStatic "
 	        "attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``, ``UnitZ``.",
 	        py::init<>())
-	        .def(VectorVisitor<Vector3ra>());
+	        .def(VectorVisitor<Vector3raHP<N>>());
 #endif
 
-	py::class_<Vector3i>(
+	py::class_<Vector3i>( // the integer ones are the same in all module scopes: HP1…HPn. It's to allow changing of module scopes without surprises.
 	        "Vector3i",
 	        "3-dimensional integer vector.\n\nSupported operations (``i`` if an int, ``v`` is a Vector3i): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
 	        "``v*i``, ``i*v``, ``v*=i``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence  (list, tuple, ...) of 3 integers.\n\nStatic attributes: "
@@ -49,13 +49,13 @@ void expose_vectors2()
 	        py::init<>())
 	        .def(VectorVisitor<Vector3i>());
 
-	py::class_<Vector2r>(
+	py::class_<Vector2rHP<N>>(
 	        "Vector2",
 	        "3-dimensional float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
 	        "``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of 2 "
 	        "floats.\n\nStatic attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``.",
 	        py::init<>())
-	        .def(VectorVisitor<Vector2r>());
+	        .def(VectorVisitor<Vector2rHP<N>>());
 	py::class_<Vector2i>(
 	        "Vector2i",
 	        "2-dimensional integer vector.\n\nSupported operations (``i`` if an int, ``v`` is a Vector2i): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, "
@@ -64,6 +64,9 @@ void expose_vectors2()
 	        py::init<>())
 	        .def(VectorVisitor<Vector2i>());
 }
+
+// explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
+YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_vectors2)
 
 #ifdef UNDEF_EIGEN_DONT_ALIGN
 #undef EIGEN_DONT_ALIGN

@@ -14,11 +14,15 @@ using namespace ::yade::MathEigenTypes;
 #define _COMPLEX_SUPPORT
 // half of minieigen/expose-complex.cpp file
 #include <py/high-precision/minieigen/visitors.hpp>
-void expose_complex2()
+template <int N> void expose_complex2()
 {
 #ifdef _COMPLEX_SUPPORT
-	py::class_<Matrix3cr>("Matrix3c", "/*TODO*/", py::init<>()).def(MatrixVisitor<Matrix3cr>());
-	py::class_<Matrix6cr>("Matrix6c", "/*TODO*/", py::init<>()).def(MatrixVisitor<Matrix6cr>());
-	py::class_<MatrixXcr>("MatrixXc", "/*TODO*/", py::init<>()).def(MatrixVisitor<MatrixXcr>());
+	py::class_<Matrix3crHP<N>>("Matrix3c", "/*TODO*/", py::init<>()).def(MatrixVisitor<Matrix3crHP<N>>());
+	py::class_<Matrix6crHP<N>>("Matrix6c", "/*TODO*/", py::init<>()).def(MatrixVisitor<Matrix6crHP<N>>());
+	py::class_<MatrixXcrHP<N>>("MatrixXc", "/*TODO*/", py::init<>()).def(MatrixVisitor<MatrixXcrHP<N>>());
 #endif
 }
+
+// explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
+YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_complex2)
+

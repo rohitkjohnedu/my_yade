@@ -12,11 +12,15 @@
 using namespace ::yade::MathEigenTypes;
 // file minieigen/expose-boxes.cpp
 #include <py/high-precision/minieigen/visitors.hpp>
-void expose_boxes()
+template <int N> void expose_boxes()
 {
-	py::class_<AlignedBox3r>("AlignedBox3", "Axis-aligned box object, defined by its minimum and maximum corners", py::init<>())
-	        .def(AabbVisitor<AlignedBox3r>());
+	py::class_<AlignedBox3rHP<N>>("AlignedBox3", "Axis-aligned box object, defined by its minimum and maximum corners", py::init<>())
+	        .def(AabbVisitor<AlignedBox3rHP<N>>());
 
-	py::class_<AlignedBox2r>("AlignedBox2", "Axis-aligned box object in 2d, defined by its minimum and maximum corners", py::init<>())
-	        .def(AabbVisitor<AlignedBox2r>());
+	py::class_<AlignedBox2rHP<N>>("AlignedBox2", "Axis-aligned box object in 2d, defined by its minimum and maximum corners", py::init<>())
+	        .def(AabbVisitor<AlignedBox2rHP<N>>());
 }
+
+// explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
+YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_boxes)
+

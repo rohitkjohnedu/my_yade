@@ -14,30 +14,34 @@ using namespace ::yade::MathEigenTypes;
 #define _COMPLEX_SUPPORT
 // file minieigen/expose-converters.cpp
 #include <py/high-precision/minieigen/converters.hpp>
-void expose_converters()
+template <int N> void expose_converters()
 {
-	custom_VectorAnyAny_from_sequence<VectorXr>();
-	custom_VectorAnyAny_from_sequence<Vector6r>();
+	custom_VectorAnyAny_from_sequence<VectorXrHP<N>>();
+	custom_VectorAnyAny_from_sequence<Vector6rHP<N>>();
 	custom_VectorAnyAny_from_sequence<Vector6i>();
-	custom_VectorAnyAny_from_sequence<Vector3r>();
+	custom_VectorAnyAny_from_sequence<Vector3rHP<N>>();
 	custom_VectorAnyAny_from_sequence<Vector3i>();
-	custom_VectorAnyAny_from_sequence<Vector2r>();
+	custom_VectorAnyAny_from_sequence<Vector2rHP<N>>();
 	custom_VectorAnyAny_from_sequence<Vector2i>();
-	custom_alignedBoxNr_from_seq<2>();
-	custom_alignedBoxNr_from_seq<3>();
-	custom_Quaternionr_from_axisAngle_or_angleAxis();
+	custom_alignedBoxNr_from_seq<N, 2>();
+	custom_alignedBoxNr_from_seq<N, 3>();
+	custom_Quaternionr_from_axisAngle_or_angleAxis<N>();
 
-	custom_MatrixAnyAny_from_sequence<Matrix3r>();
-	custom_MatrixAnyAny_from_sequence<Matrix6r>();
-	custom_MatrixAnyAny_from_sequence<MatrixXr>();
+	custom_MatrixAnyAny_from_sequence<Matrix3rHP<N>>();
+	custom_MatrixAnyAny_from_sequence<Matrix6rHP<N>>();
+	custom_MatrixAnyAny_from_sequence<MatrixXrHP<N>>();
 
 #ifdef _COMPLEX_SUPPORT
-	custom_VectorAnyAny_from_sequence<Vector2cr>();
-	custom_VectorAnyAny_from_sequence<Vector3cr>();
-	custom_VectorAnyAny_from_sequence<Vector6cr>();
-	custom_VectorAnyAny_from_sequence<VectorXcr>();
-	custom_MatrixAnyAny_from_sequence<Matrix3cr>();
-	custom_MatrixAnyAny_from_sequence<Matrix6cr>();
-	custom_MatrixAnyAny_from_sequence<MatrixXcr>();
+	custom_VectorAnyAny_from_sequence<Vector2crHP<N>>();
+	custom_VectorAnyAny_from_sequence<Vector3crHP<N>>();
+	custom_VectorAnyAny_from_sequence<Vector6crHP<N>>();
+	custom_VectorAnyAny_from_sequence<VectorXcrHP<N>>();
+	custom_MatrixAnyAny_from_sequence<Matrix3crHP<N>>();
+	custom_MatrixAnyAny_from_sequence<Matrix6crHP<N>>();
+	custom_MatrixAnyAny_from_sequence<MatrixXcrHP<N>>();
 #endif
 }
+
+// explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
+YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_converters)
+

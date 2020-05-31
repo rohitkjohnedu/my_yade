@@ -12,9 +12,9 @@
 using namespace ::yade::MathEigenTypes;
 // file minieigen/expose-quaternion.cpp
 #include <py/high-precision/minieigen/visitors.hpp>
-void expose_quaternion()
+template <int N> void expose_quaternion()
 {
-	py::class_<Quaternionr>(
+	py::class_<QuaternionrHP<N>>(
 	        "Quaternion",
 	        "Quaternion representing rotation.\n\nSupported operations (``q`` is a Quaternion, ``v`` is a Vector3): ``q*q`` (rotation composition), "
 	        "``q*=q``, ``q*v`` (rotating ``v`` by ``q``), ``q==q``, ``q!=q``.\n\nStatic attributes: ``Identity``.\n\n.. note:: Quaternion is represented "
@@ -22,5 +22,9 @@ void expose_quaternion()
 	        "This is however different from the data stored inside, which can be accessed by indices ``[0]`` (:math:`x`), ``[1]`` (:math:`y`), ``[2]`` "
 	        "(:math:`z`), ``[3]`` (:math:`w`). To obtain axis-angle programatically, use :obj:`Quaternion.toAxisAngle` which returns the tuple.",
 	        py::init<>())
-	        .def(QuaternionVisitor<Quaternionr>());
+	        .def(QuaternionVisitor<QuaternionrHP<N>>());
 }
+
+// explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
+YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_quaternion)
+
