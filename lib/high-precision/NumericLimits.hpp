@@ -17,8 +17,9 @@
 #endif
 
 namespace std {
-template <> struct numeric_limits<::yade::math::ThinRealWrapper<::yade::math::UnderlyingReal>> {
-	using UnderlyingReal                           = ::yade::math::UnderlyingReal;
+// FIXME - kolejne miejsce po RealHP, gedzie to założenie `wrap long double` wyłazi na wierzch.
+template <> struct numeric_limits<::yade::math::ThinRealWrapper<long double>> {
+	using UnderlyingReal                           = long double;
 	using ThinWrapper                              = ::yade::math::ThinRealWrapper<UnderlyingReal>;
 	constexpr static const auto& is_specialized    = std::numeric_limits<UnderlyingReal>::is_specialized;
 	constexpr static const auto& is_signed         = std::numeric_limits<UnderlyingReal>::is_signed;
@@ -56,7 +57,7 @@ template <> struct numeric_limits<::yade::math::ThinRealWrapper<::yade::math::Un
 	// constexpr static const auto& float_denorm_style= std::numeric_limits<UnderlyingReal>::float_denorm_style;
 };
 
-template <> struct is_floating_point<::yade::math::ThinRealWrapper<::yade::math::UnderlyingReal>> : std::true_type {
+template <> struct is_floating_point<::yade::math::ThinRealWrapper<long double>> : std::true_type {
 };
 
 }
