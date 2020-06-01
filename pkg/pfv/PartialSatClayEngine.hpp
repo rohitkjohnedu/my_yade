@@ -76,6 +76,8 @@ public:
 	{
 		initialPorosity   = 1.0;
 		initialSaturation = 0.01;
+		oldPressure       = 0;
+		crackArea         = 0;
 		saturation        = 0.01;
 		porosity          = 1;
 		dsdp              = 0;

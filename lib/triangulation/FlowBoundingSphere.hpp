@@ -29,6 +29,7 @@ namespace CGT {
 		//painfull, but we need that for templates inheritance...
 		using _N::boundaries;
 		using _N::boundingCells;
+		using _N::alphaBoundingCells;
 		using _N::boundsIds;
 		using _N::conductionBoundingCells;
 		using _N::cornerMax;

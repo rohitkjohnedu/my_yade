@@ -20,10 +20,10 @@ YADE_PLUGIN((PartialSatClayEngine));
 
 PartialSatClayEngine::~PartialSatClayEngine() {}
 
-
+// clang-format off
 void PartialSatClayEngine::action()
 {
-	//if (debug) cout << "Entering partialSatEngineAction "<<endl;
+	if (debug) cout << "Entering partialSatEngineAction "<<endl;
 	if (partialSatDT != 0)
 		timeStepControl();
 
@@ -41,11 +41,6 @@ void PartialSatClayEngine::action()
 		addAlphaToPositionsBuffer(true);
 	timingDeltas->checkpoint("Position buffer");
 	if (first) {
-		// FOREACH(const shared_ptr<Engine> e, Omega::instance().getScene()->engines) {
-		// 	if (e->getClassName() == "PartialSatClayEngine") {
-		// 		clayFlow = dynamic_cast<PartialSatClayEngineT*>(e.get());
-		// 	}
-		// }
 		if (debug)
 			cout << "about to build triangulation" << endl;
 		if (multithread)
@@ -95,13 +90,10 @@ void PartialSatClayEngine::action()
 			setOriginalParticleValues();
 			resetOriginalParticleValues = false;
 		}
-		if (forceConfinement)
-			simulateConfinement();
+		if (forceConfinement) simulateConfinement();
 		//initializeSaturations(*solver);
-		if (!resetVolumeSolids)
-			updatePorosity(*solver);
-		else
-			resetPoresVolumeSolids(*solver);
+		if (!resetVolumeSolids) updatePorosity(*solver);
+		else resetPoresVolumeSolids(*solver);
 
 		// if (resetPorosity) { // incase we want to reach a certain state and then set porosity again...chicken and egg problem
 		//         resetVolumeSolids=true;
@@ -111,56 +103,45 @@ void PartialSatClayEngine::action()
 		//                 setPorosityWithImageryGrid(imageryFilePath, *solver);
 		//         }
 		// }
-		if (useKeq)
-			computeEquivalentBulkModuli(*solver);
+		if (useKeq) computeEquivalentBulkModuli(*solver);
 	}
 	timingDeltas->checkpoint("Update_Volumes");
 
 	epsVolCumulative += epsVolMax;
-	if (partialSatDT == 0)
-		retriangulationLastIter++;
-	if (!updateTriangulation)
-		updateTriangulation = // If not already set true by another function of by the user, check conditions
+	if (partialSatDT == 0) retriangulationLastIter++;
+	if (!updateTriangulation) updateTriangulation = // If not already set true by another function of by the user, check conditions
 		        (defTolerance > 0 && epsVolCumulative > defTolerance) || (meshUpdateInterval > 0 && retriangulationLastIter > meshUpdateInterval);
 
 	// remesh everytime a bond break occurs (for DFNFlow-JCFPM coupling)
-	if (breakControlledRemesh)
-		remeshForFreshlyBrokenBonds();
+	if (breakControlledRemesh) remeshForFreshlyBrokenBonds();
 
 	///compute flow and and forces here
 	if (pressureForce) {
 #ifdef LINSOLV
 		permUpdateIters++;
-		if (fixTriUpdatePermInt > 0 && permUpdateIters >= fixTriUpdatePermInt)
-			updateLinearSystem(*solver);
+		if (fixTriUpdatePermInt > 0 && permUpdateIters >= fixTriUpdatePermInt) updateLinearSystem(*solver);
 #endif
-		if (partialSatEngine)
-			setCellsDSDP(*solver);
+		if (partialSatEngine) setCellsDSDP(*solver);
 		solver->gaussSeidel(partialSatDT == 0 ? scene->dt : solverDT);
 		timingDeltas->checkpoint("Factorize + Solve");
 		if (partialSatEngine) {
 			//initializeSaturations(*solver);
-			if (!freezeSaturation)
-				updateSaturation(*solver);
-			if (debug)
-				cout << "finished initializing saturations" << endl;
+			if (!freezeSaturation) updateSaturation(*solver);
+			if (debug) cout << "finished initializing saturations" << endl;
 		}
-		if (!decoupleForces)
-			solver->computeFacetForcesWithCache();
+		if (!decoupleForces) solver->computeFacetForcesWithCache();
+		if (debug) cout << "finished computing facet forces" << endl;
 	}
 	if (particleSwelling and (retriangulationLastIter == 1 or partialSatDT != 0)) {
-		if (suction)
-			if (fracBasedPointSuctionCalc)
-				computeVertexSphericalArea();
-		collectParticleSuction(*solver);
-		if (swelling)
-			swellParticles();
+		if (suction) {
+			if (fracBasedPointSuctionCalc) computeVertexSphericalArea();
+			collectParticleSuction(*solver);
+		}
+		if (swelling) swellParticles();
 	}
-	if (debug)
-		cout << "finished collecting suction and swelling " << endl;
+	if (debug) cout << "finished collecting suction and swelling " << endl;
 	//if (freeSwelling && crackModelActive) determineFracturePaths();
-	if (brokenBondsRemoveCapillaryforces)
-		removeForcesOnBrokenBonds();
+	if (brokenBondsRemoveCapillaryforces) removeForcesOnBrokenBonds();
 	timingDeltas->checkpoint("compute_Forces");
 	///Application of vicscous forces
 	scene->forces.sync();
@@ -168,14 +149,11 @@ void PartialSatClayEngine::action()
 	//if (!decoupleForces) computeViscousForces ( *solver );
 	timingDeltas->checkpoint("viscous forces");
 	if (!decoupleForces) {
-		if (partialSatDT != 0)
-			addPermanentForces(*solver);
-		else
-			applyForces(*solver);
+		if (partialSatDT != 0) addPermanentForces(*solver);
+		else applyForces(*solver);
 	}
 	timingDeltas->checkpoint("Applying Forces");
-	if (debug)
-		cout << "finished computing forces and applying" << endl;
+	if (debug) cout << "finished computing forces and applying" << endl;
 ///End compute flow and forces
 #ifdef LINSOLV
 	int sleeping = 0;
@@ -187,8 +165,7 @@ void PartialSatClayEngine::action()
 		if (debug && sleeping)
 			cerr << "sleeping..." << sleeping << endl;
 		if (updateTriangulation || ((meshUpdateInterval > 0 && ellapsedIter > (0.5 * meshUpdateInterval)) && backgroundCompleted)) {
-			if (debug)
-				cerr << "switch flow solver" << endl;
+			if (debug) cerr << "switch flow solver" << endl;
 			if (useSolver == 0)
 				LOG_ERROR("background calculations not available for Gauss-Seidel");
 			if (!fluxChanged) {
@@ -221,25 +198,25 @@ void PartialSatClayEngine::action()
 			ellapsedIter            = 0;
 			boost::thread workerThread(&PartialSatClayEngine::backgroundAction, this);
 			workerThread.detach();
-			if (debug)
-				cerr << "backgrounded" << endl;
+			if (debug) cerr << "backgrounded" << endl;
 			initializeVolumes(*solver);
 			//computeViscousForces(*solver);
-			if (debug)
-				cerr << "volumes initialized" << endl;
+			if (debug) cerr << "volumes initialized" << endl;
 		} else {
-			if (debug && !backgroundCompleted)
-				cerr << "still computing solver in the background, ellapsedIter=" << ellapsedIter << endl;
+			if (debug && !backgroundCompleted) cerr << "still computing solver in the background, ellapsedIter=" << ellapsedIter << endl;
 			ellapsedIter++;
 		}
 	} else
 #endif
 	{
 		if (updateTriangulation && !first) {
+			if (debug) cout << "building tri" <<endl;
 			buildTriangulation(pZero, *solver);
-			if (alphaBound >= 0)
-				addAlphaToPositionsBuffer(true);
+			if (debug) cout << "adding alpha to posbuf" <<endl;
+			if (alphaBound >= 0) addAlphaToPositionsBuffer(true);
+			if (debug) cout << "initializing volumes" <<endl;
 			initializeVolumes(*solver);
+			if (debug) cout << "out of init volumes" <<endl;
 			//resetVolumeSolids=true; //sets new vSolid and (invVoidVolume factored by porosity)
 			//computeViscousForces(*solver);
 			updateTriangulation     = false;
@@ -450,6 +427,7 @@ void PartialSatClayEngine::setPorosityWithImageryGrid(string imageryFilePath, Fl
 	const long size = Tes.cellHandles.size();
 #pragma omp parallel for
 	for (long i = 0; i < size; i++) {
+		if (cell->info().Pcondition) continue;
 		CellHandle& cell      = Tes.cellHandles[i];
 		Real        finalDist = 1000;
 		Real        finalPoro = 0;
@@ -478,8 +456,7 @@ void PartialSatClayEngine::setPorosityWithImageryGrid(string imageryFilePath, Fl
 
 		cell->info().vSolids = cell->info().volume() * (1. - cell->info().porosity);
 		if (!resetVolumeSolids) {
-			cell->info().Po = Po
-			        * exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
+			cell->info().Po = Po * exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
 			cell->info().lambdao = lmbda * exp(b * (meanInitialPorosity - cell->info().porosity));
 		}
 	}
@@ -787,10 +764,11 @@ void PartialSatClayEngine::collectParticleSuction(FlowSolver& flow)
 	for (long i = 0; i < size; i++) {
 		CellHandle& cell = Tes.cellHandles[i];
 
-		if (cell->info().isGhost || cell->info().blocked) //|| cell->info().Pcondition || cell->info().isFictious || cell->info().isAlpha
+		if (cell->info().isGhost || cell->info().blocked || cell->info().isAlpha) //|| cell->info().Pcondition || cell->info().isFictious || cell->info().isAlpha
 			continue; // Do we need special cases for fictious cells? May need to consider boundary contriubtion to node saturation...
 		for (int v = 0; v < 4; v++) {
 			//if (cell->vertex(v)->info().isFictious) continue;
+			if (cell->vertex(v)->info().isAlpha) continue; // avoid adding alpha vertex to suction?
 			const long int          id = cell->vertex(v)->info().id();
 			const shared_ptr<Body>& b  = (*bodies)[id];
 			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
@@ -837,10 +815,8 @@ void PartialSatClayEngine::swellParticles()
 #pragma omp parallel for
 	for (long i = 0; i < size; i++) {
 		const shared_ptr<Body>& b = (*bodies)[i];
-		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
-			continue;
-		if (!b->isStandalone())
-			continue;
+		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b) continue;
+		if (!b->isStandalone()) continue;
 		Sphere* sphere = dynamic_cast<Sphere*>(b->shape.get());
 		//const Real volume = 4./3. * M_PI*pow(sphere->radius,3);
 		PartialSatState* state = dynamic_cast<PartialSatState*>(b->state.get());
@@ -866,7 +842,7 @@ void PartialSatClayEngine::swellParticles()
 
 //////// Post processing tools //////
 
-void PartialSatClayEngine::saveFractureNetworkVTK(string fileName)
+void PartialSatClayEngine::saveFractureNetworkVTK(string fileName) // Superceded by savePermeabilityNetworkVTK
 {
 	vtkSmartPointer<vtkPoints>    intrCellPos = vtkSmartPointer<vtkPoints>::New();
 	vtkSmartPointer<vtkCellArray> fracCells   = vtkSmartPointer<vtkCellArray>::New();
@@ -1172,37 +1148,32 @@ void PartialSatClayEngine::initSolver(FlowSolver& flow)
 void PartialSatClayEngine::buildTriangulation(Real pZero, Solver& flow)
 {
 	//cout << "retriangulation" << endl;
-	if (first)
-		flow.currentTes = 0;
+	if (first) flow.currentTes = 0;
 	else {
 		flow.currentTes = !flow.currentTes;
-		if (debug)
-			cout << "--------RETRIANGULATION-----------" << endl;
+		if (debug) cout << "--------RETRIANGULATION-----------" << endl;
 	}
-	if (debug)
-		cout << "about to reset network" << endl;
+	if (debug) cout << "about to reset network" << endl;
 	flow.resetNetwork();
 	initSolver(flow);
-	if (alphaBound < 0)
-		addBoundary(flow);
-	if (debug)
-		cout << "about to add triangulate" << endl;
+	if (alphaBound < 0) addBoundary(flow);
+	else flow.alphaBoundingCells.clear();
+	if (debug) cout << "about to add triangulate" << endl;
 	//   std::cout << "About to triangulate, push button...";
 	//   std::cin.get();
 	triangulate(flow);
 	//    std::cout << "just triangulated, size" << sizeof(flow.tesselation().Triangulation()) << " push button..." << endl;
 	//    std::cin.get();
-	if (debug)
-		cout << endl << "Tesselating------" << endl << endl;
+	if (debug) cout << endl << "Tesselating------" << endl << endl;
 	flow.tesselation().compute();
-	if (alphaBound < 0)
-		flow.defineFictiousCells();
+	if (alphaBound < 0) flow.defineFictiousCells();
 	// For faster loops on cells define this vector
 	flow.tesselation().cellHandles.clear();
 	flow.tesselation().cellHandles.reserve(flow.tesselation().Triangulation().number_of_finite_cells());
 	FiniteCellsIterator cell_end = flow.tesselation().Triangulation().finite_cells_end();
-	int                 k        = 0;
+	int k = 0;
 	for (FiniteCellsIterator cell = flow.tesselation().Triangulation().finite_cells_begin(); cell != cell_end; cell++) {
+		if (cell->info().isAlpha) continue; // do we want alpha cells in the general cell handle list?
 		flow.tesselation().cellHandles.push_back(cell);
 		cell->info().id = k++;
 	} //define unique numbering now, corresponds to position in cellHandles
@@ -1233,10 +1204,8 @@ void PartialSatClayEngine::buildTriangulation(Real pZero, Solver& flow)
 		                         //	if (crackModelActive) trickPermeability(&flow);
 	porosity = flow.vPoralPorosity / flow.vTotalPorosity;
 
-	if (alphaBound < 0)
-		boundaryConditions(flow);
-	if (debug)
-		cout << "about to initialize pressure" << endl;
+	if (alphaBound < 0) boundaryConditions(flow);
+	if (debug) cout << "about to initialize pressure" << endl;
 	flow.initializePressure(pZero);
 
 	if (thermalEngine) {
@@ -1246,15 +1215,13 @@ void PartialSatClayEngine::buildTriangulation(Real pZero, Solver& flow)
 		flow.sphericalVertexAreaCalculated = false;
 	}
 
-	if (debug)
-		cout << "about to interpolate" << endl;
+	if (debug) cout << "about to interpolate" << endl;
 	if (!first && !multithread && (useSolver == 0 || fluidBulkModulus > 0 || doInterpolate || thermalEngine || partialSatEngine)) {
 		flow.interpolate(flow.T[!flow.currentTes], flow.tesselation());
 
 		//if (mineralPoro>0) blockLowPoroRegions(*solver);
 	}
-	if (debug)
-		cout << "made it out of interpolate" << endl;
+	if (debug) cout << "made it out of interpolate" << endl;
 	flow.computePermeability();
 	//if (crackCellPoroThreshold>0) trickPermOnCrackedCells(*solver);
 	if (crackModelActive)
@@ -1285,9 +1252,10 @@ void PartialSatClayEngine::initializeVolumes(FlowSolver& flow)
 	CGT::CVector           Zero(0, 0, 0);
 	for (FiniteVerticesIterator V_it = flow.tesselation().Triangulation().finite_vertices_begin(); V_it != vertices_end; V_it++)
 		V_it->info().forces = Zero;
-
+	//cout << "in initialize volumes, after force reset" <<endl;
 	FOREACH(CellHandle & cell, flow.tesselation().cellHandles)
 	{
+		//if (cell->info().isAlpha) continue; // not concerned about volumes for alpha cells?
 		switch (cell->info().fictious()) {
 			case (0): cell->info().volume() = volumeCell(cell); break;
 			case (1): cell->info().volume() = volumeCellSingleFictious(cell); break;
@@ -1295,29 +1263,29 @@ void PartialSatClayEngine::initializeVolumes(FlowSolver& flow)
 			case (3): cell->info().volume() = volumeCellTripleFictious(cell); break;
 			default: break;
 		}
+		//cout << "made it past the volume calc" <<endl;
 		if (flow.fluidBulkModulus > 0 || thermalEngine || iniVoidVolumes) {
 			cell->info().invVoidVolume() = 1 / (std::abs(cell->info().volume()) - volumeCorrection * flow.volumeSolidPore(cell));
 		} else if (partialSatEngine) {
-			if (cell->info().volume() <= 0)
+			if (cell->info().volume() <= 0 and cell->info().isAlpha and debug)
 				cerr << "cell volume zero, bound to be issues" << endl;
-			//cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
-			cell->info().invVoidVolume() = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
-			if (cell->info().invVoidVolume() == 1. / minCellVol) {
-				cell->info().blocked = 1;
-				cout << "using minCellVolume, blocking cell" << endl;
-			}
+			cell->info().invVoidVolume() = 1 / std::abs(cell->info().volume());
+			//cell->info().invVoidVolume() = 1. / std::max(minCellVol, math::abs(cell->info().volume())); // - flow.volumeSolidPore(cell)));
+			//if (cell->info().invVoidVolume() == 1. / minCellVol) {
+			//	cell->info().blocked = 1;
+			//	cout << "using minCellVolume, blocking cell" << endl;
+			//}
 		}
+		//cout << "made it past the invvoidvolume assignment" <<endl;
 		if (!cell->info().isAlpha and !cell->info().isFictious)
 			totalSpecimenVolume += cell->info().volume();
 	}
-	if (debug)
-		cout << "Volumes initialised." << endl;
+	if (debug) cout << "Volumes initialised." << endl;
 }
 
 void PartialSatClayEngine::updateVolumes(FlowSolver& flow)
 {
-	if (debug)
-		cout << "Updating volumes.............." << endl;
+	if (debug) cout << "Updating volumes.............." << endl;
 	Real invDeltaT      = 1 / (partialSatDT == 0 ? scene->dt : solverDT);
 	epsVolMax           = 0;
 	Real totVol         = 0;
@@ -1333,6 +1301,7 @@ void PartialSatClayEngine::updateVolumes(FlowSolver& flow)
 	{
 #endif
 		Real newVol, dVol;
+		//if (cell->info().isAlpha) continue; // dont care about volumes of alpha cells?
 		switch (cell->info().fictious()) {
 			case (3): newVol = volumeCellTripleFictious(cell); break;
 			case (2): newVol = volumeCellDoubleFictious(cell); break;
@@ -1341,12 +1310,10 @@ void PartialSatClayEngine::updateVolumes(FlowSolver& flow)
 			default: newVol = 0; break;
 		}
 		dVol = cell->info().volumeSign * (newVol - cell->info().volume());
-		if (!thermalEngine)
-			cell->info().dv() = dVol * invDeltaT;
-		else
-			cell->info().dv() += dVol * invDeltaT; // thermalEngine resets dv() to zero and starts adding to it before this.
+		if (!thermalEngine) cell->info().dv() = dVol * invDeltaT;
+		else cell->info().dv() += dVol * invDeltaT; // thermalEngine resets dv() to zero and starts adding to it before this.
 		cell->info().volume() = newVol;
-		if (!cell->info().isFictious)
+		if (!cell->info().isFictious and !cell->info().isAlpha)
 			totalSpecimenVolume += newVol;
 		if (defTolerance > 0) { //if the criterion is not used, then we skip these updates a save a LOT of time when Nthreads > 1
 #pragma omp atomic
@@ -1355,150 +1322,17 @@ void PartialSatClayEngine::updateVolumes(FlowSolver& flow)
 			totDVol += dVol;
 		}
 	}
-	if (defTolerance > 0)
-		epsVolMax = totDVol / totVol;
+	if (defTolerance > 0) epsVolMax = totDVol / totVol;
 	//FIXME: move this loop to FlowBoundingSphere
 	for (unsigned int n = 0; n < flow.imposedF.size(); n++) {
 		flow.IFCells[n]->info().dv() += flow.imposedF[n].second;
 		flow.IFCells[n]->info().Pcondition = false;
 	}
-	if (debug)
-		cout << "Updated volumes, total =" << totVol << ", dVol=" << totDVol << endl;
+	if (debug) cout << "Updated volumes, total =" << totVol << ", dVol=" << totDVol << endl;
 }
 
 
 /////// Discrete Fracture Network Functionality ////////
-
-
-void PartialSatClayEngine::interpolateCrack(Tesselation& Tes, Tesselation& NewTes)
-{
-	RTriangulation& Tri = Tes.Triangulation();
-//RTriangulation& newTri = NewTes.Triangulation();
-//FiniteCellsIterator cellEnd = newTri.finite_cells_end();
-#ifdef YADE_OPENMP
-	const long size = NewTes.cellHandles.size();
-#pragma omp parallel for num_threads(ompThreads > 0 ? ompThreads : 1)
-	for (long i = 0; i < size; i++) {
-		CellHandle& newCell = NewTes.cellHandles[i];
-#else
-	FOREACH(CellHandle & newCell, NewTes.cellHandles)
-	{
-#endif
-		if (newCell->info().isGhost or newCell->info().isAlpha)
-			continue;
-		CVector center(0, 0, 0);
-		if (newCell->info().fictious() == 0)
-			for (int k = 0; k < 4; k++)
-				center = center + 0.25 * (Tes.vertex(newCell->vertex(k)->info().id())->point().point() - CGAL::ORIGIN);
-		else {
-			Real boundPos = 0;
-			int  coord    = 0;
-			for (int k = 0; k < 4; k++) {
-				if (!newCell->vertex(k)->info().isFictious)
-					center = center
-					        + (1. / (4. - newCell->info().fictious()))
-					                * (Tes.vertex(newCell->vertex(k)->info().id())->point().point() - CGAL::ORIGIN);
-			}
-			for (int k = 0; k < 4; k++) {
-				if (newCell->vertex(k)->info().isFictious) {
-					coord    = solver->boundary(newCell->vertex(k)->info().id()).coordinate;
-					boundPos = solver->boundary(newCell->vertex(k)->info().id()).p[coord];
-					center   = CVector(
-                                                coord == 0 ? boundPos : center[0], coord == 1 ? boundPos : center[1], coord == 2 ? boundPos : center[2]);
-				}
-			}
-		}
-		CellHandle oldCell    = Tri.locate(CGT::Sphere(center[0], center[1], center[2]));
-		newCell->info().crack = oldCell->info().crack;
-		//		For later commit newCell->info().fractureTip = oldCell->info().fractureTip;
-		//		For later commit newCell->info().cellHalfWidth = oldCell->info().cellHalfWidth;
-
-		/// compute leakoff rate by summing the flow through facets abutting non-cracked neighbors
-		//		if (oldCell->info().crack && !oldCell->info().fictious()){
-		//			Real facetFlowRate=0;
-		//			facetFlowRate -= oldCell->info().dv();
-		//			for (int k=0; k<4;k++) {
-		//				if (!oldCell->neighbor(k)->info().crack){
-		//					facetFlowRate = oldCell->info().kNorm()[k]*(oldCell->info().shiftedP()-oldCell->neighbor(k)->info().shiftedP());
-		//					leakOffRate += facetFlowRate;
-		//				}
-		//			}
-		//		}
-	}
-}
-
-// void crackCellAbovePoroThreshold(CellHandle& cell)
-// {
-//         cell->info().crack = 1;
-//         for (int j=0; j<4; j++){
-//                 CellHandle& ncell = cell->neighbor(i);
-//                 Real fracturePerm = apertureFactor*pow(residualAperture,3.)/(12.*viscosity);
-//                  //nCell->info().crack=1;
-//                 cell->info().kNorm()[i] += fracturePerm; //
-//                 nCell->info().kNorm()[Tri.mirror_index(cell,i)] += fracturePerm;
-//         }
-// }
-
-// void PartialSatClayEngine::trickPermOnCrackedCells(FlowSolver& flow)
-// {
-//         Tesselation& Tes = flow.T[flow.currentTes];
-//         //	#ifdef YADE_OPENMP
-//         const long size = Tes.cellHandles.size();
-//         Real fracturePerm = apertureFactor*pow(residualAperture,3.)/(12.*viscosity);
-//         //#pragma omp parallel for
-//         //cout << "blocking low poro regions" << endl;
-//         for (long i=0; i<size; i++){
-//                 CellHandle& cell = Tes.cellHandles[i];
-//                 if ( cell->info().initiallyCracked ){
-//                         for (int j=0; j<4; j++){
-//                                 const CellHandle& nCell = cell->neighbor(j);
-//                                 if (!changeCrackSaturation or (changeCrackSaturation and cell->info().saturation>=SsM) or nCell->info().isFictious) {
-//                                         cell->info().kNorm()[j] = fracturePerm;
-//                                         nCell->info().kNorm()[Tes.Triangulation().mirror_index(cell,j)] = fracturePerm;
-//                                 } else { // block cracked cell if it isnt saturated
-//                                         cell->info().crack=1;
-//                                         nCell->info().crack=1;
-//                                         cell->info().blocked=1;
-//                                         nCell->info().blocked=1;
-//                                         cell->info().saturation=0;
-//                                         nCell->info().saturation=0;
-//                                 }
-//                         }
-//                 }
-//         }
-// }
-
-
-// void PartialSatClayEngine::crackCellsAbovePoroThreshold(FlowSolver& flow)
-// {
-//         Tesselation& Tes = flow.T[flow.currentTes];
-//         //	#ifdef YADE_OPENMP
-//         const long size = Tes.cellHandles.size();
-//         //#pragma omp parallel for
-//         //cout << "blocking low poro regions" << endl;
-//         for (long i=0; i<size; i++){
-//                 CellHandle& cell = Tes.cellHandles[i];
-//                 if ( ( first and cell->info().porosity > crackCellPoroThreshold ) or ( cell->info().initiallyCracked ) ){
-//                         cell->info().crack = true; cell->info().initiallyCracked = true;
-//                         Real fracturePerm = apertureFactor*pow(residualAperture,3.)/(12.*viscosity);
-//
-//                         for (int j=0; j<4; j++){
-//                                 const CellHandle& nCell = cell->neighbor(j);
-//                                 if (!changeCrackSaturation or (changeCrackSaturation and cell->info().saturation>=SsM) or nCell->info().isFictious) {
-//                                         cell->info().kNorm()[j] = fracturePerm;
-//                                         nCell->info().kNorm()[Tes.Triangulation().mirror_index(cell,j)] = fracturePerm;
-//                                 } else { // block cracked cell if it isnt saturated
-//                                         cell->info().crack=1;
-//                                         nCell->info().crack=1;
-//                                         cell->info().blocked=1;
-//                                         nCell->info().blocked=1;
-//                                         cell->info().saturation=0;
-//                                         nCell->info().saturation=0;
-//                                 }
-//                         }
-//                 }
-//         }
-// }
 
 void PartialSatClayEngine::blockCellsAbovePoroThreshold(FlowSolver& flow)
 {
@@ -1674,7 +1508,7 @@ void PartialSatClayEngine::computeFracturePerm(RTriangulation::Facet_circulator&
 	totalFractureArea += networkFractureArea;                                       /// Trying to get fracture's surface
 	// 	cout <<" ------------------ The total surface area up to here is --------------------" << totalFractureArea << endl;
 	// 	printFractureTotalArea = totalFractureArea; /// Trying to get fracture's surface
-	if (calcCrackArea and !cell1->info().isFictious) {
+	if (calcCrackArea and !cell1->info().isFictious and !cell1->info().isAlpha) {
 		CVector edge  = ed_it->first->vertex(ed_it->second)->point().point() - ed_it->first->vertex(ed_it->third)->point().point();
 		CVector unitV = edge * (1. / sqrt(edge.squared_length()));
 		Point   p3    = ed_it->first->vertex(ed_it->third)->point().point()
@@ -1724,7 +1558,7 @@ void PartialSatClayEngine::trickPermeability(Solver* flow)
 		const shared_ptr<Interaction>& interaction = interactions->find(vi1.id(), vi2.id());
 
 		if (interaction && interaction->isReal()) {
-			if (edge->first->info().isFictious)
+			if (edge->first->info().isFictious or edge->first->info().isAlpha)
 				continue; /// avoid trick permeability for fictitious
 
 			if (displacementBasedCracks) {
@@ -2091,7 +1925,7 @@ void PartialSatClayEngine::printPorosityToFile(string file)
 	myfile.close();
 }
 
-void PartialSatClayEngine::simulateConfinement()
+void PartialSatClayEngine::simulateConfinement() // TODO: needs to be updated for alpha boundary usage
 {
 	RTriangulation&                  Tri    = solver->T[solver->currentTes].Triangulation();
 	const shared_ptr<BodyContainer>& bodies = scene->bodies;
@@ -2123,7 +1957,7 @@ void PartialSatClayEngine::simulateConfinement()
 	forceConfinement = false;
 }
 
-void PartialSatClayEngine::computeVertexSphericalArea()
+void PartialSatClayEngine::computeVertexSphericalArea() // TODO: update for alpha boundary
 {
 	Tesselation& Tes = solver->T[solver->currentTes];
 	//	#ifdef YADE_OPENMP
@@ -2162,5 +1996,142 @@ void PartialSatClayEngine::computeVertexSphericalArea()
 	solver->sphericalVertexAreaCalculated = true;
 }
 
+
+
+/// UNUSED EXTRAS ////
+
+
+void PartialSatClayEngine::interpolateCrack(Tesselation& Tes, Tesselation& NewTes)
+{
+	RTriangulation& Tri = Tes.Triangulation();
+//RTriangulation& newTri = NewTes.Triangulation();
+//FiniteCellsIterator cellEnd = newTri.finite_cells_end();
+#ifdef YADE_OPENMP
+	const long size = NewTes.cellHandles.size();
+#pragma omp parallel for num_threads(ompThreads > 0 ? ompThreads : 1)
+	for (long i = 0; i < size; i++) {
+		CellHandle& newCell = NewTes.cellHandles[i];
+#else
+	FOREACH(CellHandle & newCell, NewTes.cellHandles)
+	{
+#endif
+		if (newCell->info().isGhost or newCell->info().isAlpha)
+			continue;
+		CVector center(0, 0, 0);
+		if (newCell->info().fictious() == 0)
+			for (int k = 0; k < 4; k++)
+				center = center + 0.25 * (Tes.vertex(newCell->vertex(k)->info().id())->point().point() - CGAL::ORIGIN);
+		else {
+			Real boundPos = 0;
+			int  coord    = 0;
+			for (int k = 0; k < 4; k++) {
+				if (!newCell->vertex(k)->info().isFictious)
+					center = center
+					        + (1. / (4. - newCell->info().fictious()))
+					                * (Tes.vertex(newCell->vertex(k)->info().id())->point().point() - CGAL::ORIGIN);
+			}
+			for (int k = 0; k < 4; k++) {
+				if (newCell->vertex(k)->info().isFictious) {
+					coord    = solver->boundary(newCell->vertex(k)->info().id()).coordinate;
+					boundPos = solver->boundary(newCell->vertex(k)->info().id()).p[coord];
+					center   = CVector(
+                                                coord == 0 ? boundPos : center[0], coord == 1 ? boundPos : center[1], coord == 2 ? boundPos : center[2]);
+				}
+			}
+		}
+		CellHandle oldCell    = Tri.locate(CGT::Sphere(center[0], center[1], center[2]));
+		newCell->info().crack = oldCell->info().crack;
+		//		For later commit newCell->info().fractureTip = oldCell->info().fractureTip;
+		//		For later commit newCell->info().cellHalfWidth = oldCell->info().cellHalfWidth;
+
+		/// compute leakoff rate by summing the flow through facets abutting non-cracked neighbors
+		//		if (oldCell->info().crack && !oldCell->info().fictious()){
+		//			Real facetFlowRate=0;
+		//			facetFlowRate -= oldCell->info().dv();
+		//			for (int k=0; k<4;k++) {
+		//				if (!oldCell->neighbor(k)->info().crack){
+		//					facetFlowRate = oldCell->info().kNorm()[k]*(oldCell->info().shiftedP()-oldCell->neighbor(k)->info().shiftedP());
+		//					leakOffRate += facetFlowRate;
+		//				}
+		//			}
+		//		}
+	}
+}
+
+// void crackCellAbovePoroThreshold(CellHandle& cell)
+// {
+//         cell->info().crack = 1;
+//         for (int j=0; j<4; j++){
+//                 CellHandle& ncell = cell->neighbor(i);
+//                 Real fracturePerm = apertureFactor*pow(residualAperture,3.)/(12.*viscosity);
+//                  //nCell->info().crack=1;
+//                 cell->info().kNorm()[i] += fracturePerm; //
+//                 nCell->info().kNorm()[Tri.mirror_index(cell,i)] += fracturePerm;
+//         }
+// }
+
+// void PartialSatClayEngine::trickPermOnCrackedCells(FlowSolver& flow)
+// {
+//         Tesselation& Tes = flow.T[flow.currentTes];
+//         //	#ifdef YADE_OPENMP
+//         const long size = Tes.cellHandles.size();
+//         Real fracturePerm = apertureFactor*pow(residualAperture,3.)/(12.*viscosity);
+//         //#pragma omp parallel for
+//         //cout << "blocking low poro regions" << endl;
+//         for (long i=0; i<size; i++){
+//                 CellHandle& cell = Tes.cellHandles[i];
+//                 if ( cell->info().initiallyCracked ){
+//                         for (int j=0; j<4; j++){
+//                                 const CellHandle& nCell = cell->neighbor(j);
+//                                 if (!changeCrackSaturation or (changeCrackSaturation and cell->info().saturation>=SsM) or nCell->info().isFictious) {
+//                                         cell->info().kNorm()[j] = fracturePerm;
+//                                         nCell->info().kNorm()[Tes.Triangulation().mirror_index(cell,j)] = fracturePerm;
+//                                 } else { // block cracked cell if it isnt saturated
+//                                         cell->info().crack=1;
+//                                         nCell->info().crack=1;
+//                                         cell->info().blocked=1;
+//                                         nCell->info().blocked=1;
+//                                         cell->info().saturation=0;
+//                                         nCell->info().saturation=0;
+//                                 }
+//                         }
+//                 }
+//         }
+// }
+
+
+// void PartialSatClayEngine::crackCellsAbovePoroThreshold(FlowSolver& flow)
+// {
+//         Tesselation& Tes = flow.T[flow.currentTes];
+//         //	#ifdef YADE_OPENMP
+//         const long size = Tes.cellHandles.size();
+//         //#pragma omp parallel for
+//         //cout << "blocking low poro regions" << endl;
+//         for (long i=0; i<size; i++){
+//                 CellHandle& cell = Tes.cellHandles[i];
+//                 if ( ( first and cell->info().porosity > crackCellPoroThreshold ) or ( cell->info().initiallyCracked ) ){
+//                         cell->info().crack = true; cell->info().initiallyCracked = true;
+//                         Real fracturePerm = apertureFactor*pow(residualAperture,3.)/(12.*viscosity);
+//
+//                         for (int j=0; j<4; j++){
+//                                 const CellHandle& nCell = cell->neighbor(j);
+//                                 if (!changeCrackSaturation or (changeCrackSaturation and cell->info().saturation>=SsM) or nCell->info().isFictious) {
+//                                         cell->info().kNorm()[j] = fracturePerm;
+//                                         nCell->info().kNorm()[Tes.Triangulation().mirror_index(cell,j)] = fracturePerm;
+//                                 } else { // block cracked cell if it isnt saturated
+//                                         cell->info().crack=1;
+//                                         nCell->info().crack=1;
+//                                         cell->info().blocked=1;
+//                                         nCell->info().blocked=1;
+//                                         cell->info().saturation=0;
+//                                         nCell->info().saturation=0;
+//                                 }
+//                         }
+//                 }
+//         }
+// }
+
+
 } //namespace yade
+// clang-format on
 #endif //PartialSat

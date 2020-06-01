@@ -234,9 +234,7 @@ namespace CGT {
 	template <class _Tesselation> void PartialSatLinSolv<_Tesselation>::copyCellsToLin(Real dt)
 	{
 		for (int ii = 1; ii <= ncols; ii++) {
-			T_bv[ii - 1] = T_b
-			        [ii
-			         - 1]; // - T_cells[ii]->info().dv(); // considering the volume change of tetrahedrals and the contribution to pressure change
+			T_bv[ii - 1] = T_b [ii - 1]; // - T_cells[ii]->info().dv(); // considering the volume change of tetrahedrals and the contribution to pressure change
 			if (fluidBulkModulus > 0)
 				T_bv[ii - 1] += T_cells[ii]->info().p() / (fluidBulkModulus * dt * T_cells[ii]->info().invVoidVolume());
 			if (!freezeSaturation && partialSatEngine && !isnan(T_cells[ii]->info().invVoidVolume())) {
@@ -261,15 +259,14 @@ namespace CGT {
 			//for (typename VectorCell::iterator cellIt=NewTes.cellHandles.begin(); cellIt!=NewTes.cellHandles.end(); cellIt++){
 			//	CellHandle& newCell = *cellIt;
 			//#endif
-			if (newCell->info().isGhost || newCell->info().isAlpha)
-				continue;
+			if (newCell->info().isGhost || newCell->info().isAlpha) continue; // a new alpha cell will have vertices that are not in the original Tes.vertex().
 			CVector center(0, 0, 0);
 			//cout <<"get center of alpha cell? " << newCell->info().isAlpha << endl;
 			if (newCell->info().fictious() == 0)
 				for (int k = 0; k < 4; k++) {
 					// if (newCell->vertex(k)->info().isAlpha) {
-					// 	cout << "vertex alpha is alpha with ID" << endl;
-					// 	cout << newCell->vertex(k)->info().id() << endl;
+					//  	cout << "vertex alpha is alpha with ID" << endl;
+					//  	cout << newCell->vertex(k)->info().id() << endl;
 					// }
 					center = center + 0.25 * (Tes.vertex(newCell->vertex(k)->info().id())->point().point() - CGAL::ORIGIN);
 				}
@@ -304,13 +301,10 @@ namespace CGT {
 				alphaBoundingCells.push_back(newCell);
 				continue;
 			}
-			if (!newCell->info().Pcondition)
-				newCell->info().getInfo(oldCell->info());
-			if (!newCell->info().Tcondition && thermalEngine)
-				newCell->info().temp() = oldCell->info().temp();
+			if (!newCell->info().Pcondition) newCell->info().getInfo(oldCell->info());
+			if (!newCell->info().Tcondition && thermalEngine) newCell->info().temp() = oldCell->info().temp();
 			//cout << "saturation interp" <<endl;
-			if (!newCell->info().Pcondition)
-				newCell->info().sat() = oldCell->info().sat();
+			if (!newCell->info().Pcondition) newCell->info().sat() = oldCell->info().sat();
 			newCell->info().crack             = oldCell->info().crack;
 			newCell->info().crackNum          = oldCell->info().crackNum;
 			newCell->info().initialSaturation = oldCell->info().initialSaturation;
@@ -369,7 +363,7 @@ namespace CGT {
 						//This is the cross-sectional area of the throat
 						CVector fluidSurfk = cell->info().facetSurfaces[j] * cell->info().facetFluidSurfacesRatio[j];
 						/// handle fictious vertex since we can get the projected surface easily here
-						if (cell->vertex(j)->info().isFictious) {
+						if (cell->vertex(j)->info().isFictious and !cell->info().isAlpha) {
 							//projection of facet on the boundary
 							Real projSurf                  = std::abs(Surfk[boundary(cell->vertex(j)->info().id()).coordinate]);
 							tempVect                       = -projSurf * boundary(cell->vertex(j)->info().id()).normal;
@@ -381,14 +375,11 @@ namespace CGT {
 						CVector facetUnitForce = -fluidSurfk * cell->info().solidSurfaces[j][3];
 						CVector facetForce;
 						if (((cell->info().isFictious or cell->info().isAlpha) && freeSwelling) /*|| cell->info().isExposed*/)
-							facetForce = pAir
-							        * facetUnitForce; // forces computed on boundaries of free swelling case based on air pressure only
+							facetForce = pAir * facetUnitForce; // forces computed on boundaries of free swelling case based on air pressure only
 						else {
 							facetForce = cell->info().p() * facetUnitForce * cell->info().sat() * matricSuctionRatio;
 							if (useKeq) {
-								Real delP = -cell->info().dv() * cell->info().equivalentBulkModulus
-								        / cell->info()
-								                  .volume(); // assume that each step starts with 0facet force due to volume changes (if there was no volume change, then there should be no force due to compressible mixture in cell)
+								Real delP = -cell->info().dv() * cell->info().equivalentBulkModulus/ cell->info().volume(); // assume that each step starts with 0facet force due to volume changes (if there was no volume change, then there should be no force due to compressible mixture in cell)
 								facetForce += delP * facetUnitForce;
 							}
 						}
@@ -403,19 +394,14 @@ namespace CGT {
 							        + facetUnitForce * cell->info().solidSurfaces[j][y];
 							//2nd the partial integral of pore pressure, which boils down to weighting by partial cross-sectional area
 							//uncomment to get total force / comment to get only viscous forces (Bruno)
-							if (!cell->vertex(facetVertices[j][y])->info().isFictious
-							    and !cell->vertex(facetVertices[j][y])->info().isAlpha) {
+							if (!cell->vertex(facetVertices[j][y])->info().isFictious and !cell->vertex(facetVertices[j][y])->info().isAlpha) {
 								if (((cell->info().isFictious or cell->info().isAlpha)
 								     && freeSwelling) /*|| cell->info().isExposed*/) {
 									cell->vertex(facetVertices[j][y])->info().forces
 									        = cell->vertex(facetVertices[j][y])->info().forces
-									        - facetNormal * pAir
-									                * crossSections
-									                        [j]
-									                        [y]; // forces exerted by boundary cells computed not according to suction
+									        - facetNormal * pAir* crossSections [j][y]; // forces exerted by boundary cells computed not according to suction
 								} else {
-									cell->vertex(facetVertices[j][y])->info().forces
-									        = cell->vertex(facetVertices[j][y])->info().forces
+									cell->vertex(facetVertices[j][y])->info().forces = cell->vertex(facetVertices[j][y])->info().forces
 									        - facetNormal * cell->info().p() * crossSections[j][y] * cell->info().sat()
 									                * matricSuctionRatio; // when saturation increases at beginning of imbibition on edges, the force increases and we see contraction
 								} //add to cached value
@@ -447,8 +433,7 @@ namespace CGT {
 						        + cell->info().unitForceVectors[yy] * cell->info().p() * cell->info().sat() * matricSuctionRatio;
 						if (useKeq) {
 							Real delP = -cell->info().dv() * cell->info().equivalentBulkModulus
-							        / cell->info()
-							                  .volume(); // assume that each step starts with 0facet force due to volume changes (if there was no volume change, then there should be no force due to compressible mixture in cell)
+							        / cell->info().volume(); // assume that each step starts with 0facet force due to volume changes (if there was no volume change, then there should be no force due to compressible mixture in cell)
 							cell->vertex(yy)->info().forces
 							        = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy] * delP;
 						}
@@ -785,8 +770,7 @@ namespace CGT {
 		int  numCells        = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
-			if (cell->info().Pcondition or cell->info().blocked)
-				continue;
+			if (cell->info().Pcondition or cell->info().blocked) continue;
 			saturationTotal += cell->info().sat();
 			numCells += 1;
 		}
@@ -802,8 +786,7 @@ namespace CGT {
 		int  numCells     = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
-			if (cell->info().Pcondition or cell->info().blocked)
-				continue;
+			if (cell->info().Pcondition or cell->info().blocked) continue;
 			suctionTotal += pAir - cell->info().p();
 			numCells += 1;
 		}

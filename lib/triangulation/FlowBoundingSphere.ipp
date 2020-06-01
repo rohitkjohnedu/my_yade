@@ -106,7 +106,7 @@ namespace CGT {
 		Real                facetFlowRate = 0;
 		FiniteCellsIterator cellEnd       = Tri.finite_cells_end();
 		for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != cellEnd; cell++) {
-			if (cell->info().isGhost)
+			if (cell->info().isGhost or cell->info().isAlpha)
 				continue;
 			cell->info().averageVelocity() = CGAL::NULL_VECTOR;
 			numCells++;
@@ -990,9 +990,9 @@ namespace CGT {
 			// identify cells incident to alpha vertices and set BCs
 			Tesselation& Tes       = T[currentTes];
 			const long   sizeCells = Tes.cellHandles.size();
-#ifdef YADE_OPENMP
-#pragma omp parallel for
-#endif
+//#ifdef YADE_OPENMP
+//#pragma omp parallel for
+//#endif
 			for (long i = 0; i < sizeCells; i++) {
 				CellHandle& cell = Tes.cellHandles[i];
 				for (int j = 0; j < 4; j++) {
@@ -1001,7 +1001,7 @@ namespace CGT {
 						cell->info().p()        = alphaBoundValue;
 						cell->info().Pcondition = true;
 						cell->info().isAlpha    = true;
-						//alphaBoundingCells[i].push_back(cell);
+						alphaBoundingCells.push_back(cell);
 					}
 				}
 			}

@@ -419,7 +419,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	const int oldBufferSize = buffer.size();
 	buffer.resize(solver->T[solver->currentTes].maxId+1);
  	for (int i=oldBufferSize;i<=solver->T[solver->currentTes].maxId;i++) {
-		if (i<solver->alphaIdOffset+1) continue;
+		if (i<solver->alphaIdOffset) continue;
 		posData& dat = buffer[solver->T[solver->currentTes].vertexHandles[i]->info().id()];
  		 // we dont care about any idices less than the alphavertices
  		dat.id = solver->T[solver->currentTes].vertexHandles[i]->info().id();
@@ -599,6 +599,7 @@ void TemplateFlowEngine_@TEMPLATE_FLOW_NAME@<_CellInfo,_VertexInfo,_Tesselation,
 	FOREACH(CellHandle& cell, flow.tesselation().cellHandles){
 	#endif
 		Real newVol, dVol;
+		if (cell->info().isAlpha) continue;
                 switch ( cell->info().fictious() ) {
                 	case ( 3 ) : newVol = volumeCellTripleFictious ( cell ); break;
                		case ( 2 ) : newVol = volumeCellDoubleFictious ( cell ); break;

@@ -790,7 +790,7 @@ namespace CGT {
 		std::vector<Vector3r> vSegments;
 		RTriangulation        temp(T[currentTes].Triangulation());
 		AlphaShape            as(temp);
-		alphaIdOffset = T[currentTes].vertexHandles.size() - 1;
+		alphaIdOffset = T[currentTes].vertexHandles.size(); // - 1;
 		Real minAlpha = as.find_alpha_solid();
 
 		if (alpha == 0) {
