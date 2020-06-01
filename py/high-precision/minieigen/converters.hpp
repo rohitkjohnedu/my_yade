@@ -137,9 +137,10 @@ template <class MT> struct custom_MatrixAnyAny_from_sequence {
 };
 
 // create AlignedBoxNr from tuple of 2 Vector3r's
-template <int dim> struct custom_alignedBoxNr_from_seq {
-	typedef Eigen::AlignedBox<Real, dim> AlignedBoxNr;
-	typedef Eigen::Matrix<Real, dim, 1>  VectorNr;
+// N is the level of RealHP<N>
+template <int N, int dim> struct custom_alignedBoxNr_from_seq {
+	typedef Eigen::AlignedBox<RealHP<N>, dim> AlignedBoxNr;
+	typedef Eigen::Matrix<RealHP<N>, dim, 1>  VectorNr;
 	custom_alignedBoxNr_from_seq() { py::converter::registry::push_back(&convertible, &construct, py::type_id<AlignedBoxNr>()); }
 	static void* convertible(PyObject* obj_ptr)
 	{
@@ -159,8 +160,9 @@ template <int dim> struct custom_alignedBoxNr_from_seq {
 	}
 };
 
-struct custom_Quaternionr_from_axisAngle_or_angleAxis {
-	custom_Quaternionr_from_axisAngle_or_angleAxis() { py::converter::registry::push_back(&convertible, &construct, py::type_id<Quaternionr>()); }
+// FIXME - add test for e.g. pi value, to make sure that precision works here correctly.
+template <int N> struct custom_Quaternionr_from_axisAngle_or_angleAxis {
+	custom_Quaternionr_from_axisAngle_or_angleAxis() { py::converter::registry::push_back(&convertible, &construct, py::type_id<QuaternionrHP<N>>()); }
 	static void* convertible(PyObject* obj_ptr)
 	{
 		if (!PySequence_Check(obj_ptr))
@@ -169,18 +171,20 @@ struct custom_Quaternionr_from_axisAngle_or_angleAxis {
 			return 0;
 		py::object a(py::handle<>(PySequence_GetItem(obj_ptr, 0))), b(py::handle<>(PySequence_GetItem(obj_ptr, 1)));
 		// axis-angle or angle-axis
-		if ((py::extract<Vector3r>(a).check() && py::extract<Real>(b).check()) || (py::extract<Real>(a).check() && py::extract<Vector3r>(b).check()))
+		if ((py::extract<Vector3rHP<N>>(a).check() && py::extract<RealHP<N>>(b).check())
+		    || (py::extract<RealHP<N>>(a).check() && py::extract<Vector3rHP<N>>(b).check()))
 			return obj_ptr;
 		return 0;
 	}
 	static void construct(PyObject* obj_ptr, py::converter::rvalue_from_python_stage1_data* data)
 	{
-		void*      storage = ((py::converter::rvalue_from_python_storage<Quaternionr>*)(data))->storage.bytes;
+		void*      storage = ((py::converter::rvalue_from_python_storage<QuaternionrHP<N>>*)(data))->storage.bytes;
 		py::object a(py::handle<>(PySequence_GetItem(obj_ptr, 0))), b(py::handle<>(PySequence_GetItem(obj_ptr, 1)));
-		if (py::extract<Vector3r>(py::object(a)).check())
-			new (storage) Quaternionr(AngleAxisr(py::extract<Real>(b)(), py::extract<Vector3r>(a)().normalized()));
+		if (py::extract<Vector3rHP<N>>(py::object(a)).check())
+			new (storage) QuaternionrHP<N>(AngleAxisrHP<N>(py::extract<RealHP<N>>(b)(), py::extract<Vector3rHP<N>>(a)().normalized()));
 		else
-			new (storage) Quaternionr(AngleAxisr(py::extract<Real>(a)(), py::extract<Vector3r>(b)().normalized()));
+			new (storage) QuaternionrHP<N>(AngleAxisrHP<N>(py::extract<RealHP<N>>(a)(), py::extract<Vector3rHP<N>>(b)().normalized()));
 		data->convertible = storage;
 	}
 };
+
