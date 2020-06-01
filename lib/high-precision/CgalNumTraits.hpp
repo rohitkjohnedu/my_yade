@@ -5,7 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#if (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
+//#if (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
 
 #ifndef YADE_REAL_MATH_NAMESPACE
 #error "This file cannot be included alone, include Real.hpp instead"
@@ -38,22 +38,25 @@
 
 namespace CGAL {
 
-template <> class Is_valid<::yade::Real> : public CGAL::cpp98::unary_function<::yade::Real, bool> {
+template <int N> class RealHP_Is_valid : public CGAL::cpp98::unary_function<::yade::RealHP<N>, bool> {
 public:
-	bool operator()(const ::yade::Real& x) const
+	bool operator()(const ::yade::RealHP<N>& x) const
 	{
-#if defined(CGAL_CFG_IEEE_754_BUG) and (YADE_REAL_BIT == 80)
-		return Is_valid<long double>()(static_cast<long double>(x));
-#else
-		return not::yade::math::isnan(x);
+// When CGAL detects IEEE bug, then long double needs special treatment:
+#ifdef CGAL_CFG_IEEE_754_BUG // and (YADE_REAL_BIT == 80)
+		if (std::numeric_limits<::yade::RealHP<N>>::digits == std::numeric_limits<long double>::digits) {
+			return Is_valid<long double>()(static_cast<long double>(x));
+		}
 #endif
+		return not::yade::math::isnan(x);
 	}
 };
 
-template <> class Algebraic_structure_traits<::yade::Real> : public Algebraic_structure_traits_base<::yade::Real, Field_with_kth_root_tag> {
+template <int N> class RealHP_Algebraic_structure_traits : public Algebraic_structure_traits_base<::yade::RealHP<N>, Field_with_kth_root_tag> {
 public:
 	typedef Tag_false Is_exact;
 	typedef Tag_true  Is_numerical_sensitive;
+	typedef  ::yade::RealHP<N>                                Type;
 
 	/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
 	class IsZero : public CGAL::cpp98::unary_function<Type, bool> {
@@ -87,7 +90,7 @@ public:
 		Type operator()(int k, const Type& x) const
 		{
 			CGAL_precondition_msg(k > 0, "'k' must be positive for k-th roots");
-			return ::yade::math::pow(x, static_cast<::yade::Real>(1.0) / static_cast<::yade::Real>(k));
+			return ::yade::math::pow(x, static_cast<::yade::RealHP<N>>(1.0) / static_cast<::yade::RealHP<N>>(k));
 			// note: that's what would be called for long double case:
 			// return Algebraic_structure_traits<long double>::Kth_root()(k, static_cast<long double>(x));
 		};
@@ -95,8 +98,9 @@ public:
 };
 
 
-template <> class Real_embeddable_traits<::yade::Real> : public INTERN_RET::Real_embeddable_traits_base<::yade::Real, CGAL::Tag_true> {
+template <int N> class RealHP_embeddable_traits : public INTERN_RET::Real_embeddable_traits_base<::yade::RealHP<N>, CGAL::Tag_true> {
 public:
+	typedef  ::yade::RealHP<N>                                Type;
 	class To_interval : public CGAL::cpp98::unary_function<Type, std::pair<double, double>> {
 	public:
 		std::pair<double, double> operator()(const Type& x) const { return (Interval_nt<>(static_cast<double>(x)) + Interval_nt<>::smallest()).pair(); }
@@ -132,7 +136,42 @@ public:
 	};
 };
 
+// FIXME - wewnątrz to samo zakomentowane. A chodzi o to, żeby dostarczać przeładowania tylko dla tych N dla których trzeba, zależnie od YADE_REAL_BIT inne N to jest double lub floaat128
+
+#if (YADE_REAL_BIT >= 80)
+template <> struct Is_valid<::yade::RealHP<1 >> : public RealHP_Is_valid<1 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<1 >> : public RealHP_Algebraic_structure_traits<1 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<1 >> : public RealHP_embeddable_traits<1 > {};
+#endif
+
+#if (YADE_REAL_BIT >= 64)
+template <> struct Is_valid<::yade::RealHP<2 >> : public RealHP_Is_valid<2 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<2 >> : public RealHP_Algebraic_structure_traits<2 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<2 >> : public RealHP_embeddable_traits<2 > {};
+#endif
+
+#if (YADE_REAL_BIT >= 32)
+template <> struct Is_valid<::yade::RealHP<3 >> : public RealHP_Is_valid<3 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<3 >> : public RealHP_Algebraic_structure_traits<3 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<3 >> : public RealHP_embeddable_traits<3 > {};
+#endif
+
+template <> struct Is_valid<::yade::RealHP<4 >> : public RealHP_Is_valid<4 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<4 >> : public RealHP_Algebraic_structure_traits<4 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<4 >> : public RealHP_embeddable_traits<4 > {};
+
+template <> struct Is_valid<::yade::RealHP<5 >> : public RealHP_Is_valid<5 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<5 >> : public RealHP_Algebraic_structure_traits<5 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<5 >> : public RealHP_embeddable_traits<5 > {};
+
+template <> struct Is_valid<::yade::RealHP<6 >> : public RealHP_Is_valid<6 > {};
+template <> struct Algebraic_structure_traits<::yade::RealHP<6 >> : public RealHP_Algebraic_structure_traits<6 > {};
+template <> struct Real_embeddable_traits<::yade::RealHP<6 >> : public RealHP_embeddable_traits<6 > {};
+
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h
+
+// FIXME !!!!!!!! RealHP<…>
+
 template <typename GMP1, typename GMP2>
 struct NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>
         : public CGAL::cpp98::unary_function<::yade::Real, NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>> {
@@ -174,4 +213,4 @@ using ::yade::math::sqrt;
 }
 
 #endif // CGAL_NUM_TRAITS_HPP
-#endif // (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
+//#endif // (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
