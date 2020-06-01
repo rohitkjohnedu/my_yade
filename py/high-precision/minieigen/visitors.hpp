@@ -464,7 +464,7 @@ public:
 	{
 		for (Index i = 0; i < self.size(); i++)
 			oss << (i == 0 ? "" : (((i % 3) != 0 || pad > 0) ? "," : ", "))
-			    << ::yade::minieigenHP::numToString(self.row(i / self.cols())[i % self.cols()] /*,pad*/);
+			    << ::yade::minieigenHP::numToStringHP(self.row(i / self.cols())[i % self.cols()] /*,pad*/);
 	}
 };
 
@@ -1001,7 +1001,8 @@ private:
 	}
 };
 
-template <typename QuaternionT> class QuaternionVisitor : public py::def_visitor<QuaternionVisitor<QuaternionT>> {
+template <typename QuaternionT, int Level = ::yade::math::levelOfRealHP<typename QuaternionT::Scalar>>
+class QuaternionVisitor : public py::def_visitor<QuaternionVisitor<QuaternionT>> {
 	typedef typename QuaternionT::Scalar             Scalar;
 	typedef Eigen::Matrix<Scalar, 3, 1>              CompatVec3;
 	typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> CompatVecX;
@@ -1083,9 +1084,9 @@ private:
 	struct QuaternionPickle : py::pickle_suite {
 		static py::tuple getinitargs(const QuaternionT& x) { return py::make_tuple(x.w(), x.x(), x.y(), x.z()); }
 	};
-	static QuaternionT Identity() { return QuaternionT::Identity(); }
-	static Vector3r    Rotate(const QuaternionT& self, const Vector3r& u) { return self * u; }
-	static py::tuple   toAxisAngle(const QuaternionT& self)
+	static QuaternionT       Identity() { return QuaternionT::Identity(); }
+	static Vector3rHP<Level> Rotate(const QuaternionT& self, const Vector3rHP<Level>& u) { return self * u; }
+	static py::tuple         toAxisAngle(const QuaternionT& self)
 	{
 		AngleAxisT aa(self);
 		return py::make_tuple(aa.axis(), aa.angle());
@@ -1138,9 +1139,9 @@ private:
 	{
 		const QuaternionT& self = py::extract<QuaternionT>(obj)();
 		AngleAxisT         aa(self);
-		return std::string(object_class_name(obj) + "((") + ::yade::minieigenHP::numToString(aa.axis()[0]) + ","
-		        + ::yade::minieigenHP::numToString(aa.axis()[1]) + "," + ::yade::minieigenHP::numToString(aa.axis()[2]) + "),"
-		        + ::yade::minieigenHP::numToString(aa.angle()) + ")";
+		return std::string(object_class_name(obj) + "((") + ::yade::minieigenHP::numToStringHP(aa.axis()[0]) + ","
+		        + ::yade::minieigenHP::numToStringHP(aa.axis()[1]) + "," + ::yade::minieigenHP::numToStringHP(aa.axis()[2]) + "),"
+		        + ::yade::minieigenHP::numToStringHP(aa.angle()) + ")";
 	}
 	static Index __len__() { return 4; }
 };
