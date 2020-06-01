@@ -226,31 +226,7 @@ inline ::yade::math::Real abs2(const ::yade::math::Real& x) { return x * x; }
 //}
 */
 
-/* 
-There are two ways to avoid these macors:
-
-1) modify Eigen library to change the main template declaration from
-
-	template<typename>
-	struct NumTraits;
-
-into
-
-	template<typename, typename=void>
-	struct NumTraits;
-
-then we could use the second typename to enable/disable our template specialization, by writing:
-
-	template <typename Rr>
-	struct NumTraits <Rr, typename std::enable_if<::yade::math::IsHP<Rr>>::type> : public NumTraitsHP<::yade::math::levelOfRealHP<Rr>> {};
-
-I checked locally that modification of Eigen library fixes the template specializations and removes macros.
-
-2) wait until we move yade to C++20 and then use the https://en.cppreference.com/w/cpp/language/constraints to enable/disable our
-   template specializations using the `requires` and `using` C++20 keywords, explained in section "Type requirements".
-
-*/
-
+// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/ExplicitRealHP.hpp for details.
 #define YADE_EIGEN_SUPPORT_REAL_HP(N)                                                                                                                          \
 	template <> struct NumTraits<::yade::RealHP<N>> : public NumTraitsRealHP<N> {                                                                          \
 	};                                                                                                                                                     \
@@ -266,27 +242,6 @@ I checked locally that modification of Eigen library fixes the template speciali
 		template <> inline int    cast<typename ::yade::math::RealHP<N>, int>(const ::yade::math::RealHP<N>& x) { return int(x); }                     \
 	}
 
-#if (YADE_REAL_BIT >= 80)
-YADE_EIGEN_SUPPORT_REAL_HP(1)
-#endif
-
-#if (YADE_REAL_BIT >= 64)
-YADE_EIGEN_SUPPORT_REAL_HP(2)
-#endif
-
-#if (YADE_REAL_BIT >= 32)
-YADE_EIGEN_SUPPORT_REAL_HP(3)
-#endif
-
-YADE_EIGEN_SUPPORT_REAL_HP(4)
-YADE_EIGEN_SUPPORT_REAL_HP(5)
-YADE_EIGEN_SUPPORT_REAL_HP(6)
-YADE_EIGEN_SUPPORT_REAL_HP(7)
-YADE_EIGEN_SUPPORT_REAL_HP(8)
-YADE_EIGEN_SUPPORT_REAL_HP(9)
-YADE_EIGEN_SUPPORT_REAL_HP(10)
-
-#undef YADE_EIGEN_SUPPORT_REAL_HP
 
 } // namespace Eigen
 

@@ -166,7 +166,8 @@ namespace math {
 
 namespace yade {
 namespace math {
-	using Real    = ThinRealWrapper<UnderlyingReal/* FIXME: magic constant 'long double' could be named WrappedReal or WrappedRealHP<1> or UnderlyingReal<1> or RealHP<1>, think about this. */>;
+	using Real = ThinRealWrapper<
+	        UnderlyingReal /* FIXME: magic constant 'long double' could be named WrappedReal or WrappedRealHP<1> or UnderlyingReal<1> or RealHP<1>, think about this. */>;
 	using Complex = ThinComplexWrapper<std::complex<UnderlyingReal>>;
 }
 }
@@ -203,22 +204,25 @@ static_assert(sizeof(Complex) == sizeof(std::complex<math::UnderlyingReal>), "Th
 /*************************************************************************/
 /*************************   Eigen  NumTraits   **************************/
 /*************************************************************************/
-//#if (YADE_REAL_BIT > 64)
 #include "EigenNumTraits.hpp"
-//#endif
 
 /*************************************************************************/
 /*************************    CGAL NumTraits    **************************/
 /*************************************************************************/
-//#if (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
-// FIXME - wewnątrz to samo zakomentowane. A chodzi o to, żeby dostarczać przeładowania tylko dla tych N dla których trzeba, zależnie od YADE_REAL_BIT inne N to jest double lub floaat128
+#ifdef YADE_CGAL
 #include "CgalNumTraits.hpp"
-//#endif
+#endif
 
 /*************************************************************************/
 /************************* Vector3 Matrix3 etc  **************************/
 /*************************************************************************/
 #include "MathEigenTypes.hpp"
+
+/*************************************************************************/
+/************************* RealHP<…> CGAL,Eigen **************************/
+/*************************************************************************/
+#include "ExplicitRealHP.hpp"
+
 #undef YADE_REAL_MATH_NAMESPACE
 
 /*************************************************************************/

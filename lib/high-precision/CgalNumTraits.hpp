@@ -5,14 +5,12 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-//#if (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
+#if defined(YADE_CGAL) and (not defined(CGAL_NUM_TRAITS_HPP))
+#define CGAL_NUM_TRAITS_HPP
 
 #ifndef YADE_REAL_MATH_NAMESPACE
 #error "This file cannot be included alone, include Real.hpp instead"
 #endif
-
-#if defined(YADE_CGAL) and (not defined(CGAL_NUM_TRAITS_HPP))
-#define CGAL_NUM_TRAITS_HPP
 
 #include <CGAL/Interval_nt.h>
 #include <CGAL/NT_converter.h>
@@ -54,9 +52,9 @@ public:
 
 template <int N> class RealHP_Algebraic_structure_traits : public Algebraic_structure_traits_base<::yade::RealHP<N>, Field_with_kth_root_tag> {
 public:
-	typedef Tag_false Is_exact;
-	typedef Tag_true  Is_numerical_sensitive;
-	typedef  ::yade::RealHP<N>                                Type;
+	typedef Tag_false         Is_exact;
+	typedef Tag_true          Is_numerical_sensitive;
+	typedef ::yade::RealHP<N> Type;
 
 	/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
 	class IsZero : public CGAL::cpp98::unary_function<Type, bool> {
@@ -100,7 +98,7 @@ public:
 
 template <int N> class RealHP_embeddable_traits : public INTERN_RET::Real_embeddable_traits_base<::yade::RealHP<N>, CGAL::Tag_true> {
 public:
-	typedef  ::yade::RealHP<N>                                Type;
+	typedef ::yade::RealHP<N> Type;
 	class To_interval : public CGAL::cpp98::unary_function<Type, std::pair<double, double>> {
 	public:
 		std::pair<double, double> operator()(const Type& x) const { return (Interval_nt<>(static_cast<double>(x)) + Interval_nt<>::smallest()).pair(); }
@@ -136,58 +134,19 @@ public:
 	};
 };
 
-// FIXME - wewnątrz to samo zakomentowane. A chodzi o to, żeby dostarczać przeładowania tylko dla tych N dla których trzeba, zależnie od YADE_REAL_BIT inne N to jest double lub floaat128
-
-#if (YADE_REAL_BIT >= 80)
-template <> struct Is_valid<::yade::RealHP<1 >> : public RealHP_Is_valid<1 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<1 >> : public RealHP_Algebraic_structure_traits<1 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<1 >> : public RealHP_embeddable_traits<1 > {};
-#endif
-
-#if (YADE_REAL_BIT >= 64)
-template <> struct Is_valid<::yade::RealHP<2 >> : public RealHP_Is_valid<2 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<2 >> : public RealHP_Algebraic_structure_traits<2 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<2 >> : public RealHP_embeddable_traits<2 > {};
-#endif
-
-#if (YADE_REAL_BIT >= 32)
-template <> struct Is_valid<::yade::RealHP<3 >> : public RealHP_Is_valid<3 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<3 >> : public RealHP_Algebraic_structure_traits<3 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<3 >> : public RealHP_embeddable_traits<3 > {};
-#endif
-
-template <> struct Is_valid<::yade::RealHP<4 >> : public RealHP_Is_valid<4 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<4 >> : public RealHP_Algebraic_structure_traits<4 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<4 >> : public RealHP_embeddable_traits<4 > {};
-
-template <> struct Is_valid<::yade::RealHP<5 >> : public RealHP_Is_valid<5 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<5 >> : public RealHP_Algebraic_structure_traits<5 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<5 >> : public RealHP_embeddable_traits<5 > {};
-
-template <> struct Is_valid<::yade::RealHP<6 >> : public RealHP_Is_valid<6 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<6 >> : public RealHP_Algebraic_structure_traits<6 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<6 >> : public RealHP_embeddable_traits<6 > {};
-
-template <> struct Is_valid<::yade::RealHP<7 >> : public RealHP_Is_valid<7 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<7 >> : public RealHP_Algebraic_structure_traits<7 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<7 >> : public RealHP_embeddable_traits<7 > {};
-
-template <> struct Is_valid<::yade::RealHP<8 >> : public RealHP_Is_valid<8 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<8 >> : public RealHP_Algebraic_structure_traits<8 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<8 >> : public RealHP_embeddable_traits<8 > {};
-
-template <> struct Is_valid<::yade::RealHP<9 >> : public RealHP_Is_valid<9 > {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<9 >> : public RealHP_Algebraic_structure_traits<9 > {};
-template <> struct Real_embeddable_traits<::yade::RealHP<9 >> : public RealHP_embeddable_traits<9 > {};
-
-template <> struct Is_valid<::yade::RealHP<10>> : public RealHP_Is_valid<10> {};
-template <> struct Algebraic_structure_traits<::yade::RealHP<10>> : public RealHP_Algebraic_structure_traits<10> {};
-template <> struct Real_embeddable_traits<::yade::RealHP<10>> : public RealHP_embeddable_traits<10> {};
+// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/ExplicitRealHP.hpp for details.
+#define YADE_CGAL_SUPPORT_REAL_HP(N)                                                                                                                           \
+	template <> struct Is_valid<::yade::RealHP<N>> : public RealHP_Is_valid<N> {                                                                           \
+	};                                                                                                                                                     \
+	template <> struct Algebraic_structure_traits<::yade::RealHP<N>> : public RealHP_Algebraic_structure_traits<N> {                                       \
+	};                                                                                                                                                     \
+	template <> struct Real_embeddable_traits<::yade::RealHP<N>> : public RealHP_embeddable_traits<N> {                                                    \
+	};
 
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h
 
-// FIXME !!!!!!!! RealHP<…>
-
+// FIXME - make sure that RealHP<…> works correctly with all possible GMP mpq_rational combinations.
+//         Before yade switches to C++20 it will requiree the same explicit template specializations macros as for the others in file ExplicitRealHP.hpp
 template <typename GMP1, typename GMP2>
 struct NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>
         : public CGAL::cpp98::unary_function<::yade::Real, NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>> {
@@ -229,4 +188,4 @@ using ::yade::math::sqrt;
 }
 
 #endif // CGAL_NUM_TRAITS_HPP
-//#endif // (YADE_REAL_BIT > 64) and defined(YADE_CGAL)
+
