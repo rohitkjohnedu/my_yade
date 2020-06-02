@@ -129,27 +129,6 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 /*************************************************************************/
 /*************************   RealHP + python    **************************/
 /*************************************************************************/
-/*
-Each line in this macro generates an assembly code for a template instantination. It is used in files:
-
-  py/high-precision/_ExposeBoxes.cpp        py/high-precision/_ExposeConverters.cpp    py/high-precision/_ExposeQuaternion.cpp
-  py/high-precision/_ExposeComplex1.cpp     py/high-precision/_ExposeMatrices1.cpp     py/high-precision/_ExposeVectors1.cpp
-  py/high-precision/_ExposeComplex2.cpp     py/high-precision/_ExposeMatrices2.cpp     py/high-precision/_ExposeVectors2.cpp
-
-Each line in this macro makes compilation longer by 1 minute. So only put here the ones which are really needed to be accessed from python.
-Before adding RealHP<N>; only the first line for RealHP<1>; was there.
-*/
-#define YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(name)                                                                                         \
-	template void name<1>();                                                                                                                               \
-	template void name<2>();                                                                                                                               \
-	template void name<3>();                                                                                                                               \
-	template void name<4>();                                                                                                                               \
-	template void name<5>();                                                                                                                               \
-	template void name<6>();                                                                                                                               \
-	template void name<7>();                                                                                                                               \
-	template void name<8>();                                                                                                                               \
-	template void name<9>();                                                                                                                               \
-	template void name<10>();
 
 namespace yade {
 namespace math {
@@ -184,26 +163,6 @@ namespace math {
 			registerInScope<1, RegisterHPClass>(false);
 			boost::mpl::for_each<boost::mpl::range_c<int, 1, maxN + 1>>(
 			        [=]<typename N1>(N1) { registerInScope<N1::value, RegisterHPClass>(true); });
-		}
-
-		template <int N> int getNthDigits10() { return std::numeric_limits<RealHP<N>>::digits10; }
-
-		// this helper function returns numeric_limits::digits10 for N of RealHP<N>, and it does so during runtime.
-		inline int digits10RealHP(int N)
-		{
-			// 5 is the largest length of TypeListRealHP<…>. If more were added, and precision were not the multiplies of digits10*N
-			// then the python test will quickly catch that problem. And more cases will be needed to add to this switch.
-			static_assert(
-			        boost::mpl::size<::yade::math::detail::TypeListRealHP>::value <= 5,
-			        "More types were added in RealHP.hpp, please adjust this switch(…) accordingly.");
-			switch (N) {
-				case 1: return getNthDigits10<1>();
-				case 2: return getNthDigits10<2>();
-				case 3: return getNthDigits10<3>();
-				case 4: return getNthDigits10<4>();
-				case 5: return getNthDigits10<5>();
-				default: return getNthDigits10<1>() * N; // this formula is used by NthLevel in lib/high-precision/RealHP.hpp
-			}
 		}
 
 	}

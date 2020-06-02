@@ -66,7 +66,7 @@ template <int N> void expose_vectors2()
 }
 
 // explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
-YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_vectors2)
+YADE_HP_PYTHON_REGISTER(expose_vectors2)
 
 #ifdef UNDEF_EIGEN_DONT_ALIGN
 #undef EIGEN_DONT_ALIGN

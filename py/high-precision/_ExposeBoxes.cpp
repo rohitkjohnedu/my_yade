@@ -22,5 +22,5 @@ template <int N> void expose_boxes()
 }
 
 // explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
-YADE_EIGEN_HP_EXPLICIT_INSTATINATION_OF_PYTHON_CONVERTER(expose_boxes)
+YADE_HP_PYTHON_REGISTER(expose_boxes)
 

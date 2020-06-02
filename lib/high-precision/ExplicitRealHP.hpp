@@ -83,19 +83,33 @@ struct ExplicitRealHP {
 // This macro ↓ is used in AliasCGAL.hpp, that code could be put here, but this would make compilation unnecessarily longer.
 #define YADE_HP_RUN_MACRO(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EXPLICIT_REAL_HP) // it just creates: name(1) name(2) name(3) ....
 
-#define YADE_IGNORE_ARG(arg)
+/*
+ * Macro YADE_HP_PYTHON_REGISTER generates an assembly code for a template instantination. It is used in files:
+ *
+ * py/high-precision/_ExposeBoxes.cpp        py/high-precision/_ExposeConverters.cpp    py/high-precision/_ExposeQuaternion.cpp
+ * py/high-precision/_ExposeComplex1.cpp     py/high-precision/_ExposeMatrices1.cpp     py/high-precision/_ExposeVectors1.cpp
+ * py/high-precision/_ExposeComplex2.cpp     py/high-precision/_ExposeMatrices2.cpp     py/high-precision/_ExposeVectors2.cpp
+ *
+ * Each number in YADE_PYTHON_REAL_HP, defined above,  makes compilation longer by 1 minute. So put there only the ones which are really needed to be accessed from python.
+ */
+#define YADE_HP_PY_EIGEN(r, name, levelHP) template void name<levelHP>();
+#define YADE_HP_PYTHON_REGISTER(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PY_EIGEN, name, YADE_PYTHON_REAL_HP) // instatinate templates for name<1>, name<2>, etc …
 
+/*
+ * The float and double are supported by default in Eigen and CGAL, so they have to be skipped.
+ * This macro FOR loop 'BOOST_PP_SEQ_FOR_EACH' skips registration of those that are already registered.
+ */
+#define YADE_SKIP_ARG(arg)
 #define YADE_HP_PARSE_SEQUENCE(r, data, levelHP)                                                                                                               \
 	BOOST_PP_IF(                                                                                                                                           \
 	        BOOST_PP_GREATER_EQUAL(levelHP, /* skip 'below' this number */ BOOST_PP_SEQ_ELEM(1, data)),                                                    \
 	        /* execute macro with this 'name'   */ BOOST_PP_SEQ_ELEM(0, data),                                                                             \
-	        /* if it is skipped, then ignore it */ YADE_IGNORE_ARG)                                                                                        \
+	        /* skip the already registered one  */ YADE_SKIP_ARG)                                                                                          \
 	(levelHP)
+#define YADE_HP_RUN_MACRO_FROM_LEVEL(name, below)                                                                                                              \
+	BOOST_PP_SEQ_FOR_EACH(                                                                                                                                 \
+	        YADE_HP_PARSE_SEQUENCE, (/* the macro 'name' to be executed */ name)(/* skip numbers 'below' this value */ below), YADE_EXPLICIT_REAL_HP)
 
-#define YADE_HP_RUN_MACRO_FROM_LEVEL(name, below) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_SEQUENCE, (name)(below), YADE_EXPLICIT_REAL_HP)
-
-
-// The float and double are supported by default in Eigen and CGAL, so they have to be skipped.
 #if (YADE_REAL_BIT >= 80)
 #define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO(name) //               it just creates: name(1) name(2) name(3) .... using YADE_EXPLICIT_REAL_HP
 #elif (YADE_REAL_BIT >= 64)
