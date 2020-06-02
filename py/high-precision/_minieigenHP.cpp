@@ -90,7 +90,7 @@ try {
 	                              "for details. All classes in this module support pickling.";
 
 	const constexpr int highestPythonRegisteredHP_N = 10;
-	::yade::math::detail::registerLoopForHPn<highestPythonRegisteredHP_N, RegisterEigenHP>();
+	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByMinieigen, RegisterEigenHP>();
 
 	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;

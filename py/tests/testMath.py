@@ -77,8 +77,10 @@ class SimpleTests(unittest.TestCase):
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def testBasicHP(self):
-		self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByEigenCgal()) ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
-		self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByMinieigen()) ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
+		#self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByEigenCgal()) ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
+		#self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByMinieigen()) ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
+		self.assertEqual((1,2,4,8),mth.getRealHPSupportedByEigenCgal())               ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
+		self.assertEqual((1,2)    ,mth.getRealHPSupportedByMinieigen())               ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
 
 	def getDigitsHP(self,N):
 		ret = None

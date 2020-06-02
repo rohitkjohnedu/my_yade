@@ -157,12 +157,11 @@ namespace math {
 			}
 		}
 
-		// this loop registers python functions from 1 ... maxN (including maxN) by calling the provided RegisterHPClass<int,bool>::work( , ); inside registerInScope above.
-		template <int maxN, template <int, bool> class RegisterHPClass> void registerLoopForHPn()
+		// this loop registers python functions from Range by calling the provided RegisterHPClass<int,bool>::work( , ); inside registerInScope above.
+		template <typename Range, template <int, bool> class RegisterHPClass> void registerLoopForHPn()
 		{
 			registerInScope<1, RegisterHPClass>(false);
-			boost::mpl::for_each<boost::mpl::range_c<int, 1, maxN + 1>>(
-			        [=]<typename N1>(N1) { registerInScope<N1::value, RegisterHPClass>(true); });
+			boost::mpl::for_each<Range>([=]<typename N1>(N1) { registerInScope<N1::value, RegisterHPClass>(true); });
 		}
 
 	}

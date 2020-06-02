@@ -484,7 +484,7 @@ namespace math {
 	}
 
 	// Convenience functions for Real == RealHP<1>
-	static inline Real random01()   { return random01HP<1>(); }
+	static inline Real random01() { return random01HP<1>(); }
 	static inline Real unitRandom() { return random01(); }
 	static inline Real random() { return random01() * 2 - 1; }
 	static inline Real symmetricRandom() { return random(); }

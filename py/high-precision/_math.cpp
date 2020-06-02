@@ -16,8 +16,8 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
-#include <lib/high-precision/RealIO.hpp>
 #include <lib/high-precision/RealHPInfo.hpp>
+#include <lib/high-precision/RealIO.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #ifdef YADE_CGAL
 #include <lib/base/AliasCGAL.hpp>
@@ -850,7 +850,7 @@ BOOST_PYTHON_MODULE(_math) try {
 	// this loop registers all python functions from 1 ... N == highestPythonRegisteredHP_N.
 	// Some functions for large N are extremely slow during python 'import yade.math', so they are not registered, see struct IfConstexprForSlowFunctions
 	const constexpr int highestPythonRegisteredHP_N = 10;
-	::yade::math::detail::registerLoopForHPn<highestPythonRegisteredHP_N, RegisterRealHPMath>();
+	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByEigenCgal, RegisterRealHPMath>();
 
 	expose_storage_ordering();
 

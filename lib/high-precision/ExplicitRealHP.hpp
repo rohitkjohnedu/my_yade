@@ -28,12 +28,12 @@ Caution: trying to use an unregistered for python Vector3rHP<N> type in YADE_CLA
          however it is safe (and intended) to use them in the C++ calculations in critical sections of code, without exporting them to python.
 */
 
-//#define YADE_EIGENCGAL_HP (1)(2)(4)(8)(10)(20)
-//#define YADE_MINIEIGEN_HP (1)(2)
+#define YADE_EIGENCGAL_HP (1)(2)(4)(8) //(10)(20)
+#define YADE_MINIEIGEN_HP (1)(2)
 
 // If you are doing some debugging, and need to access from minieigenHP all the precisions that are used in C++, then instead of above, use e.g. this:
-#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(5)(6)(7)(8)(9)(10) //(20)
-#define YADE_MINIEIGEN_HP YADE_EIGENCGAL_HP
+//#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(20)
+//#define YADE_MINIEIGEN_HP YADE_EIGENCGAL_HP
 
 #else // on older compilers or with older libraries, this can't work, cmake will detect such problems. In this case only RealHP<1> is instantinated.
 #define YADE_EIGENCGAL_HP (1)
