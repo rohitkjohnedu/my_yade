@@ -17,7 +17,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		#FIXME: self.digs1=yade.config.highPrecisionDecimalPlaces+yade.math.extraDigits10NecessaryForStringRepresentation
 		mpmath.mp.dps=self.digs1
 		self.extraStrDigits = mne.extraStringDigits
-		self.testLevelsHP   = mne.getRealHPSupportedByPython()
+		self.testLevelsHP   = mne.getRealHPSupportedByMinieigen()
 		self.baseDigits     = mne.getRealHPDigits10(1)
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 

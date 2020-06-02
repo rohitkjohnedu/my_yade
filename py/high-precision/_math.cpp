@@ -858,8 +858,8 @@ BOOST_PYTHON_MODULE(_math) try {
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
 	// FIXME - call SINGLE registration function ::RealHPInfo::PythonExport(), it registers all that inside it.
-	py::def("getRealHPSupportedByCpp", ::yade::math::RealHPInfo::getRealHPSupportedByCpp);
-	py::def("getRealHPSupportedByPython", ::yade::math::RealHPInfo::getRealHPSupportedByPython);
+	py::def("getRealHPSupportedByEigenCgal", ::yade::math::RealHPInfo::getRealHPSupportedByEigenCgal);
+	py::def("getRealHPSupportedByMinieigen", ::yade::math::RealHPInfo::getRealHPSupportedByMinieigen);
 	py::def("getRealHPDigits10", ::yade::math::RealHPInfo::getRealHPDigits10, (py::arg("N")));
 
 } catch (...) {

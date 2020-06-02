@@ -95,8 +95,8 @@ try {
 	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
-	py::def("getRealHPSupportedByCpp", ::yade::math::RealHPInfo::getRealHPSupportedByCpp);
-	py::def("getRealHPSupportedByPython", ::yade::math::RealHPInfo::getRealHPSupportedByPython);
+	py::def("getRealHPSupportedByEigenCgal", ::yade::math::RealHPInfo::getRealHPSupportedByEigenCgal);
+	py::def("getRealHPSupportedByMinieigen", ::yade::math::RealHPInfo::getRealHPSupportedByMinieigen);
 	py::def("getRealHPDigits10", ::yade::math::RealHPInfo::getRealHPDigits10, (py::arg("N")));
 
 } catch (...) {

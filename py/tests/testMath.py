@@ -72,9 +72,13 @@ class SimpleTests(unittest.TestCase):
 			 , "fma"       : {"6":10  , "15":100 , "18":10   , "33":10     , "100":100   , "150" :100   , "100_b" :100     , "150_b" :1000   }
 			 }
 		self.extraStrDigits = mth.extraStringDigits
-		self.testLevelsHP   = mth.getRealHPSupportedByPython()
+		self.testLevelsHP   = mth.getRealHPSupportedByEigenCgal() #### XXX XXX XXX te testy są bez minieigenHP, więc może wszystko testować
 		self.baseDigits     = mth.getRealHPDigits10(1)
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
+
+	def testBasicHP(self):
+		self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByEigenCgal()) ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
+		self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByMinieigen()) ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
 
 	def getDigitsHP(self,N):
 		ret = None

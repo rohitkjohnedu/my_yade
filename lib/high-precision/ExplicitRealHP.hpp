@@ -17,25 +17,27 @@
 
 This file provides explicit instantinations for RealHP<N>, Vector3rHP<N> etc. types. Before we switch to C++20 this file is unfortunately necessary.
 
-One cannot "just use Vector3rHP<123>", and be happy, because Eigen and CGAL are not flexible enough in template specialization mechanisms.
-The RealHP<123> just works, but for Vector3rHP<123> this file is necessary.
+One cannot "just use Vector3rHP<10>", and be happy, because Eigen and CGAL are not flexible enough in template specialization mechanisms.
+The RealHP<10> just works, but for Vector3rHP<10> or CgalHP<N> (file lib/base/AliasCGAL.hpp) this file is necessary.
 
 The current solution to this problem is to set the list of supported numbers below (separately for C++ and Python):
-	C++	: YADE_EXPLICIT_REAL_HP  ↔ The numbers listed here will work in C++ for RealHP<N> in CGAL and Eigen. Rather cheap in compilation time.
-	Python	: YADE_PYTHON_REAL_HP    ↔ These are exported to python. Expensive: each one makes compilation longer by 1 minute.
+	C++	: YADE_EIGENCGAL_HP  ↔ The numbers listed here will work in C++ for RealHP<N> in CGAL and Eigen. Rather cheap in compilation time.
+	Python	: YADE_MINIEIGEN_HP  ↔ These are exported to python. Expensive: each one makes compilation longer by 1 minute.
 
 Caution: trying to use an unregistered for python Vector3rHP<N> type in YADE_CLASS_BASE_DOC_ATTRS_* to export value to Python will cause problems.
          however it is safe (and intended) to use them in the C++ calculations in critical sections of code, without exporting them to python.
 */
 
-#define YADE_EXPLICIT_REAL_HP (1)(2)(3)(4)(5)(6)(7)(8)(9)(10)
-//#define YADE_PYTHON_REAL_HP (1)(2)(3)(4)
+//#define YADE_EIGENCGAL_HP (1)(2)(4)(8)(10)(20)
+//#define YADE_MINIEIGEN_HP (1)(2)
 
-// Python: if you are doing some debugging, and need to access from python all the precisions that are used in C++, then instead of above, use this:
-#define YADE_PYTHON_REAL_HP YADE_EXPLICIT_REAL_HP
+// If you are doing some debugging, and need to access from minieigenHP all the precisions that are used in C++, then instead of above, use e.g. this:
+#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(5)(6)(7)(8)(9)(10) //(20)
+#define YADE_MINIEIGEN_HP YADE_EIGENCGAL_HP
 
 #else // on older compilers or with older libraries, this can't work, cmake will detect such problems. In this case only RealHP<1> is instantinated.
-#define YADE_EXPLICIT_REAL_HP (1)
+#define YADE_EIGENCGAL_HP (1)
+#define YADE_MINIEIGEN_HP (1)
 #endif
 
 /*
@@ -81,7 +83,7 @@ struct ExplicitRealHP {
 
 #define YADE_HP_PARSE_ONE(r, name, levelHP) name(levelHP)
 // This macro ↓ is used in AliasCGAL.hpp, that code could be put here, but this would make compilation unnecessarily longer.
-#define YADE_HP_RUN_MACRO(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EXPLICIT_REAL_HP) // it just creates: name(1) name(2) name(3) ....
+#define YADE_HP_RUN_MACRO(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EIGENCGAL_HP) // it just creates: name(1) name(2) name(3) ....
 
 /*
  * Macro YADE_HP_PYTHON_REGISTER generates an assembly code for a template instantination. It is used in files:
@@ -90,10 +92,10 @@ struct ExplicitRealHP {
  * py/high-precision/_ExposeComplex1.cpp     py/high-precision/_ExposeMatrices1.cpp     py/high-precision/_ExposeVectors1.cpp
  * py/high-precision/_ExposeComplex2.cpp     py/high-precision/_ExposeMatrices2.cpp     py/high-precision/_ExposeVectors2.cpp
  *
- * Each number in YADE_PYTHON_REAL_HP, defined above,  makes compilation longer by 1 minute. So put there only the ones which are really needed to be accessed from python.
+ * Each number in YADE_MINIEIGEN_HP, defined above,  makes compilation longer by 1 minute. So put there only the ones which are really needed to be accessed from python.
  */
 #define YADE_HP_PY_EIGEN(r, name, levelHP) template void name<levelHP>();
-#define YADE_HP_PYTHON_REGISTER(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PY_EIGEN, name, YADE_PYTHON_REAL_HP) // instatinate templates for name<1>, name<2>, etc …
+#define YADE_HP_PYTHON_REGISTER(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PY_EIGEN, name, YADE_MINIEIGEN_HP) // instatinate templates for name<1>, name<2>, etc …
 
 /*
  * The float and double are supported by default in Eigen and CGAL, so they have to be skipped.
@@ -108,10 +110,10 @@ struct ExplicitRealHP {
 	(levelHP)
 #define YADE_HP_RUN_MACRO_FROM_LEVEL(name, below)                                                                                                              \
 	BOOST_PP_SEQ_FOR_EACH(                                                                                                                                 \
-	        YADE_HP_PARSE_SEQUENCE, (/* the macro 'name' to be executed */ name)(/* skip numbers 'below' this value */ below), YADE_EXPLICIT_REAL_HP)
+	        YADE_HP_PARSE_SEQUENCE, (/* the macro 'name' to be executed */ name)(/* skip numbers 'below' this value */ below), YADE_EIGENCGAL_HP)
 
 #if (YADE_REAL_BIT >= 80)
-#define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO(name) //               it just creates: name(1) name(2) name(3) .... using YADE_EXPLICIT_REAL_HP
+#define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO(name) //               it just creates: name(1) name(2) name(3) .... using YADE_EIGENCGAL_HP
 #elif (YADE_REAL_BIT >= 64)
 #define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO_FROM_LEVEL(name, 2) // it just creates:         name(2) name(3) ....
 #elif (YADE_REAL_BIT >= 32)
