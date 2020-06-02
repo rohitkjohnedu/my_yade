@@ -17,8 +17,8 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		#FIXME: self.digs1=yade.config.highPrecisionDecimalPlaces+yade.math.extraDigits10NecessaryForStringRepresentation
 		mpmath.mp.dps=self.digs1
 		self.extraStrDigits = mne.extraStringDigits
-		self.maxTestLevelHP = mne.maxRealLevelHP
-		self.baseDigits     = mne.digits10RealHP(1)
+		self.testLevelsHP   = mne.getRealHPSupportedByPython()
+		self.baseDigits     = mne.getRealHPDigits10(1)
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def getDigitsHP(self,N):
@@ -27,7 +27,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 			ret = self.builtinHP[self.baseDigits][N-1]
 		else:
 			ret = self.baseDigits*N
-		self.assertEqual(ret,mne.digits10RealHP(N))
+		self.assertEqual(ret,mne.getRealHPDigits10(N))
 		return ret
 
 	def adjustDigs0(self,N,HPn):
@@ -38,8 +38,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		# so basically we store one more decimal digit, and expect one less decimal digit. That amounts to ignoring one (two, if the extra one is counted) least significant digits.
 		self.tolerance = (mpmath.mpf(10)**(-self.digs0+1))*mpmath.mpf("1.001")
 
-	def runCheck(self,N0,func):
-		N      = N0+1                        # RealHP<1> == Real, the HP<…> counting starts from 1, while the python range(…) loop starts from 0.
+	def runCheck(self,N,func):
 		nameHP = "HP" + str(N)               # the same as the line 'string    name = "HP" + boost::lexical_cast<std::string>(N);' in function registerInScope in ToFromPythonConverter.hpp
 		HPn    = getattr(mne,nameHP);        # the same as the line 'py::scope HPn  = boost::python::class_<ScopeHP<N>>(name.c_str());'   in ToFromPythonConverter.hpp
 		if(N==1):
@@ -60,7 +59,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertLessEqual(abs( (mpmath.mpc(a)-mpmath.mpc(b))/mpmath.mpc(b) ),self.tolerance)
 
 	def testMpmath(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestMpmath)
 
 	def HPtestMpmath(self,N,HPn,prefix):
@@ -83,7 +82,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 
 
 	def testVector2i(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector2i)
 
 	def HPtestVector2i(self,N,HPn,prefix):
@@ -106,7 +105,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual( c2i , eval(prefix+c2i.__str__()) )
 
 	def testVector2(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector2)
 
 	def HPtestVector2(self,N,HPn,prefix):
@@ -129,7 +128,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual( c2 , eval(prefix+c2.__str__()) )
 
 	def testVector2c(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector2c)
 
 	def HPtestVector2c(self,N,HPn,prefix):
@@ -152,7 +151,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual( c2c , eval(prefix+c2c.__str__()) )
 
 	def testVector3i(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector3i)
 
 	def HPtestVector3i(self,N,HPn,prefix):
@@ -177,7 +176,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual( c3i , eval(prefix+c3i.__str__()) )
 
 	def testVector3(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector3)
 
 	def HPtestVector3(self,N,HPn,prefix):
@@ -204,7 +203,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.checkRelativeError( c3r[2] , eval(prefix+c3r.__str__())[2] )
 
 	def testVector3c(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector3c)
 
 	def HPtestVector3c(self,N,HPn,prefix):
@@ -231,7 +230,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.checkRelativeComplexError( c3c[2] , eval(prefix+c3c.__str__())[2] )
 
 	def testVector3na(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector3na)
 
 	def HPtestVector3na(self,N,HPn,prefix):
@@ -259,7 +258,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.checkRelativeError( c3a[2] , eval(prefix+c3a.__str__())[2] )
 
 	def testVector4(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestVector4)
 
 	def HPtestVector4(self,N,HPn,prefix):
@@ -291,7 +290,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.checkRelativeError( c4r[3] , eval(prefix+c4r.__str__())[3] )
 
 	def testMatrix3Test(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestMatrix3Test)
 
 	def HPtestMatrix3Test(self,N,HPn,prefix):
@@ -326,7 +325,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		#print(b3m.__str__())
 
 	def testMatrix3cTest(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestMatrix3cTest)
 
 	def HPtestMatrix3cTest(self,N,HPn,prefix):
@@ -362,7 +361,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 
 
 	def testQuaternion(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestQuaternion)
 
 	def HPtestQuaternion(self,N,HPn,prefix):

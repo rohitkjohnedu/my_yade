@@ -14,6 +14,7 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
+#include <lib/high-precision/RealHPInfo.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <iomanip>
@@ -94,7 +95,9 @@ try {
 	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
-	py::def("digits10RealHP", ::yade::math::detail::digits10RealHP, (py::arg("N")));
+	py::def("getRealHPSupportedByCpp", ::yade::math::RealHPInfo::getRealHPSupportedByCpp);
+	py::def("getRealHPSupportedByPython", ::yade::math::RealHPInfo::getRealHPSupportedByPython);
+	py::def("getRealHPDigits10", ::yade::math::RealHPInfo::getRealHPDigits10, (py::arg("N")));
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");

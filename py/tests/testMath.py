@@ -72,8 +72,8 @@ class SimpleTests(unittest.TestCase):
 			 , "fma"       : {"6":10  , "15":100 , "18":10   , "33":10     , "100":100   , "150" :100   , "100_b" :100     , "150_b" :1000   }
 			 }
 		self.extraStrDigits = mth.extraStringDigits
-		self.maxTestLevelHP = mth.maxRealLevelHP
-		self.baseDigits     = mth.digits10RealHP(1)
+		self.testLevelsHP   = mth.getRealHPSupportedByPython()
+		self.baseDigits     = mth.getRealHPDigits10(1)
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def getDigitsHP(self,N):
@@ -82,7 +82,7 @@ class SimpleTests(unittest.TestCase):
 			ret = self.builtinHP[self.baseDigits][N-1]
 		else:
 			ret = self.baseDigits*N
-		self.assertEqual(ret,mth.digits10RealHP(N))
+		self.assertEqual(ret,mth.getRealHPDigits10(N))
 		return ret
 
 	def adjustDigs0(self,N,HPn):
@@ -118,8 +118,7 @@ class SimpleTests(unittest.TestCase):
 			import sys
 			self.maxval=sys.float_info.max
 
-	def runCheck(self,N0,func):
-		N   = N0+1                        # RealHP<1> == Real, the HP<…> counting starts from 1, while the python range(…) loop starts from 0.
+	def runCheck(self,N,func):
 		HPn = getattr(mth,"HP" + str(N)); # the same as the line 'std::string name = "HP" + boost::lexical_cast<std::string>(N)' in function registerInScope in _math.cpp
 		if(N==1):
 			self.adjustDigs0(N,mth)
@@ -261,7 +260,7 @@ class SimpleTests(unittest.TestCase):
 		self.assertEqual(HPn.CGAL_Sgn(-2.3),-1)
 
 	def testInfinityNaN(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestInfinityNaN)
 
 	def HPtestInfinityNaN(self,N,HPn):
@@ -280,7 +279,7 @@ class SimpleTests(unittest.TestCase):
 		self.assertEqual(HPn.isfinite(mpmath.mpf('inf')),False)
 
 	def testCgalNumTraits(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestCgalNumTraits)
 
 	def HPtestCgalNumTraits(self,N,HPn):
@@ -332,7 +331,7 @@ class SimpleTests(unittest.TestCase):
 		self.checkRelativeError(HPn.fma(r1,r2,r3),(mpmath.mpf(r1)*r2)+r3,functionName="fma")
 
 	def testMathFunctions(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.printedAlready=set()
 			self.runCheck(N , self.HPtestMathFunctions)
 
@@ -409,14 +408,14 @@ class SimpleTests(unittest.TestCase):
 				self.threeArgMathCheck(HPn,r,r2,r3)
 
 	def testArray(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestArray)
 
 	def HPtestArray(self,N,HPn):
 		HPn.testArray()
 
 	def testBasicVariable(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestBasicVariable)
 
 	def HPtestBasicVariable(self,N,HPn):
@@ -438,7 +437,7 @@ class SimpleTests(unittest.TestCase):
 		a.cpl="13123-123123*123-50j"
 
 	def testWrongInput(self):
-		for N in range(self.maxTestLevelHP):
+		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestWrongInput)
 
 	def HPtestWrongInput(self,N,HPn):

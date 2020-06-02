@@ -17,6 +17,7 @@
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/RealIO.hpp>
+#include <lib/high-precision/RealHPInfo.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #ifdef YADE_CGAL
 #include <lib/base/AliasCGAL.hpp>
@@ -843,7 +844,7 @@ Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's s
 BOOST_PYTHON_MODULE(_math) try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	if (::yade::math::detail::digits10RealHP(1) >= 18) {
+	if (::yade::math::RealHPInfo::getRealHPDigits10(1) >= 18) {
 		std_pair_to_python_converter<double, double>();
 	}
 	// this loop registers all python functions from 1 ... N == highestPythonRegisteredHP_N.
@@ -853,10 +854,13 @@ BOOST_PYTHON_MODULE(_math) try {
 
 	expose_storage_ordering();
 
-	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
+	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, getRealHPDigits10 inside?
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
-	py::def("digits10RealHP", ::yade::math::detail::digits10RealHP, (py::arg("N")));
+	// FIXME - call SINGLE registration function ::RealHPInfo::PythonExport(), it registers all that inside it.
+	py::def("getRealHPSupportedByCpp", ::yade::math::RealHPInfo::getRealHPSupportedByCpp);
+	py::def("getRealHPSupportedByPython", ::yade::math::RealHPInfo::getRealHPSupportedByPython);
+	py::def("getRealHPDigits10", ::yade::math::RealHPInfo::getRealHPDigits10, (py::arg("N")));
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
