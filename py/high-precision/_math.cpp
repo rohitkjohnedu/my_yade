@@ -99,12 +99,12 @@ template <int N> bool                      Is_finite(const RealHP<N>& x) { retur
 namespace yade {
 template <int N> RealHP<N> simpleCgalNumTraitsCalculation()
 {
-	CGALpoint_HP<N>  x(RealHP<N>(1), RealHP<N>(1), RealHP<N>(1));
-	CGALpoint_HP<N>  p1(RealHP<N>(0), RealHP<N>(0), RealHP<N>(0));
-	CGALvector_HP<N> v1(RealHP<N>(1), RealHP<N>(1), RealHP<N>(1));
-	Plane_HP<N>      P(p1, v1);
-	RealHP<N>        h = P.a() * x.x() + P.b() * x.y() + P.c() * x.z() + P.d();
-	return ((h > 0.) - (h < 0.)) * pow(h, 2) / (CGALvector_HP<N>(P.a(), P.b(), P.c())).squared_length();
+	typename CgalHP<N>::CGALpoint  x(RealHP<N>(1), RealHP<N>(1), RealHP<N>(1));
+	typename CgalHP<N>::CGALpoint  p1(RealHP<N>(0), RealHP<N>(0), RealHP<N>(0));
+	typename CgalHP<N>::CGALvector v1(RealHP<N>(1), RealHP<N>(1), RealHP<N>(1));
+	typename CgalHP<N>::Plane      P(p1, v1);
+	RealHP<N>                      h = P.a() * x.x() + P.b() * x.y() + P.c() * x.z() + P.d();
+	return ((h > 0.) - (h < 0.)) * pow(h, 2) / (typename CgalHP<N>::CGALvector(P.a(), P.b(), P.c())).squared_length();
 }
 }
 
@@ -326,11 +326,11 @@ template <int N> struct IfConstexprForEigen<N, false> {
 
 template <int N, bool registerConverters> struct RegisterRealHPMath {
 	// python 'import this_module' measured time: skipSlowFunctionsAbove_N==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
-	static const constexpr int skipSlowFunctionsAbove_N = 20; // FIXME - exrtact/generalize this. The problem occurs only with boost cpp_bin_float
+	static const constexpr int skipSlowFunctionsAbove_N = 20; // FIXME - extract/generalize this. The problem occurs only with boost cpp_bin_float
 
 	static void work(const py::scope& topScope, const py::scope& scopeHP)
 	{
-		LOG_NOFILTER("Registering RealHP<" << N << "> and ComplexHP<" << N << ">");
+		//LOG_NOFILTER("Registering RealHP<" << N << "> and ComplexHP<" << N << ">");
 
 		// Very important line: Verifies that Real type satisfies all the requirements of RealTypeConcept
 		BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<RealHP<N>>));
