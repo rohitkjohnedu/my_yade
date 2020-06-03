@@ -686,6 +686,9 @@ template <int N, bool registerConverters> struct RegisterRealHPMath {
 		py::scope().attr("ReadCost")              = int(Eigen::NumTraits<RealHP<N>>::ReadCost);
 		py::scope().attr("AddCost")               = int(Eigen::NumTraits<RealHP<N>>::AddCost);
 		py::scope().attr("MulCost")               = int(Eigen::NumTraits<RealHP<N>>::MulCost);
+		py::scope().attr("ComplexReadCost")       = int(Eigen::NumTraits<ComplexHP<N>>::ReadCost);
+		py::scope().attr("ComplexAddCost")        = int(Eigen::NumTraits<ComplexHP<N>>::AddCost);
+		py::scope().attr("ComplexMulCost")        = int(Eigen::NumTraits<ComplexHP<N>>::MulCost);
 
 		//#if defined(YADE_EIGEN_NUM_TRAITS_HPP) or defined(EIGEN_MPREALSUPPORT_MODULE_H)
 		// The 'if constexpr(…)' is not working for C++14. So I have to simulate it using templates. Otherwise compiler will try to access non-existing types.

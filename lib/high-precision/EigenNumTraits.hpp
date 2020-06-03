@@ -26,8 +26,6 @@
 namespace Eigen {
 
 template <typename> struct EigenCostRealHP {
-	// FIXME - make sure that these enums are properly recognized; does _math.cpp export them in expose_storage_ordering() ?
-	// FIXME - add test for that
 	enum { ReadCost = Eigen::HugeCost, AddCost = Eigen::HugeCost, MulCost = Eigen::HugeCost };
 };
 
@@ -40,43 +38,11 @@ template <> struct EigenCostRealHP<boost::multiprecision::float128> {
 };
 #endif
 
-/*
-template <typename> struct EigenCostRealHP {
-// FIXME - make sure that these enums are properly recognized; does _math.cpp export them in expose_storage_ordering() ?
-// FIXME - add test for that
-	static const constexpr auto ReadCost = Eigen::HugeCost;
-	static const constexpr auto AddCost  = Eigen::HugeCost;
-	static const constexpr auto MulCost  = Eigen::HugeCost;
-};
-
-template <> struct EigenCostRealHP<boost::float_fast80_t>
-{
-	static const constexpr auto ReadCost = 1;
-	static const constexpr auto AddCost  = 1;
-	static const constexpr auto MulCost  = 1;
-};
-#ifdef BOOST_MP_FLOAT128_HPP
-template <> struct EigenCostRealHP<boost::multiprecision::float128>
-{
-	static const constexpr auto ReadCost = 1;
-	static const constexpr auto AddCost  = 2;
-	static const constexpr auto MulCost  = 2;
-};
-#endif
-*/
-
 // signature of general template from Eigen headers.
 template <class> struct NumTraits;
-// NOTE: Don't include this file for float, double, long double. Otherwise you will get errors like:
-// error: redefinition of ‘struct Eigen::NumTraits<long double>’
-// note: previous definition of ‘struct Eigen::NumTraits<long double>’ in /usr/include/eigen3/Eigen/src/Core/NumTraits.h
 
-// FIXME  ↓ Remove this comment
-// trudność:
-//   N == 1 to może być float128 lub float(dla którego już istnieje przeładowanie)
-//   RealHP<1> to może być float. Więc taka dedukcja nie jest jasna.
-template <int N> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<N>> { // NOTE: Don't include this file for float, double, long double.
-	typedef ::yade::RealHP<N> Real;                                         // XXX   Real == RealHP<N>, rename locally maybe?
+template <int N> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<N>> {
+	typedef ::yade::RealHP<N> Real;
 	typedef ::yade::RealHP<N> NonInteger;
 	typedef ::yade::RealHP<N> Nested;
 
@@ -84,10 +50,9 @@ template <int N> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<N>> { 
 	       IsSigned              = 1,
 	       IsComplex             = 0,
 	       RequireInitialization = 1,
-	       // FIXME - ReadCost etc → ReadCostHP<…>, because it depends on N.
-	       ReadCost = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::ReadCost,
-	       AddCost  = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::AddCost,
-	       MulCost  = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::MulCost };
+	       ReadCost              = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::ReadCost,
+	       AddCost               = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::AddCost,
+	       MulCost               = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::MulCost };
 
 	static constexpr long get_default_prec = std::numeric_limits<Real>::digits;
 
@@ -111,14 +76,15 @@ template <int N> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<N>> { 
 };
 
 namespace internal {
-	//template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, Rr>::type random<Rr>() { return ::yade::math::randomHP<::yade::math::levelOfRealHP<Rr>>(); }
+	// FIXME - make sure that all these functions and these below in macro YADE_EIGEN_SUPPORT_REAL_HP, are properly recognized and used.
+	//         I am no so sure that <int N> is properly resolved.
+	// other ideas:
+	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, bool>::type
+	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, Rr>::type random<Rr>() { return ::yade::math::randomHP<::yade::math::levelOfRealHP<Rr>>(); }
+	//         template <int N>       inline bool isEqualFuzzy(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
 	template <int N> inline ::yade::math::RealHP<N> random() { return ::yade::math::randomHP<N>(); }
-	// FIXME - maybe eveywhere use this:
-	// template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, bool>::type
-	// ???
 	template <int N> inline ::yade::math::RealHP<N> random(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b)
 	{
-		// FIXME - make sure these functions are called, I am no so sure that <int N> is properly resolved.
 		return a + (b - a) * ::yade::math::random01HP<N>();
 	}
 	template <int N> inline bool isMuchSmallerThan(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
@@ -126,7 +92,6 @@ namespace internal {
 		return ::yade::math::abs(a) <= ::yade::math::abs(b) * eps;
 	}
 	template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, bool>::type isEqualFuzzy(const Rr& a, const Rr& b, const Rr& eps)
-	//template <int N> inline bool isEqualFuzzy(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
 	{
 		return ::yade::math::abs(a - b) <= eps;
 	}
@@ -138,23 +103,14 @@ namespace internal {
 	{
 		return a <= b || isEqualFuzzy(a, b, eps);
 	}
-	/*
- * FIXME - make sure that all these function (listed above, and these below in macro YADE_EIGEN_SUPPORT_REAL_HP, are properly recognized and used.
- *
-	template <int N> inline long double cast<typename ::yade::math::RealHP<N>, long double>(const ::yade::math::RealHP<N>& x) { return (long double)(x); }
-	template <int N> inline double      cast<typename ::yade::math::RealHP<N>, double>(const ::yade::math::RealHP<N>& x) { return double(x); }
-	template <int N> inline long        cast<typename ::yade::math::RealHP<N>, long>(const ::yade::math::RealHP<N>& x) { return long(x); }
-	template <int N> inline int         cast<typename ::yade::math::RealHP<N>, int>(const ::yade::math::RealHP<N>& x) { return int(x); }
-*/
-
 } // end namespace internal
 
 /*************************************************************************/
 /*************************       Complex        **************************/
 /*************************************************************************/
 
-template <int N> struct NumTraitsComplexHP : GenericNumTraits<::yade::ComplexHP<N>> { // NOTE: Don't include this file for float, double, long double.
-	typedef typename ::yade::ComplexHP<N>::value_type Real;                       // XXX   Real == RealHP<N>, rename locally maybe?
+template <int N> struct NumTraitsComplexHP : GenericNumTraits<::yade::ComplexHP<N>> {
+	typedef typename ::yade::ComplexHP<N>::value_type Real;
 	typedef ::yade::ComplexHP<N>                      Complex;
 	typedef ::yade::ComplexHP<N>                      NonInteger;
 	typedef ::yade::ComplexHP<N>                      Nested;

@@ -70,6 +70,14 @@ class SimpleTests(unittest.TestCase):
 			 , "remainder" : {"6":100 , "15":5000, "18":5000 , "33":10000  , "100":10000 , "150" :100000, "100_b" :10000   , "150_b" :10000  }
 			 , "remquo"    : {"6":100 , "15":5000, "18":5000 , "33":10000  , "100":10000 , "150" :100000, "100_b" :10000   , "150_b" :10000  }
 			 , "fma"       : {"6":10  , "15":100 , "18":10   , "33":10     , "100":100   , "150" :100   , "100_b" :100     , "150_b" :1000   }
+
+			# these are not tolerances. These are EigenCostRealHP from lib/high-precision/EigenNumTraits.hpp
+			 , "read"      : {"6":1   , "15":1   , "18":1    , "33":1      , "100":10000 , "150" :10000 , "100_b" :10000   , "150_b" :10000  }
+			 , "add"       : {"6":1   , "15":1   , "18":1    , "33":2      , "100":10000 , "150" :10000 , "100_b" :10000   , "150_b" :10000  }
+			 , "mul"       : {"6":1   , "15":1   , "18":1    , "33":2      , "100":10000 , "150" :10000 , "100_b" :10000   , "150_b" :10000  }
+			 , "cread"     : {"6":2   , "15":2   , "18":2    , "33":2      , "100":20000 , "150" :20000 , "100_b" :20000   , "150_b" :20000  }
+			 , "cadd"      : {"6":2   , "15":2   , "18":2    , "33":4      , "100":20000 , "150" :20000 , "100_b" :20000   , "150_b" :20000  }
+			 , "cmul"      : {"6":6   , "15":6   , "18":6    , "33":12     , "100":60000 , "150" :60000 , "100_b" :60000   , "150_b" :60000  }
 			 }
 		self.extraStrDigits = mth.extraStringDigits
 		self.testLevelsHP   = mth.getRealHPSupportedByEigenCgal() #### XXX XXX XXX te testy są bez minieigenHP, więc może wszystko testować
@@ -77,8 +85,8 @@ class SimpleTests(unittest.TestCase):
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def testBasicHP(self):
-		#self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByEigenCgal()) ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
-		#self.assertEqual((1,2,3,4,5,6,7,8,9,10),mth.getRealHPSupportedByMinieigen()) ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
+		#self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.getRealHPSupportedByEigenCgal()) ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
+		#self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.getRealHPSupportedByMinieigen()) ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
 		self.assertEqual((1,2,4,8),mth.getRealHPSupportedByEigenCgal())               ### FIXME XXX mth.RealHPInfo.supportedLevels ()       XXX
 		self.assertEqual((1,2)    ,mth.getRealHPSupportedByMinieigen())               ### FIXME XXX mth.RealHPInfo.supportedByMiniegenHP () XXX
 
@@ -132,17 +140,19 @@ class SimpleTests(unittest.TestCase):
 		self.adjustDigs0(N,HPn)
 		func(N,HPn)                       # test scopes HP1, HP2, etc
 
-	def getDefaultTolerance(self,name):
+	def getDefaultTolerance(self,name,multiplyByTolerance=True):
+		mult = self.tolerance
+		if(not multiplyByTolerance): mult = 1
 		dictForThisFunc = self.defaultTolerances[name]
 		key = str(self.digs0)+self.extraName
 		if(key in dictForThisFunc):
-			return dictForThisFunc[key]*self.tolerance
+			return dictForThisFunc[key]*mult
 		## lower than 33 digits are all hardware precision: 6, 15, 18, 33 digits. But 4*float is 24 digits, and it can be achieved by MPFR only so add exception for 24 also.
 		self.assertTrue(self.digs0 >= 33 or self.digs0==24) ## 33 was here before
 		low = dictForThisFunc["100"+self.extraName]
 		high= dictForThisFunc["150"+self.extraName]
 		import numpy
-		return numpy.interp(self.digs0,[100,150],[low,high])
+		return numpy.interp(self.digs0,[100,150],[low,high])*mult
 
 	def printOnce(self,functionName,a):
 		if(functionName and (functionName not in self.printedAlready) and (not mpmath.isnan(abs(a)))):
@@ -454,4 +464,16 @@ class SimpleTests(unittest.TestCase):
 		self.HPnHelper = HPn
 		self.assertRaises(Exception,self.thisTestsExceptionReal)
 		self.assertRaises(Exception,self.thisTestsExceptionComplex)
+
+	def testEigenCost(self):
+		for N in self.testLevelsHP:
+			self.runCheck(N , self.HPtestEigenCost)
+
+	def HPtestEigenCost(self,N,HPn):
+		self.assertEqual(self.getDefaultTolerance("read" , False ) , HPn.ReadCost          )
+		self.assertEqual(self.getDefaultTolerance("add"  , False ) , HPn.AddCost           )
+		self.assertEqual(self.getDefaultTolerance("mul"  , False ) , HPn.MulCost           )
+		self.assertEqual(self.getDefaultTolerance("cread", False ) , HPn.ComplexReadCost   )
+		self.assertEqual(self.getDefaultTolerance("cadd" , False ) , HPn.ComplexAddCost    )
+		self.assertEqual(self.getDefaultTolerance("cmul" , False ) , HPn.ComplexMulCost    )
 
