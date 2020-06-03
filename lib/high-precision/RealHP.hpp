@@ -75,7 +75,8 @@ namespace math {
 		// depending on precision specified in compilation options, the types to use are a bit different. They "shift upwards".
 
 #if YADE_REAL_BIT <= 32
-		// note: IsWrapped and UnderlyingRealHP depend fact that ⇘ uses long double. It's a workaround boost python losing 3 digits of precision and a test of crrectness.
+		// magic constant 'long double' could be named WrappedReal or WrappedRealHP<1> or UnderlyingReal<1> or RealHP<1>, think about this.
+		// note: IsWrapped and UnderlyingRealHP depend fact that ⇘ uses long double. It's a workaround boost python losing 3 digits of precision and a test of correctness.
 		using TypeListRealHP = boost::mpl::vector<Real, double, ThinRealWrapper<long double>, NthLevelRealHP<4>, boost::multiprecision::float128>;
 #elif YADE_REAL_BIT <= 64
 		// later quad-double will be added to this list, https://github.com/boostorg/multiprecision/issues/184
@@ -151,7 +152,7 @@ namespace math {
 	template <int Level> using ComplexHP = Complex;
 #endif
 	// FIXME - notka ze str. …54 templates C++ - template <auto N> struct { … }; pozwala mieć zarówno typ jak i jego wartość. Ale chyba nadal jest nontype. tzn. musi mieć wartość?
-	template <int N> using UnderlyingRealHPi            = UnderlyingRealHP<RealHP<N>>; // his is to allow `int` template arguments  FIXME ? Or cleanup ?
+	template <int N> using UnderlyingRealHPi = UnderlyingRealHP<RealHP<N>>; // his is to allow `int` template arguments  FIXME ? Or cleanup ?
 	/*************************************************************************/
 	/*************************   levelOfRealHP<…>   **************************/
 	/*************************************************************************/

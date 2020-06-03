@@ -166,8 +166,7 @@ namespace math {
 
 namespace yade {
 namespace math {
-	using Real = ThinRealWrapper<
-	        UnderlyingReal /* FIXME: magic constant 'long double' could be named WrappedReal or WrappedRealHP<1> or UnderlyingReal<1> or RealHP<1>, think about this. */>;
+	using Real    = ThinRealWrapper<UnderlyingReal>;
 	using Complex = ThinComplexWrapper<std::complex<UnderlyingReal>>;
 }
 }
