@@ -182,7 +182,7 @@ inline ::yade::math::Real abs2(const ::yade::math::Real& x) { return x * x; }
 //}
 */
 
-// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/ExplicitRealHP.hpp for details.
+// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
 #define YADE_EIGEN_SUPPORT_REAL_HP(N)                                                                                                                          \
 	template <> struct NumTraits<::yade::RealHP<N>> : public NumTraitsRealHP<N> {                                                                          \
 	};                                                                                                                                                     \

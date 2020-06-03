@@ -850,7 +850,7 @@ BOOST_PYTHON_MODULE(_math) try {
 	if (::yade::math::RealHPInfo::getDigits10(1) >= 18) {
 		std_pair_to_python_converter<double, double>();
 	}
-	// this loop registers all python functions from range defined in YADE_EIGENCGAL_HP, file lib/high-precision/ExplicitRealHP.hpp
+	// this loop registers all python functions from range defined in YADE_EIGENCGAL_HP, file lib/high-precision/RealHPEigenCgal.hpp
 	// Some functions for large N are extremely slow during python 'import yade.math', so they are not registered, see struct IfConstexprForSlowFunctions
 	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByEigenCgal, RegisterRealHPMath>();
 

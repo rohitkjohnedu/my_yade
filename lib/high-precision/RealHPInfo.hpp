@@ -16,7 +16,7 @@
 namespace yade {
 namespace math {
 	struct RealHPInfo {
-		// set how many RealHP<N> types are provided for Eigen, CGAL and Minieigen in file lib/high-precision/ExplicitRealHP.hpp by YADE_EIGENCGAL_HP , YADE_MINIEIGEN_HP:
+		// set how many RealHP<N> types are provided for Eigen, CGAL and Minieigen in file lib/high-precision/RealHPEigenCgal.hpp by YADE_EIGENCGAL_HP , YADE_MINIEIGEN_HP:
 		static const constexpr auto sizeEigenCgal = BOOST_PP_SEQ_SIZE(YADE_EIGENCGAL_HP);
 		static const constexpr auto sizeMinieigen = BOOST_PP_SEQ_SIZE(YADE_MINIEIGEN_HP);
 

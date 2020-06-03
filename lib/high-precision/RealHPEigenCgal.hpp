@@ -77,7 +77,7 @@ There are two ways to avoid these macros:
 #endif
 
 namespace forCtags {
-struct ExplicitRealHP {
+struct RealHPEigenCgal {
 }; // for ctags
 }
 

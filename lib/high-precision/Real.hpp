@@ -218,9 +218,9 @@ static_assert(sizeof(Complex) == sizeof(std::complex<math::UnderlyingReal>), "Th
 #include "MathEigenTypes.hpp"
 
 /*************************************************************************/
-/************************* RealHP<…> CGAL,Eigen **************************/
+/************************* RealHP<…> Eigen,CGAL **************************/
 /*************************************************************************/
-#include "ExplicitRealHP.hpp"
+#include "RealHPEigenCgal.hpp"
 
 #undef YADE_REAL_MATH_NAMESPACE
 

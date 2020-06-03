@@ -32,7 +32,7 @@ namespace CGAL {
 // The Exact_predicates_inexact_constructions_kernel used `double`. Make corresponding typedef for Real type.
 template <int L> class ERealHP;
 
-// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/ExplicitRealHP.hpp for details.
+// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
 #ifdef CGAL_NO_STATIC_FILTERS
 #define YADE_REAL_HP_CGAL_KERNEL_ADAPTOR(levelHP)                                                                                                              \
 	template <>                                                                                                                                            \
@@ -55,7 +55,7 @@ YADE_HP_RUN_MACRO(YADE_REAL_HP_CGAL_KERNEL_ADAPTOR)
 using Exact_Real_predicates_inexact_constructions_kernel                          = ERealHP<1>;
 template <int levelHP> using Exact_RealHP_predicates_inexact_constructions_kernel = ERealHP<levelHP>;
 
-// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/ExplicitRealHP.hpp for details.
+// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
 #define YADE_REAL_HP_TRIANGULATION(levelHP)                                                                                                                    \
 	template <> struct Triangulation_structural_filtering_traits<ERealHP<levelHP>> {                                                                       \
 		typedef Tag_true Use_structural_filtering_tag;                                                                                                 \

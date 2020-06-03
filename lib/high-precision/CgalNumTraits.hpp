@@ -134,7 +134,7 @@ public:
 	};
 };
 
-// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/ExplicitRealHP.hpp for details.
+// There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
 #define YADE_CGAL_SUPPORT_REAL_HP(N)                                                                                                                           \
 	template <> struct Is_valid<::yade::RealHP<N>> : public RealHP_Is_valid<N> {                                                                           \
 	};                                                                                                                                                     \
@@ -146,7 +146,7 @@ public:
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h
 
 // FIXME - make sure that RealHP<…> works correctly with all possible GMP mpq_rational combinations.
-//         Before yade switches to C++20 it will requiree the same explicit template specializations macros as for the others in file ExplicitRealHP.hpp
+//         Before yade switches to C++20 it will requiree the same explicit template specializations macros as for the others in file RealHPEigenCgal.hpp
 template <typename GMP1, typename GMP2>
 struct NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>
         : public CGAL::cpp98::unary_function<::yade::Real, NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>> {
