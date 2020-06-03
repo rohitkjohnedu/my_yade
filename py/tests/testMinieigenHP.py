@@ -376,8 +376,12 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.checkRelativeError( q2[3] , mpmath.mpf("1") )
 		if(True):
 			q3=HPn.Quaternion(axis=HPn.Vector3(1,0,0),angle=mpmath.pi/2.0)
+			q3a=HPn.Quaternion((HPn.Vector3(1,0,0),mpmath.pi/2.0))
+			q3b=HPn.Quaternion((mpmath.pi/2.0,HPn.Vector3(1,0,0)))
 		else:
 			q3=HPn.Quaternion(axis=HPn.Vector3(1,0,0),angle=1.570796326794896619231321691639)
+			q3a=HPn.Quaternion((HPn.Vector3(1,0,0),1.570796326794896619231321691639))
+			q3b=HPn.Quaternion((1.570796326794896619231321691639,HPn.Vector3(1,0,0)))
 		m3q=q3.toRotationMatrix()
 		self.checkRelativeError( m3q[0][0] , mpmath.mpf("1") )
 		#print(m3q[1][2].__repr__())
@@ -391,9 +395,10 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual(mpmath.mp.dps , self.digs1 )
 		self.checkRelativeError( q4.norm() , mpmath.mpf("1") )
 
-		self.checkRelativeError( q3[0] , eval(prefix+q3.__str__())[0] )
-		self.checkRelativeError( q3[1] , eval(prefix+q3.__str__())[1] )
-		self.checkRelativeError( q3[2] , eval(prefix+q3.__str__())[2] )
-		self.checkRelativeError( q3[3] , eval(prefix+q3.__str__())[3] )
-		#print(q3.__str__())
+		for qq in (q3,q3a,q3b):
+			self.checkRelativeError( qq[0] , eval(prefix+q3.__str__())[0] )
+			self.checkRelativeError( qq[1] , eval(prefix+q3.__str__())[1] )
+			self.checkRelativeError( qq[2] , eval(prefix+q3.__str__())[2] )
+			self.checkRelativeError( qq[3] , eval(prefix+q3.__str__())[3] )
+			#print(q3.__str__())
 

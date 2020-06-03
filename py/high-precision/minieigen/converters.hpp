@@ -160,7 +160,6 @@ template <int N, int dim> struct custom_alignedBoxNr_from_seq {
 	}
 };
 
-// FIXME - add test for e.g. pi value, to make sure that precision works here correctly.
 template <int N> struct custom_Quaternionr_from_axisAngle_or_angleAxis {
 	custom_Quaternionr_from_axisAngle_or_angleAxis() { py::converter::registry::push_back(&convertible, &construct, py::type_id<QuaternionrHP<N>>()); }
 	static void* convertible(PyObject* obj_ptr)
