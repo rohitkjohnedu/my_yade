@@ -13,6 +13,7 @@ from   testMathHelper import mpc
 class ExtendedMinieigenTests(unittest.TestCase):
 	def setUp(self):
 		self.digs1=${DEC_DIGITS}+1 # FIXME ? digs1 is incorrectly used?
+		self.skip33 = True         # this is for local testing only, normally should be False. It's here because on with older compiler and -O0 the float128 is segfaulting
 		#FIXME: self.digs1=mne        .highPrecisionDecimalPlaces+mne      .extraDigits10NecessaryForStringRepresentation
 		#FIXME: self.digs1=yade.config.highPrecisionDecimalPlaces+yade.math.extraDigits10NecessaryForStringRepresentation
 		mpmath.mp.dps=self.digs1
@@ -43,11 +44,11 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		HPn    = getattr(mne,nameHP);        # the same as the line 'py::scope HPn  = boost::python::class_<ScopeHP<N>>(name.c_str());'   in ToFromPythonConverter.hpp
 		if(N==1):
 			self.adjustDigs0(N,mne)
-			if(self.digs0 == 33): return ######### FIXME - remove that. It's here because on devuan beowulf, with older compiler float128 is segfaulting
+			if((self.digs0 == 33) and self.skip33): return
 			func(N,mne,"mne.")           # test global scope functions with RealHP<1>
 		print('RealHP<'+str(N)+'>', end=' ')
 		self.adjustDigs0(N,HPn)
-		if(self.digs0 == 33): return ######### FIXME - remove that. It's here because on devuan beowulf, with older compiler float128 is segfaulting
+		if((self.digs0 == 33) and self.skip33): return
 		func(N,HPn,"mne."+nameHP+".")        # test scopes HP1, HP2, etc
 
 	def checkRelativeError(self,a,b):
