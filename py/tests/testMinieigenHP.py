@@ -13,13 +13,13 @@ from   testMathHelper import mpc
 class ExtendedMinieigenTests(unittest.TestCase):
 	def setUp(self):
 		self.digs1=${DEC_DIGITS}+1 # FIXME ? digs1 is incorrectly used?
-		self.skip33 = True         # this is for local testing only, normally should be False. It's here because on with older compiler and -O0 the float128 is segfaulting
 		#FIXME: self.digs1=mne        .highPrecisionDecimalPlaces+mne      .extraDigits10NecessaryForStringRepresentation
 		#FIXME: self.digs1=yade.config.highPrecisionDecimalPlaces+yade.math.extraDigits10NecessaryForStringRepresentation
 		mpmath.mp.dps=self.digs1
-		self.extraStrDigits = mne.extraStringDigits
-		self.testLevelsHP   = mne.getRealHPSupportedByMinieigen()
-		self.baseDigits     = mne.getRealHPDigits10(1)
+		self.extraStrDigits = mne.RealHPInfo.extraStringDigits
+		self.testLevelsHP   = mne.RealHPInfo.getSupportedByMinieigen()
+		self.baseDigits     = mne.RealHPInfo.getDigits10(1)
+		self.skip33         = mne.RealHPInfo.isFloat128Broken        # this is for local testing only. It's here because with older compiler and -O0 the float128 is segfaulting
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def getDigitsHP(self,N):
@@ -28,7 +28,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 			ret = self.builtinHP[self.baseDigits][N-1]
 		else:
 			ret = self.baseDigits*N
-		self.assertEqual(ret,mne.getRealHPDigits10(N))
+		self.assertEqual(ret,mne.RealHPInfo.getDigits10(N))
 		return ret
 
 	def adjustDigs0(self,N,HPn):

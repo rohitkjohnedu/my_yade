@@ -93,15 +93,9 @@ try {
 	py::scope().attr("__doc__") = "miniEigen is wrapper for a small part of the `Eigen <http://eigen.tuxfamily.org>`_ library. Refer to its documentation "
 	                              "for details. All classes in this module support pickling.";
 
-	const constexpr int highestPythonRegisteredHP_N = 10;
 	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByMinieigen, RegisterEigenHP>();
 
-	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
-	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
-	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
-	py::def("getRealHPSupportedByEigenCgal", ::yade::math::RealHPInfo::getRealHPSupportedByEigenCgal);
-	py::def("getRealHPSupportedByMinieigen", ::yade::math::RealHPInfo::getRealHPSupportedByMinieigen);
-	py::def("getRealHPDigits10", ::yade::math::RealHPInfo::getRealHPDigits10, (py::arg("N")));
+	::yade::math::RealHPInfo::pyRegister();
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");

@@ -29,13 +29,16 @@ namespace math {
 		using SupportedByMinieigen = boost::mpl::vector_c<int, BOOST_PP_SEQ_ENUM(YADE_MINIEIGEN_HP)>;
 
 		// export to python
-		static inline boost::python::tuple getRealHPSupportedByEigenCgal() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_EIGENCGAL_HP)); }
-		static inline boost::python::tuple getRealHPSupportedByMinieigen() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_MINIEIGEN_HP)); }
+		static inline boost::python::tuple getSupportedByEigenCgal() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_EIGENCGAL_HP)); }
+		static inline boost::python::tuple getSupportedByMinieigen() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_MINIEIGEN_HP)); }
 
 		// returns number of decimal digits for compile-time N of RealHP<N>
-		template <int N> static const constexpr auto getDigits10 = std::numeric_limits<RealHP<N>>::digits10;
+		template <int N> static const constexpr auto digits10 = std::numeric_limits<RealHP<N>>::digits10;
 		// returns number of decimal digits for runtime N of RealHP<N>
-		static int getRealHPDigits10(int N);
+		static int getDigits10(int N);
+
+		// registers itself to python
+		static void pyRegister();
 	};
 } // namespace math
 } // namespace yade

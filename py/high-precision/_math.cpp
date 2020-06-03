@@ -326,7 +326,7 @@ template <int N> struct IfConstexprForEigen<N, false> {
 
 template <int N, bool registerConverters> struct RegisterRealHPMath {
 	// python 'import this_module' measured time: skipSlowFunctionsAbove_N==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
-	static const constexpr int skipSlowFunctionsAbove_N = 10;
+	static const constexpr int skipSlowFunctionsAbove_N = 20; // FIXME - exrtact/generalize this. The problem occurs only with boost cpp_bin_float
 
 	static void work(const py::scope& topScope, const py::scope& scopeHP)
 	{
@@ -847,23 +847,16 @@ Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's s
 BOOST_PYTHON_MODULE(_math) try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	if (::yade::math::RealHPInfo::getRealHPDigits10(1) >= 18) {
+	if (::yade::math::RealHPInfo::getDigits10(1) >= 18) {
 		std_pair_to_python_converter<double, double>();
 	}
-	// this loop registers all python functions from 1 ... N == highestPythonRegisteredHP_N.
+	// this loop registers all python functions from range defined in YADE_EIGENCGAL_HP, file lib/high-precision/ExplicitRealHP.hpp
 	// Some functions for large N are extremely slow during python 'import yade.math', so they are not registered, see struct IfConstexprForSlowFunctions
-	const constexpr int highestPythonRegisteredHP_N = 10;
 	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByEigenCgal, RegisterRealHPMath>();
 
 	expose_storage_ordering();
 
-	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, getRealHPDigits10 inside?
-	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
-	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
-	// FIXME - call SINGLE registration function ::RealHPInfo::PythonExport(), it registers all that inside it.
-	py::def("getRealHPSupportedByEigenCgal", ::yade::math::RealHPInfo::getRealHPSupportedByEigenCgal);
-	py::def("getRealHPSupportedByMinieigen", ::yade::math::RealHPInfo::getRealHPSupportedByMinieigen);
-	py::def("getRealHPDigits10", ::yade::math::RealHPInfo::getRealHPDigits10, (py::arg("N")));
+	::yade::math::RealHPInfo::pyRegister();
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
