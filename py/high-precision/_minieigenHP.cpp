@@ -31,50 +31,54 @@ using namespace ::yade::MathEigenTypes;
 CREATE_CPP_LOCAL_LOGGER("_minieigenHP.cpp")
 
 template <int N, bool registerConverters> struct RegisterEigenHP {
+	// registerConverters is because C++ ↔ python converers need to be registered. In one of them (parent or child) it has to be skipped to avoid duplicate registrations.
+	// the classes (e.g. HP8.Vector3r ↔ Vector3rHP<8>) have to be exposed always.
 	static void work(const py::scope& topScope, const py::scope& scopeHP)
 	{
-		// FIXME this section and remove duplicate registrations.
+		constexpr bool notDuplicate = not((N == 1) and registerConverters);
 		// https://gitlab.com/cosurgi/minieigen-real specific stuff: START
-		//		if (registerConverters) {
 		py::scope top(topScope);
-		ArbitraryComplex_from_python<ComplexHP<N>>();
-		py::to_python_converter<ComplexHP<N>, ArbitraryComplex_to_python<ComplexHP<N>>>();
+		if (notDuplicate) {
+			ArbitraryComplex_from_python<ComplexHP<N>>();
+			py::to_python_converter<ComplexHP<N>, ArbitraryComplex_to_python<ComplexHP<N>>>();
 
-		ArbitraryReal_from_python<RealHP<N>>();
-		py::to_python_converter<RealHP<N>, ArbitraryReal_to_python<RealHP<N>>>();
-		//		}
+			ArbitraryReal_from_python<RealHP<N>>();
+			py::to_python_converter<RealHP<N>, ArbitraryReal_to_python<RealHP<N>>>();
+		}
 		// https://gitlab.com/cosurgi/minieigen-real specific stuff: END
 
 		py::scope HPn(scopeHP);
 
-		expose_converters<N>(); // in _ExposeConverters.cpp
+		expose_converters<N>(notDuplicate, topScope); // in _ExposeConverters.cpp
 
 #ifdef EIGEN_DONT_ALIGN
 		py::scope().attr("vectorize") = false;
 #else
 		py::scope().attr("vectorize") = true;
 		// when we use vectorization the Vector3r is AlignedVector3, so we need to register converter from plain old Vector3<Real> so that other functions can accept it as an argument
-		custom_VectorAnyAny_from_sequence<Eigen::Matrix<RealHP<N>, 3, 1>>();
-		py::class_<Eigen::Matrix<RealHP<N>, 3, 1>>(
-		        "Vector3na",
-		        "3-dimensional non-aligned float vector; same as :obj:`Vector3`, but with alignment (``Eigen::AlignedVector3``).\n\nSupported "
-		        "operations "
-		        "(``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, "
-		        "``v/=f``, "
-		        "``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion from sequence (list, tuple, ...) of 3 "
-		        "floats.\n\nStatic attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``, ``UnitZ``.",
-		        py::init<>())
-		        .def(VectorVisitor<Eigen::Matrix<RealHP<N>, 3, 1>>());
+		if (notDuplicate) {
+			custom_VectorAnyAny_from_sequence<Eigen::Matrix<RealHP<N>, 3, 1>>();
+			py::class_<Eigen::Matrix<RealHP<N>, 3, 1>>(
+			        "Vector3na",
+			        "3-dimensional non-aligned float vector; same as :obj:`Vector3`, but with alignment (``Eigen::AlignedVector3``).\n\nSupported "
+			        "operations (``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, "
+			        "``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion "
+			        "from sequence (list, tuple, ...) of 3 floats.\n\nStatic attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``, ``UnitZ``.",
+			        py::init<>())
+			        .def(VectorVisitor<Eigen::Matrix<RealHP<N>, 3, 1>>());
+		} else {
+			py::scope().attr("Vector3na") = topScope.attr("Vector3na");
+		}
 #endif
 
-		expose_vectors1<N>();
-		expose_vectors2<N>();
-		expose_matrices1<N>(); // must come after vectors
-		expose_matrices2<N>(); // must come after vectors
-		expose_complex1<N>();
-		expose_complex2<N>();
-		expose_quaternion<N>();
-		expose_boxes<N>();
+		expose_vectors1<N>(notDuplicate, topScope);
+		expose_vectors2<N>(notDuplicate, topScope);
+		expose_matrices1<N>(notDuplicate, topScope); // must come after vectors
+		expose_matrices2<N>(notDuplicate, topScope); // must come after vectors
+		expose_complex1<N>(notDuplicate, topScope);
+		expose_complex2<N>(notDuplicate, topScope);
+		expose_quaternion<N>(notDuplicate, topScope);
+		expose_boxes<N>(notDuplicate, topScope);
 	}
 };
 

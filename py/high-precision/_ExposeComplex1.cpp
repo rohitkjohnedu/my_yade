@@ -14,13 +14,20 @@ using namespace ::yade::MathEigenTypes;
 #define _COMPLEX_SUPPORT
 // half of minieigen/expose-complex.cpp file
 #include <py/high-precision/minieigen/visitors.hpp>
-template <int N> void expose_complex1()
+template <int N> void expose_complex1(bool notDuplicate, const py::scope& topScope)
 {
 #ifdef _COMPLEX_SUPPORT
-	py::class_<Vector2crHP<N>>("Vector2c", "/*TODO*/", py::init<>()).def(VectorVisitor<Vector2crHP<N>>());
-	py::class_<Vector3crHP<N>>("Vector3c", "/*TODO*/", py::init<>()).def(VectorVisitor<Vector3crHP<N>>());
-	py::class_<Vector6crHP<N>>("Vector6c", "/*TODO*/", py::init<>()).def(VectorVisitor<Vector6crHP<N>>());
-	py::class_<VectorXcrHP<N>>("VectorXc", "/*TODO*/", py::init<>()).def(VectorVisitor<VectorXcrHP<N>>());
+	if (notDuplicate) {
+		py::class_<Vector2crHP<N>>("Vector2c", "/*TODO*/", py::init<>()).def(VectorVisitor<Vector2crHP<N>>());
+		py::class_<Vector3crHP<N>>("Vector3c", "/*TODO*/", py::init<>()).def(VectorVisitor<Vector3crHP<N>>());
+		py::class_<Vector6crHP<N>>("Vector6c", "/*TODO*/", py::init<>()).def(VectorVisitor<Vector6crHP<N>>());
+		py::class_<VectorXcrHP<N>>("VectorXc", "/*TODO*/", py::init<>()).def(VectorVisitor<VectorXcrHP<N>>());
+	} else {
+		py::scope().attr("Vector2c") = topScope.attr("Vector2c");
+		py::scope().attr("Vector3c") = topScope.attr("Vector3c");
+		py::scope().attr("Vector6c") = topScope.attr("Vector6c");
+		py::scope().attr("VectorXc") = topScope.attr("VectorXc");
+	}
 #endif
 }
 

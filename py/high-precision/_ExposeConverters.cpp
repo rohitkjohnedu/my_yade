@@ -14,32 +14,34 @@ using namespace ::yade::MathEigenTypes;
 #define _COMPLEX_SUPPORT
 // file minieigen/expose-converters.cpp
 #include <py/high-precision/minieigen/converters.hpp>
-template <int N> void expose_converters()
+template <int N> void expose_converters(bool notDuplicate, const py::scope&)
 {
-	custom_VectorAnyAny_from_sequence<VectorXrHP<N>>();
-	custom_VectorAnyAny_from_sequence<Vector6rHP<N>>();
-	custom_VectorAnyAny_from_sequence<Vector6i>();
-	custom_VectorAnyAny_from_sequence<Vector3rHP<N>>();
-	custom_VectorAnyAny_from_sequence<Vector3i>();
-	custom_VectorAnyAny_from_sequence<Vector2rHP<N>>();
-	custom_VectorAnyAny_from_sequence<Vector2i>();
-	custom_alignedBoxNr_from_seq<N, 2>();
-	custom_alignedBoxNr_from_seq<N, 3>();
-	custom_Quaternionr_from_axisAngle_or_angleAxis<N>();
+	if (notDuplicate) {
+		custom_VectorAnyAny_from_sequence<VectorXrHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector6rHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector6i>();
+		custom_VectorAnyAny_from_sequence<Vector3rHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector3i>();
+		custom_VectorAnyAny_from_sequence<Vector2rHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector2i>();
+		custom_alignedBoxNr_from_seq<N, 2>();
+		custom_alignedBoxNr_from_seq<N, 3>();
+		custom_Quaternionr_from_axisAngle_or_angleAxis<N>();
 
-	custom_MatrixAnyAny_from_sequence<Matrix3rHP<N>>();
-	custom_MatrixAnyAny_from_sequence<Matrix6rHP<N>>();
-	custom_MatrixAnyAny_from_sequence<MatrixXrHP<N>>();
+		custom_MatrixAnyAny_from_sequence<Matrix3rHP<N>>();
+		custom_MatrixAnyAny_from_sequence<Matrix6rHP<N>>();
+		custom_MatrixAnyAny_from_sequence<MatrixXrHP<N>>();
 
 #ifdef _COMPLEX_SUPPORT
-	custom_VectorAnyAny_from_sequence<Vector2crHP<N>>();
-	custom_VectorAnyAny_from_sequence<Vector3crHP<N>>();
-	custom_VectorAnyAny_from_sequence<Vector6crHP<N>>();
-	custom_VectorAnyAny_from_sequence<VectorXcrHP<N>>();
-	custom_MatrixAnyAny_from_sequence<Matrix3crHP<N>>();
-	custom_MatrixAnyAny_from_sequence<Matrix6crHP<N>>();
-	custom_MatrixAnyAny_from_sequence<MatrixXcrHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector2crHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector3crHP<N>>();
+		custom_VectorAnyAny_from_sequence<Vector6crHP<N>>();
+		custom_VectorAnyAny_from_sequence<VectorXcrHP<N>>();
+		custom_MatrixAnyAny_from_sequence<Matrix3crHP<N>>();
+		custom_MatrixAnyAny_from_sequence<Matrix6crHP<N>>();
+		custom_MatrixAnyAny_from_sequence<MatrixXcrHP<N>>();
 #endif
+	} // XXX - make sure that it's not necessary to clone attrs to child scope, like I do this in all other files.
 }
 
 // explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)

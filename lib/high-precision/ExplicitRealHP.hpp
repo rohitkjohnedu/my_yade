@@ -94,7 +94,7 @@ struct ExplicitRealHP {
  *
  * Each number in YADE_MINIEIGEN_HP, defined above,  makes compilation longer by 1 minute. So put there only the ones which are really needed to be accessed from python.
  */
-#define YADE_HP_PY_EIGEN(r, name, levelHP) template void name<levelHP>();
+#define YADE_HP_PY_EIGEN(r, name, levelHP) template void name<levelHP>(bool, const py::scope&);
 #define YADE_HP_PYTHON_REGISTER(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PY_EIGEN, name, YADE_MINIEIGEN_HP) // instatinate templates for name<1>, name<2>, etc …
 
 /*
