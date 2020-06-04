@@ -79,16 +79,16 @@ class SimpleTests(unittest.TestCase):
 			 , "cadd"      : {"6":2   , "15":2   , "18":2    , "33":4      , "100":20000 , "150" :20000 , "100_b" :20000   , "150_b" :20000  }
 			 , "cmul"      : {"6":6   , "15":6   , "18":6    , "33":12     , "100":60000 , "150" :60000 , "100_b" :60000   , "150_b" :60000  }
 			 }
-		self.extraStrDigits = mth.RealHPInfo.extraStringDigits
-		self.testLevelsHP   = mth.RealHPInfo.getSupportedByEigenCgal()
-		self.baseDigits     = mth.RealHPInfo.getDigits10(1)
+		self.extraStrDigits = mth.RealHPConfig.extraStringDigits
+		self.testLevelsHP   = mth.RealHPConfig.getSupportedByEigenCgal()
+		self.baseDigits     = mth.RealHPConfig.getDigits10(1)
 		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def testBasicHP(self):
-		#self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.RealHPInfo.getSupportedByEigenCgal())
-		#self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.RealHPInfo.getSupportedByMinieigen())
-		self.assertEqual((1,2,4,8),mth.RealHPInfo.getSupportedByEigenCgal())
-		self.assertEqual((1,2)    ,mth.RealHPInfo.getSupportedByMinieigen())
+		#self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.RealHPConfig.getSupportedByEigenCgal())
+		#self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.RealHPConfig.getSupportedByMinieigen())
+		self.assertEqual((1,2,4,8) , mth.RealHPConfig.getSupportedByEigenCgal())
+		self.assertEqual((1,2)     , mth.RealHPConfig.getSupportedByMinieigen())
 
 	def getDigitsHP(self,N):
 		ret = None
@@ -96,7 +96,7 @@ class SimpleTests(unittest.TestCase):
 			ret = self.builtinHP[self.baseDigits][N-1]
 		else:
 			ret = self.baseDigits*N
-		self.assertEqual(ret,mth.RealHPInfo.getDigits10(N))
+		self.assertEqual(ret,mth.RealHPConfig.getDigits10(N))
 		return ret
 
 	def adjustDigs0(self,N,HPn):
