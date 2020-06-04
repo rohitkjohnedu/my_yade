@@ -16,7 +16,7 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
-#include <lib/high-precision/RealHPInfo.hpp>
+#include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/RealIO.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #ifdef YADE_CGAL
@@ -36,6 +36,7 @@
 #include <boost/concept/assert.hpp>
 #include <boost/math/concepts/real_type_concept.hpp>
 
+#include <lib/high-precision/ToFromPythonConverter.hpp>
 CREATE_CPP_LOCAL_LOGGER("_math.cpp")
 
 namespace py = ::boost::python;
@@ -121,7 +122,11 @@ template <int N, bool> struct Var {
 	void         setComplex(ComplexHP<N> val) { valueComplex = val; };
 };
 
-template <int N> void compareVec(const std::vector<RealHP<N>>& vec, const ::yade::math::UnderlyingRealHPi<N>* array)
+// A note: on page 54 in book "C++ Templates", D.Vandevoorde a 'template <auto N> struct { … };' allows to have both the type and its value. But it requires C++17.
+// so that I could declare UnderlyingRealHP which accepts both 'int' and 'RealHP<N>'
+// template <int N> using UnderlyingRealHP_int = UnderlyingRealHP<RealHP<N>>; // this is to allow `int` template arguments
+
+template <int N> void compareVec(const std::vector<RealHP<N>>& vec, const ::yade::math::UnderlyingRealHP<RealHP<N>>* array)
 {
 	for (size_t i = 0; i < vec.size(); i++) {
 		if (vec[i] != array[i]) {
@@ -133,7 +138,7 @@ template <int N> void compareVec(const std::vector<RealHP<N>>& vec, const ::yade
 
 #include <boost/range/combine.hpp>
 // this funcction simulates some external library which works on C-arrays.
-template <int N> void multVec(::yade::math::UnderlyingRealHPi<N>* array, const ::yade::math::UnderlyingRealHPi<N>& fac, size_t s)
+template <int N> void multVec(::yade::math::UnderlyingRealHP<RealHP<N>>* array, const ::yade::math::UnderlyingRealHP<RealHP<N>>& fac, size_t s)
 {
 	for (size_t i = 0; i < s; i++)
 		array[i] *= fac;
@@ -155,7 +160,7 @@ template <int N> void testArray()
 	compareVec<N>(vec, math::constVectorData(vec));
 	auto      copy = vec;
 	RealHP<N> fac  = 0.25;
-	multVec<N>(math::vectorData(vec), static_cast<::yade::math::UnderlyingRealHPi<N>>(fac), vec.size());
+	multVec<N>(math::vectorData(vec), static_cast<::yade::math::UnderlyingRealHP<RealHP<N>>>(fac), vec.size());
 	for (auto a : boost::combine(copy, vec)) {
 		if (a.template get<0>() * fac != a.template get<1>()) {
 			std::cerr << __PRETTY_FUNCTION__ << " failed test\n";
@@ -847,16 +852,16 @@ Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's s
 BOOST_PYTHON_MODULE(_math) try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	if (::yade::math::RealHPInfo::getDigits10(1) >= 18) {
+	if (::yade::math::RealHPConfig::getDigits10(1) >= 18) {
 		std_pair_to_python_converter<double, double>();
 	}
 	// this loop registers all python functions from range defined in YADE_EIGENCGAL_HP, file lib/high-precision/RealHPEigenCgal.hpp
 	// Some functions for large N are extremely slow during python 'import yade.math', so they are not registered, see struct IfConstexprForSlowFunctions
-	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByEigenCgal, RegisterRealHPMath>();
+	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByEigenCgal, RegisterRealHPMath>();
 
 	expose_storage_ordering();
 
-	::yade::math::RealHPInfo::pyRegister();
+	::yade::math::RealHPConfig::pyRegister();
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");

@@ -14,7 +14,7 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
-#include <lib/high-precision/RealHPInfo.hpp>
+#include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <iomanip>
@@ -93,9 +93,9 @@ try {
 	py::scope().attr("__doc__") = "miniEigen is wrapper for a small part of the `Eigen <http://eigen.tuxfamily.org>`_ library. Refer to its documentation "
 	                              "for details. All classes in this module support pickling.";
 
-	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPInfo::SupportedByMinieigen, RegisterEigenHP>();
+	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByMinieigen, RegisterEigenHP>();
 
-	::yade::math::RealHPInfo::pyRegister();
+	::yade::math::RealHPConfig::pyRegister();
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
