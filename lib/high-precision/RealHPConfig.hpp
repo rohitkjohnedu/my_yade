@@ -15,7 +15,7 @@
 #define YADE_EIGENCGAL_HP (1)(2)(3)(4)(8)(10)(20)
 #define YADE_MINIEIGEN_HP (1)(2)
 
-// If you are doing some debugging and need to access from minieigenHP all the precisions that are used in C++, then instead of above, use e.g. this:
+// If you are doing some debugging and need more precisions or to access them from minieigenHP, then use e.g. this:
 //#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(20)
 //#define YADE_MINIEIGEN_HP YADE_EIGENCGAL_HP
 
@@ -32,6 +32,7 @@
 namespace yade {
 namespace math {
 	struct RealHPConfig {
+	public:
 		// set how many RealHP<N> types are provided for Eigen, CGAL and Minieigen in file lib/high-precision/RealHPEigenCgal.hpp by YADE_EIGENCGAL_HP , YADE_MINIEIGEN_HP:
 		static const constexpr auto sizeEigenCgal = BOOST_PP_SEQ_SIZE(YADE_EIGENCGAL_HP);
 		static const constexpr auto sizeMinieigen = BOOST_PP_SEQ_SIZE(YADE_MINIEIGEN_HP);
@@ -55,6 +56,12 @@ namespace math {
 
 		// register this class to python
 		static void pyRegister();
+
+		// how many extra digits to use when converting to decimal srings
+		static int  getExtraStringDigits10();
+		static void setExtraStringDigits10(int d);
+	private:
+		static int extraStringDigits10;
 	};
 } // namespace math
 } // namespace yade

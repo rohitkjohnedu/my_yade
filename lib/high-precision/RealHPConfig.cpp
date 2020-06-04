@@ -11,6 +11,8 @@
 namespace yade {
 namespace math {
 
+	int RealHPConfig::extraStringDigits10 { 1 };
+
 	int RealHPConfig::getDigits10(int N)
 	{
 		// 5 is the largest length of RealHPLadder<…>. If more were added, and precision were not the multiplies of digits10*N
@@ -30,11 +32,19 @@ namespace math {
 
 	void RealHPConfig::pyRegister()
 	{
-		namespace py                          = ::boost::python;
-		py::scope here                        = py::class_<RealHPConfig>("RealHPConfig");
-		py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
-		py::def("getSupportedByEigenCgal", getSupportedByEigenCgal, R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by Eigen and CGAL)""");
-		py::def("getSupportedByMinieigen", getSupportedByMinieigen, R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by minieigenHP)""");
+		namespace py   = ::boost::python;
+		py::scope here = py::class_<RealHPConfig>("RealHPConfig")
+		                         .add_property(
+		                                 "extraStringDigits10",
+		                                 &RealHPConfig::getExtraStringDigits10,
+		                                 &RealHPConfig::setExtraStringDigits10,
+		                                 "How many extra digits to use when converting to decimal srings.");
+		py::def("getSupportedByEigenCgal",
+		        getSupportedByEigenCgal,
+		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by Eigen and CGAL)""");
+		py::def("getSupportedByMinieigen",
+		        getSupportedByMinieigen,
+		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by minieigenHP)""");
 		py::def("getDigits10", getDigits10, (py::arg("N")), R"""(:return: the ``int`` representing numeric_limits digits10 of RealHP<N>)""");
 #if (GCC_VERSION < 90201)
 #ifndef YADE_DISABLE_REAL_MULTI_HP
@@ -49,6 +59,9 @@ namespace math {
 		py::scope().attr("isFloat128Broken") = false;
 #endif
 	}
+
+	int  RealHPConfig::getExtraStringDigits10() { return extraStringDigits10; }
+	void RealHPConfig::setExtraStringDigits10(int d) { extraStringDigits10 = d; }
 } // namespace math
 } // namespace yade
 

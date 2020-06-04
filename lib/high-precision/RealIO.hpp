@@ -21,6 +21,7 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/high-precision/Real.hpp>
+#include <lib/high-precision/RealHPConfig.hpp>
 #include <boost/integer/static_log2.hpp>
 #include <boost/lexical_cast.hpp>
 #include <sstream>
@@ -28,7 +29,7 @@
 
 namespace yade {
 namespace math {
-	/* the extraDigits10NecessaryForStringRepresentation is to make sure that there are no conversion errors in the last bit.
+	/* the extraStringDigits10 is to make sure that there are no conversion errors in the last bit.
 	   a quick python example which shows the 'cutting' of last digits.
 
 # This one demostrates that `double` used by python has just 53 bits of precision:
@@ -42,7 +43,7 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(mpmath.mpf(1)+mpmath.mpf
 
 # This one shows the actual 'Real' precision used in yade. To achieve this the mth.max(…,…) are called to force the numbers
 # to pass through C++, instead of letting mpmath to calculate this, so for example we can see that float128 has 113 bits.
-# Also this test was used to verify the value for extraDigits10NecessaryForStringRepresentation as well as the formula given
+# Also this test was used to verify the value for extraStringDigits10 as well as the formula given
 # in IEEE Std 754-2019 Standard for Floating-Point Arithmetic: Pmin (bf) = 1 + ceiling( p × log10(2)), where p is the number of significant bits in bf
 
 from yade import math as mth
@@ -51,7 +52,7 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+m
 
 # Hmm maybe turn this into an external parameter? Configurable from python? And write in help "use 1 to extract results and avoid fake sense of more precision,
 # use 4 or more to have nubers which will convert exactly in both directions mpmath ↔ string ↔ C++.".
-# For now it is in yade.math.extraDigits10NecessaryForStringRepresentation
+# For now it is in yade.math.RealHPConfig.extraStringDigits10
 */
 
 	//////////////////// XXX:  	std::streamsize max_digits10 = 2 + std::numeric_limits<double>::digits * 30103UL / 100000UL;
@@ -82,13 +83,12 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+m
 	constexpr const auto exponentIeee    = realBit - significandIeee;
 	constexpr const auto reqDigits10
 	        = 1 + constexprCeiling(Try<significandIeee>::result /* * 10000000 / 33219281 */ /*0.301029995663981195213738*/ /*log_10_2*/);
-	constexpr const auto extraDigits10NecessaryForStringRepresentation = 1;
 	//static_assert((reqDigits10 - 3) == std::numeric_limits<Real>::digits10, "IEEE error.");
 
 	// guaranteed maximum precision
 	template <typename RC, int Level = levelOfHP<RC>> inline std::string toStringHP(const RC& val)
 	{
-		constexpr const auto digs1 = std::numeric_limits<RealOf<RC>>::digits10 + ::yade::math::extraDigits10NecessaryForStringRepresentation;
+		const int digs1 = std::numeric_limits<RealOf<RC>>::digits10 + ::yade::math::RealHPConfig::getExtraStringDigits10();
 		std::ostringstream   ss;
 		ss << std::setprecision(digs1) << val;
 		return ss.str();

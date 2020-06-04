@@ -12,15 +12,10 @@ from   testMathHelper import mpc
 
 class ExtendedMinieigenTests(unittest.TestCase):
 	def setUp(self):
-		self.digs1=${DEC_DIGITS}+1 # FIXME ? digs1 is incorrectly used?
-		#FIXME: self.digs1=mne        .highPrecisionDecimalPlaces+mne      .extraDigits10NecessaryForStringRepresentation
-		#FIXME: self.digs1=yade.config.highPrecisionDecimalPlaces+yade.math.extraDigits10NecessaryForStringRepresentation
-		mpmath.mp.dps=self.digs1
-		self.extraStrDigits = mne.RealHPConfig.extraStringDigits
-		self.testLevelsHP   = mne.RealHPConfig.getSupportedByMinieigen()
-		self.baseDigits     = mne.RealHPConfig.getDigits10(1)
-		self.skip33         = mne.RealHPConfig.isFloat128Broken        # this is for local testing only. It's here because with older compiler and -O0 the float128 is segfaulting
-		self.builtinHP      = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
+		self.testLevelsHP = mne.RealHPConfig.getSupportedByMinieigen()
+		self.baseDigits   = mne.RealHPConfig.getDigits10(1)
+		self.skip33       = mne.RealHPConfig.isFloat128Broken        # this is for local testing only. It's here because with older compiler and -O0 the float128 is segfaulting
+		self.builtinHP    = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def getDigitsHP(self,N):
 		ret = None
@@ -32,9 +27,9 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		return ret
 
 	def adjustDigs0(self,N,HPn):
-		self.digs0     = self.getDigitsHP(N)
-		self.digs1     = self.digs0 + 1
-		mpmath.mp.dps  = self.digs0 + self.extraStrDigits
+		self.digs0    = self.getDigitsHP(N)
+		self.digs1    = self.digs0 + mne.RealHPConfig.extraStringDigits10
+		mpmath.mp.dps = self.digs1
 		# tolerance = 1.001×10⁻ᵈ⁺¹, where ᵈ==self.digs0
 		# so basically we store one more decimal digit, and expect one less decimal digit. That amounts to ignoring one (two, if the extra one is counted) least significant digits.
 		self.tolerance = (mpmath.mpf(10)**(-self.digs0+1))*mpmath.mpf("1.001")
