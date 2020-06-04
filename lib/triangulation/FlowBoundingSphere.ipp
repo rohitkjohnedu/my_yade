@@ -100,7 +100,7 @@ namespace CGT {
 	{
 		if (noCache && T[!currentTes].Max_id() <= 0)
 			return;
-		RTriangulation&     Tri = T[noCache ? (!currentTes) : currentTes].Triangulation();
+		RTriangulation&     Tri = T[currentTes].Triangulation(); // T[noCache ? (!currentTes) : currentTes].Triangulation();
 		Point               posAvFacet;
 		int                 numCells      = 0;
 		Real                facetFlowRate = 0;

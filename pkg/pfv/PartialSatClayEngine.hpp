@@ -74,12 +74,12 @@ public:
 
 	PartialSatCellInfo(void)
 	{
-		initialPorosity   = 1.0;
+		initialPorosity   = 0.25;
 		initialSaturation = 0.01;
 		oldPressure       = 0;
 		crackArea         = 0;
 		saturation        = 0.01;
-		porosity          = 1;
+		porosity          = 0.25;
 		dsdp              = 0;
 		vSolids           = 0;
 		crack             = false;

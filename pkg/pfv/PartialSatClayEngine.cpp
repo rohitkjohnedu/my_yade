@@ -24,33 +24,27 @@ PartialSatClayEngine::~PartialSatClayEngine() {}
 void PartialSatClayEngine::action()
 {
 	if (debug) cout << "Entering partialSatEngineAction "<<endl;
-	if (partialSatDT != 0)
-		timeStepControl();
+	if (partialSatDT != 0) timeStepControl();
 
-	if (!isActivated)
-		return;
+	if (!isActivated) return;
 	timingDeltas->start();
 	if (desiredPorosity != 0) {
 		Real actualPorosity = Shop::getPorosityAlt();
 		volumeCorrection    = desiredPorosity / actualPorosity;
 	}
-	if (debug)
-		cout << "about to set positions" << endl;
+	if (debug) cout << "about to set positions" << endl;
 	setPositionsBuffer(true);
 	if (!first and alphaBound >= 0)
 		addAlphaToPositionsBuffer(true);
 	timingDeltas->checkpoint("Position buffer");
 	if (first) {
-		if (debug)
-			cout << "about to build triangulation" << endl;
+		if (debug) cout << "about to build triangulation" << endl;
 		if (multithread)
 			setPositionsBuffer(false);
 		buildTriangulation(pZero, *solver);
 		//if (debug) cout <<"about to add alphatopositionsbuffer" << endl;
-		if (alphaBound >= 0)
-			addAlphaToPositionsBuffer(true);
-		if (debug)
-			cout << "about to initializevolumes" << endl;
+		if (alphaBound >= 0) addAlphaToPositionsBuffer(true);
+		if (debug) cout << "about to initializevolumes" << endl;
 		initializeVolumes(*solver);
 		backgroundSolver    = solver;
 		backgroundCompleted = true;
@@ -63,8 +57,7 @@ void PartialSatClayEngine::action()
 				setPorosityWithImageryGrid(imageryFilePath, *solver);
 			}
 			//if ( crackCellPoroThreshold>0 ) crackCellsAbovePoroThreshold(*solver); // set initial crack network using porosity threshold from imagery
-			if (blockCellPoroThreshold > 0)
-				blockCellsAbovePoroThreshold(*solver);
+			if (blockCellPoroThreshold > 0) blockCellsAbovePoroThreshold(*solver);
 			if (mineralPoro > 0) {
 				cout << "about to block low poros" << endl;
 				blockLowPoroRegions(*solver);
@@ -72,12 +65,9 @@ void PartialSatClayEngine::action()
 			cout << "initializing saturations" << endl;
 			initializeSaturations(*solver);
 			solver->computePermeability(); //computing permeability again since they depend on the saturations. From here on, we only compute perm once per triangulation
-			if (particleSwelling && volumes)
-				setOriginalParticleValues();
-			if (useKeq)
-				computeEquivalentBulkModuli(*solver);
-			if (debug)
-				cout << "Particle swelling model active, original particle volumes set" << endl;
+			if (particleSwelling && volumes) setOriginalParticleValues();
+			if (useKeq) computeEquivalentBulkModuli(*solver);
+			if (debug) cout << "Particle swelling model active, original particle volumes set" << endl;
 		}
 	}
 #ifdef YADE_OPENMP
@@ -395,8 +385,8 @@ void PartialSatClayEngine::updatePorosity(FlowSolver& flow)
 		} // if we dont want to modify porosity during genesis, but keep the cell curve params updated between triangulations
 		// update the parameters for the unique pcs curve in this cell (keep this for interpolation purposes):
 		cell->info().Po
-		        = Po * exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
-		cell->info().lambdao = lmbda * exp(b * (meanInitialPorosity - cell->info().porosity));
+		        = Po * exp(a * (cell->info().initialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
+		cell->info().lambdao = lmbda * exp(b * (cell->info().initialPorosity - cell->info().porosity));
 	}
 }
 
@@ -427,10 +417,9 @@ void PartialSatClayEngine::setPorosityWithImageryGrid(string imageryFilePath, Fl
 	const long size = Tes.cellHandles.size();
 #pragma omp parallel for
 	for (long i = 0; i < size; i++) {
-		if (cell->info().Pcondition) continue;
 		CellHandle& cell      = Tes.cellHandles[i];
-		Real        finalDist = 1000;
-		Real        finalPoro = 0;
+		Real        finalDist = 1e10;
+		Real        finalPoro = meanInitialPorosity;
 		CVector     bc        = flow.cellBarycenter(cell);
 		// Real xi = cell->info()[0];
 		// Real yi = cell->info()[1];
@@ -445,9 +434,11 @@ void PartialSatClayEngine::setPorosityWithImageryGrid(string imageryFilePath, Fl
 					finalPoro = porosities[k];
 				}
 			}
-			if (finalPoro < minPoroClamp)
+
+			// finalPoro = meanInitialPorosity;
+			if (finalPoro <= minPoroClamp)
 				finalPoro = minPoroClamp;
-			if (finalPoro > maxPoroClamp)
+			if (finalPoro >= maxPoroClamp)
 				finalPoro = maxPoroClamp;
 			cell->info().porosity = cell->info().initialPorosity = finalPoro;
 			if (finalPoro > maxPorosity)
@@ -456,8 +447,8 @@ void PartialSatClayEngine::setPorosityWithImageryGrid(string imageryFilePath, Fl
 
 		cell->info().vSolids = cell->info().volume() * (1. - cell->info().porosity);
 		if (!resetVolumeSolids) {
-			cell->info().Po = Po * exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
-			cell->info().lambdao = lmbda * exp(b * (meanInitialPorosity - cell->info().porosity));
+			cell->info().Po = Po;  //* exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
+			cell->info().lambdao = lmbda; // * exp(b * (meanInitialPorosity - cell->info().porosity));
 		}
 	}
 	if (resetVolumeSolids)
@@ -512,8 +503,7 @@ void PartialSatClayEngine::setInitialPorosity(FlowSolver& flow)
 		// cell->info().invVoidVolume() = 1./(cell->info().volume()*cell->info().porosity); // do this at each triangulation?
 		// set parameters for unique PcS curve on this cell:
 		if (!resetVolumeSolids) {
-			cell->info().Po = Po
-			        * exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
+			cell->info().Po = Po * exp(a * (meanInitialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
 			cell->info().lambdao = lmbda * exp(b * (meanInitialPorosity - cell->info().porosity));
 		}
 	}
@@ -589,13 +579,11 @@ Real PartialSatClayEngine::dsdp(CellHandle& cell)
 	//	return dsdp;
 	// analytical derivative of van genuchten
 	const Real pc = pAir - cell->info().p(); // suction
-	if (pc <= 0)
-		return 0;
+	if (pc <= 0) return 0;
 	const Real term1 = pow(pow(pc / cell->info().Po, 1. / (1. - cell->info().lambdao)) + 1., (-cell->info().lambdao - 1.));
 	const Real term2 = cell->info().lambdao * pow(pc / cell->info().Po, 1. / (1. - cell->info().lambdao) - 1.);
 	const Real term3 = cell->info().Po * (1. - cell->info().lambdao);
-	return term1 * term2
-	        / term3; // techncially this derivative should be negative, but we use a van genuchten fit for suction, not water pressure. Within the numerical formulation, we want the change of saturation with respect to water pressure (not suction). Which essentially reverses the sign of the derivative.
+	return term1 * term2 / term3; // techncially this derivative should be negative, but we use a van genuchten fit for suction, not water pressure. Within the numerical formulation, we want the change of saturation with respect to water pressure (not suction). Which essentially reverses the sign of the derivative.
 
 	// alternate form of analytical derivative from VG 1908 https://www.nrc.gov/docs/ML0330/ML033070005.pdf
 	//	Real term1 = -cell->info().lambdao/(pc*(1.-cell->info().lambdao));
@@ -626,15 +614,13 @@ void PartialSatClayEngine::updateBoundarySaturation(FlowSolver& flow)
 {
 	if (alphaBound >= 0) {
 		for (FlowSolver::VCellIterator it = flow.alphaBoundingCells.begin(); it != flow.alphaBoundingCells.end(); it++) {
-			if ((*it) == NULL)
-				continue;
+			if ((*it) == NULL) continue;
 			setSaturationFromPcS(*it);
 		}
 	} else {
 		for (int i = 0; i < 6; i++) {
 			for (FlowSolver::VCellIterator it = flow.boundingCells[i].begin(); it != flow.boundingCells[i].end(); it++) {
-				if ((*it) == NULL)
-					continue;
+				if ((*it) == NULL) continue;
 				setSaturationFromPcS(*it);
 			}
 		}

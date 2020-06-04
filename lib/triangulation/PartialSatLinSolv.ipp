@@ -314,6 +314,11 @@ namespace CGT {
 			newCell->info().vSolids  = oldCell->info().vSolids;
 			newCell->info().blocked = oldCell->info().blocked; //used for carrying clumped minerals through sim - maybe an issue for blocking cracks
 			newCell->info().initiallyCracked = oldCell->info().initiallyCracked;
+			// shouldnt need this stuff...
+			newCell->info().dsdp = oldCell->info().dsdp;
+			newCell->info().Po = oldCell->info().Po;
+			newCell->info().lambdao = oldCell->info().lambdao;
+			newCell->info().oldPressure = oldCell->info().oldPressure;
 			//cout << "blocked interp" << endl;
 			/*		if (freezePorosity) {*/
 			/*			newCell->info().lambdao = oldCell->info().lambdao;*/
