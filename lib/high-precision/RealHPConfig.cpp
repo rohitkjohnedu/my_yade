@@ -32,9 +32,20 @@ namespace math {
 
 	void RealHPConfig::pyRegister()
 	{
-		namespace py                            = ::boost::python;
-		py::scope here                          = py::class_<RealHPConfig>("RealHPConfig");
-		py::scope().attr("extraStringDigits10") = extraStringDigits10;
+		namespace py = ::boost::python;
+		py::scope cl = py::class_<RealHPConfig>(
+		                       "RealHPConfig",
+		                       // docstrings for static properties are forbidden in python. The solution is to put it into __doc__
+		                       // https://stackoverflow.com/questions/25386370/docstrings-for-static-properties-in-boostpython
+		                       "``RealHPConfig`` class provides information about RealHP<N> type.\n"
+		                       ":cvar extraStringDigits10: this static variable allows o control how many extra digits to use when converting to "
+		                       "decimal srings.")
+		                       .add_static_property(
+		                               "extraStringDigits10",
+		                               py::make_getter(&RealHPConfig::extraStringDigits10, py::return_value_policy<py::return_by_value>()),
+		                               py::make_setter(&RealHPConfig::extraStringDigits10, py::return_value_policy<py::return_by_value>())
+		                               // python docstrings for static variables have to be written inside :cvar ………: in __doc__ of a class. See above.
+		                       );
 		py::def("getSupportedByEigenCgal",
 		        getSupportedByEigenCgal,
 		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by Eigen and CGAL)""");
