@@ -5,18 +5,18 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#include <lib/high-precision/RealHPInfo.hpp>
+#include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/RealIO.hpp>
 
 namespace yade {
 namespace math {
 
-	int RealHPInfo::getDigits10(int N)
+	int RealHPConfig::getDigits10(int N)
 	{
-		// 5 is the largest length of TypeListRealHP<…>. If more were added, and precision were not the multiplies of digits10*N
-		// then the python test will quickly catch that problem. And more cases will be needed to add to this switch.
+		// 5 is the largest length of RealHPLadder<…>. If more were added, and precision were not the multiplies of digits10*N
+		// then the python test will quickly catch that problem. Then more cases will be needed to add to this switch.
 		static_assert(
-		        boost::mpl::size<::yade::math::detail::TypeListRealHP>::value <= 5,
+		        boost::mpl::size<::yade::math::RealHPLadder>::value <= 5,
 		        "More types were added in RealHP.hpp, please adjust this switch(…) accordingly.");
 		switch (N) {
 			case 1: return digits10<1>;
@@ -28,16 +28,22 @@ namespace math {
 		}
 	}
 
-	void RealHPInfo::pyRegister()
+	void RealHPConfig::pyRegister()
 	{
 		namespace py                          = ::boost::python;
-		py::scope here                        = py::class_<RealHPInfo>("RealHPInfo");
+		py::scope here                        = py::class_<RealHPConfig>("RealHPConfig");
 		py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 		py::def("getSupportedByEigenCgal", getSupportedByEigenCgal);
 		py::def("getSupportedByMinieigen", getSupportedByMinieigen);
 		py::def("getDigits10", getDigits10, (py::arg("N")));
-#if __GNUC__ < 9
-		// this is for local testing only. It's here because on older compilers using flag -O0 most of RealHP<…> works, except for float128 which is segfaulting. The -O0 makes it useless anyway.
+#if (GCC_VERSION < 90201)
+#ifndef YADE_DISABLE_REAL_MULTI_HP
+#warning "RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>. Also you can try -O0 flag."
+// see file lib/high-precision/RealHP.hpp line: 'template <int Level> using RealHP    = Real;'
+#endif
+		// When using gcc older than 9.2.1 it is not possible for RealHP<N> to work. With optimization -O0 it can work, except for float128.
+		// If YADE_DISABLE_REAL_MULTI_HP is set, then RealHP<1> is used in place of all possible precisions RealHP<N> : see file RealHP.hpp for this setting.
+		// So this is for local testing only. With flag -O0 most of RealHP<…> works, except for float128 which is always segfaulting.
 		py::scope().attr("isFloat128Broken") = true;
 #else
 		py::scope().attr("isFloat128Broken") = false;
