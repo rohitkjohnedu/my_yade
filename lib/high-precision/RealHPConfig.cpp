@@ -33,9 +33,9 @@ namespace math {
 		namespace py                          = ::boost::python;
 		py::scope here                        = py::class_<RealHPConfig>("RealHPConfig");
 		py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
-		py::def("getSupportedByEigenCgal", getSupportedByEigenCgal);
-		py::def("getSupportedByMinieigen", getSupportedByMinieigen);
-		py::def("getDigits10", getDigits10, (py::arg("N")));
+		py::def("getSupportedByEigenCgal", getSupportedByEigenCgal, R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by Eigen and CGAL)""");
+		py::def("getSupportedByMinieigen", getSupportedByMinieigen, R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by minieigenHP)""");
+		py::def("getDigits10", getDigits10, (py::arg("N")), R"""(:return: the ``int`` representing numeric_limits digits10 of RealHP<N>)""");
 #if (GCC_VERSION < 90201)
 #ifndef YADE_DISABLE_REAL_MULTI_HP
 #warning "RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>. Also you can try -O0 flag."

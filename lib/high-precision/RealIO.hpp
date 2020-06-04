@@ -88,9 +88,8 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+m
 	// guaranteed maximum precision
 	template <typename RC, int Level = levelOfHP<RC>> inline std::string toStringHP(const RC& val)
 	{
-		constexpr const auto digs1 = std::numeric_limits<typename DeferValueType<RC, boost::is_complex<RC>::value>::real_type>::digits10
-		        + ::yade::math::extraDigits10NecessaryForStringRepresentation;
-		std::ostringstream ss;
+		constexpr const auto digs1 = std::numeric_limits<RealOf<RC>>::digits10 + ::yade::math::extraDigits10NecessaryForStringRepresentation;
+		std::ostringstream   ss;
 		ss << std::setprecision(digs1) << val;
 		return ss.str();
 	};
