@@ -32,13 +32,9 @@ namespace math {
 
 	void RealHPConfig::pyRegister()
 	{
-		namespace py   = ::boost::python;
-		py::scope here = py::class_<RealHPConfig>("RealHPConfig")
-		                         .add_property(
-		                                 "extraStringDigits10",
-		                                 &RealHPConfig::getExtraStringDigits10,
-		                                 &RealHPConfig::setExtraStringDigits10,
-		                                 "How many extra digits to use when converting to decimal srings.");
+		namespace py                            = ::boost::python;
+		py::scope here                          = py::class_<RealHPConfig>("RealHPConfig");
+		py::scope().attr("extraStringDigits10") = extraStringDigits10;
 		py::def("getSupportedByEigenCgal",
 		        getSupportedByEigenCgal,
 		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by Eigen and CGAL)""");
@@ -51,7 +47,7 @@ namespace math {
 #warning "RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>. Also you can try -O0 flag."
 // see file lib/high-precision/RealHP.hpp line: 'template <int Level> using RealHP    = Real;'
 #endif
-		// When using gcc older than 9.2.1 it is not possible for RealHP<N> to work. With optimization -O0 it can work, except for float128.
+		// When using gcc older than 9.2.1 it is not possible for RealHP<N> to work. Without optimizations -O0 it can work, except for float128.
 		// If YADE_DISABLE_REAL_MULTI_HP is set, then RealHP<1> is used in place of all possible precisions RealHP<N> : see file RealHP.hpp for this setting.
 		// So this is for local testing only. With flag -O0 most of RealHP<…> works, except for float128 which is always segfaulting.
 		py::scope().attr("isFloat128Broken") = true;
@@ -60,8 +56,6 @@ namespace math {
 #endif
 	}
 
-	int  RealHPConfig::getExtraStringDigits10() { return extraStringDigits10; }
-	void RealHPConfig::setExtraStringDigits10(int d) { extraStringDigits10 = d; }
 } // namespace math
 } // namespace yade
 

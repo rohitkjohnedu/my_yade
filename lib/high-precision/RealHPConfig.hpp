@@ -32,7 +32,6 @@
 namespace yade {
 namespace math {
 	struct RealHPConfig {
-	public:
 		// set how many RealHP<N> types are provided for Eigen, CGAL and Minieigen in file lib/high-precision/RealHPEigenCgal.hpp by YADE_EIGENCGAL_HP , YADE_MINIEIGEN_HP:
 		static const constexpr auto sizeEigenCgal = BOOST_PP_SEQ_SIZE(YADE_EIGENCGAL_HP);
 		static const constexpr auto sizeMinieigen = BOOST_PP_SEQ_SIZE(YADE_MINIEIGEN_HP);
@@ -58,9 +57,6 @@ namespace math {
 		static void pyRegister();
 
 		// how many extra digits to use when converting to decimal srings
-		static int  getExtraStringDigits10();
-		static void setExtraStringDigits10(int d);
-	private:
 		static int extraStringDigits10;
 	};
 } // namespace math

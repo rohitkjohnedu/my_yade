@@ -34,7 +34,7 @@ template <typename ArbitraryReal> struct ArbitraryReal_to_python {
 	{
 		// http://mpmath.org/doc/current/technical.html
 		::boost::python::object mpmath = ::boost::python::import("mpmath");
-		mpmath.attr("mp").attr("dps")  = int(std::numeric_limits<ArbitraryReal>::digits10 + ::yade::math::RealHPConfig::getExtraStringDigits10());
+		mpmath.attr("mp").attr("dps")  = int(std::numeric_limits<ArbitraryReal>::digits10 + ::yade::math::RealHPConfig::extraStringDigits10);
 		::boost::python::object result = mpmath.attr("mpf")(::yade::math::toStringHP<ArbitraryReal>(val));
 		return boost::python::incref(result.ptr());
 	}
@@ -89,7 +89,7 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_to_python {
 		::boost::python::object mpmath = ::boost::python::import("mpmath");
 		// http://mpmath.org/doc/current/technical.html
 		mpmath.attr("mp").attr("dps")
-		        = int(std::numeric_limits<typename ArbitraryComplex::value_type>::digits10 + ::yade::math::RealHPConfig::getExtraStringDigits10());
+		        = int(std::numeric_limits<typename ArbitraryComplex::value_type>::digits10 + ::yade::math::RealHPConfig::extraStringDigits10);
 		::boost::python::object result = mpmath.attr("mpc")(ss_real.str(), ss_imag.str());
 		return boost::python::incref(result.ptr());
 	}

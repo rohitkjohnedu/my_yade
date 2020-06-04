@@ -58,7 +58,7 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+m
 	//////////////////// XXX:  	std::streamsize max_digits10 = 2 + std::numeric_limits<double>::digits * 30103UL / 100000UL;
 	//                                                                                                       ↑↑↑
 	//                                                                                           in boost they used this trick to obtain 0.30103
-
+/*
 	constexpr const double log_10_2 = 0.301029995663981195213738;
 
 	template <int n> struct Try;
@@ -82,13 +82,13 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+m
 	constexpr const auto significandIeee = realBit - (4 * ::boost::static_log2<realBit>::value - 13);
 	constexpr const auto exponentIeee    = realBit - significandIeee;
 	constexpr const auto reqDigits10
-	        = 1 + constexprCeiling(Try<significandIeee>::result /* * 10000000 / 33219281 */ /*0.301029995663981195213738*/ /*log_10_2*/);
+	        = 1 + constexprCeiling(Try<significandIeee>::result / * * 10000000 / 33219281 */ /*0.301029995663981195213738*/ /*log_10_2* /);
 	//static_assert((reqDigits10 - 3) == std::numeric_limits<Real>::digits10, "IEEE error.");
-
+*/
 	// guaranteed maximum precision
 	template <typename RC, int Level = levelOfHP<RC>> inline std::string toStringHP(const RC& val)
 	{
-		const int digs1 = std::numeric_limits<RealOf<RC>>::digits10 + ::yade::math::RealHPConfig::getExtraStringDigits10();
+		const int digs1 = std::numeric_limits<RealOf<RC>>::digits10 + ::yade::math::RealHPConfig::extraStringDigits10;
 		std::ostringstream   ss;
 		ss << std::setprecision(digs1) << val;
 		return ss.str();
