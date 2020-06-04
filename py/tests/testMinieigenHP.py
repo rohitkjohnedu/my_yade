@@ -41,9 +41,9 @@ class ExtendedMinieigenTests(unittest.TestCase):
 			self.adjustDigs0(N,mne)
 			if((self.digs0 == 33) and self.skip33): return
 			func(N,mne,"mne.")           # test global scope functions with RealHP<1>
-		print('RealHP<'+str(N)+'>', end=' ')
 		self.adjustDigs0(N,HPn)
 		if((self.digs0 == 33) and self.skip33): return
+		print('RealHP<'+str(N)+'>', end=' ')
 		func(N,HPn,"mne."+nameHP+".")        # test scopes HP1, HP2, etc
 
 	def checkRelativeError(self,a,b):
@@ -369,7 +369,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 
 		q2 = q1.inverse()
 		self.checkRelativeError( q2[3] , mpmath.mpf("1") )
-		if(True):
+		if(yade.config.highPrecisionMpmath):
 			q3=HPn.Quaternion(axis=HPn.Vector3(1,0,0),angle=mpmath.pi/2.0)
 			q3a=HPn.Quaternion((HPn.Vector3(1,0,0),mpmath.pi/2.0))
 			q3b=HPn.Quaternion((mpmath.pi/2.0,HPn.Vector3(1,0,0)))

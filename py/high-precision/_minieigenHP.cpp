@@ -38,7 +38,8 @@ template <int N, bool registerConverters> struct RegisterEigenHP {
 		constexpr bool notDuplicate = not((N == 1) and registerConverters);
 		// https://gitlab.com/cosurgi/minieigen-real specific stuff: START
 		py::scope top(topScope);
-		if (notDuplicate) {
+		if (notDuplicate and ::yade::math::RealHPConfig::getDigits10(N) >= 18) {
+			// these are needed only for high precision. The float and double are covered by default converters.
 			ArbitraryComplex_from_python<ComplexHP<N>>();
 			py::to_python_converter<ComplexHP<N>, ArbitraryComplex_to_python<ComplexHP<N>>>();
 
@@ -82,7 +83,7 @@ template <int N, bool registerConverters> struct RegisterEigenHP {
 	}
 };
 
-BOOST_PYTHON_MODULE(THE_CPP_NAME)
+BOOST_PYTHON_MODULE(_minieigenHP)
 try {
 	YADE_SET_DOCSTRING_OPTS;
 
