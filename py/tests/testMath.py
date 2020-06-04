@@ -101,7 +101,6 @@ class SimpleTests(unittest.TestCase):
 	def adjustDigs0(self,N,HPn):
 		self.HPnHelper = HPn
 		self.digs0     = self.getDigitsHP(N)
-		mpmath.mp.dps  = self.digs0 + mth.RealHPConfig.extraStringDigits10
 		# tolerance = 1.2×10⁻ᵈ⁺¹, where ᵈ==self.digs0
 		# so basically we store one more decimal digit, and expect one less decimal digit. That amounts to ignoring one (two, if the extra one is counted) least significant digits.
 		self.tolerance   = (mpmath.mpf(10)**(-self.digs0+1))*mpmath.mpf("1.2")
@@ -111,8 +110,11 @@ class SimpleTests(unittest.TestCase):
 		else:
 			self.bits= mpmath.ceil(mpmath.mpf(self.digs0)/(0.301))+1                        # it is reproducing MPFR's formula for number of bits. Discovered by experiments.
 			mpmathVsMpfrBits = int(self.bits / 2992) # adjust discrepency between mpmath and MPFR due to incorrect log10/log2 value (above line). The 2992 was found empirically. Adjustments are possible.
-		# mpmath has 5 more internal bits
+		# mpmath has 5 more internal bits, use its mechanisms to extract epsilon
+		mpmath.mp.dps  = self.digs0 + 1
 		self.expectedEpsilon=(2**5)*mpmath.eps() / (2**mpmathVsMpfrBits)
+		# now go back to using extraStringDigits10
+		mpmath.mp.dps  = self.digs0 + mth.RealHPConfig.extraStringDigits10
 		if(self.digs0 == 6): # float case
 			self.bits=24
 			self.expectedEpsilon=1.1920928955078125e-07
@@ -170,6 +172,7 @@ class SimpleTests(unittest.TestCase):
 					if isComplex:
 						self.assertLessEqual(abs( (mpmath.mpc(a)-mpmath.mpc(b))/mpmath.mpc(b) ),tol)
 					else:
+						#print("a=",a," b=",b," tol=",tol)
 						self.assertLessEqual(abs( (mpmath.mpf(a)-mpmath.mpf(b))/mpmath.mpf(b) ),tol)
 				else:
 					if(functionName in self.defaultTolerances):
@@ -381,7 +384,7 @@ class SimpleTests(unittest.TestCase):
 		self.checkRelativeError(HPn.Euler(),mpmath.euler)
 		self.checkRelativeError(HPn.Log2(),mpmath.log(2))
 		self.checkRelativeError(HPn.Catalan(),mpmath.catalan)
-		#print("HPn.epsilon() ",HPn.epsilon(),"  self.expectedEpsilon = ",self.expectedEpsilon)
+		#print("HPn.epsilon() ",HPn.epsilon(), " N=",N ,"  self.expectedEpsilon = ",self.expectedEpsilon)
 		self.checkRelativeError(HPn.epsilon(),self.expectedEpsilon,10)
 		if(self.digs0 == 6): # exception for float
 			self.assertLessEqual(HPn.dummy_precision(),10e-6)
