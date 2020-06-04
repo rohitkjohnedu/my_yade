@@ -840,29 +840,10 @@ Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's s
 	}
 };
 
-template <int N> int getNthDigits10() { return std::numeric_limits<RealHP<N>>::digits10; }
-
-int digits10RealHP(int N)
-{
-	// 5 is the largest length of TypeListRealHP<…>. If more were added, and precision were not the multiplies of digits10*N
-	// then the python test will quickly catch that problem. And more cases will be needed to add to this switch.
-	static_assert(
-	        boost::mpl::size<::yade::math::detail::TypeListRealHP>::value <= 5,
-	        "More types were added in RealHP.hpp, please adjust this switch(…) accordingly.");
-	switch (N) {
-		case 1: return getNthDigits10<1>();
-		case 2: return getNthDigits10<2>();
-		case 3: return getNthDigits10<3>();
-		case 4: return getNthDigits10<4>();
-		case 5: return getNthDigits10<5>();
-		default: return getNthDigits10<1>() * N;
-	}
-}
-
 BOOST_PYTHON_MODULE(_math) try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	if (digits10RealHP(1) >= 18) {
+	if (::yade::math::detail::digits10RealHP(1) >= 18) {
 		std_pair_to_python_converter<double, double>();
 	}
 	// this loop registers all python functions from 1 ... N == highestPythonRegisteredHP_N.
@@ -875,7 +856,7 @@ BOOST_PYTHON_MODULE(_math) try {
 	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
 	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
 	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
-	py::def("digits10RealHP", digits10RealHP, (py::arg("N")));
+	py::def("digits10RealHP", ::yade::math::detail::digits10RealHP, (py::arg("N")));
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");

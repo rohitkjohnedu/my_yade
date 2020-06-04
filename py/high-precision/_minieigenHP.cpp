@@ -29,57 +29,73 @@ using namespace ::yade::MathEigenTypes;
 
 CREATE_CPP_LOCAL_LOGGER("_minieigenHP.cpp")
 
-BOOST_PYTHON_MODULE(_minieigenHP)
+template <int N, bool registerConverters> struct RegisterEigenHP {
+	static void work(const py::scope& topScope, const py::scope& scopeHP)
+	{
+		// FIXME this section and remove duplicate registrations.
+		// https://gitlab.com/cosurgi/minieigen-real specific stuff: START
+		//		if (registerConverters) {
+		py::scope top(topScope);
+		ArbitraryComplex_from_python<ComplexHP<N>>();
+		py::to_python_converter<ComplexHP<N>, ArbitraryComplex_to_python<ComplexHP<N>>>();
+
+		ArbitraryReal_from_python<RealHP<N>>();
+		py::to_python_converter<RealHP<N>, ArbitraryReal_to_python<RealHP<N>>>();
+		//		}
+		// https://gitlab.com/cosurgi/minieigen-real specific stuff: END
+
+		py::scope HPn(scopeHP);
+
+		expose_converters<N>(); // in _ExposeConverters.cpp
+
+#ifdef EIGEN_DONT_ALIGN
+		py::scope().attr("vectorize") = false;
+#else
+		py::scope().attr("vectorize") = true;
+		// when we use vectorization the Vector3r is AlignedVector3, so we need to register converter from plain old Vector3<Real> so that other functions can accept it as an argument
+		custom_VectorAnyAny_from_sequence<Eigen::Matrix<RealHP<N>, 3, 1>>();
+		py::class_<Eigen::Matrix<RealHP<N>, 3, 1>>(
+		        "Vector3na",
+		        "3-dimensional non-aligned float vector; same as :obj:`Vector3`, but with alignment (``Eigen::AlignedVector3``).\n\nSupported "
+		        "operations "
+		        "(``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, "
+		        "``v/=f``, "
+		        "``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion from sequence (list, tuple, ...) of 3 "
+		        "floats.\n\nStatic attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``, ``UnitZ``.",
+		        py::init<>())
+		        .def(VectorVisitor<Eigen::Matrix<RealHP<N>, 3, 1>>());
+#endif
+
+		expose_vectors1<N>();
+		expose_vectors2<N>();
+		expose_matrices1<N>(); // must come after vectors
+		expose_matrices2<N>(); // must come after vectors
+		expose_complex1<N>();
+		expose_complex2<N>();
+		expose_quaternion<N>();
+		expose_boxes<N>();
+	}
+};
+
+BOOST_PYTHON_MODULE(THE_CPP_NAME)
 try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	// arbitrary Real specific stuff: start
-#if YADE_REAL_BIT > 64
-	// these are needed only for high precision. The float and double are covered by default converters.
-	ArbitraryComplex_from_python<Complex>();
-	py::to_python_converter<Complex, ArbitraryComplex_to_python<Complex>>();
-
-	ArbitraryReal_from_python<Real>();
-	py::to_python_converter<Real, ArbitraryReal_to_python<Real>>();
-#endif
-
+	// https://gitlab.com/cosurgi/minieigen-real specific stuff: START
 	expose_storage_ordering();
-	// arbitrary Real specific stuff: end
+	// https://gitlab.com/cosurgi/minieigen-real specific stuff: END
 
 	py::scope().attr("__doc__") = "miniEigen is wrapper for a small part of the `Eigen <http://eigen.tuxfamily.org>`_ library. Refer to its documentation "
 	                              "for details. All classes in this module support pickling.";
 
-	expose_converters(); // in expose-converters.cpp
-#ifndef EIGEN_DONT_ALIGN
-	// when we use vectorization the Vector3r is AlignedVector3, so we need to register converter from plain old Vector3<Real> so that other functions can accept it as an argument
-	custom_VectorAnyAny_from_sequence<Eigen::Matrix<Real, 3, 1>>();
-	py::class_<Eigen::Matrix<Real, 3, 1>>(
-	        "Vector3na",
-	        "3-dimensional non-aligned float vector; same as :obj:`Vector3`, but with alignment (``Eigen::AlignedVector3``).\n\nSupported operations "
-	        "(``f`` if a float/int, ``v`` is a Vector3): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, "
-	        "``v==v``, ``v!=v``, plus operations with ``Matrix3`` and ``Quaternion``.\n\nImplicit conversion from sequence (list, tuple, ...) of 3 "
-	        "floats.\n\nStatic attributes: ``Zero``, ``Ones``, ``UnitX``, ``UnitY``, ``UnitZ``.",
-	        py::init<>())
-	        .def(VectorVisitor<Eigen::Matrix<Real, 3, 1>>());
-#endif
+	const constexpr int highestPythonRegisteredHP_N = 10;
+	::yade::math::detail::registerLoopForHPn<highestPythonRegisteredHP_N, RegisterEigenHP>();
 
-	expose_vectors1();
-	expose_vectors2();
-	expose_matrices1(); // must come after vectors
-	expose_matrices2(); // must come after vectors
-	expose_complex1();
-	expose_complex2();
-	expose_quaternion();
-	expose_boxes();
+	// FIXME - add struct BasicInfoAboutHP ?? with extraDigits10NecessaryForStringRepresentation, highestPythonRegisteredHP_N, digits10RealHP inside?
+	py::scope().attr("extraStringDigits") = ::yade::math::extraDigits10NecessaryForStringRepresentation;
+	py::scope().attr("maxRealLevelHP")    = highestPythonRegisteredHP_N;
+	py::def("digits10RealHP", ::yade::math::detail::digits10RealHP, (py::arg("N")));
 
-	// Requires -ldouble-conversion, but that function isn't used anywhere
-	//	py::def("float2str",&doubleToShortest,(py::arg("f"),py::arg("pad")=0),"Return the shortest string representation of *f* which will is equal to *f* when converted back to float. This function is only useful in Python prior to 3.0; starting from that version, standard string conversion does just that.");
-
-#ifdef EIGEN_DONT_ALIGN
-	py::scope().attr("vectorize") = false;
-#else
-	py::scope().attr("vectorize") = true;
-#endif
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");
 	PyErr_Print();
