@@ -10,21 +10,21 @@
 
 // In this file following things are declared for the users:
 //
-// (1) a RealHP<N>, ComplexHP<N> types are declared in such a way that:
-//    RealHP<1> == Real
-//    RealHP<2> == has twice the precision of Real
-//    RealHP<3> == has three times the precision of Real (this one is mainly for compatibility with the counting, usually this type is "slow")
-//    RealHP<4> == has four  times the precision of Real (when https://github.com/boostorg/multiprecision/issues/184 is done it will be fast)
-//    ...
-//    RealHP<N> == has N     times the precision of Real (all the higher types are based on eiher MPFR or boost::cpp_bin_float)
+// (1) RealHP<N>, ComplexHP<N> types are declared in such a way that:
+//     RealHP<1> == Real
+//     RealHP<2> == has twice the precision of Real
+//     RealHP<3> == has three times the precision of Real (this one is mainly for compatibility with the counting, usually this type is "slow")
+//     RealHP<4> == has four  times the precision of Real (when https://github.com/boostorg/multiprecision/issues/184 is done it will be fast)
+//     ...
+//     RealHP<N> == has N     times the precision of Real (all the higher types are based on eiher MPFR or boost::cpp_bin_float)
 //
-// (2) constexpr int  levelOfRealHP<Type>      - has value N in RealHP<N>   , provided that 'Type' is a valid RealHP<N>    type, otherwise it causes a compilation error.
-// (3) constexpr int  levelOfComplexHP<Type>   - has value N in ComplexHP<N>, provided that 'Type' is a valid ComplexHP<N> type, otherwise it causes a compilation error.
-// (4) constexpr int  levelOfHP<N>             - has value N for RealHP or ComplexHP
-// (5) constexpr bool isHP<Type>               - has value true, when Type belongs to RealHP<N> family
+// (2) constexpr bool isHP<Type>               - has value true, when Type belongs to RealHP<N> family
+// (3) constexpr int  levelOfRealHP<Type>      - has value N in RealHP<N>   , provided that 'Type' is a valid RealHP<N>    type, otherwise it causes a compilation error.
+// (4) constexpr int  levelOfComplexHP<Type>   - has value N in ComplexHP<N>, provided that 'Type' is a valid ComplexHP<N> type, otherwise it causes a compilation error.
+// (5) constexpr int  levelOfHP<N>             - has value N for RealHP or ComplexHP
 
-// note: N in the RealHP<N> -- the type of N has to be signed int, so that compiler can catch errors when -1 is passed as argument.
-// Older compiler could convert -1 to large positive number which results in runtime segfault.
+// note: int N in the RealHP<N> has type 'signed int N', so that compiler can catch errors when -1 is passed as argument.
+// Older compilers could convert -1 to a large positive number which results in runtime segfault, instead of compilation error.
 
 #ifndef YADE_REAL_MATH_NAMESPACE
 #error "This file cannot be included alone, include Real.hpp instead"
@@ -73,7 +73,7 @@ namespace math {
 	// Here is declared the 'ultimate' precision type called NthLevelRealHP. Depending on settings it can be MPFR or cpp_bin_float.
 	namespace detail {
 #ifdef YADE_MPFR
-		// if MPFR is available, then use it for higher types. YADE_MPFR is defined when yade links with MPFR after compilation. It is unrelated about how the Real type is defined.
+		// if MPFR is available, then use it for higher types. YADE_MPFR is defined when yade links with MPFR after compilation. It is unrelated about how the Real type is defined by YADE_REAL_MPFR.
 		template <int DecPlaces> using RealHPBackend = boost::multiprecision::mpfr_float_backend<DecPlaces, boost::multiprecision::allocate_stack>;
 #else
 		// otherwise use boost::cpp_bin_float
@@ -116,7 +116,7 @@ namespace math {
 	/*************************************************************************/
 	// first declare helper templates needed to find the position in RealHPLadder
 	namespace detail {
-		// posRealHP is position of HP in the RealHPLadder. If it's found then it returns findPosRealHP + 1, otherwise it returns 0.
+		// posRealHP is position of HP in the RealHPLadder. If it's found then it equals to findPosRealHP + 1, otherwise it equals to 0.
 		const constexpr int                        ladderSize    = boost::mpl::size<RealHPLadder>::value;
 		template <typename HP> const constexpr int findPosRealHP = boost::mpl::find<RealHPLadder, HP>::type::pos::value;
 		template <typename HP> const constexpr int posRealHP     = (findPosRealHP<HP> == ladderSize) ? (0) : (findPosRealHP<HP> + 1);
@@ -131,7 +131,7 @@ namespace math {
 	/*************************************************************************/
 	/*************************      levelOrZero     **************************/
 	/*************************************************************************/
-	// The level of RealHP. Returns 0 if HP is not from RealHP<N> family
+	// The level of RealHP. Equals to 0 if HP is not from RealHP<N> family
 	template <typename HP> const constexpr int levelOrZero = (detail::isNthLevel<HP>) ? (detail::NthLevel<HP>) : (detail::posRealHP<HP>);
 
 	/*************************************************************************/
@@ -204,6 +204,26 @@ namespace math {
 
 	template <typename A, typename B, int LevelA = levelOfHP<A>, int LevelB = levelOfHP<B>, int MaxLevel = std::max(LevelA, LevelB)>
 	using SelectHigherHP = typename std::conditional<(isComplex<A> or isComplex<B>), ComplexHP<MaxLevel>, RealHP<MaxLevel>>::type;
+
+	/*************************************************************************/
+	/*************************   allow/exclude HP   **************************/
+	/*************************************************************************/
+	// sometimes MathFunctions.hpp needs to accept/exclude specific type arguments.
+
+	// use SFINAE to allow other non HP type, its level is treated as == 1
+	template <typename HP, typename Allow, typename boost::enable_if_c<(isHP<HP> or std::is_same<HP, Allow>::value), int>::type = 0>
+	const constexpr int levelOfHPAllow = ((isHP<HP>) ? (levelOrZero<HP>) : (1));
+
+	// use SFINAE to allow other non RealHP type, its level is treated as == 1
+	template <typename HP, typename Allow, typename boost::enable_if_c<(isRealHP<HP> or std::is_same<HP, Allow>::value), int>::type = 0>
+	const constexpr int levelOfRealHPAllow = ((isHP<HP>) ? (levelOrZero<HP>) : (1));
+
+	// use SFINAE to filter out a specific type. Used by min/max in MathFunctions.hpp.
+	template <typename HP, typename Except, typename boost::enable_if_c<(isRealHP<HP> and (not std::is_same<HP, Except>::value)), int>::type = 0>
+	const constexpr int levelOfRealHPExcept = levelOfHP<HP>;
+
+	// PromoteHP turns any non-HP type into RealHP<1>, otherwise it just keeps it as it is, be it Real or Complex.
+	template <typename HP, int Level = levelOrZero<RealOf<HP>>> using PromoteHP = typename std::conditional<(Level == 0), RealHP<1>, HP>::type;
 
 } // namespace math
 
