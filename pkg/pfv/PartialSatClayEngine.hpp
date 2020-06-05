@@ -307,6 +307,8 @@ public:
 	((Real,collectedDT,0,,"this is the exact time step that is computed, it enables the stiffness timestep estimate to change dynamically while maintaining an exact match for the flow timestep"))
 	((bool,fracBasedPointSuctionCalc,0,,"if true, the suction per material point is computed based on fraction shared by incident cell."))
 	((Real,minCellVol,0,,"Use for avoiding 0 volume cells that will interupt solution of linear system."))
+	((Real,maxPo,2e6,,"Certain boundary situations where a low volume will develop and interpolate from a cell with high initial porosity leading to Po exponential estimate blowing up."))
+	((Real,minLambdao,0,,"Maybe unnecessary since the lambdao function is a decay exponential for same situation described in maxPo above"))
 	,/*PartialSatClayEngineT()*/,
 	solver = shared_ptr<FlowSolver> (new FlowSolver);
 	,

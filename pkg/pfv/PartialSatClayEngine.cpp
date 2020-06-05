@@ -377,16 +377,16 @@ void PartialSatClayEngine::updatePorosity(FlowSolver& flow)
 				if (!freezeSaturation and directlyModifySatFromPoro) { // updatesaturation with respect to volume change
 					Real dt         = partialSatDT == 0 ? scene->dt : solverDT;
 					Real volWater_o = (cell->info().volume() - cell->info().dv() * dt) * cell->info().porosity * cell->info().saturation;
-					cell->info().saturation
-					        = volWater_o / (poro * cell->info().volume()); // update the saturation with respect to new porosity and volume
+					cell->info().saturation = volWater_o / (poro * cell->info().volume()); // update the saturation with respect to new porosity and volume
 				}
 				cell->info().porosity = poro;
 			}
 		} // if we dont want to modify porosity during genesis, but keep the cell curve params updated between triangulations
 		// update the parameters for the unique pcs curve in this cell (keep this for interpolation purposes):
-		cell->info().Po
-		        = Po * exp(a * (cell->info().initialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
+		cell->info().Po = Po * exp(a * (cell->info().initialPorosity - cell->info().porosity)); // use unique cell initial porosity or overall average porosity (mu)?
+		if (cell->info().Po > maxPo) cell->info().Po = maxPo;
 		cell->info().lambdao = lmbda * exp(b * (cell->info().initialPorosity - cell->info().porosity));
+		if (cell->info().lambdao < minLambdao) cell->info().lambdao = minLambdao;
 	}
 }
 
@@ -440,6 +440,11 @@ void PartialSatClayEngine::setPorosityWithImageryGrid(string imageryFilePath, Fl
 				finalPoro = minPoroClamp;
 			if (finalPoro >= maxPoroClamp)
 				finalPoro = maxPoroClamp;
+
+			if (cell->info().Pcondition) {
+				cout << "setting boundary cell porosity to mean initial" << endl;
+				cell->info().porosity = meanInitialPorosity;
+			}
 			cell->info().porosity = cell->info().initialPorosity = finalPoro;
 			if (finalPoro > maxPorosity)
 				maxPorosity = finalPoro;
