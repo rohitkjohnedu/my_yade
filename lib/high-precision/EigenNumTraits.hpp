@@ -41,18 +41,19 @@ template <> struct EigenCostRealHP<boost::multiprecision::float128> {
 // signature of general template from Eigen headers.
 template <class> struct NumTraits;
 
-template <int N> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<N>> {
-	typedef ::yade::RealHP<N> Real;
-	typedef ::yade::RealHP<N> NonInteger;
-	typedef ::yade::RealHP<N> Nested;
+template <int levelHP> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<levelHP>> {
+	typedef ::yade::RealHP<levelHP>              Real;
+	typedef ::yade::math::UnderlyingRealHP<Real> Underlying;
+	typedef ::yade::RealHP<levelHP>              NonInteger;
+	typedef ::yade::RealHP<levelHP>              Nested;
 
 	enum { IsInteger             = 0,
 	       IsSigned              = 1,
 	       IsComplex             = 0,
 	       RequireInitialization = 1,
-	       ReadCost              = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::ReadCost,
-	       AddCost               = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::AddCost,
-	       MulCost               = ::Eigen::EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::MulCost };
+	       ReadCost              = EigenCostRealHP<Underlying>::ReadCost,
+	       AddCost               = EigenCostRealHP<Underlying>::AddCost,
+	       MulCost               = EigenCostRealHP<Underlying>::MulCost };
 
 	static constexpr long get_default_prec = std::numeric_limits<Real>::digits;
 
@@ -77,17 +78,19 @@ template <int N> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<N>> {
 
 namespace internal {
 	// FIXME - make sure that all these functions and these below in macro YADE_EIGEN_SUPPORT_REAL_HP, are properly recognized and used.
-	//         I am no so sure that <int N> is properly resolved.
+	//         I am not 100% sure that <int levelHP> is properly resolved.
 	// other ideas:
 	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, bool>::type
 	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, Rr>::type random<Rr>() { return ::yade::math::randomHP<::yade::math::levelOfRealHP<Rr>>(); }
-	//         template <int N>       inline bool isEqualFuzzy(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
-	template <int N> inline ::yade::math::RealHP<N> random() { return ::yade::math::randomHP<N>(); }
-	template <int N> inline ::yade::math::RealHP<N> random(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b)
+	//         template <int levelHP>       inline bool isEqualFuzzy(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b, const ::yade::math::RealHP<levelHP>& eps)
+	// FIXME - or just put them all into YADE_EIGEN_SUPPORT_REAL_HP, but have all working tests first.
+	template <int levelHP> inline ::yade::math::RealHP<levelHP> random() { return ::yade::math::randomHP<levelHP>(); }
+	template <int levelHP> inline ::yade::math::RealHP<levelHP> random(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b)
 	{
-		return a + (b - a) * ::yade::math::random01HP<N>();
+		return a + (b - a) * ::yade::math::random01HP<levelHP>();
 	}
-	template <int N> inline bool isMuchSmallerThan(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
+	template <int levelHP>
+	inline bool isMuchSmallerThan(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b, const ::yade::math::RealHP<levelHP>& eps)
 	{
 		return ::yade::math::abs(a) <= ::yade::math::abs(b) * eps;
 	}
@@ -95,11 +98,13 @@ namespace internal {
 	{
 		return ::yade::math::abs(a - b) <= eps;
 	}
-	template <int N> inline bool isApprox(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
+	template <int levelHP>
+	inline bool isApprox(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b, const ::yade::math::RealHP<levelHP>& eps)
 	{
 		return isEqualFuzzy(a, b, eps);
 	}
-	template <int N> inline bool isApproxOrLessThan(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
+	template <int levelHP>
+	inline bool isApproxOrLessThan(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b, const ::yade::math::RealHP<levelHP>& eps)
 	{
 		return a <= b || isEqualFuzzy(a, b, eps);
 	}
@@ -109,20 +114,20 @@ namespace internal {
 /*************************       Complex        **************************/
 /*************************************************************************/
 
-template <int N> struct NumTraitsComplexHP : GenericNumTraits<::yade::ComplexHP<N>> {
-	typedef typename ::yade::ComplexHP<N>::value_type Real;
-	typedef ::yade::ComplexHP<N>                      Complex;
-	typedef ::yade::ComplexHP<N>                      NonInteger;
-	typedef ::yade::ComplexHP<N>                      Nested;
+template <int levelHP> struct NumTraitsComplexHP : GenericNumTraits<::yade::ComplexHP<levelHP>> {
+	typedef typename ::yade::ComplexHP<levelHP>::value_type Real;
+	typedef ::yade::math::UnderlyingRealHP<Real>            Underlying;
+	typedef ::yade::ComplexHP<levelHP>                      Complex;
+	typedef ::yade::ComplexHP<levelHP>                      NonInteger;
+	typedef ::yade::ComplexHP<levelHP>                      Nested;
 
 	enum { IsInteger             = 0,
 	       IsSigned              = 1,
 	       IsComplex             = 1,
 	       RequireInitialization = 1,
-	       ReadCost              = 2 * EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::ReadCost,
-	       AddCost               = 2 * EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::AddCost,
-	       MulCost = 4 * EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::MulCost + 2 * EigenCostRealHP<::yade::math::UnderlyingRealHP<Real>>::AddCost
-	};
+	       ReadCost              = 2 * EigenCostRealHP<Underlying>::ReadCost,
+	       AddCost               = 2 * EigenCostRealHP<Underlying>::AddCost,
+	       MulCost               = 4 * EigenCostRealHP<Underlying>::MulCost + 2 * EigenCostRealHP<Underlying>::AddCost };
 
 	static constexpr long get_default_prec = std::numeric_limits<Real>::digits;
 
@@ -183,19 +188,19 @@ inline ::yade::math::Real abs2(const ::yade::math::Real& x) { return x * x; }
 */
 
 // There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
-#define YADE_EIGEN_SUPPORT_REAL_HP(N)                                                                                                                          \
-	template <> struct NumTraits<::yade::RealHP<N>> : public NumTraitsRealHP<N> {                                                                          \
+#define YADE_EIGEN_SUPPORT_REAL_HP(levelHP)                                                                                                                    \
+	template <> struct NumTraits<::yade::RealHP<levelHP>> : public NumTraitsRealHP<levelHP> {                                                              \
 	};                                                                                                                                                     \
-	template <> struct NumTraits<::yade::ComplexHP<N>> : public NumTraitsComplexHP<N> {                                                                    \
+	template <> struct NumTraits<::yade::ComplexHP<levelHP>> : public NumTraitsComplexHP<levelHP> {                                                        \
 	};                                                                                                                                                     \
 	namespace internal {                                                                                                                                   \
-		template <> inline long double cast<typename ::yade::math::RealHP<N>, long double>(const ::yade::math::RealHP<N>& x)                           \
+		template <> inline long double cast<typename ::yade::math::RealHP<levelHP>, long double>(const ::yade::math::RealHP<levelHP>& x)               \
 		{                                                                                                                                              \
 			return (long double)(x);                                                                                                               \
 		}                                                                                                                                              \
-		template <> inline double cast<typename ::yade::math::RealHP<N>, double>(const ::yade::math::RealHP<N>& x) { return double(x); }               \
-		template <> inline long   cast<typename ::yade::math::RealHP<N>, long>(const ::yade::math::RealHP<N>& x) { return long(x); }                   \
-		template <> inline int    cast<typename ::yade::math::RealHP<N>, int>(const ::yade::math::RealHP<N>& x) { return int(x); }                     \
+		template <> inline double cast<typename ::yade::math::RealHP<levelHP>, double>(const ::yade::math::RealHP<levelHP>& x) { return double(x); }   \
+		template <> inline long   cast<typename ::yade::math::RealHP<levelHP>, long>(const ::yade::math::RealHP<levelHP>& x) { return long(x); }       \
+		template <> inline int    cast<typename ::yade::math::RealHP<levelHP>, int>(const ::yade::math::RealHP<levelHP>& x) { return int(x); }         \
 	}
 
 

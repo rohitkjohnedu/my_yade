@@ -36,13 +36,13 @@
 
 namespace CGAL {
 
-template <int N> class RealHP_Is_valid : public CGAL::cpp98::unary_function<::yade::RealHP<N>, bool> {
+template <int levelHP> class RealHP_Is_valid : public CGAL::cpp98::unary_function<::yade::RealHP<levelHP>, bool> {
 public:
-	bool operator()(const ::yade::RealHP<N>& x) const
+	bool operator()(const ::yade::RealHP<levelHP>& x) const
 	{
 // When CGAL detects IEEE bug, then long double needs special treatment:
 #ifdef CGAL_CFG_IEEE_754_BUG // and (YADE_REAL_BIT == 80)
-		if (std::numeric_limits<::yade::RealHP<N>>::digits == std::numeric_limits<long double>::digits) {
+		if (std::is_same<::yade::RealHP<levelHP>, long double>::value) {
 			return Is_valid<long double>()(static_cast<long double>(x));
 		}
 #endif
@@ -50,11 +50,11 @@ public:
 	}
 };
 
-template <int N> class RealHP_Algebraic_structure_traits : public Algebraic_structure_traits_base<::yade::RealHP<N>, Field_with_kth_root_tag> {
+template <int levelHP> class RealHP_Algebraic_structure_traits : public Algebraic_structure_traits_base<::yade::RealHP<levelHP>, Field_with_kth_root_tag> {
 public:
-	typedef Tag_false         Is_exact;
-	typedef Tag_true          Is_numerical_sensitive;
-	typedef ::yade::RealHP<N> Type;
+	typedef Tag_false               Is_exact;
+	typedef Tag_true                Is_numerical_sensitive;
+	typedef ::yade::RealHP<levelHP> Type;
 
 	/* if they become necessary add tests in py/tests/testMath.py, py/high-precision/_math.cpp
 	class IsZero : public CGAL::cpp98::unary_function<Type, bool> {
@@ -88,7 +88,7 @@ public:
 		Type operator()(int k, const Type& x) const
 		{
 			CGAL_precondition_msg(k > 0, "'k' must be positive for k-th roots");
-			return ::yade::math::pow(x, static_cast<::yade::RealHP<N>>(1.0) / static_cast<::yade::RealHP<N>>(k));
+			return ::yade::math::pow(x, static_cast<::yade::RealHP<levelHP>>(1.0) / static_cast<::yade::RealHP<levelHP>>(k));
 			// note: that's what would be called for long double case:
 			// return Algebraic_structure_traits<long double>::Kth_root()(k, static_cast<long double>(x));
 		};
@@ -96,9 +96,9 @@ public:
 };
 
 
-template <int N> class RealHP_embeddable_traits : public INTERN_RET::Real_embeddable_traits_base<::yade::RealHP<N>, CGAL::Tag_true> {
+template <int levelHP> class RealHP_embeddable_traits : public INTERN_RET::Real_embeddable_traits_base<::yade::RealHP<levelHP>, CGAL::Tag_true> {
 public:
-	typedef ::yade::RealHP<N> Type;
+	typedef ::yade::RealHP<levelHP> Type;
 	class To_interval : public CGAL::cpp98::unary_function<Type, std::pair<double, double>> {
 	public:
 		std::pair<double, double> operator()(const Type& x) const { return (Interval_nt<>(static_cast<double>(x)) + Interval_nt<>::smallest()).pair(); }
@@ -135,12 +135,12 @@ public:
 };
 
 // There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
-#define YADE_CGAL_SUPPORT_REAL_HP(N)                                                                                                                           \
-	template <> struct Is_valid<::yade::RealHP<N>> : public RealHP_Is_valid<N> {                                                                           \
+#define YADE_CGAL_SUPPORT_REAL_HP(levelHP)                                                                                                                     \
+	template <> struct Is_valid<::yade::RealHP<levelHP>> : public RealHP_Is_valid<levelHP> {                                                               \
 	};                                                                                                                                                     \
-	template <> struct Algebraic_structure_traits<::yade::RealHP<N>> : public RealHP_Algebraic_structure_traits<N> {                                       \
+	template <> struct Algebraic_structure_traits<::yade::RealHP<levelHP>> : public RealHP_Algebraic_structure_traits<levelHP> {                           \
 	};                                                                                                                                                     \
-	template <> struct Real_embeddable_traits<::yade::RealHP<N>> : public RealHP_embeddable_traits<N> {                                                    \
+	template <> struct Real_embeddable_traits<::yade::RealHP<levelHP>> : public RealHP_embeddable_traits<levelHP> {                                        \
 	};
 
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h

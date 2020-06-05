@@ -30,7 +30,7 @@
 
 namespace CGAL {
 // The Exact_predicates_inexact_constructions_kernel used `double`. Make corresponding typedef for Real type.
-template <int L> class ERealHP;
+template <int levelHP> class ERealHP;
 
 // There are two ways to avoid this macro (hint: the best is to use C++20). See file lib/high-precision/RealHPEigenCgal.hpp for details.
 #ifdef CGAL_NO_STATIC_FILTERS
@@ -75,8 +75,8 @@ namespace yade {
 // These are taken from files pkg/dem/Polyhedra.hpp and /pkg/dem/Gl1_PotentialBlock.hpp
 // let's call this CgalHP struct. It uses inexact kernel. Later when mpfr support is added we can have similar aliases in other namespace for exact kernel.
 
-template <int N> struct CgalHP {
-	using K              = CGAL::Exact_RealHP_predicates_inexact_constructions_kernel<N>;
+template <int levelHP> struct CgalHP {
+	using K              = CGAL::Exact_RealHP_predicates_inexact_constructions_kernel<levelHP>;
 	using Polyhedron     = CGAL::Polyhedron_3<K>;
 	using Mesh           = CGAL::Surface_mesh<typename K::Point_3>;
 	using Triangulation  = CGAL::Delaunay_triangulation_3<K>;
