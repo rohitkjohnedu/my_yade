@@ -874,7 +874,7 @@ Real TwoPhaseFlowEngine::getChi(int numberFacets)
 			chi = 0.565;
 		} // Dodecahedron
 		else {
-			chi = 0.0893 * math::log(float(numberFacets)) + 0.326;
+			chi = 0.0893 * math::log(numberFacets) + 0.326;
 		} //Other pore shapes
 		return chi;
 	}
@@ -1413,9 +1413,9 @@ void TwoPhaseFlowEngine::adjustUnresolvedPoreThroatsAfterMerging()
 						if (cell->info().poreThroatRadius[i] >= maximumRatioPoreThroatoverPoreBody
 						            * (getChi(cell->info().numberFacets)
 						               * math::pow(
-						                       cell->info().mergedVolume,
-						                       (1.
-						                        / 3.)))) { // if throat is larger than maximumRatioPoreThroatoverPoreBody time the pore body volume, then adjust pore throat radii
+						                         cell->info().mergedVolume,
+						                         (1.
+						                          / 3.)))) { // if throat is larger than maximumRatioPoreThroatoverPoreBody time the pore body volume, then adjust pore throat radii
 							count                            = count + 1;
 							cell->info().poreThroatRadius[i] = math::min(
 							        (maximumRatioPoreThroatoverPoreBody * getChi(cell->info().numberFacets)
@@ -2626,7 +2626,7 @@ void TwoPhaseFlowEngine::getQuantities()
 				areaSphere = 4.0 * 3.14159265359
 				        * math::pow(getChi(listOfPores[i]->info().numberFacets)
 				                            * math::pow(
-				                                    listOfPores[i]->info().mergedVolume * (1.0 - listOfPores[i]->info().saturation), 0.3333),
+				                                      listOfPores[i]->info().mergedVolume * (1.0 - listOfPores[i]->info().saturation), 0.3333),
 				                    2);
 			}
 			if (listOfPores[i]->info().saturation < listOfPores[i]->info().thresholdSaturation && listOfPores[i]->info().saturation > 0.0
