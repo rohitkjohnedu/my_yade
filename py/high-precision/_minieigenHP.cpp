@@ -87,16 +87,10 @@ BOOST_PYTHON_MODULE(_minieigenHP)
 try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	// https://gitlab.com/cosurgi/minieigen-real specific stuff: START
-	expose_storage_ordering();
-	// https://gitlab.com/cosurgi/minieigen-real specific stuff: END
-
 	py::scope().attr("__doc__") = "miniEigen is wrapper for a small part of the `Eigen <http://eigen.tuxfamily.org>`_ library. Refer to its documentation "
 	                              "for details. All classes in this module support pickling.";
 
 	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByMinieigen, RegisterEigenHP>();
-
-	::yade::math::RealHPConfig::pyRegister();
 
 } catch (...) {
 	LOG_FATAL("Importing this module caused an exception and this module is in an inconsistent state now.");

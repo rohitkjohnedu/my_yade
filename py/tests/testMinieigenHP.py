@@ -12,6 +12,7 @@ from   testMathHelper import mpc
 
 class ExtendedMinieigenTests(unittest.TestCase):
 	def setUp(self):
+		mne.RealHPConfig  = yade.math.RealHPConfig
 		self.testLevelsHP = mne.RealHPConfig.getSupportedByMinieigen()
 		self.baseDigits   = mne.RealHPConfig.getDigits10(1)
 		self.skip33       = mne.RealHPConfig.isFloat128Broken        # this is for local testing only. It's here because with older compiler and -O0 the float128 is segfaulting
