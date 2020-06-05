@@ -149,7 +149,7 @@ namespace math {
 	// Add more functions as necessary, but remember to add them in py/high-precision/_math.cpp, py/tests/testMath.py and py/tests/testMathHelper.py
 	// They can be converted to accept complex by changing levelOfRealHP<> → levelOfHP<>, provided that a complex version exists.
 	// But remember to add tests for complex versions in py/high-precision/_math.cpp, py/tests/testMath.py and py/tests/testMathHelper.py
-	template <typename RC, int Level = levelOfHP<RC>> inline RC log(const RC& a)
+	template <typename RC, int Level = levelOfHPAllow<RC, int>> inline PromoteHP<RC> log(const RC& a)
 	{
 		using ::std::log;
 		using YADE_REAL_MATH_NAMESPACE::log;
@@ -216,8 +216,8 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::expm1;
 		return expm1(static_cast<const UnderlyingHP<Rr>&>(a));
 	}
-	template <typename Rr, typename T, int Level = levelOfRealHP<Rr>>
-	inline typename boost::enable_if<std::is_convertible<typename std::decay<T>::type, Rr>, Rr>::type pow(const Rr& a, const T& b)
+	template <typename Rr, typename T, int Level = levelOfRealHPAllow<Rr, int>>
+	inline typename boost::enable_if<std::is_convertible<typename std::decay<T>::type, Rr>, RealHP<Level>>::type pow(const Rr& a, const T& b)
 	{
 		using ::std::pow;
 		using YADE_REAL_MATH_NAMESPACE::pow;
@@ -247,6 +247,29 @@ namespace math {
 	/**********************    min, max, abs, sign, floor, ceil, etc...    **********************/
 	/********************************************************************************************/
 
+	//////////////////////////////////////////////////////////////////////
+	/*
+#if (defined(YADE_REAL_BIT) and (YADE_REAL_BIT != 64))
+//	// It turns out that getting min, max to work properly is more tricky than it is for other math functions: https://svn.boost.org/trac10/ticket/11149
+//	using YADE_REAL_MATH_NAMESPACE::max; // this refers to boost::multiprecision (or eventually to ::mpfr)
+//	using YADE_REAL_MATH_NAMESPACE::min;
+	// make sure that min max can accept (double,Real) argument pairs such as: max(r,0.5);
+//	inline Real max(const double& a, const Real& b) { return max(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+//	inline Real min(const double& a, const Real& b) { return min(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+//	inline Real max(const Real& a, const double& b) { return max(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+//	inline Real min(const Real& a, const double& b) { return min(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
+#endif
+#if (defined(YADE_REAL_BIT) and (YADE_REAL_BIT > 64))
+	inline Real abs(const Real& a)
+	{
+		using ::std::abs;
+		using YADE_REAL_MATH_NAMESPACE::abs;
+		return abs(static_cast<const UnderlyingReal&>(a));
+	}
+	inline Real fabs(const Real& a) { return ::yade::math::abs(a); }
+#endif
+*/
+	//////////////////////////////////////////////////////////////////////////////
 	// Both must be found by automatic lookup: the ones from ::std and the ones that accept non-double Real types.
 	using ::std::abs;
 	using ::std::fabs;
@@ -256,19 +279,19 @@ namespace math {
 	using YADE_REAL_MATH_NAMESPACE::max; // this refers to boost::multiprecision (or eventually to ::mpfr)
 	using YADE_REAL_MATH_NAMESPACE::min;
 	// make sure that min max can accept (double,Real) argument pairs such as: max(r,0.5);
-	template <typename Rr, int Level = levelOfRealHP<Rr>> inline Rr max(const double& a, const Rr& b)
+	template <typename Rr, int Level = levelOfRealHPExcept<Rr, double>> inline Rr max(const double& a, const Rr& b)
 	{
 		return max(static_cast<const UnderlyingHP<Rr>&>(a), static_cast<const UnderlyingHP<Rr>&>(b));
 	}
-	template <typename Rr, int Level = levelOfRealHP<Rr>> inline Rr min(const double& a, const Rr& b)
+	template <typename Rr, int Level = levelOfRealHPExcept<Rr, double>> inline Rr min(const double& a, const Rr& b)
 	{
 		return min(static_cast<const UnderlyingHP<Rr>&>(a), static_cast<const UnderlyingHP<Rr>&>(b));
 	}
-	template <typename Rr, int Level = levelOfRealHP<Rr>> inline Rr max(const Rr& a, const double& b)
+	template <typename Rr, int Level = levelOfRealHPExcept<Rr, double>> inline Rr max(const Rr& a, const double& b)
 	{
 		return max(static_cast<const UnderlyingHP<Rr>&>(a), static_cast<const UnderlyingHP<Rr>&>(b));
 	}
-	template <typename Rr, int Level = levelOfRealHP<Rr>> inline Rr min(const Rr& a, const double& b)
+	template <typename Rr, int Level = levelOfRealHPExcept<Rr, double>> inline Rr min(const Rr& a, const double& b)
 	{
 		return min(static_cast<const UnderlyingHP<Rr>&>(a), static_cast<const UnderlyingHP<Rr>&>(b));
 	}
