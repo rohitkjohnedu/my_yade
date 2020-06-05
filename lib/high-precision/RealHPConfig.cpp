@@ -65,6 +65,11 @@ namespace math {
 #else
 		py::scope().attr("isFloat128Broken") = false;
 #endif
+#ifndef YADE_DISABLE_REAL_MULTI_HP
+		py::scope().attr("isEnabledRealHP") = true;
+#else
+		py::scope().attr("isEnabledRealHP") = false;
+#endif
 	}
 
 } // namespace math

@@ -711,7 +711,7 @@ template <int N, bool registerConverters> struct RegisterRealHPMath {
 		        (py::arg("a"), "b"),
 		        R"""(:return: ``Real`` a random number in interval ``(a,b)``. Used by Eigen.)""");
 
-#if ((EIGEN_MAJOR_VERSION > 2) and (EIGEN_WORLD_VERSION >= 3)) or defined(YADE_EIGEN_NUM_TRAITS_HPP) or defined(EIGEN_MPREALSUPPORT_MODULE_H)
+#if EIGEN_VERSION_AT_LEAST(3,3,0)
 		py::def("isMuchSmallerThan",
 		        static_cast<bool (*)(const RealHP<N>&, const RealHP<N>&, const RealHP<N>&)>(&Eigen::internal::isMuchSmallerThan),
 		        (py::arg("a"), "b", "eps"),
@@ -852,7 +852,7 @@ Tests a simple CGAL calculation. Distance between plane and point, uses CGAL's s
 BOOST_PYTHON_MODULE(_math) try {
 	YADE_SET_DOCSTRING_OPTS;
 
-	if (::yade::math::RealHPConfig::getDigits10(1) >= 18) {
+	if ((::yade::math::RealHPConfig::getDigits10(1) >= 18) or (::yade::math::levelOrZero<double> == 0)) {
 		std_pair_to_python_converter<double, double>();
 	}
 	// this loop registers all python functions from range defined in YADE_EIGENCGAL_HP, file lib/high-precision/RealHPEigenCgal.hpp

@@ -40,7 +40,7 @@
 #else
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
-#if YADE_REAL_BIT <= 32
+#if ((YADE_REAL_BIT <= 32) and (not defined(YADE_DISABLE_REAL_MULTI_HP)))
 #include "ThinComplexWrapper.hpp"
 #include "ThinRealWrapper.hpp"
 // after the above two:
@@ -61,7 +61,7 @@ namespace math { // store info that ThinRealWrapper is not used.
 }
 }
 #endif
-#if YADE_REAL_BIT <= 64
+#if ((YADE_REAL_BIT <= 64) and (not defined(YADE_DISABLE_REAL_MULTI_HP)))
 #include <boost/multiprecision/float128.hpp>
 #endif
 
@@ -90,6 +90,7 @@ namespace math {
 	// Here is defined the progressing ladder of types 'RealHPLadder', each next type has higher precision, than the previous type.
 	// depending on precision specified in compilation options, the types to use are a bit different. They "shift upwards" within RealHPLadder
 
+#ifndef YADE_DISABLE_REAL_MULTI_HP
 #if YADE_REAL_BIT <= 32
 	// Real == float
 	using RealHPLadder = boost::mpl::vector<Real, double, ThinRealWrapper<long double>, detail::NthLevelRealHP<4>, boost::multiprecision::float128>;
@@ -108,6 +109,9 @@ namespace math {
 	using RealHPLadder = boost::mpl::vector<Real>;
 #elif (defined(YADE_REAL_MPFR) or defined(YADE_REAL_BBFLOAT))
 	// Real == cpp_bin_float or MPFR
+	using RealHPLadder = boost::mpl::vector<Real>;
+#endif
+#else
 	using RealHPLadder = boost::mpl::vector<Real>;
 #endif
 
