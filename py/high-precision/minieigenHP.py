@@ -27,11 +27,10 @@ Though it could be precompiled for some special types such as ``boost::multiprec
 The ``RealHP<n>`` :ref:`higher precision<higher-hp-precision>` vectors and matrices can be accessed in python by using the ``.HPn`` module scope. For example::
 
 	import yade.minieigenHP as mne
-	mne.HP3.Vector3(1,2,3) # produces Vector3 using RealHP<3> precision
+	mne.HP2.Vector3(1,2,3) # produces Vector3 using RealHP<2> precision
 	mth.Vector3(1,2,3)     # without using HPn module scope it defaults to RealHP<1>
 
 """
-# FIXME: write in doc/sphinx/HighPrecisionReal.rst an anchor:  .. _higher-hp-precision:
 
 # all C++ functions are accessible now:
 import yade

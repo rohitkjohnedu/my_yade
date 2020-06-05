@@ -79,7 +79,7 @@ class SimpleTests(unittest.TestCase):
 			 , "cadd"      : {"6":2   , "15":2   , "18":2    , "33":4      , "100":20000 , "150" :20000 , "100_b" :20000   , "150_b" :20000  }
 			 , "cmul"      : {"6":6   , "15":6   , "18":6    , "33":12     , "100":60000 , "150" :60000 , "100_b" :60000   , "150_b" :60000  }
 			 }
-		self.testLevelsHP = mth.RealHPConfig.getSupportedByEigenCgal()
+		self.testLevelsHP = mth.RealHPConfig.getSupportedByMinieigen()
 		self.baseDigits   = mth.RealHPConfig.getDigits10(1)
 		self.builtinHP    = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 

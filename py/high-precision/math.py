@@ -34,7 +34,7 @@ calls to this function should call this function instead, e.g. ``numpy.linspace(
 The ``RealHP<n>`` :ref:`higher precision<higher-hp-precision>` math functions can be accessed in python by using the ``.HPn`` module scope. For example::
 
 	import yade.math as mth
-	mth.HP3.sqrt(2) # produces square root of 2 using RealHP<3> precision
+	mth.HP2.sqrt(2) # produces square root of 2 using RealHP<2> precision
 	mth.sqrt(2)     # without using HPn module scope it defaults to RealHP<1>
 
 """

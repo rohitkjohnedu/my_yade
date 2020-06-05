@@ -857,7 +857,7 @@ BOOST_PYTHON_MODULE(_math) try {
 	}
 	// this loop registers all python functions from range defined in YADE_EIGENCGAL_HP, file lib/high-precision/RealHPEigenCgal.hpp
 	// Some functions for large N are extremely slow during python 'import yade.math', so they are not registered, see struct IfConstexprForSlowFunctions
-	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByEigenCgal, RegisterRealHPMath>();
+	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByMinieigen, RegisterRealHPMath>();
 
 	expose_storage_ordering();
 
