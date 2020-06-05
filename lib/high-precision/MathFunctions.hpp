@@ -247,29 +247,6 @@ namespace math {
 	/**********************    min, max, abs, sign, floor, ceil, etc...    **********************/
 	/********************************************************************************************/
 
-	//////////////////////////////////////////////////////////////////////
-	/*
-#if (defined(YADE_REAL_BIT) and (YADE_REAL_BIT != 64))
-//	// It turns out that getting min, max to work properly is more tricky than it is for other math functions: https://svn.boost.org/trac10/ticket/11149
-//	using YADE_REAL_MATH_NAMESPACE::max; // this refers to boost::multiprecision (or eventually to ::mpfr)
-//	using YADE_REAL_MATH_NAMESPACE::min;
-	// make sure that min max can accept (double,Real) argument pairs such as: max(r,0.5);
-//	inline Real max(const double& a, const Real& b) { return max(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
-//	inline Real min(const double& a, const Real& b) { return min(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
-//	inline Real max(const Real& a, const double& b) { return max(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
-//	inline Real min(const Real& a, const double& b) { return min(static_cast<const UnderlyingReal&>(a), static_cast<const UnderlyingReal&>(b)); }
-#endif
-#if (defined(YADE_REAL_BIT) and (YADE_REAL_BIT > 64))
-	inline Real abs(const Real& a)
-	{
-		using ::std::abs;
-		using YADE_REAL_MATH_NAMESPACE::abs;
-		return abs(static_cast<const UnderlyingReal&>(a));
-	}
-	inline Real fabs(const Real& a) { return ::yade::math::abs(a); }
-#endif
-*/
-	//////////////////////////////////////////////////////////////////////////////
 	// Both must be found by automatic lookup: the ones from ::std and the ones that accept non-double Real types.
 	using ::std::abs;
 	using ::std::fabs;
