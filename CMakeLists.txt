@@ -358,6 +358,7 @@ MESSAGE(STATUS   "${Esc}[36mChosen compiler flags are: CMAKE_CXX_FLAGS = ${CMAKE
 #  * set REAL_USE_ARBITRARY  as one of: --- "OFF" -- or "MPFR" or "BOOST_BIN_FLOAT"
 #  * set REAL_USE_MPMATH     as one of: -OFF-,------ON--------
 #  * set REAL_PREC_NAME      as one of: "PrecisionFloat" "PrecisionDouble", "PrecisionLongDouble", "PrecisionFloat128", "PrecisionMpfr" or "PrecisionBoostBinFloat"
+#  * set REAL_MULTI_HP       is set to "ON" when the compiler supports it, otherwise to "OFF"
 #  * set CONFIGURED_FEATS    ${REAL_PREC_NAME} ${REAL_USE_MPMATH}
 #  * #define YADE_REAL_BIT  REAL_PRECISION_BITS
 #  * #define YADE_REAL_DEC  REAL_DECIMAL_PLACES
@@ -467,8 +468,38 @@ IF(REAL_USE_ARBITRARY)
   ENDIF()
 ENDIF()
 
+# Detect if RealHP<N> is supported. Allow option to override this for testing.
+FIND_PACKAGE(Mpmath)
+IF((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 9.2.1) OR ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 8.3.0) AND (ENABLE_MPFR) AND (REAL_PRECISION_BITS GREATER 128)) OR (ALLOW_CRASHES))
+  IF(MPMATH_FOUND)
+    SET(REAL_MULTI_HP "ON")
+    IF(NOT ENABLE_MPFR)
+      IF(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION LESS 71 AND REAL_PRECISION_BITS EQUAL 80)
+        MESSAGE(STATUS "${Esc}[31mCannot enable RealHP<N> with 'long double' type because cpp_bin_float in boost version < 1.71 has interoperability problems, please use cmake option ENABLE_MPFR=ON to fix this or upgrade boost library.${Esc}[0m")
+        SET(REAL_MULTI_HP "OFF")
+      ELSE()
+        MESSAGE(STATUS "${Esc}[31mWarning: RealHP<N> higher precision types will use slow boost cpp_bin_float, consider passing cmake option ENABLE_MPFR=ON to fix this.${Esc}[0m")
+      ENDIF()
+    ENDIF()
+  ELSE()
+    SET(REAL_MULTI_HP "OFF")
+    MESSAGE(STATUS "${Esc}[31mDisabling RealHP<N>, it can work on this system, but python3-mpmath package is missing.${Esc}[0m")
+  ENDIF()
+ELSE()
+  SET(REAL_MULTI_HP "OFF")
+  MESSAGE(STATUS "${Esc}[31mDisabling RealHP<N>, this compiler is too old to make this work.${Esc}[0m")
+ENDIF()
+IF(REAL_MULTI_HP)
+  SET(REAL_USE_MPMATH "ON")
+  SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} RealHP")
+  MESSAGE(STATUS "${Esc}[32mEnabling RealHP<N>, double, quadruple, octuple precisions are available: RealHP<2>, RealHP<4>, RealHP<8>${Esc}[0m")
+ELSE()
+  ADD_DEFINITIONS("-DYADE_DISABLE_REAL_MULTI_HP")
+  SET(DISABLED_FEATS "${DISABLED_FEATS} RealHP")
+ENDIF()
+
+# if REAL_MULTI_HP is enabled then REAL_USE_MPMATH must be ON
 IF(REAL_USE_MPMATH)
-  FIND_PACKAGE(Mpmath REQUIRED)
   IF(MPMATH_FOUND)
     MESSAGE(STATUS "python-mpmath found, version: ${MPMATH_VERSION}")
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} mpmath")
@@ -1048,7 +1079,7 @@ FILE(GLOB SRC_CORE "core/*.cpp")
 FILE(GLOB_RECURSE SRC_PKG  "pkg/*.cpp")
 FILE(GLOB SRC_LIB  "lib/*.cpp")
 
-SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/factory/ClassFactory.cpp;lib/factory/DynLibManager.cpp;lib/base/Logging.cpp;lib/compatibility/LapackCompatibility.cpp;lib/compatibility/VTKCompatibility.cpp")
+SET(SRC_LIB "${SRC_LIB};lib/base/Math.cpp;lib/high-precision/RealHPConfig.cpp;lib/factory/ClassFactory.cpp;lib/factory/DynLibManager.cpp;lib/base/Logging.cpp;lib/compatibility/LapackCompatibility.cpp;lib/compatibility/VTKCompatibility.cpp")
 SET(SRC_LIB "${SRC_LIB};lib/serialization/Serializable.cpp;lib/pyutil/gil.cpp;core/main/pyboot.cpp;${GUI_SRC_LIB};${CGAL_SRC_LIB}")
 IF(ENABLE_POTENTIAL_PARTICLES OR ENABLE_POTENTIAL_BLOCKS)
   SET(SRC_LIB "${SRC_LIB};lib/computational-geometry/MarchingCube.cpp")
@@ -1081,9 +1112,12 @@ IF(ENABLE_MPFR)
   TARGET_LINK_LIBRARIES(yade ${MPFR_LIBRARIES})
 ENDIF()
 
-IF(REAL_PRECISION_BITS EQUAL 128)
+IF(REAL_PRECISION_BITS EQUAL 128 OR ((REAL_MULTI_HP) AND (REAL_PRECISION_BITS LESS 128)))
   # the quadmath library is a part of g++ package, no need to check if it is installed.
   TARGET_LINK_LIBRARIES(yade -lquadmath)
+  MESSAGE(STATUS "linking -lquadmath")
+ELSE()
+  MESSAGE(STATUS "linking -lquadmath skipped")
 ENDIF()
 
 IF(ENABLE_VTK)
