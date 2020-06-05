@@ -133,7 +133,8 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 namespace yade {
 namespace math {
 	namespace detail {
-		template <int N> class ScopeHP { // separate class is needed to act as python scope identifier. Might become useful later.
+		template <int, template <int, bool> class>
+		class ScopeHP { // separate class is needed to act as python scope identifier. Might become useful later.
 		};
 
 		template <int N, template <int, bool> class RegisterHPClass> void registerInScope(bool createInternalScopeHP)
@@ -148,7 +149,7 @@ namespace math {
 				//    yade.math.sin(10)                             yade.math.HP1.sin(10)
 				//    yade.minieigenHP.Vector3r(1,2,3)              yade.minieigenHP.HP1.Vector3r(1,2,3)
 				std::string          name = "HP" + boost::lexical_cast<std::string>(N); // scope name: "HP1", "HP2", etc
-				boost::python::scope HPn  = boost::python::class_<ScopeHP<N>>(name.c_str());
+				boost::python::scope HPn  = boost::python::class_<ScopeHP<N, RegisterHPClass>>(name.c_str());
 				RegisterHPClass<N, true>::work(topScope, HPn);
 			} else {
 				// this one puts the 'base precision' RealHP<1> math functions in the top scope of this python module. They are duplicated inside HP1.
