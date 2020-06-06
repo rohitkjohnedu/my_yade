@@ -129,6 +129,15 @@ namespace math {
 			return static_cast<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>(val);
 		}
 		explicit operator ::boost::multiprecision::float128() const { return static_cast<::boost::multiprecision::float128>(val); }
+		template <unsigned int Num>
+		ThinRealWrapper(const ::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>& otherVal)
+		        : val(static_cast<WrappedReal>(otherVal))
+		{
+		}
+		ThinRealWrapper(const ::boost::multiprecision::float128& otherVal)
+		        : val(static_cast<WrappedReal>(otherVal))
+		{
+		}
 #endif
 		explicit operator const WrappedReal&() const { return val; }
 		explicit operator WrappedReal&() { return val; }
