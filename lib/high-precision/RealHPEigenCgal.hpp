@@ -63,7 +63,8 @@ There are two ways to avoid these macros:
 
 */
 
-#if ((not defined(YADE_REAL_MATH_NAMESPACE)) or (not defined(YADE_EIGEN_SUPPORT_REAL_HP)) or (defined(YADE_CGAL) and (not defined(YADE_CGAL_SUPPORT_REAL_HP))))
+#if ((not defined(YADE_REAL_MATH_NAMESPACE)) or (not defined(YADE_EIGEN_SUPPORT_REAL_HP))                                                                      \
+     or (defined(YADE_CGAL) and (not defined(YADE_DISABLE_REAL_MULTI_HP)) and (not defined(YADE_CGAL_SUPPORT_REAL_HP))))
 #error "This file cannot be included alone, include Real.hpp instead"
 #endif
 
@@ -119,7 +120,7 @@ YADE_REGISTER_SELECTED_HP_LEVELS(YADE_EIGEN_SUPPORT_REAL_HP)
 
 } // namespace Eigen
 
-#ifdef YADE_CGAL
+#ifdef YADE_CGAL_SUPPORT_REAL_HP
 namespace CGAL {
 
 // The YADE_CGAL_SUPPORT_REAL_HP is provided from file lib/high-precision/CgalNumTraits.hpp

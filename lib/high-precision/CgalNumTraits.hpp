@@ -5,7 +5,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#if defined(YADE_CGAL) and (not defined(CGAL_NUM_TRAITS_HPP))
+#if (((not defined(YADE_DISABLE_REAL_MULTI_HP)) or (YADE_REAL_BIT > 64)) and defined(YADE_CGAL) and (not defined(CGAL_NUM_TRAITS_HPP)))
 #define CGAL_NUM_TRAITS_HPP
 
 #ifndef YADE_REAL_MATH_NAMESPACE
