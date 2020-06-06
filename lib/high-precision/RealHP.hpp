@@ -200,6 +200,14 @@ namespace math {
 	template <typename HP, typename boost::enable_if_c<isHP<HP>, int>::type = 0> const constexpr int        levelOfHP   = levelOrZero<RealOf<HP>>;
 	template <typename HP, typename boost::enable_if_c<isRealHP<HP>, int>::type = 0> const constexpr int    levelOfRealHP    = levelOfHP<HP>;
 	template <typename HP, typename boost::enable_if_c<isComplexHP<HP>, int>::type = 0> const constexpr int levelOfComplexHP = levelOfHP<HP>;
+	// check if it's float128
+#ifdef BOOST_MP_FLOAT128_HPP
+	template <typename A> const constexpr bool isFloat128 = std::is_same<boost::multiprecision::float128, typename std::decay<A>::type>::value;
+#else
+	template <typename A> const constexpr bool isFloat128 = false;
+#endif
+	// check if HP is an MPFR or cpp_bin_float
+	template <typename HP> const constexpr bool isNthLevel = detail::isNthLevel<HP>;
 
 	/*************************************************************************/
 	/*************************  SelectHigherHP<A,B> **************************/

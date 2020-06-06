@@ -424,13 +424,8 @@ namespace math {
 	//YADE_WRAP_FUNC_2(sph_bessel, unsigned)
 
 
-#ifdef BOOST_MP_FLOAT128_HPP
-	template <typename A> const constexpr bool IsFloat128 = std::is_same<boost::multiprecision::float128, typename std::decay<A>::type>::value;
-#else
-	template <typename A> const constexpr bool IsFloat128 = false;
-#endif
 	// workaround broken tgamma for boost::float128, see https://github.com/boostorg/math/issues/307
-	template <typename Rr, int Level = levelOfRealHP<Rr>, typename boost::enable_if_c<IsFloat128<Rr>, int>::type = 0> inline Rr tgamma(const Rr& a)
+	template <typename Rr, int Level = levelOfRealHP<Rr>, typename boost::enable_if_c<isFloat128<Rr>, int>::type = 0> inline Rr tgamma(const Rr& a)
 	{
 		using ::std::tgamma;
 		using YADE_REAL_MATH_NAMESPACE::tgamma;
@@ -440,7 +435,7 @@ namespace math {
 			return abs(tgamma(static_cast<UnderlyingRealHP<Rr>>(a))) * ((static_cast<unsigned long long>(floor(abs(a))) % 2 == 0) ? -1 : 1);
 		}
 	}
-	template <typename Rr, int Level = levelOfRealHP<Rr>, typename boost::disable_if_c<IsFloat128<Rr>, int>::type = 0> inline Rr tgamma(const Rr& a)
+	template <typename Rr, int Level = levelOfRealHP<Rr>, typename boost::disable_if_c<isFloat128<Rr>, int>::type = 0> inline Rr tgamma(const Rr& a)
 	{
 		using ::std::tgamma;
 		using YADE_REAL_MATH_NAMESPACE::tgamma;
