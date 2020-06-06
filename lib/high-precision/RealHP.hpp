@@ -206,7 +206,7 @@ namespace math {
 	/*************************************************************************/
 	// SelectHigherHP helps selecting a maximum type encompassing both A and B.
 
-	template <typename A, typename B, int LevelA = levelOfHP<A>, int LevelB = levelOfHP<B>, int MaxLevel = std::max(LevelA, LevelB)>
+	template <typename A, typename B, int LevelA = levelOfHP<A>, int LevelB = levelOfHP<B>, int MaxLevel = ((LevelA > LevelB) ? (LevelA) : (LevelB))>
 	using SelectHigherHP = typename std::conditional<(isComplex<A> or isComplex<B>), ComplexHP<MaxLevel>, RealHP<MaxLevel>>::type;
 
 	/*************************************************************************/
