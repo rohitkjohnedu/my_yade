@@ -24,14 +24,15 @@
 #define YADE_MINIEIGEN_HP (1)
 #endif
 
+#define YADE_HP_PARSE_ONE(r, name, levelHP) name(levelHP)
+#define YADE_REGISTER_HP_LEVELS(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EIGENCGAL_HP) // it just creates: name(1) name(2) name(3) ....
+// This macro ↑ is also used in lib/base/AliasCGAL.hpp, that code could be put here, but it would make compilation unnecessarily longer.
+
 #include <lib/high-precision/Real.hpp>
 #include <array>
 #include <boost/mpl/vector_c.hpp>
+#include <boost/preprocessor.hpp>
 #include <boost/python.hpp>
-
-#ifdef YADE_MPFR
-#include <boost/preprocessor/seq/reverse.hpp>
-#endif
 
 namespace yade {
 namespace math {
@@ -61,9 +62,19 @@ namespace math {
 		static inline boost::python::tuple getSupportedByMinieigen() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_MINIEIGEN_HP)); }
 
 		// returns number of decimal and binary digits for runtime N of RealHP<N>
-		template <template <int> class> static int getDigits(int N);
-		static inline int                          getDigits10(int N) { return getDigits<DigitsHP10>(N); };
-		static inline int                          getDigits2(int N) { return getDigits<DigitsHP2>(N); };
+		template <template <int> class dig> static inline int getDigits(int N)
+		{
+			switch (N) {
+#define CASE_LEVEL_HP(levelHP)                                                                                                                                 \
+	case levelHP: return dig<levelHP>::value();
+				YADE_REGISTER_HP_LEVELS(CASE_LEVEL_HP)
+#undef CASE_LEVEL_HP
+				default: return dig<1>::value() * N; // this formula is used by NthLevel in lib/high-precision/RealHP.hpp
+			}
+		}
+
+		static inline int getDigits10(int N) { return getDigits<DigitsHP10>(N); };
+		static inline int getDigits2(int N) { return getDigits<DigitsHP2>(N); };
 
 		// how many extra digits to use when converting to decimal srings
 		static int extraStringDigits10;
@@ -76,7 +87,11 @@ namespace math {
 		// boost cpp_bin_float has some problem that importing it in pythoon is very slow when these functions are exported: erf, erfc, lgamma, tgamma
 		// python 'import this_module' measured time: workaroundSlowBoostBinFloat==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
 		// the workaround is to make them unavailable in python for higher N values. See invocation of IfConstexprForSlowFunctions in py/high-precision/_math.cpp
+#ifndef YADE_DISABLE_REAL_MULTI_HP
 		static const constexpr auto workaroundSlowBoostBinFloat = 2;
+#else
+		static const constexpr auto workaroundSlowBoostBinFloat = 1;
+#endif
 #endif
 
 		// register this class to python

@@ -73,10 +73,6 @@ struct RealHPEigenCgal {
 }; // for ctags
 }
 
-#define YADE_HP_PARSE_ONE(r, name, levelHP) name(levelHP)
-// This macro ↓ is used in lib/base/AliasCGAL.hpp, that code could be put here, but this would make compilation unnecessarily longer.
-#define YADE_REGISTER_HP_LEVELS(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EIGENCGAL_HP) // it just creates: name(1) name(2) name(3) ....
-
 /*
  * Macro YADE_HP_PYTHON_REGISTER generates an assembly code for a template instantination. It is used in files:
  *

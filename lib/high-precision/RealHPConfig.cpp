@@ -13,30 +13,6 @@ namespace math {
 
 	int RealHPConfig::extraStringDigits10 { 1 };
 
-	template <template <int> class dig> int RealHPConfig::getDigits(int N)
-	{
-		// 5 is the largest length of RealHPLadder<…>. If more were added, and precision were not the multiplies of digits10*N
-		// then the python test will quickly catch that problem. Then more cases will be needed to add to this switch.
-		static_assert(
-		        boost::mpl::size<::yade::math::RealHPLadder>::value <= 5,
-		        "More types were added in RealHP.hpp, please adjust this switch(…) accordingly.");
-		switch (N) {
-			// NOTE: I could turn this into a self-unfolding macro, like in RealHPEigenCgal.hpp (there it was necessary), but maybe better to have here a simple readable code?
-			case 1: return dig<1>::value();
-			case 2: return dig<2>::value();
-			case 3: return dig<3>::value();
-			case 4: return dig<4>::value();
-			case 5: return dig<5>::value();
-			case 6: return dig<6>::value();
-			case 7: return dig<7>::value();
-			case 8: return dig<8>::value();
-			case 9: return dig<9>::value();
-			case 10: return dig<10>::value();
-			case 20: return dig<20>::value();
-			default: return dig<1>::value() * N; // this formula is used by NthLevel in lib/high-precision/RealHP.hpp
-		}
-	}
-
 	void RealHPConfig::pyRegister()
 	{
 		namespace py = ::boost::python;
