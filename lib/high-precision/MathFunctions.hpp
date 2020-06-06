@@ -216,8 +216,8 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::expm1;
 		return expm1(static_cast<const UnderlyingHP<Rr>&>(a));
 	}
-	template <typename Rr, typename T, int Level = levelOfRealHPAllow<Rr, int>>
-	inline typename boost::enable_if<std::is_convertible<typename std::decay<T>::type, Rr>, RealHP<Level>>::type pow(const Rr& a, const T& b)
+	template <typename A, typename B, int Level = levelOfRealHPAllow<A, int>, typename Rr = PromoteHP<A>>
+	inline typename boost::enable_if<std::is_convertible<typename std::decay<B>::type, Rr>, Rr>::type pow(const A& a, const B& b)
 	{
 		using ::std::pow;
 		using YADE_REAL_MATH_NAMESPACE::pow;
