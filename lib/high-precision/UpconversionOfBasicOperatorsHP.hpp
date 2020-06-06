@@ -75,6 +75,12 @@ namespace math {
 		        const SelectMaybeComplexHP<A, B, LevelB>&,
 		        const SelectMaybeComplexHP<A, B, LevelB>>::type;
 
+		// Older compilers do not have std::void_t, this small helper type is used by HasPlus, HasMinus, etc, below.
+		template <typename... Ts> struct make_void {
+			typedef void type;
+		};
+		template <typename... Ts> using void_type = typename make_void<Ts...>::type;
+
 		// These templates are used to find out if there exists an operator+ between types A and B. So basically it is designed to catch the example written at the start of this file:
 		//
 		//  Real       a = 1;
@@ -85,19 +91,19 @@ namespace math {
 		template <typename A, typename B, class = void> struct HasPlus : std::false_type {
 		};
 		//                                                                        std::declval<A>()            + std::declval<B>() // also works.
-		template <typename A, typename B> struct HasPlus<A, B, std::void_t<decltype(std::declval<A, B>().operator+())>> : std::true_type {
+		template <typename A, typename B> struct HasPlus<A, B, void_type<decltype(std::declval<A, B>().operator+())>> : std::true_type {
 		};
 		template <typename A, typename B, class = void> struct HasMinus : std::false_type {
 		};
-		template <typename A, typename B> struct HasMinus<A, B, std::void_t<decltype(std::declval<A, B>().operator-())>> : std::true_type {
+		template <typename A, typename B> struct HasMinus<A, B, void_type<decltype(std::declval<A, B>().operator-())>> : std::true_type {
 		};
 		template <typename A, typename B, class = void> struct HasMult : std::false_type {
 		};
-		template <typename A, typename B> struct HasMult<A, B, std::void_t<decltype(std::declval<A, B>().operator*())>> : std::true_type {
+		template <typename A, typename B> struct HasMult<A, B, void_type<decltype(std::declval<A, B>().operator*())>> : std::true_type {
 		};
 		template <typename A, typename B, class = void> struct HasDiv : std::false_type {
 		};
-		template <typename A, typename B> struct HasDiv<A, B, std::void_t<decltype(std::declval<A, B>().operator/())>> : std::true_type {
+		template <typename A, typename B> struct HasDiv<A, B, void_type<decltype(std::declval<A, B>().operator/())>> : std::true_type {
 		};
 
 		// Enable all of this only when the operators+-*/ are not provided and both types are of the HP kind. Either RealHP or ComplexHP.
