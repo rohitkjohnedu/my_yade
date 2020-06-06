@@ -29,8 +29,20 @@
 #include <boost/mpl/vector_c.hpp>
 #include <boost/python.hpp>
 
+#ifdef YADE_MPFR
+#include <boost/preprocessor/seq/reverse.hpp>
+#endif
+
 namespace yade {
 namespace math {
+	// contains number of decimal and binary digits during compile-time N of RealHP<N>
+	template <int N> struct DigitsHP10 { // must be a struct, so that getDigits<…>(N) will accept it as an argument.
+		static inline int value() { return std::numeric_limits<RealHP<N>>::digits10; }
+	};
+	template <int N> struct DigitsHP2 {
+		static inline int value() { return std::numeric_limits<RealHP<N>>::digits; }
+	};
+
 	struct RealHPConfig {
 		// set how many RealHP<N> types are provided for Eigen, CGAL and Minieigen in file lib/high-precision/RealHPEigenCgal.hpp by YADE_EIGENCGAL_HP , YADE_MINIEIGEN_HP:
 		static const constexpr auto sizeEigenCgal = BOOST_PP_SEQ_SIZE(YADE_EIGENCGAL_HP);
@@ -48,16 +60,27 @@ namespace math {
 		static inline boost::python::tuple getSupportedByEigenCgal() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_EIGENCGAL_HP)); }
 		static inline boost::python::tuple getSupportedByMinieigen() { return boost::python::make_tuple(BOOST_PP_SEQ_ENUM(YADE_MINIEIGEN_HP)); }
 
-		// returns number of decimal digits for compile-time N of RealHP<N>
-		template <int N> static const constexpr auto digits10 = std::numeric_limits<RealHP<N>>::digits10;
-		// returns number of decimal digits for runtime N of RealHP<N>
-		static int getDigits10(int N);
-
-		// register this class to python
-		static void pyRegister();
+		// returns number of decimal and binary digits for runtime N of RealHP<N>
+		template <template <int> class> static int getDigits(int N);
+		static inline int                          getDigits10(int N) { return getDigits<DigitsHP10>(N); };
+		static inline int                          getDigits2(int N) { return getDigits<DigitsHP2>(N); };
 
 		// how many extra digits to use when converting to decimal srings
 		static int extraStringDigits10;
+
+#ifdef YADE_MPFR
+#define YADE_EIGENCGAL_HP_REVERSE BOOST_PP_SEQ_REVERSE(YADE_EIGENCGAL_HP)
+		static const constexpr auto workaroundSlowBoostBinFloat = BOOST_PP_SEQ_HEAD(YADE_EIGENCGAL_HP_REVERSE);
+#undef YADE_EIGENCGAL_HP_REVERSE
+#else
+		// boost cpp_bin_float has some problem that importing it in pythoon is very slow when these functions are exported: erf, erfc, lgamma, tgamma
+		// python 'import this_module' measured time: workaroundSlowBoostBinFloat==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
+		// the workaround is to make them unavailable in python for higher N values. See invocation of IfConstexprForSlowFunctions in py/high-precision/_math.cpp
+		static const constexpr auto workaroundSlowBoostBinFloat = 2;
+#endif
+
+		// register this class to python
+		static void pyRegister();
 	};
 } // namespace math
 } // namespace yade

@@ -13,7 +13,7 @@ namespace math {
 
 	int RealHPConfig::extraStringDigits10 { 1 };
 
-	int RealHPConfig::getDigits10(int N)
+	template <template <int> class dig> int RealHPConfig::getDigits(int N)
 	{
 		// 5 is the largest length of RealHPLadder<…>. If more were added, and precision were not the multiplies of digits10*N
 		// then the python test will quickly catch that problem. Then more cases will be needed to add to this switch.
@@ -21,12 +21,19 @@ namespace math {
 		        boost::mpl::size<::yade::math::RealHPLadder>::value <= 5,
 		        "More types were added in RealHP.hpp, please adjust this switch(…) accordingly.");
 		switch (N) {
-			case 1: return digits10<1>;
-			case 2: return digits10<2>;
-			case 3: return digits10<3>;
-			case 4: return digits10<4>;
-			case 5: return digits10<5>;
-			default: return digits10<1> * N; // this formula is used by NthLevel in lib/high-precision/RealHP.hpp
+			// NOTE: I could turn this into a self-unfolding macro, like in RealHPEigenCgal.hpp (there it was necessary), but maybe better to have here a simple readable code?
+			case 1: return dig<1>::value();
+			case 2: return dig<2>::value();
+			case 3: return dig<3>::value();
+			case 4: return dig<4>::value();
+			case 5: return dig<5>::value();
+			case 6: return dig<6>::value();
+			case 7: return dig<7>::value();
+			case 8: return dig<8>::value();
+			case 9: return dig<9>::value();
+			case 10: return dig<10>::value();
+			case 20: return dig<20>::value();
+			default: return dig<1>::value() * N; // this formula is used by NthLevel in lib/high-precision/RealHP.hpp
 		}
 	}
 
@@ -53,7 +60,8 @@ namespace math {
 		        getSupportedByMinieigen,
 		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by minieigenHP)""");
 		py::def("getDigits10", getDigits10, (py::arg("N")), R"""(:return: the ``int`` representing numeric_limits digits10 of RealHP<N>)""");
-#if (GCC_VERSION < 90201)
+		py::def("getDigits2", getDigits2, (py::arg("N")), R"""(:return: the ``int`` representing numeric_limits digits (binary bits) of RealHP<N>)""");
+#if (__GNUC__ < 9) // It should be checking  if (ver < 9.2.1) in fact. But cmake does the job. So here it's only to catch 'larger' mistakes.
 #ifndef YADE_DISABLE_REAL_MULTI_HP
 #warning "RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>. Also you can try -O0 flag."
 // see file lib/high-precision/RealHP.hpp line: 'template <int Level> using RealHP    = Real;'
@@ -70,6 +78,7 @@ namespace math {
 #else
 		py::scope().attr("isEnabledRealHP") = false;
 #endif
+		py::scope().attr("workaroundSlowBoostBinFloat") = int(workaroundSlowBoostBinFloat);
 	}
 
 } // namespace math

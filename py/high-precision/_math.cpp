@@ -331,7 +331,7 @@ template <int N> struct IfConstexprForEigen<N, false> {
 
 template <int N, bool registerConverters> struct RegisterRealHPMath {
 	// python 'import this_module' measured time: skipSlowFunctionsAbove_N==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
-	static const constexpr int skipSlowFunctionsAbove_N = 20; // FIXME - extract/generalize this. The problem occurs only with boost cpp_bin_float
+	static const constexpr int skipSlowFunctionsAbove_N = yade::math::RealHPConfig::workaroundSlowBoostBinFloat;
 
 	static void work(const py::scope& topScope, const py::scope& scopeHP)
 	{
