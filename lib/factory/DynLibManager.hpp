@@ -13,6 +13,7 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
+#include <map>
 
 namespace yade { // Cannot have #include directive inside.
 

@@ -1,6 +1,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #include <lib/base/Math.hpp>
+#include <list>
 
 namespace yade { // Cannot have #include directive inside.
 
