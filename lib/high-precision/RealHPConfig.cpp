@@ -60,3 +60,33 @@ namespace math {
 } // namespace math
 } // namespace yade
 
+/* FIXME - put this into documentation (above) of extraStringDigits10
+
+The extraStringDigits10 is to make sure that there are no conversion errors in the last bit.
+here is a quick python example which shows the 'cutting' of last digits.
+
+# This one demostrates that `double` used by python has just 53 bits of precision:
+
+for a in range(128): print(str(a).rjust(3,' ')+": "+str(1+1./pow(2.,a)))
+
+# This one shows the 'true' values:
+
+import mpmath; mpmath.mp.dps=200;
+for a in range(128): print(str(a).rjust(3,' ')+": "+str(mpmath.mpf(1)+mpmath.mpf(1)/pow(mpmath.mpf(2),mpmath.mpf(a))))
+
+# This one shows the actual 'Real' precision used in yade. To achieve this the mth.max(…,…) are called to force the numbers
+# to pass through C++, instead of letting mpmath to calculate this, so for example we can see that float128 has 113 bits.
+# Also this test was used to verify the value for extraStringDigits10 as well as the formula given
+# in IEEE Std 754-2019 Standard for Floating-Point Arithmetic: Pmin (bf) = 1 + ceiling( p × log10(2)), where p is the number of significant bits in bf
+
+from yade import math as mth
+for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+mth.max(0,1)/mth.pow(mth.max(0,2),a))))
+
+# But also we can now check the precision directly by calling
+
+yade.math.RealHPConfig.getDigits2(N) # for any N of RealHP<N>
+
+# Hmm maybe turn this into an external parameter? Configurable from python? And write in help "use 1 to extract results and avoid fake sense of more precision,
+# use 4 or more to have numbers which will convert exactly in both directions mpmath ↔ string ↔ C++.".
+# For now it is in yade.math.RealHPConfig.extraStringDigits10
+*/
