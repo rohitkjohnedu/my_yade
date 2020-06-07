@@ -17,7 +17,7 @@ void SPHEngine::action()
 			if (mask > 0 && (b->groupMask & mask) == 0)
 				continue;
 			this->calculateSPHRho(b);
-			b->state->press = std::max(0.0, k * (b->state->rho - b->state->rho0));
+			b->state->press = math::max(0.0, k * (b->state->rho - b->state->rho0));
 		}
 		YADE_PARALLEL_FOREACH_BODY_END();
 	}
@@ -66,7 +66,7 @@ Real smoothkernelLucy(const double& r, const double& h)
 	if (r <= h && h > 0) {
 		// Lucy Kernel function, [Lucy1977] (27)
 		const Real r_h = r / h;
-		return 105. / (16. * M_PI * h * h * h) * (1. + 3. * r_h) * std::pow((1. - r_h), 3);
+		return 105. / (16. * M_PI * h * h * h) * (1. + 3. * r_h) * math::pow((1. - r_h), 3);
 	} else {
 		return 0;
 	}
@@ -76,7 +76,7 @@ Real smoothkernelLucyGrad(const double& r, const double& h)
 {
 	if (r <= h && h > 0) {
 		// 1st derivative of Lucy Kernel function, [Lucy1977] (27)
-		return 105. / (16. * M_PI * h * h * h) * (-12. * r) * std::pow((h - r), 2) / (h * h * h * h);
+		return 105. / (16. * M_PI * h * h * h) * (-12. * r) * math::pow((h - r), 2) / (h * h * h * h);
 	} else {
 		return 0;
 	}
@@ -102,7 +102,7 @@ Real smoothkernelBSpline1(const double& r, const double& h)
 		if (r <= h) {
 			return coefA * (2. / 3. - r_h * r_h + 1. / 2. * r_h * r_h * r_h);
 		} else {
-			return coefA / 6. * std::pow((2. - r_h), 3);
+			return coefA / 6. * math::pow((2. - r_h), 3);
 		}
 	} else {
 		return 0;
@@ -118,7 +118,7 @@ Real smoothkernelBSpline1Grad(const double& r, const double& h)
 		if (r <= h) {
 			return coefA * (-r_h) * (2. - 3. / 2. * r_h);
 		} else {
-			return coefA * (-1. / 2.) * std::pow((2. - r_h), 2);
+			return coefA * (-1. / 2.) * math::pow((2. - r_h), 2);
 		}
 	} else {
 		return 0;
@@ -152,7 +152,7 @@ Real smoothkernelBSpline2(const double& r, const double& h)
 		if (r <= h) {
 			return coefA * (10. / 3. - 7. * r_h * r_h + 4 * r_h * r_h * r_h);
 		} else {
-			return coefA * std::pow((2. - r_h), 2) * ((5. - 4. * r_h) / 3.);
+			return coefA * math::pow((2. - r_h), 2) * ((5. - 4. * r_h) / 3.);
 		}
 	} else {
 		return 0;
@@ -168,7 +168,7 @@ Real smoothkernelBSpline2Grad(const double& r, const double& h)
 		if (r <= h) {
 			return coefA * (-2.) / (h * h) * (7. * r - 6. * r * r_h);
 		} else {
-			return coefA * 2. / h * (-6. + 7. * r_h - 2. * std::pow(r_h, 2));
+			return coefA * 2. / h * (-6. + 7. * r_h - 2. * math::pow(r_h, 2));
 		}
 	} else {
 		return 0;
