@@ -52,7 +52,7 @@ namespace math {
 #ifndef YADE_DISABLE_REAL_MULTI_HP
 		py::scope().attr("isEnabledRealHP") = true;
 #else
-		py::scope().attr("isEnabledRealHP") = false;
+		py::scope().attr("isEnabledRealHP")  = false;
 #endif
 		py::scope().attr("workaroundSlowBoostBinFloat") = int(workaroundSlowBoostBinFloat);
 	}

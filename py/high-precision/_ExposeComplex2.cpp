@@ -31,4 +31,3 @@ template <int N> void expose_complex2(bool notDuplicate, const py::scope& topSco
 
 // explicit instantination - tell compiler to produce a compiled version of expose_converters (it is faster when done in parallel in .cpp files)
 YADE_HP_PYTHON_REGISTER(expose_complex2)
-

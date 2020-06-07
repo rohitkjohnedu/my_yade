@@ -169,8 +169,8 @@ namespace math {
 
 #else
 	// RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>.
-	template <int Level> using RealHP    = Real;
-	template <int Level> using ComplexHP = Complex;
+	template <int Level> using RealHP                     = Real;
+	template <int Level> using ComplexHP                  = Complex;
 #endif
 
 	/*************************************************************************/
@@ -245,4 +245,3 @@ using math::RealHP;
 } // namespace yade
 
 #endif
-

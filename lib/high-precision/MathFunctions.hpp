@@ -296,7 +296,7 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::ceil;
 		return ceil(static_cast<const UnderlyingHP<Rr>&>(a));
 	}
-	template <typename Rr, int Level = levelOfRealHPAllow<Rr,double>> inline Rr round(const Rr& a)
+	template <typename Rr, int Level = levelOfRealHPAllow<Rr, double>> inline Rr round(const Rr& a)
 	{
 		using ::std::round;
 		using YADE_REAL_MATH_NAMESPACE::round;

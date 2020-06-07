@@ -186,4 +186,3 @@ template <int N> struct custom_Quaternionr_from_axisAngle_or_angleAxis {
 		data->convertible = storage;
 	}
 };
-

@@ -188,4 +188,3 @@ using ::yade::math::sqrt;
 }
 
 #endif // CGAL_NUM_TRAITS_HPP
-

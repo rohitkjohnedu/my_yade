@@ -152,11 +152,15 @@ namespace math {
 #else
 		template <unsigned int Dec> using HPBackend = boost::multiprecision::cpp_bin_float<Dec>;
 #endif
-		template <unsigned int Num> explicit operator ::std::complex<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>() const
+		template <unsigned int Num>
+		explicit operator ::std::complex<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>() const
 		{
 			return static_cast<::std::complex<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>>(val);
 		}
-		explicit operator ::std::complex<::boost::multiprecision::float128>() const { return static_cast<::std::complex<::boost::multiprecision::float128>>(val); }
+		explicit operator ::std::complex<::boost::multiprecision::float128>() const
+		{
+			return static_cast<::std::complex<::boost::multiprecision::float128>>(val);
+		}
 #endif
 		explicit operator const WrappedComplex&() const { return val; }
 		explicit operator WrappedComplex&() { return val; }

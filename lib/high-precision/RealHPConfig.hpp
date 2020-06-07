@@ -101,4 +101,3 @@ namespace math {
 } // namespace yade
 
 #endif
-

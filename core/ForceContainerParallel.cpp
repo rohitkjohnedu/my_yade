@@ -105,24 +105,26 @@ void ForceContainer::setPermForce(Body::id_t id, const Vector3r& f)
 {
 	ensureSize(id, -1);
 	if (permForceSynced) { // current permF has been accumulated already, substract it form total then add new value; else just set the value below
-		addForceUnsynced(id, f -_permForce[id] );
+		addForceUnsynced(id, f - _permForce[id]);
 	}
-	_permForce[id]  = f;
+	_permForce[id] = f;
 	if (not permForceUsed) {
-		synced = false;
-		permForceUsed = true;}
+		synced        = false;
+		permForceUsed = true;
+	}
 }
 
 void ForceContainer::setPermTorque(Body::id_t id, const Vector3r& t)
 {
 	ensureSize(id, -1);
 	if (permForceSynced) { // current permF has been accumulated already, substract it form total then add new value; else just set the value below
-		addTorqueUnsynced(id, t -_permTorque[id] );
+		addTorqueUnsynced(id, t - _permTorque[id]);
 	}
 	_permTorque[id] = t;
 	if (not permForceUsed) {
-		synced = false;
-		permForceUsed = true;}
+		synced        = false;
+		permForceUsed = true;
+	}
 }
 
 const Vector3r& ForceContainer::getPermForce(Body::id_t id) { return ((size_t)id < size) ? _permForce[id] : _zero; }
@@ -196,7 +198,7 @@ void ForceContainer::sync()
 		}
 	}
 	permForceSynced = true;
-	synced = true;
+	synced          = true;
 	syncCount++;
 }
 
