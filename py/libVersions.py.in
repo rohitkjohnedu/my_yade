@@ -258,6 +258,8 @@ def printAllVersions(rstFormat=False):
 		pass
 	print("Yade config dir: ",confD)
 	print("Yade precision :  "+str(yade.config.highPrecisionBits)+" bits, "+str(yade.config.highPrecisionDecimalPlaces)+" decimal places, with"+("" if yade.config.highPrecisionMpmath else "out")+" mpmath")
+	if('RealHP' in yade.config.features):
+		print("Yade RealHP<…> :  "+str(yade.math.getRealHPCppDigits10())+" decimal digits in C++, "+str(yade.math.getRealHPPythonDigits10())+" decimal digits accessible from python")
 	if(rstFormat==False): print("```")
 	print("\nLibraries used :\n")
 	print(lines)

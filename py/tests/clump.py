@@ -36,7 +36,7 @@ class TestSimpleClump(unittest.TestCase):
 		"Clump: mass, centroid, intertia"
 		b1,b2,bC=[O.bodies[id] for id in (self.id1,self.id2,self.idC)]
 		# mass
-		if(yade.config.highPrecisionMpmath):
+		if(yade.math.needsMpmathAtN(1)):
 			# looks like with high precision there are some dangling bits at the end
 			self.assertAlmostEqual(bC.state.mass,b1.state.mass+b2.state.mass)
 		else:

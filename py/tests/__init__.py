@@ -50,7 +50,7 @@ def testAll():
 	TestResult object for further examination."""
 	suite=unittest.defaultTestLoader.loadTestsFromNames(allTestsFQ)
 	import doctest
-	if(yade.config.highPrecisionMpmath == False):
+	if(yade.math.needsMpmathAtN(1) == False):
 		# docstest checks the printed output. So high precision output causes failures such as:   Expected: 2000.0    Got: mpf('2000.0')
 		# todo: see if mp.pretty = True, from http://mpmath.org/doc/current/basics.html#printing can alleviate this.
 		for mod in allModules:

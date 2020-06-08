@@ -38,17 +38,38 @@ The ``RealHP<n>`` :ref:`higher precision<higher-hp-precision>` math functions ca
 	mth.sqrt(2)     # without using HPn module scope it defaults to RealHP<1>
 
 """
-# FIXME: write in doc/sphinx/HighPrecisionReal.rst an anchor:  .. _higher-hp-precision:
+
 # all C++ functions are accessible now:
 from yade._math import *
 
 import yade.config
 
+def needsMpmathAtN(N):
+	"""
+	:param N: The ``int`` N value of ``RealHP<N>`` in question. Must be ``N >= 1``.
+	:return: ``True`` or ``False`` with information if using ``mpmath`` is necessary to avoid losing precision when working with ``RealHP<N>``.
+	"""
+	if(N < 1):
+		raise ValueError("Incorrect N argument: "+str(N))
+	return yade._math.RealHPConfig.getDigits10(N) > 15
+
+def getRealHPCppDigits10():
+	"""
+	:return: tuple containing amount of decimal digits supported on C++ side by Eigen and CGAL.
+	"""
+	return tuple(yade._math.RealHPConfig.getDigits10(i) for i in yade._math.RealHPConfig.getSupportedByEigenCgal())
+
+def getRealHPPythonDigits10():
+	"""
+	:return: tuple containing amount of decimal digits supported on python side by yade.minieigenHP.
+	"""
+	return tuple(yade._math.RealHPConfig.getDigits10(i) for i in yade._math.RealHPConfig.getSupportedByMinieigen())
+
 def linspace(a,b,num):
 	"""
 	This function calls ``numpy.linspace(…)`` or ``mpmath.linspace(…)``, because ``numpy.linspace`` function does not work with mpmath.
 	"""
-	if(yade.config.highPrecisionMpmath):
+	if(needsMpmathAtN(1)):
 		import mpmath
 		return mpmath.linspace(a,b,num)
 	else:

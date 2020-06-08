@@ -258,7 +258,7 @@ class TestMatchMaker(unittest.TestCase):
 		
 		O.step()
 		self.assertTrue((atan(O.interactions[id11,id12].phys.tangensOfFrictionAngle)-0.1)==0)
-		if(yade.config.highPrecisionMpmath):
+		if(yade.math.needsMpmathAtN(1)):
 			# looks like with high precision there are some dangling bits at the end
 			self.assertAlmostEqual(atan(O.interactions[id21,id22].phys.tangensOfFrictionAngle),0.2)
 		else:
