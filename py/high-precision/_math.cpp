@@ -145,6 +145,7 @@ template <int N> void multVec(::yade::math::UnderlyingRealHP<RealHP<N>>* array, 
 }
 
 namespace yade {
+void testLoopRealHP();
 template <int N> void testArray()
 {
 	LOG_NOFILTER(
@@ -167,6 +168,8 @@ template <int N> void testArray()
 			exit(1);
 		}
 	}
+	LOG_NOFILTER("calling testLoopRealHP()");
+	testLoopRealHP();
 }
 }
 
@@ -235,6 +238,7 @@ template <int N> struct IfConstexprForSlowFunctions<N, true> {
 
 template <int, bool> struct IfConstexprForEigen;
 
+#ifndef __clang__ // problem with clang 9.0.1-12. It tries to instatinate an explicitly illegal/disabled code. Produces errors that some types don't exist. But they shouldn't exist.
 template <int N> struct IfConstexprForEigen<N, true> {
 	static void work(const py::scope& scopeHP, const long& defprec)
 	{
@@ -281,6 +285,7 @@ template <int N> struct IfConstexprForEigen<N, true> {
 		        R"""(:return: ``Real`` the smallest number greater than zero. Wraps `std::numeric_limits<Real>::min() <https://en.cppreference.com/w/cpp/types/numeric_limits/min>`__)""");
 	}
 };
+#endif
 
 template <int N> struct IfConstexprForEigen<N, false> {
 	static void work(const py::scope& scopeHP, const long& defprec)
@@ -339,6 +344,12 @@ template <int N, bool registerConverters> struct RegisterRealHPMath {
 
 		// Very important line: Verifies that Real type satisfies all the requirements of RealTypeConcept
 		BOOST_CONCEPT_ASSERT((boost::math::concepts::RealTypeConcept<RealHP<N>>));
+		if (::yade::math::isHP<RealHP<N>> == false) {
+			throw std::runtime_error("::yade::math::isHP<RealHP<N1>> == false, please file a bug report.");
+		};
+		if (::yade::math::isHP<ComplexHP<N>> == false) {
+			throw std::runtime_error("::yade::math::isHP<ComplexHP<N1>> == false, please file a bug report.");
+		};
 
 		if (registerConverters) {
 			py::scope top(topScope);
@@ -871,3 +882,131 @@ try {
 	boost::python::handle_exception();
 	throw;
 }
+
+// This header needs to be tested, but it must be included below everything, because otherwise it would pollute other code.
+#include <lib/high-precision/UpconversionOfBasicOperatorsHP.hpp>
+#include <boost/core/demangle.hpp>
+#include <boost/lexical_cast.hpp>
+
+namespace yade {
+
+template <int N1> struct TestRealHP2 {
+	template <typename N2mpl> void operator()(N2mpl)
+	{
+		constexpr int N2   = N2mpl::value;
+		constexpr int N    = std::max(N1, N2);
+		std::string   info = "N1=" + boost::lexical_cast<std::string>(N1) + " N2=" + boost::lexical_cast<std::string>(N2) + " "
+		        + boost::core::demangle(typeid(RealHP<N1>).name()) + " " + boost::core::demangle(typeid(RealHP<N2>).name()) + " "
+		        + boost::core::demangle(typeid(ComplexHP<N1>).name()) + " " + boost::core::demangle(typeid(ComplexHP<N2>).name());
+		//LOG_NOFILTER("TestRealHP info:" << info);
+		{
+			RealHP<N1> a  = static_cast<RealHP<N1>>(-1.25);
+			RealHP<N2> b  = static_cast<RealHP<N2>>(2.5);
+			auto       c1 = a + b;
+			auto       c2 = a - b;
+			auto       c3 = a * b;
+			auto       c4 = a / b;
+			if (c1 != RealHP<N>(1.25))
+				throw std::runtime_error(("TestRealHP error: Fatal r1" + info).c_str());
+			if (c2 != RealHP<N>(-3.75))
+				throw std::runtime_error(("TestRealHP error: Fatal r2" + info).c_str());
+			if (c3 != RealHP<N>(-3.125))
+				throw std::runtime_error(("TestRealHP error: Fatal r3" + info).c_str());
+			if (c4 != RealHP<N>(-0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal r4" + info).c_str());
+			auto       d1 = a;
+			auto       d2 = b;
+			RealHP<N2> d3 = RealHP<N2>(a);
+			RealHP<N1> d4 = RealHP<N1>(b);
+			auto       d5 = d1 + d2 + d3 + d4;
+			if (d5 != RealHP<N>(2.5))
+				throw std::runtime_error(("TestRealHP error: Fatal r5" + info).c_str());
+		}
+		{
+			ComplexHP<N1> a  = ComplexHP<N1>(-1.25, 0.5);
+			ComplexHP<N2> b  = ComplexHP<N2>(1.0, 1.0);
+			auto          c1 = a + b;
+			auto          c2 = a - b;
+			auto          c3 = a * b;
+			auto          c4 = a / b;
+			if (c1 != ComplexHP<N>(-0.25, 1.5))
+				throw std::runtime_error(("TestRealHP error: Fatal c1" + info).c_str());
+			if (c2 != ComplexHP<N>(-2.25, -0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal c2" + info).c_str());
+			if (c3 != ComplexHP<N>(-1.75, -0.75))
+				throw std::runtime_error(("TestRealHP error: Fatal c3" + info).c_str());
+			if (c4 != ComplexHP<N>(-0.375, 0.875))
+				throw std::runtime_error(("TestRealHP error: Fatal c4" + info).c_str());
+			auto d1 = a;
+			auto d2 = b;
+			// down-converting requires extra casting
+			ComplexHP<N2> d3 = ComplexHP<N2>(RealHP<N2>(a.real()), RealHP<N2>(a.imag()));
+			ComplexHP<N1> d4 = ComplexHP<N1>(RealHP<N1>(b.real()), RealHP<N1>(b.imag()));
+			auto          d5 = d1 + d2 + d3 + d4;
+			if (d5 != ComplexHP<N>(-0.5, 3.0))
+				throw std::runtime_error(("TestRealHP error: Fatal c5" + info).c_str());
+		}
+		{
+			ComplexHP<N1> a  = ComplexHP<N1>(-1.25, 0.5);
+			RealHP<N2>    b  = RealHP<N2>(1.0);
+			auto          c1 = a + b;
+			auto          c2 = a - b;
+			auto          c3 = a * b;
+			auto          c4 = a / b;
+			auto          c5 = b + a;
+			auto          c6 = b - a;
+			auto          c7 = b * a;
+			auto          c8 = b / a;
+			if (c1 != ComplexHP<N>(-0.25, 0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr1" + info).c_str());
+			if (c2 != ComplexHP<N>(-2.25, 0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr2" + info).c_str());
+			if (c3 != ComplexHP<N>(-1.25, 0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr3" + info).c_str());
+			if (c4 != ComplexHP<N>(-1.25, 0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr4" + info).c_str());
+			if (c5 != ComplexHP<N>(-0.25, 0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr5" + info).c_str());
+			if (c6 != ComplexHP<N>(2.25, -0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr6" + info).c_str());
+			if (c7 != ComplexHP<N>(-1.25, 0.5))
+				throw std::runtime_error(("TestRealHP error: Fatal cr7" + info).c_str());
+			if (::yade::math::abs(c8 - ComplexHP<N>(-0.68965517241379310345, -0.27586206896551724138)) > 0.1)
+				throw std::runtime_error(("TestRealHP error: Fatal cr8" + info).c_str());
+			auto d1 = a;
+			auto d2 = b;
+			// down-converting requires extra casting
+			ComplexHP<N2> d3 = ComplexHP<N2>(RealHP<N2>(a.real()), RealHP<N2>(a.imag()));
+			RealHP<N1>    d4 = RealHP<N1>(b);
+			auto          d5 = d1 + d2 + d4 + d3;
+			if (d5 != ComplexHP<N>(-0.5, 1.0))
+				throw std::runtime_error(("TestRealHP error: Fatal cr5" + info).c_str());
+			auto d6 = d1 + d2 + d3 + d4;
+			if (d6 != ComplexHP<N>(-0.5, 1.0))
+				throw std::runtime_error(("TestRealHP error: Fatal cr6" + info).c_str());
+
+			static_assert(std::is_same<ComplexHP<N>, decltype(c1)>::value, "Assert error c1");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c2)>::value, "Assert error c2");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c3)>::value, "Assert error c3");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c4)>::value, "Assert error c4");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c5)>::value, "Assert error c5");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c6)>::value, "Assert error c6");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c7)>::value, "Assert error c7");
+			static_assert(std::is_same<ComplexHP<N>, decltype(c8)>::value, "Assert error c8");
+			static_assert(std::is_same<ComplexHP<N1>, decltype(d1)>::value, "Assert error d1");
+			static_assert(std::is_same<decltype(b), decltype(d2)>::value, "Assert error d2");
+			static_assert(std::is_same<ComplexHP<N2>, decltype(d3)>::value, "Assert error d3");
+			static_assert(std::is_same<RealHP<N1>, decltype(d4)>::value, "Assert error d4");
+			static_assert(std::is_same<ComplexHP<N>, decltype(d5)>::value, "Assert error d5");
+			static_assert(std::is_same<ComplexHP<N>, decltype(d6)>::value, "Assert error d6");
+		}
+	}
+};
+
+struct TestRealHP1 {
+	template <typename N1> void operator()(N1) { boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP2<N1::value>()); }
+};
+
+void testLoopRealHP() { boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP1()); }
+}
+
