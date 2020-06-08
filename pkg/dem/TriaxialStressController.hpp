@@ -81,7 +81,7 @@ public:
 		"An engine maintaining constant stresses or constant strain rates on some boundaries of a parallepipedic packing. The stress/strain control is defined for each axis using :yref:`TriaxialStressController::stressMask` (a bitMask) and target values are defined by goal1,goal2, and goal3. The sign conventions of continuum mechanics are used for strains and stresses (positive traction)."
 		"\n\n.. note::\n\t The algorithms used have been developed initialy for simulations reported in [Chareyre2002a]_ and [Chareyre2005]_. They have been ported to Yade in a second step and used in e.g. [Kozicki2008]_,[Scholtes2009b]_,[Jerier2010b]."
 		,
-   		((unsigned int,stiffnessUpdateInterval,10,,"target strain rate (./s)"))
+		((unsigned int,stiffnessUpdateInterval,10,,"iteration period for measuring the resultant packing-boundaries stiffnesses, for stress servo-control"))
    		((unsigned int,radiusControlInterval,10,,""))
 		((unsigned int,computeStressStrainInterval,10,,""))
 		((Real,stressDamping,0.25,,"wall damping coefficient for the stress control - wallDamping=0 implies a (theoretical) perfect control, wallDamping=1 means no movement"))
