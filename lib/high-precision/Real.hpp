@@ -34,6 +34,9 @@
  * https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/fastest_typdefs.html
  *
  * TODO: Interval types: https://www.boost.org/doc/libs/1_71_0/libs/multiprecision/doc/html/boost_multiprecision/tut/interval/mpfi.html
+ *   Note about Arb or flint library, and MPFI interval calculations or Automatic differentiation techniques:
+ *   they can be implemented by extending RealHP as a type trait for the Real type. Meaning that a Tag class can be used as a trait in definition of Real to select
+ *   which of these (regular one, MPFI, Arb, ……) is to be used.
  *
  * Some hints how to use float128
  *   https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/float128_hints.html

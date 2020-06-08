@@ -8,6 +8,13 @@
 #include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/RealIO.hpp>
 
+namespace forCtags {
+struct RealHPConfigPythonTags { // these are directly assigned below in pyRegister(), they are not C++ variables. So let ctags find them here.
+	bool isFloat128Broken;
+	bool isEnabledRealHP;
+}; // for ctags
+}
+
 namespace yade {
 namespace math {
 
@@ -18,6 +25,10 @@ namespace math {
 		namespace py = ::boost::python;
 		py::scope cl = py::class_<RealHPConfig>(
 		                       "RealHPConfig",
+		                       // The docstrings can use syntax
+		                       //  :param ……: ………
+		                       //  :return: …….
+		                       // For details see https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
 		                       // docstrings for static properties are forbidden in python. The solution is to put it into __doc__
 		                       // https://stackoverflow.com/questions/25386370/docstrings-for-static-properties-in-boostpython
 		                       "``RealHPConfig`` class provides information about RealHP<N> type.\n"

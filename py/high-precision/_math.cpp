@@ -883,7 +883,7 @@ try {
 	throw;
 }
 
-// This header needs to be tested, but it must be included below everything, because otherwise it would pollute other code.
+// The header UpconversionOfBasicOperatorsHP has to be tested, but it must be included below everything, because otherwise it would pollute other code. So test it here.
 #include <lib/high-precision/UpconversionOfBasicOperatorsHP.hpp>
 #include <boost/core/demangle.hpp>
 #include <boost/lexical_cast.hpp>
@@ -895,7 +895,7 @@ template <int N1> struct TestRealHP2 {
 	{
 		constexpr int N2   = N2mpl::value;
 		constexpr int N    = std::max(N1, N2);
-		std::string   info = "N1=" + boost::lexical_cast<std::string>(N1) + " N2=" + boost::lexical_cast<std::string>(N2) + " "
+		std::string   info = " N1=" + boost::lexical_cast<std::string>(N1) + " N2=" + boost::lexical_cast<std::string>(N2) + " "
 		        + boost::core::demangle(typeid(RealHP<N1>).name()) + " " + boost::core::demangle(typeid(RealHP<N2>).name()) + " "
 		        + boost::core::demangle(typeid(ComplexHP<N1>).name()) + " " + boost::core::demangle(typeid(ComplexHP<N2>).name());
 		//LOG_NOFILTER("TestRealHP info:" << info);
@@ -980,10 +980,10 @@ template <int N1> struct TestRealHP2 {
 			RealHP<N1>    d4 = RealHP<N1>(b);
 			auto          d5 = d1 + d2 + d4 + d3;
 			if (d5 != ComplexHP<N>(-0.5, 1.0))
-				throw std::runtime_error(("TestRealHP error: Fatal cr5" + info).c_str());
+				throw std::runtime_error(("TestRealHP error: Fatal cr9" + info).c_str());
 			auto d6 = d1 + d2 + d3 + d4;
 			if (d6 != ComplexHP<N>(-0.5, 1.0))
-				throw std::runtime_error(("TestRealHP error: Fatal cr6" + info).c_str());
+				throw std::runtime_error(("TestRealHP error: Fatal cr10" + info).c_str());
 
 			static_assert(std::is_same<ComplexHP<N>, decltype(c1)>::value, "Assert error c1");
 			static_assert(std::is_same<ComplexHP<N>, decltype(c2)>::value, "Assert error c2");
@@ -1008,5 +1008,6 @@ struct TestRealHP1 {
 };
 
 void testLoopRealHP() { boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP1()); }
-}
+
+} // namespace yade
 

@@ -154,6 +154,10 @@ namespace math {
 	// OK. At this point we have the typelist 'RealHPLadder' which lists the consecutive types in the progressing precision ladder. Now we can use it to define RealHP<int> type.
 	// Also we have some helpers: 'Underlying*HP<N>' and 'levelOrZero'
 
+	// Note about Arb or flint library, and MPFI interval calculations or Automatic differentiation techniques:
+	// they can be implemented here as a type trait for the Real type. Meaning that a Tag class can be used as a trait in definition of Real to select
+	// which of these (regular one, MPFI, Arb, ……) is to be used.
+
 #ifndef YADE_DISABLE_REAL_MULTI_HP
 	template <int Level>
 	using RealHP = typename std::conditional<
@@ -169,8 +173,8 @@ namespace math {
 
 #else
 	// RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>.
-	template <int Level> using RealHP                     = Real;
-	template <int Level> using ComplexHP                  = Complex;
+	template <int Level> using RealHP                     = Real;    // ignore Level
+	template <int Level> using ComplexHP                  = Complex; // ignore Level
 #endif
 
 	/*************************************************************************/
