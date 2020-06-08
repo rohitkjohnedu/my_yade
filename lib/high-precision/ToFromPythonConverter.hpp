@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/range_c.hpp>
+#include <functional>
 
 namespace forCtags {
 struct ToFromPythonConverter {
@@ -142,7 +143,7 @@ namespace math {
 			boost::python::scope topScope;
 			if (createInternalScopeHP) {
 				// This creates internal python scope HP1 or HP2 or HP3 and so on. In each of them are the same math functions with respective precisions.
-				// The main moint is that all math functions, and minieigen classes are accessible e.g. for RealHP<4>, via:
+				// The main point is that all math functions, and minieigen classes are accessible e.g. for RealHP<4>, via:
 				//    yade.math.HP4.sin(10)
 				//    yade.minieigenHP.HP4.Vector3r(1,2,3)
 				// The original RealHP<1> are present in two places:
@@ -158,13 +159,16 @@ namespace math {
 			}
 		}
 
+		template <template <int, bool> class RegisterHPClass> struct WorkaroundClangCompiler {
+			template <typename N1> void operator()(N1) { registerInScope<N1::value, RegisterHPClass>(true); }
+		};
+
 		// this loop registers python functions from Range by calling the provided RegisterHPClass<int,bool>::work( , ); inside registerInScope above.
 		template <typename Range, template <int, bool> class RegisterHPClass> void registerLoopForHPn()
 		{
 			registerInScope<1, RegisterHPClass>(false);
-			boost::mpl::for_each<Range>([=]<typename N1>(N1) { registerInScope<N1::value, RegisterHPClass>(true); });
+			boost::mpl::for_each<Range>(WorkaroundClangCompiler<RegisterHPClass>());
 		}
-
 	}
 }
 }
