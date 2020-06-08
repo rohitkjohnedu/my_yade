@@ -29,7 +29,7 @@
 #ifdef YADE_BOOST_LOG
 // workaruond bug https://github.com/boostorg/multiprecision/issues/207, later add here ' and (BOOST_VERSION < 107?00)' to not include this after it is fixed.
 #include <boost/version.hpp>
-#if defined(YADE_REAL_MPFR) and (BOOST_VERSION >= 106800)
+#if defined(YADE_MPFR) and (BOOST_VERSION >= 106800)
 #include <lib/base/Math.hpp>
 #endif
 
