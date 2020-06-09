@@ -334,6 +334,12 @@ namespace math {
 		using YADE_REAL_MATH_NAMESPACE::isfinite;
 		return isfinite(static_cast<const UnderlyingHP<Rr>&>(a));
 	}
+	template <typename Rr, int Level = levelOfRealHP<Rr>> inline int fpclassify(const Rr& a)
+	{
+		using ::std::fpclassify;
+		using YADE_REAL_MATH_NAMESPACE::fpclassify;
+		return fpclassify(static_cast<const UnderlyingHP<Rr>&>(a));
+	}
 #endif
 
 	/********************************************************************************************/
