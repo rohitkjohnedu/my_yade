@@ -824,6 +824,7 @@ void PartialSatClayEngine::swellParticles()
 		//
 		const Real vNew = state->volumeOriginal * (volStrain + 1.);
 		const Real rNew = pow(3. * vNew / (4. * M_PI), 1. / 3.);
+		if (rNew <= minParticleSwellFactor * state->radiiOriginal) continue;  // dont decrease size too much
 		totalVolChange += (pow(rNew, 3.) - pow(sphere->radius, 3.)) * 4. / 3. * M_PI;
 		state->radiiChange = rNew - state->radiiOriginal;
 		sphere->radius     = rNew;

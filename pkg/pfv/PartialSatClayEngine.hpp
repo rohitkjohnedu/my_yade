@@ -309,6 +309,7 @@ public:
 	((Real,minCellVol,0,,"Use for avoiding 0 volume cells that will interupt solution of linear system."))
 	((Real,maxPo,2e6,,"Certain boundary situations where a low volume will develop and interpolate from a cell with high initial porosity leading to Po exponential estimate blowing up."))
 	((Real,minLambdao,0,,"Maybe unnecessary since the lambdao function is a decay exponential for same situation described in maxPo above"))
+	((Real,minParticleSwellFactor,0.1,,"If prevents particles from decreasing too far as their saturation decreases."))
 	,/*PartialSatClayEngineT()*/,
 	solver = shared_ptr<FlowSolver> (new FlowSolver);
 	,
