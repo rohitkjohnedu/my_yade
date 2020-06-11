@@ -10,16 +10,20 @@ from yade import math as mth
 import testMathHelper
 
 if(yade.config.highPrecisionMpmath):
-	print('\n\033[92m'+"Using "+str(yade.math.getRealHPPyhonDigits10())+" decimal digits in python. Importing mpmath"+'\033[0m\n')
+	print('\n\033[92m'+"Using "+str(yade.math.getRealHPPythonDigits10())+" decimal digits in python. Importing mpmath"+'\033[0m\n')
 	import mpmath
 
 class SimpleTests(unittest.TestCase):
+	def needsMpmathAtN(self,N): return yade.math.needsMpmathAtN(N)
+	def hasMpfr(self): return ('MPFR' in yade.config.features)
+	def nowUsesBoostBinFloat(self,N): return (not self.hasMpfr()) and ((yade.math.RealHPConfig.getDigits10(N) > 33) or (yade.math.RealHPConfig.getDigits10(N)==24))
 	def setUp(self):
+		self.testRecordingMode=False # if 'True' then it will record 'self.newTolerances' maximum errors encountered, to be put later in place of 'self.defaultTolerances'. See function tearDown() below.
 		self.printedAlready=set()
 		self.nonBoostMPFR=False # I was testing non-boost MPFR before: /usr/include/eigen3/unsupported/Eigen/MPRealSupport. Might come handy later.
 		# If failures appear and function is not broken then increase tolerance a little.
 		self.defaultTolerances={
-			#  function decimal places : tolerance factor. Each "10" corresponds to single wrong decimal place.
+			#  function decimal places : tolerance factor. Each "10" corresponds to single wrong decimal place. But they are approximate and rounded up.
 			#
 			#                 float   double    long double float128        MPFR_100        MPFR_150     cpp_bin_float_100  cpp_bin_float_150
 			#
@@ -31,7 +35,7 @@ class SimpleTests(unittest.TestCase):
 			 , "asin"      : {"6":100 , "15":100 , "18":100  , "33":1000   , "100":1000  , "150" :1000  , "100_b" :1000    , "150_b" :1000   }
 			 , "asinh"     : {"6":1   , "15":1   , "18":1    , "33":1      , "100":1     , "150" :1     , "100_b" :1       , "150_b" :50     }
 
-			# maybe the error lies in  mpmath, b ecause everything is compared with it.
+			# maybe the error lies in  mpmath, because everything is compared with it.
 			 , "sin"       : {"6":100 , "15":100 , "18":20000, "33":4000   , "100":80000 , "150" :80000 , "100_b" :800000  , "150_b" :800000 }
 			 , "cos"       : {"6":100 , "15":100 , "18":20000, "33":4000   , "100":80000 , "150" :80000 , "100_b" :800000  , "150_b" :800000 }
 			 , "tan"       : {"6":100 , "15":100 , "18":20000, "33":4000   , "100":80000 , "150" :80000 , "100_b" :800000  , "150_b" :800000 }
@@ -89,17 +93,90 @@ class SimpleTests(unittest.TestCase):
 		self.testLevelsHP = mth.RealHPConfig.getSupportedByMinieigen()
 		self.baseDigits   = mth.RealHPConfig.getDigits10(1)
 		self.builtinHP    = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
+		if(self.testRecordingMode):
+			self.startRecordingErrors()
+
+	def tearDown(self):
+		if(self.testRecordingMode):
+			if(self.totalCount != 0):
+				import pickle
+				fname="/tmp/"+str(self.id().split('.')[-1]+"_dig"+str(self.baseDigits)+self.extraName+"_ex"+str(mth.RealHPConfig.extraStringDigits10)+"__"+str(self.totalCount))+".pickle"
+				print(str(self.newTolerances)+"\n\n saving: "+fname)
+				pickle.dump( self.newTolerances, open( fname, "wb" ) )
+				# this is how I sort by error, to find the worst performing functions:
+				# d=pickle.load( open( "testMathFunctions_dig33_ex4__18000.pickle", "rb" ) );sorted([(d[key]['33'][0],key) for key in d], key=lambda tup: tup[0])
+
+	def getDefaultTolerance(self,name,multiplyByTolerance=True):
+		mult = self.tolerance
+		key = str(self.digs0) + self.extraName
+		if(self.testRecordingMode):
+			if(name in self.newTolerances and key in self.newTolerances[name] and self.getMpmath().isfinite(self.newTolerances[name][key][0])):
+				return self.newTolerances[name][key][0]*mult
+		if(not multiplyByTolerance): mult = 1
+		dictForThisFunc = self.defaultTolerances[name]
+		if(key in dictForThisFunc):
+			return dictForThisFunc[key]*mult
+		## lower than 33 digits are all hardware precision: 6, 15, 18, 33 digits. But 4*float is 24 digits, and it can be achieved by MPFR only so add exception for 24 also.
+		self.assertTrue(self.digs0 > 33 or self.digs0==24) ## 33 was here before
+		low = dictForThisFunc["100"+self.extraName]
+		high= dictForThisFunc["150"+self.extraName]
+		import numpy
+		return numpy.interp(self.digs0,[100,150],[low,high])*mult
+
+	def storeArgs(self,args):
+		self.storedArgs=args
+
+	def storeDefaultTolerance(self,error,name):
+		newFactor = (error / self.tolerance)*self.getMpmath().mpf(1.01)
+		oldFactor = newFactor
+		key = str(self.digs0) + self.extraName
+		if(name in self.newTolerances):
+			if(key in self.newTolerances[name] and self.getMpmath().isfinite(self.newTolerances[name][key][0])):
+				oldFactor = self.newTolerances[name][key][0]
+		else:
+			self.newTolerances[name] = {}
+		if(newFactor >= oldFactor):
+			self.newTolerances[name][key] = (newFactor, self.storedArgs)
+
+	def lgamma(self,r):
+		mpmath.mp.dps = mth.RealHPConfig.getDigits10(self.maxN) + mth.RealHPConfig.extraStringDigits10
+		return mpmath.log(abs(mpmath.gamma(r)))
+
+	def startRecordingErrors(self):
+		self.newTolerances  = {}
+		self.maxN           = mth.RealHPConfig.getSupportedByMinieigen()[-1]
+		if(mth.RealHPConfig.getDigits10(self.maxN) < 490):
+			print("\n*****\nWarning: recording errors uses less than 490 digits precision. See commits ef1fed55f 015292c0a, they were removed afer this error search was finished.\n*****\n")
+		self.maxHPn         = getattr(mth,"HP" + str(self.maxN))
+		# make maxHPn very similar to mpmath - emulate it.
+		self.maxHPn.mpf     = mpmath.mpf
+		self.maxHPn.mpc     = mpmath.mpc
+		self.maxHPn.power   = self.maxHPn.pow
+		self.maxHPn.pi      = self.maxHPn.Pi()
+		self.maxHPn.euler   = self.maxHPn.Euler()
+		self.maxHPn.catalan = self.maxHPn.Catalan()
+		if(self.maxN > mth.RealHPConfig.workaroundSlowBoostBinFloat): # these functions are unavailable in C++ (because 'import minieigenHP' is too slow for cpp_bin_float), so emulate them
+			self.maxHPn.lgamma  = self.lgamma
+			self.maxHPn.tgamma  = mpmath.gamma
+			self.maxHPn.gamma   = mpmath.gamma
+			self.maxHPn.erf     = mpmath.erf
+			self.maxHPn.erfc    = mpmath.erfc
+		else:
+			self.maxHPn.gamma   = self.maxHPn.tgamma
+		self.storeArgs((mpmath.mpf('nan'),))
+		self.totalCount = 0
 
 	def testBasicHP(self):
+		if(self.testRecordingMode): return # skip this test if recording.
 		if(mth.RealHPConfig.isEnabledRealHP):
-			self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.RealHPConfig.getSupportedByEigenCgal())
-			self.assertEqual((1,2,3,4,5,6,7,8,9,10,20),mth.RealHPConfig.getSupportedByMinieigen())
-			#self.assertEqual((1,2,4,8) , mth.RealHPConfig.getSupportedByEigenCgal())
-			#self.assertEqual((1,2)     , mth.RealHPConfig.getSupportedByMinieigen())
-			if('MPFR' not in yade.config.features):
-				self.assertEqual( 2   , mth.RealHPConfig.workaroundSlowBoostBinFloat)
+			ec = (1, 2, 3, 4, 8, 10, 20) # (1,2,3,4,5,6,7,8,9,10,20) #
+			mn = (1, 2)                  # ec                        # use these if changed something in lib/high-precision/RealHPConfig.hpp
+			self.assertEqual(ec , mth.RealHPConfig.getSupportedByEigenCgal())
+			self.assertEqual(mn , mth.RealHPConfig.getSupportedByMinieigen())
+			if(not self.hasMpfr()):
+				self.assertEqual( 2    , mth.RealHPConfig.workaroundSlowBoostBinFloat)
 			else:
-				self.assertEqual( 20  , mth.RealHPConfig.workaroundSlowBoostBinFloat)
+				self.assertEqual(ec[-1], mth.RealHPConfig.workaroundSlowBoostBinFloat)
 		else:
 			self.assertEqual((1,) , mth.RealHPConfig.getSupportedByEigenCgal())
 			self.assertEqual((1,) , mth.RealHPConfig.getSupportedByMinieigen())
@@ -122,12 +199,12 @@ class SimpleTests(unittest.TestCase):
 		self.tolerance   = (MPn.mpf(10)**(-self.digs0+1))*MPn.mpf("1.2")
 		#self.bits       = MPn.ceil(MPn.mpf(self.digs0)/(MPn.log(2)/MPn.log(10)))+1 # Maybe a bug report against MPFR + cpp_bin_float? They don't use this formula for number of bits
 		self.bits        = MPn.ceil(MPn.mpf(self.digs0)/(0.301))+1       # it is reproducing MPFR's formula for number of bits. Discovered by experiments. Adjustments are possible.
-		mpmathVsMpfrBits = int(self.bits / 2992)                         # adjust discrepency between mpmath and MPFR due to incorrect log10/log2 value (above line). The 2992 was found empirically.
+		mpmathVsMpfrBits = int(self.bits / 2085)                         # adjust discrepency between mpmath and MPFR due to incorrect log10/log2 value (above line). The 2085 was found empirically.
 		# mpmath has 5 more internal bits, use its mechanisms to extract epsilon
-		MPn.mp.dps = self.digs0 + 1
-		self.expectedEpsilon=(2**5)*MPn.eps() / (2**mpmathVsMpfrBits)
+		self.getMpmath().mp.dps = self.digs0 + 1
+		self.expectedEpsilon=(2**5)*self.getMpmath().eps() / (2**mpmathVsMpfrBits)
 		# now go back to using extraStringDigits10
-		MPn.mp.dps = self.digs0 + mth.RealHPConfig.extraStringDigits10
+		self.getMpmath().mp.dps = self.digs0 + mth.RealHPConfig.extraStringDigits10
 		if(self.digs0 == 6): # float case
 			self.bits=24
 			self.expectedEpsilon=1.1920928955078125e-07
@@ -140,91 +217,97 @@ class SimpleTests(unittest.TestCase):
 		if(self.digs0 == 33): # float128 case
 			self.bits=113
 			self.expectedEpsilon=MPn.mpf('1.925929944387235853055977942584926994e-34')
-		if(yade.math.needsMpmathAtN(N)):
+		if(self.needsMpmathAtN(N)):
 			self.maxval=(MPn.mpf(1)-self.expectedEpsilon)*MPn.power(2,HPn.max_exp2)
 		else:
 			import sys
 			self.maxval=sys.float_info.max
-		if (('MPFR' not in yade.config.features) and ((yade.math.RealHPConfig.getDigits10(N) > 33) or (yade.math.RealHPConfig.getDigits10(N)==24))):
+		if (self.nowUsesBoostBinFloat(N)):
 			self.extraName="_b"
 		else:
 			self.extraName=""
 
-	def runCheck(self,N,func):
-		HPn = getattr(mth,"HP" + str(N)); # the same as the line 'std::string name = "HP" + boost::lexical_cast<std::string>(N)' in function registerInScope in _math.cpp
-		if(yade.math.needsMpmathAtN(N)):
-			MPn = mpmath
+	def getMpmath(self):
+		if(self.needsMpmathAtN(self.currentN)):
+			return mpmath
 		else:
-			MPn = testMathHelper
-		self.MPnHelper = MPn
+			return testMathHelper
+
+	def runCheck(self,N,func):
+		if(self.testRecordingMode and N == self.maxN):
+			return                    # no need to test maxN against itself. It is for testing lower precisions against it.
+		self.currentN = N
+		HPn = getattr(mth,"HP" + str(N)); # the same as the line 'std::string name = "HP" + boost::lexical_cast<std::string>(N)' in function registerInScope in _math.cpp
+		if(not self.testRecordingMode):
+			MPn = self.getMpmath()
+		else:
+			MPn = self.maxHPn         # we are recording the errors, do all the tests against the max precision available
 		if(N==1):
 			self.adjustDigs0(N,mth,MPn)
 			func(N,mth,MPn)           # test global scope functions with RealHP<1>
 		self.adjustDigs0(N,HPn,MPn)
 		func(N,HPn,MPn)                   # test scopes HP1, HP2, etc
 
-	def getDefaultTolerance(self,name,multiplyByTolerance=True):
-		mult = self.tolerance
-		if(not multiplyByTolerance): mult = 1
-		dictForThisFunc = self.defaultTolerances[name]
-		key = str(self.digs0) + self.extraName
-		if(key in dictForThisFunc):
-			return dictForThisFunc[key]*mult
-		## lower than 33 digits are all hardware precision: 6, 15, 18, 33 digits. But 4*float is 24 digits, and it can be achieved by MPFR only so add exception for 24 also.
-		self.assertTrue(self.digs0 > 33 or self.digs0==24) ## 33 was here before
-		low = dictForThisFunc["100"+self.extraName]
-		high= dictForThisFunc["150"+self.extraName]
-		import numpy
-		return numpy.interp(self.digs0,[100,150],[low,high])*mult
-
 	def printOnce(self,functionName,a):
-		MPn = self.MPnHelper
+		MPn = self.getMpmath()
 		if(functionName and (functionName not in self.printedAlready) and (not MPn.isnan(abs(a)))):
 			self.printedAlready.add(functionName)
 			print(functionName.ljust(15)+" : "+a.__repr__())
 
 	def checkRelativeError(self,a,b,tol=None,functionName=None,isComplex=False):
-		MPn = self.MPnHelper
+		MPn = self.getMpmath()
+		prevDps    = MPn.mp.dps
+		if(self.testRecordingMode):
+			MPn.mp.dps = mth.RealHPConfig.getDigits10(self.maxN) + mth.RealHPConfig.extraStringDigits10
+		denominator=max(abs(a),abs(b)) # avoid division by zero
+		if(denominator == 0):          # they are both equal to zero
+			error = 0
+		else:
+			if isComplex:
+				error = abs( (MPn.mpc(a)-MPn.mpc(b))/MPn.mpc(denominator) )
+			else:
+				error = abs( (MPn.mpf(a)-MPn.mpf(b))/MPn.mpf(denominator) )
 		if(abs(b) <= self.maxval and abs(b) >= self.HPnHelper.smallest_positive()):
 			#print("a= ",a," b= ",b," smallest=",self.HPnHelper.smallest_positive(), " maxval=",self.maxval)
 			self.printOnce(functionName,a)
-			if(MPn.isnan(a)):
-				if(functionName != "lgamma"): # lgamma triggers this warning too often.
-					print("\033[93m Warning: \033[0m got NaN, cannot verify if: ",a," == " ,b, " that was for function: \033[93m ",functionName, " \033[0m")
+			if((not MPn.isfinite(a)) or (not MPn.isfinite(b))):
+				if((functionName != "lgamma") and (not self.testRecordingMode)): # lgamma triggers this warning too often.
+					print("\033[93m Warning: \033[0m got NaN or Inf, cannot verify if: ",a," == " ,b, " that was for function: \033[93m ",functionName, " \033[0m")
 			else:
 				if(tol != None):
-					if isComplex:
-						self.assertLessEqual(abs( (MPn.mpc(a)-MPn.mpc(b))/MPn.mpc(b) ),tol)
-					else:
-						#print("a=",a," b=",b," tol=",tol)
-						self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/MPn.mpf(b) ),tol)
+					#print("a=",a," b=",b," tol=",tol)
+					self.assertLessEqual(error,tol)
 				else:
 					if(functionName in self.defaultTolerances):
+						if(self.testRecordingMode):
+							self.storeDefaultTolerance(error,functionName)
 						defaultToleranceForThisFunction = self.getDefaultTolerance(functionName)
 						#print(defaultToleranceForThisFunction," ---- ",functionName)
-						if isComplex:
-							self.assertLessEqual(abs( (MPn.mpc(a)-MPn.mpc(b))/MPn.mpc(b) ),defaultToleranceForThisFunction)
-						else:
-							self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/MPn.mpf(b) ),defaultToleranceForThisFunction)
+						self.assertLessEqual(error,defaultToleranceForThisFunction)
 					else:
-						if isComplex:
-							self.assertLessEqual(abs( (MPn.mpc(a)-MPn.mpc(b))/MPn.mpc(b) ),self.tolerance)
-						else:
-							self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/MPn.mpf(b) ),self.tolerance)
-		else:
+						self.assertLessEqual(error,self.tolerance)
+		elif(not self.testRecordingMode):
 			print("Skipping ",functionName," check, the builtin number: ", a, " cannot have value outside of its possible repesentation: " , b, ", because it has only ",self.digs0," digits.")
+		MPn.mp.dps = prevDps
 	
 	def checkRelativeComplexError(self,a,b,tol=None,functionName=None):
 		self.printOnce(functionName,a)
 		self.checkRelativeError(abs(a),abs(b),tol,functionName,True)
 
 	def oneArgMathCheck(self,N,HPn,MPn,r):
-		self.checkRelativeError(HPn.sin(r) ,MPn.sin(r) ,functionName="sin")
-		self.checkRelativeError(HPn.sinh(r),MPn.sinh(r),functionName="sinh")
-		self.checkRelativeError(HPn.cos(r) ,MPn.cos(r) ,functionName="cos")
-		self.checkRelativeError(HPn.cosh(r),MPn.cosh(r),functionName="cosh")
-		self.checkRelativeError(HPn.tan(r) ,MPn.tan(r) ,functionName="tan")
-		self.checkRelativeError(HPn.tanh(r),MPn.tanh(r),functionName="tanh")
+		# note: cos, tan, sin, lgamma, tgamma get wildly inaccurrate when |arg| > 20. Errors are in the range log₁₀(8000000)≈7 decimal places for most of RealHP<…> types.
+		# these functions become more or less useless. So better to measure error in a usable range. I arbitrarily set it to 4*Pi and 20.
+		# This strange behavior is explained by the error in the remainder(…) for which I do not restrict arguments (so you can look up its error in the table). These trig
+		# functions try to remove periodicity by calculating remainder from division by Pi, but they can only be as good as the remainder calculation itself. And this calculation
+		# cannot produce more precision than the number already has, after its first few digits are cut-off by the remainder calculation.
+		cut1=HPn.roundTrip( r % self.getMpmath().pi*4 ) # the HPn.identity(…) call is to cut the digits to those representible in HPn
+		cut2=HPn.roundTrip( r % 20 )
+		self.checkRelativeError(HPn.sin(cut1) ,MPn.sin(cut1) ,functionName="sin")
+		self.checkRelativeError(HPn.sinh(r)   ,MPn.sinh(r),functionName="sinh")
+		self.checkRelativeError(HPn.cos(cut1) ,MPn.cos(cut1) ,functionName="cos")
+		self.checkRelativeError(HPn.cosh(r)   ,MPn.cosh(r),functionName="cosh")
+		self.checkRelativeError(HPn.tan(cut1) ,MPn.tan(cut1) ,functionName="tan")
+		self.checkRelativeError(HPn.tanh(r)   ,MPn.tanh(r),functionName="tanh")
 		# check math functions, but ensure that input arguments produce real (not complex) results
 		self.checkRelativeError(HPn.abs(r)         ,abs(r),functionName="abs")
 		self.checkRelativeError(HPn.acos(r%1)      ,MPn.acos(r%1),functionName="acos")
@@ -243,10 +326,14 @@ class SimpleTests(unittest.TestCase):
 		#print(HPn.ilogb(r).__repr__()) # ilogb is not present in mpmath
 		if(N <= mth.RealHPConfig.workaroundSlowBoostBinFloat):
 			#print(" N=",N , " digits10=", yade.math.RealHPConfig.getDigits10(N) ,"  self.expectedEpsilon = ",self.expectedEpsilon, " r=",r)
+			if(self.testRecordingMode):
+				self.checkRelativeError(HPn.lgamma(cut2),self.maxHPn.lgamma(cut2),functionName="lgamma")
+				self.checkRelativeError(HPn.tgamma(cut2),self.maxHPn.tgamma(cut2),functionName="tgamma")
+			else:
+				self.checkRelativeError(HPn.lgamma(cut2),MPn.log(abs(MPn.gamma(cut2))),functionName="lgamma")
+				self.checkRelativeError(HPn.tgamma(cut2),MPn.gamma(cut2),functionName="tgamma")
 			self.checkRelativeError(HPn.erf(r)   ,MPn.erf(r),functionName="erf")
 			self.checkRelativeError(HPn.erfc(r)  ,MPn.erfc(r),functionName="erfc")
-			self.checkRelativeError(HPn.lgamma(r),MPn.log(abs(MPn.gamma(r))),functionName="lgamma")
-			self.checkRelativeError(HPn.tgamma(r),MPn.gamma(r),functionName="tgamma")
 		self.checkRelativeError(HPn.log(abs(r)+self.tolerance)  ,MPn.log(abs(r)+self.tolerance),functionName="log")
 		self.checkRelativeError(HPn.log10(abs(r)+self.tolerance),MPn.log10(abs(r)+self.tolerance),functionName="log10")
 		self.checkRelativeError(HPn.log1p(abs(r)+self.tolerance),MPn.log(1+abs(r)+self.tolerance),functionName="log1p")
@@ -387,7 +474,8 @@ class SimpleTests(unittest.TestCase):
 		#print("mpmath:",hex(id(mpmath)))
 		a=HPn.Var()
 		a.val=zz
-		self.assertEqual(MPn.mp.dps , self.digs0 + mth.RealHPConfig.extraStringDigits10 )
+		if(not self.testRecordingMode):
+			self.assertEqual(MPn.mp.dps , self.digs0 + mth.RealHPConfig.extraStringDigits10 )
 		#print("---- a.val=",a.val.__repr__())
 		#print("---- zz   =",zz   .__repr__())
 		#print("---- DPS  =",mpmath.mp.dps)
@@ -422,35 +510,38 @@ class SimpleTests(unittest.TestCase):
 				self.assertLessEqual(abs(HPn.random()-0.5),0.5)
 			else:
 				self.assertLessEqual(abs(HPn.random()    ),1.0)
-		for aa in range(4):
-			for bb in range(4):
-				a = (aa-3)*5
-				b = bb*10
-				r = HPn.random(a,a+b+1)
-				r2= HPn.random(a,a+b+1)
-				r3= HPn.random(a,a+b+5)
-				#print("random=",r)
-				self.assertLessEqual(r,a+b+1)
-				self.assertGreaterEqual(r,a)
-				self.assertFalse(HPn.isMuchSmallerThan(r,1,HPn.epsilon()))
-				# NOTE: Below is a very sensitive test. If it starts failing, then see in function adjustDigs0, how expectedEpsilon is calculated.
-				# Maybe MPFR or cpp_bin_float changed the number of bits or changed their internal approximation of log10/log2.
-				self.assertTrue(HPn.isMuchSmallerThan(self.expectedEpsilon,1+abs(r),HPn.epsilon()))
-				self.assertTrue(HPn.isEqualFuzzy(r+self.expectedEpsilon*0.01,r,HPn.epsilon()))
-				self.checkRelativeError(HPn.toLongDouble(r),float(r), 1e-14) # FIXME - should be 1e-17, but python does not support that
-				self.checkRelativeError(HPn.toDouble(r),float(r), 1e-14)
-				self.checkRelativeError(HPn.toDouble(r),float(r), 1e-14)
-				self.assertEqual(HPn.toLong(r),int(r))
-				self.assertEqual(HPn.toInt(r),int(r))
-				#
-				#print(r.__repr__(),r2.__repr__(),r3.__repr__())
-				self.oneArgMathCheck(N,HPn,MPn,r)
-				self.oneArgMathCheck(N,HPn,MPn,r2)
-				self.oneArgMathCheck(N,HPn,MPn,r3)
-				self.twoArgMathCheck(HPn,MPn,r,r2)
-				self.twoArgMathCheck(HPn,MPn,r,r3)
-				self.twoArgMathCheck(HPn,MPn,r2,r3)
-				self.threeArgMathCheck(HPn,MPn,r,r2,r3)
+		for aa in range(1000000 if self.testRecordingMode else 20):
+			m = 100 if self.testRecordingMode else 20
+			r = HPn.random(-m,m)
+			r2= HPn.random(-m,m)
+			r3= HPn.random(-m,m)
+			if(self.testRecordingMode):
+				self.totalCount = self.totalCount + 1
+				self.storeArgs((r,r2,r3))
+			#print("random=",r)
+			self.assertLessEqual(r,m)
+			self.assertGreaterEqual(r,-m)
+			self.assertFalse(HPn.isMuchSmallerThan(r,1,HPn.epsilon()))
+			# NOTE: Below is a very sensitive test. If it starts failing, then see in function adjustDigs0, how expectedEpsilon is calculated.
+			# Maybe MPFR or cpp_bin_float changed the number of bits or changed their internal approximation of log10/log2.
+			self.assertTrue(HPn.isMuchSmallerThan(self.expectedEpsilon,1+abs(r),HPn.epsilon()))
+			self.assertTrue(HPn.isEqualFuzzy(r+self.expectedEpsilon*0.01,r,HPn.epsilon()))
+			self.checkRelativeError(HPn.toLongDouble(r),float(r), 1e-14) # FIXME - should be 1e-17, but python does not support that
+			self.checkRelativeError(HPn.toDouble(r),float(r), 1e-14)
+			self.checkRelativeError(HPn.toDouble(r),float(r), 1e-14)
+			self.assertEqual(HPn.toLong(r),int(r))
+			self.assertEqual(HPn.toInt(r),int(r))
+			#
+			#print(r.__repr__(),r2.__repr__(),r3.__repr__())
+			self.oneArgMathCheck(N,HPn,MPn,r)
+			self.oneArgMathCheck(N,HPn,MPn,r2)
+			self.oneArgMathCheck(N,HPn,MPn,r3)
+			self.twoArgMathCheck(HPn,MPn,r,r2)
+			self.twoArgMathCheck(HPn,MPn,r,r3)
+			self.twoArgMathCheck(HPn,MPn,r2,r3)
+			self.threeArgMathCheck(HPn,MPn,r,r2,r3)
+			if(self.testRecordingMode and (self.totalCount % 20000 == 0)):
+				self.tearDown() # save progress
 
 	def testArray(self):
 		for N in self.testLevelsHP:
