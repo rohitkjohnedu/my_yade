@@ -63,6 +63,8 @@ template <typename T1, typename T2> struct std_pair_to_python_converter {
 	}
 };
 
+template <int N> RealHP<N> roundTrip(const RealHP<N>& x) { return x; }
+
 template <int N> std::pair<RealHP<N>, int> test_frexp(const RealHP<N>& x)
 {
 	int       i   = 0;
@@ -767,6 +769,10 @@ template <int N, bool registerConverters> struct RegisterRealHPMath {
 		        static_cast<int (*)(const RealHP<N>&)>(&Eigen::internal::cast<RealHP<N>, int>),
 		        (py::arg("x")),
 		        R"""(:return: ``int`` converts ``Real`` type to ``int`` and returns a native python ``int``.)""");
+		py::def("roundTrip",
+		        roundTrip<N>,
+		        (py::arg("x")),
+		        R"""(:return: ``Real`` returns the argument ``x``. Can be used to convert type to native RealHP<N> accuracy.)""");
 
 
 		/********************************************************************************************/
