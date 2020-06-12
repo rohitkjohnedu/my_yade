@@ -10,10 +10,12 @@ import yade
 import testMathHelper
 
 if(yade.config.highPrecisionMpmath):
-	#print('\n\033[92m'+"Using "+str(yade.math.getRealHPPyhonDigits10())+" decimal digits in python. Importing mpmath"+'\033[0m\n')
+	#print('\n\033[92m'+"Using "+str(yade.math.getRealHPPythonDigits10())+" decimal digits in python. Importing mpmath"+'\033[0m\n')
 	import mpmath
 
 class ExtendedMinieigenTests(unittest.TestCase):
+	def needsMpmathAtN(self,N): return yade.math.needsMpmathAtN(N)
+	def hasMpfr(self): return ('MPFR' in yade.config.features)
 	def setUp(self):
 		mne.RealHPConfig  = yade.math.RealHPConfig
 		self.testLevelsHP = mne.RealHPConfig.getSupportedByMinieigen()
@@ -42,7 +44,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 	def runCheck(self,N,func):
 		nameHP = "HP" + str(N)               # the same as the line 'string    name = "HP" + boost::lexical_cast<std::string>(N);' in function registerInScope in ToFromPythonConverter.hpp
 		HPn    = getattr(mne,nameHP);        # the same as the line 'py::scope HPn  = boost::python::class_<ScopeHP<N>>(name.c_str());'   in ToFromPythonConverter.hpp
-		if(yade.math.needsMpmathAtN(N)):
+		if(self.needsMpmathAtN(N)):
 			MPn = mpmath
 		else:
 			MPn = testMathHelper
@@ -56,12 +58,12 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		print('RealHP<'+str(N)+'>', end=' ')
 		func(N,HPn,"mne."+nameHP+".",MPn)    # test scopes HP1, HP2, etc
 
-	def checkRelativeError(self,a,b):
+	def checkRelativeError(self,a,b,mult=1.0):
 		MPn = self.MPnHelper
 		if b!=0:
-			self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/MPn.mpf(b) ),self.tolerance)
+			self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/MPn.mpf(b) ),self.tolerance*mult)
 		else:
-			self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/self.tolerance ),self.tolerance)
+			self.assertLessEqual(abs( (MPn.mpf(a)-MPn.mpf(b))/self.tolerance ),self.tolerance*mult)
 	def checkRelativeComplexError(self,a,b):
 		MPn = self.MPnHelper
 		self.assertLessEqual(abs( (MPn.mpc(a)-MPn.mpc(b))/MPn.mpc(b) ),self.tolerance)
@@ -382,7 +384,7 @@ class ExtendedMinieigenTests(unittest.TestCase):
 
 		q2 = q1.inverse()
 		self.checkRelativeError( q2[3] , MPn.mpf("1") )
-		if(yade.math.needsMpmathAtN(N)):
+		if(self.needsMpmathAtN(N)):
 			q3=HPn.Quaternion(axis=HPn.Vector3(1,0,0),angle=MPn.pi/2.0)
 			q3a=HPn.Quaternion((HPn.Vector3(1,0,0),MPn.pi/2.0))
 			q3b=HPn.Quaternion((MPn.pi/2.0,HPn.Vector3(1,0,0)))
@@ -403,10 +405,10 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.assertEqual(MPn.mp.dps , self.digs1 )
 		self.checkRelativeError( q4.norm() , MPn.mpf("1") )
 
-		for qq in (q3,q3a,q3b):
-			self.checkRelativeError( qq[0] , eval(prefix+q3.__str__())[0] )
-			self.checkRelativeError( qq[1] , eval(prefix+q3.__str__())[1] )
-			self.checkRelativeError( qq[2] , eval(prefix+q3.__str__())[2] )
-			self.checkRelativeError( qq[3] , eval(prefix+q3.__str__())[3] )
+		for qq in (q3,q3a,q3b): # cpp_bin_float needs larger tolerance here.
+			self.checkRelativeError( qq[0] , eval(prefix+q3.__str__())[0] , 1 if self.hasMpfr() else 50) # cpp_bin_float needs higher tolerance.
+			self.checkRelativeError( qq[1] , eval(prefix+q3.__str__())[1] , 1 if self.hasMpfr() else 50)
+			self.checkRelativeError( qq[2] , eval(prefix+q3.__str__())[2] , 1 if self.hasMpfr() else 50)
+			self.checkRelativeError( qq[3] , eval(prefix+q3.__str__())[3] , 1 if self.hasMpfr() else 50)
 			#print(q3.__str__())
 
