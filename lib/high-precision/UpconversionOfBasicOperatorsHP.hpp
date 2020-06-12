@@ -103,16 +103,16 @@ namespace math {
 		// Enable all of this only when the operators+-*/ are not provided and both types are of the HP kind. Either RealHP or ComplexHP.
 		// These templates help o determine if these operators are needed by the compiler.
 		template <typename A, typename B> struct NeedsBasicPlusOperatorHP {
-			static const constexpr bool value = (((not HasPlus<A, B>::value)) and ::yade::math::IsHP<A> and ::yade::math::IsHP<B>);
+			static const constexpr bool value = (((not HasPlus<A, B>::value)) and ::yade::math::isHP<A> and ::yade::math::isHP<B>);
 		};
 		template <typename A, typename B> struct NeedsBasicMinusOperatorHP {
-			static const constexpr bool value = (((not HasMinus<A, B>::value)) and ::yade::math::IsHP<A> and ::yade::math::IsHP<B>);
+			static const constexpr bool value = (((not HasMinus<A, B>::value)) and ::yade::math::isHP<A> and ::yade::math::isHP<B>);
 		};
 		template <typename A, typename B> struct NeedsBasicMultOperatorHP {
-			static const constexpr bool value = (((not HasMult<A, B>::value)) and ::yade::math::IsHP<A> and ::yade::math::IsHP<B>);
+			static const constexpr bool value = (((not HasMult<A, B>::value)) and ::yade::math::isHP<A> and ::yade::math::isHP<B>);
 		};
 		template <typename A, typename B> struct NeedsBasicDivOperatorHP {
-			static const constexpr bool value = (((not HasDiv<A, B>::value)) and ::yade::math::IsHP<A> and ::yade::math::IsHP<B>);
+			static const constexpr bool value = (((not HasDiv<A, B>::value)) and ::yade::math::isHP<A> and ::yade::math::isHP<B>);
 		};
 	} // namespace detail
 } // namespace math

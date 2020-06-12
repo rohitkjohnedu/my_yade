@@ -5,22 +5,21 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
-#ifndef YADE_EXPLICIT_REAL_HP_HPP
-#define YADE_EXPLICIT_REAL_HP_HPP
+#ifndef YADE_REAL_HP_EIGEN_CGAL_MINIEIGEN_HPP
+#define YADE_REAL_HP_EIGEN_CGAL_MINIEIGEN_HPP
 
+// Select which RealHP<N> are going to work with Eigen, CGAL, minieigenHP, by selecting N values in YADE_EIGENCGAL_HP, YADE_MINIEIGEN_HP
+#include <lib/high-precision/RealHPConfig.hpp>
 #include <boost/preprocessor.hpp>
-
-// RealHP<…> can't work with older gcc, cmake will detect this.
-#ifndef YADE_DISABLE_REAL_MULTI_HP
 
 /*
 
-This file provides explicit instantinations for RealHP<N>, Vector3rHP<N> etc. types. Before we switch to C++20 this file is unfortunately necessary.
+This file provides explicit instantinations for Vector3rHP<N> family of types. Before we switch to C++20 this file is unfortunately necessary.
 
 One cannot "just use Vector3rHP<10>", and be happy, because Eigen and CGAL are not flexible enough in template specialization mechanisms.
 The RealHP<10> just works, but for Vector3rHP<10> or CgalHP<N> (file lib/base/AliasCGAL.hpp) this file is necessary.
 
-The current solution to this problem is to set the list of supported numbers below (separately for C++ and Python):
+The current solution to this problem is to set the list of supported numbers in RealHPConfig.hpp (separately for C++ and Python):
 	C++	: YADE_EIGENCGAL_HP  ↔ The numbers listed here will work in C++ for RealHP<N> in CGAL and Eigen. Rather cheap in compilation time.
 	Python	: YADE_MINIEIGEN_HP  ↔ These are exported to python. Expensive: each one makes compilation longer by 1 minute.
 
@@ -28,16 +27,8 @@ Caution: trying to use an unregistered for python Vector3rHP<N> type in YADE_CLA
          however it is safe (and intended) to use them in the C++ calculations in critical sections of code, without exporting them to python.
 */
 
-#define YADE_EIGENCGAL_HP (1)(2)(4)(8) //(10)(20)
-#define YADE_MINIEIGEN_HP (1)(2)
-
-// If you are doing some debugging, and need to access from minieigenHP all the precisions that are used in C++, then instead of above, use e.g. this:
-//#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(20)
-//#define YADE_MINIEIGEN_HP YADE_EIGENCGAL_HP
-
-#else // on older compilers or with older libraries, this can't work, cmake will detect such problems. In this case only RealHP<1> is instantinated.
-#define YADE_EIGENCGAL_HP (1)
-#define YADE_MINIEIGEN_HP (1)
+#if ((not defined(YADE_EIGENCGAL_HP)) or (not defined(YADE_MINIEIGEN_HP)))
+#error "YADE_EIGENCGAL_HP and YADE_MINIEIGEN_HP should be defined in file RealHPConfig.hpp"
 #endif
 
 /*
@@ -56,7 +47,7 @@ There are two ways to avoid these macros:
    then we could use the second typename to enable/disable our template specialization, by writing:
 
 	template <typename Rr>
-	struct NumTraits <Rr, typename std::enable_if<::yade::math::IsHP<Rr>>::type> : public NumTraitsHP<::yade::math::levelOfRealHP<Rr>> {};
+	struct NumTraits <Rr, typename std::enable_if<::yade::math::isHP<Rr>>::type> : public NumTraitsHP<::yade::math::levelOfRealHP<Rr>> {};
 
    Do the same with CGAL.
    I checked locally that modification of Eigen library fixes the template specializations and removes all these macros.
@@ -82,8 +73,8 @@ struct RealHPEigenCgal {
 }
 
 #define YADE_HP_PARSE_ONE(r, name, levelHP) name(levelHP)
-// This macro ↓ is used in AliasCGAL.hpp, that code could be put here, but this would make compilation unnecessarily longer.
-#define YADE_HP_RUN_MACRO(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EIGENCGAL_HP) // it just creates: name(1) name(2) name(3) ....
+// This macro ↓ is used in lib/base/AliasCGAL.hpp, that code could be put here, but this would make compilation unnecessarily longer.
+#define YADE_REGISTER_HP_LEVELS(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_EIGENCGAL_HP) // it just creates: name(1) name(2) name(3) ....
 
 /*
  * Macro YADE_HP_PYTHON_REGISTER generates an assembly code for a template instantination. It is used in files:
@@ -108,22 +99,22 @@ struct RealHPEigenCgal {
 	        /* execute macro with this 'name'   */ BOOST_PP_SEQ_ELEM(0, data),                                                                             \
 	        /* skip the already registered one  */ YADE_SKIP_ARG)                                                                                          \
 	(levelHP)
-#define YADE_HP_RUN_MACRO_FROM_LEVEL(name, below)                                                                                                              \
+#define YADE_REGISTER_HP_LEVELS_FROM(name, below)                                                                                                              \
 	BOOST_PP_SEQ_FOR_EACH(                                                                                                                                 \
 	        YADE_HP_PARSE_SEQUENCE, (/* the macro 'name' to be executed */ name)(/* skip numbers 'below' this value */ below), YADE_EIGENCGAL_HP)
 
 #if (YADE_REAL_BIT >= 80)
-#define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO(name) //               it just creates: name(1) name(2) name(3) .... using YADE_EIGENCGAL_HP
+#define YADE_REGISTER_SELECTED_HP_LEVELS(name) YADE_REGISTER_HP_LEVELS(name) //         it creates: name(1) name(2) name(3) .... using YADE_EIGENCGAL_HP
 #elif (YADE_REAL_BIT >= 64)
-#define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO_FROM_LEVEL(name, 2) // it just creates:         name(2) name(3) ....
+#define YADE_REGISTER_SELECTED_HP_LEVELS(name) YADE_REGISTER_HP_LEVELS_FROM(name, 2) // it creates:         name(2) name(3) ....
 #elif (YADE_REAL_BIT >= 32)
-#define YADE_HP_RUN_EXPLICIT_MACRO(name) YADE_HP_RUN_MACRO_FROM_LEVEL(name, 3) // it just creates:                 name(3) ....
+#define YADE_REGISTER_SELECTED_HP_LEVELS(name) YADE_REGISTER_HP_LEVELS_FROM(name, 3) // it creates:                 name(3) ....
 #endif
 
 namespace Eigen {
 
 // The YADE_EIGEN_SUPPORT_REAL_HP is provided from file lib/high-precision/EigenNumTraits.hpp
-YADE_HP_RUN_EXPLICIT_MACRO(YADE_EIGEN_SUPPORT_REAL_HP)
+YADE_REGISTER_SELECTED_HP_LEVELS(YADE_EIGEN_SUPPORT_REAL_HP)
 #undef YADE_EIGEN_SUPPORT_REAL_HP
 
 } // namespace Eigen
@@ -132,13 +123,13 @@ YADE_HP_RUN_EXPLICIT_MACRO(YADE_EIGEN_SUPPORT_REAL_HP)
 namespace CGAL {
 
 // The YADE_CGAL_SUPPORT_REAL_HP is provided from file lib/high-precision/CgalNumTraits.hpp
-YADE_HP_RUN_EXPLICIT_MACRO(YADE_CGAL_SUPPORT_REAL_HP)
+YADE_REGISTER_SELECTED_HP_LEVELS(YADE_CGAL_SUPPORT_REAL_HP)
 #undef YADE_CGAL_SUPPORT_REAL_HP
 
 } // namespace CGAL
 #endif // YADE_CGAL
 
-#undef YADE_HP_RUN_EXPLICIT_MACRO
+#undef YADE_REGISTER_SELECTED_HP_LEVELS
 
 #endif
 

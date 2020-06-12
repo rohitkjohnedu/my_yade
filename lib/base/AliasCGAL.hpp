@@ -49,7 +49,7 @@ template <int L> class ERealHP;
 	};
 #endif
 
-YADE_HP_RUN_MACRO(YADE_REAL_HP_CGAL_KERNEL_ADAPTOR)
+YADE_REGISTER_HP_LEVELS(YADE_REAL_HP_CGAL_KERNEL_ADAPTOR)
 #undef YADE_REAL_HP_CGAL_KERNEL_ADAPTOR
 
 using Exact_Real_predicates_inexact_constructions_kernel                          = ERealHP<1>;
@@ -61,7 +61,7 @@ template <int levelHP> using Exact_RealHP_predicates_inexact_constructions_kerne
 		typedef Tag_true Use_structural_filtering_tag;                                                                                                 \
 	};
 
-YADE_HP_RUN_MACRO(YADE_REAL_HP_TRIANGULATION)
+YADE_REGISTER_HP_LEVELS(YADE_REAL_HP_TRIANGULATION)
 #undef YADE_REAL_HP_TRIANGULATION
 
 } // namespace CGAL

@@ -79,8 +79,8 @@ namespace internal {
 	// FIXME - make sure that all these functions and these below in macro YADE_EIGEN_SUPPORT_REAL_HP, are properly recognized and used.
 	//         I am no so sure that <int N> is properly resolved.
 	// other ideas:
-	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, bool>::type
-	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, Rr>::type random<Rr>() { return ::yade::math::randomHP<::yade::math::levelOfRealHP<Rr>>(); }
+	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, bool>::type
+	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, Rr>::type random<Rr>() { return ::yade::math::randomHP<::yade::math::levelOfRealHP<Rr>>(); }
 	//         template <int N>       inline bool isEqualFuzzy(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b, const ::yade::math::RealHP<N>& eps)
 	template <int N> inline ::yade::math::RealHP<N> random() { return ::yade::math::randomHP<N>(); }
 	template <int N> inline ::yade::math::RealHP<N> random(const ::yade::math::RealHP<N>& a, const ::yade::math::RealHP<N>& b)
@@ -91,7 +91,7 @@ namespace internal {
 	{
 		return ::yade::math::abs(a) <= ::yade::math::abs(b) * eps;
 	}
-	template <typename Rr> inline typename boost::enable_if_c<::yade::math::IsHP<Rr>, bool>::type isEqualFuzzy(const Rr& a, const Rr& b, const Rr& eps)
+	template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, bool>::type isEqualFuzzy(const Rr& a, const Rr& b, const Rr& eps)
 	{
 		return ::yade::math::abs(a - b) <= eps;
 	}

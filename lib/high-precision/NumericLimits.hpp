@@ -18,7 +18,7 @@
 
 namespace std {
 // magic constant 'long double' could be named WrappedReal or WrappedRealHP<1> or UnderlyingReal<1> or RealHP<1>, think about this.
-// note: IsWrapped and UnderlyingRealHP depend fact that ⇘ uses long double. It's a workaround boost python losing 3 digits of precision and a test of correctness.
+// note: IsWrapped and UnderlyingRealHP in RealHP.hpp depend on fact that ↓ uses long double. It's a workaround to boost python losing 3 digits of precision and a test of correctness.
 template <> struct numeric_limits<::yade::math::ThinRealWrapper<long double>> {
 	using UnderlyingReal                           = long double;
 	using ThinWrapper                              = ::yade::math::ThinRealWrapper<UnderlyingReal>;

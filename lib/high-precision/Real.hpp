@@ -220,6 +220,9 @@ static_assert(sizeof(Complex) == sizeof(std::complex<math::UnderlyingReal>), "Th
 /*************************************************************************/
 /************************* RealHP<…> Eigen,CGAL **************************/
 /*************************************************************************/
+// Select which RealHP<N> are going to work with Eigen, CGAL, minieigenHP:
+#include "RealHPConfig.hpp"
+// Make them work:
 #include "RealHPEigenCgal.hpp"
 
 #undef YADE_REAL_MATH_NAMESPACE
