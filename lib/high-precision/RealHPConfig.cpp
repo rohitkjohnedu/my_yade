@@ -18,7 +18,7 @@ struct RealHPConfigPythonTags { // these are directly assigned below in pyRegist
 namespace yade {
 namespace math {
 
-	int RealHPConfig::extraStringDigits10 { 1 };
+	int RealHPConfig::extraStringDigits10 { 4 };
 
 	void RealHPConfig::pyRegister()
 	{
