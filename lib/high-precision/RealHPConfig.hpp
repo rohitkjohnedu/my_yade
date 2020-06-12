@@ -12,7 +12,7 @@
 // Declare which precisions will be used in YADE for Eigen, CGAL and for minieigenHP (see file lib/high-precision/RealHPEigenCgal.hpp for details):
 //	C++	: YADE_EIGENCGAL_HP  ↔ The numbers listed here will work in C++ for RealHP<N> in CGAL and Eigen. Rather cheap in compilation time.
 //	Python	: YADE_MINIEIGEN_HP  ↔ These are exported to python. Expensive: each one makes compilation longer by 1 minute.
-#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(8)(10)
+#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(8)(10)(20)
 #define YADE_MINIEIGEN_HP (1)(2)
 
 // If you are doing some debugging and need to access from minieigenHP all the precisions that are used in C++, then instead of above, use e.g. this:
