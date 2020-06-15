@@ -36,7 +36,7 @@ The ``O.materials`` object (instance of :yref:`Omega.materials`) holds defined s
 
 ``label`` given to each material is optional, but can be passed to :yref:`sphere<yade.utils.sphere>` and other functions for constructing body. The value returned by ``O.materials.append`` is an ``id`` of the material, which can be also passed to :yref:`sphere<yade.utils.sphere>` -- it is a little bit faster than using label, though not noticeable for small number of particles and perhaps less convenient.
 
-If no :ref:`Material<inheritanceGraphMaterial>` is specified when calling :yref:`sphere<yade.utils.sphere>`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created: FrictMat(density=2e3,young=30e9,poisson=.3,frictionAngle=.5236). This should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
+If no :ref:`Material<inheritanceGraphMaterial>` is specified when calling :yref:`sphere<yade.utils.sphere>`, the *last* defined material is used; that is a convenient default. If no material is defined yet (hence there is no last material), a default material will be created: FrictMat(density=1e3,young=1e7,poisson=.3,frictionAngle=.5). This should not happen for serious simulations, but is handy in simple scripts, where exact material properties are more or less irrelevant.
 
 .. ipython::
 
