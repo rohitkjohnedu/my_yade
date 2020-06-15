@@ -230,7 +230,7 @@ namespace CGT {
 		return ncols;
 	}
 
-
+	// clang-format off
 	template <class _Tesselation> void PartialSatLinSolv<_Tesselation>::copyCellsToLin(Real dt)
 	{
 		for (int ii = 1; ii <= ncols; ii++) {
@@ -471,7 +471,7 @@ namespace CGT {
 			cout << "totalForce = " << totalForce << endl;
 		}
 	}
-
+	// clang-format on
 
 	template <class _Tesselation> void PartialSatLinSolv<_Tesselation>::computePermeability()
 	{
