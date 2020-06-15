@@ -558,7 +558,7 @@ Each of these points corresponds to one or several engines::
 
 The order of engines is important. In majority of cases, you will put any additional engine after :yref:`InteractionLoop`:
 
-* if it apply force, it should come before :yref:`NewtonIntegrator`, otherwise the force will never be effective.
+* if it applies force, it should come before :yref:`NewtonIntegrator`, otherwise the force will never be effective.
 * if it makes use of bodies' positions, it should also come before :yref:`NewtonIntegrator`, otherwise, positions at the next step will be used (this might not be critical in many cases, such as output for visualization with :yref:`VTKRecorder`).
 
 The :yref:`O.engines<Omega.engines>` sequence must be always assigned at once (the reason is in the fact that although engines themselves are passed by reference, the sequence is *copied* from c++ to Python or from Python to c++). This includes modifying an existing ``O.engines``; therefore ::
@@ -592,7 +592,7 @@ At this moment (January 2019), the most common choice is :yref:`InsertionSortCol
       ...
    ]
 
-Using more functors than necessary (such as :yref:`Bo1_Facet_Aabb` if there are no :yref:`facets<Facet>` in the simulation) has no performance penalty. On the other hand, missing functors for existing :yref:`shapes<Shape>` will cause those bodies to not collider with other bodies (they will freely interpenetrate).
+Using more functors than necessary (such as :yref:`Bo1_Facet_Aabb` if there are no :yref:`facets<Facet>` in the simulation) has no performance penalty. On the other hand, missing functors for existing :yref:`shapes<Shape>` will cause those bodies to not collide with other bodies (they will freely interpenetrate).
 
 There are other :ref:`colliders<inheritanceGraphCollider>` as well, though their usage is only experimental:
 
@@ -799,7 +799,7 @@ Boundary controllers
 Engines deriving from :ref:`BoundaryController<inheritanceGraphBoundaryController>` impose boundary conditions during simulation, either directly, or by influencing several bodies. You are referred to their individual documentation for details, though you might find interesting in particular
 
 * :yref:`UniaxialStrainer` for applying strain along one axis at constant rate; useful for plotting strain-stress diagrams for uniaxial loading case. See :ysrc:`examples/concrete/uniax.py` for an example.
-* :yref:`TriaxialStressController` which applies prescribed stress/strain along 3 perpendicular axes on cuboid-shaped packing using 6 walls (:yref:`Box` objects) (:yref:`ThreeDTriaxialEngine` is generalized such that it allows independent value of stress along each axis)
+* :yref:`TriaxialStressController` which applies prescribed stress/strain along 3 perpendicular axes on cuboid-shaped packing using 6 walls (:yref:`Box` objects)
 * :yref:`PeriTriaxController` for applying stress/strain along 3 axes independently, for simulations using periodic boundary conditions (:yref:`Cell`)
 
 Field appliers
@@ -930,7 +930,7 @@ Tracking variables
 Running python code
 -------------------
 
-A special engine :yref:`PyRunner` can be used to periodically call python code, specified via the ``command`` parameter. Periodicity can be controlled by specifying computation time (``realPeriod``), virutal time (``virtPeriod``) or iteration number (``iterPeriod``).
+A special engine :yref:`PyRunner` can be used to periodically call python code, specified via the ``command`` parameter. Periodicity can be controlled by specifying computation time (``realPeriod``), virtual time (``virtPeriod``) or iteration number (``iterPeriod``).
 
 For instance, to print kinetic energy (using :yref:`kineticEnergy<yade._utils.kineticEnergy>`) every 5 seconds, the following engine will be put to ``O.engines``::
 
@@ -1023,7 +1023,7 @@ In that case, naturally, the labeled object must define attributes which are use
 
 Plotting variables
 -------------------
-Above, we explained how to track variables by storing them using :yref:`yade.plot.addData`. These data can be readily used for plotting. Yade provides a simple, quick to use, plotting in the :yref:`yade.plot` module. Naturally, since direct access to underlying data is possible via :yref:`yade.plot.data`, these data can be processed in any way.
+Above, we explained how to track variables by storing them using :yref:`yade.plot.addData`. These data can be readily used for plotting. Yade provides a simple, quick to use, plotting in the :yref:`yade.plot` module. Naturally, since direct access to underlying data is possible via :yref:`yade.plot.data`, these data can be processed in any other way.
 
 The :yref:`yade.plot.plots` dictionary is a simple specification of plots. Keys are x-axis variable, and values are tuple of y-axis variables, given as strings that were used for :yref:`yade.plot.addData`; each entry in the dictionary represents a separate figure::
 
