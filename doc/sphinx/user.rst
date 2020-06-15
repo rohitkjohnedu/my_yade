@@ -133,7 +133,7 @@ The function :yref:`appendClumped()<BodyContainer.appendClumped>` is designed fo
 
 * Use existing spheres and clump them together:
 
-For this case the function :yref:`clump()<BodyContainer.clump>` can be used. One way to do this is to create a list of bodies, that should be clumped before using the :yref:`clump()<BodyContainer.clump>` command:
+For this case the function :yref:`clump()<BodyContainer.clump>` can be applied on a list of existing bodies:
 
 .. ipython::
 
