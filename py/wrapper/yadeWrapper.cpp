@@ -1788,7 +1788,7 @@ try {
 	py::class_<pyMaterialContainer>(
 	        "MaterialContainer",
 	        "Container for :yref:`Materials<Material>`. A material can be accessed using \n\n #. numerical index in range(0,len(cont)), like cont[2]; \n "
-	        "#. textual label that was given to the material, like cont['steel']. This etails traversing all materials and should not be used frequently.",
+	        "#. textual label that was given to the material, like cont['steel']. This entails traversing all materials and should not be used frequently.",
 	        py::init<pyMaterialContainer&>())
 	        .def("append", &pyMaterialContainer::append, "Add new shared :yref:`Material`; changes its id and return it.")
 	        .def("append", &pyMaterialContainer::appendList, "Append list of :yref:`Material` instances, return list of ids.")
