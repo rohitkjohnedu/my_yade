@@ -922,3 +922,17 @@ class clumpTemplate(object):
 		self.numCM = len(relRadii)
 		self.relRadii = relRadii
 		self.relPositions = relPositions
+
+def randomOrientation():
+	"""
+	Returns (uniformly distributed) random orientation.
+	Taken from `Eigen::Quaternion::UnitRandom() source code <https://eigen.tuxfamily.org/dox-devel/Quaternion_8h_source.html>`_.
+	Uses standard Python random.random() function(s), you can :code:`random.seed()` it
+	"""
+	from math import pi,sqrt,sin,cos
+	u1 = random.random()
+	u2 = random.random() * pi
+	u3 = random.random() * pi
+	a = sqrt(1 - u1)
+	b = sqrt(u1)
+	return Quaternion(a*sin(u2),a*cos(u2),b*sin(u3),b*cos(u3))
