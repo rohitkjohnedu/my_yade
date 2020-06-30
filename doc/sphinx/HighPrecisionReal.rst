@@ -26,7 +26,9 @@ The last two types are arbitrary precision, and their number of bits ``Nbit`` or
 .. note::
 	See file :ysrc:`Real.hpp<lib/high-precision/Real.hpp>` for details. All ``Real`` types pass the :ysrccommit:`real type concept<1b4ae97583bd8a6efc74cb0d0/py/high-precision/_math.cpp#L197>` test from `boost concepts <https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/real_concepts.html>`__. The support for :ysrc:`Eigen<lib/high-precision/EigenNumTraits.hpp>` and :ysrc:`CGAL <lib/high-precision/CgalNumTraits.hpp>` is done with numerical traits.
 
-.. [#prec] The amount of decimal places in this table is the amount of places which are completely determined by the binary represenation. One additional decimal digit (or two if rounding down is used, which is not the case by default) is necessary to fully reconstruct binary representation. A simple python example to demonstrate this fact: ``for a in range(16): print(1./pow(2.,a))``, shows that every binary digit produces "extra" ``…25`` at the end of decimal representation, but these decimal digits are not completely determined by the binary representation, because for example ``…37`` is impossible to obtain there. More binary bits are necessary to represent ``…37``, but the ``…25`` was produced by the last available bit.
+.. [#prec] The amount of decimal places in this table is the amount of places which are completely determined by the binary represenation. :ref:`Few additional decimal digits <extraStringDigits>` is necessary to fully reconstruct binary representation. A simple python example to demonstrate this fact: ``for a in range(16): print(1./pow(2.,a))``, shows that every binary digit produces "extra" ``…25`` at the end of decimal representation, but these decimal digits are not completely determined by the binary representation, because for example ``…37`` is impossible to obtain there. More binary bits are necessary to represent ``…37``, but the ``…25`` was produced by the last available bit.
+
+.. _highPrecisionRealInstallation:
 
 Installation
 ===========================================
@@ -107,6 +109,24 @@ The unsupported modules are automatically disabled during the cmake stage.
 
 .. [#supp4] The module is enabled by default, the ``yade --test`` and ``yade --check`` pass, as well as most of examples are working. However the calculations are performed at lower ``double`` precision. A wrapper/converter layer for :ysrc:`LAPACK library <lib/compatibility/LapackCompatibility.hpp>` has been implemented. To make it work with full precision these routines should be reimplemented using Eigen.
 
+.. _higher-hp-precision:
+
+Double, quadruple and higher precisions
+===========================================
+
+Sometimes a critical section of the calculations in C++ would work better if it was performed in the higher precision to guarantee that it will produce the correct result in the default precision. A simple example is solving a system of linear equations (basically inverting a matrix) where some coefficients are very close to zero or the `Kahan summation algorithm <https://en.wikipedia.org/wiki/Kahan_summation_algorithm>`__.
+
+If  :ref:`requirements <highPrecisionRealInstallation>` are satisfied, Yade supports higher precision multipliers in such a way that ``RealHP<1>`` is the ``Real`` type described above, and every higher number is a multiplier of the ``Real`` precision. ``RealHP<2>`` is double precision of ``RealHP<1>``, ``RealHP<4>`` is quadruple precision and so on. The general formula for amount of decimal places is implemented in :ysrccommit:`RealHP.hpp<26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/RealHP.hpp#L84>` file and the number of decimal places used is simply a multiple N of decimal places in ``Real`` precision, it is used when native types are not available. The family of available native precision types is listed in the :ysrccommit:`RealHPLadder <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/RealHP.hpp#L100>` type list.
+
+All types listed in :ysrc:`MathEigenTypes.hpp<lib/high-precision/MathEigenTypes.hpp>` follow the same naming pattern: ``Vector3rHP<1>`` is the regular ``Vector3r`` and ``Vector3rHP<N>`` for any supported N uses the precision multiplier N. One could then use an Eigen algorithm for solving a system of linear equations with a higher N using ``MatrixXrHP<N>`` to obtain the result with higher precision. Then continuing calculations in default ``Real`` precision, after the critical section is done.
+
+Before we fully move to C++20 standard, one small restriction is in place: the precision multipliers actually supported are determined by the two defines in the :ysrccommit:`RealHPConfig.hpp <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/RealHPConfig.hpp#L15>` file:
+
+1. ``#define YADE_EIGENCGAL_HP (1)(2)(4)(8)`` - the multipliers listed here will work in C++ for ``RealHP<N>`` in CGAL and Eigen. They are cheap in compilation time, but have to be listed here nonetheless. After we move code to C++20 this define will be removed and all multipliers will be supported via `single template constraint <https://en.cppreference.com/w/cpp/language/constraints>`__. This inconvenience arises from the fact that both CGAL and Eigen libraries offer template specializations only for a *specific* type, not a generalized family of types. Thus this define is used to declare the required template specializations.
+2. ``#define YADE_MINIEIGEN_HP (1)(2)``       - the precision multipliers listed here are exported to python, they are expensive: each one makes compilation longer by 1 minute. Adding more can be useful only for debugging purposes. The double ``RealHP<2>`` type is by default listed here to allow exploring the higher precision types from python. Also please note that ``mpmath`` supports `only one precision <http://mpmath.org/doc/current/basics.html#temporarily-changing-the-precision>`__ at a time. Having different ``mpmath`` variables with different precision is poorly supported, albeit ``mpmath`` authors promise to improve that in the future. Fortunately this is not a big problem for Yade users because the general goal here is to allow more precise calculations in the critical sections of C++ code, not in python. This problem is partially mitigated by *changing* :ysrccommit:`mpmath precision each time <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/ToFromPythonConverter.hpp#L37>` when a C++ ↔ python conversion occurs. So one should keep in mind that the variable ``mpmath.mp.dps`` always reflects the precision used by latest conversion performed, even if that conversion took place in GUI (not in the running script). Existing ``mpmath`` variables are not truncated to lower precision, their extra digits are simply ignored until ``mpmath.mp.dps`` is increased again, however the truncation might occur during assignment.
+
+On some occasions it is useful to have an intuitive up-conversion between C++ types of different precisions, say for example to add ``RealHP<1>`` to ``RealHP<2>`` type. The file :ysrccommit:`UpconversionOfBasicOperatorsHP.hpp <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/UpconversionOfBasicOperatorsHP.hpp#L134>` serves this purpose. This header is not included by default, because more often than not, adding such two different types will be a mistake (efficiency--wise) and compiler will catch them and complain. After including this header this operation will become possible and the resultant type of such operation will be always the higher precision of the two types used. This file should be included only in ``.cpp`` files. If it was included in any ``.hpp`` file then it could pose problems with C++ type safety and will have unexpected consequences. An example usage of this header is in the :ysrccommit:`following test routine<61fc7f208027344e27dc832052b3f8c911a5909e/py/high-precision/_math.cpp#L909>`.
+
 Compatibility
 ===========================================
 
@@ -128,6 +148,20 @@ has to be replaced with:
 	from yade.minieigenHP import *
 
 Respectively ``import minieigen`` has to be replaced with ``import yade.minieigenHP as minieigen``, the old name ``as minieigen`` being used only for the sake of backward compatibility. Then high precision (binary compatible) version of minieigen is used when non ``double`` type is used as ``Real``.
+
+The ``RealHP<N>`` :ref:`higher precision<higher-hp-precision>` vectors and matrices can be accessed in python by using the ``.HPn`` module scope. For example::
+
+	import yade.minieigenHP as mne
+	mne.HP2.Vector3(1,2,3) # produces Vector3 using RealHP<2> precision
+	mth.Vector3(1,2,3)     # without using HPn module scope it defaults to RealHP<1>
+
+The respective math functions such as::
+
+	import yade.math as mth
+	mth.HP2.sqrt(2) # produces square root of 2 using RealHP<2> precision
+	mth.sqrt(2)     # without using HPn module scope it defaults to RealHP<1>
+
+are supported as well and work by using the respective C++ function calls, which is usually faster than the ``mpmath`` functions.
 
 .. warning:: There may be still some parts of python code that were not migrated to high precision and may not work well with ``mpmath`` module. See :ref:`debugging section <hp-debugging>` for details.
 
@@ -152,7 +186,7 @@ If a new mathematical function is needed it has to be added in the following pla
 3. :ysrc:`py/tests/testMath.py`
 4. :ysrc:`py/tests/testMathHelper.py`
 
-The tests for a new function are to be added in :ysrc:`py/tests/testMath.py` in one of these functions: ``oneArgMathCheck(…):``, ``twoArgMathCheck(…):``, ``threeArgMathCheck(…):``. A table of expected error tolerances in ``self.defaultTolerances`` is to be supplemented as well. To determine tolerances with better confidence it is recommended to temporarily increase number of tests in the :ysrccommit:`test loop<1b4ae97583bd8a6efc74cb0d0/py/tests/testMath.py#L338>`, but scale the arguments ``a`` and ``b`` accordingly to avoid infinities cropping up. To determine tolerances for currently implemented functions a ``range(2000)`` in both loops was used.
+The tests for a new function are to be added in :ysrc:`py/tests/testMath.py` in one of these functions: ``oneArgMathCheck(…):``, ``twoArgMathCheck(…):``, ``threeArgMathCheck(…):``. A table of expected error tolerances in ``self.defaultTolerances`` is to be supplemented as well. To determine tolerances with better confidence it is recommended to temporarily increase number of tests in the :ysrccommit:`test loop<1b4ae97583bd8a6efc74cb0d0/py/tests/testMath.py#L338>`, but scale the arguments ``a`` and ``b`` accordingly to avoid infinities cropping up. To determine tolerances for currently implemented functions a ``range(1000000)`` in the loop was used.
 
 .. _hp-to-string:
 
@@ -160,6 +194,13 @@ String conversions
 ----------------------------------------------
 
 It is recommended to use ``math::toString(…)`` and ``math::fromStringReal(…)`` conversion functions instead of ``boost::lexical_cast<std::string>(…)``. The ``toString`` function (in file :ysrc:`RealIO.hpp<lib/high-precision/RealIO.hpp>`) guarantees full precision during conversion. It is important to note that ``std::to_string`` does `not guarantee this <https://en.cppreference.com/w/cpp/string/basic_string/to_string>`__ and ``boost::lexical_cast`` does `not guarantee this either <https://www.boost.org/doc/libs/1_72_0/doc/html/boost_lexical_cast.html>`__.
+
+.. _extraStringDigits:
+
+Text conversions
+----------------------------------------------
+
+TODO, it is discussed below, explain ``extraStringDigits10``.
 
 
 Eigen and CGAL
@@ -176,7 +217,7 @@ Eigen and CGAL libraries have native high precision support.
 VTK
 -------------------------------------------
 
-Since VTK is only used to record results for later viewing in other software, such as `paraview <https://www.paraview.org/>`__, the recording of all decimal places does not seem to be necessary.
+Since VTK is only used to record results for later viewing in other software, such as `paraview <https://www.paraview.org/>`__, the recording of all decimal places does not seem to be necessary (for now).
 Hence all recording commands in ``C++`` convert ``Real`` type down to ``double`` using ``static_cast<double>`` command. This has been implemented via classes ``vtkPointsReal``, ``vtkTransformReal`` and ``vtkDoubleArrayFromReal`` in file :ysrc:`VTKCompatibility.hpp<lib/compatibility/VTKCompatibility.hpp>`. Maybe VTK in the future will support non ``double`` types. If that will be needed, the interface can be updated there.
 
 
