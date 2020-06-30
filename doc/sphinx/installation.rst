@@ -441,7 +441,7 @@ GPU Acceleration
 The FlowEngine can be accelerated with CHOLMOD's GPU accelerated solver. The specific hardware and software requirements are outlined in the section :ref:`GPUacceleration`.
 
 Special builds
-------------
+----------------
 
 The software can be compiled by a special way to find some specific bugs and problems in it: memory corruptions, data races, undefined behaviour etc.
 
