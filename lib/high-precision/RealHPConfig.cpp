@@ -31,9 +31,18 @@ namespace math {
 		                       // For details see https://thomas-cokelaer.info/tutorials/sphinx/docstring_python.html
 		                       // docstrings for static properties are forbidden in python. The solution is to put it into __doc__
 		                       // https://stackoverflow.com/questions/25386370/docstrings-for-static-properties-in-boostpython
-		                       "``RealHPConfig`` class provides information about RealHP<N> type.\n"
-		                       ":cvar extraStringDigits10: this static variable allows o control how many extra digits to use when converting to "
-		                       "decimal srings.")
+		                       R"""(
+``RealHPConfig`` class provides information about RealHP<N> type.
+
+:cvar extraStringDigits10: this static variable allows to control how many extra digits to use when converting to decimal strings. Assign a different value to it to affect the string conversion done in :ysrccommit:`C++ ↔ python conversions <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/ToFromPythonConverter.hpp#L37>` as well as in :ysrccommit:`all other conversions<26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/RealIO.hpp#L34>`. Be careful, because values smaller than 3 can fail the round trip conversion test.
+
+:cvar isFloat128Broken: provides runtime information if Yade was compiled with g++ version < 9.2.1 and thus ``boost::multiprecision::float128`` cannot work.
+
+:cvar isEnabledRealHP:  provides runtime information ``RealHP<N>`` is available for N higher than 1.
+
+:cvar workaroundSlowBoostBinFloat: ``boost::multiprecision::cpp_bin_float`` has some problem that importing it in python is very slow when these functions are exported: erf, erfc, lgamma, tgamma. In such case the python ``import yade.math`` can take more than minute. The workaround is to make them unavailable in python for higher N values. See invocation of IfConstexprForSlowFunctions in :ysrccommit:`_math.cpp<61fc7f208027344e27dc832052b3f8c911a5909e/py/high-precision/_math.cpp#L672>`. This variable contains the highest N in which these functions are available. It equals to highest N when ``boost::multiprecision::cpp_bin_float`` is not used.
+
+)""")
 		                       .add_static_property(
 		                               "extraStringDigits10",
 		                               py::make_getter(&RealHPConfig::extraStringDigits10, py::return_value_policy<py::return_by_value>()),
@@ -71,12 +80,12 @@ namespace math {
 } // namespace math
 } // namespace yade
 
-/* FIXME - put this into documentation (above) of extraStringDigits10
+/* A bit more about extraStringDigits10:
 
 The extraStringDigits10 is to make sure that there are no conversion errors in the last bit.
 here is a quick python example which shows the 'cutting' of last digits.
 
-# This one demostrates that `double` used by python has just 53 bits of precision:
+# This one demonstrates that `double` used by python has just 53 bits of precision:
 
 for a in range(128): print(str(a).rjust(3,' ')+": "+str(1+1./pow(2.,a)))
 
@@ -85,19 +94,19 @@ for a in range(128): print(str(a).rjust(3,' ')+": "+str(1+1./pow(2.,a)))
 import mpmath; mpmath.mp.dps=200;
 for a in range(128): print(str(a).rjust(3,' ')+": "+str(mpmath.mpf(1)+mpmath.mpf(1)/pow(mpmath.mpf(2),mpmath.mpf(a))))
 
-# This one shows the actual 'Real' precision used in yade. To achieve this the mth.max(…,…) are called to force the numbers
+# This one shows the actual 'Real' precision used in yade. To achieve this the mth.roundTrip(…) is called to force the numbers
 # to pass through C++, instead of letting mpmath to calculate this, so for example we can see that float128 has 113 bits.
 # Also this test was used to verify the value for extraStringDigits10 as well as the formula given
 # in IEEE Std 754-2019 Standard for Floating-Point Arithmetic: Pmin (bf) = 1 + ceiling( p × log10(2)), where p is the number of significant bits in bf
 
 from yade import math as mth
-for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.max(0,mth.max(0,1)+mth.max(0,1)/mth.pow(mth.max(0,2),a))))
+for a in range(128): print(str(a).rjust(3,' ')+": "+str(mth.roundTrip(mth.roundTrip(1)+mth.roundTrip(1)/mth.pow(mth.roundTrip(2),a))))
 
 # But also we can now check the precision directly by calling
 
 yade.math.RealHPConfig.getDigits2(N) # for any N of RealHP<N>
 
-# Hmm maybe turn this into an external parameter? Configurable from python? And write in help "use 1 to extract results and avoid fake sense of more precision,
+# FIXED: Hmm maybe turn this into an external parameter? Configurable from python? And write in help "use 1 to 'just' extract results and avoid fake sense of more precision,
 # use 4 or more to have numbers which will convert exactly in both directions mpmath ↔ string ↔ C++.".
 # For now it is in yade.math.RealHPConfig.extraStringDigits10
 */

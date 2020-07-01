@@ -84,7 +84,7 @@ namespace math {
 		static const constexpr auto workaroundSlowBoostBinFloat = BOOST_PP_SEQ_HEAD(YADE_EIGENCGAL_HP_REVERSE);
 #undef YADE_EIGENCGAL_HP_REVERSE
 #else
-		// boost cpp_bin_float has some problem that importing it in pythoon is very slow when these functions are exported: erf, erfc, lgamma, tgamma
+		// boost cpp_bin_float has some problem that importing it in python is very slow when these functions are exported: erf, erfc, lgamma, tgamma
 		// python 'import this_module' measured time: workaroundSlowBoostBinFloat==6 → 10min, N==5 → 3m24s, N==4 → 1m55s, N==3 → 1minute23sec
 		// the workaround is to make them unavailable in python for higher N values. See invocation of IfConstexprForSlowFunctions in py/high-precision/_math.cpp
 #ifndef YADE_DISABLE_REAL_MULTI_HP
