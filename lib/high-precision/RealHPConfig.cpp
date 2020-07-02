@@ -9,7 +9,7 @@
 #include <lib/high-precision/RealIO.hpp>
 
 namespace forCtags {
-struct RealHPConfigPythonTags { // these are directly assigned below in pyRegister(), they are not C++ variables. So let ctags find them here.
+struct RealHPConfig { // these are directly assigned below in pyRegister(), they are not C++ variables. So let ctags find them here, struct forCtags::RealHPConfig is not used anywhere (except for ctags).
 	bool isFloat128Broken;
 	bool isEnabledRealHP;
 }; // for ctags

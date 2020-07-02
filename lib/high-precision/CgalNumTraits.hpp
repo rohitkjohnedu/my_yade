@@ -145,8 +145,9 @@ public:
 
 // When faster CGAL computations are needed, we might want to use and specialize converter for /usr/include/CGAL/Lazy_exact_nt.h
 
-// FIXME - make sure that RealHP<…> works correctly with all possible GMP mpq_rational combinations.
+// TODO: - make sure that RealHP<…> works correctly with all possible GMP mpq_rational combinations.
 //         Before yade switches to C++20 it will requiree the same explicit template specializations macros as for the others in file RealHPEigenCgal.hpp
+// NOTE: it passes all the tests so far. So if a mistake is discovered here, then please make sure to add that case to the tests.
 template <typename GMP1, typename GMP2>
 struct NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>
         : public CGAL::cpp98::unary_function<::yade::Real, NT_converter<::yade::Real, __gmp_expr<GMP1, GMP2>>> {

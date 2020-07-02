@@ -77,13 +77,14 @@ template <int levelHP> struct NumTraitsRealHP : GenericNumTraits<::yade::RealHP<
 };
 
 namespace internal {
-	// FIXME - make sure that all these functions and these below in macro YADE_EIGEN_SUPPORT_REAL_HP, are properly recognized and used.
+	// TODO: - make sure that all these functions and these below in macro YADE_EIGEN_SUPPORT_REAL_HP, are properly recognized and used.
 	//         I am not 100% sure that <int levelHP> is properly resolved.
 	// other ideas:
 	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, bool>::type
 	//         template <typename Rr> inline typename boost::enable_if_c<::yade::math::isHP<Rr>, Rr>::type random<Rr>() { return ::yade::math::randomHP<::yade::math::levelOfRealHP<Rr>>(); }
 	//         template <int levelHP>       inline bool isEqualFuzzy(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b, const ::yade::math::RealHP<levelHP>& eps)
-	// FIXME - or just put them all into YADE_EIGEN_SUPPORT_REAL_HP, but have all working tests first.
+	// TODO: - or just put them all into YADE_EIGEN_SUPPORT_REAL_HP, but have all working tests first.
+	// NOTE: it passes all the tests so far. So if a mistake is discovered here, then please make sure to add that case to the tests.
 	template <int levelHP> inline ::yade::math::RealHP<levelHP> random() { return ::yade::math::randomHP<levelHP>(); }
 	template <int levelHP> inline ::yade::math::RealHP<levelHP> random(const ::yade::math::RealHP<levelHP>& a, const ::yade::math::RealHP<levelHP>& b)
 	{
