@@ -29,7 +29,7 @@ _maxLev=3
 
 def runtime():
 	'''
-	Return total running time, i.e. sum of all deltas (same as last line in the output of stats())
+	Return total running time (same as last line in the output of stats()) in nanoseconds
 	'''
 	return sum([e.execTime for e in O.engines])
 
