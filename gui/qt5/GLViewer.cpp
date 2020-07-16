@@ -382,12 +382,12 @@ void GLViewer::keyPressEvent(QKeyEvent* e)
 		LOG_INFO("Saving QGLViewer state to /tmp/qglviewerState.xml");
 		setStateFileName("/tmp/qglviewerState.xml");
 		saveStateToFile();
-		setStateFileName(QString::null);
+		setStateFileName(QString());
 	} else if (e->key() == Qt::Key_L) {
 		LOG_INFO("Loading QGLViewer state from /tmp/qglviewerState.xml");
 		setStateFileName("/tmp/qglviewerState.xml");
 		restoreStateFromFile();
-		setStateFileName(QString::null);
+		setStateFileName(QString());
 	} else if (e->key() == Qt::Key_X || e->key() == Qt::Key_Y || e->key() == Qt::Key_Z) {
 		int axisIdx = (e->key() == Qt::Key_X ? 0 : (e->key() == Qt::Key_Y ? 1 : 2));
 		if (manipulatedClipPlane < 0) {
