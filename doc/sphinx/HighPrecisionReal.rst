@@ -39,7 +39,7 @@ regular :ref:`installation instructions <install-from-source-code>`. With extra 
 1. Following packages are required to be installed: ``python3-mpmath`` ``libmpfr-dev`` ``libmpfrc++-dev`` (the ``mpfr`` related
    packages are necessary only to use ``boost::multiprecision::mpfr`` type). These packages are already listed in the :ref:`default requirements <prerequisites>`.
 
-2. A g++ compiler version 9.2.1 or higher is required. It shall be noted that upgrading only the compiler on an existing linux installation is difficult and it is not recommended. A simpler solution is to upgrade entire linux installation.
+2. A g++ compiler version 9.2.1 or higher is required. It shall be noted that upgrading only the compiler on an existing linux installation (an older one, in which packages for different versions of gcc were not introduced) is difficult and it is not recommended. A simpler solution is to upgrade entire linux installation.
 
 3. During cmake invocation specify:
 
@@ -262,4 +262,7 @@ Also refer to :ref:`address sanitizer section <address-sanitizer>`, as it is mos
 		./scripts/clang-formatter.sh /tmp/Body.hpp
 
 	Be careful because such files tend to be large and clang-format is slow. So sometimes it is more useful to only use the last part of the file, where the macro was postprocessed. Then replace the macro in the original file in question, and then continue debugging. But this time it will be revealed where inside a macro the problem occurs.
+
+.. note::
+	When :ref:`asking questions <getting-help>` about High Precision it is recommended to start the question title with ``[RealHP]``.
 
