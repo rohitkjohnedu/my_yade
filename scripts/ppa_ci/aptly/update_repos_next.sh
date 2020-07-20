@@ -19,4 +19,5 @@ do
 	aptly repo add yadedaily-$i deb/*.dsc
 	rm -rf /home/anton/deb/*
 	aptly publish update $i filesystem:yadedaily:
+	aptly db cleanup
 done
