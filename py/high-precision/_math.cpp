@@ -31,6 +31,7 @@
 #include <sstream>
 
 #include <py/high-precision/_ExposeStorageOrdering.hpp>
+#include <py/high-precision/_RealHPDiagnostics.hpp>
 
 // testing Real type
 #include <boost/concept/assert.hpp>
@@ -878,6 +879,7 @@ try {
 	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByMinieigen, RegisterRealHPMath>();
 
 	expose_storage_ordering();
+	exposeRealHPDiagnostics();
 
 	::yade::math::RealHPConfig::pyRegister();
 
