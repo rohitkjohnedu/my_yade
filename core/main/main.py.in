@@ -44,7 +44,7 @@ except ImportError: # argparse not present, print error message
 	raise RuntimeError("\n\nPlease install 'python-argparse' package.\n")
 prog = os.path.basename(sys.argv[0])
 par=argparse.ArgumentParser(usage='%s [options] [ simulation.xml[.bz2] | script.py [script options]]'%prog,
-  prog=prog,description="Yade: open-source platform for dynamic compuations. It\
+  prog=prog,description="Yade: open-source platform for dynamic computations. It\
   is an extensible open-source framework for discrete numerical models, focused\
   on Discrete Element Method. The computation parts are written in c++ using\
   flexible object model, allowing independent implementation of new algorithms\
