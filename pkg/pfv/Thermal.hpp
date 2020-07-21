@@ -97,7 +97,7 @@ public:
 	Real         getThermalDT() { return thermalDT; }
 	int          getConductionIterPeriod() { return conductionIterPeriod; }
 	Real         getMaxTimeStep() { return maxTimeStep; }
-	void         applyBoundaryHeatFluxes();
+	//void         applyBoundaryHeatFluxes();
 	// clang-format off
 		YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(ThermalEngine,PartialEngine,"An engine typically used in combination with FlowEngine to simulate thermal-hydraulic-mechanical processes. Framework description and demonstration presented within the following paper [Caulk2019a]_ :Caulk, R.A. and Chareyre, B. (2019) An open framework for the simulation of thermal-hydraulic-mechanical processes in discrete element systems. Thermal Process Engineering: Proceedings of DEM8 International Conference for Discrete Element Methods, Enschede Netherlands, July 2019.",
 		/*attributes*/

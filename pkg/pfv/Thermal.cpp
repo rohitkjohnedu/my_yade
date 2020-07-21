@@ -303,40 +303,41 @@ void ThermalEngine::setConductionBoundary()
 	boundarySet = true;
 }
 
-void ThermalEngine::applyBoundaryHeatFluxes()
-{
-	RTriangulation&                  Tri    = flow->solver->T[flow->solver->currentTes].Triangulation();
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	for (int bound = 0; bound < 6; bound++) {
-		int& id = *flow->solver->boundsIds[bound];
-		flow->solver->conductionBoundingCells[bound].clear();
-		if (id < 0)
-			continue;
-		CGT::ThermalBoundary& bi = flow->solver->conductionBoundary(id);
-		if (bi.fluxCondition) {
-			VectorCell tmpCells;
-			tmpCells.resize(10000);
-			VCellIterator cells_it  = tmpCells.begin();
-			VCellIterator cells_end = Tri.incident_cells(flow->solver->T[flow->solver->currentTes].vertexHandles[id], cells_it);
+// FIXME: buggy, commenting out for now 
+//void ThermalEngine::applyBoundaryHeatFluxes()
+//{
+//	RTriangulation&                  Tri    = flow->solver->T[flow->solver->currentTes].Triangulation();
+//	const shared_ptr<BodyContainer>& bodies = scene->bodies;
+//	for (int bound = 0; bound < 6; bound++) {
+//		int& id = *flow->solver->boundsIds[bound];
+//		flow->solver->conductionBoundingCells[bound].clear();
+//		if (id < 0)
+//			continue;
+//		CGT::ThermalBoundary& bi = flow->solver->conductionBoundary(id);
+//		if (bi.fluxCondition) {
+//			VectorCell tmpCells;
+//			tmpCells.resize(10000);
+//			VCellIterator cells_it  = tmpCells.begin();
+//			VCellIterator cells_end = Tri.incident_cells(flow->solver->T[flow->solver->currentTes].vertexHandles[id], cells_it);
 
-			for (VCellIterator it = tmpCells.begin(); it != cells_end; it++) {
-				CellHandle& cell = *it;
-				for (int v = 0; v < 4; v++) {
-					if (!cell->vertex(v)->info().isFictious) {
-						const long int          id = cell->vertex(v)->info().id();
-						const shared_ptr<Body>& b  = (*bodies)[id];
-						if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
-							continue;
-						auto* thState       = b->state.get();
-						thState->Tcondition = false;
-						thState->stepFlux += bi.value;
-						thState->boundaryId = bound;
-					}
-				}
-			}
-		}
-	}
-}
+//			for (VCellIterator it = tmpCells.begin(); it != cells_end; it++) {
+//				CellHandle& cell = *it;
+//				for (int v = 0; v < 4; v++) {
+//					if (!cell->vertex(v)->info().isFictious) {
+//						const long int          id = cell->vertex(v)->info().id();
+//						const shared_ptr<Body>& b  = (*bodies)[id];
+//						if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
+//							continue;
+//						auto* thState       = b->state.get();
+//						thState->Tcondition = false;
+//						thState->stepFlux += bi.value;
+//						thState->boundaryId = bound;
+//					}
+//				}
+//			}
+//		}
+//	}
+//}
 
 void ThermalEngine::computeSolidFluidFluxes()
 {
@@ -649,7 +650,7 @@ void ThermalEngine::computeNewPoreTemperatures()
 
 void ThermalEngine::computeNewParticleTemperatures()
 {
-	applyBoundaryHeatFluxes();
+	//applyBoundaryHeatFluxes(); // FIXME: buggy commenting out for now
 	const shared_ptr<BodyContainer>& bodies = scene->bodies;
 	const long                       size   = bodies->size();
 
