@@ -46,8 +46,8 @@ namespace math {
 
 	struct RealHPConfig {
 		// set how many RealHP<N> types are provided for Eigen, CGAL and Minieigen in file lib/high-precision/RealHPEigenCgal.hpp by YADE_EIGENCGAL_HP , YADE_MINIEIGEN_HP:
-		static const constexpr auto sizeEigenCgal = BOOST_PP_SEQ_SIZE(YADE_EIGENCGAL_HP);
-		static const constexpr auto sizeMinieigen = BOOST_PP_SEQ_SIZE(YADE_MINIEIGEN_HP);
+		static const constexpr size_t sizeEigenCgal = BOOST_PP_SEQ_SIZE(YADE_EIGENCGAL_HP);
+		static const constexpr size_t sizeMinieigen = BOOST_PP_SEQ_SIZE(YADE_MINIEIGEN_HP);
 
 		// make a runtime iterable array (runtime variable names start with lowerCase)
 		static const constexpr std::array<int, sizeEigenCgal> supportedByEigenCgal { BOOST_PP_SEQ_ENUM(YADE_EIGENCGAL_HP) };
@@ -76,7 +76,7 @@ namespace math {
 		static inline int getDigits10(int N) { return getDigits<DigitsHP10>(N); };
 		static inline int getDigits2(int N) { return getDigits<DigitsHP2>(N); };
 
-		// how many extra digits to use when converting to decimal srings
+		// how many extra digits to use when converting to decimal strings
 		static int extraStringDigits10;
 
 #ifdef YADE_MPFR
