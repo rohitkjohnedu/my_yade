@@ -33,10 +33,23 @@
  * Depending on platform the fastest one is chosen.
  * https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/fastest_typdefs.html
  *
- * TODO: Interval types: https://www.boost.org/doc/libs/1_71_0/libs/multiprecision/doc/html/boost_multiprecision/tut/interval/mpfi.html
- *   Note about Arb or flint library, and MPFI interval calculations or Automatic differentiation techniques:
- *   they can be implemented by extending RealHP as a type trait for the Real type. Meaning that a Tag class can be used as a trait in definition of Real to select
- *   which of these (regular one, MPFI, Arb, ……) is to be used.
+ * TODO:
+ * It is possible to extend RealHP<N> with a type trait. A Tag class in definition of UnderlyingReal or Real or RealHP to select which of these extensions are selected to be used:
+ *   → regular RealHP<N>
+ *   → selecting a different rounding mode policy
+ *       An important and easy test of numerical stability is to run the same calculations with different rounding modes:
+ *       page 54 "How Futile are Mindless Assessments of Roundoff in Floating-Point Computation ?" in https://people.eecs.berkeley.edu/~wkahan/Mindless.pdf
+ *       https://www.boost.org/doc/libs/1_73_0/libs/numeric/interval/doc/rounding.htm
+ *   → MPFI, Interval Arithmetic (IA) types:
+ *       see chapter about IA and conclusions in https://people.eecs.berkeley.edu/~wkahan/Mindless.pdf "How Futile are Mindless Assessments of Roundoff in Floating-Point Computation ?"
+ *       https://www.boost.org/doc/libs/1_71_0/libs/multiprecision/doc/html/boost_multiprecision/tut/interval/mpfi.html
+ *       "Choosing Your Own Interval Type" https://www.boost.org/doc/libs/1_73_0/libs/numeric/interval/doc/guide.htm
+ *   → Arb
+ *   → flint library
+ *   → Automatic differentiation:
+ *       https://github.com/vincent-picaud/MissionImpossible
+ *       Eigen::AutoDiffScalar  A scalar type replacement with automatic differentation capability. https://eigen.tuxfamily.org/dox/unsupported/classEigen_1_1AutoDiffScalar.html
+ *   → ………
  *
  * Some hints how to use float128
  *   https://www.boost.org/doc/libs/1_71_0/libs/math/doc/html/math_toolkit/float128_hints.html
