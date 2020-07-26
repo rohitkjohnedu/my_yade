@@ -150,8 +150,13 @@ namespace math {
 				//    yade.math.sin(10)                             yade.math.HP1.sin(10)
 				//    yade.minieigenHP.Vector3r(1,2,3)              yade.minieigenHP.HP1.Vector3r(1,2,3)
 				std::string          name = "HP" + boost::lexical_cast<std::string>(N); // scope name: "HP1", "HP2", etc
-				boost::python::scope HPn  = boost::python::class_<ScopeHP<N, RegisterHPClass>>(name.c_str());
-				RegisterHPClass<N, true>::work(topScope, HPn);
+				if( PyObject_HasAttrString(topScope.ptr(), name.c_str()) == true ) {
+					// If the scope already exists, then use it to add more objects to it.
+					RegisterHPClass<N, true>::work(topScope, boost::python::scope(topScope.attr(name.c_str())) );
+				} else {
+					boost::python::scope HPn  = boost::python::class_<ScopeHP<N, RegisterHPClass>>(name.c_str());
+					RegisterHPClass<N, true>::work(topScope, HPn);
+				}
 			} else {
 				// this one puts the 'base precision' RealHP<1> math functions in the top scope of this python module. They are duplicated inside HP1.
 				// Not sure which place is more convenient to use. Maybe both.
