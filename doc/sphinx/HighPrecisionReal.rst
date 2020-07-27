@@ -125,14 +125,14 @@ Before we fully move to C++20 standard, one small restriction is in place: the p
 1. ``#define YADE_EIGENCGAL_HP (1)(2)(3)(4)(8)(10)(20)`` - the multipliers listed here will work in C++ for ``RealHP<N>`` in CGAL and Eigen. They are cheap in compilation time, but have to be listed here nonetheless. After we move code to C++20 this define will be removed and all multipliers will be supported via `single template constraint <https://en.cppreference.com/w/cpp/language/constraints>`__. This inconvenience arises from the fact that both CGAL and Eigen libraries offer template specializations only for a *specific* type, not a generalized family of types. Thus this define is used to declare the required :ysrc:`template specializations<lib/high-precision/RealHPEigenCgal.hpp>`.
 
 .. hint::
-	The highest precision available N= ``(20)`` corersponds to 300 decimal places when compiling Yade with the default settings, without changing ``REAL_DECIMAL_PLACES=……`` cmake compilation option.
+	The highest precision available N= ``(20)`` corresponds to 300 decimal places when compiling Yade with the default settings, without changing ``REAL_DECIMAL_PLACES=……`` cmake compilation option.
 
 2. ``#define YADE_MINIEIGEN_HP (1)(2)``       - the precision multipliers listed here are exported to python, they are expensive: each one makes compilation longer by 1 minute. Adding more can be useful only for debugging purposes. The double ``RealHP<2>`` type is by default listed here to allow exploring the higher precision types from python. Also please note that ``mpmath`` supports `only one precision <http://mpmath.org/doc/current/basics.html#temporarily-changing-the-precision>`__ at a time. Having different ``mpmath`` variables with different precision is poorly supported, albeit ``mpmath`` authors promise to improve that in the future. Fortunately this is not a big problem for Yade users because the general goal here is to allow more precise calculations in the critical sections of C++ code, not in python. This problem is partially mitigated by *changing* :ysrccommit:`mpmath precision each time <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/ToFromPythonConverter.hpp#L37>` when a C++ ↔ python conversion occurs. So one should keep in mind that the variable ``mpmath.mp.dps`` always reflects the precision used by latest conversion performed, even if that conversion took place in GUI (not in the running script). Existing ``mpmath`` variables are not truncated to lower precision, their extra digits are simply ignored until ``mpmath.mp.dps`` is increased again, however the truncation might occur during assignment.
 
 On some occasions it is useful to have an intuitive up-conversion between C++ types of different precisions, say for example to add ``RealHP<1>`` to ``RealHP<2>`` type. The file :ysrccommit:`UpconversionOfBasicOperatorsHP.hpp <26bffeb7ef4fd0d15e4faa025f68f97381621f04/lib/high-precision/UpconversionOfBasicOperatorsHP.hpp#L134>` serves this purpose. This header is not included by default, because more often than not, adding such two different types will be a mistake (efficiency--wise) and compiler will catch them and complain. After including this header this operation will become possible and the resultant type of such operation will be always the higher precision of the two types used. This file should be included only in ``.cpp`` files. If it was included in any ``.hpp`` file then it could pose problems with C++ type safety and will have unexpected consequences. An example usage of this header is in the :ysrccommit:`following test routine<61fc7f208027344e27dc832052b3f8c911a5909e/py/high-precision/_math.cpp#L909>`.
 
 
-.. warning:: Trying to use N unregistered in ``YADE_MINIEIGEN_HP`` for a ``Vector3rHP<N>`` type inside the ``YADE_CLASS_BASE_DOC_ATTRS_*`` macro to export it to python will not work. Only these N listed in ``YADE_MINIEIGEN_HP`` will work. However it is safe (and intended) to use them in the C++ calculations in critical sections of code, without exporting them to python.
+.. warning:: Trying to use N unregistered in ``YADE_MINIEIGEN_HP`` for a ``Vector3rHP<N>`` type inside the ``YADE_CLASS_BASE_DOC_ATTRS_*`` macro to export it to python will not work. Only these N listed in ``YADE_MINIEIGEN_HP`` will work. However it is safe (and intended) to use these from ``YADE_EIGENCGAL_HP`` in the C++ calculations in critical sections of code, without exporting them to python.
 
 Compatibility
 ===========================================
@@ -209,6 +209,32 @@ For higher precision types it is possible to control during runtime the precisio
 .. note::
 	The parameter ``extraStringDigits10`` does not affect ``double`` conversions, because ``boost::python`` uses an internal converter for this particular type. It might be changed in the future if the need arises.
 
+.. comment TODO once documentation builds on g++ ver > 9.2.1 replace this example with actual code that gets run while building documentation.
+It is important to note that creating higher types such as ``RealHP<2>`` from string representation of ``RealHP<1>`` is ambiguous. Consider following example::
+
+	import yade.math as mth
+
+	mth.HP1.getDecomposedReal(1.23)['bits']
+	Out[2]: '10011101011100001010001111010111000010100011110101110'
+
+	mth.HP2.getDecomposedReal('1.23')['bits']  # passing the same arg in decimal format to HP2 produces nonzero bits after the first 53 bits of HP1
+	Out[3]: '10011101011100001010001111010111000010100011110101110000101000111101011100001010001111010111000010100011110101110'
+
+	mth.HP2.getDecomposedReal(mth.HP1.toHP2(1.23))['bits'] # it is possible to use yade.math.HPn.toHPm(…) conversion, which preserves binary representation
+	Out[4]: '10011101011100001010001111010111000010100011110101110000000000000000000000000000000000000000000000000000000000000'
+
+Which of these two ``RealHP<2>`` binary representations is more desirable depends on what is needed:
+
+1. The best binary approximation of a ``1.23`` decimal.
+2. Reproducing the 53 binary bits of that number into a higher precision to continue the calculations on **the same** number which was previously in lower precision.
+
+To achieve 1. simply pass the argument ``'1.23'`` as string. To achieve 2. use :yref:`yade.math.HPn.toHPm(…)<yade._math.HP1.toHP2>` conversion, which maintains binary fidelity using a single :ysrccommit:`static_cast<RealHP<m>>(…)<dd8eba8390012f05c27aee97bca486d69f8cf256/py/high-precision/_ExposeRealBitTest.cpp#L621>`. Similar problem is `discussed in mpmath <http://mpmath.org/doc/current/basics.html#providing-correct-input>`__ documentation.
+
+.. hint::
+	All ``RealHP<N>`` function arguments that are of type higher than ``double`` can also accept decimal strings. This allows to preserve precision above python default floating point precision.
+
+.. warning::
+	On the contrary all the function arguments that are of type ``double`` can not accept decimal strings. To mitigate that one can use ``toHPm(…)`` converters with string arguments. It might be changed in the future if the need arises.
 
 Eigen and CGAL
 ----------------------------------------------

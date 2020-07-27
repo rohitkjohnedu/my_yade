@@ -73,7 +73,7 @@ namespace yade {
 //   / to do this have a look at CMakeLists 'Real precision' section
 
 // These are taken from files pkg/dem/Polyhedra.hpp and /pkg/dem/Gl1_PotentialBlock.hpp
-// let's call this CgalHP struct. It uses inexact kernel. Later when mpfr support is added we can have similar aliases in other namespace for exact kernel.
+// let's call this CgalHP struct. It uses inexact kernel. If exact kernel is necessary and ENABLE_MPFR used, we can add similar aliases in other namespace for the exact kernel.
 
 template <int levelHP> struct CgalHP {
 	using K              = CGAL::Exact_RealHP_predicates_inexact_constructions_kernel<levelHP>;

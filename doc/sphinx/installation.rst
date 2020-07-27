@@ -143,7 +143,7 @@ Prerequisites
 ^^^^^^^^^^^^^
 
 Yade relies on a number of external software to run; they are checked before the compilation starts.
-Some of them are only optional. The last ones are only relevant for using the fluid coupling module (:yref:`FlowEngine`).
+Some of them are only optional.
 
 * `cmake <http://www.cmake.org/>`_ build system
 * `gcc <https://gcc.gnu.org/>`_ compiler (g++); other compilers will not work; you need g++>=4.2 for openMP support
@@ -160,7 +160,7 @@ Some of them are only optional. The last ones are only relevant for using the fl
 * `VTK <http://www.vtk.org/>`_ library (optional but recommended)
 * `CGAL <http://www.cgal.org/>`_ library (optional)
 * `SuiteSparse <http://www.suitesparse.com>`_ sparse algebra library (fluid coupling, optional, requires eigen>=3.1)
-* `OpenBLAS <http://www.openblas.net/>`_ optimized and parallelized alternative to the standard blas+lapack (fluid coupling, optional)
+* `OpenBLAS <http://www.openblas.net/>`_ optimized and parallelized alternative to the standard blas+lapack (fluid coupling :yref:`FlowEngine`, optional)
 * `Metis <http://glaros.dtc.umn.edu/gkhome/metis/metis/overview/>`_ matrix preconditioning (fluid coupling, optional)
 * `OpenMPI <https://www.open-mpi.org/software/>`_ library for parallel distributed computing (For MPI and OpenFOAM coupling, optional)
 * `python3-mpi4py <https://bitbucket.org/mpi4py/>`_ MPI for Python (For MPI, optional)
@@ -257,7 +257,7 @@ For example::
     
     cmake -DENABLE_POTENTIAL_BLOCKS=ON
 
-As of Yade version git-2315bd8 (or 2018.02b release), the following options are available: (see the `source code <https://gitlab.com/yade-dev/trunk/blob/master/CMakeLists.txt>`_ for a most up-to-date list)
+The following cmake options are available: (see the `source code <https://gitlab.com/yade-dev/trunk/blob/master/CMakeLists.txt>`_ for a most up-to-date list)
 
 	* CMAKE_INSTALL_PREFIX: path where Yade should be installed (/usr/local by default)
 	* LIBRARY_OUTPUT_PATH: path to install libraries (lib by default)

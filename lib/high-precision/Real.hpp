@@ -47,6 +47,8 @@
  *   → Arb
  *   → flint library
  *   → Automatic differentiation:
+ *       https://www.boost.org/doc/libs/master/libs/math/doc/html/math_toolkit/autodiff.html #include <boost/math/differentiation/autodiff.hpp>
+ *       https://github.com/boostorg/math/pull/176#issuecomment-454174960
  *       https://github.com/vincent-picaud/MissionImpossible
  *       Eigen::AutoDiffScalar  A scalar type replacement with automatic differentation capability. https://eigen.tuxfamily.org/dox/unsupported/classEigen_1_1AutoDiffScalar.html
  *   → ………
