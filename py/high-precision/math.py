@@ -44,6 +44,10 @@ from yade._math import *
 
 import yade.config
 
+# import these two functions to yade.math
+getDigits10 = yade._math.RealHPConfig.getDigits10
+getDigits2  = yade._math.RealHPConfig.getDigits2
+
 def needsMpmathAtN(N):
 	"""
 	:param N: The ``int`` N value of ``RealHP<N>`` in question. Must be ``N >= 1``.

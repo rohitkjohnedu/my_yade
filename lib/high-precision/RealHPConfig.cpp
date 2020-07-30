@@ -57,12 +57,20 @@ namespace math {
 		                       );
 		py::def("getSupportedByEigenCgal",
 		        getSupportedByEigenCgal,
-		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by Eigen and CGAL)""");
+		        R"""(:return: the ``tuple`` containing ``N`` from ``RealHP<N>`` precisions supported by Eigen and CGAL)""");
 		py::def("getSupportedByMinieigen",
 		        getSupportedByMinieigen,
-		        R"""(:return: the ``tuple`` containing N from RealHP<N> precisions supported by minieigenHP)""");
-		py::def("getDigits10", getDigits10, (py::arg("N")), R"""(:return: the ``int`` representing numeric_limits digits10 of RealHP<N>)""");
-		py::def("getDigits2", getDigits2, (py::arg("N")), R"""(:return: the ``int`` representing numeric_limits digits (binary bits) of RealHP<N>)""");
+		        R"""(:return: the ``tuple`` containing ``N`` from ``RealHP<N>`` precisions supported by minieigenHP)""");
+		py::def("getDigits10", getDigits10, (py::arg("N")), R"""(
+This is a yade.math.RealHPConfig diagnostic function.
+
+:param N: ``int`` - the value of ``N`` in ``RealHP<N>``.
+:return: the ``int`` representing ``std::numeric_limits<RealHP<N>>::digits10``)""");
+		py::def("getDigits2", getDigits2, (py::arg("N")), R"""(
+This is a yade.math.RealHPConfig diagnostic function.
+
+:param N: ``int`` - the value of ``N`` in ``RealHP<N>``.
+:return: the ``int`` representing ``std::numeric_limits<RealHP<N>>::digits``, which corresponds to the number of significand bits used by this type.)""");
 #if (__GNUC__ < 9) // It should be checking  if (ver < 9.2.1) in fact. But cmake does the job. So here it's only to catch 'larger' mistakes.
 #ifndef YADE_DISABLE_REAL_MULTI_HP
 #warning "RealHP<…> won't work on this system, cmake sets YADE_DISABLE_REAL_MULTI_HP to use RealHP<1> for all precisions RealHP<N>. Also you can try -O0 flag."
