@@ -22,6 +22,19 @@ struct ToFromPythonConverter {
 }
 
 /*************************************************************************/
+/*************************       mpmath         **************************/
+/*************************************************************************/
+template <typename Rr> struct prepareMpmath {
+	static inline ::boost::python::object work()
+	{
+		// http://mpmath.org/doc/current/technical.html
+		::boost::python::object mpmath = ::boost::python::import("mpmath"); // this code is never compiled if python3-mpmath package is unavailable.
+		mpmath.attr("mp").attr("dps")  = int(std::numeric_limits<Rr>::digits10 + ::yade::math::RealHPConfig::extraStringDigits10);
+		return mpmath;
+	}
+};
+
+/*************************************************************************/
 /*************************        Real          **************************/
 /*************************************************************************/
 
@@ -33,9 +46,7 @@ struct ToFromPythonConverter {
 template <typename ArbitraryReal> struct ArbitraryReal_to_python {
 	static PyObject* convert(const ArbitraryReal& val)
 	{
-		// http://mpmath.org/doc/current/technical.html
-		::boost::python::object mpmath = ::boost::python::import("mpmath");
-		mpmath.attr("mp").attr("dps")  = int(std::numeric_limits<ArbitraryReal>::digits10 + ::yade::math::RealHPConfig::extraStringDigits10);
+		::boost::python::object mpmath = prepareMpmath<ArbitraryReal>::work();
 		::boost::python::object result = mpmath.attr("mpf")(::yade::math::toStringHP<ArbitraryReal>(val));
 		return boost::python::incref(result.ptr());
 	}
@@ -65,6 +76,7 @@ template <typename ArbitraryReal> struct ArbitraryReal_from_python {
 	}
 	static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
+		prepareMpmath<ArbitraryReal>::work();
 		std::istringstream ss { ::boost::python::call_method<std::string>(obj_ptr, "__str__") };
 
 		void* storage = ((boost::python::converter::rvalue_from_python_storage<ArbitraryReal>*)(data))->storage.bytes;
@@ -87,10 +99,7 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_to_python {
 		std::stringstream ss_imag {};
 		ss_real << ::yade::math::toStringHP<typename ArbitraryComplex::value_type>(val.real());
 		ss_imag << ::yade::math::toStringHP<typename ArbitraryComplex::value_type>(val.imag());
-		::boost::python::object mpmath = ::boost::python::import("mpmath");
-		// http://mpmath.org/doc/current/technical.html
-		mpmath.attr("mp").attr("dps")
-		        = int(std::numeric_limits<typename ArbitraryComplex::value_type>::digits10 + ::yade::math::RealHPConfig::extraStringDigits10);
+		::boost::python::object mpmath = prepareMpmath<typename ArbitraryComplex::value_type>::work();
 		::boost::python::object result = mpmath.attr("mpc")(ss_real.str(), ss_imag.str());
 		return boost::python::incref(result.ptr());
 	}
@@ -111,6 +120,7 @@ template <typename ArbitraryComplex> struct ArbitraryComplex_from_python {
 	}
 	static void construct(PyObject* obj_ptr, boost::python::converter::rvalue_from_python_stage1_data* data)
 	{
+		prepareMpmath<typename ArbitraryComplex::value_type>::work();
 		std::istringstream ss_real { ::boost::python::call_method<std::string>(
 			::boost::python::expect_non_null(PyObject_GetAttrString(obj_ptr, "real")), "__str__") };
 		std::istringstream ss_imag { ::boost::python::call_method<std::string>(
