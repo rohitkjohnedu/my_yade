@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <bitset>
 #include <boost/core/demangle.hpp>
-#include <boost/math/special_functions/ulp.hpp>
+#include <boost/math/special_functions/next.hpp>
 #include <boost/mpl/reverse.hpp>
 #include <boost/predef/other/endian.h>
 #include <boost/python.hpp>
@@ -43,19 +43,14 @@ private:
 	bool                       fpSubNormal { false };
 	bool                       fpZero { false };
 	int                        fpClassify { 0 }; // https://en.cppreference.com/w/cpp/numeric/math/fpclassify
-	bool                       fpClassifyError { false };
-	bool                       frexpError { false };
 	int                        levelOfHP { -1 };
-	std::string                funcName {};
 	std::string                demangledType {};
 	std::string                whatEntered {};
 
-	template <typename Rr> Rr rebuild() const { return rebuild<Rr>(this->bits, this->exp, this->sig); }
 	// this function is only because I discovered a bug in frexp function for multiprecision MPFR
 	template <typename Rr> inline void checkNormExp(Rr& norm, int& ex, const Rr& x)
 	{
-		if (((norm < 0.5) or (norm >= 1)) and (not fpZero) and (norm != 0)) {
-			frexpError = true;
+		if (((norm < 0.5) or (norm >= 1)) and (not fpZero) and (norm != 0) and math::isfinite(norm)) {
 			// TODO: check if latest MPFR version fixed bug in frexp for arguments such as:
 			// -0.999999999999999999999999778370088952043740344504867972909872539207515981285392968364222963125347205961928119872988781594713043198125331291
 			// and if not then file a bug report.
@@ -74,7 +69,8 @@ private:
 				ex -= 1;
 			} else {
 				bad = true;
-				LOG_FATAL("Failed to fix this, norm = " << math::toStringHP(norm) << " ex = " << ex);
+				LOG_FATAL("Failed to fix frexp function, norm = " << math::toStringHP(norm) << " ex = " << ex);
+				throw std::runtime_error("Failed to fix frexp; got norm = " + math::toStringHP(norm));
 			}
 		}
 	}
@@ -86,6 +82,12 @@ public:
 	}
 	bool wrong() const { return (bits.empty() or abs(sig) > 1 or bad); }
 	// don't call rebuild() when wrong() == true
+	template <typename Rr> Rr rebuild() const
+	{
+		if (wrong())
+			throw std::runtime_error("DecomposedReal::rebuild got wrong() data.");
+		return rebuild<Rr>(this->bits, this->exp, this->sig);
+	}
 	template <typename Rr> static Rr rebuild(const std::vector<unsigned char>& bits, const int& exp, const int& sig)
 	{
 		Rr  ret = 0;
@@ -101,7 +103,7 @@ public:
 		return ret * static_cast<Rr>(sig);
 	}
 
-	template <typename Rr> DecomposedReal(const Rr& x, const std::string& func)
+	template <typename Rr> DecomposedReal(const Rr& x)
 	{
 		this->levelOfHP = math::levelOfHP<Rr>; // this line will fail if Rr is not a RealHP type.
 		fpInf           = math::isinf(x);
@@ -111,16 +113,14 @@ public:
 		fpSubNormal     = (fpClassify == FP_SUBNORMAL);
 		fpZero          = (fpClassify == FP_ZERO);
 		if ((fpInf != (fpClassify == FP_INFINITE)) or (fpNan != (fpClassify == FP_NAN))) {
-			bad             = true;
-			fpClassifyError = true;
+			bad = true;
 		}
-		funcName      = func;
 		demangledType = boost::core::demangle(typeid(Rr).name());
 		whatEntered   = math::toStringHP(x);
 		bad           = (not math::isfinite(x)); // NaN or Inf
 		int ex        = 0;
-		Rr  norm      = frexp(abs(x), &ex);
-		checkNormExp(norm, ex, x); // may set frexpError=true; bad=true;
+		Rr  norm      = math::frexp(math::abs(x), &ex);
+		checkNormExp(norm, ex, x); // may set bad=true;
 		if (bad)
 			return;
 		sig     = math::sign(x);
@@ -133,7 +133,7 @@ public:
 			if ((ex <= 0) and (pos < int(bits.size())) and (pos >= 0) and (not bad)) {
 				bits[pos] = 1;
 				norm -= static_cast<Rr>(0.5);
-				norm = frexp(norm, &ex);
+				norm = math::frexp(norm, &ex);
 				checkNormExp(norm, ex, x);
 			} else {
 				LOG_FATAL("DecomposedReal construction error, x=" << x);
@@ -158,21 +158,18 @@ public:
 		} else { // create None when reconstrucion is not possible, https://www.boost.org/doc/libs/1_42_0/libs/python/doc/v2/object.html#object-spec-ctors
 			ret["reconstructed"] = py::object();
 		}
-		ret["sign"]            = sig;
-		ret["exp"]             = exp;
-		ret["bits"]            = out.str();
-		ret["wrong"]           = wrong();
-		ret["fpInf"]           = fpInf;
-		ret["fpNan"]           = fpNan;
-		ret["fpNormal"]        = fpNormal;
-		ret["fpSubNormal"]     = fpSubNormal;
-		ret["fpZero"]          = fpZero;
-		ret["fpClassify"]      = fpClassify;
-		ret["fpClassifyError"] = fpClassifyError;
-		ret["frexpError"]      = frexpError;
-		ret["func"]            = funcName;
-		ret["type"]            = demangledType;
-		ret["input"]           = whatEntered;
+		ret["sign"]        = sig;
+		ret["exp"]         = exp;
+		ret["bits"]        = out.str();
+		ret["wrong"]       = wrong();
+		ret["fpInf"]       = fpInf;
+		ret["fpNan"]       = fpNan;
+		ret["fpNormal"]    = fpNormal;
+		ret["fpSubNormal"] = fpSubNormal;
+		ret["fpZero"]      = fpZero;
+		ret["fpClassify"]  = fpClassify;
+		ret["type"]        = demangledType;
+		ret["input"]       = whatEntered;
 		return ret;
 	}
 
@@ -194,6 +191,11 @@ public:
 		}
 		return true;
 	}
+	template <typename A, typename B> static void veryEqual(const A& a, const B& b)
+	{
+		if (not DecomposedReal(a).veryEqual(DecomposedReal(b)))
+			throw std::runtime_error("DecomposedReal::veryEqual error " + math::toStringHP(a) + " vs. " = math::toStringHP(b));
+	}
 };
 
 bool isThisSystemLittleEndian()
@@ -208,7 +210,7 @@ bool isThisSystemLittleEndian()
 }
 
 template <int N> std::string      getDemangledName() { return boost::core::demangle(typeid(RealHP<N>).name()); };
-template <int N> py::dict         getDecomposedReal(const RealHP<N>& arg) { return DecomposedReal(arg, "getDecomposedReal").getDict<RealHP<N>>(); }
+template <int N> py::dict         getDecomposedReal(const RealHP<N>& arg) { return DecomposedReal(arg).getDict<RealHP<N>>(); }
 template <int N, int M> RealHP<M> toHP(const RealHP<N>& arg) { return static_cast<RealHP<M>>(arg); };
 
 template <int N, int M> void registerHPnHPm()
@@ -283,7 +285,7 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 		py::def("getDecomposedReal",
 		        static_cast<py::dict (*)(const RealHP<N>&)>(&getDecomposedReal<N>),
 		        (py::arg("x")),
-		        R"""(:return: ``dict`` - the dictionary with the debug information how the DecomposedReal class sees this type. This is for debugging purposes, rather slow. Includes result from `fpclassify<https://en.cppreference.com/w/cpp/numeric/math/fpclassify>`__ function call, a binary representation and other useful info. See also :yref:`fromBits<yade._math.fromBits>`)""");
+		        R"""(:return: ``dict`` - the dictionary with the debug information how the DecomposedReal class sees this type. This is for debugging purposes, rather slow. Includes result from `fpclassify <https://en.cppreference.com/w/cpp/numeric/math/fpclassify>`__ function call, a binary representation and other useful info. See also :yref:`fromBits<yade._math.fromBits>`.)""");
 
 // This also could be a boost::mpl::for_each loop (like in registerLoopForHPn) with templates and a helper struct. Not sure which approach is more readable.
 #define REGISTER_CONVERTER_HPn_TO_HPm(levelHP) registerHPnHPm<N, levelHP>();
@@ -313,37 +315,152 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 
 template <int minHP> class TestBits { // minHP is because the bits absent in lower precision should be zero to avoid ambiguity.
 private:
-	const int&                   testCount;
-	const Real&                  minX;
-	const Real&                  maxX;
-	const std::set<int>&         testSet;
-	bool                         first { true };
-	py::dict                     result, empty, reference;
-	std::array<RealHP<minHP>, 3> randomVals { 0, 0, 0 };
+	using Rnd        = std::array<RealHP<minHP>, 3>;
+	using Error      = std::pair<Rnd /* arguments */, int /* ULP error */>;
+	using FuncErrors = std::map<int /* N, the level of HP */, Error>;
+	const int&                            testCount;
+	const Real&                           minX;
+	const Real&                           maxX;
+	const std::set<int>&                  testSet;
+	bool                                  first { true };
+	bool                                  extraChecks { false };
+	FuncErrors                            empty;
+	std::map<std::string, FuncErrors>     results;
+	std::map<std::string, DecomposedReal> reference;
+	Rnd                                   randomArgs;
 
 public:
-	TestBits(const int& testCount_, const Real& minX_, const Real& maxX_, const std::set<int>& testSet_)
+	TestBits(const int& testCount_, const Real& minX_, const Real& maxX_, const std::set<int>& testSet_, bool extraChecks_)
 	        : testCount(testCount_)
 	        , minX(minX_)
 	        , maxX(maxX_)
 	        , testSet(testSet_)
+	        , extraChecks(extraChecks_)
+	        , randomArgs { 0, 0, 0 } // up to 3 arguments are needed. Though most of the time only the first one is used.
 	{
 		for (auto N : testSet)
 			if (N != *testSet.rbegin())
-				empty[N] = std::make_pair(randomVals, 0);
+				empty[N] = Error { randomArgs, 0 };
 	}
 	void prepare()
 	{
 		first = true;
-		for (auto& a : randomVals)
-			a = Eigen::internal::random<minHP>(minX, maxX);
+		for (auto& a : randomArgs)
+			a = Eigen::internal::random<minHP>(static_cast<RealHP<minHP>>(minX), static_cast<RealHP<minHP>>(maxX));
+	}
+	template <int testN> void amend(const std::string& funcName, const RealHP<testN>& funcValue)
+	{
+		if (results.count(funcName) == 0)
+			results[funcName] = empty;
+		if (first) { // store results for the highest N
+			reference[funcName] = DecomposedReal(funcValue);
+		} else if (math::isfinite(funcValue) and (not reference[funcName].wrong())) {
+			int bad = static_cast<int>(boost::math::float_distance(reference[funcName].template rebuild<RealHP<testN>>(), funcValue));
+			if (bad > results[funcName][testN].second) {
+				results[funcName][testN] = Error { randomArgs, bad };
+			}
+		}
+	}
+	template <int testN> void amend(const std::string& funcName, const ComplexHP<testN>& funcValue)
+	{
+		amend<testN>("complex " + funcName + " real", funcValue.real());
+		amend<testN>("complex " + funcName + " imag", funcValue.imag());
 	}
 	template <int testN> void checkFunctions()
 	{
 		if (testSet.find(testN) == testSet.end()) // skip N that were not requested to be tested.
 			return;
+		std::array<RealHP<testN>, 3> args {};
+		for (int i = 0; i < 3; ++i) {
+			args[i] = static_cast<RealHP<testN>>(randomArgs[i]); // Prepare the random numbers with correct precision.
+			if (extraChecks)                                     // Will throw in case of error. Just an extra check.
+				DecomposedReal::veryEqual(randomArgs[i], args[i]);
+		}
+// Add here tests of more functions as necessary.
+//                ↓ R - Real, C - Complex, A - abs
+#define CHECK_FUN_R_1(name) amend<testN>(#name, math::name(args[0]))
+#define CHECK_FUN_A_1(name) amend<testN>(#name, math::name(math::abs(args[0])))
+#define CHECK_FUN_R_2(name) amend<testN>(#name, math::name(args[0], args[1]))
+#define CHECK_FUN_R_3(name) amend<testN>(#name, math::name(args[0], args[1], args[2]))
+#define CHECK_FUN_C_2(name) amend<testN>(#name, math::name(ComplexHP<testN>(args[0], args[1])))
+		CHECK_FUN_R_2(basicAdd);
+		CHECK_FUN_R_2(basicSub);
+		CHECK_FUN_R_2(basicDiv);
+		CHECK_FUN_R_2(basicMult);
+
+		CHECK_FUN_R_1(sin);
+		CHECK_FUN_R_1(cos);
+		CHECK_FUN_R_1(tan);
+		CHECK_FUN_R_1(sinh);
+		CHECK_FUN_R_1(cosh);
+		CHECK_FUN_R_1(tanh);
+
+		CHECK_FUN_R_1(asin);
+		CHECK_FUN_R_1(acos);
+		CHECK_FUN_R_1(atan);
+		CHECK_FUN_R_1(asinh);
+		CHECK_FUN_R_1(acosh);
+		CHECK_FUN_R_1(atanh);
+		CHECK_FUN_R_2(atan2);
+
+		CHECK_FUN_C_2(sin);
+		CHECK_FUN_C_2(cos);
+		CHECK_FUN_C_2(tan);
+		CHECK_FUN_C_2(sinh);
+		CHECK_FUN_C_2(cosh);
+		CHECK_FUN_C_2(tanh);
+
+		CHECK_FUN_R_1(log);
+		CHECK_FUN_R_1(log10);
+		CHECK_FUN_R_1(log1p);
+		CHECK_FUN_R_1(log2);
+		CHECK_FUN_R_1(logb);
+		CHECK_FUN_R_1(ilogb);
+
+		// can't check those. This entire check is based on assumption that frexp works correctly.
+		//CHECK_FUNC(ldexp);
+		//CHECK_FUNC(frexp);
+		CHECK_FUN_R_1(exp);
+		CHECK_FUN_R_1(exp2);
+		CHECK_FUN_R_1(expm1);
+
+		CHECK_FUN_R_2(pow);
+		CHECK_FUN_A_1(sqrt);
+		CHECK_FUN_R_1(cbrt);
+		CHECK_FUN_R_2(hypot);
+
+		CHECK_FUN_R_1(erf);
+		CHECK_FUN_R_1(erfc);
+		CHECK_FUN_R_1(lgamma);
+		CHECK_FUN_R_1(tgamma);
+
+		//CHECK_FUNC(modf);
+		CHECK_FUN_R_2(fmod);
+		CHECK_FUN_R_2(remainder);
+		//CHECK_FUNC(remquo);
+		CHECK_FUN_R_3(fma);
+#undef CHECK_FUN_R_1
+#undef CHECK_FUN_A_1
+#undef CHECK_FUN_R_2
+#undef CHECK_FUN_R_3
+#undef CHECK_FUN_C_2
+
+		first = false;
 	}
-	py::dict getResult() { return result; }
+	py::dict getResult()
+	{
+		py::dict ret {};
+		for (const auto& a : results) {
+			py::dict badBits {};
+			for (const auto& funcErrors : a.second) {
+				Error er                                                  = funcErrors.second;
+				Rnd   arg                                                 = er.first;
+				badBits[math::RealHPConfig::getDigits2(funcErrors.first)] = py::make_tuple(py::make_tuple(arg[0], arg[1], arg[2]), er.second);
+			}
+			ret[a.first] = badBits;
+		}
+		return ret;
+	}
 };
 
 template <int minHP> struct TestLoop {
@@ -353,9 +470,9 @@ template <int minHP> struct TestLoop {
 	template <typename Nmpl> void operator()(Nmpl) { tb.template checkFunctions<Nmpl::value>(); }
 };
 
-template <int minHP> py::dict runTest(int testCount, const Real& minX, const Real& maxX, int printEveryNth, const std::set<int>& testSet)
+template <int minHP> py::dict runTest(int testCount, const Real& minX, const Real& maxX, int printEveryNth, const std::set<int>& testSet, bool extraChecks)
 {
-	TestBits<minHP> testHelper(testCount, minX, maxX, testSet);
+	TestBits<minHP> testHelper(testCount, minX, maxX, testSet, extraChecks);
 	TestLoop<minHP> testLoop(testHelper);
 	while (testCount-- > 0) {
 		testHelper.prepare();
@@ -366,7 +483,7 @@ template <int minHP> py::dict runTest(int testCount, const Real& minX, const Rea
 	return testHelper.getResult();
 }
 
-py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX, Real maxX, int printEveryNth)
+py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX, Real maxX, int printEveryNth, bool extraChecks)
 {
 	std::set<int> testSet { py::stl_input_iterator<int>(testLevelsHP), py::stl_input_iterator<int>() };
 	if (testSet.size() < 2)
@@ -376,9 +493,9 @@ py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX,
 	int smallestTestedHPn = *testSet.begin();
 	// Go from runtime parameter to a constexpr template parameter. This allows for greater precision in entire test.
 	if (smallestTestedHPn == 1)
-		return runTest<1>(testCount, minX, maxX, printEveryNth, testSet);
+		return runTest<1>(testCount, minX, maxX, printEveryNth, testSet, extraChecks);
 	else
-		return runTest<2>(testCount, minX, maxX, printEveryNth, testSet);
+		return runTest<2>(testCount, minX, maxX, printEveryNth, testSet, extraChecks);
 
 	// This uses a switch instead and produces all possible variants, but is compiling longer.
 	/* switch (smallestTestedHPn) {
@@ -416,16 +533,18 @@ void exposeRealHPDiagnostics()
 	         py::arg("testCount")     = 10,
 	         py::arg("minX")          = yade::Real { -10 },
 	         py::arg("maxX")          = yade::Real { 10 },
-	         py::arg("printEveryNth") = 1000),
+	         py::arg("printEveryNth") = 1000,
+	         py::arg("extraChecks")   = false),
 	        R"""(
-Tests mathematical functions against the highest precision from argument ``testLevelsHP`` and returns the largest `ULP distance<https://en.wikipedia.org/wiki/Unit_in_the_last_place>`__ `found<https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/float_comparison.html>`__ with :yref:`getFloatDistanceULP<yade._math.getFloatDistanceULP>`. A ``testCount`` randomized tries with function arguments in range ``minX ... maxX`` are performed on the ``RealHP<N>`` types where ``N`` is from the list provided in ``testLevelsHP`` argument.
+Tests mathematical functions against the highest precision in argument ``testLevelsHP`` and returns the largest `ULP distance <https://en.wikipedia.org/wiki/Unit_in_the_last_place>`__ `found <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/float_comparison.html>`__ with :yref:`getFloatDistanceULP<yade._math.getFloatDistanceULP>`. A ``testCount`` randomized tries with function arguments in range ``minX ... maxX`` are performed on the ``RealHP<N>`` types where ``N`` is from the list provided in ``testLevelsHP`` argument.
 
 :param testLevelsHP: a ``list`` of ``int`` values consisting of high precision levels ``N`` (in ``RealHP<N>``) for which the tests should be done. Must consist at least of two elements so that there is a higher precision type available against which to perform the tests.
 :param testCount: ``int`` - specifies how many randomized tests of each function to perform.
 :param minX: ``Real`` - start of the range in which the random arguments are generated.
 :param maxX: ``Real`` - end of that range.
-:param printEveryNth: will :ref:`print using<logging>` ``LOG_INFO`` the progress information every Nth step in the ``testCount`` loop.
-:return: A python dictionary with he largest ULP distance to the correct function value. For each function name there is a dictionary consisting of: how many binary digits (bits) are in the tested ``RealHP<N>`` type, the worst argument for this function, and how many ULPs were different from the reference value.
+:param printEveryNth: will :ref:`print using<logging>` ``LOG_INFO`` the progress information every Nth step in the ``testCount`` loop. To see it e.g. start using ``yade -f6``, also see :ref:`logger documentation<logging>`.
+:param extraChecks: will perform extra checks while executing this funcion. Useful only for debugging of :yref:`getRealHPErrors<yade.math.getRealHPErrors>`.
+:return: A python dictionary with the largest ULP distance to the correct function value. For each function name there is a dictionary consisting of: how many binary digits (bits) are in the tested ``RealHP<N>`` type, the worst arguments for this function, and how many ULPs were different from the reference value.
 	)""");
 }
 
