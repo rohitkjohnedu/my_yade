@@ -71,9 +71,15 @@ if ('VTK' in features):
 		raise YadeCheckError("checkVTKRecorder does not have reference results for VTK version "+str(vtkVer)+", check files in "+vtkSaveDir+", if they are correct add them to: scripts/checks-and-tests/checks/data/vtk_reference_"+str(vtkVer[0])+'/')
 	if(vtkVer[0]==6): fileList=['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']
 	if(vtkVer[0]==8): fileList=['10.vtm','10/10_0.vtu','10/10_2.vtp']
+	verName = str(vtkVer[0])
+	if(vtkVer[0] == 8):
+		if(vtkVer[1] < 2):
+			verName += '.1'
+		else:
+			verName += '.2' # let's hope that higher versions will produce output like ver 8.2
 	for fname in fileList:
 		print("checking file: ",vtkSaveDir+fname)
-		referenceFile = open( checksPath+'/data/vtk_reference_'+str(vtkVer[0])+'/'+fname, "r" )
+		referenceFile = open( checksPath+'/data/vtk_reference_'+verName+'/'+fname, "r" )
 		testedFile    = open( vtkSaveDir+fname, "r" )
 		lineCount=0
 		for line1, line2 in zip(referenceFile, testedFile):
