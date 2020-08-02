@@ -409,6 +409,57 @@ class SimpleTests(unittest.TestCase):
 		self.assertEqual(HPn.isfinite(MPn.mpf('nan')),False)
 		self.assertEqual(HPn.isfinite(MPn.mpf('inf')),False)
 
+	def testRealHPDiagnostics(self):
+		for N in self.testLevelsHP:
+			self.runCheck(N , self.HPtestRealHPDiagnostics)
+
+	def HPtestRealHPDiagnostics(self,N,HPn,MPn):
+		import random
+		source = '1'
+		for i in range(mth.getDigits2(N)-1):
+			source += random.choice(['0', '1'])
+		for m in (list(self.testLevelsHP) + list(reversed(self.testLevelsHP))): # goes both directions, because that's how I discovered a small mistake in ToFromPythonConverter.hpp
+			if(m >= N):
+				HPm     = getattr(mth,"HP" + str(m))
+				toHPn   = getattr(HPm,"toHP" + str(N))
+				testNum = HPm.fromBits(source)
+				if(m == N):
+					source2 = source[:-1]+'1'
+					testNum2= HPm.fromBits(source2)
+					self.assertLessEqual(HPm.getFloatDistanceULP(testNum,testNum2) , 1)
+					source3 = source[:-2]+'11'
+					testNum3= HPm.fromBits(source3)
+					self.assertLessEqual(HPm.getFloatDistanceULP(testNum,testNum3) , 3)
+				if(mth.getDigits2(m) in [24,53,64,113]): # don't check MPFR, cpp_bin_float.
+					self.assertTrue(source in HPm.getRawBits(testNum)) # checks only 'in', because sign+exponent (usually in front of raw bits) are architecture-specific.
+				self.assertEqual( HPm.getDecomposedReal(testNum)['bits'], source.ljust(mth.getDigits2(m),'0'))
+				self.assertEqual( HPn.fromBits(source)                  , toHPn(testNum))
+		if(mth.getDigits2(N) == 24 ): self.assertEqual(HPn.getDemangledName(),'float')
+		if(mth.getDigits2(N) == 53 ): self.assertEqual(HPn.getDemangledName(),'double')
+		if(mth.getDigits2(N) == 64 ): self.assertTrue('long double' in HPn.getDemangledName())
+		if(mth.getDigits2(N) == 113): self.assertTrue('float128'    in HPn.getDemangledName())
+
+	def testRealHPErrors(self):
+		if(len(self.testLevelsHP)<2):
+			return
+		testULP = yade.math.getRealHPErrors(list(self.testLevelsHP),100)
+		print(testULP)
+		for func in testULP:
+			for bits in testULP[func]:
+				ulp = testULP[func][bits][1]
+				n = -1
+				for nn in self.testLevelsHP:
+					if(mth.getDigits2(nn) == bits):
+						n = nn
+						break
+				if(ulp>8):
+					print("ULP error for function"+'\033[91m',func,'\033[0m'+"at precision RealHP<",n,">, using",bits,"bits, with arg:",testULP[func][bits][0],"is ULP=",ulp)
+
+				if (self.nowUsesBoostBinFloat(n) and (bits > 100) and (func=='erfc')): # exception
+					self.assertLessEqual(ulp,200)
+				else:
+					self.assertLessEqual(ulp,8)
+
 	def testCgalNumTraits(self):
 		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestCgalNumTraits)
