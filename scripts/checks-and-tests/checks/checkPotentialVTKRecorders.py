@@ -15,13 +15,18 @@ if ('VTK' in features):
 #	tmpSaveDir='.' # Uncomment to run this script locally.
 	vtkSaveDir = tmpSaveDir+'/potentialVTKRecorders/'
 	def checkVTK(prefix):
+		vtkVer=yade.libVersions.getVersion('vtk')
+		if(vtkVer[0]==8 and vtkVer[1]==2):
+			extraPath = 'ver8.2/'
+		else:
+			extraPath = 'ver6-8.1/'
 		toSkip=[] # Here we can put sections to ignore, if too sensitive
 		section=""
 		skippedLines=0
 		fileList=[prefix+'contactPoint.10.vtu',prefix+'Id.10.vtu',prefix+'-pb.10.vtp',prefix+'vel.10.vtu']
 		for fname in fileList:
 			print("checking file: ",vtkSaveDir+fname)
-			referenceFile = open( checksPath+'/data/potentialVTKRecorders/'+fname, "r" )
+			referenceFile = open( checksPath+'/data/potentialVTKRecorders/'+extraPath+fname, "r" )
 			testedFile    = open( vtkSaveDir+fname, "r" )
 			lineCount=0
 			for line1, line2 in zip(referenceFile, testedFile):
