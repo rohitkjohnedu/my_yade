@@ -48,7 +48,7 @@ if ('VTK' in features):
 							raise YadeCheckError("checkPotentialVTKRecorders failed in file "+fname+" line: "+str(lineCount)+", because the lines have different elements:\n"+line1+"\nvs.\n"+line2)
 						for s1, s2 in zip(sp1,sp2):
 							try:
-								if( abs( float(s1) - float(s2) ) > 1e-6 ):
+								if( abs( float(s1) - float(s2) ) > 5e-6 ):
 									raise YadeCheckError("checkPotentialVTKRecorders failed float comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
 							except ValueError:
 								if(s1=='>' and s2=='/>'):
