@@ -315,19 +315,20 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 
 template <int minHP> class TestBits { // minHP is because the bits absent in lower precision should be zero to avoid ambiguity.
 private:
-	using Rnd        = std::array<RealHP<minHP>, 3>;
-	using Error      = std::pair<Rnd /* arguments */, int /* ULP error */>;
-	using FuncErrors = std::map<int /* N, the level of HP */, Error>;
-	const int&                            testCount;
-	const Real&                           minX;
-	const Real&                           maxX;
-	const std::set<int>&                  testSet;
-	bool                                  first { true };
-	bool                                  extraChecks { false };
-	FuncErrors                            empty;
-	std::map<std::string, FuncErrors>     results;
-	std::map<std::string, DecomposedReal> reference;
-	Rnd                                   randomArgs;
+	using Rnd                                = std::array<RealHP<minHP>, 3>;
+	using Error                              = std::pair<Rnd /* arguments */, int /* ULP error */>;
+	using FuncErrors                         = std::map<int /* N, the level of HP */, Error>;
+	static const constexpr auto         maxN = boost::mpl::back<math::RealHPConfig::SupportedByEigenCgal>::type::value;
+	const int&                          testCount;
+	const Real&                         minX;
+	const Real&                         maxX;
+	const std::set<int>&                testSet;
+	bool                                first { true };
+	bool                                extraChecks { false };
+	FuncErrors                          empty;
+	std::map<std::string, FuncErrors>   results;
+	std::map<std::string, RealHP<maxN>> reference;
+	Rnd                                 randomArgs;
 
 public:
 	TestBits(const int& testCount_, const Real& minX_, const Real& maxX_, const std::set<int>& testSet_, bool extraChecks_)
@@ -353,9 +354,9 @@ public:
 		if (results.count(funcName) == 0)
 			results[funcName] = empty;
 		if (first) { // store results for the highest N
-			reference[funcName] = DecomposedReal(funcValue);
-		} else if (math::isfinite(funcValue) and (not reference[funcName].wrong())) {
-			int bad = static_cast<int>(boost::math::float_distance(reference[funcName].template rebuild<RealHP<testN>>(), funcValue));
+			reference[funcName] = static_cast<RealHP<maxN>>(funcValue);
+		} else if (math::isfinite(funcValue) and math::isfinite(reference[funcName])) {
+			int bad = static_cast<int>(boost::math::float_distance(static_cast<RealHP<testN>>(reference[funcName]), funcValue));
 			if (bad > results[funcName][testN].second) {
 				results[funcName][testN] = Error { randomArgs, bad };
 			}
