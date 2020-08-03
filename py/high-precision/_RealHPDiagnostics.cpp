@@ -307,7 +307,7 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 		        R"""(
 :param bits: ``str`` - a string containing '0', '1' characters.
 :param exp:  ``int`` - the binary exponent which shifts the bits.
-:param sign: ``int`` - the sign, should be -1 or +1, but it is not checked. It multiplies the result when construcion from bits is finished.
+:param sign: ``int`` - the sign, should be -1 or +1, but it is not checked. It multiplies the result when construction from bits is finished.
 :return: ``RealHP<N>`` constructed from string containing '0', '1' bits. This is for debugging purposes, rather slow.
 )""");
 	}
@@ -476,7 +476,7 @@ template <int minHP> py::dict runTest(int testCount, const Real& minX, const Rea
 	TestLoop<minHP> testLoop(testHelper);
 	while (testCount-- > 0) {
 		testHelper.prepare();
-		boost::mpl::for_each<boost::mpl::reverse<math::RealHPConfig::SupportedByEigenCgal>::type>(testLoop);
+		boost::mpl::for_each<boost::mpl::reverse<math::RealHPConfig::SupportedByMinieigen>::type>(testLoop);
 		if (((testCount % printEveryNth) == 0) and (testCount != 0))
 			LOG_INFO("minHP = " << minHP << ", testCount = " << testCount << "\n" << py::extract<std::string>(py::str(testHelper.getResult()))());
 	}
@@ -488,8 +488,8 @@ py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX,
 	std::set<int> testSet { py::stl_input_iterator<int>(testLevelsHP), py::stl_input_iterator<int>() };
 	if (testSet.size() < 2)
 		throw std::runtime_error("The testLevelsHP is too small, there must be a higher precision to test against.");
-	if (not std::includes(math::RealHPConfig::supportedByEigenCgal.begin(), math::RealHPConfig::supportedByEigenCgal.end(), testSet.begin(), testSet.end()))
-		throw std::runtime_error("testLevelsHP contains N not present in yade.math.RealHPConfig.getSupportedByEigenCgal()");
+	if (not std::includes(math::RealHPConfig::supportedByMinieigen.begin(), math::RealHPConfig::supportedByMinieigen.end(), testSet.begin(), testSet.end()))
+		throw std::runtime_error("testLevelsHP contains N not present in yade.math.RealHPConfig.getSupportedByMinieigen()");
 	int smallestTestedHPn = *testSet.begin();
 	// Go from runtime parameter to a constexpr template parameter. This allows for greater precision in entire test.
 	if (smallestTestedHPn == 1)
@@ -519,7 +519,7 @@ py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX,
 void exposeRealHPDiagnostics()
 {
 	// this loop registers diagnostic functions for all HPn types.
-	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByEigenCgal, ::yade::RegisterRealBitDebug>();
+	::yade::math::detail::registerLoopForHPn<::yade::math::RealHPConfig::SupportedByMinieigen, ::yade::RegisterRealBitDebug>();
 
 	py::def("isThisSystemLittleEndian",
 	        ::yade::isThisSystemLittleEndian,
@@ -543,8 +543,8 @@ Tests mathematical functions against the highest precision in argument ``testLev
 :param minX: ``Real`` - start of the range in which the random arguments are generated.
 :param maxX: ``Real`` - end of that range.
 :param printEveryNth: will :ref:`print using<logging>` ``LOG_INFO`` the progress information every Nth step in the ``testCount`` loop. To see it e.g. start using ``yade -f6``, also see :ref:`logger documentation<logging>`.
-:param extraChecks: will perform extra checks while executing this funcion. Useful only for debugging of :yref:`getRealHPErrors<yade.math.getRealHPErrors>`.
-:return: A python dictionary with the largest ULP distance to the correct function value. For each function name there is a dictionary consisting of: how many binary digits (bits) are in the tested ``RealHP<N>`` type, the worst arguments for this function, and how many ULPs were different from the reference value.
+:param extraChecks: will perform extra checks while executing this funcion. Useful only for debugging of :yref:`getRealHPErrors<yade._math.getRealHPErrors>`.
+:return: A python dictionary with the largest ULP distance to the correct function value. For each function name there is a dictionary consisting of: how many binary digits (bits) are in the tested ``RealHP<N>`` type, the worst arguments for this function, and the ULP distance to the reference value.
 	)""");
 }
 
