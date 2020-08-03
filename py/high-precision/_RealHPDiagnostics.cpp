@@ -288,10 +288,11 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 		        R"""(:return: ``dict`` - the dictionary with the debug information how the DecomposedReal class sees this type. This is for debugging purposes, rather slow. Includes result from `fpclassify <https://en.cppreference.com/w/cpp/numeric/math/fpclassify>`__ function call, a binary representation and other useful info. See also :yref:`fromBits<yade._math.fromBits>`.)""");
 
 // This also could be a boost::mpl::for_each loop (like in registerLoopForHPn) with templates and a helper struct. Not sure which approach is more readable.
+#define YADE_REGISTER_MNE_LEVELS(name) BOOST_PP_SEQ_FOR_EACH(YADE_HP_PARSE_ONE, name, YADE_MINIEIGEN_HP) // it just creates: name(1) name(2) name(3) ....
 #define REGISTER_CONVERTER_HPn_TO_HPm(levelHP) registerHPnHPm<N, levelHP>();
-		YADE_REGISTER_HP_LEVELS(REGISTER_CONVERTER_HPn_TO_HPm)
+		YADE_REGISTER_MNE_LEVELS(REGISTER_CONVERTER_HPn_TO_HPm)
 #undef REGISTER_CONVERTER_HPn_TO_HPm
-
+#undef YADE_REGISTER_MNE_LEVELS
 		py::def("getRawBits",
 		        static_cast<std::string (*)(const RealHP<N>&)>(&getRawBits<N>),
 		        (py::arg("x")),
@@ -299,7 +300,11 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 
 		py::def("getFloatDistanceULP",
 		        static_cast<RealHP<N> (*)(const RealHP<N>&, const RealHP<N>&)>(&boost::math::float_distance),
-		        R"""(:return: an integer value stored in ``RealHP<N>``, the `ULP distance <https://en.wikipedia.org/wiki/Unit_in_the_last_place>`__ calculated by `boost::math::float_distance <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/next_float/float_distance.html>`__, also see `Floating-point Comparison <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/float_comparison.html>`__ and `Prof. Kahan paper about this topic <https://people.eecs.berkeley.edu/~wkahan/Mindless.pdf>`__.)""");
+		        R"""(:return: an integer value stored in ``RealHP<N>``, the `ULP distance <https://en.wikipedia.org/wiki/Unit_in_the_last_place>`__ calculated by `boost::math::float_distance <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/next_float/float_distance.html>`__, also see `Floating-point Comparison <https://www.boost.org/doc/libs/1_73_0/libs/math/doc/html/math_toolkit/float_comparison.html>`__ and `Prof. Kahan paper about this topic <https://people.eecs.berkeley.edu/~wkahan/Mindless.pdf>`__.
+
+.. warning::
+	The returned value is the **directed distance** between two arguments, this means that it can be negative.
+)""");
 
 		py::def("fromBits",
 		        static_cast<RealHP<N> (*)(const std::string&, int, int)>(&fromBits<N>),
@@ -315,10 +320,11 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 
 template <int minHP> class TestBits { // minHP is because the bits absent in lower precision should be zero to avoid ambiguity.
 private:
-	using Rnd                                = std::array<RealHP<minHP>, 3>;
-	using Error                              = std::pair<Rnd /* arguments */, int /* ULP error */>;
-	using FuncErrors                         = std::map<int /* N, the level of HP */, Error>;
-	static const constexpr auto         maxN = boost::mpl::back<math::RealHPConfig::SupportedByEigenCgal>::type::value;
+	static const constexpr auto maxN = boost::mpl::back<math::RealHPConfig::SupportedByEigenCgal>::type::value;
+	static const constexpr auto maxP = boost::mpl::back<math::RealHPConfig::SupportedByMinieigen>::type::value; // this one gets exported to python.
+	using Rnd                        = std::array<RealHP<minHP>, 3>;
+	using Error                      = std::pair<Rnd /* arguments */, RealHP<maxP> /* ULP error */>;
+	using FuncErrors                 = std::map<int /* N, the level of HP */, Error>;
 	const int&                          testCount;
 	const Real&                         minX;
 	const Real&                         maxX;
@@ -356,9 +362,10 @@ public:
 		if (first) { // store results for the highest N
 			reference[funcName] = static_cast<RealHP<maxN>>(funcValue);
 		} else if (math::isfinite(funcValue) and math::isfinite(reference[funcName])) {
-			int bad = static_cast<int>(boost::math::float_distance(static_cast<RealHP<testN>>(reference[funcName]), funcValue));
-			if (bad > results[funcName][testN].second) {
-				results[funcName][testN] = Error { randomArgs, bad };
+			auto ulpError
+			        = static_cast<RealHP<maxP>>(math::abs(boost::math::float_distance(static_cast<RealHP<testN>>(reference[funcName]), funcValue)));
+			if (ulpError > results[funcName][testN].second) {
+				results[funcName][testN] = Error { randomArgs, ulpError };
 			}
 		}
 	}
@@ -546,6 +553,10 @@ Tests mathematical functions against the highest precision in argument ``testLev
 :param printEveryNth: will :ref:`print using<logging>` ``LOG_INFO`` the progress information every Nth step in the ``testCount`` loop. To see it e.g. start using ``yade -f6``, also see :ref:`logger documentation<logging>`.
 :param extraChecks: will perform extra checks while executing this funcion. Useful only for debugging of :yref:`getRealHPErrors<yade._math.getRealHPErrors>`.
 :return: A python dictionary with the largest ULP distance to the correct function value. For each function name there is a dictionary consisting of: how many binary digits (bits) are in the tested ``RealHP<N>`` type, the worst arguments for this function, and the ULP distance to the reference value.
+
+.. hint::
+	The returned ULP error is an absolute value, as opposed to :yref:`getFloatDistanceULP<yade._math.getFloatDistanceULP>` which is signed.
+
 	)""");
 }
 
