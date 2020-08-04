@@ -93,25 +93,7 @@ for b in O.bodies:
 
 # we only need flow engine to detect boundaries, there is no flow computed for this 
 flow.dead=0
-flow.defTolerance=-1 #0.3
-flow.meshUpdateInterval=-1 #200
-flow.useSolver=4
-flow.permeabilityFactor=-0.7e-7 #1
-flow.viscosity=10
-flow.bndCondIsPressure=[0,0,0,0,0,0]
-flow.bndCondValue=[0,0,0,0,0,0]
-flow.boundaryUseMaxMin=[0,0,0,0,0,0]
-flow.thermalEngine=True
-flow.debug=False
-flow.fluidRho = 1000
-flow.fluidCp = 4184
-flow.fluidK = 0.650
-flow.bndCondIsTemperature=[1,1,0,0,0,0]
-flow.thermalEngine=True
-flow.thermalBndCondValue=[0,0,0,0,0,0]
 
-flow.tZero=t0
-flow.pZero=0
 thermal.dead=0
 thermal.conduction=True
 thermal.thermoMech=False
@@ -137,7 +119,7 @@ flow.updateTriangulation=True
 O.dt=1.
 O.dynDt=False
 
-O.run(1,1)
+flow.emulateAction()
 flow.dead=1
 
 #triax.goal2=-11000
