@@ -320,11 +320,11 @@ template <int N, bool /*registerConverters*/> struct RegisterRealBitDebug {
 
 template <int minHP> class TestBits { // minHP is because the bits absent in lower precision should be zero to avoid ambiguity.
 private:
-	static const constexpr auto maxN = boost::mpl::back<math::RealHPConfig::SupportedByEigenCgal>::type::value;
+	static const constexpr auto maxN = boost::mpl::back<math::RealHPConfig::SupportedByEigenCgal>::type::value; // the absolutely maximum precision.
 	static const constexpr auto maxP = boost::mpl::back<math::RealHPConfig::SupportedByMinieigen>::type::value; // this one gets exported to python.
-	using Rnd                        = std::array<RealHP<minHP>, 3>;
-	using Error                      = std::pair<Rnd /* arguments */, RealHP<maxP> /* ULP error */>;
-	using FuncErrors                 = std::map<int /* N, the level of HP */, Error>;
+	using Rnd        = std::array<RealHP<minHP>, 3>; // minHP is because the bits absent in lower precision should be zero to avoid ambiguity.
+	using Error      = std::pair<std::array<RealHP<maxP>, 3> /* arguments */, RealHP<maxP> /* ULP error */>;
+	using FuncErrors = std::map<int /* N, the level of HP */, Error>;
 	const int&                          testCount;
 	const Real&                         minX;
 	const Real&                         maxX;
@@ -335,6 +335,20 @@ private:
 	std::map<std::string, FuncErrors>   results;
 	std::map<std::string, RealHP<maxN>> reference;
 	Rnd                                 randomArgs;
+
+	enum struct Domain { All, PlusMinus1, AboveMinus1, Above1, Above0, NonZero };
+	template <int testN> auto applyDomain(const RealHP<testN>& x, const Domain& d)
+	{
+		switch (d) {
+			case Domain::All: return x;
+			case Domain::PlusMinus1: return math::fmod(math::abs(x), static_cast<RealHP<testN>>(2)) - 1;
+			case Domain::AboveMinus1: return math::abs(x) - 1;
+			case Domain::Above1: return math::abs(x) + 1;
+			case Domain::Above0: return math::abs(x);
+			case Domain::NonZero: return (x == 0) ? 1 : x; // extremely rare
+			default: throw std::runtime_error("applyDomain : unrecognized domain selected to use.");
+		};
+	}
 
 public:
 	TestBits(const int& testCount_, const Real& minX_, const Real& maxX_, const std::set<int>& testSet_, bool extraChecks_)
@@ -347,7 +361,7 @@ public:
 	{
 		for (auto N : testSet)
 			if (N != *testSet.rbegin())
-				empty[N] = Error { randomArgs, 0 };
+				empty[N] = Error { { 0, 0, 0 }, 0 };
 	}
 	void prepare()
 	{
@@ -355,7 +369,8 @@ public:
 		for (auto& a : randomArgs)
 			a = Eigen::internal::random<minHP>(static_cast<RealHP<minHP>>(minX), static_cast<RealHP<minHP>>(maxX));
 	}
-	template <int testN> void amend(const std::string& funcName, const RealHP<testN>& funcValue)
+	template <int testN>
+	void amend(const std::string& funcName, const RealHP<testN>& funcValue, const std::vector<Domain>& domains, const std::array<RealHP<testN>, 3>& args)
 	{
 		if (results.count(funcName) == 0)
 			results[funcName] = empty;
@@ -365,14 +380,19 @@ public:
 			auto ulpError
 			        = static_cast<RealHP<maxP>>(math::abs(boost::math::float_distance(static_cast<RealHP<testN>>(reference[funcName]), funcValue)));
 			if (ulpError > results[funcName][testN].second) {
-				results[funcName][testN] = Error { randomArgs, ulpError };
+				std::array<RealHP<maxP>, 3> usedArgs { 0, 0, 0 };
+				for (size_t i = 0; i < 3; ++i)
+					if (i < domains.size())
+						usedArgs[i] = static_cast<RealHP<maxP>>(applyDomain<testN>(args[i], domains[i]));
+				results[funcName][testN] = Error { usedArgs, ulpError };
 			}
 		}
 	}
-	template <int testN> void amend(const std::string& funcName, const ComplexHP<testN>& funcValue)
+	template <int testN>
+	void amend(const std::string& funcName, const ComplexHP<testN>& funcValue, const std::vector<Domain>& dom, const std::array<RealHP<testN>, 3>& args)
 	{
-		amend<testN>("complex " + funcName + " real", funcValue.real());
-		amend<testN>("complex " + funcName + " imag", funcValue.imag());
+		amend<testN>("complex " + funcName + " real", funcValue.real(), dom, args);
+		amend<testN>("complex " + funcName + " imag", funcValue.imag(), dom, args);
 	}
 	template <int testN> void checkFunctions()
 	{
@@ -384,75 +404,73 @@ public:
 			if (extraChecks)                                     // Will throw in case of error. Just an extra check.
 				DecomposedReal::veryEqual(randomArgs[i], args[i]);
 		}
-// Add here tests of more functions as necessary.
-//                ↓ R - Real, C - Complex, A - abs
-#define CHECK_FUN_R_1(name) amend<testN>(#name, math::name(args[0]))
-#define CHECK_FUN_A_1(name) amend<testN>(#name, math::name(math::abs(args[0])))
-#define CHECK_FUN_R_2(name) amend<testN>(#name, math::name(args[0], args[1]))
-#define CHECK_FUN_R_3(name) amend<testN>(#name, math::name(args[0], args[1], args[2]))
-#define CHECK_FUN_C_2(name) amend<testN>(#name, math::name(ComplexHP<testN>(args[0], args[1])))
-		CHECK_FUN_R_2(basicAdd);
-		CHECK_FUN_R_2(basicSub);
-		CHECK_FUN_R_2(basicDiv);
-		CHECK_FUN_R_2(basicMult);
+		// clang-format off
+// Add here tests of more functions as necessary. Make sure to use proper domain.
+//                ↓ R - Real, C - Complex
+#define CHECK_FUN_R_1(f, domain)     amend<testN>(#f, math::f(                 applyDomain<testN>(args[0], domain)), { domain }, args)
+#define CHECK_FUN_R_2(f, d1, d2)     amend<testN>(#f, math::f(                 applyDomain<testN>(args[0], d1), applyDomain<testN>(args[1], d2) ), { d1, d2 }, args)
+#define CHECK_FUN_R_3(f, d1, d2, d3) amend<testN>(#f, math::f(                 applyDomain<testN>(args[0], d1), applyDomain<testN>(args[1], d2)  , applyDomain<testN>(args[2], d3)), { d1, d2, d3 }, args)
+#define CHECK_FUN_C_2(f, d1, d2)     amend<testN>(#f, math::f(ComplexHP<testN>(applyDomain<testN>(args[0], d1), applyDomain<testN>(args[1], d2))), { d1, d2 }, args)
+		CHECK_FUN_R_2(basicAdd , Domain::All, Domain::All);        // all
+		CHECK_FUN_R_2(basicSub , Domain::All, Domain::All);        // all
+		CHECK_FUN_R_2(basicDiv , Domain::All, Domain::All);        // all
+		CHECK_FUN_R_2(basicMult, Domain::All, Domain::All);        // all
 
-		CHECK_FUN_R_1(sin);
-		CHECK_FUN_R_1(cos);
-		CHECK_FUN_R_1(tan);
-		CHECK_FUN_R_1(sinh);
-		CHECK_FUN_R_1(cosh);
-		CHECK_FUN_R_1(tanh);
+		CHECK_FUN_R_1(sin  , Domain::All);                         // all
+		CHECK_FUN_R_1(cos  , Domain::All);                         // all
+		CHECK_FUN_R_1(tan  , Domain::All);                         // all
+		CHECK_FUN_R_1(sinh , Domain::All);                         // all
+		CHECK_FUN_R_1(cosh , Domain::All);                         // all
+		CHECK_FUN_R_1(tanh , Domain::All);                         // all
 
-		CHECK_FUN_R_1(asin);
-		CHECK_FUN_R_1(acos);
-		CHECK_FUN_R_1(atan);
-		CHECK_FUN_R_1(asinh);
-		CHECK_FUN_R_1(acosh);
-		CHECK_FUN_R_1(atanh);
-		CHECK_FUN_R_2(atan2);
+		CHECK_FUN_R_1(asin , Domain::PlusMinus1);                  // -1,1
+		CHECK_FUN_R_1(acos , Domain::PlusMinus1);                  // -1,1
+		CHECK_FUN_R_1(atan , Domain::All);                         // all
+		CHECK_FUN_R_1(asinh, Domain::All);                         // all
+		CHECK_FUN_R_1(acosh, Domain::Above1);                      // x>1
+		CHECK_FUN_R_1(atanh, Domain::PlusMinus1);                  // -1,1
+		CHECK_FUN_R_2(atan2, Domain::All, Domain::All);            // all
 
-		CHECK_FUN_C_2(sin);
-		CHECK_FUN_C_2(cos);
-		CHECK_FUN_C_2(tan);
-		CHECK_FUN_C_2(sinh);
-		CHECK_FUN_C_2(cosh);
-		CHECK_FUN_C_2(tanh);
+		CHECK_FUN_C_2(sin  , Domain::All, Domain::All);            // all
+		CHECK_FUN_C_2(cos  , Domain::All, Domain::All);            // all
+		CHECK_FUN_C_2(tan  , Domain::All, Domain::All);            // all
+		CHECK_FUN_C_2(sinh , Domain::All, Domain::All);            // all
+		CHECK_FUN_C_2(cosh , Domain::All, Domain::All);            // all
+		CHECK_FUN_C_2(tanh , Domain::All, Domain::All);            // all
 
-		CHECK_FUN_R_1(log);
-		CHECK_FUN_R_1(log10);
-		CHECK_FUN_R_1(log1p);
-		CHECK_FUN_R_1(log2);
-		CHECK_FUN_R_1(logb);
-		CHECK_FUN_R_1(ilogb);
+		CHECK_FUN_R_1(log  , Domain::Above0);                      // x>0
+		CHECK_FUN_R_1(log10, Domain::Above0);                      // x>0
+		CHECK_FUN_R_1(log1p, Domain::AboveMinus1);                 // x>-1
+		CHECK_FUN_R_1(log2 , Domain::Above0);                      // x>0
+		CHECK_FUN_R_1(logb , Domain::NonZero);                     // x≠0
+		//CHECK_FUN_R_1(ilogb);                                    // x≠0 // If the correct result is greater than INT_MAX or smaller than INT_MIN, then return value is unspecified.
 
-		// can't check those. This entire check is based on assumption that frexp works correctly.
 		//CHECK_FUNC(ldexp);
 		//CHECK_FUNC(frexp);
-		CHECK_FUN_R_1(exp);
-		CHECK_FUN_R_1(exp2);
-		CHECK_FUN_R_1(expm1);
+		CHECK_FUN_R_1(exp  , Domain::All);                         // all
+		CHECK_FUN_R_1(exp2 , Domain::All);                         // all
+		CHECK_FUN_R_1(expm1, Domain::All);                         // all
 
-		CHECK_FUN_R_2(pow);
-		CHECK_FUN_A_1(sqrt);
-		CHECK_FUN_R_1(cbrt);
-		CHECK_FUN_R_2(hypot);
+		CHECK_FUN_R_2(pow  , Domain::Above0, Domain::All);         // x>0 (no complex here) , all y
+		CHECK_FUN_R_1(sqrt , Domain::Above0);                      // x>0
+		CHECK_FUN_R_1(cbrt , Domain::Above0);                      // x>0
+		CHECK_FUN_R_2(hypot, Domain::All, Domain::All);            // all
 
-		CHECK_FUN_R_1(erf);
-		CHECK_FUN_R_1(erfc);
-		CHECK_FUN_R_1(lgamma);
-		CHECK_FUN_R_1(tgamma);
+		CHECK_FUN_R_1(erf   , Domain::All);                        // all
+		CHECK_FUN_R_1(erfc  , Domain::All);                        // all
+		CHECK_FUN_R_1(lgamma, Domain::All);                        // all, except pole errors
+		CHECK_FUN_R_1(tgamma, Domain::All);                        // all, except pole errors
 
 		//CHECK_FUNC(modf);
-		CHECK_FUN_R_2(fmod);
-		CHECK_FUN_R_2(remainder);
+		CHECK_FUN_R_2(fmod     , Domain::All, Domain::NonZero);    // y≠0
+		CHECK_FUN_R_2(remainder, Domain::All, Domain::NonZero);    // y≠0
 		//CHECK_FUNC(remquo);
-		CHECK_FUN_R_3(fma);
+		CHECK_FUN_R_3(fma, Domain::All, Domain::All, Domain::All); // all
 #undef CHECK_FUN_R_1
-#undef CHECK_FUN_A_1
 #undef CHECK_FUN_R_2
 #undef CHECK_FUN_R_3
 #undef CHECK_FUN_C_2
-
+		// clang-format on
 		first = false;
 	}
 	py::dict getResult()
@@ -461,8 +479,8 @@ public:
 		for (const auto& a : results) {
 			py::dict badBits {};
 			for (const auto& funcErrors : a.second) {
-				Error er                                                  = funcErrors.second;
-				Rnd   arg                                                 = er.first;
+				Error                       er                            = funcErrors.second;
+				std::array<RealHP<maxP>, 3> arg                           = er.first;
 				badBits[math::RealHPConfig::getDigits2(funcErrors.first)] = py::make_tuple(py::make_tuple(arg[0], arg[1], arg[2]), er.second);
 			}
 			ret[a.first] = badBits;
