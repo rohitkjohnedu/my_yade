@@ -605,7 +605,7 @@ Some c++ might have long or content-rich documentation, which is rather inconven
 
 #. Provide at least a brief description of the class in the c++ code nevertheless, for people only reading the code.
 #. Add notice saying "This class is documented in detail in the :ysrc:`py/_extraDocs.py` file". 
-#. Add documentation to :ysrc:`py/_etraDocs.py` in this way::
+#. Add documentation to :ysrc:`py/_extraDocs.py` in this way::
 		
 		module.YourClass.__doc__='''
 			This is the docstring for YourClass.
@@ -628,7 +628,7 @@ Internal c++ documentation
 Support framework
 =======================
 
-Besides the framework provided by the c++ standard library (including STL), boost and other dependencies, yade provides its own specific services.
+Besides the framework provided by the c++ standard library (including STL), boost and other dependencies, Yade provides its own specific services.
 
 
 Pointers
@@ -663,7 +663,7 @@ To have both speed and safety, Yade provides 2 macros:
 
 Basic numerics
 ---------------
-The floating point type to use in Yade ``Real``, which is by default typedef for ``double`` (64 bits, 15 decimal places). [#real]_ 
+The floating point type to use in Yade is ``Real``, which is by default typedef for ``double`` (64 bits, 15 decimal places). [#real]_ 
 
 Yade uses the `Eigen <http://eigen.tuxfamily.org>`_ library for computations. It provides classes for 2d and 3d vectors, quaternions and 3x3 matrices templated by number type; their specialization for the ``Real`` type are typedef'ed with the "r" suffix, and occasionally useful integer types with the "i" suffix:
 
