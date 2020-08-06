@@ -325,16 +325,20 @@ private:
 	using Rnd        = std::array<RealHP<minHP>, 3>; // minHP is because the bits absent in lower precision should be zero to avoid ambiguity.
 	using Error      = std::pair<std::array<RealHP<maxP>, 3> /* arguments */, RealHP<maxP> /* ULP error */>;
 	using FuncErrors = std::map<int /* N, the level of HP */, Error>;
-	const int&                          testCount;
-	const Real&                         minX;
-	const Real&                         maxX;
+	int                                 testCount;
+	const RealHP<minHP>                 minX;
+	const RealHP<minHP>                 maxX;
 	const std::set<int>&                testSet;
 	bool                                first { true };
 	bool                                extraChecks { false };
 	FuncErrors                          empty;
 	std::map<std::string, FuncErrors>   results;
 	std::map<std::string, RealHP<maxN>> reference;
-	Rnd                                 randomArgs;
+	Rnd                                 minHPArgs;
+	bool                                useRandomArgs;
+	// When not useRandomArgs then a linear scan is performed. The scan starts from minX but to make the range to be "in the middle" between minX and maxX,
+	// the start has to shifted by half { 0.5 } upwards from minX. Of course this arbitrary choice will be nullified by any non-symmetrical choice of minX…maxX.
+	RealHP<minHP> count { 0.5 };
 
 	enum struct Domain { All, PlusMinus1, AboveMinus1, Above1, Above0, NonZero };
 	template <int testN> auto applyDomain(const RealHP<testN>& x, const Domain& d)
@@ -351,13 +355,14 @@ private:
 	}
 
 public:
-	TestBits(const int& testCount_, const Real& minX_, const Real& maxX_, const std::set<int>& testSet_, bool extraChecks_)
+	TestBits(const int& testCount_, const Real& minX_, const Real& maxX_, bool useRnd, const std::set<int>& testSet_, bool extraChecks_)
 	        : testCount(testCount_)
 	        , minX(minX_)
 	        , maxX(maxX_)
 	        , testSet(testSet_)
 	        , extraChecks(extraChecks_)
-	        , randomArgs { 0, 0, 0 } // up to 3 arguments are needed. Though most of the time only the first one is used.
+	        , minHPArgs { 0, 0, 0 } // up to 3 arguments are needed. Though most of the time only the first one is used.
+	        , useRandomArgs { useRnd }
 	{
 		for (auto N : testSet)
 			if (N != *testSet.rbegin())
@@ -366,8 +371,16 @@ public:
 	void prepare()
 	{
 		first = true;
-		for (auto& a : randomArgs)
-			a = Eigen::internal::random<minHP>(static_cast<RealHP<minHP>>(minX), static_cast<RealHP<minHP>>(maxX));
+		for (auto& a : minHPArgs)
+			a = Eigen::internal::random<minHP>(minX, maxX);
+		if (not useRandomArgs) {
+			// To make sure that these equidistant points are not overlapping when math::abs(…) or math::fmod(…) are used I add a small random variation to them.
+			minHPArgs[0] = Eigen::internal::random<minHP>(static_cast<RealHP<minHP>>(-0.25), static_cast<RealHP<minHP>>(0.25));
+			// The points will be still equidistant on average ↓← here the random variation is used.
+			minHPArgs[0] = minX + (maxX - minX) * (count + minHPArgs[0]) / RealHP<minHP>(testCount);
+			count += 1;
+			//LOG_NOFILTER(minHPArgs[0]);
+		}
 	}
 	template <int testN>
 	void amend(const std::string& funcName, const RealHP<testN>& funcValue, const std::vector<Domain>& domains, const std::array<RealHP<testN>, 3>& args)
@@ -400,9 +413,9 @@ public:
 			return;
 		std::array<RealHP<testN>, 3> args {};
 		for (int i = 0; i < 3; ++i) {
-			args[i] = static_cast<RealHP<testN>>(randomArgs[i]); // Prepare the random numbers with correct precision.
-			if (extraChecks)                                     // Will throw in case of error. Just an extra check.
-				DecomposedReal::veryEqual(randomArgs[i], args[i]);
+			args[i] = static_cast<RealHP<testN>>(minHPArgs[i]); // Prepare the random numbers with correct precision.
+			if (extraChecks)                                    // Will throw in case of error. Just an extra check.
+				DecomposedReal::veryEqual(minHPArgs[i], args[i]);
 		}
 		// clang-format off
 // Add here tests of more functions as necessary. Make sure to use proper domain.
@@ -496,9 +509,10 @@ template <int minHP> struct TestLoop {
 	template <typename Nmpl> void operator()(Nmpl) { tb.template checkFunctions<Nmpl::value>(); }
 };
 
-template <int minHP> py::dict runTest(int testCount, const Real& minX, const Real& maxX, int printEveryNth, const std::set<int>& testSet, bool extraChecks)
+template <int minHP>
+py::dict runTest(int testCount, const Real& minX, const Real& maxX, bool useRandomArgs, int printEveryNth, const std::set<int>& testSet, bool extraChecks)
 {
-	TestBits<minHP> testHelper(testCount, minX, maxX, testSet, extraChecks);
+	TestBits<minHP> testHelper(testCount, minX, maxX, useRandomArgs, testSet, extraChecks);
 	TestLoop<minHP> testLoop(testHelper);
 	while (testCount-- > 0) {
 		testHelper.prepare();
@@ -509,8 +523,10 @@ template <int minHP> py::dict runTest(int testCount, const Real& minX, const Rea
 	return testHelper.getResult();
 }
 
-py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX, Real maxX, int printEveryNth, bool extraChecks)
+py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX, Real maxX, bool useRandomArgs, int printEveryNth, bool extraChecks)
 {
+	TRVAR1(py::extract<std::string>(py::str(testLevelsHP))());
+	TRVAR6(testCount, minX, maxX, useRandomArgs, printEveryNth, extraChecks);
 	std::set<int> testSet { py::stl_input_iterator<int>(testLevelsHP), py::stl_input_iterator<int>() };
 	if (testSet.size() < 2)
 		throw std::runtime_error("The testLevelsHP is too small, there must be a higher precision to test against.");
@@ -519,9 +535,9 @@ py::dict getRealHPErrors(const py::list& testLevelsHP, int testCount, Real minX,
 	int smallestTestedHPn = *testSet.begin();
 	// Go from runtime parameter to a constexpr template parameter. This allows for greater precision in entire test.
 	if (smallestTestedHPn == 1)
-		return runTest<1>(testCount, minX, maxX, printEveryNth, testSet, extraChecks);
+		return runTest<1>(testCount, minX, maxX, useRandomArgs, printEveryNth, testSet, extraChecks);
 	else
-		return runTest<2>(testCount, minX, maxX, printEveryNth, testSet, extraChecks);
+		return runTest<2>(testCount, minX, maxX, useRandomArgs, printEveryNth, testSet, extraChecks);
 
 	// This uses a switch instead and produces all possible variants, but is compiling longer.
 	/* switch (smallestTestedHPn) {
@@ -559,6 +575,7 @@ void exposeRealHPDiagnostics()
 	         py::arg("testCount")     = 10,
 	         py::arg("minX")          = yade::Real { -10 },
 	         py::arg("maxX")          = yade::Real { 10 },
+	         py::arg("useRandomArgs") = false,
 	         py::arg("printEveryNth") = 1000,
 	         py::arg("extraChecks")   = false),
 	        R"""(
@@ -568,6 +585,7 @@ Tests mathematical functions against the highest precision in argument ``testLev
 :param testCount: ``int`` - specifies how many randomized tests of each function to perform.
 :param minX: ``Real`` - start of the range in which the random arguments are generated.
 :param maxX: ``Real`` - end of that range.
+:param useRandomArgs: If ``False`` (default) then ``minX ... maxX`` is divided into ``testCount`` equidistant points. If ``True`` then each call is a random number. This applies only to the first argument of a function, if a function takes more than one argument, then remaining arguments are random - 2D scans are not performed.
 :param printEveryNth: will :ref:`print using<logging>` ``LOG_INFO`` the progress information every Nth step in the ``testCount`` loop. To see it e.g. start using ``yade -f6``, also see :ref:`logger documentation<logging>`.
 :param extraChecks: will perform extra checks while executing this funcion. Useful only for debugging of :yref:`getRealHPErrors<yade._math.getRealHPErrors>`.
 :return: A python dictionary with the largest ULP distance to the correct function value. For each function name there is a dictionary consisting of: how many binary digits (bits) are in the tested ``RealHP<N>`` type, the worst arguments for this function, and the ULP distance to the reference value.
