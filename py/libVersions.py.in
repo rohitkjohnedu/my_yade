@@ -266,6 +266,17 @@ def printAllVersions(rstFormat=False):
 	print("Linux version: "+str(getLinuxVersion()))
 	print("")
 
+def getAllVersions(rstFormat=False):
+	"""
+	:return: ``str`` - this function returns the result of :yref:`printAllVersions(rstFormat)<yade.libVersions.printAllVersions>` call inside a string variable.
+	"""
+	import sys,io
+	origStdOut = sys.stdout
+	newStdOut  = io.StringIO()
+	sys.stdout = newStdOut
+	printAllVersions(rstFormat)
+	sys.stdout = origStdOut
+	return newStdOut.getvalue()
 
 """
 GITLAB format:
