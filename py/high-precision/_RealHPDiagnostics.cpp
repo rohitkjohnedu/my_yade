@@ -426,7 +426,7 @@ public:
 #define CHECK_FUN_C_2(f, d1, d2)     amend<testN>(#f, math::f(ComplexHP<testN>(applyDomain<testN>(args[0], d1), applyDomain<testN>(args[1], d2))), { d1, d2 }, args)
 		CHECK_FUN_R_2(basicAdd , Domain::All, Domain::All);        // all
 		CHECK_FUN_R_2(basicSub , Domain::All, Domain::All);        // all
-		CHECK_FUN_R_2(basicDiv , Domain::All, Domain::All);        // all
+		CHECK_FUN_R_2(basicDiv , Domain::All, Domain::NonZero);    // all
 		CHECK_FUN_R_2(basicMult, Domain::All, Domain::All);        // all
 
 		CHECK_FUN_R_1(sin  , Domain::All);                         // all
@@ -466,7 +466,7 @@ public:
 
 		CHECK_FUN_R_2(pow  , Domain::Above0, Domain::All);         // x>0 (no complex here) , all y
 		CHECK_FUN_R_1(sqrt , Domain::Above0);                      // x>0
-		CHECK_FUN_R_1(cbrt , Domain::Above0);                      // x>0
+		CHECK_FUN_R_1(cbrt , Domain::All);                         // all
 		CHECK_FUN_R_2(hypot, Domain::All, Domain::All);            // all
 
 		CHECK_FUN_R_1(erf   , Domain::All);                        // all
