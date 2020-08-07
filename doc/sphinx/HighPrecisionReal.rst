@@ -228,7 +228,7 @@ Which of these two ``RealHP<2>`` binary representations is more desirable depend
 1. The best binary approximation of a ``1.23`` decimal.
 2. Reproducing the 53 binary bits of that number into a higher precision to continue the calculations on **the same** number which was previously in lower precision.
 
-To achieve 1. simply pass the argument ``'1.23'`` as string. To achieve 2. use :yref:`yade.math.HPn.toHPm(…)<yade._math.HP1.toHP2>` conversion, which maintains binary fidelity using a single :ysrccommit:`static_cast<RealHP<m>>(…)<dd8eba8390012f05c27aee97bca486d69f8cf256/py/high-precision/_ExposeRealBitTest.cpp#L621>`. Similar problem is `discussed in mpmath <http://mpmath.org/doc/current/basics.html#providing-correct-input>`__ documentation.
+To achieve 1. simply pass the argument ``'1.23'`` as string. To achieve 2. use :yref:`yade.math.HPn.toHPm(…)<yade._math.HP1.toHP2>` conversion, which maintains binary fidelity using a single :ysrccommit:`static_cast<RealHP<m>>(…)<dd8eba8390012f05c27aee97bca486d69f8cf256/py/high-precision/_ExposeRealBitTest.cpp#L621>`. Similar problem is discussed in `mpmath <http://mpmath.org/doc/current/basics.html#providing-correct-input>`__ and `boost <https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/boost_multiprecision/tut/floats/fp_eg/caveats.html>`__ documentation.
 
 .. hint::
 	All ``RealHP<N>`` function arguments that are of type higher than ``double`` can also accept decimal strings. This allows to preserve precision above python default floating point precision.
