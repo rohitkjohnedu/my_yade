@@ -471,13 +471,16 @@ class SimpleTests(unittest.TestCase):
 			for bits in testULP[func]:
 				tolerateErrorULP = 8
 				if(self.nowUsesBoostBinFloat( self.bitsToLevelHP(bits) )):
-					tolerateErrorULP = 200 # cpp_bin_float has larger errors
-					if(func == "tgamma"):
+					tolerateErrorULP = 127 # cpp_bin_float has larger errors
+					if(func in ["tgamma","acos","erfc"]):
 						tolerateErrorULP = 50000
 					elif(func == "lgamma"):
-						tolerateErrorULP =100000
+						tolerateErrorULP = 1e10
+					elif(func in ["sin","cos","tan","fma"]):
+						tolerateErrorULP = 2e8
 				# DONE: file a bug report about higher precision versions of these two functions. They have large error: log2(300000000)≈28.1 incorrect bits.
 				#       https://github.com/boostorg/multiprecision/issues/262
+				#       https://github.com/boostorg/multiprecision/issues/264
 				# when it's fixed we can check boost version and skip this line below.
 				if((func in ["complex tan real","complex tanh imag"])):
 					#tolerateErrorULP = 600000000
