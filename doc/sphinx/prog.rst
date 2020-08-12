@@ -37,7 +37,7 @@ we shall call each top-level component *module*::
 Header installation
 ^^^^^^^^^^^^^^^^^^^^
 CMAKE uses the original source layout and it is advised to use ``#include <module/Class.hpp>``
-style of inclusion rather than ``#include "Class.hpp`` even if you are in the same directory.
+style of inclusion rather than ``#include "Class.hpp"`` even if you are in the same directory.
 The following table gives a few examples:
 
 ============================================================= =========================
