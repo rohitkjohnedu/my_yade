@@ -6,6 +6,7 @@
 #include "OpenGLRenderer.hpp"
 #include <lib/opengl/GLUtils.hpp>
 #include <lib/pyutil/gil.hpp>
+#include <lib/serialization/EnumSupport.hpp>
 #include <core/Scene.hpp>
 #include <core/Timing.hpp>
 #include <pkg/common/Aabb.hpp>
@@ -16,6 +17,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
+YADE_ENUM(yade::OpenGLRenderer, BlinkHighlight, (NEVER)(NORMAL)(WEAK));
 YADE_PLUGIN((OpenGLRenderer)(GlExtraDrawer));
 CREATE_LOGGER(OpenGLRenderer);
 
@@ -191,8 +193,8 @@ void OpenGLRenderer::render(const shared_ptr<Scene>& _scene, Body::id_t selectio
 
 	// recompute emissive light colors for highlighted bodies
 	Real now              = TimingInfo::getNow(/*even if timing is disabled*/ true) * 1e-9;
-	highlightEmission0[0] = highlightEmission0[1] = highlightEmission0[2] = .8 * normSquare(now, 1);
-	highlightEmission1[0] = highlightEmission1[1] = highlightEmission0[2] = .5 * normSaw(now, 2);
+	highlightEmission0[0] = highlightEmission0[1] = highlightEmission0[2] = ((blinkHighlight == BlinkHighlight::WEAK) ? 0.2 : 0.8) * normSquare(now, 1);
+	highlightEmission1[0] = highlightEmission1[1] = highlightEmission1[2] = ((blinkHighlight == BlinkHighlight::WEAK) ? 0.2 : 0.6) * normSaw(now, 2);
 
 	// clipping
 	assert(clipPlaneNormals.size() == (size_t)numClipPlanes);
@@ -455,7 +457,8 @@ void OpenGLRenderer::renderShape()
 
 		// ignored in non-selection mode, use it always
 		glPushName(b->id);
-		bool highlight = (b->id == selId || (b->clumpId >= 0 && b->clumpId == selId) || b->shape->highlight);
+		bool highlight
+		        = (b->id == selId || (b->clumpId >= 0 && b->clumpId == selId) || b->shape->highlight) and (blinkHighlight != BlinkHighlight::NEVER);
 
 		glPushMatrix();
 		AngleAxisr aa(ori);

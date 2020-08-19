@@ -358,6 +358,25 @@ class AttrEditor_Matrix3(AttrEditor_MatrixX):
 	def __init__(self,parent,getter,setter):
 		AttrEditor_MatrixX.__init__(self,parent,getter,setter,3,3,lambda r,c:(r,c))
 
+class AttrEditor_QComboBox(AttrEditor,QComboBox):
+	def __init__(self,parent,getter,setter):
+		AttrEditor.__init__(self,getter,setter)
+		QComboBox.__init__(self,parent)
+		self.activated.connect(self.update)
+		for item in self.getter().names: self.addItem(item)
+		try:
+			self.setCurrentText(self.getter().name);
+		except:
+			self.setCurrentIndex(0);
+	def refresh(self): pass
+	def update(self,v):
+		self.setter(self.currentText())
+		#print("update "+str(v)+ " " +str(self.getter() ))
+		logging.debug('Update %s with %s' % (str(v),str(self.getter())) )
+		pass
+
+class EnumDropDownMenu(object): pass
+
 class Se3FakeType(object): pass
 
 _fundamentalEditorMap={
@@ -375,6 +394,7 @@ _fundamentalEditorMap={
 	,Vector3i:AttrEditor_Vector3i
 	,Vector2i:AttrEditor_Vector2i
 	,Se3FakeType:AttrEditor_Se3
+	,EnumDropDownMenu:AttrEditor_QComboBox
 }
 
 _fundamentalInitValues={
@@ -392,6 +412,7 @@ _fundamentalInitValues={
 	,Vector2i:Vector2i.Zero
 	,Vector2:Vector2.Zero
 	,Se3FakeType:(Vector3.Zero,Quaternion((0,1,0),0.0))
+	,EnumDropDownMenu:0
 }
 
 if yade.config.highPrecisionMpmath:
@@ -504,6 +525,8 @@ class SerializableEditor(QFrame):
 				#if not t: raise RuntimeError('Unable to guess type of '+str(self.ser)+'.'+attr)
 			# hack for Se3, which is returned as (Vector3,Quaternion) in python
 			elif isinstance(val,tuple) and len(val)==2 and val[0].__class__==Vector3 and val[1].__class__==Quaternion: t=Se3FakeType
+			# recognize a registered py::enum_ from C++
+			elif str(val.__class__.__base__) == "<class 'Boost.Python.enum'>": t = EnumDropDownMenu
 			else: t=val.__class__
 			match=re.search(':yattrflags:`\s*([0-9]+)\s*`',doc) # non-empty attribute
 			flags=int(match.group(1)) if match else 0

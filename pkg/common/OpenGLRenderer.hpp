@@ -103,6 +103,7 @@ public:
 	void                                                 renderShape();
 	void                                                 renderAllInteractionsWire();
 	template <class FunctorType, class DispatcherT> void setupDispatcher(const vector<string>& names, DispatcherT& dispatcher);
+	enum class BlinkHighlight { NEVER, NORMAL, WEAK };
 
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(OpenGLRenderer,Serializable,"Class responsible for rendering scene on OpenGL devices.",
@@ -114,6 +115,7 @@ public:
 		((Vector3r,light2Color,Vector3r(0.5,0.5,0.1),,"Per-color intensity of secondary light (RGB)."))
 		((Vector3r,cellColor,Vector3r(1,1,0),,"Color of the periodic cell (RGB)."))
 		((Vector3r,bgColor,Vector3r(.2,.2,.2),,"Color of the background canvas (RGB)"))
+		((BlinkHighlight,blinkHighlight,BlinkHighlight::NORMAL,,"Adjust blinking of the body selected in the 'Simulation Inspection' window."))
 		((bool,wire,false,,"Render all bodies with wire only (faster)"))
 		((bool,light1,true,,"Turn light 1 on."))
 		((bool,light2,true,,"Turn light 2 on."))
