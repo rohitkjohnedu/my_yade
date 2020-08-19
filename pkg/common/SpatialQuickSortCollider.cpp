@@ -66,9 +66,15 @@ void SpatialQuickSortCollider::action()
 		j   = i;
 		while (++j < nbElements) {
 			if (rank[j]->min[0] > max[0])
-				break;
+				break; // skip all others, because it's sorted along X
+			id2 = rank[j]->id;
+#ifdef YADE_MPI
+			if (not Collider::mayCollide(Body::byId(id, scene).get(), Body::byId(id2, scene).get(), scene->subdomain))
+#else
+			if (not Collider::mayCollide(Body::byId(id, scene).get(), Body::byId(id2, scene).get()))
+#endif
+				continue; // skip this pair id ↔ id2, because it cannot collide for whatever reasons, e.g. a groupMask
 			if (rank[j]->min[1] < max[1] && rank[j]->max[1] > min[1] && rank[j]->min[2] < max[2] && rank[j]->max[2] > min[2]) {
-				id2 = rank[j]->id;
 				if ((interaction = interactions->find(Body::id_t(id), Body::id_t(id2))) == 0) {
 					interaction = shared_ptr<Interaction>(new Interaction(id, id2));
 					interactions->insert(interaction);
