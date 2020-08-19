@@ -104,7 +104,7 @@ template <typename Scalar> struct Math {
 	static Scalar       Sign(Scalar f) { return ::yade::math::sign(f); }              // { if(f<0) return -1; if(f>0) return 1; return 0; }
 	static Scalar       UnitRandom() { return ::yade::math::unitRandom(); }           //((double)rand()/((double)(RAND_MAX)))
 	static Scalar       SymmetricRandom() { return ::yade::math::symmetricRandom(); } //2.*(((double)rand())/((double)(RAND_MAX)))-1.
-	static Scalar       FastInvCos0(Scalar fValue)
+	static Scalar       FastInvCos0(Scalar fValue) // FIXME : only Law2_ScGeom_CapillaryPhys_Capillarity*.cpp use this function.
 	{
 		Scalar fRoot   = sqrt(((Scalar)1.0) - fValue);
 		Scalar fResult = -(Scalar)0.0187293;
@@ -155,7 +155,7 @@ template <typename Scalar> Matrix3<Scalar> voigt_toSymmTensor(const Vector6<Scal
 	return ret;
 }
 /* convert 2nd order tensor to 6-vector (Voigt notation), symmetrizing the tensor;
-	if strain is true, multiply non-diagonal compoennts by 2.
+	if strain is true, multiply non-diagonal components by 2.
 */
 template <typename Scalar> Vector6<Scalar> tensor_toVoigt(const Matrix3<Scalar>& m, bool strain = false)
 {
