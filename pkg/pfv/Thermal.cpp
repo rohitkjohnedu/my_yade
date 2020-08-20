@@ -303,7 +303,7 @@ void ThermalEngine::setConductionBoundary()
 	boundarySet = true;
 }
 
-// FIXME: buggy, commenting out for now 
+// FIXME: buggy, commenting out for now
 //void ThermalEngine::applyBoundaryHeatFluxes()
 //{
 //	RTriangulation&                  Tri    = flow->solver->T[flow->solver->currentTes].Triangulation();

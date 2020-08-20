@@ -775,7 +775,8 @@ namespace CGT {
 		int  numCells        = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
-			if (cell->info().Pcondition or cell->info().blocked) continue;
+			if (cell->info().Pcondition or cell->info().blocked)
+				continue;
 			saturationTotal += cell->info().sat();
 			numCells += 1;
 		}
@@ -791,7 +792,8 @@ namespace CGT {
 		int  numCells     = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
-			if (cell->info().Pcondition or cell->info().blocked) continue;
+			if (cell->info().Pcondition or cell->info().blocked)
+				continue;
 			suctionTotal += pAir - cell->info().p();
 			numCells += 1;
 		}

@@ -990,9 +990,9 @@ namespace CGT {
 			// identify cells incident to alpha vertices and set BCs
 			Tesselation& Tes       = T[currentTes];
 			const long   sizeCells = Tes.cellHandles.size();
-//#ifdef YADE_OPENMP
-//#pragma omp parallel for
-//#endif
+			//#ifdef YADE_OPENMP
+			//#pragma omp parallel for
+			//#endif
 			for (long i = 0; i < sizeCells; i++) {
 				CellHandle& cell = Tes.cellHandles[i];
 				for (int j = 0; j < 4; j++) {

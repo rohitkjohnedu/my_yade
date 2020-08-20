@@ -148,7 +148,7 @@ template <int N> void multVec(::yade::math::UnderlyingRealHP<RealHP<N>>* array, 
 }
 
 namespace yade {
-void testLoopRealHP();
+void                  testLoopRealHP();
 template <int N> void testArray()
 {
 	LOG_NOFILTER(
@@ -1018,4 +1018,3 @@ struct TestRealHP1 {
 void testLoopRealHP() { boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP1()); }
 
 } // namespace yade
-

@@ -630,4 +630,3 @@ Tests mathematical functions against the highest precision in argument ``testLev
 
 	)""");
 }
-

@@ -390,7 +390,7 @@ void GLViewer::postDraw()
 		}
 		glLineWidth(1.);
 		glEnable(GL_DEPTH_TEST);
-		std::ostringstream oss{};
+		std::ostringstream oss {};
 		oss << std::setprecision(3) << scaleStep;
 		QGLViewer::drawText(scaleCenter[0], scaleCenter[1], oss.str().c_str());
 		stopScreenCoordinatesSystem();

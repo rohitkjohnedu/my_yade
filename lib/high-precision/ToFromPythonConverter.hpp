@@ -159,12 +159,12 @@ namespace math {
 				// The original RealHP<1> are present in two places:
 				//    yade.math.sin(10)                             yade.math.HP1.sin(10)
 				//    yade.minieigenHP.Vector3r(1,2,3)              yade.minieigenHP.HP1.Vector3r(1,2,3)
-				std::string          name = "HP" + boost::lexical_cast<std::string>(N); // scope name: "HP1", "HP2", etc
-				if( PyObject_HasAttrString(topScope.ptr(), name.c_str()) == true ) {
+				std::string name = "HP" + boost::lexical_cast<std::string>(N); // scope name: "HP1", "HP2", etc
+				if (PyObject_HasAttrString(topScope.ptr(), name.c_str()) == true) {
 					// If the scope already exists, then use it to add more objects to it.
-					RegisterHPClass<N, true>::work(topScope, boost::python::scope(topScope.attr(name.c_str())) );
+					RegisterHPClass<N, true>::work(topScope, boost::python::scope(topScope.attr(name.c_str())));
 				} else {
-					boost::python::scope HPn  = boost::python::class_<ScopeHP<N, RegisterHPClass>>(name.c_str());
+					boost::python::scope HPn = boost::python::class_<ScopeHP<N, RegisterHPClass>>(name.c_str());
 					RegisterHPClass<N, true>::work(topScope, HPn);
 				}
 			} else {

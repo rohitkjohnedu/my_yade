@@ -21,8 +21,8 @@ namespace math {
 	int RealHPConfig::extraStringDigits10 { 4 };
 	// https://stackoverflow.com/questions/14395967/proper-initialization-of-static-constexpr-array-in-class-template
 	// should not have a (duplicate) initializer in its namespace scope definition
-	const constexpr size_t RealHPConfig::sizeEigenCgal;
-	const constexpr size_t RealHPConfig::sizeMinieigen;
+	const constexpr size_t                                       RealHPConfig::sizeEigenCgal;
+	const constexpr size_t                                       RealHPConfig::sizeMinieigen;
 	const constexpr std::array<int, RealHPConfig::sizeEigenCgal> RealHPConfig::supportedByEigenCgal;
 	const constexpr std::array<int, RealHPConfig::sizeMinieigen> RealHPConfig::supportedByMinieigen;
 

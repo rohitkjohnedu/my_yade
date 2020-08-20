@@ -216,8 +216,10 @@ bool Ig2_Wall_Polyhedra_PolyhedraGeom::go(
 
 	//move wall
 	Vector3r normal = Vector3r(0, 0, 0);
-	if (sense != 0) normal[PA] = sense;
-	else normal[PA] = se32.position[PA]-se31.position[PA]>0?1:-1;
+	if (sense != 0)
+		normal[PA] = sense;
+	else
+		normal[PA] = se32.position[PA] - se31.position[PA] > 0 ? 1 : -1;
 	CGALvector CGALnormal = CGALvector(normal[0], normal[1], normal[2]);
 	Plane      A          = Plane(CGALpoint(se31.position[0], se31.position[1], se31.position[2]), CGALvector(normal[0], normal[1], normal[2]));
 
