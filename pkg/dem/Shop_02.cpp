@@ -343,7 +343,7 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	// *** Fabric tensor ***/
 	fabric          = Matrix3r::Zero();
 	int       count = 0; // number of interactions
-	pair<Vector3r,Vector3r> aabb  = Shop::aabbExtrema(cutoff);
+	const auto aabb = Shop::aabbExtrema(cutoff);
 	Vector3r  bbMin = aabb.first, bbMax = aabb.second;
 	Vector3r  cp;
 
