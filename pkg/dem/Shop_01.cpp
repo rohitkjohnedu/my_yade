@@ -385,7 +385,7 @@ Real Shop::getPorosity(const shared_ptr<Scene>& _scene, Real _volume)
 	Real                    V;
 	if (!scene->isPeriodic) {
 		if (_volume <= 0) { // throw std::invalid_argument("utils.porosity must be given (positive) *volume* for aperiodic simulations.");
-			pair<Vector3r,Vector3r> extrema = aabbExtrema();
+			const auto extrema = aabbExtrema();
 			V = (extrema.second[0] - extrema.first[0]) * (extrema.second[1] - extrema.first[1]) * (extrema.second[2] - extrema.first[2]);
 		} else
 			V = _volume;

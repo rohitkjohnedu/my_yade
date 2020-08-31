@@ -17,7 +17,7 @@ using math::min; // using inside .cpp file is ok.
 
 py::tuple negPosExtremeIds(int axis, Real distFactor)
 {
-	pair<Vector3r,Vector3r> extrema  = Shop::aabbExtrema();
+	const auto extrema = Shop::aabbExtrema();
 	Real      minCoord = extrema.first[axis], maxCoord = extrema.second[axis];
 	py::list  minIds, maxIds;
 	for (const auto& b : *Omega::instance().getScene()->bodies) {
@@ -431,7 +431,7 @@ shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id
 Real      Shop__unbalancedForce(bool useMaxForce /*false by default*/) { return Shop::unbalancedForce(useMaxForce); }
 py::tuple Shop__aabbExtrema(Real cutoff, bool centers)
 {
-	pair<Vector3r,Vector3r> aabb = Shop::aabbExtrema(cutoff,centers);
+	const auto aabb = Shop::aabbExtrema(cutoff,centers);
 	return py::make_tuple(aabb.first, aabb.second);
 }
 

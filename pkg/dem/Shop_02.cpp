@@ -452,7 +452,7 @@ Matrix3r Shop::getStress(Real volume)
 	Scene* scene         = Omega::instance().getScene().get();
 	Real   volumeNonPeri = 0;
 	if (volume == 0 && !scene->isPeriodic) {
-		pair<Vector3r,Vector3r> extrema = Shop::aabbExtrema();
+		const auto extrema = Shop::aabbExtrema();
 		volumeNonPeri = (extrema.second[0] - extrema.first[0]) * (extrema.second[1] - extrema.first[1]) * (extrema.second[2] - extrema.first[2]);
 	}
 	if (volume == 0)
