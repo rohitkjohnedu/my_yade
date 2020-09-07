@@ -51,38 +51,34 @@ try {
 	              boost::python::arg("distributeMass") = false,
 	              boost::python::arg("seed")           = -1,
 	              boost::python::arg("hSize")          = Matrix3r(Matrix3r::Zero())),
-	             // FIXME: use R"""(raw text)""" here, like exaplained in https://yade-dem.org/doc/prog.html#sphinx-documentation and used in py/_libVersions.cpp
-	             "Create a random cloud of particles enclosed in a parallelepiped (also works in 2D if minCorner[k]=maxCorner[k] for one coordinate). The "
-	             "resulting packing is a gas-like state with no contacts between particles initially. Usually used as a first "
-	             "step before reaching a dense packing."
-	             "\nSphere radius distribution can be specified using one of the following ways:\n\n#. *rMean*, *rRelFuzz* and *num* gives uniform radius "
-	             "distribution in *rMean×(1 ± rRelFuzz)*. Less than *num* spheres can be generated if it is too high.\n#. *rRelFuzz*, *num* and (optional) "
-	             "*porosity*, which estimates mean radius so that *porosity* is attained at the end.  *rMean* must be less than 0 (default). *porosity* is "
-	             "only an initial guess for the generation algorithm, which will retry with higher porosity until the prescibed *num* is obtained.\n#. "
-	             "*psdSizes* and *psdCumm*, two arrays specifying points of the `particle size distribution "
-	             "<http://en.wikipedia.org/wiki/Particle_size_distribution>`__ function. As many spheres as possible are generated.\n#. *psdSizes*, "
-	             "*psdCumm*, *num*, and (optional) *porosity*, like above but if *num* is not obtained, *psdSizes* will be scaled down uniformly, until "
-	             "*num* is obtained (see :yref:`appliedPsdScaling<yade._packSpheres.SpherePack.appliedPsdScaling>`).\n\nBy default (with "
-	             "``distributeMass==False``), the distribution is applied to particle count (i.e. particle count percent passing). The typical "
-	             "geomechanics sense of \"particle size distribution\" is the distribution of *mass fraction* (i.e. mass percent passing); this can be "
-	             "achieved with ``distributeMass=True``."
-	             "\n\nIf *num* is defined, then sizes generation is deterministic, giving the best fit of target distribution. It enables spheres "
-	             "placement in descending size order, thus giving lower porosity than the random generation."
-	             "\n\n:param Vector3 minCorner: lower corner of an axis-aligned box\n:param Vector3 maxCorner: upper corner of an axis-aligned box\n:param "
-	             "Matrix3 hSize: base vectors of a generalized box (arbitrary parallelepiped, typically :yref:`Cell::hSize`), superseeds minCorner and "
-	             "maxCorner if defined. For periodic boundaries only.\n:param float rMean: mean radius or spheres\n:param float rRelFuzz: dispersion of "
-	             "radius relative to rMean\n:param int num: number of spheres to be generated. If negative (default), generate as many as possible with "
-	             "stochastic sizes, ending after a fixed number of tries to place the sphere in space, else generate exactly *num* spheres with "
-	             "deterministic size distribution.\n:param bool periodic: whether the packing to be generated should be periodic\n:param float porosity: "
-	             "initial guess for the iterative generation procedure (if *num*>1). The algorithm will be retrying until the number of generated spheres "
-	             "is *num*. The first iteration tries with the provided porosity, but next iterations increase it if necessary (hence an initialy high "
-	             "porosity can speed-up the algorithm). If *psdSizes* is not defined, *rRelFuzz* ($z$) and *num* ($N$) are used so that the porosity given "
-	             "($\\rho$) is approximately achieved at the end of generation, $r_m=\\sqrt[3]{\\frac{V(1-\\rho)}{\\frac{4}{3}\\pi(1+z^2)N}}$. The default "
-	             "is $\\rho$=0.5. The optimal value depends on *rRelFuzz* or  *psdSizes*.\n:param psdSizes: sieve sizes (particle diameters) when particle "
-	             "size distribution (PSD) is specified\n:param psdCumm: cummulative fractions of particle sizes given by *psdSizes*; must be the same "
-	             "length as *psdSizes* and should be non-decreasing\n:param bool distributeMass: if ``True``, given distribution will be used to "
-	             "distribute sphere's mass rather than radius of them.\n:param seed: number used to initialize the random number generator.\n:returns: "
-	             "number of created spheres, which can be lower than *num* depending on the method used.\n")
+				R"""(Create a random cloud of particles enclosed in a parallelepiped. The resulting packing is a gas-like state with no contacts between particles initially. Usually used as a first step before reaching a dense packing.
+
+				:param Vector3 minCorner: lower corner of an axis-aligned box
+				:param Vector3 maxCorner: upper corner of an axis-aligned box
+				:param Matrix3 hSize: base vectors of a generalized box (arbitrary parallelepiped, typically :yref:`Cell::hSize`), superseeds minCorner and maxCorner if defined. For periodic boundaries only.
+				:param float rMean: mean radius or spheres
+				:param float rRelFuzz: dispersion of radius relative to rMean
+				:param int num: number of spheres to be generated. If negative (default), generate as many as possible with stochastic sizes, ending after a fixed number of tries to place the sphere in space, else generate exactly ``num`` spheres with deterministic size distribution.
+				:param bool periodic: whether the packing to be generated should be periodic
+				:param float porosity: initial guess for the iterative generation procedure (if ``num``>1). The algorithm will be retrying until the number of generated spheres is ``num``. The first iteration tries with the provided porosity, but next iterations increase it if necessary (hence an initialy high porosity can speed-up the algorithm). If ``psdSizes`` is not defined, ``rRelFuzz`` ($z$) and ``num`` ($N$) are used so that the porosity given ($\rho$) is approximately achieved at the end of generation, $r_m=\sqrt[3]{\frac{V(1-\rho)}{\frac{4}{3}\pi(1+z^2)N}}$. The default is $\rho$=0.5. The optimal value depends on ``rRelFuzz`` or  ``psdSizes``.
+				:param psdSizes: sieve sizes (particle diameters) when particle size distribution (PSD) is specified.
+				:param psdCumm: cummulative fractions of particle sizes given by ``psdSizes``; must be the same length as *psdSizes* and should be non-decreasing.
+				:param bool distributeMass: if ``True``, given distribution will be used to distribute sphere's mass rather than radius of them.
+				:param seed: number used to initialize the random number generator.
+				:returns: number of created spheres, which can be lower than ``num`` depending on the method used.
+
+				.. note::
+					- Works in 2D if ``minCorner[k]=maxCorner[k]`` for one coordinate.
+					- If ``num`` is defined, then sizes generation is deterministic, giving the best fit of target distribution. It enables spheres placement in descending size order, thus giving lower porosity than the random generation.
+					- By default (with ``distributeMass==False``), the distribution is applied to particle count (i.e. particle count percent passing). The typical geomechanics sense of "particle size distribution" is the distribution of *mass fraction* (i.e. mass percent passing); this can be achieved with ``distributeMass=True``.
+					- Sphere radius distribution can be specified using one of the following ways:
+
+						1. ``rMean``, ``rRelFuzz`` and ``num`` gives uniform radius distribution in $rMean×(1 \pm rRelFuzz)$. Less than ``num`` spheres can be generated if it is too high.
+						2. ``rRelFuzz``, ``num`` and (optional) ``porosity``, which estimates mean radius so that ``porosity`` is attained at the end.  ``rMean`` must be less than 0 (default). ``porosity`` is only an initial guess for the generation algorithm, which will retry with higher porosity until the prescibed *num* is obtained.
+						3. ``psdSizes`` and ``psdCumm``, two arrays specifying points of the `particle size distribution <http://en.wikipedia.org/wiki/Particle_size_distribution>`_ function. As many spheres as possible are generated.
+						4. ``psdSizes``, ``psdCumm``, ``num``, and (optional) ``porosity``, like above but if ``num`` is not obtained, ``psdSizes`` will be scaled down uniformly, until ``num`` is obtained (see :yref:`appliedPsdScaling<yade._packSpheres.SpherePack.appliedPsdScaling>`).
+				)""")
+
 	        .def("psd",
 	             &SpherePack::psd,
 	             (boost::python::arg("bins") = 50, boost::python::arg("mass") = true),
@@ -100,10 +96,15 @@ try {
 	              boost::python::arg("periodic") = false,
 	              boost::python::arg("num")      = -1,
 								boost::python::arg("seed")           = -1),
-	             "Create random loose packing of clumps within box given by *minCorner* and *maxCorner*. Clumps are selected with equal probability. At "
-	             "most *num* clumps will be positioned if *num* is positive; otherwise, as many clumps as possible will be put in space, until maximum "
-	             "number of attempts to place a new clump randomly is achieved.")
-	        //
+				R"""(Create a random loose packing of clumps the same way `makeCloud <https://yade-dem.org/doc/yade.pack.html?highlight=makecloud#yade._packSpheres.SpherePack.makeCloud>`_ does with spheres. The parameters ``minCorner``, ``maxCorner``, ``periodic``, ``num`` and ``seed`` are the same as in makeCloud_. The parameter ``clumps`` is a list containing all the different clumps to be appended as ``SpherePack`` objects. Here is an exemple that shows how to create a cloud made of 10 identical clumps :
+
+				.. code-block:: python
+
+					clp = SpherePack([((0,0,0), 1e-2), ((1e-2,0,0), 1e-2)]) # The clump we want a cloud of
+					sp = SpherePack()
+					sp.makeClumpCloud((0,0,0), (1,1,1), [clp], num=10, seed=42)
+					sp.toSimulation() # All the particles in the cloud are now appended to O.bodies
+				)""")
 	        .def("aabb", &SpherePack::aabb_py, "Get axis-aligned bounding box coordinates, as 2 3-tuples.")
 	        .def("dim", &SpherePack::dim, "Return dimensions of the packing in terms of aabb(), as a 3-tuple.")
 	        .def("center", &SpherePack::midPt, "Return coordinates of the bounding box center.")
