@@ -133,7 +133,7 @@ public:
 		((Real, delT, 0,,"Allows user to apply a delT to solids and observe macro thermal expansion. Resets to 0 after one conduction step."))
         	((Real,tsSafetyFactor,0.8,,"Allow user to control the timstep estimate with a safety factor. Default 0.8. If <= 0, thermal timestep is equal to DEM"))
         	((Real,porosityFactor,0,,"If >0, factors the fluid thermal expansion. Useful for simulating low porosity matrices."))
-        	((bool,tempDependentFluidBeta,false,,"If true, fluid volumetric thermal expansion is temperature dependent (linear model between 20-70 degC)"))
+        	((bool,tempDependentFluidBeta,false,,"If true, fluid volumetric thermal expansion coefficient, beta, is temperature dependent (linear model between 20-70 degC)"))
         	((Real,minimumFluidCondDist,0,,"Useful for maintaining stability despite poor external triangulations involving flat tetrahedrals. Consider setting to minimum particle diameter to keep scale."))
 		,
 		/* extra initializers */
