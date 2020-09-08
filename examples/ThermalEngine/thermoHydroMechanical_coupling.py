@@ -8,7 +8,7 @@
 #
 # Script demonstrating the use of full Thermo-Hydro-Mechanical coupling
 # in ThermalEngine. Methods published in: 
-#Robert Caulk, Luc Sholtès, Marek Krzaczek, Bruno Chareyre,
+#Robert Caulk, Luc Scholtès, Marek Krzaczek, Bruno Chareyre,
 #A pore-scale thermo–hydro-mechanical model for particulate systems,
 #Computer Methods in Applied Mechanics and Engineering,
 #Volume 372,
@@ -42,7 +42,7 @@ walls=aabbWalls([mn,mx],thickness=0,material='walls')
 wallIds=O.bodies.append(walls)
 
 sp=pack.SpherePack()
-sp.makeCloud(mn,mx,rMean=0.0015,rRelFuzz=0.333,num=200,seed=11) 
+sp.makeCloud(mn,mx,rMean=0.0015,rRelFuzz=0.333,num=100,seed=1) 
 sp.toSimulation(color=(0.752, 0.752, 0.752),material='spheres')
 
 triax=TriaxialStressController(
@@ -89,7 +89,7 @@ flow.debug=False
 # add flow
 flow.permeabilityMap = False
 flow.pZero = 10
-flow.meshUpdateInterval=5
+flow.meshUpdateInterval=2
 flow.fluidBulkModulus=2.2e9
 flow.useSolver=4
 flow.permeabilityFactor=-1e-5
