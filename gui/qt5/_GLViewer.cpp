@@ -292,8 +292,8 @@ try {
 	py::def("View", y::createView, "Create a new 3d view.");
 	py::def("centerValues",
 	        y::centerValues,
-	        ":return: a dictionary with all parameters currently used by yade.qt.center(…), see yade.qt.center? for details. Returns zeros if view is "
-	        "closed.");
+	        ":return: a dictionary with all parameters currently used by ``yade.qt.center(…)``, see :yref:`yade.qt.center<yade.qt._GLViewer.center>` or "
+	        "type ``yade.qt.center?`` for details. Returns zeros if view is closed.");
 	py::def("center",
 	        y::centerViews,
 	        (py::arg("suggestedRadius")   = -1.0,

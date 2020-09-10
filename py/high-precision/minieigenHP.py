@@ -28,7 +28,7 @@ The ``RealHP<n>`` :ref:`higher precision<higher-hp-precision>` vectors and matri
 
 	import yade.minieigenHP as mne
 	mne.HP2.Vector3(1,2,3) # produces Vector3 using RealHP<2> precision
-	mth.Vector3(1,2,3)     # without using HPn module scope it defaults to RealHP<1>
+	mne.Vector3(1,2,3)     # without using HPn module scope it defaults to RealHP<1>
 
 """
 
