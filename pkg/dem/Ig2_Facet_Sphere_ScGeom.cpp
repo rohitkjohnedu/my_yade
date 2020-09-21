@@ -217,7 +217,7 @@ bool Ig2_Wall_Sphere_ScGeom::go(
 	if (isNew)
 		c->geom = shared_ptr<ScGeom>(new ScGeom());
 	const shared_ptr<ScGeom>& ws = YADE_PTR_CAST<ScGeom>(c->geom);
-	ws->radius1 = ws->radius2 = radius; // do the same as for facet-sphere: wall's "radius" is the same as the sphere's radius
+	ws->radius1 = ws->radius2 = radius; // wall's "radius" is chosen as the same as the sphere's radius
 	ws->contactPoint          = contPt;
 	ws->penetrationDepth      = -(math::abs(dist) - radius);
 	// ws->normal is assigned by precompute

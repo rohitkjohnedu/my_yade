@@ -35,8 +35,8 @@ public:
 	        const bool&                    force,
 	        const shared_ptr<Interaction>& c);
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Facet` and :yref:`Sphere`.",
-		((Real,shrinkFactor,((void)"no shrinking",0),,"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multipled by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Facet_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Facet` and :yref:`Sphere`. The equivalent radius for the Facet (:yref:`ScGeom.refR1`) is chosen as twice the Sphere's one.",
+		((Real,shrinkFactor,((void)"no shrinking",0),,"The radius of the inscribed circle of the facet is decreased by the value of the sphere's radius multiplied by *shrinkFactor*. From the definition of contact point on the surface made of facets, the given surface is not continuous and becomes in effect surface covered with triangular tiles, with gap between the separate tiles equal to the sphere's radius multiplied by 2×*shrinkFactor*. If zero, no shrinking is done."))
 	);
 	// clang-format on
 	DECLARE_LOGGER;
@@ -83,7 +83,7 @@ public:
 	   const bool&                    force,
 	   const shared_ptr<Interaction>& c);
 	// clang-format off
-	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Wall_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Wall` and :yref:`Sphere`.",
+	YADE_CLASS_BASE_DOC_ATTRS(Ig2_Wall_Sphere_ScGeom,IGeomFunctor,"Create/update a :yref:`ScGeom` instance representing intersection of :yref:`Wall` and :yref:`Sphere`. The equivalent radius for the Wall (:yref:`ScGeom.refR1`) is chosen equal to the Sphere's radius.",
 		((bool,noRatch,true,,"Avoid granular ratcheting"))
 	);
 	// clang-format on
