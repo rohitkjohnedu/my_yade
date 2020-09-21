@@ -765,9 +765,9 @@ try {
 	        &Shop::flipCell,
 	        (py::arg("flip") = Matrix3r(Matrix3r::Zero())),
 	        "Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible. This function relies on the fact that "
-	        "periodic cell defines by repetition of its corners regular grid of points in $R^3$; however, all cells generating identical grid are "
+	        "periodic cell is defined by the repetition of its corners' regular grid points in $R^3$; however, all cells generating identical grid points are "
 	        "equivalent and can be flipped one over another. This necessitates adjustment of :yref:`Interaction.cellDist` for interactions that cross "
-	        "boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: "
+	        "the boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: "
 	        "integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is "
 	        "accessible as ``Shop::flipCell``.");
 	py::def("getViscoelasticFromSpheresInteraction",
