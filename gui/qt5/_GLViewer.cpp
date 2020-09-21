@@ -332,7 +332,7 @@ Center all views.
 	                &pyGLViewer::get_orthographic,
 	                &pyGLViewer::set_orthographic,
 	                "Whether orthographic projection is used; if false, use perspective projection.")
-	        .add_property("screenSize", &pyGLViewer::get_screenSize, &pyGLViewer::set_screenSize, "Size of the viewer's window, in scree pixels")
+	        .add_property("screenSize", &pyGLViewer::get_screenSize, &pyGLViewer::set_screenSize, "Size of the viewer's window, in screen pixels")
 	        .add_property(
 	                "timeDisp",
 	                &pyGLViewer::get_timeDisp,
