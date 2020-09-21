@@ -1,4 +1,4 @@
-# J. Duriez (jerome.duriez@irstea.fr)
+# J. Duriez (jerome.duriez@inrae.fr)
 
 # to import with yade/python/ipython solveLaplace_uc.py, or with execfile('solveLaplace_uc.py',globals()) once inside a yade/python/ipython session
 

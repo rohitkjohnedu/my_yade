@@ -1,4 +1,4 @@
-// jerome.duriez@irstea.fr
+// jerome.duriez@inrae.fr
 
 #pragma once
 

@@ -1,5 +1,5 @@
 from __future__ import print_function
-# J. Duriez (jerome.duriez@irstea.fr)
+# J. Duriez (jerome.duriez@inrae.fr)
 
 # to import with yade/python/ipython solveLiqBridge.py, or with execfile('solveLiqBridge.py',globals()) once inside a yade/python/ipython session
 

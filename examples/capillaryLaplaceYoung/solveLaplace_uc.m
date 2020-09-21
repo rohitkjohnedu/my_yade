@@ -1,4 +1,4 @@
-% J. Duriez (jerome.duriez@irstea.fr)
+% J. Duriez (jerome.duriez@inrae.fr)
 
 function stabSol = solveLaplace_uc(theta,rRatio,uStar,delta1Cons,deltaZ,save)
 % Solves Laplace-Young equation for given r, uc* and theta
