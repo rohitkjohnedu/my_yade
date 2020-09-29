@@ -48,7 +48,7 @@ from yade.minieigenHP import *
 
 #matplotlib.use('TkAgg')
 #matplotlib.use('GTKAgg')
-##matplotlib.use('QtAgg')
+##matplotlib.use('Qt5Agg')
 matplotlib.rc('axes',grid=True) # put grid in all figures
 import pylab
 

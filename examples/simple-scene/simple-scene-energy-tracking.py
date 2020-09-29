@@ -20,7 +20,7 @@ rotate_in_two_directions = True
 ############################################
 
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Qt5Agg')
 O.materials.append(CohFrictMat(
 	young=3e8,
 	poisson=0.3,
