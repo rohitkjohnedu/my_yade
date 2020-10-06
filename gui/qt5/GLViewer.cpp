@@ -1,8 +1,6 @@
 /*************************************************************************
-*  Copyright (C) 2004 by Olivier Galizzi                                 *
-*  olivier.galizzi@imag.fr                                               *
-*  Copyright (C) 2005 by Janek Kozicki                                   *
-*  cosurgi@berlios.de                                                    *
+*  2004      Olivier Galizzi                                             *
+*  2005-2020 Janek Kozicki                                               *
 *                                                                        *
 *  This program is free software; it is licensed under the terms of the  *
 *  GNU General Public License v2 or later. See file LICENSE for details. *
@@ -43,9 +41,16 @@ GLViewer::~GLViewer()
 {
 	LOG_DEBUG("Closing " << viewId);
 	const std::lock_guard<std::mutex> lock(Omega::instance().renderMutex);
-	makeCurrent();
-	LOG_DEBUG("Acquired lock, releasing OpenGL context.");
-	doneCurrent();
+	LOG_DEBUG("Acquired lock.");
+	LOG_DEBUG("context() is " << std::hex << context());
+	if(isValid()) {
+		LOG_DEBUG("Acquiring context.");
+		makeCurrent();
+		LOG_DEBUG("Releasing OpenGL context.");
+		doneCurrent();
+	} else {
+		LOG_DEBUG("OpenGL context was already released.");
+	}
 }
 
 void GLViewer::staticCloseEvent(QCloseEvent* e, const int viewId)
