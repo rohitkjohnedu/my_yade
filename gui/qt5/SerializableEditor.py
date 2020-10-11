@@ -95,7 +95,7 @@ class AttrEditor_Bool(AttrEditor,QFrame):
 		AttrEditor.__init__(self,getter,setter)
 		QFrame.__init__(self,parent)
 		self.checkBox=QCheckBox(self)
-		lay=QVBoxLayout(self); lay.setSpacing(0); lay.addStretch(1); lay.addWidget(self.checkBox); lay.addStretch(1)
+		lay=QVBoxLayout(self); lay.setSpacing(0); lay.setContentsMargins(0,0,0,0); lay.addStretch(1); lay.addWidget(self.checkBox); lay.addStretch(1)
 		self.checkBox.clicked.connect(self.update)
 	def refresh(self): self.checkBox.setChecked(self.getter())
 	def update(self): self.trySetter(self.checkBox.isChecked())
@@ -229,7 +229,7 @@ class AttrEditor_Se3(AttrEditor,QFrame):
 	def __init__(self,parent,getter,setter):
 		AttrEditor.__init__(self,getter,setter)
 		QFrame.__init__(self,parent)
-		self.grid=QGridLayout(self); self.grid.setSpacing(0);
+		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setContentsMargins(0,0,0,0);
 		for row,col in itertools.product(list(range(2)),list(range(5))): # one additional column for vertical line in quaternion
 			if (row,col)==(0,3): continue
 			if (row,col)==(0,4): self.grid.addWidget(QLabel(u'←<i>pos</i> ↙<i>ori</i>',self),row,col); continue
@@ -275,7 +275,7 @@ class AttrEditor_MatrixX(AttrEditor,QFrame):
 		self.setContentsMargins(0,0,0,0)
 		self.first=True
 		val=self.getter()
-		self.grid=QGridLayout(self); self.grid.setSpacing(0);
+		self.grid=QGridLayout(self); self.grid.setSpacing(0); self.grid.setContentsMargins(0,0,0,0);
 		for row,col in itertools.product(list(range(self.rows)),list(range(self.cols))):
 			w=QLineEdit('')
 			self.grid.addWidget(w,row,col);
