@@ -20,9 +20,6 @@ class NewtonIntegrator;
 namespace yade { // Cannot have #include directive inside.
 
 
-#define VECTOR4_TEMPLATE(Scalar) Eigen::Matrix<Scalar, 4, 1>
-typedef VECTOR4_TEMPLATE(Real) Vector4r;
-
 class Lin4NodeTetra : public DeformableElement {
 public:
 	friend class If2_Lin4NodeTetra_LinIsoRayleighDampElast;
