@@ -111,21 +111,21 @@ template <typename ArbitraryEnum> struct ArbitraryEnum_from_python {
 #define YADE_ENUM_PARSE_ONE(r, FULL_SCOPE__ENUM_TYPE, enumNAME) .value(BOOST_PP_STRINGIZE(enumNAME), FULL_SCOPE__ENUM_TYPE::enumNAME)
 
 #define YADE_ENUM(FULL_SCOPE, ENUM_TYPE, ENUM_SEQUENCE)                                                                                                        \
-	template <> CREATE_LOGGER(ArbitraryEnum_from_python<FULL_SCOPE::ENUM_TYPE>);                                                                           \
+	TEMPLATE_CREATE_LOGGER(ArbitraryEnum_from_python<FULL_SCOPE::ENUM_TYPE>);                                                                              \
 	}                                                                        /* end namespace yade */                                                      \
 	namespace {                                                              /* start anonymous namespace */                                               \
 		__attribute__((constructor)) void registerEnum_##ENUM_TYPE(void) /* we cannot have enums with same name in multiple scopes */                  \
 		{                                                                                                                                              \
 			try {                                                                                                                                  \
-				/* register in the main scope */                                                                                               \
-				boost::python::object                         main = boost::python::import("__main__");                                        \
-				boost::python::scope                          scope(main);                                                                     \
+				/* register in yade scope */                                                                                                   \
+				boost::python::object                         main = boost::python::import("yade");                                            \
+				boost::python::scope                          setScope(main);                                                                  \
 				boost::python::type_info                      info = boost::python::type_id<FULL_SCOPE::ENUM_TYPE>();                          \
 				const boost::python::converter::registration* reg  = boost::python::converter::registry::query(info);                          \
 				if ((reg == NULL) or (reg->m_to_python == NULL)) {                                                                             \
 					yade::ArbitraryEnum_from_python<FULL_SCOPE::ENUM_TYPE>();                                                              \
 					boost::python::enum_<FULL_SCOPE::ENUM_TYPE>(                                                                           \
-					        #ENUM_TYPE) /* the loop over ENUM_SEQUENCE in next line registers all enum name strings */                     \
+					        "EnumClass_" #ENUM_TYPE) /* the loop over ENUM_SEQUENCE in next line registers all enum name strings */        \
 					        BOOST_PP_SEQ_FOR_EACH(YADE_ENUM_PARSE_ONE, FULL_SCOPE::ENUM_TYPE, ENUM_SEQUENCE);                              \
 				}                                                                                                                              \
 			} catch (...) {                                                                                                                        \
