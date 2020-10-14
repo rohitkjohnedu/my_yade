@@ -368,7 +368,11 @@ class AttrEditor_QComboBox(AttrEditor,QComboBox):
 			self.setCurrentText(self.getter().name);
 		except:
 			self.setCurrentIndex(0);
-	def refresh(self): pass
+	def refresh(self):
+		try:
+			self.setCurrentText(self.getter().name);
+		except:
+			self.setCurrentIndex(0);
 	def update(self,v):
 		self.setter(self.currentText())
 		#print("update "+str(v)+ " " +str(self.getter() ))
