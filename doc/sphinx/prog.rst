@@ -331,6 +331,9 @@ All debug macros are summarized in the table below:
 	| ``CREATE_LOGGER(ClassName);``                             | Creates logger static variable (with name ``"ClassName"``) inside class            |
 	|                                                           | implementation in ``.cpp`` file.                                                   |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
+	| ``TEMPLATE_CREATE_LOGGER(ClassName<OtherClass>);``        | Creates logger static variable (with name ``"ClassName<OtherClass>"``) inside class|
+	|                                                           | implementation in a ``.cpp`` file. Use this for templated classes.                 |
+	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
 	| ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");``              | Creates logger static variable outside of any class (with name ``"filename.cpp"``) |
 	|                                                           | inside the ``filename.cpp`` file.                                                  |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
@@ -1053,6 +1056,39 @@ The Python wrapper automatically creates constructor that takes keyword (named) 
 		Constructs from lists of …
 
 which then appears in the documentation similar to :yref:`InteractionLoop`.
+
+Enums
+^^^^^^^^^^^^^^^^^^^
+
+It is possible to expose ``enum`` and ``enum class`` (the ``enum class`` is the preferred one because it has stronger type safety to protect programmer from mistakes) in GUI in a dropdown menu. This approach is backward compatible, an assignment of ``int`` value in an old python script will work the same as before. Additionally it will be possible to assign the ``string`` type values to an enum. To enable the dropdown menu one must put a macro ``YADE_ENUM( Scope , EnumName , (ValueName1)(ValueName2)(ValueName3)(ValueName4) )`` in a ``.cpp`` file. Where each macro argument means:
+
+	1. ``Scope`` is the full scope name in which the enum resides. For example the scope of ``yade::OpenGLRenderer::BlinkHighlight`` is ``yade::OpenGLRenderer``.
+	2. ``EnumName`` is the name of the enum to be registered
+	3. ``ValueName`` are all enum values that are to be exposed to python. They have to be updated if the C++ enum declaration in ``.hpp`` file changes.
+
+After it is registered, like for example in :ysrccommit:`OpenGLRenderer.cpp<42d676ec83183ec3/pkg/common/OpenGLRenderer.cpp#L20>` it is available for use. Additionally the registered enum class type definitions are exposed in ``yade.EnumClass_*`` scope, for example one can check the ``names`` and ``values`` dictionaries:
+
+.. ipython::
+
+	Yade [1]: yade.EnumClass_BlinkHighlight.names
+
+	Yade [2]: yade.EnumClass_BlinkHighlight.values
+
+Keep in mind that these are **not the variable instances** hence trying to assign something to them will not change the blinkHighlight setting in GUI. To change enum value from python the respective variable must be assigned to. For example:
+
+.. ipython::
+
+	Yade [1]: rend = yade.qt.Renderer()
+
+	Yade [1]: rend.blinkHighlight
+
+	Yade [1]: rend.blinkHighlight = 'NEVER'
+
+	Yade [1]: rend.blinkHighlight = -5 ##### trying to assign incorrect value will not change current setting
+
+	Yade [1]: rend.blinkHighlight
+
+Alternatively the dropdown menu in GUI can be used for the same effect.
 
 Static attributes
 ^^^^^^^^^^^^^^^^^^^
