@@ -138,6 +138,7 @@ public:                                                                         
 	static boost::log::sources::severity_logger<Logging::SeverityLevel> logger
 #define CREATE_LOGGER(classname)                                                                                                                               \
 	boost::log::sources::severity_logger<Logging::SeverityLevel> classname::logger = Logging::instance().createNamedLogger(#classname)
+#define TEMPLATE_CREATE_LOGGER(ClassName) template <> CREATE_LOGGER(ClassName) /* Use this when creating a logger for a templated ClassName<SomeOtherClass> */
 #define CREATE_CPP_LOCAL_LOGGER(filtername)                                                                                                                    \
 	namespace {                                                                                                                                            \
 		boost::log::sources::severity_logger<Logging::SeverityLevel> logger = Logging::instance().createNamedLogger(filtername);                       \
@@ -179,6 +180,7 @@ public:                                                                         
 
 #define DECLARE_LOGGER
 #define CREATE_LOGGER(classname)
+#define TEMPLATE_CREATE_LOGGER(classname)
 #define CREATE_CPP_LOCAL_LOGGER(name)
 #endif
 
