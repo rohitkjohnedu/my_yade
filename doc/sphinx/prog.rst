@@ -1077,6 +1077,7 @@ After it is registered, like for example in :ysrccommit:`OpenGLRenderer.cpp<42d6
 Keep in mind that these are **not the variable instances** hence trying to assign something to them will not change the blinkHighlight setting in GUI. To change enum value from python the respective variable must be assigned to. For example:
 
 .. ipython::
+	:okexcept:
 
 	Yade [1]: rend = yade.qt.Renderer()
 
@@ -1084,7 +1085,7 @@ Keep in mind that these are **not the variable instances** hence trying to assig
 
 	Yade [1]: rend.blinkHighlight = 'NEVER'
 
-	Yade [1]: rend.blinkHighlight = -5 ##### trying to assign incorrect value will not change current setting
+	Yade [1]: rend.blinkHighlight = 5      # trying to assign incorrect value will not change current setting
 
 	Yade [1]: rend.blinkHighlight
 
