@@ -1074,20 +1074,24 @@ After it is registered, like for example in :ysrccommit:`OpenGLRenderer.cpp<42d6
 
 	Yade [2]: yade.EnumClass_BlinkHighlight.values
 
-Keep in mind that these are **not the variable instances** hence trying to assign something to them will not change the blinkHighlight setting in GUI. To change enum value from python the respective variable must be assigned to. For example:
+Keep in mind that these are **not the variable instances** hence trying to assign something to them will not change the blinkHighlight setting in GUI. To change enum value from python the respective variable must be assigned to, such as :yref:`yade.qt.Renderer().blinkHighlight<OpenGLRenderer::blinkHighlight>`. Trying to assign an incorrect value will throw an exception. For example:
 
 .. ipython::
 	:okexcept:
 
-	Yade [1]: rend = yade.qt.Renderer()
+	Yade [1]: r = yade.FlowEngine() # this is only a test of enum, not of FlowEngine
 
-	Yade [1]: rend.blinkHighlight
+	Yade [1]: r.useSolver
 
-	Yade [1]: rend.blinkHighlight = 'NEVER'
+	Yade [1]: r.useSolver = 'GaussSeidel'
 
-	Yade [1]: rend.blinkHighlight = 5      # trying to assign incorrect value will not change current setting
+	Yade [1]: try:
+	   ...:     r.useSolver = 20    # assigning incorrect value has no effect
+	   ...: except:
+	   ...:     print("Error, value is still equal to:",r.useSolver)
+	   ...:
 
-	Yade [1]: rend.blinkHighlight
+	Yade [1]: r.useSolver
 
 Alternatively the dropdown menu in GUI can be used for the same effect.
 
