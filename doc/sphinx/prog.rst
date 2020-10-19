@@ -1076,6 +1076,9 @@ After it is registered, like for example in :ysrccommit:`OpenGLRenderer.cpp<42d6
 
 Keep in mind that these are **not the variable instances** hence trying to assign something to them will not change the blinkHighlight setting in GUI. To change enum value from python the respective variable must be assigned to, such as :yref:`yade.qt.Renderer().blinkHighlight<OpenGLRenderer::blinkHighlight>`. Trying to assign an incorrect value will throw an exception. For example:
 
+.. comment: the code below won't work with yade.qt.Renderer().blinkHighlight, because QT gui variables are not accessible while building docs.
+.. comment: also, some versions of sphinx-doc, namely versions ∈ [1.4.9,1.8.4] (the older and the newer ones work) cannot properly catch TypeError exception, even with :okexcept: statement.
+
 .. ipython::
 	:okexcept:
 
