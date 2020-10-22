@@ -18,7 +18,7 @@ def facetBox(center,extents,orientation=Quaternion((0,1,0),0.0),wallMask=63,**kw
 	If any of the box dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the box.
 
 	:param Vector3 center: center of the box
-	:param Vector3 extents: lengths of the box sides
+	:param Vector3 extents: half lengths of the box sides
 	:param Quaternion orientation: orientation of the box
 	:param bitmask wallMask: determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls
 	:param \*\*kw: (unused keyword arguments) passed to :yref:`yade.utils.facet`
@@ -34,7 +34,7 @@ def facetParallelepiped(center,extents,height,orientation=Quaternion((0,1,0),0.0
 	If any of the parallelepiped dimensions is zero, corresponding facets will not be created. The facets are oriented outwards from the parallelepiped.
 
 	:param Vector3 center: center of the parallelepiped
-	:param Vector3 extents: lengths of the parallelepiped sides
+	:param Vector3 extents: half lengths of the parallelepiped sides
 	:param Real height: height of the parallelepiped (along axis z)
 	:param Quaternion orientation: orientation of the parallelepiped
 	:param bitmask wallMask: determines which walls will be created, in the order -x (1), +x (2), -y (4), +y (8), -z (16), +z (32). The numbers are ANDed; the default 63 means to create all walls
