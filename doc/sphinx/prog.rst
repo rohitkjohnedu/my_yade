@@ -309,14 +309,28 @@ To enable debugging for particular class the ``DECLARE_LOGGER;`` macro should be
 
 All debug macros (``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``) listed in section above accept the ``std::ostream`` syntax inside the brackets, such as ``LOG_TRACE( a << b << " text" )``. The ``LOG_NOFILTER`` is special because it is always printed regardless of debug level, hence it should be used only in development branches.
 
-Additionally six macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);``. See :ysrccommit:`function testAllLevels<775ae7436/py/_log.cpp#L41>` for example use.
+Additionally seven macros for printing variables at ``LOG_TRACE`` level are available: ``TRVAR1``, ``TRVAR2``, ``TRVAR3``, ``TRVAR4``, ``TRVAR5``, ``TRVAR6`` and ``TRVARn``. They print the variables, e.g.: ``TRVAR3(testInt,testStr,testReal);`` or ``TRVARn((testInt)(testStr)(testReal))``. See :ysrccommit:`function testAllLevels<d91be7a8dede/py/_log.cpp#L128>` for example use.
 
 The macro ``TRACE;`` prints a ``"Been here"`` message at ``TRACE`` log filter level, and can be used for quick debugging.
 
-There are additionally specified macro aliases, for easier use in editors with tab completion, which have a filter level number in their name:
+Timed debug macros
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	* ``LOG_6_TRACE``, ``LOG_5_DEBUG``, ``LOG_4_INFO``, ``LOG_3_WARN``, ``LOG_2_ERROR``, ``LOG_1_FATAL``, ``LOG_0_NOFILTER``.
-	* ``LOG_6``, ``LOG_5``, ``LOG_4``, ``LOG_3``, ``LOG_2``, ``LOG_1``, ``LOG_0``.
+In some situations it is useful to debug variables inside a **very fast**, or maybe a **multithreaded**, loop. In such situations it would be useful to:
+
+   1. Avoid spamming console with very fast printed messages and add some print timeout to them, preferably specified with units of seconds or milliseconds.
+   2. Make sure that each separate thread has opportunity to print message, without interleaving such messages with other threads.
+
+.. note:: To satisfy the first requirement all ``LOG_TIMED_*`` macros accept **two arguments**, where the first argument is the wait timeout, using `standard C++14 / C++20 time units <https://en.cppreference.com/w/cpp/header/chrono#Literals>`__, example use is ``LOG_TIMED_INFO( 2s , "test int: " << testInt++);`` to print every 2 seconds. But only seconds and milliseconds are accepted (this can be changed if necessary).
+
+.. note:: To satisfy the second requirement a `thread_local static <https://en.cppreference.com/w/cpp/language/storage_duration>`__ timer variable is used.
+
+For this purpose serve the following family of macros: ``LOG_TIMED_TRACE``, ``LOG_TIMED_DEBUG``, ``LOG_TIMED_INFO``, ``LOG_TIMED_WARN``, ``LOG_TIMED_ERROR``, ``LOG_TIMED_FATAL``, ``LOG_TIMED_NOFILTER``. As well as ``TIMED_TRVAR1``, ``TIMED_TRVAR2``, ``TIMED_TRVAR3``, ``TIMED_TRVAR4``, ``TIMED_TRVAR5``, ``TIMED_TRVAR6`` and ``TIMED_TRVARn``. Example usage can be found in :ysrccommit:`function testTimedLevels<d91be7a8dede/py/_log.cpp#L181>`.
+
+The timers inside these ``LOG_TIMED_*`` macros are declared as `thread_local static <https://en.cppreference.com/w/cpp/language/storage_duration>`__ which means that time of last print to console is stored independently for each thread and an extra code block which checks time and compares with time of last print is added. It means that a bit more calculations are done than typical ``LOG_*`` macros which only perform an integer comparison to check filter level. Therefore suggested use is only during heavy debugging, because this is not supposed to be fast. When debugging is finished then better to remove them.
+
+.. note:: The ``*_TRACE`` family of macros are removed by compiler during release builds. So those are very safe to use, but make sure to compile yade with ``cmake -DMAX_LOG_LEVEL=6`` option (because the default is 5).
+
 
 All debug macros are summarized in the table below:
 
@@ -337,18 +351,38 @@ All debug macros are summarized in the table below:
 	| ``CREATE_CPP_LOCAL_LOGGER("filename.cpp");``              | Creates logger static variable outside of any class (with name ``"filename.cpp"``) |
 	|                                                           | inside the ``filename.cpp`` file.                                                  |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
-	| ``LOG_TRACE``, ``LOG_DEBUG``, ``LOG_INFO``, ``LOG_WARN``, | Prints message using ``std::ostream`` syntax, like:                                |
-	| ``LOG_ERROR``, ``LOG_FATAL``, ``LOG_NOFILTER``            | ``LOG_TRACE( a << b << " text" )``                                                 |
+	| | ``LOG_TRACE``,    ``LOG_TIMED_TRACE``,                  | | Prints message using ``std::ostream`` syntax, like:                              |
+	| | ``LOG_DEBUG``,    ``LOG_TIMED_DEBUG``,                  | | ``LOG_TRACE( a << b << " text" )``                                               |
+	| | ``LOG_INFO``,     ``LOG_TIMED_INFO``,                   | | ``LOG_TIMED_TRACE( 5s ,  a << b << " text" );`` , prints every 5 seconds         |
+	| | ``LOG_WARN``,     ``LOG_TIMED_WARN``,                   | | ``LOG_TIMED_DEBUG( 500ms , a );``, prints every 500 milliseconds                 |
+	| | ``LOG_ERROR``,    ``LOG_TIMED_ERROR``,                  |                                                                                    |
+	| | ``LOG_FATAL``,    ``LOG_TIMED_FATAL``,                  |                                                                                    |
+	| | ``LOG_NOFILTER``, ``LOG_TIMED_NOFILTER``                |                                                                                    |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
-	| ``TRVAR1``, ``TRVAR2``, ``TRVAR3``,                       | Prints provided variables like: ``TRVAR3(testInt,testStr,testReal);``              |
-	| ``TRVAR4``, ``TRVAR5``, ``TRVAR6``                        | See file :ysrc:`py/_log.cpp` for example use.                                      |
+	| | ``TRVAR1``,  ``TIMED_TRVAR1``,                          | | Prints provided variables like:                                                  |
+	| | ``TRVAR2``,  ``TIMED_TRVAR2``,                          | | ``TRVAR3(testInt,testStr,testReal);``                                            |
+	| | ``TRVAR3``,  ``TIMED_TRVAR3``,                          | | ``TRVARn((testInt)(testStr)(testReal));``                                        |
+	| | ``TRVAR4``,  ``TIMED_TRVAR4``,                          | | ``TIMED_TRVAR3(  10s  , testInt , testStr , testReal);``                         |
+	| | ``TRVAR5``,  ``TIMED_TRVAR5``,                          | | ``TIMED_TRVARn( 500ms , (testInt)(testStr)(testReal));``                         |
+	| | ``TRVAR6``,  ``TIMED_TRVAR6``,                          | | See file :ysrc:`py/_log.cpp` for example use.                                    |
+	| | ``TRVARn``,  ``TIMED_TRVARn``                           |                                                                                    |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
 	| ``TRACE;``                                                | Prints a ``"Been here"`` message at ``TRACE`` log filter level.                    |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
-	| ``LOG_6_TRACE``, ``LOG_5_DEBUG``, ``LOG_4_INFO``,         | Additional macro aliases for easier use in editors with tab completion.            |
-	| ``LOG_3_WARN``, ``LOG_2_ERROR``, ``LOG_1_FATAL``,         | They have have a filter level number in their name                                 |
-	| ``LOG_0_NOFILTER``, ``LOG_6``, ``LOG_5``, ``LOG_4``,      |                                                                                    |
-	| ``LOG_3``, ``LOG_2``, ``LOG_1``, ``LOG_0``                |                                                                                    |
+	| | ``LOG_TIMED_6``, ``LOG_6_TRACE``,                       | Additional macro aliases for easier use in editors with tab completion.            |
+	| | ``LOG_TIMED_5``, ``LOG_5_DEBUG``,                       | They have have a filter level number in their name.                                |
+	| | ``LOG_TIMED_4``, ``LOG_4_INFO``,                        |                                                                                    |
+	| | ``LOG_TIMED_3``, ``LOG_3_WARN``,                        |                                                                                    |
+	| | ``LOG_TIMED_2``, ``LOG_2_ERROR``,                       |                                                                                    |
+	| | ``LOG_TIMED_1``, ``LOG_1_FATAL``,                       |                                                                                    |
+	| | ``LOG_TIMED_0``, ``LOG_0_NOFILTER``,                    |                                                                                    |
+	| | ``LOG_TIMED_6_TRACE``,    ``LOG_6``,                    |                                                                                    |
+	| | ``LOG_TIMED_5_DEBUG``,    ``LOG_5``,                    |                                                                                    |
+	| | ``LOG_TIMED_4_INFO``,     ``LOG_4``,                    |                                                                                    |
+	| | ``LOG_TIMED_3_WARN``,     ``LOG_3``,                    |                                                                                    |
+	| | ``LOG_TIMED_2_ERROR``,    ``LOG_2``,                    |                                                                                    |
+	| | ``LOG_TIMED_1_FATAL``,    ``LOG_1``,                    |                                                                                    |
+	| | ``LOG_TIMED_0_NOFILTER``, ``LOG_0``                     |                                                                                    |
 	+-----------------------------------------------------------+------------------------------------------------------------------------------------+
 
 
@@ -359,7 +393,7 @@ Maximum log level
 
 Using `boost::log <https://www.boost.org/doc/libs/release/libs/log/>`_ for log filtering means that each call to ``LOG_*`` macro must perform a single integer comparison to determine if the message passes current filter level. For production use calculations should be as fast as possible and this filtering is not optimal, because the macros are *not optimized out*, as they can be re-enabled with a simple call to ``log.setLevel("Default",log.TRACE)`` or ``log.setLevel("Default",6)``. The remedy is to use the cmake compilation option ``MAX_LOG_LEVEL=4`` (or 3) which will remove macros higher than the specified level during compilation. The code will run slightly faster and the command ``log.setLevel("Default",6)`` will only print a warning that such high log level (which can be checked with :yref:`yade.log.getMaxLevel()<yade._log.getMaxLevel>` call) is impossible to obtain with current build.
 
-.. note:: At the time when logging was introduced into yade the speed-up gain was so small, that it turned out to be impossible to measure with ``yade -f0 --performance`` command. Hence this option ``MAX_LOG_LEVEL`` was introduced only on principle.
+.. note:: At the time when logging was introduced into yade the speed-up gain was so small, that it turned out to be impossible to measure with ``yade -f0 --stdperformance`` command. Hence this option ``MAX_LOG_LEVEL`` was introduced only on principle.
 
 The upside of this approach is that yade can be compiled in a non-debug build, and the log filtering framework can be still used.
 
