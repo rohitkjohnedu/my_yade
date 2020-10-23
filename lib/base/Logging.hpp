@@ -37,6 +37,7 @@
 #include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup.hpp>
+#include <boost/preprocessor.hpp>
 #include <map>
 #include <string>
 #include <vector>
@@ -193,6 +194,10 @@ public:                                                                         
 #define TRVAR4(a, b, c, d) LOG_TRACE(_TRV(a) << _TRV(b) << _TRV(c) << _TRV(d))
 #define TRVAR5(a, b, c, d, e) LOG_TRACE(_TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e))
 #define TRVAR6(a, b, c, d, e, f) LOG_TRACE(_TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) << _TRV(f))
+
+#define TRVARn_PRINT_ONE(r, SKIP , VARn) TRVAR1(VARn)
+// this one prints arbitrary number of variables, but they must be a boost preprocessor sequence like (var1)(var2)(var3), see py/_log.cpp for example usage.
+#define TRVARn(ALL_VARS) BOOST_PP_SEQ_FOR_EACH(TRVARn_PRINT_ONE, ~ , ALL_VARS )
 
 // Logger aliases:
 #define LOG_6_TRACE(msg) LOG_TRACE(msg)

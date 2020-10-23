@@ -122,3 +122,16 @@
 #define LOG_TIMED_1(t, msg) LOG_TIMED_FATAL(t, msg)
 #define LOG_TIMED_0(t, msg) LOG_TIMED_NOFILTER(t, msg)
 
+// macros for quick debugging without spamming terminal:
+#define TIMED_TRVAR1(T, a) LOG_TIMED_TRACE(T, _TRV(a))
+#define TIMED_TRVAR2(T, a, b) LOG_TIMED_TRACE(T, _TRV(a) << _TRV(b))
+#define TIMED_TRVAR3(T, a, b, c) LOG_TIMED_TRACE(T, _TRV(a) << _TRV(b) << _TRV(c))
+#define TIMED_TRVAR4(T, a, b, c, d) LOG_TIMED_TRACE(T, _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d))
+#define TIMED_TRVAR5(T, a, b, c, d, e) LOG_TIMED_TRACE(T, _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e))
+#define TIMED_TRVAR6(T, a, b, c, d, e, f) LOG_TIMED_TRACE(T, _TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) << _TRV(f))
+
+#define TIMED_TRVARn_PRINT_ONE(r, WAIT, VARn) TIMED_TRVAR1(WAIT, VARn)
+
+// this one prints arbitrary number of variables, but they must be a boost preprocessor sequence like (var1)(var2)(var3), see py/_log.cpp for example usage.
+#define TIMED_TRVARn(WAIT, ALL_VARS) BOOST_PP_SEQ_FOR_EACH(TIMED_TRVARn_PRINT_ONE, WAIT, ALL_VARS)
+
