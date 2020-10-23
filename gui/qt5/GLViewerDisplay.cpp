@@ -11,6 +11,7 @@
 #include "GLViewer.hpp"
 #include "OpenGLManager.hpp"
 
+#include <lib/base/TimedLogging.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 #include <lib/pyutil/gil.hpp>
 #include <lib/serialization/ObjectIO.hpp>
@@ -253,14 +254,15 @@ void GLViewer::postDraw()
 
 	int nSegments = static_cast<int>(2 * nHalfSegments);
 	if (nSegments > 500) {
-		LOG_WARN(
+		LOG_TIMED_WARN(
+		        10s,
 		        "More than 500 grid segments (currently: "
 		        << nSegments << ") take too long to draw, using previous value: " << prevSegments
 		        << ". If you need denser grid try calling: yade.qt.center(suggestedRadius,gridOrigin,suggestedCenter,gridDecimalPlaces); (each "
 		           "parameter is optional) to reduce scene grid radius. Current values are: yade.qt.center(suggestedRadius="
 		        << QGLViewer::camera()->sceneRadius() << ",gridOrigin=(" << gridOrigin[0] << "," << gridOrigin[1] << "," << gridOrigin[2]
 		        << "),suggestedCenter=(" << QGLViewer::camera()->sceneCenter()[0] << "," << QGLViewer::camera()->sceneCenter()[1] << ","
-		        << QGLViewer::camera()->sceneCenter()[2] << "),gridDecimalPlaces=" << gridDecimalPlaces << ")");
+		        << QGLViewer::camera()->sceneCenter()[2] << "),gridDecimalPlaces=" << gridDecimalPlaces << ")\nPress '-' (decrease grid density) in View window to remove this warning.\n");
 		nSegments = prevSegments;
 	}
 	prevSegments = nSegments;
