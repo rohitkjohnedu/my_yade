@@ -11,9 +11,13 @@
 
 #include <lib/base/AliasNamespaces.hpp>
 #include <lib/base/Logging.hpp>
+#include <lib/base/TimedLogging.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <core/Omega.hpp>
+#include <boost/core/demangle.hpp>
+#include <chrono>
 #include <string>
+#include <thread>
 
 CREATE_CPP_LOCAL_LOGGER("_log.cpp");
 
@@ -85,7 +89,7 @@ std::string defaultConfigFileName() { return Logging::instance().defaultConfigFi
 
 int getMaxLevel() { return Logging::instance().maxLogLevel; }
 
-#else
+#else // #ifdef YADE_BOOST_LOG, without boost::log use the simplified logging method:
 
 void printNoBoostLogWarning()
 {
@@ -119,7 +123,7 @@ std::string defaultConfigFileName()
 }
 int getMaxLevel() { return std::min(MAX_LOG_LEVEL, MAX_HARDCODED_LOG_LEVEL); }
 
-#endif
+#endif // END #ifdef YADE_BOOST_LOG
 
 void testAllLevels()
 {
@@ -149,6 +153,55 @@ void testAllLevels()
 	TRACE;
 }
 
+void testTimedLevels()
+{
+	unsigned long long int testInt = 0;
+	using namespace std::chrono_literals; // use the following function signature:
+	//
+	//        constexpr chrono::duration<…,…> operator "" s(unsigned long long);
+	//
+	// to be able to write 1s to mean 1 second. See:
+	// * https://en.cppreference.com/w/cpp/chrono/operator%22%22h
+	// * https://en.cppreference.com/w/cpp/thread/sleep_for
+
+	// with `using namespace std::chrono_literals` you can write this:
+	constexpr auto wait_half = 500ms;
+	auto           wait_1s   = 1s;
+	auto           wait_2s   = 2s;
+	// without `using namespace std::chrono_literals` you have to write this:
+	constexpr std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>> wait_half_without_using(500); // int64_t type supports ±292.5 years in nanoseconds.
+	// the constexpr above was used only for the purpose to demonstrate that these are the same:
+	static_assert(wait_half == wait_half_without_using, "Half a second should be 500ms.");
+	static_assert(std::is_same<decltype(wait_half), decltype(wait_half_without_using)>::value, "And the type is decltype(500ms)");
+
+	TRVAR3(wait_half.count(), wait_1s.count(), wait_2s.count())
+	using boost::core::demangle; // to print exact type of std::chrono::duration
+
+	// This auto type declared above for 500ms, 1s, 2s is actually std::chrono::duration<…,…> like this:
+	LOG_DEBUG(
+	        "\n The types of LOG_TIMED_* first argument are any of std::chrono::duration<…> like for example:\n "
+	        << "type of wait_half is " << demangle(typeid(decltype(wait_half)).name()) << "; wait_half.count() == " << wait_half.count() << "\n "
+	        << "type of wait_1s   is " << demangle(typeid(decltype(wait_1s)).name()) << "   ; wait_1s.count()   == " << wait_1s.count() << "\n "
+	        << "type of wait_2s   is " << demangle(typeid(decltype(wait_2s)).name()) << "   ; wait_2s.count()   == " << wait_2s.count()
+	        << "\n----------------\n")
+
+	LOG_NOFILTER("Starting the 2.1 second test. The '2s' logs should be printed once, the '0.5s' should be printed four times.\n\n")
+	for (int i = 0; i < 21; ++i) {
+		// write 2s  here     ↓ instead of using variable wait_2s, because that's how it is comfortable to be used. The variable wait_2s above was only a demonstration of how the type works.
+		LOG_TIMED_0_NOFILTER(2s, "Test 2s timed log level: LOG_0_NOFILTER, test int: " << testInt++);
+		LOG_TIMED_1_FATAL(2s, "Test 2s timed log level: LOG_1_FATAL, test int: " << testInt++);
+		LOG_TIMED_2_ERROR(2s, "Test 2s timed log level: LOG_2_ERROR, test int: " << testInt++);
+		LOG_TIMED_3_WARN(1s, "Test 1s timed log level: LOG_3_WARN, test int: " << testInt++);
+		LOG_TIMED_4_INFO(1s, "Test 1s timed log level: LOG_4_INFO, test int: " << testInt++);
+		LOG_TIMED_5_DEBUG(500ms, "Test 0.5s timed log level: LOG_5_DEBUG, test int: " << testInt++ << "\n");
+		LOG_TIMED_6_TRACE(500ms, "Test 0.5s timed log level: LOG_6_TRACE, test int: " << testInt++ << "\n");
+		std::this_thread::sleep_for(100ms);
+	}
+
+	LOG_WARN("Upon next call of this function the '2s' will be printed first also, because the timers are 'thread_local static', which means that they "
+	         "preserve timers between different calls to this function, but have separate static instances for each different thread.")
+}
+
 } // namespace yade
 
 // BOOST_PYTHON_MODULE cannot be inside yade namespace, it has 'extern "C"' keyword, which strips it out of any namespaces.
@@ -163,6 +216,10 @@ try {
 
 	py::def("testAllLevels", testAllLevels, R"""(
 This function prints test messages on all log levels. Can be used to see how filtering works and to what streams the logs are written.
+	)""");
+
+	py::def("testTimedLevels", testTimedLevels, R"""(
+This function prints timed test messages on all log levels. In this test the log levels ∈ [0…2] are timed to print every 2 seconds, levels ∈ [3,4] every 1 second and levels ∈ [5,6] every 0.5 seconds. The loop lasts for 2.1 seconds. Can be used to see how timed filtering works and to what streams the logs are written.
 	)""");
 
 	// default level

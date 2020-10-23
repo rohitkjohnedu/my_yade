@@ -1,0 +1,124 @@
+/*************************************************************************
+*  2020      Janek Kozicki                                               *
+*                                                                        *
+*  This program is free software; it is licensed under the terms of the  *
+*  GNU General Public License v2 or later. See file LICENSE for details. *
+*************************************************************************/
+
+#pragma once
+#include <lib/base/Logging.hpp>
+#include <lib/base/Timer.hpp>
+
+/*
+ * This header provides macros LOG_TIMED_* very similar to the regular LOG_* macros, with one extra functionality:
+ * the log messages are printed not more often than the first macro argument 'howOften'.
+ *
+ * They are intended is to make it easier to debug parts of code which print a lot of messages extremely fast.
+ * It adds an extra code block that checks time and compares with time of last print. It means a that bit more
+ * calculations are done than typical LOG_* macros which only perform an integer comparison to check filter level.
+ * Here an extra subtraction is done to check times.
+ *
+ * Suggested use is only during debugging, because this is not supposed to be fast. Then better remove them afterwards.
+ *
+ * The *_TRACE family of macros are removed by compiler during release builds. So those are very safe to use, but make sure to compile yade
+ * with `cmake -DMAX_LOG_LEVEL=6` option (because default is 5), or you would never see LOG_TRACE and LOG_TIMED_TRACE print anything.
+ *
+ *
+ * In general there are two solutions to make each message check its timing separately:
+ *  1. Create a std::map< int uniqueIdentifier , std::chrono::time_point<…> lastCheck > inside class Logging (or class derived from Logging) and check there.
+ *  2. Or use a thread_local static variable inside a macro
+ *
+ * They both would work exactly the same. But std::map<…,…> inside a class has following disadvantages:
+ *  - adds an extra lookup in std::map
+ *  - requires boost::log, because it requires the Logging class
+ * While it would have one advantage over macro solution:
+ *  + would not have to check time if the filter level integer comparison says to skip printing.
+ *
+ * So for now I will implement this with a macro. So this works without boost::log and no std::map<…> lookup is performed,
+ * because the variable is sitting right here.
+ *
+ * This could be later turned into a class derived from Logging and have exactly the same interface.
+ * We will see what works best.
+ *
+ *
+ * The usage of this macro is following:
+ *
+ *   LOG_TIMED_TRACE( howOften , MESSAGE ) // or LOG_TIMED_DEBUG(… , …) or other macros from this family.
+ *
+ *   → The howOften argument is of std::chrono::duration type https://en.cppreference.com/w/cpp/chrono/duration
+ *     See file py/_log.cpp function testTimedLevels(); for example usage.
+ *   → The MESSAGE argument is the same message as in regular LOG_* macros.
+ *
+ * To make this macro "type safe", like regular function calls I put a static_assert inside. It checks that the duration is compatible
+ * with std::chrono::high_resolution_clock::now(); Without static_assert it would end up with weird compilation errors.
+ *
+ * So it will accept arguments such as:
+ *
+ *   using namespace std::chrono_literals;  // use this namespace to enable 's' and 'ms' postfix literals. Nice example in https://en.cppreference.com/w/cpp/thread/sleep_for
+ *                                          // I can't use this namespace inside this header file, because this is a .hpp file, and that would produce namespace pollution problems.
+ *
+ *   LOG_TIMED_INFO( 2s  , "Print every 2 seconds")
+ *   LOG_TIMED_INFO( 20ms, "Print every 20 milliseconds")
+ *
+ * These 2s or 20ms is a compile-time rational constant from namespace std::chrono_literals, so the compiler optimizes it into a single integer comparison.
+ * Only seconds and milliseconds are accepted as arguments, to produce a more readable compiler error message (in case of problems).
+ *
+ */
+
+/*
+ * quick test of this, with invocation:  yade -f6
+ *
+ *   import log ; yade.log.testTimedLevels()
+ *
+ */
+
+#define LOG_TIMED(howOften, MSG)                                                                                                                               \
+	{                                                                                                                                                      \
+		/* Accept only 'howOften' intervals with units of 'second' or 'millisecond'. */                                                                \
+		using namespace std::    /* to be able to write: 10s or 200ms, see https://en.cppreference.com/w/cpp/thread/sleep_for */                       \
+		        chrono_literals; /* and https://en.cppreference.com/w/cpp/chrono/duration                                     */                       \
+		                         /* TODO: when we will have units in yade::units, we can replace this with 1_s and 1_ms       */                       \
+		static_assert(           /*       C++ standard uses int64_t because it ↓ supports ±292.5 years in nanoseconds.        */                       \
+		              std::is_same<decltype(howOften), std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>>>::value                   \
+		                      or std::is_same<decltype(howOften), std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1)>>>::value,          \
+		              "Error: cannot convert argument to seconds or milliseconds. For examples see file py/_log.cpp function testTimedLevels();");     \
+		/* declare local timer */                                                                                                                      \
+		thread_local static auto t = Timer();                                                                                                          \
+		if (t.check(howOften)) { /* check if it is time to print */                                                                                    \
+			MSG                                                                                                                                    \
+		}                                                                                                                                              \
+	}
+
+#define LOG_TIMED_NOFILTER(howOften, msg) LOG_TIMED(howOften, LOG_NOFILTER(msg))
+#define LOG_TIMED_FATAL(howOften, msg) LOG_TIMED(howOften, LOG_FATAL(msg))
+#define LOG_TIMED_ERROR(howOften, msg) LOG_TIMED(howOften, LOG_ERROR(msg))
+#define LOG_TIMED_WARN(howOften, msg) LOG_TIMED(howOften, LOG_WARN(msg))
+#define LOG_TIMED_INFO(howOften, msg) LOG_TIMED(howOften, LOG_INFO(msg))
+#define LOG_TIMED_DEBUG(howOften, msg) LOG_TIMED(howOften, LOG_DEBUG(msg))
+#define LOG_TIMED_TRACE(howOften, msg) LOG_TIMED(howOften, LOG_TRACE(msg))
+
+// Logger aliases:
+#define LOG_TIMED_6_TRACE(t, msg) LOG_TIMED_TRACE(t, msg)
+#define LOG_TIMED_5_DEBUG(t, msg) LOG_TIMED_DEBUG(t, msg)
+#define LOG_TIMED_4_INFO(t, msg) LOG_TIMED_INFO(t, msg)
+#define LOG_TIMED_3_WARN(t, msg) LOG_TIMED_WARN(t, msg)
+#define LOG_TIMED_2_ERROR(t, msg) LOG_TIMED_ERROR(t, msg)
+#define LOG_TIMED_1_FATAL(t, msg) LOG_TIMED_FATAL(t, msg)
+#define LOG_TIMED_0_NOFILTER(t, msg) LOG_TIMED_NOFILTER(t, msg)
+
+#define LOG_TRACE_TIMED(t, msg) LOG_TIMED_TRACE(t, msg)
+#define LOG_DEBUG_TIMED(t, msg) LOG_TIMED_DEBUG(t, msg)
+#define LOG_INFO_TIMED(t, msg) LOG_TIMED_INFO(t, msg)
+#define LOG_WARN_TIMED(t, msg) LOG_TIMED_WARN(t, msg)
+#define LOG_ERROR_TIMED(t, msg) LOG_TIMED_ERROR(t, msg)
+#define LOG_FATAL_TIMED(t, msg) LOG_TIMED_FATAL(t, msg)
+#define LOG_NOFILTER_TIMED(t, msg) LOG_TIMED_NOFILTER(t, msg)
+
+#define LOG_TIMED_6(t, msg) LOG_TIMED_TRACE(t, msg)
+#define LOG_TIMED_5(t, msg) LOG_TIMED_DEBUG(t, msg)
+#define LOG_TIMED_4(t, msg) LOG_TIMED_INFO(t, msg)
+#define LOG_TIMED_3(t, msg) LOG_TIMED_WARN(t, msg)
+#define LOG_TIMED_2(t, msg) LOG_TIMED_ERROR(t, msg)
+#define LOG_TIMED_1(t, msg) LOG_TIMED_FATAL(t, msg)
+#define LOG_TIMED_0(t, msg) LOG_TIMED_NOFILTER(t, msg)
+

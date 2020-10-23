@@ -143,7 +143,7 @@ public:                                                                         
 	namespace {                                                                                                                                            \
 		boost::log::sources::severity_logger<Logging::SeverityLevel> logger = Logging::instance().createNamedLogger(filtername);                       \
 	}
-#else
+#else // #ifdef YADE_BOOST_LOG, without boost::log use the simplified logging method:
 #include <iostream>
 #define _POOR_MANS_LOG(level, msg)                                                                                                                             \
 	{                                                                                                                                                      \
@@ -182,7 +182,7 @@ public:                                                                         
 #define CREATE_LOGGER(classname)
 #define TEMPLATE_CREATE_LOGGER(classname)
 #define CREATE_CPP_LOCAL_LOGGER(name)
-#endif
+#endif // END #ifdef YADE_BOOST_LOG
 
 // macros for quick debugging
 #define TRACE LOG_TRACE("Been here")
