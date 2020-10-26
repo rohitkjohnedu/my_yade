@@ -713,7 +713,7 @@ Yade additionally defines a class named :yref:`Se3r`, which contains spatial pos
 
 Eigen provides full rich linear algebra functionality. Some code further uses the [cgal]_ library for computational geometry.
 
-In Python, basic numeric types are wrapped and imported from the ``yade.minieigenHP`` module; the types drop the ``r`` type qualifier at the end, the syntax is otherwise similar. ``Se3r`` is not wrapped at all, only converted automatically, rarely as it is needed, from/to a ``(Vector3,Quaternion)`` tuple/list. See :ref:`high precision section <high-precision>` for more details.
+In Python, basic numeric types are wrapped and imported from the ``yade.minieigenHP`` module; the types drop the ``r`` type qualifier at the end, the syntax is otherwise similar. ``Se3r`` is not wrapped at all, only converted automatically, rarely as it is needed, from/to a ``(Vector3,Quaternion)`` tuple/list. See :ref:`high precision section <highPrecisionReal>` for more details.
 
 .. ipython::
 	:okexcept:
@@ -723,11 +723,11 @@ In Python, basic numeric types are wrapped and imported from the ``yade.minieige
 
 	# cross product
 
-	Yade [1]: Vector3(1,2,3).cross(Vector3(0,0,1))  
+	Yade [1]: Vector3(1,2,3).cross(Vector3(0,0,1))
 
 	# construct quaternion from axis and angle
 
-	Yade [2]: Quaternion(Vector3(0,0,1),pi/2)             
+	Yade [2]: Quaternion(Vector3(0,0,1),pi/2)
 
 .. note:: Quaternions are internally stored as 4 numbers. Their usual human-readable representation is, however, (normalized) axis and angle of rotation around that axis, and it is also how they are input/output in Python. Raw internal values can be accessed using the ``[0]`` … ``[3]`` element access (or ``.W()``, ``.X()``, ``.Y()`` and ``.Z()`` methods), in both c++ and Python.
 

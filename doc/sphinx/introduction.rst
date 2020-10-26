@@ -461,7 +461,7 @@ Generalized forces include force, torque and forced displacement and rotation; t
 	Yade [1]: O.forces.f(0)
 
 	@suppress
-	Yade [2]: from yade import Vector3
+	Yade [2]: from yade import Vector3,Quaternion
 
 	Yade [2]: O.forces.addF(0,Vector3(1,2,3))
 
