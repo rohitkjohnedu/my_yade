@@ -2,7 +2,6 @@
 // 2013 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 
 #include "InsertionSortCollider.hpp"
-#include <lib/base/TimedLogging.hpp>
 #include <core/Interaction.hpp>
 #include <core/InteractionContainer.hpp>
 #include <core/Scene.hpp>
@@ -112,7 +111,6 @@ void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionConta
 #pragma omp parallel for schedule(dynamic, 1) num_threads(ompThreads > 0 ? min(ompThreads, omp_get_max_threads()) : omp_get_max_threads())
 	for (unsigned k = 0; k < nChunks; k++) {
 		int threadNum = omp_get_thread_num();
-		TIMED_TRVAR1(10s , threadNum); // each thread reports separately every 10 seconds
 		for (auto i = chunks[k] + 1; i < chunks[k + 1]; i++) {
 			const Bounds viInit = v[i];
 			auto         j      = i - 1;

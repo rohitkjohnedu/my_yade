@@ -157,21 +157,21 @@ void testAllLevels()
 	TRACE;
 
 	LOG_TRACE("\n\nTest print of TIMED_TRVARn macro family (every 2 seconds, one time):\n\n");
-	for (int i = 0; i < 21; ++i) {
-		TIMED_TRVAR1(2s, testInt);
-		TIMED_TRVAR2(2s, testInt, testStr);
-		TIMED_TRVAR3(2s, testInt, testStr, testReal);
-		TIMED_TRVAR4(2s, testInt, testStr, testReal, testVec);
-		TIMED_TRVAR5(2s, testInt, testStr, testReal, testVec, testMat);
-		TIMED_TRVAR6(2s, testInt, testStr, testReal, testVec, testMat, testComplex);
+	for (int i = 0; i < 11; ++i) {
+		TIMED_TRVAR1(1s, testInt);
+		TIMED_TRVAR2(1s, testInt, testStr);
+		TIMED_TRVAR3(1s, testInt, testStr, testReal);
+		TIMED_TRVAR4(1s, testInt, testStr, testReal, testVec);
+		TIMED_TRVAR5(1s, testInt, testStr, testReal, testVec, testMat);
+		TIMED_TRVAR6(1s, testInt, testStr, testReal, testVec, testMat, testComplex);
 
-		LOG_TIMED_TRACE(2s, "\n\nTest print of arbitrary number of variables (one argument):");
+		LOG_TIMED_TRACE(1s, "\n\nTest print of arbitrary number of variables (one argument):");
 
-		TIMED_TRVARn(2s, (testInt));
+		TIMED_TRVARn(1s, (testInt));
 
-		LOG_TIMED_TRACE(2s, "\n\nTest print of arbitrary number of variables (8 arguments):");
+		LOG_TIMED_TRACE(1s, "\n\nTest print of arbitrary number of variables (8 arguments):");
 
-		TIMED_TRVARn(2s, (testInt)(testStr)(testReal)(testVec)(testMat)(testComplex)(7)(8));
+		TIMED_TRVARn(1s, (testInt)(testStr)(testReal)(testVec)(testMat)(testComplex)(7)(8));
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(100ms);

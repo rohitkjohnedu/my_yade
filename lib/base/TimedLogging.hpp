@@ -81,7 +81,8 @@
 		static_assert(           /*       C++ standard uses int64_t because it ↓ supports ±292.5 years in nanoseconds.        */                       \
 		              std::is_same<decltype(howOften), std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>>>::value                   \
 		                      or std::is_same<decltype(howOften), std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1)>>>::value,          \
-		              "Error: cannot convert argument to seconds or milliseconds. For examples see file py/_log.cpp function testTimedLevels();");     \
+		              "Error: cannot convert argument to seconds (e.g. 1s) or milliseconds (e.g. 20ms). For examples see file py/_log.cpp function "   \
+		              "testTimedLevels();");                                                                                                           \
 		/* declare local timer */                                                                                                                      \
 		thread_local static auto t = Timer();                                                                                                          \
 		if (t.check(howOften)) { /* check if it is time to print */                                                                                    \
