@@ -308,10 +308,29 @@ Center all views.
 :param suggestedCenter:   optional parameter, if provided other than (0,0,0) then it will be used instead of automatic calculation of scene center using bounding boxes. This parameter affects the drawn rotation-center. If you try to rotate the view, and the rotation is around some strange point, then this parameter needs to be changed.
 :param gridDecimalPlaces: default value=4, determines the number of decimal places to be shown on grid labels using stringstream (extra zeros are not shown).
 
-.. hint:: You can get the current values of all these four arguments by invoking command: yade.qt.centerValues()
+.. note:: You can get the current values of all these four arguments by invoking command: :yref:`yade.qt.centerValues()<yade.qt._GLViewer.centerValues>`
 
 )""");
-	py::def("views", y::getAllViews, "Return list of all open :yref:`yade.qt.GLViewer` objects");
+	py::def("views", y::getAllViews, R"""(
+
+:return: a list of all open :yref:`yade.qt.GLViewer` objects
+
+If one needs to exactly copy camera position and settings between two different yade sessions, the following commands can be used:
+
+.. code-block:: python
+
+  v=yade.qt.views()[0]                           ## to obtain a handle of currently opened view.
+  v.lookAt, v.viewDir, v.eyePosition, v.upVector ## to print the current camera parameters of the view.
+
+  ## Then copy the output of this command into the second yade session to reposition the camera.
+  v.lookAt, v.viewDir, v.eyePosition, v.upVector = (Vector3(-0.5,1.6,0.47),Vector3(-0.5,0.6,0.4),Vector3(0.015,0.98,-0.012),Vector3(0.84,0.46,0.27))
+  ## Since these parameters depend on each other it might be necessary to execute this command twice.
+
+Also one can call :yref:`yade.qt.centerValues()<yade.qt._GLViewer.centerValues>` to obtain current settings of axis and scene radius (if defaults are not used) and apply them via call to :yref:`yade.qt.center<yade.qt._GLViewer.center>` in the second yade session.
+
+This cumbersome method above may be improved in the future.
+
+)""");
 
 	py::def("Renderer", &y::getRenderer, "Return the active :yref:`OpenGLRenderer` object.");
 
