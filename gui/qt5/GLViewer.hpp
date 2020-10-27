@@ -53,6 +53,7 @@ private:
 	bool                                   displayGridNumbers;
 	bool                                   autoGrid;
 	Real                                   prevGridStep;
+	Real                                   requestedGridStep;
 	int                                    prevSegments;
 	int                                    gridDecimalPlaces;
 	Vector3r                               gridOrigin;
@@ -119,10 +120,8 @@ public:
 	void useDisplayParameters(size_t n);
 	//! Save display parameters (QGOViewer and OpenGLRenderer) to Scene::dispParams[n]
 	void saveDisplayParameters(size_t n);
-	//! Get radius of the part of scene that fits the current view
-	double displayedSceneRadius();
-	//! Get center of the part of scene that fits the current view
-	qglviewer::Vec displayedSceneCenter();
+	//! Get radius & center of the part of scene that fits the current view
+	std::pair<double, qglviewer::Vec> displayedSceneRadiusCenter();
 
 	//! Adds our attributes to the QGLViewer state that can be saved
 	QDomElement domElement(const QString& name, QDomDocument& document) const;

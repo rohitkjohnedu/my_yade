@@ -81,6 +81,7 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	displayGridNumbers = true;
 	autoGrid           = true;
 	prevGridStep       = 1;
+	requestedGridStep  = 1; // it's possible that it is requested to draw too dense grid (which would take too long to draw). This is why prevGridStep is separate variable.
 	prevSegments       = 2;
 	gridOrigin         = Vector3r(0, 0, 0);
 	gridDecimalPlaces  = 4;
@@ -416,10 +417,10 @@ void GLViewer::keyPressEvent(QKeyEvent* e)
 		displayGridNumbers = !displayGridNumbers;
 	else if (e->key() == Qt::Key_Plus) {
 		autoGrid = false;
-		prevGridStep /= 10;
+		requestedGridStep /= 10;
 	} else if (e->key() == Qt::Key_Minus) {
 		autoGrid = false;
-		prevGridStep *= 10;
+		requestedGridStep *= 10;
 	} else if (e->key() == Qt::Key_Return) {
 		if (Omega::instance().isRunning())
 			Omega::instance().pause();

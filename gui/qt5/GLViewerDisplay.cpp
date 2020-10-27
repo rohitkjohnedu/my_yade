@@ -190,18 +190,12 @@ void GLViewer::drawWithNames()
 	renderer->renderShape();
 }
 
-
-qglviewer::Vec GLViewer::displayedSceneCenter()
+std::pair<double, qglviewer::Vec> GLViewer::displayedSceneRadiusCenter()
 {
-	return camera()->unprojectedCoordinatesOf(
-	        qglviewer::Vec(width() / 2 /* pixels */, height() / 2 /* pixels */, /*middle between near plane and far plane*/ .5));
-}
-
-double GLViewer::displayedSceneRadius()
-{
-	return (camera()->unprojectedCoordinatesOf(qglviewer::Vec(width() / 2, height() / 2, .5))
-	        - camera()->unprojectedCoordinatesOf(qglviewer::Vec(0, 0, .5)))
-	        .norm();
+	auto w2 = width() / 2;
+	auto h2 = height() / 2;
+	return { (camera()->unprojectedCoordinatesOf(qglviewer::Vec(w2, h2, 0.5)) - camera()->unprojectedCoordinatesOf(qglviewer::Vec(0, 0, 0.5))).norm(),
+		 camera()->unprojectedCoordinatesOf(qglviewer::Vec(w2 /* pixels */, h2 /* pixels */, /* middle between near plane and far plane */ 0.5)) };
 }
 
 void GLViewer::drawReadableNum(const Real& n, const Vector3r& pos, unsigned precision, const Vector3r& color)
@@ -226,7 +220,8 @@ void GLViewer::drawTextWithPixelShift(const std::string& txt, const Vector3r& po
 	glColor3v(color);
 	qglviewer::Vec p = QGLViewer::camera()->projectedCoordinatesOf(
 	        qglviewer::Vec((static_cast<double>(pos[0])), (static_cast<double>(pos[1])), (static_cast<double>(pos[2]))));
-	QGLViewer::drawText(static_cast<int>(p[0] + pixelShift[0]), static_cast<int>(p[1] + pixelShift[1]), txt.c_str());
+	if (p[0] > 0 and p[0] < this->width() and p[1] > 0 and p[1] < this->height()) // don't waste time to draw outside window frame.
+		QGLViewer::drawText(static_cast<int>(p[0] + pixelShift[0]), static_cast<int>(p[1] + pixelShift[1]), txt.c_str());
 }
 
 void GLViewer::postDraw()
@@ -239,19 +234,17 @@ void GLViewer::postDraw()
 	qglviewer::Vec c               = QGLViewer::camera()->sceneCenter();
 	renderer->viewInfo.sceneCenter = Vector3r(c[0], c[1], c[2]);
 
-	Real dispDiameter
-	        = min(wholeDiameter, max((Real)displayedSceneRadius() * 2, wholeDiameter / 1e3)); // limit to avoid drawing 1e5 lines with big zoom level
+	auto radiusCenter = displayedSceneRadiusCenter();
+
+	Real dispDiameter = min(
+	        wholeDiameter, max(static_cast<Real>(radiusCenter.first * 2.), wholeDiameter / 1e3)); // limit to avoid drawing 1e5 lines with big zoom level
 	//qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
-	Real gridStep(prevGridStep);
+	Real gridStep(requestedGridStep);
 	if (autoGrid)
 		gridStep = pow(10, (floor(0.5 + log10(dispDiameter))));
-	prevGridStep       = gridStep;
-	Real scaleStep     = pow(10, (floor(log10(displayedSceneRadius() * 2) - .7))); // unconstrained
-	int  nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
-	Real realSize      = nHalfSegments * gridStep;
-	//LOG_TRACE("nHalfSegments="<<nHalfSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	glPushMatrix();
 
+	int nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
 	int nSegments = static_cast<int>(2 * nHalfSegments);
 	if (nSegments > 500) {
 		LOG_TIMED_WARN(
@@ -264,7 +257,14 @@ void GLViewer::postDraw()
 		        << "),suggestedCenter=(" << QGLViewer::camera()->sceneCenter()[0] << "," << QGLViewer::camera()->sceneCenter()[1] << ","
 		        << QGLViewer::camera()->sceneCenter()[2] << "),gridDecimalPlaces=" << gridDecimalPlaces << ")\nPress '-' (decrease grid density) in View window to remove this warning.\n");
 		nSegments = prevSegments;
+		gridStep  = prevGridStep;
 	}
+	prevGridStep = gridStep;
+	if (autoGrid)
+		requestedGridStep = gridStep;
+	nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
+	Real realSize = nHalfSegments * gridStep;
+	//LOG_TRACE("nHalfSegments="<<nHalfSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	prevSegments = nSegments;
 	// round requested gridOrigin to nearest nicely-readable value
 	Vector3r gridCen = Vector3r(0, 0, 0);
@@ -357,13 +357,13 @@ void GLViewer::postDraw()
 
 	// scale
 	if (drawScale) {
-		Real           segmentSize = scaleStep;
+		const Real     segmentSize = pow(10, (floor(log10(radiusCenter.first * 2) - .7))); // unconstrained
 		qglviewer::Vec screenDxDy[3]; // dx,dy for x,y,z scale segments
 		int            extremalDxDy[2] = { 0, 0 };
 		for (int axis = 0; axis < 3; axis++) {
 			qglviewer::Vec delta(0, 0, 0);
 			delta[axis]           = static_cast<double>(segmentSize);
-			qglviewer::Vec center = displayedSceneCenter();
+			qglviewer::Vec center = radiusCenter.second;
 			screenDxDy[axis]      = camera()->projectedCoordinatesOf(center + delta) - camera()->projectedCoordinatesOf(center);
 			for (int xy = 0; xy < 2; xy++)
 				extremalDxDy[xy]
@@ -375,7 +375,7 @@ void GLViewer::postDraw()
 		scaleCenter[0] = std::abs(extremalDxDy[0]) + margin;
 		scaleCenter[1] = std::abs(extremalDxDy[1]) + margin;
 		//LOG_DEBUG("Center of scale "<<scaleCenter[0]<<","<<scaleCenter[1]);
-		//displayMessage(QString().sprintf("displayed scene radius %g",displayedSceneRadius()));
+		//displayMessage(QString().sprintf("displayed scene radius %g",radiusCenter.first));
 		startScreenCoordinatesSystem();
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
@@ -393,7 +393,7 @@ void GLViewer::postDraw()
 		glLineWidth(1.);
 		glEnable(GL_DEPTH_TEST);
 		std::ostringstream oss {};
-		oss << std::setprecision(3) << scaleStep;
+		oss << std::setprecision(3) << segmentSize;
 		QGLViewer::drawText(scaleCenter[0], scaleCenter[1], oss.str().c_str());
 		stopScreenCoordinatesSystem();
 	}
