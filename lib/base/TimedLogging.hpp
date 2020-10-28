@@ -9,6 +9,8 @@
 #include <lib/base/Logging.hpp>
 #include <lib/base/Timer.hpp>
 
+namespace yade { // Cannot have #include directive inside.
+
 /*
  * This header provides macros LOG_TIMED_* very similar to the regular LOG_* macros, with one extra functionality:
  * the log messages are printed not more often than the first macro argument 'howOften'.
@@ -65,27 +67,26 @@
  *
  */
 
-/*
- * quick test of this, with invocation:  yade -f6
- *
- *   import log ; yade.log.testTimedLevels()
- *
- */
+namespace units { // C++ standard uses int64_t because ↓ it supports ±292.5 years in nanoseconds.
+	using Seconds      = ::std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1)>>;
+	using MilliSeconds = ::std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>>;
+
+	template <typename TimeUnit> const constexpr bool isSecond        = std::is_same<TimeUnit, Seconds>::value;
+	template <typename TimeUnit> const constexpr bool isMilliSecond   = std::is_same<TimeUnit, MilliSeconds>::value;
+	template <typename TimeUnit> const constexpr bool isSecOrMilliSec = isSecond<TimeUnit> or isMilliSecond<TimeUnit>;
+}
+
+// quick test, with invocation:  yade -f6
+//   import log ; yade.log.testTimedLevels()
+
+// use std::chrono_literals; in this block to properly expand 10s or 500ms from https://en.cppreference.com/w/cpp/header/chrono#Literals, it does not leak out.
 
 #define LOG_TIMED(howOften, MSG)                                                                                                                               \
 	{                                                                                                                                                      \
-		/* Accept only 'howOften' intervals with units of 'second' or 'millisecond'. */                                                                \
-		using namespace std::    /* to be able to write: 10s or 200ms, see https://en.cppreference.com/w/cpp/thread/sleep_for */                       \
-		        chrono_literals; /* and https://en.cppreference.com/w/cpp/chrono/duration                                     */                       \
-		                         /* TODO: when we will have units in yade::units, we can replace this with 1_s and 1_ms       */                       \
-		static_assert(           /*       C++ standard uses int64_t because it ↓ supports ±292.5 years in nanoseconds.        */                       \
-		              std::is_same<decltype(howOften), std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>>>::value                   \
-		                      or std::is_same<decltype(howOften), std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1)>>>::value,          \
-		              "Error: cannot convert argument to seconds (e.g. 1s) or milliseconds (e.g. 20ms). For examples see file py/_log.cpp function "   \
-		              "testTimedLevels();");                                                                                                           \
-		/* declare local timer */                                                                                                                      \
+		using namespace std::chrono_literals;                                                                                                          \
+		static_assert(units::isSecOrMilliSec<decltype(howOften)>, "LOG_TIMED_* Bad first argument, see testTimedLevels(); in file py/_log.cpp.");      \
 		thread_local static auto t = Timer();                                                                                                          \
-		if (t.check(howOften)) { /* check if it is time to print */                                                                                    \
+		if (t.check(howOften)) {                                                                                                                       \
 			MSG                                                                                                                                    \
 		}                                                                                                                                              \
 	}
@@ -135,4 +136,6 @@
 
 // this one prints arbitrary number of variables, but they must be a boost preprocessor sequence like (var1)(var2)(var3), see py/_log.cpp for example usage.
 #define TIMED_TRVARn(WAIT, ALL_VARS) BOOST_PP_SEQ_FOR_EACH(TIMED_TRVARn_PRINT_ONE, WAIT, ALL_VARS)
+
+} // namespace yade
 
