@@ -14,9 +14,9 @@
  *
  */
 
-#include <boost/python/detail/wrap_python.hpp>
 #include <lib/base/Logging.hpp>
 #include <boost/preprocessor.hpp>
+#include <boost/python.hpp>
 
 #ifndef YADE_ENUM_SUPPORT_HPP
 #define YADE_ENUM_SUPPORT_HPP
