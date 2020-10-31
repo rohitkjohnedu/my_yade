@@ -192,8 +192,8 @@ void GLViewer::drawWithNames()
 
 std::pair<double, qglviewer::Vec> GLViewer::displayedSceneRadiusCenter()
 {
-	auto w2 = width() / 2;
-	auto h2 = height() / 2;
+	const auto w2 = width() / 2;
+	const auto h2 = height() / 2;
 	return { (camera()->unprojectedCoordinatesOf(qglviewer::Vec(w2, h2, 0.5)) - camera()->unprojectedCoordinatesOf(qglviewer::Vec(0, 0, 0.5))).norm(),
 		 camera()->unprojectedCoordinatesOf(qglviewer::Vec(w2 /* pixels */, h2 /* pixels */, /* middle between near plane and far plane */ 0.5)) };
 }
@@ -234,9 +234,9 @@ void GLViewer::postDraw()
 	qglviewer::Vec c               = QGLViewer::camera()->sceneCenter();
 	renderer->viewInfo.sceneCenter = Vector3r(c[0], c[1], c[2]);
 
-	auto radiusCenter = displayedSceneRadiusCenter();
+	const auto radiusCenter = displayedSceneRadiusCenter();
 
-	Real dispDiameter = min(
+	const Real dispDiameter = min(
 	        wholeDiameter, max(static_cast<Real>(radiusCenter.first * 2.), wholeDiameter / 1e3)); // limit to avoid drawing 1e5 lines with big zoom level
 	//qglviewer::Vec center=QGLViewer::camera()->sceneCenter();
 	Real gridStep(requestedGridStep);
@@ -244,30 +244,31 @@ void GLViewer::postDraw()
 		gridStep = pow(10, (floor(0.5 + log10(dispDiameter))));
 	glPushMatrix();
 
-	int nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
-	int nSegments = static_cast<int>(2 * nHalfSegments);
+	const auto nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
+	const auto nSegments     = static_cast<int>(2 * nHalfSegments);
 	if (nSegments > 500) {
 		LOG_TIMED_WARN(
 		        10s,
 		        "More than 500 grid segments (currently: "
-		        << nSegments << ") take too long to draw, using previous value: " << prevSegments
-		        << ". If you need denser grid try calling: yade.qt.center(suggestedRadius,gridOrigin,suggestedCenter,gridDecimalPlaces); (each "
-		           "parameter is optional) to reduce scene grid radius. Current values are: yade.qt.center(suggestedRadius="
-		        << QGLViewer::camera()->sceneRadius() << ",gridOrigin=(" << gridOrigin[0] << "," << gridOrigin[1] << "," << gridOrigin[2]
-		        << "),suggestedCenter=(" << QGLViewer::camera()->sceneCenter()[0] << "," << QGLViewer::camera()->sceneCenter()[1] << ","
-		        << QGLViewer::camera()->sceneCenter()[2] << "),gridDecimalPlaces=" << gridDecimalPlaces << ")\nPress '-' (decrease grid density) in View window to remove this warning.\n");
+		                << nSegments << ") take too long to draw, using previous value: " << prevSegments
+		                << ". If you need denser grid try calling: yade.qt.center(suggestedRadius,gridOrigin,suggestedCenter,gridDecimalPlaces); (each "
+		                   "parameter is optional) to reduce scene grid radius. Current values are: yade.qt.center(suggestedRadius="
+		                << QGLViewer::camera()->sceneRadius() << ",gridOrigin=(" << gridOrigin[0] << "," << gridOrigin[1] << "," << gridOrigin[2]
+		                << "),suggestedCenter=(" << QGLViewer::camera()->sceneCenter()[0] << "," << QGLViewer::camera()->sceneCenter()[1] << ","
+		                << QGLViewer::camera()->sceneCenter()[2] << "),gridDecimalPlaces=" << gridDecimalPlaces
+		                << ")\nPress '-' (decrease grid density) in View window to remove this warning.\n");
 		nSegments = prevSegments;
 		gridStep  = prevGridStep;
 	}
 	prevGridStep = gridStep;
 	if (autoGrid)
 		requestedGridStep = gridStep;
-	nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
-	Real realSize = nHalfSegments * gridStep;
+	nHalfSegments       = ((int)(wholeDiameter / gridStep)) + 1;
+	const auto realSize = nHalfSegments * gridStep;
 	//LOG_TRACE("nHalfSegments="<<nHalfSegments<<",gridStep="<<gridStep<<",realSize="<<realSize);
 	prevSegments = nSegments;
 	// round requested gridOrigin to nearest nicely-readable value
-	Vector3r gridCen = Vector3r(0, 0, 0);
+	auto gridCen = Vector3r(0, 0, 0);
 	if (gridOrigin != Vector3r(0, 0, 0)) {
 		gridCen = Vector3r(
 		        gridOrigin[0] - math::remainder(gridOrigin[0], gridStep),
@@ -358,7 +359,7 @@ void GLViewer::postDraw()
 	// scale
 	if (drawScale) {
 		const Real     segmentSize = pow(10, (floor(log10(radiusCenter.first * 2) - .7))); // unconstrained
-		qglviewer::Vec screenDxDy[3]; // dx,dy for x,y,z scale segments
+		qglviewer::Vec screenDxDy[3];                                                      // dx,dy for x,y,z scale segments
 		int            extremalDxDy[2] = { 0, 0 };
 		for (int axis = 0; axis < 3; axis++) {
 			qglviewer::Vec delta(0, 0, 0);

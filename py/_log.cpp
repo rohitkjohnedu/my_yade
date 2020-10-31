@@ -191,10 +191,11 @@ void testTimedLevels()
 
 	// with `using namespace std::chrono_literals` you can write this:
 	constexpr auto wait_half = 500ms;
-	auto           wait_1s   = 1s;
-	auto           wait_2s   = 2s;
+	constexpr auto wait_1s   = 1s;
+	constexpr auto wait_2s   = 2s;
 	// without `using namespace std::chrono_literals` you have to write this:
-	constexpr std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>> wait_half_without_using(500); // int64_t type supports ±292.5 years in nanoseconds.
+	constexpr std::chrono::duration<int64_t, std::ratio<int64_t(1), int64_t(1000)>> wait_half_without_using(
+	        500); // int64_t type supports ±292.5 years in nanoseconds.
 	// the constexpr above was used only for the purpose to demonstrate that these are the same:
 	static_assert(wait_half == wait_half_without_using, "Half a second should be 500ms.");
 	static_assert(std::is_same<decltype(wait_half), decltype(wait_half_without_using)>::value, "And the type is decltype(500ms)");
