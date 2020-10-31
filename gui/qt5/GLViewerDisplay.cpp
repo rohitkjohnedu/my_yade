@@ -244,8 +244,8 @@ void GLViewer::postDraw()
 		gridStep = pow(10, (floor(0.5 + log10(dispDiameter))));
 	glPushMatrix();
 
-	const auto nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
-	const auto nSegments     = static_cast<int>(2 * nHalfSegments);
+	auto nHalfSegments = ((int)(wholeDiameter / gridStep)) + 1;
+	auto nSegments     = static_cast<int>(2 * nHalfSegments);
 	if (nSegments > 500) {
 		LOG_TIMED_WARN(
 		        10s,
