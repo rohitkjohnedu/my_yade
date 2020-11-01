@@ -19,6 +19,7 @@
 #include <boost/python.hpp>
 #include <boost/python/stl_iterator.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <map>
 #include <set>
 
 #include <lib/high-precision/ToFromPythonConverter.hpp>
