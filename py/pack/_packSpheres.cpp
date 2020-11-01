@@ -51,7 +51,7 @@ try {
 	              boost::python::arg("distributeMass") = false,
 	              boost::python::arg("seed")           = -1,
 	              boost::python::arg("hSize")          = Matrix3r(Matrix3r::Zero())),
-				R"""(Create a random cloud of particles enclosed in a parallelepiped. The resulting packing is a gas-like state with no contacts between particles initially. Usually used as a first step before reaching a dense packing.
+	             R"""(Create a random cloud of particles enclosed in a parallelepiped. The resulting packing is a gas-like state with no contacts between particles initially. Usually used as a first step before reaching a dense packing.
 
 				:param Vector3 minCorner: lower corner of an axis-aligned box
 				:param Vector3 maxCorner: upper corner of an axis-aligned box
@@ -95,8 +95,8 @@ try {
 	              boost::python::arg("clumps"),
 	              boost::python::arg("periodic") = false,
 	              boost::python::arg("num")      = -1,
-								boost::python::arg("seed")           = -1),
-				R"""(Create a random loose packing of clumps the same way `makeCloud <https://yade-dem.org/doc/yade.pack.html?highlight=makecloud#yade._packSpheres.SpherePack.makeCloud>`_ does with spheres. The parameters ``minCorner``, ``maxCorner``, ``periodic``, ``num`` and ``seed`` are the same as in makeCloud_. The parameter ``clumps`` is a list containing all the different clumps to be appended as ``SpherePack`` objects. Here is an exemple that shows how to create a cloud made of 10 identical clumps :
+	              boost::python::arg("seed")     = -1),
+	             R"""(Create a random loose packing of clumps the same way `makeCloud <https://yade-dem.org/doc/yade.pack.html?highlight=makecloud#yade._packSpheres.SpherePack.makeCloud>`_ does with spheres. The parameters ``minCorner``, ``maxCorner``, ``periodic``, ``num`` and ``seed`` are the same as in makeCloud_. The parameter ``clumps`` is a list containing all the different clumps to be appended as ``SpherePack`` objects. Here is an exemple that shows how to create a cloud made of 10 identical clumps :
 
 				.. code-block:: python
 

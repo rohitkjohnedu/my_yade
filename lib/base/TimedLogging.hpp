@@ -138,4 +138,3 @@ namespace units { // C++ standard uses int64_t because ↓ it supports ±292.5 y
 #define TIMED_TRVARn(WAIT, ALL_VARS) BOOST_PP_SEQ_FOR_EACH(TIMED_TRVARn_PRINT_ONE, WAIT, ALL_VARS)
 
 } // namespace yade
-

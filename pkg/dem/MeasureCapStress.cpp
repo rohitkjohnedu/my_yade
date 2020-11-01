@@ -69,7 +69,7 @@ void MeasureCapStress::action()
 		volume = scene->cell->hSize.determinant();
 	else {
 		const auto extrema = Shop::aabbExtrema();
-		volume = (extrema.second[0] - extrema.first[0]) * (extrema.second[1] - extrema.first[1]) * (extrema.second[2] - extrema.first[2]);
+		volume             = (extrema.second[0] - extrema.first[0]) * (extrema.second[1] - extrema.first[1]) * (extrema.second[2] - extrema.first[2]);
 	}
 	if (debug)
 		cout << "c++ : volume = " << volume << endl;

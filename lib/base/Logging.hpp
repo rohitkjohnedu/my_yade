@@ -195,9 +195,9 @@ public:                                                                         
 #define TRVAR5(a, b, c, d, e) LOG_TRACE(_TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e))
 #define TRVAR6(a, b, c, d, e, f) LOG_TRACE(_TRV(a) << _TRV(b) << _TRV(c) << _TRV(d) << _TRV(e) << _TRV(f))
 
-#define TRVARn_PRINT_ONE(r, SKIP , VARn) TRVAR1(VARn)
+#define TRVARn_PRINT_ONE(r, SKIP, VARn) TRVAR1(VARn)
 // this one prints arbitrary number of variables, but they must be a boost preprocessor sequence like (var1)(var2)(var3), see py/_log.cpp for example usage.
-#define TRVARn(ALL_VARS) BOOST_PP_SEQ_FOR_EACH(TRVARn_PRINT_ONE, ~ , ALL_VARS )
+#define TRVARn(ALL_VARS) BOOST_PP_SEQ_FOR_EACH(TRVARn_PRINT_ONE, ~, ALL_VARS)
 
 // Logger aliases:
 #define LOG_6_TRACE(msg) LOG_TRACE(msg)

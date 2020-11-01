@@ -17,9 +17,9 @@ using math::min; // using inside .cpp file is ok.
 
 py::tuple negPosExtremeIds(int axis, Real distFactor)
 {
-	const auto extrema = Shop::aabbExtrema();
-	Real      minCoord = extrema.first[axis], maxCoord = extrema.second[axis];
-	py::list  minIds, maxIds;
+	const auto extrema  = Shop::aabbExtrema();
+	Real       minCoord = extrema.first[axis], maxCoord = extrema.second[axis];
+	py::list   minIds, maxIds;
 	for (const auto& b : *Omega::instance().getScene()->bodies) {
 		shared_ptr<Sphere> s = YADE_PTR_DYN_CAST<Sphere>(b->shape);
 		if (!s)
@@ -431,7 +431,7 @@ shared_ptr<Interaction> Shop__createExplicitInteraction(Body::id_t id1, Body::id
 Real      Shop__unbalancedForce(bool useMaxForce /*false by default*/) { return Shop::unbalancedForce(useMaxForce); }
 py::tuple Shop__aabbExtrema(Real cutoff, bool centers)
 {
-	const auto aabb = Shop::aabbExtrema(cutoff,centers);
+	const auto aabb = Shop::aabbExtrema(cutoff, centers);
 	return py::make_tuple(aabb.first, aabb.second);
 }
 
@@ -765,7 +765,8 @@ try {
 	        &Shop::flipCell,
 	        (py::arg("flip") = Matrix3r(Matrix3r::Zero())),
 	        "Flip periodic cell so that angles between $R^3$ axes and transformed axes are as small as possible, using the two following facts:"
-	        "1. repeating in $R^3$ space the corners of a periodic cell defines a regular grid; 2. two cells leading through this process to a unique grid are "
+	        "1. repeating in $R^3$ space the corners of a periodic cell defines a regular grid; 2. two cells leading through this process to a unique grid "
+	        "are "
 	        "equivalent and can be flipped one over another. Flipping necessitates adjustment of :yref:`Interaction.cellDist` for interactions that cross "
 	        "the boundary and didn't before (or vice versa), and re-initialization of collider. The *flip* argument can be used to specify desired flip: "
 	        "integers, each column for one axis; if zero matrix, best fit (minimizing the angles) is computed automatically.\n\nIn c++, this function is "

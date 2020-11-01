@@ -43,7 +43,7 @@ GLViewer::~GLViewer()
 	const std::lock_guard<std::mutex> lock(Omega::instance().renderMutex);
 	LOG_DEBUG("Acquired lock.");
 	LOG_DEBUG("context() is " << std::hex << context());
-	if(isValid()) {
+	if (isValid()) {
 		LOG_DEBUG("Acquiring context.");
 		makeCurrent();
 		LOG_DEBUG("Releasing OpenGL context.");
@@ -81,10 +81,11 @@ GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGL
 	displayGridNumbers = true;
 	autoGrid           = true;
 	prevGridStep       = 1;
-	requestedGridStep  = 1; // it's possible that it is requested to draw too dense grid (which would take too long to draw). This is why prevGridStep is separate variable.
-	prevSegments       = 2;
-	gridOrigin         = Vector3r(0, 0, 0);
-	gridDecimalPlaces  = 4;
+	requestedGridStep
+	        = 1; // it's possible that it is requested to draw too dense grid (which would take too long to draw). This is why prevGridStep is separate variable.
+	prevSegments      = 2;
+	gridOrigin        = Vector3r(0, 0, 0);
+	gridDecimalPlaces = 4;
 	resize(550, 550);
 	last = -1;
 	if (viewId == 0)

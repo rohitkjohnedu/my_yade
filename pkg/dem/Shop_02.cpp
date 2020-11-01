@@ -341,11 +341,11 @@ void Shop::fabricTensor(Real& Fmean, Matrix3r& fabric, Matrix3r& fabricStrong, M
 	Scene* scene = Omega::instance().getScene().get();
 
 	// *** Fabric tensor ***/
-	fabric          = Matrix3r::Zero();
-	int       count = 0; // number of interactions
-	const auto aabb = Shop::aabbExtrema(cutoff);
-	Vector3r  bbMin = aabb.first, bbMax = aabb.second;
-	Vector3r  cp;
+	fabric           = Matrix3r::Zero();
+	int        count = 0; // number of interactions
+	const auto aabb  = Shop::aabbExtrema(cutoff);
+	Vector3r   bbMin = aabb.first, bbMax = aabb.second;
+	Vector3r   cp;
 
 	Fmean = 0; // initialize average contact force for split = 1 fabric measurements
 	// interactions loop to compute the fabric tensor returned when split = 0, and also measures average force for subsequent computations for split = 1:
@@ -453,7 +453,7 @@ Matrix3r Shop::getStress(Real volume)
 	Real   volumeNonPeri = 0;
 	if (volume == 0 && !scene->isPeriodic) {
 		const auto extrema = Shop::aabbExtrema();
-		volumeNonPeri = (extrema.second[0] - extrema.first[0]) * (extrema.second[1] - extrema.first[1]) * (extrema.second[2] - extrema.first[2]);
+		volumeNonPeri      = (extrema.second[0] - extrema.first[0]) * (extrema.second[1] - extrema.first[1]) * (extrema.second[2] - extrema.first[2]);
 	}
 	if (volume == 0)
 		volume = scene->isPeriodic ? scene->cell->hSize.determinant() : volumeNonPeri;
@@ -1037,7 +1037,7 @@ void Shop::growParticle(Body::id_t bodyID, Real multiplier, bool updateMass)
 	}
 }
 
-pair<Vector3r,Vector3r> Shop::aabbExtrema(Real cutoff, bool centers)
+pair<Vector3r, Vector3r> Shop::aabbExtrema(Real cutoff, bool centers)
 {
 	if (cutoff < 0. || cutoff > 1.)
 		throw invalid_argument("Cutoff must be >=0 and <=1.");
@@ -1051,8 +1051,8 @@ pair<Vector3r,Vector3r> Shop::aabbExtrema(Real cutoff, bool centers)
 		minimum = minimum.cwiseMin(b->state->pos - (centers ? Vector3r::Zero() : rrr));
 		maximum = maximum.cwiseMax(b->state->pos + (centers ? Vector3r::Zero() : rrr));
 	}
-	Vector3r dim = maximum - minimum;
-	pair<Vector3r,Vector3r> ret(minimum + .5 * cutoff * dim,maximum - .5 * cutoff * dim);
+	Vector3r                 dim = maximum - minimum;
+	pair<Vector3r, Vector3r> ret(minimum + .5 * cutoff * dim, maximum - .5 * cutoff * dim);
 	return ret;
 }
 
