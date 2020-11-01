@@ -69,7 +69,8 @@
  */
 
 #include <boost/config.hpp>
-#if (__GNUC__ > 7) or (not BOOST_GCC)
+#include <boost/version.hpp>
+#if (((__GNUC__ > 7) or (not BOOST_GCC)) and (BOOST_VERSION >= 106700))
 #define BOOST_CSTDFLOAT_NO_LIBQUADMATH_COMPLEX // see issue https://github.com/boostorg/math/issues/350
 #include <boost/cstdfloat.hpp>
 #else
