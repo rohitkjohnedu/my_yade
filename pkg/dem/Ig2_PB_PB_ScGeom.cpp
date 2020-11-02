@@ -910,7 +910,7 @@ bool Ig2_PB_PB_ScGeom::getPtOnParticleAreaNormal(
 		        * (planeNormal.x() * (-state1.pos.x() - shift2[0]) + planeNormal.y() * (-state1.pos.y() - shift2[1])
 		           + planeNormal.z() * (-state1.pos.z() - shift2[2]) - s1->d[i] - s1->r);
 		dotProd = planeNormal.dot(prevDir);
-		if (Mathr::Sign(dotProd) > 0.0 && fabs(dotProd) > pow(10.0, -3)) { //planeNormal and searchDirection converges
+		if (math::sign(dotProd) > 0.0 && fabs(dotProd) > pow(10.0, -3)) { //planeNormal and searchDirection converges
 			u        = (planeNormal.dot(previousPt) - d) / (planeNormal.dot(-prevDir));
 			newPoint = previousPt + u * prevDir;
 			if (fabs(planeNormal.dot(newPoint) - d) > pow(10, -5)) {
@@ -964,7 +964,7 @@ bool Ig2_PB_PB_ScGeom::getPtOnParticleAreaNormal(
 //	Real fOri =evaluatePB(cm1, state1, ptOnParticle);
 //	int counter = 0;
 //	//normal.normalize();
-//	Vector3r step = normal*Mathr::Sign(f) *-1.0;
+//	Vector3r step = normal*math::sign(f) *-1.0;
 //	Vector3r bracketA(0,0,0);
 //	Vector3r bracketB(0,0,0);
 //	Vector3r prevPt = ptOnParticle;
@@ -979,7 +979,7 @@ bool Ig2_PB_PB_ScGeom::getPtOnParticleAreaNormal(
 //			//LOG_WARN("Initial point searching exceeded 500 iterations!");
 //			std::cout<<"ptonparticleArea search exceeded 50000 iterations! step:"<<step<<", fOri: "<<fOri<<endl;
 //		}
-//	}while(Mathr::Sign(fprevious)*Mathr::Sign(f)*1.0> 0.0 );
+//	}while(math::sign(fprevious)*math::sign(f)*1.0> 0.0 );
 
 //	bracketA = ptOnParticle;
 //	bracketB = prevPt; //ptOnParticle -step;
@@ -1132,7 +1132,7 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(
 			Ddiag[i * totalPlanes + i] = pow(Dinvert[i], 2);
 		}
 		orival = val;
-		if (iter == 0 && Mathr::Sign(oriMinD) * 1.0 < 0.0) {
+		if (iter == 0 && math::sign(oriMinD) * 1.0 < 0.0) {
 			std::cout << "oriMinD: " << oriMinD << endl;
 			converge = false;
 			break;
@@ -1232,7 +1232,7 @@ bool Ig2_PB_PB_ScGeom::customSolveAnalyticCentre(
 				minD = D[i];
 			}
 		}
-		while (Mathr::Sign(minD) * 1.0 < 0.0) {
+		while (math::sign(minD) * 1.0 < 0.0) {
 			backtrack *= 0.5;
 			dcopy_(&varNo, &xx[0], &incx, &blasNewX[0], &incy);
 			daxpy_(&varNo, &backtrack, &blasStep[0], &incx, &blasNewX[0], &incy);
@@ -1603,7 +1603,7 @@ Real Ig2_PB_PB_ScGeom::evaluatePB(const shared_ptr<Shape>& cm1, const State& sta
 	Real plane;
 	for (int i = 0; i < planeNo; i++) {
 		plane = s1->a[i] * x + s1->b[i] * y + s1->c[i] * z - s1->d[i] - r; //-pow(10,-10);
-		if (Mathr::Sign(plane) * 1.0 < 0.0) {
+		if (math::sign(plane) * 1.0 < 0.0) {
 			insideCount++;
 		}
 	}
@@ -1728,7 +1728,7 @@ void Ig2_PB_PB_ScGeom::getPtOnParticle2(
 	Real fprevious = f;
 	int  counter   = 0;
 	//normal.normalize();
-	Vector3r step = searchDir * Mathr::Sign(f) * -1.0;
+	Vector3r step = searchDir * math::sign(f) * -1.0;
 	Vector3r bracketA(0, 0, 0), bracketB(0, 0, 0);
 
 	do {
@@ -1741,7 +1741,7 @@ void Ig2_PB_PB_ScGeom::getPtOnParticle2(
 			std::cout << "ptonparticle2 search exceeded 50000 iterations! step:" << step << endl;
 		}
 
-	} while (Mathr::Sign(fprevious) * Mathr::Sign(f) * 1.0 > 0.0);
+	} while (math::sign(fprevious) * math::sign(f) * 1.0 > 0.0);
 	bracketA = ptOnParticle;
 	bracketB = ptOnParticle - step;
 	Vector3r zero(0, 0, 0);

@@ -698,7 +698,7 @@ Real Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(
 		beta               = beta_prev + upperBound * termA.norm();
 		Real f_upper_bound = termA.norm() - fN * (miu_peak - delta_miu * (1.0 - exp(-1.0 * beta / 0.35)));
 		int  iterUpper     = 0;
-		while (Mathr::Sign(f_upper_bound) * Mathr::Sign(f_lower_bound) > 0.0) {
+		while (math::sign(f_upper_bound) * math::sign(f_lower_bound) > 0.0) {
 			upperBound    = 5.0 * upperBound;
 			termA         = (Fs_prev + Ks * du) / (Ks * upperBound + 1.0);
 			beta          = beta_prev + upperBound * termA.norm();
@@ -725,7 +725,7 @@ Real Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVec(
 			beta     = beta_prev + lambda * termA.norm();
 			function = termA.norm() - fN * (miu_peak - delta_miu * (1.0 - exp(-1.0 * beta / 0.35)));
 			Fmid     = function;
-			if (Mathr::Sign(Fmid) == Mathr::Sign(f_lower_bound)) {
+			if (math::sign(Fmid) == math::sign(f_lower_bound)) {
 				lowerBound    = midTrial;
 				f_lower_bound = function;
 			} else {
@@ -833,7 +833,7 @@ Real Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(
 		beta               = beta_prev + upperBound * termA.norm();
 		Real f_upper_bound = termA.norm() - fN * (miu_peak * (1.0 - exp(-1.0 * beta_prev / upeak)));
 		int  iterUpper     = 0;
-		while (Mathr::Sign(f_upper_bound) * Mathr::Sign(f_lower_bound) > 0.0) {
+		while (math::sign(f_upper_bound) * math::sign(f_lower_bound) > 0.0) {
 			upperBound    = 5.0 * upperBound;
 			termA         = (Fs_prev + Ks * du) / (Ks * upperBound + 1.0);
 			beta          = beta_prev + upperBound * termA.norm();
@@ -860,7 +860,7 @@ Real Law2_SCG_KnKsPBPhys_KnKsPBLaw::stressUpdateVecTalesnick(
 			beta     = beta_prev + lambda * termA.norm();
 			function = termA.norm() - fN * (miu_peak * (1.0 - exp(-1.0 * beta_prev / upeak)));
 			Fmid     = function;
-			if (Mathr::Sign(Fmid) == Mathr::Sign(f_lower_bound)) {
+			if (math::sign(Fmid) == math::sign(f_lower_bound)) {
 				lowerBound    = midTrial;
 				f_lower_bound = function;
 			} else {

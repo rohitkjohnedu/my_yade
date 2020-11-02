@@ -104,7 +104,7 @@ void RockBolt::action()
 				Real     planeD = plane.dot(state1->pos) + pb->d[i] + pb->r;
 				if (intersectPlane(pb, state1, startingPoint, boltDirection, boltLength, jointIntersection, plane, planeD)) {
 					Real sign         = plane.dot(boltDirection);
-					jointIntersection = jointIntersection - Mathr::Sign(sign) * halfActiveLength * boltDirection;
+					jointIntersection = jointIntersection - math::sign(sign) * halfActiveLength * boltDirection;
 					distance.push_back(jointIntersection.norm());
 					jointIntersection = state1->ori.conjugate() * (jointIntersection - state1->pos);
 					intersectNo++;
@@ -194,8 +194,8 @@ void RockBolt::action()
 			Vector3r        nodeDistance
 			        = getNodeDistance(s1, state1, s2, state2, localCoordinates[2 * j - 1], localCoordinates[2 * j]); /* 2 minus 1, from 1 to 2 */
 
-			if (initialLength.size() < abs(blockNo - 1)) {                                                       /*not initialized */
-				initialLength.push_back(nodeDistance.norm() * Mathr::Sign(nodeDistance.dot(boltDirection))); /* negative if there is overlap */
+			if (initialLength.size() < abs(blockNo - 1)) {                                                      /*not initialized */
+				initialLength.push_back(nodeDistance.norm() * math::sign(nodeDistance.dot(boltDirection))); /* negative if there is overlap */
 				initialDirection.push_back(nodeDistance);
 				forces.push_back(0.0);
 				axialForces.push_back(0.0);
@@ -206,7 +206,7 @@ void RockBolt::action()
 				distanceFrCentre.push_back(0.0);
 			} else {
 				if (resetLengthInit == true) {
-					initialLength[j - 1] = nodeDistance.norm() * Mathr::Sign(nodeDistance.dot(boltDirection));
+					initialLength[j - 1] = nodeDistance.norm() * math::sign(nodeDistance.dot(boltDirection));
 					resetLengthInit      = false;
 				}
 				Vector3r direction = nodeDistance;
@@ -218,10 +218,10 @@ void RockBolt::action()
 				//}else{
 				dirSign = direction.dot(boltDirection); //FIXME assume special case does not happen, i.e., activeLength is long enough
 
-				Vector3r axialForce = (normalStiffness * (Mathr::Sign(dirSign) * nodeDistance.norm() - initialLength[j - 1]) + preTension)
-				        * (Mathr::Sign(dirSign)
+				Vector3r axialForce = (normalStiffness * (math::sign(dirSign) * nodeDistance.norm() - initialLength[j - 1]) + preTension)
+				        * (math::sign(dirSign)
 				           * direction); /* the last term makes sure tension is always pointing in the direction of boltdirection */
-				//Vector3r axialForce = (axialStiffness/initialLength[j-1]*(Mathr::Sign(dirSign)*nodeDistance.norm() - initialLength[j-1])+preTension)*(Mathr::Sign(dirSign)*direction);/* the last term makes sure tension is always pointing in the direction of boltdirection */
+				//Vector3r axialForce = (axialStiffness/initialLength[j-1]*(math::sign(dirSign)*nodeDistance.norm() - initialLength[j-1])+preTension)*(math::sign(dirSign)*direction);/* the last term makes sure tension is always pointing in the direction of boltdirection */
 				Vector3r shearDir = boltDirection.cross(Vector3r(0, 1, 0));
 				shearDir.normalize();
 				Vector3r shearForce = shearStiffness * (nodeDistance.dot(shearDir)) * shearDir;
@@ -233,7 +233,7 @@ void RockBolt::action()
 				}
 				axialForces[j - 1] = axialForce.norm();
 				shearForces[j - 1] = shearForce.norm();
-				forces[j - 1]      = (axialForce + shearForce).norm(); //*Mathr::Sign(dirSign);
+				forces[j - 1]      = (axialForce + shearForce).norm(); //*math::sign(dirSign);
 				averageForce += forces[j - 1];
 				maxForce = std::max(maxForce, forces[j - 1]);
 
@@ -393,7 +393,7 @@ Real RockBolt::evaluateFNoSphereVol(const PotentialBlock* s1, const State* state
 	int  insideCount = 0;
 	for (int i = 0; i < planeNo; i++) {
 		Real plane = s1->a[i] * x + s1->b[i] * y + s1->c[i] * z - s1->d[i] - 1.0002 * r; //-pow(10,-10);
-		if (Mathr::Sign(plane) * 1.0 < 0.0) {
+		if (math::sign(plane) * 1.0 < 0.0) {
 			insideCount++;
 		}
 	}

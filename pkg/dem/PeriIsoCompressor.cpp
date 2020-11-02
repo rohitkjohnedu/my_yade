@@ -70,7 +70,7 @@ void PeriIsoCompressor::action()
 		Real avgGrow  = 1e-4 * (sigmaGoal - sigAvg) * avgArea / (avgStiffness > 0 ? avgStiffness : 1);
 		Real maxToAvg = maxSize / avgSize;
 		if (math::abs(maxToAvg * avgGrow) > maxDisplPerStep)
-			avgGrow = Mathr::Sign(avgGrow) * maxDisplPerStep / maxToAvg;
+			avgGrow = math::sign(avgGrow) * maxDisplPerStep / maxToAvg;
 		Real okGrow = -(minSize - 2.1 * maxSpan) / maxToAvg;
 		if (avgGrow < okGrow)
 			throw runtime_error("Unable to shring cell due to maximum body size (although required by stress condition). Increase particle "
@@ -92,7 +92,7 @@ void PeriIsoCompressor::action()
 			cellGrow[axis] = 1e-4 * (sigmaGoal - sigma[axis]) * cellArea[axis]
 			        / (avgStiffness > 0 ? avgStiffness : 1); // FIXME: wrong dimensions? See PeriTriaxController
 			if (math::abs(cellGrow[axis]) > maxDisplPerStep)
-				cellGrow[axis] = Mathr::Sign(cellGrow[axis]) * maxDisplPerStep;
+				cellGrow[axis] = math::sign(cellGrow[axis]) * maxDisplPerStep;
 			cellGrow[axis] = max(cellGrow[axis], -(cellSize[axis] - 2.1 * maxSpan));
 			// crude way of predicting sigma, for steps when it is not computed from intrs
 			if (avgStiffness > 0)
@@ -234,7 +234,7 @@ void PeriTriaxController::action()
 				LOG_TRACE(axis << ": stress=" << stress[axis] << ", goal=" << goal[axis] << ", cellGrow=" << strain_rate * scene->dt);
 			} else {                  //accelerate the deformation using the density of the period, includes Cundall's damping
 				assert(mass > 0); //user set
-				Real dampFactor = 1 - growDamping * Mathr::Sign(strain_rate * (goal[axis] - stress[axis]));
+				Real dampFactor = 1 - growDamping * math::sign(strain_rate * (goal[axis] - stress[axis]));
 				strain_rate += dampFactor * scene->dt * (goal[axis] - stress[axis]) / mass;
 				LOG_TRACE(axis << ": stress=" << stress[axis] << ", goal=" << goal[axis] << ", velGrad=" << strain_rate);
 			}
@@ -249,7 +249,7 @@ void PeriTriaxController::action()
 			strain_rate = (1 - growDamping) * strain_rate + .8 * prevGrow[axis];
 		// limit maximum strain rate
 		if (math::abs(strain_rate) > maxStrainRate[axis])
-			strain_rate = Mathr::Sign(strain_rate) * maxStrainRate[axis];
+			strain_rate = math::sign(strain_rate) * maxStrainRate[axis];
 		// do not shrink below minimum cell size (periodic collider condition), although it is suboptimal WRT resulting stress
 		strain_rate = max(strain_rate, -(cellSize[axis] - 2.1 * maxBodySpan[axis]) / scene->dt);
 

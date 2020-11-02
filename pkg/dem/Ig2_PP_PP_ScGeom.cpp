@@ -662,7 +662,7 @@ void Ig2_PP_PP_ScGeom::getPtOnParticle2(
 	Real fprevious = f;
 	int  counter   = 0;
 	//normal.normalize();
-	Vector3r step = searchDir * Mathr::Sign(f) * -1.0;
+	Vector3r step = searchDir * math::sign(f) * -1.0;
 	Vector3r bracketA(0, 0, 0), bracketB(0, 0, 0);
 
 	do {
@@ -674,7 +674,7 @@ void Ig2_PP_PP_ScGeom::getPtOnParticle2(
 			//LOG_WARN("Initial point searching exceeded 500 iterations!");
 			std::cout << "ptonparticle2 search exceeded 50000 iterations! step:" << step << endl;
 		}
-	} while (Mathr::Sign(fprevious) * Mathr::Sign(f) * 1.0 > 0.0);
+	} while (math::sign(fprevious) * math::sign(f) * 1.0 > 0.0);
 	bracketA = ptOnParticle;
 	bracketB = ptOnParticle - step;
 	Vector3r zero(0, 0, 0);

@@ -144,7 +144,7 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 			phys->u_elastic += du;
 		}
 	} else {
-		du = Mathr::Sign(phys->initialShearDir.dot(phys->shearDir)) * shearIncrement.norm(); //check cumulative shear displacement
+		du = math::sign(phys->initialShearDir.dot(phys->shearDir)) * shearIncrement.norm(); //check cumulative shear displacement
 		if (fabs(phys->mobilizedShear) > 0.99999) {
 			if (du > 0.0) { //if negative it means it is unloading
 				phys->u_cumulative += du;

@@ -25,13 +25,13 @@ CREATE_LOGGER(NewtonIntegrator);
 void NewtonIntegrator::cundallDamp1st(Vector3r& force, const Vector3r& vel)
 {
 	for (int i = 0; i < 3; i++)
-		force[i] *= 1 - damping * Mathr::Sign(force[i] * vel[i]);
+		force[i] *= 1 - damping * math::sign(force[i] * vel[i]);
 }
 // 2nd order numerical damping
 void NewtonIntegrator::cundallDamp2nd(const Real& dt, const Vector3r& vel, Vector3r& accel)
 {
 	for (int i = 0; i < 3; i++)
-		accel[i] *= 1 - damping * Mathr::Sign(accel[i] * (vel[i] + 0.5 * dt * accel[i]));
+		accel[i] *= 1 - damping * math::sign(accel[i] * (vel[i] + 0.5 * dt * accel[i]));
 }
 
 Vector3r NewtonIntegrator::computeAccel(const Vector3r& force, const Real& mass, int blockedDOFs)

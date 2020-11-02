@@ -307,10 +307,10 @@ long SpherePack::makeCloud(
 					} else { //not aligned, find closest neighbor in a cube of size 1, then transform distance to cartesian coordinates
 						Vector3r c1c2 = invHsize * (pack[j].c - c);
 						for (int axis = 0; axis < 3; axis++) {
-							if (math::abs(c1c2[axis]) < math::abs(c1c2[axis] - Mathr::Sign(c1c2[axis])))
+							if (math::abs(c1c2[axis]) < math::abs(c1c2[axis] - math::sign(c1c2[axis])))
 								dr[axis] = c1c2[axis];
 							else
-								dr[axis] = c1c2[axis] - Mathr::Sign(c1c2[axis]);
+								dr[axis] = c1c2[axis] - math::sign(c1c2[axis]);
 						}
 						dr = hSize * dr; //now in cartesian coordinates
 					}

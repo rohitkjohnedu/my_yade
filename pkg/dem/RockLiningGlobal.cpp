@@ -237,7 +237,7 @@ void RockLiningGlobal::action()
 			sigmaMax[j]           = axialForces[j] / area + fabs(moment[j]) * (2.0 * liningThickness) / Inertia;
 			sigmaMin[j]           = axialForces[j] / area - fabs(moment[j]) * (2.0 * liningThickness) / Inertia;
 			Real displacementSign = (state1->pos - refPos[j]).dot(refPos[j]);
-			displacement[j]       = Mathr::Sign(displacementSign) * (state1->pos - refPos[j]).norm();
+			displacement[j]       = math::sign(displacementSign) * (state1->pos - refPos[j]).norm();
 			Vector3r dir          = refPos[j];
 			dir.normalize();
 			radialDisplacement[j] = (state1->pos - refPos[j]).dot(dir);
@@ -532,7 +532,7 @@ Real RockLiningGlobal::evaluateFNoSphereVol(const PotentialBlock* s1, const Stat
 	int  insideCount = 0;
 	for (int i = 0; i < planeNo; i++) {
 		Real plane = s1->a[i] * x + s1->b[i] * y + s1->c[i] * z - s1->d[i] - 1.0002 * r; //-pow(10,-10);
-		if (Mathr::Sign(plane) * 1.0 < 0.0) {
+		if (math::sign(plane) * 1.0 < 0.0) {
 			insideCount++;
 		}
 	}
