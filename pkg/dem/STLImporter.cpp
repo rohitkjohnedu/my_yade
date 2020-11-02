@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 #include "STLImporter.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/dem/Shop.hpp>
 
 namespace yade { // Cannot have #include directive inside.

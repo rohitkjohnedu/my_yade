@@ -6,6 +6,7 @@ Caulk, R. (2018) Stochastic Augmentation of the Discrete Element Method for the 
 Yade Technical Archive. DOI: 10.5281/zenodo.1202039 */
 
 #include "JointedCohesiveFrictionalPM.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/Sphere.hpp>

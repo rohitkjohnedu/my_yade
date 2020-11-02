@@ -1,4 +1,5 @@
 
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/common/Facet.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/common/Wall.hpp>

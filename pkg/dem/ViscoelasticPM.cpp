@@ -1,5 +1,6 @@
 // 2009 © Sergei Dorofeenko <sega@users.berlios.de>
 #include "ViscoelasticPM.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <core/State.hpp>

@@ -8,6 +8,7 @@
 
 #include "TriaxialCompressionEngine.hpp"
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Interaction.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>

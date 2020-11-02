@@ -2,6 +2,7 @@
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
 #include "ForceEngine.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <lib/smoothing/LinearInterpolate.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/Sphere.hpp>

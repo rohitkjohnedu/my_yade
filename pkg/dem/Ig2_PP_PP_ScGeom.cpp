@@ -4,6 +4,7 @@
 
 #ifdef YADE_POTENTIAL_PARTICLES
 #include "Ig2_PP_PP_ScGeom.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/dem/ScGeom.hpp>
 //#include <pkg/dem/PotentialParticle.hpp>
 //#include <yade/lib-base/yadeWm3Extra.hpp>

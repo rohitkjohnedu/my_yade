@@ -1,3 +1,4 @@
+#include <lib/high-precision/Constants.hpp>
 #include <core/Interaction.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/CapillaryPhys.hpp>

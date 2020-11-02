@@ -1,4 +1,5 @@
 
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/SpheresFactory.hpp>
 #include <boost/random/linear_congruential.hpp>

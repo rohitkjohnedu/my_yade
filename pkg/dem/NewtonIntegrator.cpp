@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Clump.hpp>
 #include <core/Scene.hpp>
 #include <pkg/dem/NewtonIntegrator.hpp>

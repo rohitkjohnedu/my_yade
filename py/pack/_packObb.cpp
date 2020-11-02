@@ -4,6 +4,7 @@
 
 #include <lib/base/Logging.hpp>
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 
 CREATE_CPP_LOCAL_LOGGER("_packObb.cpp");

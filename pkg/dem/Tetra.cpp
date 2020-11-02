@@ -3,6 +3,7 @@
 
 #include "Tetra.hpp"
 
+#include <lib/high-precision/Constants.hpp>
 #include <core/Interaction.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>

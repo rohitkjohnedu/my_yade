@@ -2,6 +2,7 @@
 #pragma once
 
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/PartialEngine.hpp>
 
 namespace yade { // Cannot have #include directive inside.

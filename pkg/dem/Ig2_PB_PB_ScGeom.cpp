@@ -6,6 +6,7 @@
 #ifdef YADE_POTENTIAL_BLOCKS
 
 #include "Ig2_PB_PB_ScGeom.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/dem/ScGeom.hpp>
 //#include <pkg/dem/PotentialBlock.hpp>
 //#include<yade/lib-base/yadeWm3Extra.hpp>

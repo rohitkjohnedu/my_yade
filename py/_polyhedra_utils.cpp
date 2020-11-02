@@ -5,6 +5,7 @@
 
 #include <lib/base/AliasNamespaces.hpp>
 #include <lib/base/Logging.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>

@@ -8,6 +8,7 @@
 #ifdef YADE_OPENGL
 
 #include "Grid.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 
 namespace yade { // Cannot have #include directive inside.

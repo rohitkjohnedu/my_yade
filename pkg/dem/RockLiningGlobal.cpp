@@ -4,6 +4,7 @@
 #if defined(YADE_POTENTIAL_BLOCKS) && defined(YADE_VTK)
 #include "RockLiningGlobal.hpp"
 #include <lib/compatibility/VTKCompatibility.hpp> // fix InsertNextTupleValue → InsertNextTuple name change (and others in the future)
+#include <lib/high-precision/Constants.hpp>
 //#include<pkg/dem/KnKsLaw.hpp>
 #include <core/Material.hpp>
 #include <core/Omega.hpp>

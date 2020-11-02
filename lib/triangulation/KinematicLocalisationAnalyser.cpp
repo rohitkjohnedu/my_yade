@@ -11,6 +11,7 @@
 // #define		CELL_INFO_TYPE		Cell_Info;
 
 #include "KinematicLocalisationAnalyser.hpp" //This one first, because it defines the info types
+#include <lib/high-precision/Constants.hpp>
 // #include "Tesselation.h"
 // #include "TriaxialState.h"
 #include "basicVTKwritter.hpp"

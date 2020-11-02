@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "CapillaryStressRecorder.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/common/ElastMat.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/CapillaryPhys.hpp>

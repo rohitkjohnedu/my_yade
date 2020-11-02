@@ -6,6 +6,7 @@
 *  GNU General Public License v2 or later. See file LICENSE for details. *
 *************************************************************************/
 
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/dem/KinemSimpleShearBox.hpp>
 
 #include <core/State.hpp>

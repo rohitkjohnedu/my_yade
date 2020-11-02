@@ -8,6 +8,7 @@
 
 #include "WirePM.hpp"
 #include "../../lib/base/Math.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <pkg/dem/ScGeom.hpp>

@@ -2,6 +2,7 @@
 // 2012 © Kneib Francois <francois.kneib@irstea.fr>
 
 #include "Cylinder.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/common/Sphere.hpp>
 #ifdef YADE_OPENGL
 #include <lib/opengl/OpenGLWrapper.hpp>

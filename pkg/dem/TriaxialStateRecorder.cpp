@@ -9,6 +9,7 @@
 *************************************************************************/
 
 #include "TriaxialStateRecorder.hpp"
+#include <lib/high-precision/Constants.hpp>
 // #include <pkg/dem/TriaxialCompressionEngine.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>

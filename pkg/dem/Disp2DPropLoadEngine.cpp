@@ -9,6 +9,7 @@
 
 #include "Disp2DPropLoadEngine.hpp"
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Scene.hpp>
 #include <core/State.hpp>
 #include <pkg/common/Box.hpp>

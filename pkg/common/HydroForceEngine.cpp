@@ -2,6 +2,7 @@
 // 2017 © Julien Chauchat <julien.chauchat@legi.grenoble-inp.fr>
 
 #include "HydroForceEngine.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <lib/smoothing/LinearInterpolate.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/Sphere.hpp>

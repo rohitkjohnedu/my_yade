@@ -1,3 +1,4 @@
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/dem/DemXDofGeom.hpp>
 #include <pkg/dem/DomainLimiter.hpp>
 #include <pkg/dem/Shop.hpp>

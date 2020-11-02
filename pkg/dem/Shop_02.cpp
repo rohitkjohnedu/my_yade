@@ -1,5 +1,6 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
 #include "Shop.hpp"
+#include <lib/high-precision/Constants.hpp>
 
 #include <core/Body.hpp>
 #include <core/Interaction.hpp>

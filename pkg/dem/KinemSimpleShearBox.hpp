@@ -9,6 +9,7 @@
 #pragma once
 
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Body.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/BoundaryController.hpp>

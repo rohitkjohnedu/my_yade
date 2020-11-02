@@ -9,6 +9,7 @@
 // Experimental engine under development
 #ifdef PARTIALSAT
 #include "PartialSatClayEngine.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <pkg/common/Sphere.hpp>
 #include <pkg/dem/CohesiveFrictionalContactLaw.hpp>
 #include <pkg/dem/HertzMindlin.hpp>

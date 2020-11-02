@@ -1,4 +1,5 @@
 #include "FacetTopologyAnalyzer.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Body.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/Facet.hpp>

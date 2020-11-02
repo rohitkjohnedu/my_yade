@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <lib/high-precision/Constants.hpp>
 #include <core/TimeStepper.hpp>
 
 namespace yade { // Cannot have #include directive inside.

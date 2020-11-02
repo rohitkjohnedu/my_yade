@@ -9,6 +9,7 @@
 #ifdef YADE_CGAL
 
 #include "TesselationWrapper.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <lib/triangulation/Timer.h>
 #include <pkg/dem/Shop.hpp>
 #include <pkg/dem/SpherePack.hpp>

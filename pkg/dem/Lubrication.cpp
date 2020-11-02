@@ -1,5 +1,6 @@
 
 #include "Lubrication.hpp"
+#include <lib/high-precision/Constants.hpp>
 
 namespace yade { // Cannot have #include directive inside.
 

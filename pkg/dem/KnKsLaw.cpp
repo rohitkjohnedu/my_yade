@@ -1,5 +1,6 @@
 #ifdef YADE_POTENTIAL_PARTICLES
 #include "KnKsLaw.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Scene.hpp>
 //#include <pkg/dem/ScGeom.hpp>
 #include <core/Omega.hpp>

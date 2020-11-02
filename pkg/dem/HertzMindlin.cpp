@@ -1,6 +1,7 @@
 // 2010 © Chiara Modenese <c.modenese@gmail.com>
 
 #include "HertzMindlin.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <pkg/dem/ScGeom.hpp>

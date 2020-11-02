@@ -1,5 +1,6 @@
 // 2007 © Václav Šmilauer <eudoxos@arcig.cz>
 #include "Shop.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <boost/tokenizer.hpp>
 
 #include "core/Body.hpp"

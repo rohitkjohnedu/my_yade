@@ -2,6 +2,7 @@
 
 #include <lib/base/AliasNamespaces.hpp>
 #include <lib/base/Logging.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <lib/pyutil/doc_opts.hpp>
 #include <lib/pyutil/gil.hpp>
 #include <lib/pyutil/raw_constructor.hpp>

@@ -7,6 +7,7 @@
 
 #include "RockBolt.hpp"
 //#include<pkg/dem/KnKsLaw.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <pkg/dem/ScGeom.hpp>
 #include <cstdlib>

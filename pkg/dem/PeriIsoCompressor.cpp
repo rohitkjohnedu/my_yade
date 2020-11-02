@@ -1,6 +1,7 @@
 
 // 2009 © Václav Šmilauer <eudoxos@arcig.cz>
 
+#include <lib/high-precision/Constants.hpp>
 #include <lib/pyutil/gil.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/NormShearPhys.hpp>

@@ -4,6 +4,7 @@
 /* The numerical library is changed from CPLEX to CLP because subscription to the academic initiative is required to use CPLEX for free */
 #ifdef YADE_POTENTIAL_BLOCKS
 
+#include <lib/high-precision/Constants.hpp>
 #include <core/Clump.hpp>
 #include <pkg/dem/KnKsPBLaw.hpp>
 

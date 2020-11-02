@@ -4,6 +4,7 @@
 #ifdef YADE_OPENGL
 
 #include "OpenGLRenderer.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <lib/opengl/GLUtils.hpp>
 #include <lib/pyutil/gil.hpp>
 #include <lib/serialization/EnumSupport.hpp>

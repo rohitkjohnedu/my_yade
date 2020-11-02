@@ -7,6 +7,7 @@
 *************************************************************************/
 #ifdef FLOW_ENGINE
 #include "TwoPhaseFlowEngine.hpp"
+#include <lib/high-precision/Constants.hpp>
 
 //keep this #ifdef for commited versions unless you really have stable version that should be compiled by default
 //it will save compilation time for everyone else

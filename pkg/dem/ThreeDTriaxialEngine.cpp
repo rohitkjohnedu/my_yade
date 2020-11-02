@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "ThreeDTriaxialEngine.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 

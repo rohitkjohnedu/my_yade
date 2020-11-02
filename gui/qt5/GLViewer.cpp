@@ -9,6 +9,7 @@
 #include "GLViewer.hpp"
 #include "OpenGLManager.hpp"
 
+#include <lib/high-precision/Constants.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
 #include <lib/pyutil/gil.hpp>
 #include <lib/serialization/ObjectIO.hpp>

@@ -11,6 +11,7 @@
 // #define XVIEW
 #include "FlowBoundingSphere.hpp" //include after #define XVIEW
 #include "vector"
+#include <lib/high-precision/Constants.hpp>
 #include <assert.h>
 #include <fstream>
 #include <iostream>

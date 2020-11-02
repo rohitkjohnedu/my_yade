@@ -1,6 +1,7 @@
 // (c) 2007-2010 Vaclav Smilauer <eudoxos@arcig.cz>
 
 #include "Clump.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/BodyContainer.hpp>
 #include <core/Scene.hpp>
 #include <core/State.hpp>

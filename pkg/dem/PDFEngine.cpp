@@ -1,4 +1,5 @@
 #include "PDFEngine.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <fstream>
 #include <iostream>
 #include <type_traits>

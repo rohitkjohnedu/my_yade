@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "SimpleShear.hpp"
+#include <lib/high-precision/Constants.hpp>
 
 #include <core/Interaction.hpp>
 #include <core/Scene.hpp>

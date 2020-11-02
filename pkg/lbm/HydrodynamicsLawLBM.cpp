@@ -25,6 +25,7 @@
 
 #include "HydrodynamicsLawLBM.hpp"
 #include <lib/base/AliasNamespaces.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/Box.hpp>

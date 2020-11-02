@@ -3,6 +3,7 @@
 // © 2008 Václav Šmilauer <eudoxos@arcig.cz>
 // © 2006 Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <pkg/dem/ScGeom.hpp>

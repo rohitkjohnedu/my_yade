@@ -2,6 +2,7 @@
 // 2013 © Bruno Chareyre <bruno.chareyre@grenoble-inp.fr>
 
 #include "InsertionSortCollider.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Interaction.hpp>
 #include <core/InteractionContainer.hpp>
 #include <core/Scene.hpp>

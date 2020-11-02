@@ -1,6 +1,7 @@
 // © 2009 Václav Šmilauer <eudoxos@arcig.cz>
 
 #include <lib/base/AliasNamespaces.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <core/Timing.hpp>

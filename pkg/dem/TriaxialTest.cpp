@@ -7,6 +7,7 @@
 *************************************************************************/
 
 
+#include <lib/high-precision/Constants.hpp>
 #include <core/Body.hpp>
 #include <core/Interaction.hpp>
 #include <core/Scene.hpp>

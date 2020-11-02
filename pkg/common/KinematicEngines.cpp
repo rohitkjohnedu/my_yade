@@ -1,4 +1,5 @@
 
+#include <lib/high-precision/Constants.hpp>
 #include <lib/smoothing/LinearInterpolate.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/KinematicEngines.hpp>

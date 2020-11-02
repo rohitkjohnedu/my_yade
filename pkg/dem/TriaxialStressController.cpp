@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "TriaxialStressController.hpp"
+#include <lib/high-precision/Constants.hpp>
 #include <core/Clump.hpp>
 #include <core/Scene.hpp>
 #include <core/State.hpp>

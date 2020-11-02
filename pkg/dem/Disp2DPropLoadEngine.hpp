@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <lib/high-precision/Constants.hpp>
 #include <core/Body.hpp>
 #include <core/Omega.hpp>
 #include <pkg/common/BoundaryController.hpp>
