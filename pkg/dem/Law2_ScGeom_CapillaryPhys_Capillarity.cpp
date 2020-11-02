@@ -11,6 +11,7 @@
 #include <pkg/dem/ScGeom.hpp>
 
 #include <lib/base/Math.hpp>
+#include <lib/high-precision/MathApprox.hpp>
 #include <core/Omega.hpp>
 #include <core/Scene.hpp>
 #include <pkg/common/Sphere.hpp>
@@ -337,9 +338,9 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::checkFusion()
 
 					Real normalAngle = 0;
 					if (normalDot >= 0)
-						normalAngle = Mathr::FastInvCos0(normalDot);
+						normalAngle = math::fastInvCos0(normalDot);
 					else
-						normalAngle = ((Mathr::PI)-Mathr::FastInvCos0(-(normalDot)));
+						normalAngle = ((Mathr::PI)-math::fastInvCos0(-(normalDot)));
 
 					if ((angle1 + angle2) * Mathr::DEG_TO_RAD > normalAngle) {
 						if (!hertzOn) {
