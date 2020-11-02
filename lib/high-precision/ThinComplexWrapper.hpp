@@ -92,7 +92,8 @@ namespace math {
 
 		// construct from Real
 		// copy constructor from Real
-		ThinComplexWrapper(const ThinRealWrapper<NonComplex>& initVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_copy_constructor<WrappedComplex>::value)
+		constexpr ThinComplexWrapper(const ThinRealWrapper<NonComplex>& initVal)
+		        BOOST_NOEXCEPT_IF(boost::has_nothrow_copy_constructor<WrappedComplex>::value)
 		        : val(static_cast<NonComplex>(initVal)) {};
 		// copy assignment operator from Real
 		ThinComplexWrapper& operator=(const ThinRealWrapper<NonComplex>& rhs) BOOST_NOEXCEPT_IF(boost::has_nothrow_assign<WrappedComplex>::value)

@@ -99,7 +99,7 @@ namespace math {
 
 		// move/copy constructor from OtherType which is_convertible to WrappedReal
 		template <typename OtherType, typename = EnableIfConvertible<OtherType>>
-		ThinRealWrapper(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value)
+		constexpr ThinRealWrapper(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedReal>::value)
 		        : val(static_cast<WrappedReal>(std::forward<OtherType>(moveVal)))
 		{
 		}
