@@ -207,7 +207,7 @@ void TriaxialTest::createSphere(shared_ptr<Body>& body, Vector3r position, Real 
 	aabb->color        = Vector3r(0, 1, 0);
 	iSphere->radius    = radius;
 	//iSphere->color	= Vector3r(0.4,0.1,0.1);
-	iSphere->color = Vector3r(Mathr::UnitRandom(), Mathr::UnitRandom(), Mathr::UnitRandom());
+	iSphere->color = Vector3r(math::unitRandom(), math::unitRandom(), math::unitRandom());
 	iSphere->color.normalize();
 	body->shape    = iSphere;
 	body->bound    = aabb;

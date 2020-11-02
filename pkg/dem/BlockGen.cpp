@@ -1839,7 +1839,7 @@ bool BlockGen::createBlock(shared_ptr<Body>& body, struct Block block, int numbe
 
 	if (color[0] == -1 or color[1] == -1 or color[2] == -1) {
 		pBlock->color = Vector3r(
-		        Mathr::UnitRandom(), Mathr::UnitRandom(), Mathr::UnitRandom()); //math::max(math::max(maxXoverall, maxYoverall),maxZoverall) ; //
+		        math::unitRandom(), math::unitRandom(), math::unitRandom()); //math::max(math::max(maxXoverall, maxYoverall),maxZoverall) ; //
 	} else {
 		pBlock->color = color;
 	}

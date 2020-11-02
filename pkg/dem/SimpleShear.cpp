@@ -251,10 +251,10 @@ string SimpleShear::GenerateCloud(vector<BasicSphere>& sphere_list, Vector3r low
 	for (i = 0; i < number; ++i) {
 		BasicSphere s;
 		for (t = 0; t < tries; ++t) {
-			s.second     = (Mathr::UnitRandom() - 0.5) * rad_std_dev * mean_radius + mean_radius;
-			s.first.x()  = lowerCorner.x() + s.second + (dimensions.x() - 2 * s.second) * Mathr::UnitRandom();
-			s.first.y()  = lowerCorner.y() + s.second + (dimensions.y() - 2 * s.second) * Mathr::UnitRandom();
-			s.first.z()  = lowerCorner.z() + s.second + (dimensions.z() - 2 * s.second) * Mathr::UnitRandom();
+			s.second     = (math::unitRandom() - 0.5) * rad_std_dev * mean_radius + mean_radius;
+			s.first.x()  = lowerCorner.x() + s.second + (dimensions.x() - 2 * s.second) * math::unitRandom();
+			s.first.y()  = lowerCorner.y() + s.second + (dimensions.y() - 2 * s.second) * math::unitRandom();
+			s.first.z()  = lowerCorner.z() + s.second + (dimensions.z() - 2 * s.second) * math::unitRandom();
 			bool overlap = false;
 			for (long j = 0; (j < i && !overlap); j++)
 				if (pow(sphere_list[j].second + s.second, 2) > (sphere_list[j].first - s.first).squaredNorm())

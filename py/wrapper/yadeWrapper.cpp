@@ -449,7 +449,7 @@ public:
 
 					shared_ptr<Sphere> sphereTmp = shared_ptr<Sphere>(new Sphere());
 					sphereTmp->radius            = newRadTmp[jj];
-					sphereTmp->color             = Vector3r(Mathr::UnitRandom(), Mathr::UnitRandom(), Mathr::UnitRandom());
+					sphereTmp->color             = Vector3r(math::unitRandom(), math::unitRandom(), math::unitRandom());
 					sphereTmp->color.normalize();
 					newSphere->shape = sphereTmp;
 

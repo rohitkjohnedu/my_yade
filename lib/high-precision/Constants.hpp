@@ -36,8 +36,6 @@ template <typename Scalar> struct Math {
 
 	// TODO: use directly yade::math::functions
 	static Scalar Sign(Scalar f) { return ::yade::math::sign(f); }              // { if(f<0) return -1; if(f>0) return 1; return 0; }
-	static Scalar UnitRandom() { return ::yade::math::unitRandom(); }           //((double)rand()/((double)(RAND_MAX)))
-	static Scalar SymmetricRandom() { return ::yade::math::symmetricRandom(); } //2.*(((double)rand())/((double)(RAND_MAX)))-1.
 };
 using Mathr = Math<Real>;
 
