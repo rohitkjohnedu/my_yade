@@ -15,6 +15,7 @@
 //    because mpmath is a purely python library (which was one of the main difficulties when writing lib/high-precision/ToFromPythonConverter.hpp)
 
 #include <lib/base/Logging.hpp>
+#include <lib/high-precision/Constants.hpp>
 #include <lib/high-precision/Real.hpp>
 #include <lib/high-precision/RealHPConfig.hpp>
 #include <lib/high-precision/RealIO.hpp>
@@ -34,11 +35,22 @@
 #include <py/high-precision/_RealHPDiagnostics.hpp>
 
 // testing Real type
+#define BOOST_ENABLE_ASSERT_HANDLER
+#include <boost/assert.hpp> // Simple boost assert a little better than standard assert: https://www.boost.org/doc/libs/master/libs/assert/doc/html/assert.html
 #include <boost/concept/assert.hpp>
 #include <boost/math/concepts/real_type_concept.hpp>
 
 #include <lib/high-precision/ToFromPythonConverter.hpp>
 CREATE_CPP_LOCAL_LOGGER("_math.cpp")
+
+namespace boost {
+void assertion_failed(char const* expr, char const* function, char const* /*file*/, long line)
+{
+	std::string msg = function + (":" + boost::lexical_cast<std::string>(line)) + ", test failed for: " + expr;
+	LOG_FATAL(msg);
+	throw std::runtime_error(msg.c_str());
+};
+}
 
 namespace py = ::boost::python;
 using ::yade::Complex;
@@ -148,6 +160,24 @@ template <int N> void multVec(::yade::math::UnderlyingRealHP<RealHP<N>>* array, 
 }
 
 namespace yade {
+template <int N> void testConstants()
+{
+	LOG_NOFILTER("Checking ConstantsHP<" << N << ">");
+	BOOST_ASSERT(math::ConstantsHP<N>::PI == boost::math::constants::pi<RealHP<N>>());
+	BOOST_ASSERT(math::ConstantsHP<N>::TWO_PI == boost::math::constants::two_pi<RealHP<N>>());
+	BOOST_ASSERT(math::ConstantsHP<N>::HALF_PI == boost::math::constants::half_pi<RealHP<N>>());
+	BOOST_ASSERT(math::ConstantsHP<N>::SQRT_TWO_PI == boost::math::constants::root_two_pi<RealHP<N>>());
+	BOOST_ASSERT(math::ConstantsHP<N>::E == boost::math::constants::e<RealHP<N>>());
+	BOOST_ASSERT(math::ConstantsHP<N>::I == ComplexHP<N>(0, 1));
+
+	// these two involve division. On 32bit architecture there might be a different rounding, which may result in an error. Let's hope it's not worse on other architectures.
+	BOOST_ASSERT(math::abs(boost::math::float_distance(math::ConstantsHP<N>::DEG_TO_RAD, math::ConstantsHP<N>::PI / RealHP<N>(180))) <= 1);
+	BOOST_ASSERT(math::abs(boost::math::float_distance(math::ConstantsHP<N>::RAD_TO_DEG, RealHP<N>(180) / math::ConstantsHP<N>::PI)) <= 1);
+
+	BOOST_ASSERT(math::ConstantsHP<N>::EPSILON == std::numeric_limits<RealHP<N>>::epsilon());
+	BOOST_ASSERT(math::ConstantsHP<N>::MAX_REAL == std::numeric_limits<RealHP<N>>::max());
+	BOOST_ASSERT(math::ConstantsHP<N>::ZERO_TOLERANCE == RealHP<N>(1e-20));
+}
 void                  testLoopRealHP();
 template <int N> void testArray()
 {
@@ -679,6 +709,13 @@ template <int N, bool registerConverters> struct RegisterRealHPMath {
 		        ::yade::testArray<N>,
 		        R"""(This function tests call to ``std::vector::data(…)`` function in order to extract the array.)""");
 
+		/********************************************************************************************/
+		/**********************              other C++ side tests              **********************/
+		/********************************************************************************************/
+		py::def("testConstants",
+		        ::yade::testConstants<N>,
+		        R"""(This function tests lib/high-precision/Constants.hpp, the yade::math::ConstantsHP<N>, former yade::Mathr constants.)""");
+
 
 		/********************************************************************************************/
 		/**********************                     random                     **********************/
@@ -914,7 +951,7 @@ template <int N1> struct TestRealHP2 {
 			auto       c2 = a - b;
 			auto       c3 = a * b;
 			auto       c4 = a / b;
-			if (c1 != RealHP<N>(1.25))
+			if (c1 != RealHP<N>(1.25)) // NOTE: might want later to replace these if with BOOST_ASSERT
 				throw std::runtime_error(("TestRealHP error: Fatal r1" + info).c_str());
 			if (c2 != RealHP<N>(-3.75))
 				throw std::runtime_error(("TestRealHP error: Fatal r2" + info).c_str());
@@ -1012,7 +1049,11 @@ template <int N1> struct TestRealHP2 {
 };
 
 struct TestRealHP1 {
-	template <typename N1> void operator()(N1) { boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP2<N1::value>()); }
+	template <typename N1> void operator()(N1)
+	{
+		boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP2<N1::value>());
+		testConstants<N1::value>();
+	}
 };
 
 void testLoopRealHP() { boost::mpl::for_each<::yade::math::RealHPConfig::SupportedByEigenCgal>(TestRealHP1()); }

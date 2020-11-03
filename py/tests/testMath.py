@@ -623,6 +623,13 @@ class SimpleTests(unittest.TestCase):
 			if(self.testRecordingMode and (self.totalCount % 20000 == 0)):
 				self.tearDown() # save progress
 
+	def testConstants(self):
+		for N in self.testLevelsHP:
+			self.runCheck(N , self.HPtestConstants)
+
+	def HPtestConstants(self,N,HPn,MPn):
+		HPn.testConstants()
+
 	def testArray(self):
 		for N in self.testLevelsHP:
 			self.runCheck(N , self.HPtestArray)
