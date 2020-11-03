@@ -120,7 +120,7 @@ void GLViewer::wheelEvent(QWheelEvent* event)
 	}
 	assert(manipulatedClipPlane < renderer->numClipPlanes);
 	Real           distStep = 1e-3 * sceneRadius();
-	Real           dist     = event->delta() * manipulatedFrame()->wheelSensitivity() * distStep;
+	Real           dist     = event->angleDelta().y() * manipulatedFrame()->wheelSensitivity() * distStep;
 	Vector3r       normal   = renderer->clipPlaneSe3[manipulatedClipPlane].orientation * Vector3r(0, 0, 1);
 	qglviewer::Vec newPos   = manipulatedFrame()->position()
 	        + qglviewer::Vec((static_cast<double>(normal[0])),

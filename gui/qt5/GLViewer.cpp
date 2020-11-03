@@ -67,7 +67,7 @@ void GLViewer::staticCloseEvent(QCloseEvent* e, const int viewId)
 void GLViewer::closeEvent(QCloseEvent* e) { GLViewer::staticCloseEvent(e, viewId); }
 
 GLViewer::GLViewer(int _viewId, const shared_ptr<OpenGLRenderer>& _renderer, QGLWidget* shareWidget)
-        : QGLViewer(/*parent*/ (QWidget*)NULL, shareWidget)
+        : QGLViewer(/*parent*/ (QWidget*)NULL, shareWidget, {})
         , renderer(_renderer)
         , viewId(_viewId)
 {
