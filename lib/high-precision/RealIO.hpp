@@ -26,6 +26,11 @@
 #include <sstream>
 #include <string>
 
+namespace forCtags {
+struct RealIO {
+}; // for ctags
+}
+
 namespace yade {
 namespace math {
 	// guaranteed maximum precision

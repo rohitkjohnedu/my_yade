@@ -8,6 +8,11 @@
 #ifndef YADE_REAL_HP_TYPE_HPP
 #define YADE_REAL_HP_TYPE_HPP
 
+namespace forCtags {
+struct RealHP {
+}; // for ctags, but also see RealHPEigenCgal
+}
+
 // In this file following things are declared for the users:
 //
 // (1) RealHP<N>, ComplexHP<N> types are declared in such a way that:
