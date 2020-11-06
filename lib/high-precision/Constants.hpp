@@ -16,14 +16,21 @@
  * → When they are constexpr they must be initialized inside a class.
  * → To generate symbols for linker they must be declared second time outside of class, and initialized there if not constexpr.
  * → But they can't be constexpr if Real type has more than 33 decimal places precision.
- * Hence above are three IF conditions. One solution is to initialize (or not) each variable in four places. Which is sooo prone to mistakes, that it is crazy.
  *
- * Another solution is to use BOOST_PP_IF condition for preprocessor. This also looks crazy.
- * But each variable is initialized in single place: in the macro Y_DECLARE_CONSTANTS. This is much less prone to mistakes.
+ * Hence above are three IF conditions. There are two possible solutions:
+ * 1. Declare/initialize each variable in four places. This is prone to mistakes, so be careful.
+ *    We will use this approach for now, because this code is more often read than written. But be careful when adding more Constants
  *
- * To examine what the compiler actually sees invoke this command:
+ * 2. Use BOOST_PP_IF condition for preprocessor. This involves a macro, so be careful, but each variable is declared only once.
+ *    You can examine the "nice" macro solution in 'git show 549774eeca2f63a877' or in https://gitlab.com/yade-dev/trunk/-/blob/549774eeca2f63a877/lib/high-precision/Constants.hpp#L77
  *
- *    g++ -E -P lib/high-precision/Constants.hpp  -I ./ -I /usr/include/eigen3 -I /usr/include/python3.7m > /tmp/Out.hpp
+ * Switching between the two solutions is rather straightforward (if needed). The commit 549774eeca2f63a877 has been heavily tested.
+ *    Each variable in there is initialized in single place: in the macro Y_DECLARE_CONSTANTS.
+ *    To examine what the compiler actually sees invoke this command:
+ *      g++ -E -P lib/high-precision/Constants.hpp  -I ./ -I /usr/include/eigen3 -I /usr/include/python3.7m > /tmp/Out.hpp
+ *
+ *
+ * Here the non-macro approach is used. We can quickly switch to macro solution if needed, use commit 549774eeca2f63a877 for that.
  *
  *
  * About initializng the values like epsilon() or max() see:
