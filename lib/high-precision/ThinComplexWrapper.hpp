@@ -102,7 +102,7 @@ namespace math {
 			return *this;
 		};
 		// move constructor from Real
-		ThinComplexWrapper(ThinRealWrapper<NonComplex>&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
+		constexpr ThinComplexWrapper(ThinRealWrapper<NonComplex>&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
 		        : val(static_cast<NonComplex>(moveVal)) {};
 		// move assignment operator Real
 		ThinComplexWrapper& operator=(ThinRealWrapper<NonComplex>&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
@@ -112,14 +112,14 @@ namespace math {
 		};
 		// constructor from two Real arguments
 		template <typename OtherType, typename = EnableIfNonComplexConvertible<OtherType>>
-		ThinComplexWrapper(const ThinRealWrapper<OtherType>& v1, const ThinRealWrapper<OtherType>& v2)
+		constexpr ThinComplexWrapper(const ThinRealWrapper<OtherType>& v1, const ThinRealWrapper<OtherType>& v2)
 		        BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
 		        : val(static_cast<OtherType>(v1), static_cast<OtherType>(v2))
 		{
 		}
 		// move/copy constructor from two Real arguments
 		template <typename OtherType, typename = EnableIfNonComplexConvertible<OtherType>>
-		ThinComplexWrapper(OtherType&& moveVal_1, OtherType&& moveVal_2) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
+		constexpr ThinComplexWrapper(OtherType&& moveVal_1, OtherType&& moveVal_2) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
 		        : val(std::forward<OtherType>(moveVal_1), std::forward<OtherType>(moveVal_2))
 		{
 		}
@@ -128,7 +128,7 @@ namespace math {
 
 		// move/copy constructor from OtherType which is_convertible to WrappedComplex
 		template <typename OtherType, typename = EnableIfConvertible<OtherType>>
-		ThinComplexWrapper(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
+		constexpr ThinComplexWrapper(OtherType&& moveVal) BOOST_NOEXCEPT_IF(boost::has_nothrow_move<WrappedComplex>::value)
 		        : val(static_cast<WrappedComplex>(std::forward<OtherType>(moveVal)))
 		{
 		}
