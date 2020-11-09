@@ -634,6 +634,8 @@ def saveDataTxt(fileName,vars=None, headers=None):
 	array([1, 2])
 	>>> d['b']
 	array([11, 12])
+	>>> import os # cleanup
+	>>> os.remove('/tmp/dataFile.txt.tar.gz')
 
 	:param fileName: file to save data to; if it ends with ``.bz2`` / ``.gz``, the file will be compressed using bzip2 / gzip. 
 	:param vars: Sequence (tuple/list/set) of variable names to be saved. If ``None`` (default), all variables in :yref:`yade.plot.plot` are saved.
