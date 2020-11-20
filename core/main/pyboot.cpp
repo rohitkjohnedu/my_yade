@@ -30,7 +30,11 @@ struct pyboot {
 /* Initialize yade, loading given plugins */
 void yadeInitialize(boost::python::list& pp, const std::string& confDir)
 {
+#if PY_MAJOR_VERSION < 3 || PY_MINOR_VERSION < 7
 	PyEval_InitThreads();
+#else
+	Py_Initialize();
+#endif
 
 	yade::Omega& O(yade::Omega::instance());
 	O.init();
