@@ -27,7 +27,7 @@ To check which version of Yade is included in your specific distribution, visit
 `Debian <http://packages.qa.debian.org/y/yade.html>`_.
 The `Debian-Backports <http://backports.debian.org/Instructions>`_
 repository is updated regularly to bring the newest Yade version to the users of stable
-Debians.
+Debians (more on this `here <https://lists.launchpad.net/yade-dev/msg15033.html>`_ for Debian 9 and 10).
 
 **Daily packages**
 
