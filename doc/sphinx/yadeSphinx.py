@@ -220,7 +220,7 @@ Yade wrapper class reference
     sect('Interaction Geometry creation','',['IGeomFunctor','IGeomDispatcher'])+
     sect('Interaction Physics creation','',['IPhysFunctor','IPhysDispatcher'])+
     sect('Constitutive laws','',['LawFunctor','LawDispatcher'])+
-    #sect('Internal forces','',['InternalForceFunctor', 'InternalForceDispatcher'])+
+    sect('Internal forces','',['InternalForceFunctor', 'InternalForceDispatcher'])+
     sect('Callbacks','',[#'BodyCallback',
         'IntrCallback'])+
     sect('Preprocessors','',['FileGenerator'])+
