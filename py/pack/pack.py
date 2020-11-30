@@ -47,11 +47,7 @@ try:
 	import gts
 except ImportError: pass
 
-# make c++ predicates available in this module
-noPredicate = False
-try:
-	from yade._packPredicates import * ## imported in randomDensePack as well
-except ImportError: pass; noPredicate = True
+from yade._packPredicates import * ## imported in randomDensePack as well
 
 # import SpherePack
 from yade._packSpheres import *
@@ -60,7 +56,7 @@ from yade._packObb import *
 ##
 # extend _packSphere.SpherePack c++ class by this method
 ##
-if not (noPredicate):
+if (True):
   def SpherePack_toSimulation(self,rot=Matrix3.Identity,**kw):
     """Append spheres directly to the simulation. In addition calling :yref:`O.bodies.append<BodyContainer.append>`,
   this method also appropriately sets periodic cell information of the simulation.

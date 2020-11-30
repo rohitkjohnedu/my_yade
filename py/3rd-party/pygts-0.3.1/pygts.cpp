@@ -392,8 +392,6 @@ static PyObject* triangle_enclosing(PyObject* self, PyObject* args)
 
 
 #if PY_MAJOR_VERSION >= 3
-// in python/Modules/_io/_iomodule.h
-extern PyTypeObject PyIOBase_Type;
 // taken from:
 // https://github.com/mapserver/mapserver/issues/4748
 /* Translate Python's built-in file object to FILE * */
@@ -423,10 +421,6 @@ FILE* FILE_from_py_file__raises(PyObject* f_, const char* mode)
 {
 	FILE* f;
 #if PY_MAJOR_VERSION >= 3
-	if (!PyObject_IsInstance(f_, (PyObject*)&PyIOBase_Type)) {
-		PyErr_SetString(PyExc_TypeError, "expected a File (PyIOBase_type).");
-		return NULL;
-	}
 	f = streamFromPyFile(f_, mode);
 	if (f == NULL) {
 		PyErr_SetString(PyExc_TypeError, "failed to obtained FILE* from the Python object (python 3 only).");
