@@ -20,7 +20,7 @@ if ( 'CGAL' in features ):
 
     def checkForcesBodies(fR, bodNum):
        if (abs(f[2] - fR)/f[2] >  tolerance or len(O.bodies) != bodNum):
-          raise YadeCheckError(warningString(fR, f[2], 4, len(O.bodies)))
+          raise YadeCheckError(warningString(fR, f[2], bodNum, len(O.bodies)))
        else:
           printSuccess()
 
@@ -72,8 +72,8 @@ if ( 'CGAL' in features ):
 
     cgalVer=yade.libVersions.getVersion('cgal')
 
-    if(cgalVer > (4,9,0)):
-        print("CGAL version is ",cgalVer,". Will test for cgal version > 4.9")
+    if(cgalVer > (4,9,0) and cgalVer < (5,1,1)):
+        print("CGAL version is ",cgalVer,". Will test for (cgal version > 4.9) and (cgal version < 5.1.1)")
         O.run(166, True);
         # number of bodies depends on precision used.
         if(yade.config.highPrecisionDecimalPlaces < 18 or yade.config.highPrecisionDecimalPlaces > 33):
@@ -81,7 +81,7 @@ if ( 'CGAL' in features ):
         else:
             checkForcesBodies(-21.7037, 10)
     else:
-        print("CGAL version is ",cgalVer,". Will test for cgal version <= 4.9")
+        print("CGAL version is ",cgalVer,". Will test for (cgal version <= 4.9) or (cgal version >= 5.1.1)")
         O.run(250, True); checkForcesBodies(25.44893, 4)
         O.run(50, True); checkForcesBodies(28.791353, 4)
         O.run(10, True); checkForcesBodies(30.731547, 4)
