@@ -5,6 +5,7 @@
 
 from yade import mpy as mp
 mp.initialize(3)
+#mp.VERBOSE_OUTPUT = True # to see more of what happens behind the scene
 
 mp.mprint("I'm here")
 
@@ -39,5 +40,14 @@ if mp.rank==0:
         mp.sendCommand(executors=[1,2],command= "list(map(lambda b: setattr(b,'subdomain',rank),O.bodies))", wait=True)
 
         print("Assigned bodies:", mp.sendCommand([1,2], "len([b for b in O.bodies if b.subdomain==rank])", True) )
+        
+        # Kill workers pool, then start again with a new
+        # any data in the old threads is lost
+        mp.disconnect()
+        mp.initialize(8)
+        # not all workers will be displayed because mp.MAX_RANK_OUTPUT=5 by default
+        mp.sendCommand(executors="slaves",command="mprint('I am a new one')",wait=True)
+        
+        # no need to diconnect here, it will be called when exiting yade anyway
     
 

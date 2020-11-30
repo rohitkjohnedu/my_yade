@@ -97,6 +97,7 @@ USE_CPP_INTERS = False #sending intersections using mpi4py sometimes fails (depe
 ### Internals
 
 comm = None
+comm_slave = None # will be MPI.Comm.Get_parent() at runtime, until we disconnect 
 rank = None
 numThreads = None
 MPI = None # will be mpi4py.MPI after configure()
@@ -124,30 +125,7 @@ _ASSIGNED_IDS_ = 21
 _GET_CONNEXION_= 22
 
 
-## Initialization
 
-def configure(): # calling this function will import mpi4py.MPI, 
-	'''
-	Import MPI and define context, configure will no spawn workers by itself, that is done by initialize()
-	openmpi environment variables needs to be set before calling configure()
-	'''
-	global comm, rank, numThreads, colorScale, MPI
-	#os.environ["OMPI_MCA_rmaps_base_oversubscribe"]="1" # needed here, after importing MPI is too late (or there is a way to update flags before the spawn?)
-	from mpi4py import MPI
-	worldComm = MPI.COMM_WORLD
-	color = 3; key =0;
-	comm = worldComm.Split(color, key)  # if OFOAM coupled, split communicator
-
-	parent = comm.Get_parent()
-	if parent!=MPI.COMM_NULL: 	# if executor is a spawned worker merge comm with master 
-		comm=parent.Merge()
-
-	rank = comm.Get_rank()		# set rank and numThreads
-	if rank>0:
-		sys.stderr.write=sys.stdout.write # so we see error messages from workers in terminal
-	numThreads = comm.Get_size()
-	colorScale= makeColorScale(numThreads)
-	
 	
 def makeColorScale(n=numThreads):
 	scale= [(0.3+random.random())*Vector3(colorsys.hsv_to_rgb(value*1.0/n, 1, 1)) for value in range(0, n)]
@@ -192,16 +170,62 @@ def colorDomains():
 		colorScale = makeColorScale(numThreads)
 	for b in O.bodies:
 		b.shape.color=colorScale[b.subdomain]
+		
+## Initialization
+
+def configure(): # calling this function will import mpi4py.MPI, 
+	'''
+	Import MPI and define context, configure will no spawn workers by itself, that is done by initialize()
+	openmpi environment variables needs to be set before calling configure()
+	'''
+	global comm, comm_slave, rank, numThreads, colorScale, MPI
+	#os.environ["OMPI_MCA_rmaps_base_oversubscribe"]="1" # needed here, after importing MPI is too late (or there is a way to update flags before the spawn?)
+	from mpi4py import MPI
+	worldComm = MPI.COMM_WORLD
+	color = 3; key =0;
+	comm = worldComm.Split(color, key)  # if OFOAM coupled, split communicator
+
+	comm_slave = comm.Get_parent()
+	if comm_slave!=MPI.COMM_NULL: 	# if executor is a spawned worker merge comm with master 
+		comm=comm_slave.Merge()
+
+	rank = comm.Get_rank()		# set rank and numThreads
+	if rank>0:
+		sys.stderr.write=sys.stdout.write # so we see error messages from workers in terminal
+	numThreads = comm.Get_size()
+	colorScale= makeColorScale(numThreads)
+
+def disconnect():
+	global comm,comm_slave
+	if rank==0: # exit the interactive mode on master _after_ telling workers to exit
+		wprint("sending exit command")
+		sendCommand(executors="slaves",command="exit",wait=False)
+	if comm:
+		wprint("disconnecting")
+		 # should be a Disconnect(), no a Free(), but we have an issue with openmpi it seems
+		 # https://bitbucket.org/mpi4py/mpi4py/issues/176/disconnect-hangs-with-openmp31-python-38
+		comm.Free() 
+		if comm_slave:
+			comm_slave.Disconnect()
+		else:
+			mprint("please report bug in mpy.disconnect()")
+		if rank>0: # kill workers
+			exit
+	else:
+		mprint("mpy already disconnected")
+	comm=None
+	comm_slave=None
+	yade.runtime.opts.mpi_mode=False
 
 def initialize(np):
-	global comm,rank,numThreads,userScriptInCheckList
+	global comm,comm_slave,rank,numThreads,userScriptInCheckList
 	
 	if comm==None: configure()
 	
 	process_count = comm.Get_size()
 
 	if(process_count<np):
-	
+		#TODO: if process_count>numThreads, free some workers
 		# HACK 1: this is to detect when we run regression tests and prevent mpirun to enter a parallel testing spree
 		if "--check" in sys.yade_argv:
 			userScriptInCheckList=inspect.stack()[2][1]
@@ -221,11 +245,11 @@ def initialize(np):
 		if not yade.runtime.opts.mpi_mode: #MASTER only, the workers will be already in mpi_mode
 			mprint("will spawn ",numThreads-process_count," workers")
 			if (userScriptInCheckList==""): #normal case
-				comm = MPI.COMM_WORLD.Spawn(yadeArgv[0], args=yadeArgv[1:],maxprocs=numThreads-process_count).Merge()
+				comm_slave = MPI.COMM_WORLD.Spawn(yadeArgv[0], args=yadeArgv[1:],maxprocs=numThreads-process_count)
 			else: #HACK 1 (continued) handle execution by checkList.py, otherwise would we run checkList.py in parallel
 				#os.environ['OMPI_MCA_btl_vader_single_copy_mechanism']='none' # suppress (harmless?) messages on newer versions of linux (docker specific)
-				comm = MPI.COMM_WORLD.Spawn(sys.yade_argv[0], args=[userScriptInCheckList],maxprocs=numThreads-process_count).Merge()
-			#TODO: if process_count>numThreads, free some workers
+				comm_slave = MPI.COMM_WORLD.Spawn(sys.yade_argv[0], args=[userScriptInCheckList],maxprocs=numThreads-process_count)
+			comm = comm_slave.Merge()
 			yade.runtime.opts.mpi_mode=True
 			rank=0
 		else:	#WORKERS
@@ -241,16 +265,15 @@ def spawnedProcessWaitCommand():
 	global waitingCommands
 	if waitingCommands: return
 	if comm==None: configure()
-	
-	sys.stderr.write=sys.stdout.write
 	wprint("I'm now waiting")
+	waitingCommands = True
 	s=MPI.Status()
 	while 1:
 		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
 			time.sleep(0.001)
 		command = comm.recv(source=s.source,tag=_MASTER_COMMAND_)
 		if command=="exit": #this is to terminate the waiting loop remotely
-			comm.send(None,dest=s.source,tag=_RETURN_VALUE_)
+			comm.send(0,dest=s.source,tag=_RETURN_VALUE_)
 			break
 		wprint("will now execute ",command)
 		try:
@@ -259,15 +282,17 @@ def spawnedProcessWaitCommand():
 			comm.send(None,dest=s.source,tag=_RETURN_VALUE_)
 			mprint(sys.exc_info())
 			raise
-	waitingCommands = True
+	waitingCommands = False
+	disconnect() # this will kill the workers
 		
 def sendCommand(executors,command,wait=True,workerToWorker=False):
 	'''
-	Send a command to a worker (or list of) from master or from another worker. executors="all" is accepted, then even master will execute the command.
+	Send a command to a worker (or list of) from master or from another worker. Accepted executors are "i", "[i,j,k]", "slaves", "all" (then even master will execute the command).
 	'''
 	start=time.time()
 	if (rank>0 and not workerToWorker): wprint("sendCommand ignored by worker", rank, ", pass workerToWorker=True to force it"); return
 	if (executors=="all"): executors=list(range(numThreads))
+	if (executors=="slaves"): executors=list(range(1,numThreads))
 	argIsList=isinstance(executors,list)
 	toMaster = (argIsList and 0 in executors) or executors==0
 	if (toMaster and rank>0): mprint("workers cannot sendCommand to master (only master to itself)")
