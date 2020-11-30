@@ -27,7 +27,10 @@ if ( 'CGAL' in features ):
     mat1 = PolyhedraMat(density=densityIn, young=youngIn,poisson=poissonIn, frictionAngle=frictionIn,IsSplitable=True,strength=1)
     O.bodies.append(wall(0,axis=2,sense=1, material = mat1))
 
-    vertices = [[0,0,0],[sizeB,0,0],[sizeB,sizeB,0],[sizeB,sizeB,sizeB],[0,sizeB,0],[0,sizeB,sizeB],[0,0,sizeB],[sizeB,0,sizeB]]
+    x = 0.0000000001 # add some numerical noise to remove degenerate cases
+    y = 0.000000001
+    z = 0.0000000005
+    vertices = [[0+x,0+y,0+z],[sizeB-x,0-y,0-z],[sizeB+x,sizeB+y,0-z],[sizeB+x,sizeB-y,sizeB+z],[0-x,sizeB+y,0+z],[0-x,sizeB-y,sizeB+z],[0+x,0-y,sizeB-z],[sizeB-x,0+y,sizeB-z]]
     t = polyhedra_utils.polyhedra(mat1,v=vertices)
     t.state.pos = (0,0,sizeB/2)
     O.bodies.append(t)
