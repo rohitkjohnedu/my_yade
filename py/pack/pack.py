@@ -457,7 +457,7 @@ def _getMemoizedPacking(memoizeDb,radius,rRelFuzz,x1,y1,z1,fullDim,wantPeri,fill
 
 
 
-def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=False,memoDbg=False,color=None,returnSpherePack=None,seed=0):
+def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=0.,spheresInCell=0,memoizeDb=None,useOBB=False,memoDbg=False,color=None,returnSpherePack=None,seed=-1):
 	"""Generator of random dense packing with given geometry properties, using TriaxialTest (aperiodic)
 	or PeriIsoCompressor (periodic). The periodicity depens on whether	the spheresInCell parameter is given.
 
@@ -529,7 +529,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		#print cloudPorosity,beta,gamma,N100,x1,y1,z1,O.cell.refSize
 		#print x1,y1,z1,radius,rRelFuzz
 		O.materials.append(FrictMat(young=3e10,density=2400))
-		num=sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,spheresInCell,True)
+		num=sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,spheresInCell,True,seed=seed)
 		O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=5,keepProportions=True),NewtonIntegrator(damping=.6)]
 		O.materials.append(FrictMat(young=30e9,frictionAngle=.5,poisson=.3,density=1e3))
 		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
@@ -559,7 +559,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		sp.rotate(*orientation.toAxisAngle())
 	return filterSpherePack(predicate,sp,material=material,color=color,returnSpherePack=returnSpherePack)
 
-def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False):
+def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False,seed=-1):
 	"""Generate periodic dense packing.
 
 	A cell of initSize is stuffed with as many spheres as possible, then we run periodic compression with PeriIsoCompressor, just like with
@@ -579,7 +579,7 @@ def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False):
 	O.periodic=True
 	#O.cell.refSize=initSize
 	O.cell.setBox(initSize)
-	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True)
+	sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True,seed=seed)
 	O.engines=[ForceResetter(),InsertionSortCollider([Bo1_Sphere_Aabb()],verletDist=.05*radius),InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()]),PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='O.pause();',globalUpdateInt=20,keepProportions=True),NewtonIntegrator(damping=.8)]
 	O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
 	for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
