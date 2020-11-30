@@ -196,6 +196,12 @@ def configure(): # calling this function will import mpi4py.MPI,
 	colorScale= makeColorScale(numThreads)
 
 def disconnect():
+	'''
+	Kill all mpi processes, leaving python interpreter to rank 0 as in single-threaded execution.
+	The scenes in workers are lost since further reconnexion to mpi will just spawn new processes.
+	The scene in master thread is left unchanged. 
+	'''
+	
 	global comm,comm_slave
 	if rank==0: # exit the interactive mode on master _after_ telling workers to exit
 		wprint("sending exit command")
