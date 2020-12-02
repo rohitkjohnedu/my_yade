@@ -477,6 +477,8 @@ Initial split
 
  The present implementation can be found in :ysrc:`py/bisectionDecomposition.py`, and a parallel version can be found `here. <https://github.com/bchareyre/yade-mpi/blob/593a4d6abf7e488ab1ac633a1e6725ac301b2a14/py/tree_decomp.py>`_
 
+.. note:: importing :ysrc:`py/bisectionDecomposition.py` triggers the import of *mpi4py* and ultimately of the MPI library and related environment variables. The *mpy* module may change some mpi settings on import, therefore it is safer to only import *bisectionDecomposition* after some ``mpy.initialize()``.
+
  
 Updating the decomposition (load balancing)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
