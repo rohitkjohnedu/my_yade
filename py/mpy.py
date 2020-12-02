@@ -53,7 +53,6 @@ this = sys.modules[__name__]
 #from yade import *
 from yade.utils import *
 from yade.wrapper import *
-import yade.bisectionDecomposition as dd
 #import yade.runtime
 from yade import timing; timing.mpi={} #prepare a dictionnary for mpi-related stats
 
@@ -836,6 +835,7 @@ def splitScene():
 		O.initialEngines = O.engines
 		if DOMAIN_DECOMPOSITION: #if not already partitionned by the user we partition here
 			if rank == 0:
+				import yade.bisectionDecomposition as dd
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain(fibreList) 
 		maxid = len(O.bodies)-1
@@ -926,6 +926,7 @@ def splitScene():
 	else: 
 		if (DOMAIN_DECOMPOSITION and RESET_SUBDOMAINS_WHEN_COLLIDE):
 			if rank == 0:
+				import yade.bisectionDecomposition as dd
 				decomposition = dd.decompBodiesSerial(comm) 
 				decomposition.partitionDomain() 
 			O.subD.splitBodiesToWorkers(RESET_SUBDOMAINS_WHEN_COLLIDE)

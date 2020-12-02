@@ -12,6 +12,7 @@ The maximum depth/number of levels is defined as log2(N_{w}), where N_{w} is the
 from math import ceil, log10, log
 from yade.wrapper import * 
 from yade.minieigenHP import Vector3
+# Note: importing mpi4py will scan environment variable for MPI flags (e.g. OMPI_MCA), so because of this import here bisectionDecomposition can't be imported before mpy.configure(), which may change env variables
 from mpi4py import MPI 
 import sys
 
