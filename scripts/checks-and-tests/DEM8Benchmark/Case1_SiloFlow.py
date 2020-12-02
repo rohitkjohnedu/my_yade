@@ -87,7 +87,7 @@ O.engines=[
 		)],
 		[Law2_ScGeom_MindlinPhys_Mindlin()],
 	),
-	NewtonIntegrator(damping=0,gravity=[0,0,-9.81],label="newton"),
+	NewtonIntegrator(damping=0,gravity=[0,0,-9810],label="newton"),
 	#GlobalStiffnessTimeStepper(active=1,timestepSafetyCoefficient=0.8, timeStepUpdateInterval=100, parallelMode=False, label = "ts",defaultDt=PWaveTimeStep()), #FIXME Remember to reinstate parallelMode=True when we use MPI
 	#VTKRecorder(virtPeriod=0.04,fileName='/tmp/Silo-',recorders=['spheres','facets']),
 ]
