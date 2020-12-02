@@ -18,13 +18,13 @@ if mp.rank==0:
         
         ## exploit sendCommand to send data between yade instances directly with mpi4py (see mpi4py documentation)
         ## in the message we actually tell the worker to wait another message (nested comm), but the second one
-        ## uses underlying mpi4py, and it handles pickable objetcs with uppercased variants of Send/Recv
+        ## uses underlying mpi4py, and it handles pickable objects
         mp.sendCommand(executors=1,command="message=comm.recv(source=0); mprint('received: ',message)",wait=False)
         mp.comm.send("hello",dest=1)
         
-        ## pickable objects with upper-cased comm. (even though this one is empty)
+        ## pickable objects 
         ## pay attention to pointer adresses, they are different! (as expected)
-        ## this moving data around between independent parts of memory
+        ## this is moving data around between independent parts of memory
         mp.sendCommand(executors=1,command="O.bodies.append(Body()); O.bodies[0].shape=Sphere(radius=0.456); comm.send(O.bodies[0],dest=0); mprint('sent a ',O.bodies[0].shape)",wait=False)
         bodyFrom1 = mp.comm.recv(source=1)
         mp.mprint("received a ",bodyFrom1.shape,"with radius=",bodyFrom1.shape.radius)
