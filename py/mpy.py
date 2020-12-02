@@ -193,6 +193,8 @@ def configure(): # calling this function will import mpi4py.MPI,
 		sys.stderr.write=sys.stdout.write # so we see error messages from workers in terminal
 	numThreads = comm.Get_size()
 	colorScale= makeColorScale(numThreads)
+	
+configure() # needed at import time, else we can't check rank or numThreads right after import 
 
 def disconnect():
 	'''
@@ -223,10 +225,8 @@ def disconnect():
 	yade.runtime.opts.mpi_mode=False
 
 def initialize(np):
-	global comm,comm_slave,rank,numThreads,userScriptInCheckList
-	
-	if comm==None: configure()
-	
+	global comm,comm_slave,rank,numThreads,userScriptInCheckList,colorScale
+	if comm==None: configure() # should only happen after a despawn
 	process_count = comm.Get_size()
 
 	if(process_count<np):
@@ -247,6 +247,8 @@ def initialize(np):
 		# END HACK 2
 		
 		numThreads=np
+		colorScale= makeColorScale(numThreads)
+		
 		if not yade.runtime.opts.mpi_mode: #MASTER only, the workers will be already in mpi_mode
 			mprint("will spawn ",numThreads-process_count," workers")
 			if (userScriptInCheckList==""): #normal case
@@ -762,6 +764,9 @@ O.splitted=False
 O.splittedOnce=False #after the first split we have additional bodies (Subdomains) and engines in the merged scene, use this flag to know
 
 def mergeScene():
+	
+	if(rank==0 and waitingCommands):
+		sendCommand("slaves","mergeScene()",False)
 	if O.splitted:
 		if MERGE_W_INTERACTIONS or ERASE_REMOTE_MASTER or DISTRIBUTED_INSERT:
 			O.subD.mergeOp()
