@@ -559,7 +559,7 @@ def randomDensePack(predicate,radius,material=-1,dim=None,cropLayers=0,rRelFuzz=
 		sp.rotate(*orientation.toAxisAngle())
 	return filterSpherePack(predicate,sp,material=material,color=color,returnSpherePack=returnSpherePack)
 
-def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False,seed=-1):
+def randomPeriPack(radius,initSize,rRelFuzz=0.0,memoizeDb=None,noPrint=False,seed=0):
 	"""Generate periodic dense packing.
 
 	A cell of initSize is stuffed with as many spheres as possible, then we run periodic compression with PeriIsoCompressor, just like with
