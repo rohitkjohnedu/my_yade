@@ -114,15 +114,16 @@ def text(fileName,shift=Vector3.Zero,scale=1.0,**kw):
 	return textExt(fileName=fileName,format='x_y_z_r',shift=shift,scale=scale,**kw)
 
 
-def stl(file, dynamic=None,fixed=True,wire=True,color=None,highlight=False,noBound=False,material=-1):
+def stl(file, dynamic=None,fixed=True,wire=True,color=None,highlight=False,noBound=False,material=-1,scale=1.0):
 	""" Import geometry from stl file, return list of created facets."""
 	imp = STLImporter()
 	facets=imp.ymport(file)
 	for b in facets:
+		b.shape.setVertices(b.shape.vertices[0]*scale, b.shape.vertices[1]*scale, b.shape.vertices[2]*scale)
 		b.shape.color=color if color else utils.randomColor()
 		b.shape.wire=wire
 		b.shape.highlight=highlight
-		pos=b.state.pos
+		pos=b.state.pos*scale
 		utils._commonBodySetup(b,0,Vector3(0,0,0),material=material,pos=pos,noBound=noBound,dynamic=dynamic,fixed=fixed)
 		b.aspherical=False
 	return facets
