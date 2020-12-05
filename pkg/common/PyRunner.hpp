@@ -13,12 +13,13 @@ public:
 	virtual void action()
 	{
 		if (command.size() > 0)
-			pyRunString(command);
+			pyRunString(command, ignoreErrors);
 	}
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS(PyRunner,PeriodicEngine,
 		"Execute a python command periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
 		((string,command,"",,"Command to be run by python interpreter. Not run if empty."))
+		((bool,ignoreErrors,false,,"Debug only: set this value to true to tell PyRunner to ignore any errors encountered during command execution."))
 	);
 	// clang-format on
 };
