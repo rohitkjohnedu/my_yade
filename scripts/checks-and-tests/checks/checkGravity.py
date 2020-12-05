@@ -16,6 +16,7 @@ tc = 0.001
 en = 0.3
 et = 0.3
 
+O.dt=0.02*tc
 
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=et))
 
@@ -23,11 +24,14 @@ sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAng
 v_down = -5.0
 v_up = 5.0
 g = -9.81
-tolerance = 1e-3
+tolerance = 1e-10
 
-id_0=o.bodies.append(sphere((0.0,0,0),0.2,material=sphereMat))    #The body has no initial vertical Velocity
-id_down=o.bodies.append(sphere((1.0,0,0),0.2,material=sphereMat)) #The body has an initial vertical Velocity -5
-id_up=o.bodies.append(sphere((2.0,0,0),0.2,material=sphereMat))   #The body has an initial vertical Velocity +5
+def calcPos(v,t):
+  return v*t + g*t*t/2
+
+id_0=o.bodies.append(sphere((0.0,calcPos(0,O.dt/2),0),0.2,material=sphereMat))    #The body has no initial vertical Velocity
+id_down=o.bodies.append(sphere((1.0,calcPos(v_down,O.dt/2),0),0.2,material=sphereMat)) #The body has an initial vertical Velocity -5
+id_up=o.bodies.append(sphere((2.0,calcPos(v_up,O.dt/2),0),0.2,material=sphereMat))   #The body has an initial vertical Velocity +5
 
 O.bodies[id_down].state.vel[1] = v_down
 O.bodies[id_up].state.vel[1] = v_up
@@ -63,7 +67,7 @@ def checkPos():
     warningMessageVel (v_up, O.bodies[id_up].state.vel[1], getCurrentPos(0))
   
 def getCurrentPos(inVel=0):
-  t = O.time+O.dt
+  t = O.time+O.dt*1.5
   return inVel*t + g*t*t/2
 
 def getCurrentVel(inVel=0):
@@ -76,7 +80,6 @@ def warningMessagePos(inVel, y_pos, y_pos_need):
 def warningMessageVel(inVel, y_vel, y_pos_vel):
   raise YadeCheckError("The body with the initial velocity %.3f, has an y-velocity %.3f, but it should be %.3f" % (inVel, y_vel, y_pos_vel))
 
-O.dt=0.02*tc
 O.saveTmp('init');
 O.run(1000000)
 O.wait()
