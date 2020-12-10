@@ -2,8 +2,8 @@
 
 # 3 Spheres have an initial velociries: 0, +5, -5
 # Their positions and velocities are checked during free fall
-# Checks the correctness of NewtonIntegrator and GravityEngine
-# Also see checkGravityKuttaCashKarp54.py
+# Checks the correctness of RungeKuttaCashKarp54Integrator and GravityEngine
+# Also see checkGravity.py
 
 ## Omega
 from __future__ import print_function
@@ -22,40 +22,45 @@ O.dt=0.02*tc
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=et))
 
 
-v_down = -5.0
-v_up = 5.0
-g = -9.81
-tolerance = 1e-10
+v_down    = -5.0
+v_up      =  5.0
+g         = -9.81
+tolerance = 1e-12
 
-def calcPos(v,t):
-  return v*t + g*t*t/2
+id_0    = o.bodies.append(sphere((0,0,0),0.2,material=sphereMat)) # The body has no initial vertical Velocity
+id_down = o.bodies.append(sphere((1,0,0),0.2,material=sphereMat)) # The body has an initial vertical Velocity -5
+id_up   = o.bodies.append(sphere((2,0,0),0.2,material=sphereMat)) # The body has an initial vertical Velocity +5
 
-id_0=o.bodies.append(sphere((0.0,calcPos(0,O.dt/2),0),0.2,material=sphereMat))    #The body has no initial vertical Velocity
-id_down=o.bodies.append(sphere((1.0,calcPos(v_down,O.dt/2),0),0.2,material=sphereMat)) #The body has an initial vertical Velocity -5
-id_up=o.bodies.append(sphere((2.0,calcPos(v_up,O.dt/2),0),0.2,material=sphereMat))   #The body has an initial vertical Velocity +5
-
-# Instead of setting initial positions (above) to be declared at O.dt/2 one can also set initial velocities to be at -O.dt/2
-# see https://gitlab.com/yade-dev/trunk/-/merge_requests/555#note_462560944
 O.bodies[id_down].state.vel[1] = v_down
-O.bodies[id_up].state.vel[1] = v_up
+O.bodies[id_up  ].state.vel[1] = v_up
 
-## Engines 
-o.engines=[
+# RungeKuttaCashKarp54Integrator calculates O.dt step with requested precision (rel_err, abs_err).
+# The calculations involve checking forces at various positions, resetting state and so on, multiple times. With very small timesteps. But the end result is the dimulation advanced by O.dt
+# see https://www.boost.org/doc/libs/1_74_0/libs/numeric/odeint/doc/html/boost/numeric/odeint/runge_kutta_cash_karp54.html
+# and https://yade-dem.org/doc/yade.wrapper.html?highlight=rungekuttacashkarp54integrator#yade.wrapper.RungeKuttaCashKarp54Integrator
+integrator=RungeKuttaCashKarp54Integrator([
   ForceResetter(),
-  InsertionSortCollider([
-    Bo1_Sphere_Aabb(),
-    Bo1_Facet_Aabb(),
-  ]),
+  GeneralIntegratorInsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
   InteractionLoop(
     [Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
     [Ip2_ViscElMat_ViscElMat_ViscElPhys()],
     [Law2_ScGeom_ViscElPhys_Basic()],
   ),
-  NewtonIntegrator(damping=0,gravity=[0,g,0]),
-  PyRunner(command='checkPos()',iterPeriod=10000),
+  GravityEngine(gravity=[0,g,0]),
+]);
+
+# Tolerances can be set for the optimum accuracy. Just for fun use maximum available precision: yade.math.epsilon
+integrator.rel_err = yade.math.epsilon() # 1e-20; # yade.math.epsilon()
+integrator.abs_err = yade.math.epsilon() # 1e-20;
+
+## Engines 
+o.engines=[
+   integrator
+  ,PyRunner(command='checkPos()',iterPeriod=10),
 ]
 
 def checkPos():
+  print("Iter=%i, time=%.15f, dt=%.15f" % (O.iter, O.time, O.dt))
   if (abs((O.bodies[id_0   ].state.pos[1] - getCurrentPos(0     ))/O.bodies[id_0   ].state.pos[1]) > tolerance):
     warningMessagePos (0     , O.bodies[id_0   ].state.pos[1], getCurrentPos(0))
 
@@ -75,19 +80,19 @@ def checkPos():
     warningMessageVel (v_up  , O.bodies[id_up  ].state.vel[1], getCurrentVel(v_up))
 
 def getCurrentPos(inVel=0):
-  t = O.time+O.dt*1.5
+  t = O.time + O.dt
   return inVel*t + g*t*t/2
 
 def getCurrentVel(inVel=0):
-  t = O.time+O.dt
+  t = O.time + O.dt
   return inVel + g*t
 
 def warningMessagePos(inVel, y_pos, y_pos_need):
-  raise YadeCheckError("The body with the initial velocity %.3f, has an y-position %.15f, but it should be %.15f. Iter=%i, time=%.15f, dt=%.15f" % (inVel, y_pos, y_pos_need, O.iter, O.time, O.dt))
+  raise YadeCheckError("The body with the initial velocity %.3f, has an y-position %.19f, but it should be %.19f. Iter=%i, time=%.15f, dt=%.15f" % (inVel, y_pos, y_pos_need, O.iter, O.time, O.dt))
 
 def warningMessageVel(inVel, y_vel, y_vel_need):
-  raise YadeCheckError("The body with the initial velocity %.3f, has an y-velocity %.15f, but it should be %.15f. Iter=%i, time=%.15f, dt=%.15f" % (inVel, y_vel, y_vel_need, O.iter, O.time, O.dt))
+  raise YadeCheckError("The body with the initial velocity %.3f, has an y-velocity %.19f, but it should be %.19f. Iter=%i, time=%.15f, dt=%.15f" % (inVel, y_vel, y_vel_need, O.iter, O.time, O.dt))
 
-O.saveTmp('init');
-O.run(1000000)
-O.wait()
+#O.saveTmp('init');
+O.run(1000000,True)
+
