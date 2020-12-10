@@ -10,22 +10,28 @@ from __future__ import print_function
 o=Omega() 
 
 ## PhysicalParameters 
-Density=2400
-frictionAngle=radians(35)
-sphereRadius=0.05
-tc = 0.001
-en = 0.3
-et = 0.3
+Density       = 2400
+frictionAngle = radians(35)
+sphereRadius  = 0.05
+tc            = 0.001
+en            = 0.3
+et            = 0.3
 
-O.dt=0.02*tc
+O.dt          = 2*tc
 
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=et))
 
 
 v_down    = -5.0
 v_up      =  5.0
-g         = -9.81
-tolerance = 1e-12
+
+# Important  !!!! when using yade high-precision any *quickly* *typed* floating point number can "destroy" the calculations.
+# Important  !!!! For example in yade-mpfr150 declaring      g = -9.81 in fact produces number which is not useful to
+#            ↓↓↓↓ do a simulation with 150 decimal places :  g = -9.8100000000000004973799150320701301097869873046875
+#            ↓↓↓↓ make sure to use, yade.math.toHP1(………), so that he numbers are converted to native rpecision.
+g         = yade.math.toHP1(-9.81)
+tolerance = 10**(-yade.math.getDigits10(1)+3)
+print("checkGravityKuttaCashKarp54.py : yade precision is ",yade.math.getDigits10(1)," decimal places. Will use error tolerance of: ", tolerance)
 
 id_0    = o.bodies.append(sphere((0,0,0),0.2,material=sphereMat)) # The body has no initial vertical Velocity
 id_down = o.bodies.append(sphere((1,0,0),0.2,material=sphereMat)) # The body has an initial vertical Velocity -5
@@ -60,7 +66,7 @@ o.engines=[
 ]
 
 def checkPos():
-  print("Iter=%i, time=%.15f, dt=%.15f" % (O.iter, O.time, O.dt))
+  #print("Iter=%i, time=%.15f, dt=%.15f" % (O.iter, O.time, O.dt))
   if (abs((O.bodies[id_0   ].state.pos[1] - getCurrentPos(0     ))/O.bodies[id_0   ].state.pos[1]) > tolerance):
     warningMessagePos (0     , O.bodies[id_0   ].state.pos[1], getCurrentPos(0))
 
@@ -93,6 +99,8 @@ def warningMessagePos(inVel, y_pos, y_pos_need):
 def warningMessageVel(inVel, y_vel, y_vel_need):
   raise YadeCheckError("The body with the initial velocity %.3f, has an y-velocity %.19f, but it should be %.19f. Iter=%i, time=%.15f, dt=%.15f" % (inVel, y_vel, y_vel_need, O.iter, O.time, O.dt))
 
-#O.saveTmp('init');
-O.run(1000000,True)
+# on higher precisions, with error tolerance of yade.math.epsilon() this can ger really slow. So only do 200 iterations.
+# also note, that although the error can be very small, it is still accumulating. Increasing number of iterations to 1000000 will require a larger tolerance declared at start of this script.
+# but declaring larger O.dt solves this problem, because the actual error accumulations happens mostly between the iterations. And less inside the runge_kutta_cash_karp54, which focuses on eliminating it.
+O.run(200,True)
 
