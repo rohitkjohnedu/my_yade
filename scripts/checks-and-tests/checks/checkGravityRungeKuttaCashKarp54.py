@@ -3,7 +3,7 @@
 # 3 Spheres have an initial velociries: 0, +5, -5
 # Their positions and velocities are checked during free fall
 # Checks the correctness of NewtonIntegrator and GravityEngine
-# Also see checkGravityRungeKuttaCashKarp54.py
+# Also see checkGravityKuttaCashKarp54.py
 
 ## Omega
 from __future__ import print_function
@@ -36,7 +36,6 @@ id_up=o.bodies.append(sphere((2.0,calcPos(v_up,O.dt/2),0),0.2,material=sphereMat
 
 # Instead of setting initial positions (above) to be declared at O.dt/2 one can also set initial velocities to be at -O.dt/2
 # see https://gitlab.com/yade-dev/trunk/-/merge_requests/555#note_462560944
-# Or use a different integrator, see checkGravityRungeKuttaCashKarp54.py
 O.bodies[id_down].state.vel[1] = v_down
 O.bodies[id_up].state.vel[1] = v_up
 
