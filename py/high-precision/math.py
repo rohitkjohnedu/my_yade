@@ -90,12 +90,13 @@ def toHP1(arg):
 
 	If you are debugging a high precision python script, and have difficulty finding places where such cuts have happened you should use ``yade.math.toHP1(string)``
 	for declaring all python floating point numbers which are physically important in the simulation.
-	And also look for warnings like ``Warning: only 15 digits are used for arg = "`` printed in red by this function.
+	This function will throw exception if bad conversion is about to take place.
 
 	Also see example high precision check :ysrc:`checkGravityRungeKuttaCashKarp54.py<scripts/checks-and-tests/checks/checkGravityRungeKuttaCashKarp54.py>`.
 	"""
 	if((type(arg) == float) and (getDigits2(1)!=53)):
-		print('\033[91m'+"Warning: only 15 digits are used for arg = ",arg,'\033[0m')
+		raise RuntimeError("Error: only first 15 digits would be used for arg = "+str(arg)+", better pass the argument as string or python mpmath high precision type.")
+		#print('\033[91m'+"Warning: only 15 digits are used for arg = ",arg,'\033[0m')
 	if((type(arg) == str) and (getDigits2(1)==53)): # also: ("PrecisionDouble" in yade.config.features)
 		return yade._math.toHP1(float(arg))
 	else:

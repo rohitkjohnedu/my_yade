@@ -234,10 +234,13 @@ To achieve 1. simply pass the argument ``'1.23'`` as string. To achieve 2. use :
 	All ``RealHP<N>`` function arguments that are of type higher than ``double`` can also accept decimal strings. This allows to preserve precision above python default floating point precision.
 
 .. warning::
-	On the contrary all the function arguments that are of type ``double`` can not accept decimal strings. To mitigate that one can use ``toHPm(…)`` converters with string arguments. It might be changed in the future if the need arises.
+	On the contrary all the function arguments that are of type ``double`` can not accept decimal strings. To mitigate that one can use ``toHPn(…)`` converters with string arguments.
+
+.. hint::
+	To make debugging of this problem easier the function ``yade.math.toHP1(…)`` will print a warning if the argument is a python float (not a decimal string), but the yade ``Real`` precision is not ``double``.
 
 .. warning::
-	I cannot stress this problem enough, please try running ``yade --check`` (or ``yade ./checkGravityKuttaCashKarp54.py``) in precision different than ``double`` after changing :ysrccommit:`this line<7664212e6764ee1eaad/scripts/checks-and-tests/checks/checkGravityKuttaCashKarp54.py#L32>` into ``g = -9.81``. In this (particular and simple) case the ``getCurrentPos()`` :ysrccommit:`function<7664212e6764ee1eaad/scripts/checks-and-tests/checks/checkGravityKuttaCashKarp54.py#L95>` fails on python side because low-precision ``g`` is multiplied by high-precision ``t``.
+	I cannot stress this problem enough, please try running ``yade --check`` (or ``yade ./checkGravityRungeKuttaCashKarp54.py``) in precision different than ``double`` after changing :ysrccommit:`this line<e9f92ab12791fdd27b24989/scripts/checks-and-tests/checks/checkGravityRungeKuttaCashKarp54.py#L32>` into ``g = -9.81``. In this (particular and simple) case the ``getCurrentPos()`` :ysrccommit:`function<e9f92ab12791fdd27b24989/scripts/checks-and-tests/checks/checkGravityRungeKuttaCashKarp54.py#L102>` fails on the python side because low-precision ``g`` is multiplied by high-precision ``t``.
 
 Eigen and CGAL
 ----------------------------------------------
