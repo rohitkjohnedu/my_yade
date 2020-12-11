@@ -31,10 +31,6 @@ v_up      =  5.0
 #            ↓↓↓↓ make sure to use, yade.math.toHP1(………), so that the numbers on python side use native yade rpecision.
 g         = yade.math.toHP1("-9.81")
 
-if(yade.math.toHP1(1.234567890123456789012345678901234567890) != yade.math.toHP1("1.234567890123456789012345678901234567890")):
-	print("Above warning was to demonstrate floating point conversion problems.")
-	print('\033[93m'+"Remember to use yade.math.toHP1(number); with string arguments. Otherwise only first 15 digits are used."+'\033[0m\n')
-
 tolerance = 10**(-yade.math.getDigits10(1)+3)
 print("checkGravityRungeKuttaCashKarp54.py : yade precision is ",yade.math.getDigits10(1)," decimal places. Will use error tolerance of: ", tolerance)
 
