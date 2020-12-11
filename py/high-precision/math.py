@@ -80,3 +80,24 @@ def linspace(a,b,num):
 		import numpy
 		return numpy.linspace(a,b,num=num)
 
+def toHP1(arg):
+	"""
+	This function is for compatibility of calls like: ``g = yade.math.toHP1("-9.81")``. If yade is compiled with default ``Real`` precision set as ``double``,
+	then python won't accept string arguments as numbers. However when using higher precisions only calls
+	``yade.math.toHP1("1.234567890123456789012345678901234567890")`` do not cut to the first 15 decimal places.
+	The calls such as ``yade.math.toHP1(1.234567890123456789012345678901234567890)`` will use default ``python`` ↔ ``double`` conversion and will cut
+	the number to its first 15 digits.
+
+	If you are debugging a high precision python script, and have difficulty finding places where such cuts have happened you should use ``yade.math.toHP1(string)``
+	for declaring all python floating point numbers which are physically important in the simulation.
+	And also look for warnings like ``Warning: only 15 digits are used for arg = "`` printed in red by this function.
+
+	Also see example high precision check :ysrc:`checkGravityRungeKuttaCashKarp54.py<scripts/checks-and-tests/checks/checkGravityRungeKuttaCashKarp54.py>`.
+	"""
+	if((type(arg) == float) and (getDigits2(1)!=53)):
+		print('\033[91m'+"Warning: only 15 digits are used for arg = ",arg,'\033[0m')
+	if((type(arg) == str) and (getDigits2(1)==53)): # also: ("PrecisionDouble" in yade.config.features)
+		return yade._math.toHP1(float(arg))
+	else:
+		return yade._math.toHP1(arg)
+
