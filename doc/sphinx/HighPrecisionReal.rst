@@ -236,6 +236,9 @@ To achieve 1. simply pass the argument ``'1.23'`` as string. To achieve 2. use :
 .. warning::
 	On the contrary all the function arguments that are of type ``double`` can not accept decimal strings. To mitigate that one can use ``toHPm(…)`` converters with string arguments. It might be changed in the future if the need arises.
 
+.. warning::
+	I cannot stress this problem enough, please try running ``yade --check`` (or ``yade ./checkGravityKuttaCashKarp54.py``) in precision different than ``double`` after changing :ysrccommit:`this line<7664212e6764ee1eaad/scripts/checks-and-tests/checks/checkGravityKuttaCashKarp54.py#L32>` into ``g = -9.81``. In this (particular and simple) case the ``getCurrentPos()`` :ysrccommit:`function<7664212e6764ee1eaad/scripts/checks-and-tests/checks/checkGravityKuttaCashKarp54.py#L95>` fails on python side because low-precision ``g`` is multiplied by high-precision ``t``.
+
 Eigen and CGAL
 ----------------------------------------------
 

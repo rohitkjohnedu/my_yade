@@ -25,17 +25,22 @@ sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAng
 v_down    = -5.0
 v_up      =  5.0
 
-# Important  !!!! when using yade high-precision any *quickly* *typed* floating point number can "destroy" the calculations.
+# Important  !!!! when using yade high-precision be careful because any *quickly* *typed* ad-hoc floating point number can "destroy" the calculations.
 # Important  !!!! For example in yade-mpfr150 declaring      g = -9.81 in fact produces number which is not useful to
 #            ↓↓↓↓ do a simulation with 150 decimal places :  g = -9.8100000000000004973799150320701301097869873046875
-#            ↓↓↓↓ make sure to use, yade.math.toHP1(………), so that he numbers are converted to native rpecision.
-g         = yade.math.toHP1(-9.81)
-tolerance = 10**(-yade.math.getDigits10(1)+3)
-print("checkGravityKuttaCashKarp54.py : yade precision is ",yade.math.getDigits10(1)," decimal places. Will use error tolerance of: ", tolerance)
+#            ↓↓↓↓ make sure to use, yade.math.toHP1(………), so that the numbers on python side use native yade rpecision.
+g         = yade.math.toHP1("-9.81")
 
-print("Note: for high precision calculations use yade.math.toHP1(……) see this:")
-print("g = yade.math.toHP1(-9.81) ## produces: ", (        yade.math.toHP1(-9.81)).__repr__())
-print("g = -9.81                  ## produces: ", (-9.81 * yade.math.toHP1( 1   )).__repr__())
+if(yade.math.toHP1(1.234567890123456789012345678901234567890) != yade.math.toHP1("1.234567890123456789012345678901234567890")):
+	print("Above warning was to demonstrate floating point conversion problems.")
+	print('\033[93m'+"Remember to use yade.math.toHP1(number); with string arguments. Otherwise only first 15 digits are used."+'\033[0m\n')
+
+tolerance = 10**(-yade.math.getDigits10(1)+3)
+print("checkGravityRungeKuttaCashKarp54.py : yade precision is ",yade.math.getDigits10(1)," decimal places. Will use error tolerance of: ", tolerance)
+
+print("Note: for high precision calculations use yade.math.toHP1(...) see this:")
+print("g = yade.math.toHP1(-9.81) ## produces: ", (        yade.math.toHP1('-9.81')).__repr__())
+print("g = -9.81                  ## produces: ", (-9.81 * yade.math.toHP1('1'    )).__repr__())
 print("See https://yade-dem.org/doc/HighPrecisionReal.html#string-conversions for more info.")
 
 id_0    = o.bodies.append(sphere((0,0,0),0.2,material=sphereMat)) # The body has no initial vertical Velocity
@@ -67,7 +72,7 @@ integrator.abs_err = yade.math.epsilon() # 1e-20;
 ## Engines 
 o.engines=[
    integrator
-  ,PyRunner(command='checkPos()',iterPeriod=10),
+  ,PyRunner(command='checkPos()',iterPeriod=1),
 ]
 
 def checkPos():
@@ -90,6 +95,10 @@ def checkPos():
   if (abs((O.bodies[id_up  ].state.vel[1] - getCurrentVel(v_up  ))/O.bodies[id_up  ].state.vel[1]) > tolerance):
     warningMessageVel (v_up  , O.bodies[id_up  ].state.vel[1], getCurrentVel(v_up))
 
+# When not using yade.math.HP1(…) to declare g in python, in this particular case, the error occurs in getCurrentPos(inVel=0).
+# The low-precision g is multiplied by high-precision t which causes incorrect value after first 15 decimal places.
+# In this simple simulation frictionAngle or stiffness are not used, but in any simulation *each* floating point
+# number with incorrect precision on python side can cause problems.
 def getCurrentPos(inVel=0):
   t = O.time + O.dt
   return inVel*t + g*t*t/2
@@ -104,8 +113,14 @@ def warningMessagePos(inVel, y_pos, y_pos_need):
 def warningMessageVel(inVel, y_vel, y_vel_need):
   raise YadeCheckError("The body with the initial velocity %.3f, has an y-velocity %.19f, but it should be %.19f. Iter=%i, time=%.15f, dt=%.15f" % (inVel, y_vel, y_vel_need, O.iter, O.time, O.dt))
 
-# on higher precisions, with error tolerance of yade.math.epsilon() this can ger really slow. So only do 200 iterations.
-# also note, that although the error can be very small, it is still accumulating. Increasing number of iterations to 1000000 will require a larger tolerance declared at start of this script.
-# but declaring larger O.dt solves this problem, because the actual error accumulations happens mostly between the iterations. And less inside the runge_kutta_cash_karp54, which focuses on eliminating it.
-O.run(200,True)
+# on higher precisions, with error tolerance of yade.math.epsilon() this can become really slow. So only do 200 iterations.
+# also note, that although the error can be very small, it is still accumulating. Increasing number of iterations to 1000000
+# will require a larger tolerance declared at start of this script. But declaring larger O.dt (partially) solves this problem,
+# because the actual error accumulations happens mostly between the iterations. And less inside the runge_kutta_cash_karp54,
+# which focuses on eliminating it.
+O.run(241,True)
+# Note about error tolerance = 10**(-yade.math.getDigits10(1)+3) as declared above.
+# This note might be useful in case of problems on other architectures:
+#  O.run(242,True) fails on yade-mpfr150. Passes with higher tolerance.
+#  O.run(241,True) fails on yade-long-double when incorrect assignment g = -9.81 is used above.
 
