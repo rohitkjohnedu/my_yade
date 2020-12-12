@@ -17,7 +17,7 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,attrs=[],**kw
 	:param str format: the name of output format. Supported `x_y_z_r`(default), `x_y_z_r_matId`, 'x_y_z_r_attrs'
 	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
 	:param float scale: factor scales the given data.
-	:param list attrs: attrs read from file if export.textExt(format='x_y_z_r_attrs') were used ('passed by refernece' style)
+	:param list attrs: attrs read from file if export.textExt(format='x_y_z_r_attrs') were used ('passed by reference' style)
 	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.sphere`
 	:returns: list of spheres.
 
@@ -55,6 +55,50 @@ def textExt(fileName,format='x_y_z_r',shift=Vector3.Zero,scale=1.0,attrs=[],**kw
 			raise RuntimeError("Please, specify a correct format output!");
 	return ret
 
+
+def textFacets(fileName,format='x1_y1_z1_x2_y2_z2_x3_y3_z3',shift=Vector3.Zero,scale=1.0,**kw):
+	"""Load facet coordinates from file in specific format, returns a list of corresponding bodies; that may be inserted to the simulation with O.bodies.append().
+	
+	:param str filename: file name
+	:param str format: the name of output format. Supported `x1_y1_z1_x2_y2_z2_x3_y3_z3`(default), `x1_y1_z1_x2_y2_z2_x3_y3_z3_matId`, 'id_x1_y1_z1_x2_y2_z2_x3_y3_z3_matId' or 'x1_y1_z1_x2_y2_z2_x3_y3_z3_attrs'
+	:param [float,float,float] shift: [X,Y,Z] parameter moves the specimen.
+	:param float scale: factor scales the given data.
+	:param \*\*kw: (unused keyword arguments) is passed to :yref:`yade.utils.facet`
+	:returns: list of facets.
+
+	Lines starting with # are skipped
+	"""
+	infile = open(fileName,"r")
+	lines = infile.readlines()
+	infile.close()
+	ret=[]
+	for line in lines:
+		data = line.split()
+		if (data[0] == "#format"):
+			format=data[1]
+			continue
+		elif (data[0][0] == "#"): continue
+		
+		if (format=='x1_y1_z1_x2_y2_z2_x3_y3_z3'):
+			V1=Vector3( float(data[0]),float(data[1]),float(data[2]));	V2=Vector3( float(data[3]),float(data[4]),float(data[5]));	V3=Vector3( float(data[6]),float(data[7]),float(data[8]))
+			ret.append(utils.facet((shift+V1*scale, shift+V2*scale, shift+V3*scale),**kw))
+		
+		elif (format=='x1_y1_z1_x2_y2_z2_x3_y3_z3_matId'):
+			V1=Vector3( float(data[0]),float(data[1]),float(data[2]));	V2=Vector3( float(data[3]),float(data[4]),float(data[5]));	V3=Vector3( float(data[6]),float(data[7]),float(data[8]))
+			ret.append(utils.facet((shift+V1*scale, shift+V2*scale, shift+V3*scale),material=int(data[9]),**kw))
+		
+		elif (format=='id_x1_y1_z1_x2_y2_z2_x3_y3_z3_matId'):
+			V1=Vector3( float(data[1]),float(data[2]),float(data[3]));	V2=Vector3( float(data[4]),float(data[5]),float(data[6]));	V3=Vector3( float(data[7]),float(data[8]),float(data[9]))
+			ret.append(utils.facet((shift+V1*scale, shift+V2*scale, shift+V3*scale),material=int(data[10]),**kw))
+		
+		elif (format=='x1_y1_z1_x2_y2_z2_x3_y3_z3_attrs'):
+			V1=Vector3( float(data[0]),float(data[1]),float(data[2]));	V2=Vector3( float(data[3]),float(data[4]),float(data[5]));	V3=Vector3( float(data[6]),float(data[7]),float(data[8]))
+			ret.append(utils.facet((shift+V1*scale, shift+V2*scale, shift+V3*scale),**kw))
+			attrs.append(data[4:])
+			
+		else:
+			raise RuntimeError("Please, specify a correct format output!");
+	return ret
 
 def textClumps(fileName,shift=Vector3.Zero,discretization=0,orientation=Quaternion((0,1,0),0.0),scale=1.0,**kw):
 	"""Load clumps-members from file, insert them to the simulation.
