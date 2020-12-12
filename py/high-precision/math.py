@@ -94,11 +94,11 @@ def toHP1(arg):
 
 	Also see example high precision check :ysrc:`checkGravityRungeKuttaCashKarp54.py<scripts/checks-and-tests/checks/checkGravityRungeKuttaCashKarp54.py>`.
 	"""
-	if((type(arg) == float) and (getDigits2(1)!=53)):
+	if(type(arg) == float):
 		raise RuntimeError("Error: only first 15 digits would be used for arg = "+str(arg)+", better pass the argument as string or python mpmath high precision type.")
 		#print('\033[91m'+"Warning: only 15 digits are used for arg = ",arg,'\033[0m')
 	if((type(arg) == str) and (getDigits2(1)==53)): # also: ("PrecisionDouble" in yade.config.features)
-		return yade._math.toHP1(float(arg))
+		return yade._math.toHP1(float(arg))     # if yade is compiled with `double` then toHP1(…) cannot accept string and python float has enough precision. So here we make sure it works.
 	else:
 		return yade._math.toHP1(arg)
 
