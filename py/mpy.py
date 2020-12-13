@@ -83,6 +83,7 @@ ENABLE_PFACETS = False    #PFacets need special (and expensive) tricks, if PFace
 DISTRIBUTED_INSERT = False  #if True each worker is supposed to "O.bodies.insertAtId" its own bodies
 REALLOCATE_FREQUENCY = 0  # if >0 checkAndCollide() will automatically reallocate bodies to subdomains, if =1 realloc. happens each time collider is triggered, if >1 it happens every N trigger
 REALLOCATE_FILTER = None # pointer to filtering function, will be set to 'medianFilter' hereafter, could point to other ones if implemented
+FAIR_SHARE = True # try to keep equal no. bodies per subdomain when reallocating  
 AUTO_COLOR = True
 MINIMAL_INTERSECTIONS = False # Reduces the size of position/velocity comms (at the end of the colliding phase, we can exclude those bodies with no interactions besides body<->subdomain from intersections). 
 REALLOCATE_MINIMAL = False # if true, intersections are minimized before reallocations, hence minimizing the number of reallocated bodies
@@ -471,7 +472,7 @@ def shrinkIntersections():
 	for r in reqs:
 		ints[r[0]]=r[1].wait()
 		if ints[r[0]]!=O.subD.mirrorIntersections[r[0]]:
-			wprint("inconsistency in the filtering of intersections[",r[0],"]:",len(ints[r[0]]),"received vs.",len(O.subD.mirrorIntersections[r[0]]))
+			mprint("inconsistency in the filtering of intersections[",r[0],"]:",len(ints[r[0]]),"received vs.",len(O.subD.mirrorIntersections[r[0]]))
 	O.subD.mirrorIntersections = ints #that's because python wrapping only enable assignment
 	return res,oriLen
 
@@ -1175,6 +1176,62 @@ def mpirun(nSteps,np=None,withMerge=False):
 #######  Bodies re-allocation  ########
 #######################################
 
+
+
+def bodyErase(ids):
+	'''
+	The parallel version of O.bodies.erase(id), should be called collectively else the distributed scenes become inconsistent with each other (even the subdomains which don't have 'id' can call safely). For performance, better call on a list: bodyErase([i,j,k]).
+	'''
+	if(rank==0 and waitingCommands):
+		erased = sendCommand("slaves","bodyErase("+str(ids)+")",True)
+	
+	if not isinstance(ids,list): ids = [ids]
+	# we get legit python lists so we can list[k].remove(id) more simply than with the wrapped vector< vector< int > >
+	intersections_ = O.subD.intersections
+	mirrorIntersections_ = O.subD.mirrorIntersections
+
+	for id in ids:
+		if O.bodies[id]==None:
+			if rank!=0 or not waitingCommands: return 0
+			else: return [0]+erased
+		b=O.bodies[id]
+		owner = b.subdomain
+		tmp=O.bodies[O.subD.subdomains[owner-1]].shape.ids
+		tmp.remove(id)
+		O.bodies[O.subD.subdomains[owner-1]].shape.ids=tmp
+		
+		if rank==owner:
+			removedFrom=[]
+			for ii in O.interactions.withBodyAll(id):
+				otherID = ii.id1 if ii.id2==id else ii.id2
+				otherSD = O.bodies[otherID].subdomain
+				if otherSD != rank and not otherSD in removedFrom:
+					#mprint("removing",id," from intersections with",O.bodies[otherID].subdomain)
+					if id in intersections_[otherSD]:
+						intersections_[otherSD].remove(id)
+					if hasattr(O.subD,"fullIntersections") and id in O.subD.fullIntersections[O.bodies[otherID].subdomain]:
+						O.subD.fullIntersections[otherSD].remove(id) # <== normally ok here, it is a legit python list, not a c++ wrapper
+					# FIXME: is it safe to not do thses commented lines? else we will crash on empty subdomains at some point
+					#if len(O.subD.intersections[O.bodies[otherID].subdomain])==0: # if it was last interacting body then the two subdomains don't interact any more
+						#O.subD.intersections[rank].remove(O.bodies[otherID].subdomain)
+					removedFrom.append(otherSD)
+		else:
+			if id in mirrorIntersections_[owner]:
+				mirrorIntersections_[owner].remove(id)
+			if hasattr(O.subD,"fullMirrorIntersections") and id in O.subD.fullMirrorIntersections[owner]:
+						O.subD.fullMirrorIntersections[owner].remove(id)
+			# FIXME: same as above in the symmetric case 
+			#if len(O.subD.intersections[O.bodies[otherID].subdomain])==0: # if it was last interacting body then the two subdomains don't interact any more
+			#O.subD.intersections[rank].remove(O.bodies[otherID].subdomain)
+		O.bodies.erase(id)
+	
+	# write result back into the subdomain
+	O.subD.intersections =  intersections_
+	O.subD.mirrorIntersections = mirrorIntersections_
+
+	if rank!=0 or not waitingCommands: return 1
+	else: return [1]+erased
+
 def runOnSynchronouslPairs(workers,command):
 	'''
 	Locally (from one worker POV), this function runs interactive mpi tasks defined by 'command' on a list of other workers (typically the list of interacting subdomains).
@@ -1395,11 +1452,10 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 			O.subD.intersections=O.subD.intersections[:otherDomain]+[ints]+O.subD.intersections[otherDomain+1:]
 	
 	te = time.time() 
-	
-	#mprint("time in clear intrs -->  ", te-ts, "  rank = ", rank)
-	
+	numSubscribedHere = len(O.subD.ids) #total weigth of this domain, for load balancing after some erase
+		
 	req = comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
-	timing_comm.send("reallocateBodiesPairWiseBlocking",[O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank]],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	timing_comm.send("reallocateBodiesPairWiseBlocking",[O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank],numSubscribedHere],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
 	newMirror = req.wait()
 	
 	ts = time.time() 
@@ -1413,6 +1469,7 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	#mprint("time in mirrorUpdate  ", te-ts, "  rank = ", rank)
 	
 	O.subD._centers_of_mass[otherDomain]=newMirror[1]
+	numSubscribedOther = newMirror[2]
 	
 	candidates,mirror = _filter(rank,otherDomain)
 	
@@ -1430,6 +1487,7 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 		#mprint("different contents:", mirror," ", mirrorCandidates2)
 	
 	#mprint("sending to ",otherDomain,": ",len(candidates))
+	
 	migrateBodies(candidates,rank,otherDomain) #send
 	migrateBodies(None,otherDomain,rank)       #recv
 	
