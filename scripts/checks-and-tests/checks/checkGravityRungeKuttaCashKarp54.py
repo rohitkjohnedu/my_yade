@@ -10,20 +10,24 @@ from __future__ import print_function
 o=Omega() 
 
 ## PhysicalParameters 
-Density       = 2400
-frictionAngle = radians(35)
-sphereRadius  = 0.05
-tc            = 0.001
-en            = 0.3
-et            = 0.3
+# In present test these parameters are in fact not used, because the spheres are only falling down.
+# However for good measure let us use the full precision Real here also.
+from yade.math import toHP1, radiansHP1
+
+Density       = toHP1(2400)
+frictionAngle = radiansHP1(35)
+sphereRadius  = toHP1('0.05')
+tc            = toHP1('0.001')
+en            = toHP1('0.3')
+et            = toHP1('0.3')
 
 O.dt          = 2*tc
 
 sphereMat=O.materials.append(ViscElMat(density=Density,frictionAngle=frictionAngle,tc=tc,en=en,et=et))
 
 
-v_down    = -5.0
-v_up      =  5.0
+v_down    = toHP1(-5)
+v_up      = toHP1( 5)
 
 # Important  !!!! when using yade high-precision be careful because any *quickly* *typed* ad-hoc floating point number can "destroy" the calculations.
 # Important  !!!! For example in yade-mpfr150 declaring      g = -9.81 in fact produces number which is not useful to
@@ -119,4 +123,5 @@ O.run(241,True)
 # This note might be useful in case of problems on other architectures:
 #  O.run(242,True) fails on yade-mpfr150. Passes with higher tolerance.
 #  O.run(241,True) fails on yade-long-double when incorrect assignment g = -9.81 is used above.
+# If we replace "raise YadeCheckError" with "print" we can see that these errors occur only when id_up sphere's velocity is near zero. Then the errors disappear again.
 
