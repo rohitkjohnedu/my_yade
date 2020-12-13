@@ -87,6 +87,7 @@ FAIR_SHARE = True # try to keep equal no. bodies per subdomain when reallocating
 AUTO_COLOR = True
 MINIMAL_INTERSECTIONS = False # Reduces the size of position/velocity comms (at the end of the colliding phase, we can exclude those bodies with no interactions besides body<->subdomain from intersections). 
 REALLOCATE_MINIMAL = False # if true, intersections are minimized before reallocations, hence minimizing the number of reallocated bodies
+MASTER_UPDATE_STATES = False # does master thread need to provide updated pos/vel? else they will be fixed or moved by the workers (e.g. MotionEngines)
 fibreList = []
 FLUID_COUPLING = False
 fluidBodies = [] 
@@ -675,6 +676,9 @@ statesCommTime=0
 
 def sendRecvStates():
 	global statesCommTime
+	
+	if rank==0 and not MASTER_UPDATE_STATES: return # master has just nothing to do if workers don't need updated pos/vel
+	
 	start=time.time()
 	#____1. get ready to receive positions from other subdomains
 	pstates = []
@@ -682,8 +686,8 @@ def sendRecvStates():
 		
 	if rank!=0: #the master process never receive updated states (except when gathering)
 		for otherDomain in O.subD.intersections[rank]:
-			if len(O.subD.mirrorIntersections[otherDomain])==0:
-				continue #can happen if MINIMAL_INTERSECTIONS
+			if len(O.subD.mirrorIntersections[otherDomain])==0: continue #can happen if MINIMAL_INTERSECTIONS
+			if otherDomain==0 and not MASTER_UPDATE_STATES: continue # skip, we don't need news from master
 			if not USE_CPP_MPI:
 				buf.append(bytearray(1<<22)) #FIXME: smarter size? this is for a few thousands states max (empirical); bytearray(1<<24) = 128 MB 
 				pstates.append( comm.irecv(buf[-1],otherDomain, tag=_ID_STATE_SHAPE_))  #warning leaving buffer size undefined crash for large subdomains (MPI_ERR_TRUNCATE: message truncated)
@@ -722,6 +726,7 @@ def sendRecvStates():
 		
 		for otherDomain in O.subD.intersections[rank]:
 			if len(O.subD.mirrorIntersections[otherDomain])==0: continue #can happen if MINIMAL_INTERSECTIONS
+			if otherDomain==0 and not MASTER_UPDATE_STATES: continue
 			timing_comm.mpiWaitReceived("mpiWaitReceived(States)",otherDomain)
 			O.subD.setStateValuesFromBuffer(otherDomain)
 	statesCommTime+=(time.time()-start)
