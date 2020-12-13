@@ -102,3 +102,13 @@ def toHP1(arg):
 	else:
 		return yade._math.toHP1(arg)
 
+def radiansHP1(arg):
+	"""
+	The default python function ``import math ; math.radians(arg)`` only works on 15 digit ``double`` precision. If you want to carry on calculations in higher precision
+	it is advisable to use this function ``yade.math.radiansHP1(arg)`` instead. It uses full yade ``Real`` precision numbers.
+
+	NOTE: in the future this function may replace ``radians(…)`` function which is called in yade in many scripts, and which in fact is a call to native python ``math.radians``.
+	We only need to find the best backward compatible approach for this. The function ``yade.math.radiansHP1(arg)`` will remain as the function which uses native yade ``Real`` precision.
+	"""
+	return yade.math.HP1.Pi() * toHP1(arg) / toHP1(180)
+
