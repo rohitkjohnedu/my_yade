@@ -853,6 +853,55 @@ void Subdomain::cleanIntersections(int otherDomain)
 
 void Subdomain::updateNewMirrorIntrs(int otherDomain, const std::vector<Body::id_t>& newMirror) { mirrorIntersections[otherDomain] = newMirror; }
 
+
+// Count interactions of a body with given subdomain
+unsigned Subdomain::countIntsWith(Body::id_t body, Body::id_t someSubD, const shared_ptr<Scene>& scene) const
+{
+	if (not Body::byId(body, scene)) {
+		LOG_WARN("invalid body id: "<<body<<" vs. sd "<<someSubD<<", compared in "<<subdomainRank);
+		return 0;
+	}
+	const auto& intrs = Body::byId(body, scene)->intrs;
+	return std::count_if(intrs.begin(), intrs.end(), [&](auto i) {
+		assert(scene->bodies->exists(i.first));
+		return (Body::byId(i.first, scene)->subdomain == someSubD and not Body::byId(i.first, scene)->getIsSubdomain());
+	});
+}
+
+vector<Body::id_t> Subdomain::filteredInts(Body::id_t someSubD, bool mirror) const
+{
+	auto&  intrs = mirror ? mirrorIntersections[someSubD] : intersections[someSubD];
+	std::vector<Body::id_t>  filtered;
+	const shared_ptr<Scene>& scene = Omega::instance().getScene();
+	std::copy_if(intrs.begin(), intrs.end(), std::back_inserter(filtered), [&](auto i) {
+		return (this->countIntsWith(i, mirror ? scene->subdomain : someSubD, scene) > 0);
+	});
+	return filtered;
+}
+
+double Subdomain::filterIntersections()
+{
+	// we don't touch intersections with zero yet, unsure it would work directly as it's a bit special
+	assert(intersections.size() == mirrorIntersections.size());
+	const shared_ptr<Scene>& scene = Omega::instance().getScene();
+	assert(scene->subdomain > 0); // this function should not be called by master
+	unsigned oldNum(0), newNum(0);
+	for (Body::id_t subd = 1; unsigned(subd) < intersections.size(); subd++)
+		if (subd != scene->subdomain) {
+			// PLEASE DON'T REMOVE THOSE COMMENTED DEBUG MESSAGES
+			// 			unsigned oldI(intersections[subd].size()), oldM(mirrorIntersections[subd].size());
+			oldNum += intersections[subd].size();
+			if (mirrorIntersections[subd].size()>0)	mirrorIntersections[subd] = filteredInts(subd, true);
+			if (intersections[subd].size()>0) 		intersections[subd]       = filteredInts(subd, false);
+			newNum += intersections[subd].size();
+			// 			LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<(oldI-intersections[subd].size())<<" / "<<oldI<<"  vs. "<<subd);
+			// 			LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<(oldM-mirrorIntersections[subd].size())<<" / "<<oldM<<" from "<<subd);
+		}
+	// 		LOG_WARN("SubD "<<scene->subdomain<<" suppressed "<<oldNum-newNum<<" / "<<oldNum);
+	return (oldNum ? (oldNum - newNum) / double(oldNum) : 0); //return overall ratio of removed elements (low means useless)
+}
+
+
 } // namespace yade
 
 #endif
