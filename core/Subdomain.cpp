@@ -741,29 +741,23 @@ std::vector<projectedBoundElem> Subdomain::projectedBoundsCPP(int otherSD, const
 }
 
 std::vector<Body::id_t>
-Subdomain::medianFilterCPP(boost::python::list& idsToRecv, int otherSD, const Vector3r& otherSubDCM, const Vector3r& subDCM, bool useAABB)
+Subdomain::medianFilterCPP(boost::python::list& idsToRecv, int otherSD, const Vector3r& otherSubDCM, const Vector3r& subDCM, int giveAway, bool useAABB)
 {
 	std::vector<Body::id_t>         idsToSend;
 	std::vector<projectedBoundElem> pos = projectedBoundsCPP(otherSD, otherSubDCM, subDCM, useAABB);
-	if (!pos.size()) {
-		LOG_ERROR("ERROR IN CALCULATING PROJECTED BOUNDS WITH SUBDOMAIN = " << otherSD << "  from Subdomain = " << subdomainRank);
-	}
+	if (!pos.size()) LOG_ERROR("ERROR IN CALCULATING PROJECTED BOUNDS WITH SUBDOMAIN = " << otherSD << "  from Subdomain = " << subdomainRank);
 	int xminus = 0;
 	int xplus  = (int)pos.size() - 1;
 	while (xminus < xplus) {
-		while ((pos[xminus].second.first == subdomainRank) && (xminus < xplus))
-			++xminus;
-		while ((pos[xplus].second.first == otherSD) && (xminus < xplus))
-			--xplus;
-		if (xminus < xplus) {
-			idsToSend.push_back(pos[xplus].second.second);
-			idsToRecv.append(pos[xminus].second.second);
-			pos[xminus].second.first = subdomainRank;
-			pos[xplus].second.first  = otherSD;
-			++xminus;
-			--xplus;
-		}
+		while ((pos[xminus].second.first == subdomainRank) && (xminus < xplus)) ++xminus;
+		while ((pos[xplus].second.first == otherSD) && (xminus < xplus)) --xplus;
 	}
+		
+	int xSplit=std::min( std::max( xminus-giveAway, 0 ), (int)pos.size() - 1);
+	for (int x=xSplit; x<(int)pos.size() ; x++)
+		if (pos[x].second.first == subdomainRank) idsToSend.push_back(pos[x].second.second);
+	for (int x=0; x<xSplit ; x++)
+		if (pos[x].second.first == otherSD) idsToRecv.append(pos[x].second.second);
 	return idsToSend;
 }
 

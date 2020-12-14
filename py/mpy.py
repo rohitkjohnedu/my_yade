@@ -505,7 +505,7 @@ def checkAndCollide():
 					if (MINIMAL_INTERSECTIONS and REALLOCATE_MINIMAL):
 						r=shrinkIntersections() #if we filter before reallocation we minimize the reallocations
 						#mprint("filtered out (1)",r[0],"of",r[1])
-					reallocateBodiesToSubdomains(REALLOCATE_FILTER)
+					reallocateBodiesToSubdomains(REALLOCATE_FILTER,blocking=True)
 					_REALLOC_COUNT=0
 			if (MINIMAL_INTERSECTIONS): #filter here, even if already done before, since realloc updated intersections
 				#if rank>0:
@@ -1187,6 +1187,9 @@ def bodyErase(ids):
 	'''
 	The parallel version of O.bodies.erase(id), should be called collectively else the distributed scenes become inconsistent with each other (even the subdomains which don't have 'id' can call safely). For performance, better call on a list: bodyErase([i,j,k]).
 	'''
+	if not numThreads or numThreads<=1:
+		if isinstance(ids,list): mprint("deleting a list of bodies only supported in parallel run")
+		return O.bodies.erase(ids)
 	if(rank==0 and waitingCommands):
 		erased = sendCommand("slaves","bodyErase("+str(ids)+")",True)
 	
@@ -1202,7 +1205,10 @@ def bodyErase(ids):
 		b=O.bodies[id]
 		owner = b.subdomain
 		tmp=O.bodies[O.subD.subdomains[owner-1]].shape.ids
-		tmp.remove(id)
+		if not id in tmp:
+			wprint("trying to erase",id,"from",owner,"but failed" ) #FIXME: it actually happens, maybe due to deprecated remote lists (harmless), but better check
+		else:
+			tmp.remove(id)
 		O.bodies[O.subD.subdomains[owner-1]].shape.ids=tmp
 		
 		if rank==owner:
@@ -1353,9 +1359,10 @@ def projectedBounds(i,j):
 	pos.sort(key= lambda x: x[0])
 	return pos
 
-def medianFilter(i,j):
+def medianFilter(i,j,giveAway):
 	'''
 	Returns bodies in "i" to be assigned to "j" based on median split between the center points of subdomain's AABBs
+	If giveAway!=0, positive or negative, "i" will give/acquire this number to "j" with nothing in return (for load balancing purposes)    
 	'''
 	bodiesToSend=[]
 	bodiesToRecv=[]
@@ -1366,7 +1373,7 @@ def medianFilter(i,j):
 		useAABB = False; 
 		otherSubDCM = O.subD._centers_of_mass[j]
 		subDCM = O.subD._centers_of_mass[i]
-		bodiesToSend= O.subD.medianFilterCPP(bodiesToRecv,j, otherSubDCM, subDCM, useAABB)
+		bodiesToSend= O.subD.medianFilterCPP(bodiesToRecv,j, otherSubDCM, subDCM, giveAway, useAABB)
 		
 	else:
 		pos = projectedBounds(i,j)
@@ -1375,17 +1382,14 @@ def medianFilter(i,j):
 		while (xminus<xplus):
 			while (pos[xminus][1]==i and xminus<xplus): xminus+=1
 			while (pos[xplus][1]==j and xminus<xplus): xplus-=1
-			if xminus<xplus:
-				bodiesToSend.append(pos[xplus][2])
-				bodiesToRecv.append(pos[xminus][2])
-				pos[xminus][1]=i
-				pos[xplus][1]=j
-				xminus+=1; xplus-=1
-	#if len(bodiesToSend)>0: mprint("will send ",len(bodiesToSend)," to ",j," (and recv ",len(bodiesToRecv),")")
-	te = time.time() 
+		
+		# Now we have xminus = xplus, it defines splitting point where we have equal number of j before x, and i after x, to be swapped
+		# Before that we move the split in case we want net gain/loss of bodies after filtering
+		xSplit=min( max( xminus-giveAway, 0 ), len(pos)-1)
+		bodiesToSend= [x[2] for x in pos[xSplit:] if x[1]==i]
+		bodiesToRecv2= [x[2] for x in pos[:xSplit] if x[1]==j] #for debugging only
 	
-	#mprint("time in median filter -->  ", te-ts, "  rank = ", rank)
-	
+	#mprint("will send ",len(bodiesToSend)," to ",j," and recv ",len(bodiesToRecv),"(",len(bodiesToRecv2),"), while giveAway=",giveAway)
 	return bodiesToSend,bodiesToRecv
 
 REALLOCATE_FILTER=medianFilter #that's currently default and only option
@@ -1405,7 +1409,7 @@ def reallocateBodiesToSubdomains(_filter=medianFilter,blocking=True):
 		_functor = lambda x : reallocateBodiesPairWiseBlocking(medianFilter,x)
 		runOnSynchronouslPairs(O.subD.intersections[rank],_functor)
 	else: 	# non-blocking method, migrated bodies are decided unilateraly by each subdomain
-		# if using medianFilter it leads to non-constant bodies per subdomain
+		# doesn't work with medianFilter
 		if rank>0:
 			for worker in O.subD.intersections[rank]:
 				if worker==0: continue
@@ -1475,8 +1479,9 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	
 	O.subD._centers_of_mass[otherDomain]=newMirror[1]
 	numSubscribedOther = newMirror[2]
+	giveAway = int(0.5* (numSubscribedHere-numSubscribedOther))
 	
-	candidates,mirror = _filter(rank,otherDomain)
+	candidates,mirror = _filter(rank,otherDomain,giveAway)
 	
 	#mprint("Will send ",candidates)
 	#req2=comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
