@@ -741,7 +741,7 @@ std::vector<projectedBoundElem> Subdomain::projectedBoundsCPP(int otherSD, const
 }
 
 std::vector<Body::id_t>
-Subdomain::medianFilterCPP(boost::python::list& idsToRecv, int otherSD, const Vector3r& otherSubDCM, const Vector3r& subDCM, int giveAway, bool useAABB)
+Subdomain::medianFilterCPP(int otherSD, const Vector3r& otherSubDCM, const Vector3r& subDCM, int giveAway, bool useAABB)
 {
 	std::vector<Body::id_t>         idsToSend;
 	std::vector<projectedBoundElem> pos = projectedBoundsCPP(otherSD, otherSubDCM, subDCM, useAABB);
@@ -756,8 +756,6 @@ Subdomain::medianFilterCPP(boost::python::list& idsToRecv, int otherSD, const Ve
 	int xSplit=std::min( std::max( xminus-giveAway, 0 ), (int)pos.size() - 1);
 	for (int x=xSplit; x<(int)pos.size() ; x++)
 		if (pos[x].second.first == subdomainRank) idsToSend.push_back(pos[x].second.second);
-	for (int x=0; x<xSplit ; x++)
-		if (pos[x].second.first == otherSD) idsToRecv.append(pos[x].second.second);
 	return idsToSend;
 }
 

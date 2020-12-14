@@ -1365,15 +1365,11 @@ def medianFilter(i,j,giveAway):
 	If giveAway!=0, positive or negative, "i" will give/acquire this number to "j" with nothing in return (for load balancing purposes)    
 	'''
 	bodiesToSend=[]
-	bodiesToRecv=[]
-	
-	ts = time.time()
-	
 	if USE_CPP_REALLOC: 
 		useAABB = False; 
 		otherSubDCM = O.subD._centers_of_mass[j]
 		subDCM = O.subD._centers_of_mass[i]
-		bodiesToSend= O.subD.medianFilterCPP(bodiesToRecv,j, otherSubDCM, subDCM, giveAway, useAABB)
+		bodiesToSend= O.subD.medianFilterCPP(j, otherSubDCM, subDCM, giveAway, useAABB)
 		
 	else:
 		pos = projectedBounds(i,j)
@@ -1387,10 +1383,10 @@ def medianFilter(i,j,giveAway):
 		# Before that we move the split in case we want net gain/loss of bodies after filtering
 		xSplit=min( max( xminus-giveAway, 0 ), len(pos)-1)
 		bodiesToSend= [x[2] for x in pos[xSplit:] if x[1]==i]
-		bodiesToRecv2= [x[2] for x in pos[:xSplit] if x[1]==j] #for debugging only
+		#bodiesToRecv2= [x[2] for x in pos[:xSplit] if x[1]==j] #for debugging only
 	
 	#mprint("will send ",len(bodiesToSend)," to ",j," and recv ",len(bodiesToRecv),"(",len(bodiesToRecv2),"), while giveAway=",giveAway)
-	return bodiesToSend,bodiesToRecv
+	return bodiesToSend
 
 REALLOCATE_FILTER=medianFilter #that's currently default and only option
 
@@ -1481,22 +1477,7 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	numSubscribedOther = newMirror[2]
 	giveAway = int(0.5* (numSubscribedHere-numSubscribedOther))
 	
-	candidates,mirror = _filter(rank,otherDomain,giveAway)
-	
-	#mprint("Will send ",candidates)
-	#req2=comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
-	#comm.send(candidates,dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
-	#mirrorCandidates2 = req2.wait()
-	#req2.wait()
-	##mirrorCandidates2=req2.wait()
-	#mprint("mirrorCandidates2 ",mirrorCandidates2)
-	#if mirrorCandidates2==None: mirrorCandidates2=[] #sending empty list results in 'None' received... fix it here
-	#if len(mirrorCandidates2)!=len(candidates):
-		#mprint("UNBALANCED: will send",len(candidates)," and receive ",len(mirrorCandidates2))
-	#if mirrorCandidates2!=mirror:
-		#mprint("different contents:", mirror," ", mirrorCandidates2)
-	
-	#mprint("sending to ",otherDomain,": ",len(candidates))
+	candidates = _filter(rank,otherDomain,giveAway)
 	
 	migrateBodies(candidates,rank,otherDomain) #send
 	migrateBodies(None,otherDomain,rank)       #recv
