@@ -13,12 +13,20 @@ scriptsToRun=os.listdir(checksPath)
 failedScripts=list()
 maxElapsedTime=0
 
+#some scripts are singleCore only because of required 100% reproducibility
+singleCore= ['checkVTKRecorder.py' ,'checkPotentialVTKRecorders.py' ,'checkJCFpm.py' ,'checkColliderCorrectness.py' ,'checkColliderConstantness.py']
+
 #checkSpawn.py fails always for now, needs investigations
 skipScripts = ['checkList.py','checkSpawn.py']
 onlyOneScript = [] # use this if you want to test only one script, it takes precedence over skipScripts.
 
+def multiCore(): # multi core --check is running.
+	return ((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1'))
+
 def mustCheck(sc):
 	if(len(onlyOneScript)==1): return sc in onlyOneScript
+	if(multiCore()):
+		return (sc not in singleCore) and (sc not in skipScripts)
 	return sc not in skipScripts
 
 for script in scriptsToRun:
@@ -39,7 +47,10 @@ for script in scriptsToRun:
 		O.reset()
 	elif (not mustCheck(script)):
 		print("###################################")
-		print("Skipping %s, because it is in SkipScripts"%script)
+		if(multiCore()):
+			print("Skipping %s, because this script only works with -j1 (single core) or is in skipScripts"%script)
+		else:
+			print("Skipping %s, because it is in skipScripts"%script)
 
 if(maxElapsedTime > 30):
 	print("\033[95mWARNING: some checks took longer than 30 seconds.\033[0m")
