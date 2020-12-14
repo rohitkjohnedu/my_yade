@@ -115,6 +115,14 @@ if mp.rank==0:
     Nspheres=122000
     sp_new=sp_new[0:Nspheres]
 
+    # -------------------------------------------------------------------- #
+    #  Import mesh
+    if not os.path.exists(fileName+'.stl'):
+        print("Downloading mesh file")
+        try:
+            os.system('wget http://perso.3sr-grenoble.fr/users/bchareyre/yade/input/'+fileName+'.stl')
+        except:
+            print("** probably no internet connection, grab the *.stl files by yourself **")
     from yade import ymport
     facets = ymport.stl(fileName+'.stl',color=(0,1,0),material=Steel)
     fctIds = range(len(facets))
