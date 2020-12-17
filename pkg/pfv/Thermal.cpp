@@ -180,10 +180,8 @@ void ThermalEngine::setReynoldsNumbers()
 
 void ThermalEngine::setInitialValues()
 {
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	const long                       size   = bodies->size();
-	for (long i = 0; i < size; i++) {
-		const shared_ptr<Body>& b = (*bodies)[i];
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
+	{
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 			continue;
 		auto* state  = b->state.get();
@@ -194,16 +192,14 @@ void ThermalEngine::setInitialValues()
 		if (advection)
 			state->isCavity = true; // easiest to start by assuming cavity and flip if touching non-cavity
 	}
+	YADE_PARALLEL_FOREACH_BODY_END();
 }
 
 void ThermalEngine::timeStepEstimate()
 {
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	const long                       size   = bodies->size();
 	//	#pragma omp parallel for
-	for (long i = 0; i < size; i++) {
-		const shared_ptr<Body>& b = (*bodies)[i];
-		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
+	for(const auto & b :  *scene->bodies)
+	{	if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 			continue;
 		auto*      thState            = b->state.get();
 		Sphere*    sphere             = dynamic_cast<Sphere*>(b->shape.get());
@@ -287,6 +283,7 @@ void ThermalEngine::setConductionBoundary()
 				for (int v = 0; v < 4; v++) {
 					if (!cell->vertex(v)->info().isFictious) {
 						const long int          id = cell->vertex(v)->info().id();
+						if (!Body::byId(id)) continue;
 						const shared_ptr<Body>& b  = (*bodies)[id];
 						if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 							continue;
@@ -359,6 +356,7 @@ void ThermalEngine::computeSolidFluidFluxes()
 			if (!cell->info().Tcondition && cell->info().isFictious)
 				continue; // don't compute conduction with boundary cells that do not have a temperature assigned
 			const long int          id = cell->vertex(v)->info().id();
+			if (!Body::byId(id)) continue;
 			const shared_ptr<Body>& b  = (*bodies)[id];
 			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 				continue;
@@ -375,20 +373,22 @@ void ThermalEngine::computeSolidFluidFluxes()
 	}
 }
 
+
 void ThermalEngine::unboundCavityParticles()
 { // maybe move to flowbounding sphere, but all tools are here atm
-	shared_ptr<BodyContainer>& bodies = scene->bodies;
-	const long                 size   = bodies->size();
-#pragma omp parallel for
-	for (long i = 0; i < size; i++) {
-		const shared_ptr<Body>& b       = (*bodies)[i];
-		auto*                   thState = b->state.get();
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
+	{
+		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
+			continue;
+		auto* thState = b->state.get();
 		if (thState->isCavity) {
 			b->setBounded(false);
 			if (debug)
 				cout << "cavity body unbounded" << endl;
 		}
 	}
+	YADE_PARALLEL_FOREACH_BODY_END();
+
 }
 
 
@@ -469,6 +469,7 @@ void ThermalEngine::computeSolidSolidFluxes()
 			if (!geom)
 				continue;
 			const Real              pd  = geom->penetrationDepth;
+			if (!Body::byId(I->getId1(), scene) or !Body::byId(I->getId2(), scene)) continue;
 			const shared_ptr<Body>& b1_ = Body::byId(I->getId1(), scene);
 			const shared_ptr<Body>& b2_ = Body::byId(I->getId2(), scene);
 			if (b1_->shape->getClassIndex() != Sphere::getClassIndexStatic() || b2_->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b1_
@@ -651,12 +652,9 @@ void ThermalEngine::computeNewPoreTemperatures()
 void ThermalEngine::computeNewParticleTemperatures()
 {
 	//applyBoundaryHeatFluxes(); // FIXME: buggy commenting out for now
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	const long                       size   = bodies->size();
 
-#pragma omp parallel for
-	for (long i = 0; i < size; i++) {
-		const shared_ptr<Body>& b = (*bodies)[i];
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
+		{
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 			continue;
 		auto* thState = b->state.get();
@@ -671,18 +669,16 @@ void ThermalEngine::computeNewParticleTemperatures()
 		thState->temp     = thState->stepFlux * thermalDT / (thState->Cp * density * volume) + thState->oldTemp; // first order forward difference
 		thState->stepFlux = 0;
 	}
+	YADE_PARALLEL_FOREACH_BODY_END();
 }
 
 
 void ThermalEngine::thermalExpansion()
 {
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	const long                       size   = bodies->size();
 	// adjust particle size
 	if (particleAlpha > 0) {
-#pragma omp parallel for
-		for (long i = 0; i < size; i++) {
-			const shared_ptr<Body> b = (*bodies)[i];
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
+	{
 			if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 				continue;
 			Sphere* sphere  = dynamic_cast<Sphere*>(b->shape.get());
@@ -693,9 +689,10 @@ void ThermalEngine::thermalExpansion()
 				thState->delRadius = thState->alpha * sphere->radius * (thState->temp - thState->oldTemp);
 				sphere->radius += thState->delRadius;
 			}
-		}
+		//}
 	}
-
+	YADE_PARALLEL_FOREACH_BODY_END();
+	}
 	// adjust cell pressure
 	if (fluidBeta > 0) {
 		cavitySolidVolumeChange = 0;
@@ -751,6 +748,7 @@ void ThermalEngine::computeCellVolumeChangeFromSolidVolumeChange(CellHandle& cel
 	Real solidVolumeChange = 0;
 	for (int v = 0; v < 4; v++) {
 		const long int          id = cell->vertex(v)->info().id();
+		if (!Body::byId(id)) continue;
 		const shared_ptr<Body>& b  = (*bodies)[id];
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 			continue;
@@ -829,11 +827,8 @@ void ThermalEngine::updateForces()
 // used for instantly changing temperature and observing volumetric expansion
 void ThermalEngine::applyTempDeltaToSolids(Real delT)
 {
-	const shared_ptr<BodyContainer>& bodies = scene->bodies;
-	const long                       size   = bodies->size();
-#pragma omp parallel for
-	for (long i = 0; i < size; i++) {
-		const shared_ptr<Body> b = (*bodies)[i];
+	YADE_PARALLEL_FOREACH_BODY_BEGIN(const shared_ptr<Body>& b, scene->bodies)
+	{
 		if (b->shape->getClassIndex() != Sphere::getClassIndexStatic() || !b)
 			continue;
 		auto* thState = b->state.get();
@@ -841,6 +836,7 @@ void ThermalEngine::applyTempDeltaToSolids(Real delT)
 			thState->temp += delT;
 		}
 	}
+	YADE_PARALLEL_FOREACH_BODY_END();
 	delT = 0;
 }
 
