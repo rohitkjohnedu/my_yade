@@ -183,9 +183,10 @@ namespace std {
 // OK, bug reported to  CGAL: https://github.com/CGAL/cgal/issues/4527
 //                     Eigen: https://gitlab.com/libeigen/eigen/issues/1823
 // we can disable this later by #ifdef-ing a CGAL version.
+#if CGAL_VERSION_NR < CGAL_VERSION_NUMBER(5, 1, 1)
 using ::yade::math::pow;
 using ::yade::math::sqrt;
-
+#endif
 }
 
 #endif // CGAL_NUM_TRAITS_HPP
