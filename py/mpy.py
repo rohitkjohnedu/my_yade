@@ -1403,7 +1403,7 @@ def medianFilter(i,j,giveAway):
 
 REALLOCATE_FILTER=medianFilter #that's currently default and only option
 
-def reallocateBodiesToSubdomains(_filter=medianFilter,blocking=True):
+def reallocateBodiesToSubdomains(_filter=REALLOCATE_FILTER,blocking=True):
 	'''
 	Re-assign bodies to subdomains based on '_filter' argument.
 	Requirement: '_filter' is a function taking ranks of origin and destination and returning the list of bodies (by index) to be moved. That's where the decomposition strategy is defined. See example medianFilter (used by default).
@@ -1415,7 +1415,7 @@ def reallocateBodiesToSubdomains(_filter=medianFilter,blocking=True):
 	O.subD._centers_of_mass[rank]=O.subD.centerOfMass()
 	
 	if blocking: # the filter will be applied sequentially to each other domain. It can include blocking communications in subdomain pairs
-		_functor = lambda x : reallocateBodiesPairWiseBlocking(medianFilter,x)
+		_functor = lambda x : reallocateBodiesPairWiseBlocking(_filter,x)
 		runOnSynchronouslPairs(O.subD.intersections[rank],_functor)
 	else: 	# non-blocking method, migrated bodies are decided unilateraly by each subdomain
 		# doesn't work with medianFilter
@@ -1484,12 +1484,9 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 		O.subD.mirrorIntersections=O.subD.mirrorIntersections[:otherDomain]+[newMirror[0]]+O.subD.mirrorIntersections[otherDomain+1:]
 	te = time.time() 
 	
-	#mprint("time in mirrorUpdate  ", te-ts, "  rank = ", rank)
-	
 	O.subD._centers_of_mass[otherDomain]=newMirror[1]
 	numSubscribedOther = newMirror[2]
 	giveAway = int(0.5* (numSubscribedHere-numSubscribedOther))
-	
 	candidates = _filter(rank,otherDomain,giveAway)
 	
 	migrateBodies(candidates,rank,otherDomain) #send
