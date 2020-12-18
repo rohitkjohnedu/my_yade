@@ -12,11 +12,12 @@ standard_library.install_aliases()
 
 from builtins import range
 from builtins import object
-__all__=['data','plots','labels','live','liveInterval','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
+__all__=['data','plots','labels','live','liveInterval','setLiveForceAlwaysUpdate','autozoom','plot','reset','resetData','splitData','reverseData','addData','addAutoData','saveGnuplot','saveDataTxt','savePlotSequence']
 
 # multi-threaded support for Tk
 # safe to import even if Tk will not be used
 import mtTkinter as Tkinter
+import _thread
 
 try:
 	import Image
@@ -66,12 +67,16 @@ xylabels={}
 legendLoc=('upper left','upper right')
 "Location of the y1 and y2 legends on the plot, if y2 is active."
 
+plotSyncLock=_thread.allocate_lock()
+"A lock (mutex) used for synchronizing live drawing (happens every ``liveInterval`` seconds) and adding more plot data. Also see https://gitlab.com/yade-dev/trunk/-/issues/110"
+liveForceAlwaysUpdate=False
+"See :yref:`yade.plot.setLiveForceAlwaysUpdate`."
 live=True if yade.runtime.hasDisplay else False
-"Enable/disable live plot updating. Disabled by default for now, since it has a few rough edges."
+"Enable/disable live plot updating."
 liveInterval=1
 "Interval for the live plot updating, in seconds."
 autozoom=True
-"Enable/disable automatic plot rezooming after data update."
+"Enable/disable automatic plot rezooming after data update. Sometimes rezooming must be skipped unless a call to :yref:`yade.plot.setLiveForceAlwaysUpdate` forces it to work."
 scientific=True if hasattr(pylab,'ticklabel_format') else False  ## safe default for older matplotlib versions
 "Use scientific notation for axes ticks."
 axesWd=0
@@ -245,6 +250,8 @@ def addData(*d_in,**kw):
 
 	"""
 	import numpy
+	if(live and liveForceAlwaysUpdate):
+		plotSyncLock.acquire()
 	if len(data)>0: numSamples=len(data[list(data.keys())[0]])
 	else: numSamples=0
 	# align with imgData, if there is more of them than data
@@ -269,6 +276,18 @@ def addData(*d_in,**kw):
 	#print [(k,len(data[k])) for k in data.keys()]
 	#numpy.array([nan for i in range(numSamples)])
 	#numpy.append(data[name],[d[name]],1)
+	if(live and liveForceAlwaysUpdate and plotSyncLock.locked()): # check if locked() in case when liveForceAlwaysUpdate was changed during addData(…) call.
+		plotSyncLock.release()
+
+def setLiveForceAlwaysUpdate(forceLiveUpdate):
+	"The :yref:`yade.plot.liveInterval` and :yref:`yade.plot.live` control live refreshing of the plot during calculations. The refreshing is done in a separate thread, so that it does not interfere with calculations. Drawing the data will not work when at exactly the same time it is being updated in other thread. Use ``yade.plot.setLiveForceAlwaysUpdate(True)`` if you want calculations to **PAUSE** during the plot updates. This function returns current ``bool`` value of forced updates if the call was a success, otherwise it returns a ``str`` with explanation why it failed. It is guaranteed to work if simulation was paused with :yref:`O.pause()<Omega.pause>` call."
+	if(plotSyncLock.acquire(blocking=False)):
+		global liveForceAlwaysUpdate
+		liveForceAlwaysUpdate=forceLiveUpdate
+		plotSyncLock.release()
+		return forceLiveUpdate
+	else:
+		return "setLiveForceAlwaysUpdate("+str(forceLiveUpdate)+"); failed. Try again after pausing the simulation with :yref:`O.pause()<Omega.pause>`."
 
 def addImgData(**kw):
 	for k in kw:
@@ -509,15 +528,26 @@ def liveUpdate(timestamp):
 			l=ax.legend(loc=ax.yadeLabelLoc)
 			if hasattr(l,'draggable'): l.draggable(True)
 		if autozoom:
+			if(liveForceAlwaysUpdate): plotSyncLock.acquire()
 			for ax in axes:
 				try:
+					## Note about https://gitlab.com/yade-dev/trunk/-/issues/110 , we can see that the data (x,y) to plot has correct sizes:
+					#print("1st line sizes: ", len(ax.lines[0]._x), len(ax.lines[0]._y)) # ← e.g. the first line: ax.lines[0]
+					## But before ax.relim() finishes running the other thread will add data to _y, but not yet to _x
+					## We can confirm this by printing these sizes inside function _broadcast_shape in file stride_tricks.py from package python3-numpy
 					ax.relim() # recompute axes limits
 					ax.autoscale_view()
-				except RuntimeError: pass # happens if data are being updated and have not the same dimension at the very moment
+				except Exception:
+					## This happens if data are being updated and have not the same dimension at the very moment.
+					## So the solution is to ignore this exception and hope that next time plot refresh will happen at more favorable time.
+					## Alternatively one might call setLiveForceAlwaysUpdate(True) which will pause addData during the plot redraw
+					#print(e)
+					pass # happens if data are being updated and have not the same dimension at the very moment
+			if(liveForceAlwaysUpdate and plotSyncLock.locked()): plotSyncLock.release()
 		for fig in figs:
 			try:
 				fig.canvas.draw()
-			except RuntimeError: pass # happens here too
+			except Exception: pass # happens here too
 		time.sleep(liveInterval)
 	
 def savePlotSequence(fileBase,stride=1,imgRatio=(5,7),title=None,titleFrames=20,lastFrames=30):
@@ -607,7 +637,6 @@ def plot(noShow=False,subPlots=True):
 	if not noShow:
 		if not yade.runtime.hasDisplay: return # would error out with some backends, such as Agg used in batches
 		if live:
-			import _thread
 			_thread.start_new_thread(liveUpdate,(time.time(),))
 		# pylab.show() # this blocks for some reason; call show on figures directly
 		for f in figs:
