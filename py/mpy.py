@@ -458,6 +458,7 @@ def shrinkIntersections():
 	This will reduce the number of updates in sendRecvStates
 	Initial lists are backed-up and need to be restored (and all states updated) before collision detection (see checkAndCollide())
 	'''
+	if O.subD.fullIntersections!=None: mprint("Problem HERE!!!!!!!!!!!")
 	O.subD.fullIntersections = O.subD.intersections
 	O.subD.fullMirrorIntersections = O.subD.mirrorIntersections
 	if (rank==0): return 0,0
@@ -489,9 +490,10 @@ def checkAndCollide():
 	if needsCollide:
 		if(COPY_MIRROR_BODIES_WHEN_COLLIDE):
 			if MINIMAL_INTERSECTIONS:
-				if hasattr(O.subD,"fullIntersections"): # if we have tricked intersections in previous steps we set them backto full content in order to update all positions before colliding
+				if hasattr(O.subD,"fullIntersections") and O.subD.fullIntersections!=None: # if we have tricked intersections in previous steps we set them backto full content in order to update all positions before colliding
 					O.subD.intersections = O.subD.fullIntersections
 					O.subD.mirrorIntersections = O.subD.fullMirrorIntersections
+					O.subD.fullMirrorIntersections=O.subD.fullIntersections=None #clear, so we know we can re-use
 				#else: mprint("fullIntersections not initialized (first iteration or rank=0)")
 					sendRecvStates() # triggers comm
 			
@@ -502,12 +504,18 @@ def checkAndCollide():
 				_REALLOC_COUNT+=1
 				if _REALLOC_COUNT>=REALLOCATE_FREQUENCY:
 					#comm.barrier() #we will modify intersections while they can still be accessed by calls to mpi in parallelCollide()
-					if (MINIMAL_INTERSECTIONS and REALLOCATE_MINIMAL):
+					if (REALLOCATE_MINIMAL): # shrink
+						mprint("don't use REALLOCATE_MINIMAL. It seems broken for the moment")
 						r=shrinkIntersections() #if we filter before reallocation we minimize the reallocations
 						#mprint("filtered out (1)",r[0],"of",r[1])
 					reallocateBodiesToSubdomains(REALLOCATE_FILTER,blocking=True)
+					if (REALLOCATE_MINIMAL and not MINIMAL_INTERSECTIONS): # restore
+						O.subD.intersections = O.subD.fullIntersections
+						O.subD.mirrorIntersections = O.subD.fullMirrorIntersections
+						O.subD.fullMirrorIntersections=O.subD.fullIntersections=None
+
 					_REALLOC_COUNT=0
-			if (MINIMAL_INTERSECTIONS): #filter here, even if already done before, since realloc updated intersections
+			elif (MINIMAL_INTERSECTIONS): #filter here, even if already done before, since realloc updated intersections
 				#if rank>0:
 				r=shrinkIntersections()
 				recordMpiTiming("filteredInts",r[0]); recordMpiTiming("totInts",r[1]); recordMpiTiming("interactionsInts",len(O.interactions)); recordMpiTiming("iterInts",O.iter)
@@ -1187,31 +1195,39 @@ def bodyErase(ids):
 	'''
 	The parallel version of O.bodies.erase(id), should be called collectively else the distributed scenes become inconsistent with each other (even the subdomains which don't have 'id' can call safely). For performance, better call on a list: bodyErase([i,j,k]).
 	'''
-	if not numThreads or numThreads<=1:
-		if isinstance(ids,list): mprint("deleting a list of bodies only supported in parallel run")
-		return O.bodies.erase(ids)
-	if(rank==0 and waitingCommands):
-		erased = sendCommand("slaves","bodyErase("+str(ids)+")",True)
 	
 	if not isinstance(ids,list): ids = [ids]
-	# we get legit python lists so we can list[k].remove(id) more simply than with the wrapped vector< vector< int > >
+	erased=0
+	
+	if not numThreads or numThreads<=1:# non-parallel case, fall back but handle lists
+		for i in ids:
+			erased += O.bodies.erase(i)
+		return erased
+	
+	if(rank==0 and waitingCommands): # make it collective
+		erased = sendCommand("slaves","bodyErase("+str(ids)+")",True)
+	
+	if hasattr(O.subD,"fullIntersections") and O.subD.fullIntersections!=None: #un-shrink
+		O.subD.intersections = O.subD.fullIntersections
+		O.subD.mirrorIntersections = O.subD.fullMirrorIntersections
+		O.subD.fullMirrorIntersections=O.subD.fullIntersections=None
+		
 	intersections_ = O.subD.intersections
 	mirrorIntersections_ = O.subD.mirrorIntersections
 
+	ori = len(O.subD.ids)
+	localIds=O.subD.ids
+
 	for id in ids:
 		if O.bodies[id]==None:
-			if rank!=0 or not waitingCommands: return 0
-			else: return [0]+erased
+			mprint("not erasing None"); continue
 		b=O.bodies[id]
 		owner = b.subdomain
-		tmp=O.bodies[O.subD.subdomains[owner-1]].shape.ids
-		if not id in tmp:
-			wprint("trying to erase",id,"from",owner,"but failed" ) #FIXME: it actually happens, maybe due to deprecated remote lists (harmless), but better check
-		else:
-			tmp.remove(id)
-		O.bodies[O.subD.subdomains[owner-1]].shape.ids=tmp
 		
 		if rank==owner:
+			if not id in localIds: mprint("a nasty bug somewhere")
+			localIds.remove(id)
+			
 			removedFrom=[]
 			for ii in O.interactions.withBodyAll(id):
 				otherID = ii.id1 if ii.id2==id else ii.id2
@@ -1220,28 +1236,25 @@ def bodyErase(ids):
 					#mprint("removing",id," from intersections with",O.bodies[otherID].subdomain)
 					if id in intersections_[otherSD]:
 						intersections_[otherSD].remove(id)
-					if hasattr(O.subD,"fullIntersections") and id in O.subD.fullIntersections[O.bodies[otherID].subdomain]:
-						O.subD.fullIntersections[otherSD].remove(id) # <== normally ok here, it is a legit python list, not a c++ wrapper
-					# FIXME: is it safe to not do thses commented lines? else we will crash on empty subdomains at some point
-					#if len(O.subD.intersections[O.bodies[otherID].subdomain])==0: # if it was last interacting body then the two subdomains don't interact any more
-						#O.subD.intersections[rank].remove(O.bodies[otherID].subdomain)
 					removedFrom.append(otherSD)
 		else:
 			if id in mirrorIntersections_[owner]:
 				mirrorIntersections_[owner].remove(id)
-			if hasattr(O.subD,"fullMirrorIntersections") and id in O.subD.fullMirrorIntersections[owner]:
-						O.subD.fullMirrorIntersections[owner].remove(id)
+			#if hasattr(O.subD,"fullMirrorIntersections") and id in O.subD.fullMirrorIntersections[owner]:
+						#O.subD.fullMirrorIntersections[owner].remove(id)
 			# FIXME: same as above in the symmetric case 
 			#if len(O.subD.intersections[O.bodies[otherID].subdomain])==0: # if it was last interacting body then the two subdomains don't interact any more
 			#O.subD.intersections[rank].remove(O.bodies[otherID].subdomain)
-		O.bodies.erase(id)
+		erased+=O.bodies.erase(id)
 	
 	# write result back into the subdomain
+	# other subdomain's ids are locally deprecated (should be safe since they are not used)
+	O.subD.ids = localIds
 	O.subD.intersections =  intersections_
 	O.subD.mirrorIntersections = mirrorIntersections_
 
-	if rank!=0 or not waitingCommands: return 1
-	else: return [1]+erased
+	return erased
+
 
 def runOnSynchronouslPairs(workers,command):
 	'''
