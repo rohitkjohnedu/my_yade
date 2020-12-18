@@ -1386,19 +1386,10 @@ def medianFilter(i,j,giveAway):
 		
 	else:
 		pos = projectedBounds(i,j)
-		# we will start from first and last elements and converge to middle, to check possible inversions of bboxes along the axis
-		xminus=0; xplus=len(pos)-1
-		while (xminus<xplus):
-			while (pos[xminus][1]==i and xminus<xplus): xminus+=1
-			while (pos[xplus][1]==j and xminus<xplus): xplus-=1
-		
-		# Now we have xminus = xplus, it defines splitting point where we have equal number of j before x, and i after x, to be swapped
-		# Before that we move the split in case we want net gain/loss of bodies after filtering
-		xSplit=min( max( xminus-giveAway, 0 ), len(pos)-1)
-		bodiesToSend= [x[2] for x in pos[xSplit:] if x[1]==i]
-		#bodiesToRecv2= [x[2] for x in pos[:xSplit] if x[1]==j] #for debugging only
-	
-	#mprint("will send ",len(bodiesToSend)," to ",j," and recv ",len(bodiesToRecv),"(",len(bodiesToRecv2),"), while giveAway=",giveAway)
+		finalSize = min( max(0, len(O.subD.intersections[j]) - giveAway) , len(pos))
+		bodiesToSend= [x[2] for x in pos[finalSize:] if x[1]==i]
+		#bodiesToRecv= [x[2] for x in pos[:finalSize] if x[1]==j] #for debugging only
+
 	return bodiesToSend
 
 REALLOCATE_FILTER=medianFilter #that's currently default and only option
