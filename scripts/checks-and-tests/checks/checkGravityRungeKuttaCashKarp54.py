@@ -2,8 +2,8 @@
 
 # 3 Spheres have an initial velociries: 0, +5, -5
 # Their positions and velocities are checked during free fall
-# Checks the correctness of RungeKuttaCashKarp54Integrator and GravityEngine
-# Also see checkGravity.py
+# checkGravity.py                     Checks the correctness of NewtonIntegrator and GravityEngine
+# checkGravityRungeKuttaCashKarp54.py Checks the correctness of RungeKuttaCashKarp54Integrator and GravityEngine
 
 ## Omega
 from __future__ import print_function
@@ -35,7 +35,7 @@ v_up      = toHP1( 5)
 #            ↓↓↓↓ make sure to use, yade.math.toHP1(………), so that the numbers on python side use native yade rpecision.
 g         = yade.math.toHP1("-9.81")
 
-tolerance = 10**(-yade.math.getDigits10(1)+3)
+tolerance = 10**(-yade.math.getDigits10(1)+3) # for MPFR-150 that means 147 correct decimal places.
 print("checkGravityRungeKuttaCashKarp54.py : yade precision is ",yade.math.getDigits10(1)," decimal places. Will use error tolerance of: ", tolerance)
 
 print("Note: for high precision calculations use yade.math.toHP1(...) see this:")
@@ -56,7 +56,10 @@ O.bodies[id_up  ].state.vel[1] = v_up
 # and https://yade-dem.org/doc/yade.wrapper.html?highlight=rungekuttacashkarp54integrator#yade.wrapper.RungeKuttaCashKarp54Integrator
 integrator=RungeKuttaCashKarp54Integrator([
   ForceResetter(),
-  GeneralIntegratorInsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),]),
+  GeneralIntegratorInsertionSortCollider([
+    Bo1_Sphere_Aabb(),
+    Bo1_Facet_Aabb(),
+  ]),
   InteractionLoop(
     [Ig2_Sphere_Sphere_ScGeom(), Ig2_Facet_Sphere_ScGeom()],
     [Ip2_ViscElMat_ViscElMat_ViscElPhys()],
