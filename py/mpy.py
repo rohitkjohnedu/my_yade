@@ -963,9 +963,7 @@ def updateMirrorOwners():
 		for id in mirrorInts[kk]:
 			if not O.bodies[id]:
 				continue
-				#mprint("skip mirror",id)
 			elif O.bodies[id].subdomain!=kk:
-				mprint("fix it(2)")
 				O.bodies[id].subdomain = kk
 			
 
