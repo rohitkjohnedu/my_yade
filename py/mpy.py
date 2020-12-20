@@ -1155,7 +1155,9 @@ def mpirun(nSteps,np=None,withMerge=False):
 	if (np>numThreads):  
 		if numThreads==1: initialize(np) #this will set numThreads
 		else: mprint("number of mpy cores can't be increased when already initialized")
-	if(rank==0 and not caller_name=='execfile'): #if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
+	# if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
+	# if the caller is 'sendCommand', then assume the workers are also being sent the mpirun command, no need to trigger them
+	if(rank==0 and not caller_name=='execfile' and not caller_name=='sendCommand'):
 		waitingCommands=True
 		for w in range(1,numThreads):
 			comm.send("yade.mpy.mpirun(nSteps="+str(nSteps)+",withMerge="+str(withMerge)+")",dest=w,tag=_MASTER_COMMAND_)
@@ -1232,7 +1234,8 @@ def bodyErase(ids):
 
 	for id in ids:
 		if O.bodies[id]==None:
-			mprint("not erasing None"); continue
+			#mprint("not erasing None");
+			continue
 		b=O.bodies[id]
 		owner = b.subdomain
 		
