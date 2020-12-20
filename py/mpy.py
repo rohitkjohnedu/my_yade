@@ -458,24 +458,28 @@ def shrinkIntersections():
 	This will reduce the number of updates in sendRecvStates
 	Initial lists are backed-up and need to be restored (and all states updated) before collision detection (see checkAndCollide())
 	'''
-	if O.subD.fullIntersections!=None: mprint("Problem HERE!!!!!!!!!!!")
+	if hasattr(O.subD,"fullIntersections") and O.subD.fullIntersections!=None: mprint("Problem HERE!!!!!!!!!!!")
 	O.subD.fullIntersections = O.subD.intersections
 	O.subD.fullMirrorIntersections = O.subD.mirrorIntersections
 	if (rank==0): return 0,0
-	res=O.subD.filterIntersections()
 	oriLen=sum([len(c) for c in O.subD.intersections])
-	reqs=[]
-	for other in O.subD.intersections[rank]:
-			if other==0: continue
-			reqs.append([other,comm.irecv(None, other, tag=_MIRROR_INTERSECTIONS_)])
-			comm.send(O.subD.intersections[other],dest=other,tag=_MIRROR_INTERSECTIONS_)
-	ints = O.subD.mirrorIntersections
+	res=O.subD.filterIntersections()
 	
-	for r in reqs:
-		ints[r[0]]=r[1].wait()
-		if ints[r[0]]!=O.subD.mirrorIntersections[r[0]]:
-			mprint("inconsistency in the filtering of intersections[",r[0],"]:",len(ints[r[0]]),"received vs.",len(O.subD.mirrorIntersections[r[0]]))
-	O.subD.mirrorIntersections = ints #that's because python wrapping only enable assignment
+	##ints = O.subD.mirrorIntersections	
+	## What follows did not show any anomalous result, so we better skip communication
+	## of something every worker agree on splontaneously
+	#reqs=[]
+	#for other in O.subD.intersections[rank]:
+			#if other==0: continue
+			#reqs.append([other,comm.irecv(None, other, tag=_MIRROR_INTERSECTIONS_)])
+			#comm.send(O.subD.intersections[other],dest=other,tag=_MIRROR_INTERSECTIONS_)
+	
+	
+	#for r in reqs:
+		#ints[r[0]]=r[1].wait()
+		#if ints[r[0]]!=O.subD.mirrorIntersections[r[0]]:
+			#mprint("inconsistency in the filtering of intersections[",r[0],"]:",len(ints[r[0]]),"received vs.",len(O.subD.mirrorIntersections[r[0]]))
+	#O.subD.mirrorIntersections = ints #that's because python wrapping only enable assignment
 	return res,oriLen
 
 def checkAndCollide():
