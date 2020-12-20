@@ -508,18 +508,12 @@ def checkAndCollide():
 				_REALLOC_COUNT+=1
 				if _REALLOC_COUNT>=REALLOCATE_FREQUENCY:
 					#comm.barrier() #we will modify intersections while they can still be accessed by calls to mpi in parallelCollide()
-					if (REALLOCATE_MINIMAL): # shrink
-						mprint("don't use REALLOCATE_MINIMAL. It seems broken for the moment")
+					if (REALLOCATE_MINIMAL and not MINIMAL_INTERSECTIONS): # shrink
 						r=shrinkIntersections() #if we filter before reallocation we minimize the reallocations
 						#mprint("filtered out (1)",r[0],"of",r[1])
 					reallocateBodiesToSubdomains(REALLOCATE_FILTER,blocking=True)
-					if (REALLOCATE_MINIMAL and not MINIMAL_INTERSECTIONS): # restore
-						O.subD.intersections = O.subD.fullIntersections
-						O.subD.mirrorIntersections = O.subD.fullMirrorIntersections
-						O.subD.fullMirrorIntersections=O.subD.fullIntersections=None
-
 					_REALLOC_COUNT=0
-			elif (MINIMAL_INTERSECTIONS): #filter here, even if already done before, since realloc updated intersections
+			if (MINIMAL_INTERSECTIONS): #filter here, even if already done before, since realloc updated intersections
 				#if rank>0:
 				r=shrinkIntersections()
 				recordMpiTiming("filteredInts",r[0]); recordMpiTiming("totInts",r[1]); recordMpiTiming("interactionsInts",len(O.interactions)); recordMpiTiming("iterInts",O.iter)
