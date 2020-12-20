@@ -508,7 +508,8 @@ def checkAndCollide():
 				_REALLOC_COUNT+=1
 				if _REALLOC_COUNT>=REALLOCATE_FREQUENCY:
 					#comm.barrier() #we will modify intersections while they can still be accessed by calls to mpi in parallelCollide()
-					if (REALLOCATE_MINIMAL and not MINIMAL_INTERSECTIONS): # shrink
+					if (REALLOCATE_MINIMAL): # shrink
+						mprint("don't use REALLOCATE_MINIMAL. It seems broken for the moment")
 						r=shrinkIntersections() #if we filter before reallocation we minimize the reallocations
 						#mprint("filtered out (1)",r[0],"of",r[1])
 					reallocateBodiesToSubdomains(REALLOCATE_FILTER,blocking=True)
@@ -955,7 +956,19 @@ def splitScene():
 		sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = collisionChecker.dead = False
 	
 	O.splitted = True
-		
+
+def updateMirrorOwners():
+	mirrorInts=O.subD.mirrorIntersections
+	for kk in range(len(mirrorInts)):
+		for id in mirrorInts[kk]:
+			if not O.bodies[id]:
+				continue
+				#mprint("skip mirror",id)
+			elif O.bodies[id].subdomain!=kk:
+				mprint("fix it(2)")
+				O.bodies[id].subdomain = kk
+			
+
 def updateAllIntersections():
 	subD=O.subD
 	subD.intersections=genLocalIntersections(subD.subdomains)
@@ -1018,6 +1031,7 @@ def updateAllIntersections():
 				else:
 					subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
 				#reboundRemoteBodies(intrs)
+	updateMirrorOwners()
 
 bodiesToImport=[]
 
@@ -1424,24 +1438,24 @@ def reallocateBodiesToSubdomains(_filter=REALLOCATE_FILTER,blocking=True):
 		if not ERASE_REMOTE_MASTER:
 			if rank == 0 : 
 				if (AUTO_COLOR) : colorDomains()
-			updateAllIntersections()
-			
 	else:
 		O.subD.ids = [b.id for b in O.bodies if (b.subdomain==rank and not b.isSubdomain)] #update local ids
 
 		if not ERASE_REMOTE_MASTER:
 			# update remote ids in master
-			if rank>0: req = comm.isend(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
+			if rank>0:
+				req = comm.isend(O.subD.ids,dest=0,tag=_ASSIGNED_IDS_)
+				req.wait()
 			else: #master will update subdomains for correct display (besides, keeping 'ids' updated for remote subdomains may not be a strict requirement)
 				for k in range(1,numThreads):
 					ids=comm.recv(source=k,tag=_ASSIGNED_IDS_)
 					O.bodies[O.subD.subdomains[k-1]].shape.ids=ids
 					for i in ids: O.bodies[i].subdomain=k
 				if (AUTO_COLOR): colorDomains()
-			# update intersections and mirror
-			updateAllIntersections() #triggers communication
-			if rank>0: req.wait()
 
+			# update intersections and mirror
+			#mprint("updating all intersections")
+	updateAllIntersections() #triggers communication
 
 def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	'''
