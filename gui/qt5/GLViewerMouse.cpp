@@ -39,20 +39,20 @@ void GLViewer::mouseMovesCamera()
 
 #if QGLVIEWER_VERSION >= 0x020500
 	setMouseBinding(Qt::ShiftModifier, Qt::RightButton, FRAME, ZOOM);
-	setMouseBinding(Qt::ShiftModifier, Qt::MidButton, FRAME, TRANSLATE);
+	setMouseBinding(Qt::ShiftModifier, Qt::MiddleButton, FRAME, TRANSLATE);
 	setMouseBinding(Qt::ShiftModifier, Qt::RightButton, FRAME, ROTATE);
 
-	setMouseBinding(Qt::NoModifier, Qt::MidButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::NoModifier, Qt::MiddleButton, CAMERA, ZOOM);
 	setMouseBinding(Qt::NoModifier, Qt::LeftButton, CAMERA, ROTATE);
 	setMouseBinding(Qt::NoModifier, Qt::RightButton, CAMERA, TRANSLATE);
 #else
 	setMouseBinding(Qt::SHIFT + Qt::LeftButton, SELECT);
 	setMouseBinding(Qt::SHIFT + Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
-	setMouseBinding(Qt::SHIFT + Qt::MidButton, FRAME, TRANSLATE);
+	setMouseBinding(Qt::SHIFT + Qt::MiddleButton, FRAME, TRANSLATE);
 	setMouseBinding(Qt::SHIFT + Qt::RightButton, FRAME, ROTATE);
 
 	setMouseBinding(Qt::LeftButton + Qt::RightButton, CAMERA, ZOOM);
-	setMouseBinding(Qt::MidButton, CAMERA, ZOOM);
+	setMouseBinding(Qt::MiddleButton, CAMERA, ZOOM);
 	setMouseBinding(Qt::LeftButton, CAMERA, ROTATE);
 	setMouseBinding(Qt::RightButton, CAMERA, TRANSLATE);
 	camera()->frame()->setWheelSensitivity(-1.0f);
@@ -62,7 +62,7 @@ void GLViewer::mouseMovesCamera()
 void GLViewer::mouseMovesManipulatedFrame(qglviewer::Constraint* c)
 {
 	setMouseBinding(Qt::LeftButton + Qt::RightButton, FRAME, ZOOM);
-	setMouseBinding(Qt::MidButton, FRAME, ZOOM);
+	setMouseBinding(Qt::MiddleButton, FRAME, ZOOM);
 	setMouseBinding(Qt::LeftButton, FRAME, ROTATE);
 	setMouseBinding(Qt::RightButton, FRAME, TRANSLATE);
 	setWheelBinding(Qt::NoModifier, FRAME, ZOOM);
