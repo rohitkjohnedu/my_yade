@@ -185,7 +185,6 @@ def configure(): # calling this function will import mpi4py.MPI,
 	worldComm = MPI.COMM_WORLD
 	color = 3; key =0;
 	comm = worldComm.Split(color, key)  # if OFOAM coupled, split communicator
-
 	comm_slave = comm.Get_parent()
 	if comm_slave!=MPI.COMM_NULL: 	# if executor is a spawned worker merge comm with master 
 		comm=comm_slave.Merge()
@@ -205,7 +204,8 @@ def disconnect():
 	The scene in master thread is left unchanged. 
 	'''
 	
-	global comm,comm_slave
+	global comm,comm_slave,numThreads
+	if comm==None: return #not connected
 	if rank==0: # exit the interactive mode on master _after_ telling workers to exit
 		wprint("sending exit command")
 		sendCommand(executors="slaves",command="exit",wait=False)
@@ -216,7 +216,7 @@ def disconnect():
 		comm.Free() 
 		if comm_slave:
 			comm_slave.Disconnect()
-		else:
+		elif rank>0:
 			mprint("please report bug in mpy.disconnect()")
 		if rank>0: # kill workers
 			exit
@@ -224,50 +224,65 @@ def disconnect():
 		mprint("mpy already disconnected")
 	comm=None
 	comm_slave=None
+	numThreads=None
 	yade.runtime.opts.mpi_mode=False
+	
+def makeMpiArgv():
+		stack = inspect.stack()
+		interactive=False
+		yadeArgv = sys.yade_argv.copy() # the arguments to be passed to workers
+		if '--check' in yadeArgv: yadeArgv.remove("--check") # escape this since the check scripts will be called from master thread already
+		if '--checkall' in yadeArgv: yadeArgv.remove("--checkall")
+		
+		# 'mpy.py' will be the caller in first N lines, followed by a py script or some interactive command
+		# we search backward the first line where caller is not mpy.py to identify the script calling initialize
+		# in a way to handle execfiled scripts (e.g. yade --check)
+		lastCalledScript = ""
+		searchDepth=6
+		for line in range(searchDepth):
+			if stack[line][3]=='run_code':  # we are in interactive shell, no script to run 
+					interactive = True
+					break
+			for kArg in range(1,len(stack[line])):
+				if str(stack[line][kArg])[-3:]=='.py':
+					if str(stack[line][kArg])[-6:]=='mpy.py': break # jump to next line in the stack
+					else: lastCalledScript = stack[line][kArg]
+			if  lastCalledScript != "": break
+		
+		if  lastCalledScript != "":
+			kArg=1
+			while kArg<len(yadeArgv):  
+				if yadeArgv[kArg][-3:]=='.py':
+					yadeArgv[kArg]=lastCalledScript
+					break
+				kArg+=1
+			if kArg==len(yadeArgv): # yadeArgv empty of any script => execfiled from python shell
+				yadeArgv.append(lastCalledScript)
+		return yadeArgv,interactive
 
 def initialize(np):
-	global comm,comm_slave,rank,numThreads,userScriptInCheckList,colorScale
+	global comm,comm_slave,rank,numThreads,userScriptInCheckList,colorScale,waitingCommands
+	if (comm!=None and rank==0):
+		wprint("disconnecting before initialize");
+		disconnect() # reset to virgin context
 	if comm==None: configure() # should only happen after a despawn
 	process_count = comm.Get_size()
-
-	if(process_count<np):
-		#TODO: if process_count>numThreads, free some workers
-		# HACK 1: this is to detect when we run regression tests and prevent mpirun to enter a parallel testing spree
-		if(("--check" in sys.yade_argv) or ("--checkall" in sys.yade_argv)):
-			userScriptInCheckList=inspect.stack()[2][1]
-		# END HACK 1 (continued below)
-		
-		# HACK 2:
-		yadeArgv = sys.yade_argv.copy()
-		if yadeArgv.count("yadeSphinx.py"):
-			# yadeSphinx.py itself must not run parallel (only examples in it may run parallel), remove it from argv so workers will not run it
-			# they will wait after being initialized, responding to messages sent trhough ipython directives within *.rst source
-			yadeArgv.remove("yadeSphinx.py")
-			# suppress (harmless?) messages on newer versions of linux (docker specific) - https://github.com/open-mpi/ompi/issues/4948
-			#os.environ['OMPI_MCA_btl_vader_single_copy_mechanism']='none'
-		# END HACK 2
-		
+	if rank==0: # MASTER
+		yadeArgv,waitingCommands = makeMpiArgv()		
 		numThreads=np
 		colorScale= makeColorScale(numThreads)
 		
-		if not yade.runtime.opts.mpi_mode: #MASTER only, the workers will be already in mpi_mode
-			mprint("will spawn ",numThreads-process_count," workers")
-			if (userScriptInCheckList==""): #normal case
-				comm_slave = MPI.COMM_WORLD.Spawn(yadeArgv[0], args=yadeArgv[1:],maxprocs=numThreads-process_count)
-			else: #HACK 1 (continued) handle execution by checkList.py, otherwise would we run checkList.py in parallel
-				#os.environ['OMPI_MCA_btl_vader_single_copy_mechanism']='none' # suppress (harmless?) messages on newer versions of linux (docker specific)
-				comm_slave = MPI.COMM_WORLD.Spawn(sys.yade_argv[0], args=[userScriptInCheckList],maxprocs=numThreads-process_count)
-			comm = comm_slave.Merge()
-			yade.runtime.opts.mpi_mode=True
-			rank=0
-		else:	#WORKERS
-			mprint("spawned")
-		#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
-		O.subD=Subdomain() #for storage and comm only, this one will not be used beyond that 
-		O.subD.comm = comm
-	else:
-		if rank==0: yade.runtime.opts.mpi_mode=True #since if we started without mpiexec it is initialized to False
+		mprint("will spawn ",numThreads-process_count," workers running:",yadeArgv[0], yadeArgv[1:])
+		comm_slave = MPI.COMM_WORLD.Spawn(yadeArgv[0], args=yadeArgv[1:],maxprocs=numThreads-process_count)
+		comm = comm_slave.Merge()
+		yade.runtime.opts.mpi_mode=True
+	
+	else:	#WORKERS
+		wprint("spawned")
+	#initialize subdomains. For Master it will be used storage and comm only, for workers it will be over-written in the split operation
+	O.subD=Subdomain() 
+	O.subD.comm = comm
+
 	return rank,numThreads
 
 def spawnedProcessWaitCommand():
@@ -1142,25 +1157,15 @@ def mpirun(nSteps,np=None,withMerge=False):
 		O.run(nSteps,True)
 		return
 	
-	# DIRTY HACK: this is to detect when we run regression tests and prevent mpirun to enter a parallel testing spree
-	#stack=inspect.stack()
-	#global userScriptInCheckList
-	#if len(stack[3][1])>12 and stack[3][1][-12:]=="checkList.py":
-		#userScriptInCheckList=stack[1][1]
-	caller_name = inspect.stack()[2][3]
-	#mprint("stack", stack)
-	
-	if (np>numThreads):  
-		if numThreads==1: initialize(np) #this will set numThreads
-		else: mprint("number of mpy cores can't be increased when already initialized")
-	# if the caller is the user's script, everyone already calls mpirun and the workers are not waiting for a command.
-	# if the caller is 'sendCommand', then assume the workers are also being sent the mpirun command, no need to trigger them
-	if(rank==0 and not caller_name=='execfile' and not caller_name=='sendCommand'):
-		waitingCommands=True
+	if (np!=numThreads): 
+		if numThreads != None:
+			mprint("warning: it is unsafe to change numThreads in consecutive executions of mpy.initialize/mpirun. In general it needs explicit disconnect() and rebuilding a scene in between.")
+		initialize(np) #this will set numThreads
+
+	if(rank==0 and waitingCommands):
 		for w in range(1,numThreads):
 			comm.send("yade.mpy.mpirun(nSteps="+str(nSteps)+",withMerge="+str(withMerge)+")",dest=w,tag=_MASTER_COMMAND_)
-			wprint("Command sent to ",w)
-	
+			wprint("mpirun command sent to ",w)	
 	
 	if FLUID_COUPLING:
 		fluidCoupling = typedEngine("FoamCoupling") 
