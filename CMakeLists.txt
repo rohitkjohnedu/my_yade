@@ -196,6 +196,10 @@ ENDIF(ENABLE_LOGGER)
 
 ADD_DEFINITIONS("-DMAX_LOG_LEVEL=${MAX_LOG_LEVEL}")
 
+#=====================================================================
+#= Detection of library and architecture versions for libVersions ====
+#=====================================================================
+INCLUDE(FindMissingVersions)
 #==================================
 #====== *** PYTHON/BOOST *** ======
 #==================================
@@ -1023,10 +1027,6 @@ ENDIF(COINUTILS_VERSION VERSION_LESS 2.11.3)
 ELSE(ENABLE_POTENTIAL_BLOCKS)
   SET(DISABLED_FEATS "${DISABLED_FEATS} PotentialBlocks")
 ENDIF(ENABLE_POTENTIAL_BLOCKS)
-#===========================================================
-#= Forced detection of library versions for libVersions ====
-#===========================================================
-INCLUDE(FindMissingVersions)
 #===========================================================
 
 IF (INSTALL_PREFIX)

@@ -3,6 +3,21 @@
 # The only way to determine version is by reading the actual source files.
 # I do this by checking their md5sum.
 
+# This doesn't work inside docker. Because uname -m returns parent architectuure, not the docker one.
+# if(CMAKE_VERSION VERSION_LESS "3.17.0") # https://stackoverflow.com/questions/11944060/how-to-detect-target-architecture-using-cmake
+#     EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+# else()                                  # https://cmake.org/cmake/help/latest/variable/CMAKE_HOST_SYSTEM_PROCESSOR.html  - new cmake version calls uname -m natively
+#     set(ARCHITECTURE CMAKE_HOST_SYSTEM_PROCESSOR)
+# endif()
+
+# So let's use dpkg. A very simple and efficient method....
+EXECUTE_PROCESS( COMMAND /usr/bin/dpkg --print-architecture COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
+if (NOT ARCHITECTURE) # .... which doesn't work on other linux distributions. So someone might want to fix this later.
+            set(ARCHITECTURE "unknown")
+endif()
+
+message( STATUS "Architecture: ${ARCHITECTURE}" )
+
 ##################################################################################
 ##### Find version of freeglut by reading md5sum of include/GL/freeglut_std.h
 ##### I have downloaded all available freeglut versions and did on them: 
