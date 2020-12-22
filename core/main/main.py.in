@@ -358,12 +358,11 @@ def userSession(gui='none',qapp=None):
 				mp.waitingCommands=True
 				ipshell()
 			mp.disconnect()
-			mp.MPI.Finalize()
 		else:
 			# after the script execution, never exit directly. Instead, wait a command from master to do so.
 			# We do this even in non-interactive mode, in that case the wait process is spawned just long enough to receive the 'disconnect' instruction from master
 			mp.spawnedProcessWaitCommand()
-			mp.MPI.Finalize()
+		mp.MPI.Finalize()
 
 ## run userSession in a way corresponding to the features we use:
 gui=None
