@@ -66,6 +66,7 @@ VERBOSE_OUTPUT=False
 NO_OUTPUT=False
 COLOR_OUTPUT=True # color mprint output per rank / turn off here for sphinx build mainly
 MAX_RANK_OUTPUT=5 #: larger ranks will be skipped in mprint
+TIMEOUT = 5 # after this delay self-kill, so we don't leave the OS with nasty orphan processes
 SEND_SHAPES=False #if false only bodies' states are communicated between threads, else shapes as well (to be implemented)
 ERASE_REMOTE = True # True is MANDATORY. Erase bodies not interacting wit a given subdomain? else keep dead clones of all bodies in each scene
 ERASE_REMOTE_MASTER = True # erase remotes on master or keep them for fast merge (updating just b.state)
@@ -276,6 +277,8 @@ def initialize(np):
 		comm_slave = MPI.COMM_WORLD.Spawn(yadeArgv[0], args=yadeArgv[1:],maxprocs=numThreads-process_count)
 		comm = comm_slave.Merge()
 		yade.runtime.opts.mpi_mode=True
+		if waitingCommands:
+			declareMasterInteractive() #in interactive session tell the workers to ignore timeout
 	
 	else:	#WORKERS
 		wprint("spawned")
@@ -293,8 +296,15 @@ def spawnedProcessWaitCommand():
 	waitingCommands = True
 	s=MPI.Status()
 	while 1:
-		while not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
+		maxTime = time.time()+TIMEOUT
+		waitTime=0
+		while (TIMEOUT==0 or waitTime<maxTime) and not comm.Iprobe(source=MPI.ANY_SOURCE, tag=_MASTER_COMMAND_, status=s):
 			time.sleep(0.001)
+			waitTime=time.time()
+		if TIMEOUT!=0 and waitTime>=maxTime:
+			mprint("orphan yade worker disconnecting")
+			break
+
 		command = comm.recv(source=s.source,tag=_MASTER_COMMAND_)
 		if command=="exit": #this is to terminate the waiting loop remotely
 			comm.send(0,dest=s.source,tag=_RETURN_VALUE_)
@@ -308,7 +318,17 @@ def spawnedProcessWaitCommand():
 			raise
 	waitingCommands = False
 	disconnect() # this will kill the workers
-		
+	
+def declareMasterInteractive():
+	'''
+	This is to signal that we are in interactive session, so TIMEOUT will be reset to 0 (ignored)
+	'''
+	global TIMEOUT
+	TIMEOUT = 0
+	if rank==0:
+		waitingCommands=True
+	sendCommand("slaves","sys.modules['yade.mpy'].TIMEOUT=0",False)
+
 def sendCommand(executors,command,wait=True,workerToWorker=False):
 	'''
 	Send a command to a worker (or list of) from master or from another worker. Accepted executors are "i", "[i,j,k]", "slaves", "all" (then even master will execute the command).
@@ -347,6 +367,7 @@ def sendCommand(executors,command,wait=True,workerToWorker=False):
 		wprint("sendCommand returned in "+str(time.time()-start)+" s")
 		return (resCommand if argIsList else resCommand[0])
 	else:
+		for r in reqs: r.wait() # make sure everything has been sent
 		return None
 
 
@@ -1158,7 +1179,7 @@ def mpirun(nSteps,np=None,withMerge=False):
 		return
 	
 	if (np!=numThreads): 
-		if numThreads != None:
+		if numThreads >1:
 			mprint("warning: it is unsafe to change numThreads in consecutive executions of mpy.initialize/mpirun. In general it needs explicit disconnect() and rebuilding a scene in between.")
 		initialize(np) #this will set numThreads
 
