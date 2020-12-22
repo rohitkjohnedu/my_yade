@@ -117,12 +117,16 @@ stages:
         "c6pak") echo "19" ;;
         "y7pak") echo "16" ;;
         "c7pak") echo "16" ;;
+        "y8pak") echo "5"  ;;
+        "c8pak") echo "5"  ;;
+        "y9pak") echo "5"  ;;
+        "c9pak") echo "5"  ;;
         "yade-runner") echo "12" ;;
         "yade-runner-01") echo "1" ;;
         *) echo "8";;
         esac)
     - echo $JOBSNUM
-    - if [[ ${CI_RUNNER_DESCRIPTION} == "y8pak" || ${CI_RUNNER_DESCRIPTION} == "c8pak" ]] ; then export MAX_CCACHE="500.0G"; else export MAX_CCACHE="200.0G"; fi
+    - if [[ ${CI_RUNNER_DESCRIPTION} == "y8pak" || ${CI_RUNNER_DESCRIPTION} == "c8pak" || ${CI_RUNNER_DESCRIPTION} == "y9pak" || ${CI_RUNNER_DESCRIPTION} == "c9pak" ]] ; then export MAX_CCACHE="500.0G"; else export MAX_CCACHE="200.0G"; fi
     - echo "max_size = ${MAX_CCACHE}" > ~/.ccache/ccache.conf
     - ccache -s
     - echo $SKIP_TEST
@@ -802,6 +806,10 @@ pages:
         "c6pak") echo "12" ;;
         "y7pak") echo "10" ;;
         "c7pak") echo "10" ;;
+        "y8pak") echo "5" ;;
+        "c8pak") echo "5" ;;
+        "y9pak") echo "5" ;;
+        "c9pak") echo "5" ;;
         "yade-runner") echo "12" ;;
         "yade-runner-01") echo "1" ;;
         *) echo "8";;
