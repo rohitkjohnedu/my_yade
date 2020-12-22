@@ -8,6 +8,7 @@
 # Configure MPI module if needed
 numThreads=4
 from yade import mpy as mp
+#mp.disconnect()
 if numThreads>1:
     mp.DOMAIN_DECOMPOSITION =True
     mp.ACCUMULATE_FORCES=False
@@ -142,3 +143,4 @@ if mp.rank==0:
         mp.mprint("Parallel MPI silo -N4 succeeds")
     else:
         raise YadeCheckError("Parallel MPI silo -N4 fails")
+    mp.disconnect()

@@ -1,11 +1,12 @@
-
+import time
+import numpy
 if 'MPI' in yade.config.features:
-    import time
-    import numpy
+   
 
     try:
         from yade import mpy as mp
         mp.initialize(2)
+        if mp.rank>0: mp.mprint("spawned!")
     except:
         raise YadeCheckError("Error in initializing mpy ")
 
@@ -54,3 +55,9 @@ if 'MPI' in yade.config.features:
             print("1e4 integers in a python array:",dt2/numTrial)
     except:
         raise YadeCheckError("Error in some MPI4PY communications")
+
+    try:
+        if mp.rank==0:
+            mp.disconnect()
+    except:
+        raise YadeCheckError("Error in disconnecting mpy ")
