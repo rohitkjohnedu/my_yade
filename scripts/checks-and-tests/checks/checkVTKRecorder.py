@@ -90,7 +90,7 @@ if ('VTK' in features):
 			if(t1[0]=='        <DataArray type=' and t2[0]=='        <DataArray type='):
 				if(t1[3]==t2[3]):
 					section=t1[3]
-					print("checking section: ", section, ("(non-matching lines allowed)" if (section in toSkip) else ""))
+					#print("checking section: ", section, ("(non-matching lines allowed)" if (section in toSkip) else ""))
 				else:
 					raise YadeCheckError("checkVTKRecorder cannot determine section name in file "+fname+" line: "+str(lineCount)+" with lines: \n"+line1+"\nvs.\n"+line2)
 			if(t1[0]=='<VTKFile type='): isHeader=True # various VTK versions have different headers.
