@@ -14,7 +14,9 @@ failedScripts=list()
 maxElapsedTime=0
 
 #some scripts are singleCore only because of required 100% reproducibility
+
 singleCore= ['checkVTKRecorder.py' ,'checkPotentialVTKRecorders.py' ,'checkJCFpm.py' ,'checkPolyhedraCrush.py' ,'checkColliderCorrectness.py' ,'checkColliderConstantness.py']
+
 
 #some scripts take longer than 30 seconds. Let's allow them, but only with yade --checkall
 slowScripts= ['checkClumpHopper.py']
