@@ -23,6 +23,7 @@ if numThreads>1:
     mp.YADE_TIMING=False
     mp.VERBOSE_OUTPUT=True
     mp.ERASE_REMOTE=True  #needed if checkMPI.py made it False?
+    mp.TIMEOUT=60
 else:     
     O.timingEnabled=True
 
