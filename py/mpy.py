@@ -227,6 +227,8 @@ def disconnect():
 	comm_slave=None
 	numThreads=None
 	yade.runtime.opts.mpi_mode=False
+	O.splittedOnce=False
+	O.splitted=False
 	
 def makeMpiArgv():
 		stack = inspect.stack()
@@ -263,10 +265,11 @@ def makeMpiArgv():
 
 def initialize(np):
 	global comm,comm_slave,rank,numThreads,userScriptInCheckList,colorScale,waitingCommands
-	if (comm!=None and rank==0):
-		wprint("disconnecting before initialize");
-		disconnect() # reset to virgin context
-	if comm==None: configure() # should only happen after a despawn
+	if (comm!=None and yade.runtime.opts.mpi_mode==True):
+		if rank==0: disconnect() # reset to virgin context
+		else: exit # kill myself, I'm part of deprecated pool
+	if comm==None:
+		configure() # should only happen after a despawn
 	process_count = comm.Get_size()
 	if rank==0: # MASTER
 		yadeArgv,waitingCommands = makeMpiArgv()		
