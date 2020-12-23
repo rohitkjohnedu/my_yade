@@ -309,9 +309,9 @@ and the output:
 	Running script testInit.py
 	Master: before initialize: rank  0 / 1 ;  100  bodies 
 	Master: will spawn  1  workers 
-	Master: after initialize: rank  0 / 4 ;  100  bodies 
-	Worker1: before initialize: rank  2 / 4 ;  100  bodies 
-	Worker1: after initialize: rank  2 / 4 ;  100  bodies 
+	Master: after initialize: rank  0 / 2 ;  100  bodies 
+	Worker1: before initialize: rank  1 / 2 ;  100  bodies 
+	Worker1: after initialize: rank  1 / 2 ;  100  bodies 
 
 
 
