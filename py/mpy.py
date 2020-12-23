@@ -1071,7 +1071,7 @@ def updateAllIntersections():
 			for req in reqs:
 				intrs=req[1].wait()
 				if SEND_BYTEARRAYS:
-					wprint("Received mirrors from: ", req[0], " : ",np.frombuffer(intrs,dtype=np.int32))
+					wprint("Received mirrors from: ", req[0], " : ",int(len(intrs)/4))
 					O.bufferFromIntrsct(subD,req[0],int(len(intrs)/4),True)[:]=intrs
 					intrs=np.frombuffer(intrs,dtype=np.int32)
 				else:
