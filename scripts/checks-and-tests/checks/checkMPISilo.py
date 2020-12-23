@@ -21,6 +21,8 @@ if numThreads>1:
     mp.VERBOSE_OUTPUT=False
     mp.SEND_BYTEARRAYS=True
     mp.YADE_TIMING=False
+    mp.VERBOSE_OUTPUT=True
+    mp.ERASE_REMOTE=True  #needed if checkMPI.py made it False?
 else:     
     O.timingEnabled=True
 
