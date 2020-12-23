@@ -38,7 +38,7 @@ granularMaterial='M1'
 #granularMaterial='M2'
 
 if mp.rank==0:
-	print("Note: this test may take a minute or more, if too long for you add it to 'skipScripts' in checkList.py")
+    print("Note: this test may take a minute or more, if too long for you add it to 'skipScripts' in checkList.py")
     Steel = O.materials.append(FrictMat(young=0.1e-2,poisson=0.2,density=7200e-12,label='Steel'))
     e_M1_M2=0.45;	f_M1_M2=0.2
     e_M1_M1=0.5;	f_M1_M1=0.3
