@@ -1032,7 +1032,7 @@ def updateAllIntersections():
 		else:
 			# from master
 			b_ids=comm.recv(source=0, tag=_MIRROR_INTERSECTIONS_)
-			wprint("Received mirrors from master: ",b_ids)
+			wprint("Received mirrors from master: ",len(b_ids))
 			#FIXME: we are assuming that Body::id_t is 4 bytes here, not that portable...
 			numInts0= int(len(b_ids)/4) if SEND_BYTEARRAYS else len(b_ids)  #ints = 4 bytes
 			
