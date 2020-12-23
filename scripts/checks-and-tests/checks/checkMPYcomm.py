@@ -48,10 +48,13 @@ if 'MPI' in yade.config.features:
         newSizes = mp.sendCommand(executors="slaves",command="len(O.bodies)",wait=True)
         if newSizes != [0, 0, 0, 0, 0, 0, 0]:
             raise YadeCheckError("dirty scenes after a reconnexion")
-
-        mp.disconnect()
     
     elif mp.rank==None:
         raise YadeCheckError("uninitialized mpi rank")
 
- 
+    if mp.rank==0:
+        try:
+            mp.mprint("MPYcomm disconnect")
+            mp.disconnect()
+        except:
+            raise YadeCheckError("Error in disconnecting mpy ")
