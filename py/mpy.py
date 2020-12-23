@@ -212,9 +212,18 @@ def disconnect():
 		sendCommand(executors="slaves",command="exit",wait=False)
 	if comm:
 		wprint("disconnecting")
-		 # should be a Disconnect(), no a Free(), but we have an issue with openmpi it seems
+		 # (1) should be a Disconnect(), no a Free(), but we have an issue with openmpi it seems
 		 # https://bitbucket.org/mpi4py/mpi4py/issues/176/disconnect-hangs-with-openmp31-python-38
-		comm.Free() 
+		 # (2) for some reason even comm.Free() causes trouble: multiple parallel scripts can be 
+		 # chained in 'yade --check' after free(), but not all of them. Ultimately it crashes like this on checkMPISilo.py (unbuntu20.04):
+		 # Signal: Segmentation fault (11)
+		 # Signal code: Address not mapped (1)
+		 # Failing at address: 0x49
+		 # [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x46210)[0x7ff3982d3210]
+		 # [ 1] /usr/lib/x86_64-linux-gnu/openmpi/lib/openmpi3/mca_pml_ob1.so(mca_pml_ob1_add_comm+0x169)[0x7ff378060789]
+		 # commenting out "Free()" seems to workaround, so let it be. Unclear if it is a bug here or an issue with openmpi
+		
+		#comm.Free() 
 		if comm_slave:
 			comm_slave.Disconnect()
 		elif rank>0:
@@ -272,7 +281,7 @@ def initialize(np):
 		configure() # should only happen after a despawn
 	process_count = comm.Get_size()
 	if rank==0: # MASTER
-		yadeArgv,waitingCommands = makeMpiArgv()		
+		yadeArgv,waitingCommands = makeMpiArgv()
 		numThreads=np
 		colorScale= makeColorScale(numThreads)
 		
