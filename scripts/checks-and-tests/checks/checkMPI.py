@@ -7,7 +7,7 @@
 # v1 is usually fine, but for some reason the pipeline doesn't like it either
 
 
-if 'MPI' in yade.config.features and yade.libVersions.getAllVersionsCpp()['mpi'][0][0]==3:
+if 'MPI' in yade.config.features and yade.libVersions.getAllVersionsCpp()['mpi'][0][0]>=3:
 		
 	NSTEPS=100 #turn it >0 to see time iterations, else only initilization TODO!HACK
 	#NSTEPS=50 #turn it >0 to see time iterations, else only initilization
@@ -71,8 +71,12 @@ if 'MPI' in yade.config.features and yade.libVersions.getAllVersionsCpp()['mpi']
 		Ek=kineticEnergy()
 		mp.mprint("got Ek=",Ek)
 		refEk=1120803.9955506378
+		refForce=-5896308.29096195
 		if (abs(Ek-refEk)/refEk)>1e-10:
 			raise YadeCheckError("kinetic energy changed by"+str((Ek-refEk)/refEk))
+		if (abs(O.forces.f(WALL_ID)[1]-refForce)/refForce)>1e-10:
+			raise YadeCheckError("force on wall changed by"+str(abs(O.forces.f(WALL_ID)[1]-refForce)/refForce))
+		mp.disconnect()
 else:
-	print("checkMPI.py only tested against openmpi3")
+	print("checkMPI.py only tested if openmpi version>=3 and MPI is enabled")
 
