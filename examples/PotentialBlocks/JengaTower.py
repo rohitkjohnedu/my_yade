@@ -1,18 +1,20 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # 2020 (c) Vasileios Angelidakis <v.angelidakis2@ncl.ac.uk>
 
 # Collapse of a zero-porosity packing of cuboidal blocks in a Jenga-like tower, using the Potential Blocks.
 
+recordVTK=False
 # ────────────────────────────────────────────────────────────────────────────────────────────────────────── #
-# Create vtk directory
-import os
-import errno
-try:
-	os.mkdir('./vtk/')
-except OSError as exc:
-	if exc.errno != errno.EEXIST:
-		raise
-	pass
+if recordVTK:
+	# Create vtk directory
+	import os
+	import errno
+	try:
+		os.mkdir('./vtk/')
+	except OSError as exc:
+		if exc.errno != errno.EEXIST:
+			raise
+		pass
 
 # ────────────────────────────────────────────────────────────────────────────────────────────────────────── #
 # Contact stiffnesses and Engines
@@ -32,7 +34,6 @@ O.engines=[
 		[Law2_SCG_KnKsPBPhys_KnKsPBLaw(initialOverlapDistance=init,allowViscousAttraction=False,label='law')]
 	),
 	NewtonIntegrator(damping=0.1,exactAsphericalRot=True,gravity=[0,0,-9.81],label='newton'),
-#	SnapshotEngine(iterPeriod=100,fileBase='vtk/jenga-',firstIterRun=10,label='snapshooter'),
 ]
 
 # ────────────────────────────────────────────────────────────────────────────────────────────────────────── #
@@ -123,15 +124,18 @@ def eraseFallenParticles():
 O.engines=O.engines+[PyRunner(iterPeriod=500,command='eraseFallenParticles()',dead=True,label='eFP')]
 
 # ────────────────────────────────────────────────────────────────────────────────────────────────────────── #
-# Export VTK results
-from yade import export
-vtkExporter = export.VTKExporter('./vtk/jengaTowerExample')
+if recordVTK:
+	# Take snapshots
+#	O.engines=O.engines+[SnapshotEngine(iterPeriod=100,fileBase='vtk/jenga-',firstIterRun=10,label='snapshooter')]
 
-def vtkExport():
-	vtkExporter.exportPotentialBlocks(what=dict(n='b.id'))
+	# Export VTK results
+	from yade import export
+	vtkExporter = export.VTKExporter('./vtk/jengaTowerExample')
 
-O.engines=O.engines+[PyRunner(iterPeriod=500,command='vtkExport()')]
+	def vtkExport():
+		vtkExporter.exportPotentialBlocks(what=dict(n='b.id'))
 
+	O.engines=O.engines+[PyRunner(iterPeriod=500,command='vtkExport()')]
 
 # ────────────────────────────────────────────────────────────────────────────────────────────────────────── #
 O.saveTmp()
