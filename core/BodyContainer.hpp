@@ -42,6 +42,7 @@ class InteractionContainer;
 /*
 Container of bodies implemented as flat std::vector.
 The iterator will silently skip null body pointers which may exist after removal. The null pointers can still be accessed via the [] operator.
+When the container is sparse (after erasing bodies or mpi decomposition) the container supports redirection, i.e. looping on the indices of the non-void elements of the container (realBodies) rather than on elements of the container. This is integrated in the above YADE_PARALLEL_FOREACH macros.
 
 Any alternative implementation should use the same API.
 */
@@ -82,7 +83,7 @@ public:
 		((vector<Body::id_t>,insertedBodies,vector<Body::id_t>(),Attr::readonly,"The list of newly bodies inserted, to be used and purged by collider"))
 		((vector<Body::id_t>,realBodies,vector<Body::id_t>(),Attr::readonly,"Redirection vector to non-null bodies, used to optimize loops after numerous insertion/erase. In MPI runs the list is restricted to bodies and neighbors present in current subdomain."))
 		((bool,useRedirection,false,,"true if the scene uses up-to-date lists for boundedBodies and realBodies; turned true automatically 1/ after removal of bodies if :yref:`enableRedirection=True <BodyContainer.enableRedirection>`, and 2/ in MPI execution. |yupdate|"))
-		((bool,enableRedirection,false,,"let collider switch to optimized algorithm with body redirection when bodies are erased - false by default, because it can cause crashes, see `issue 172 <https://gitlab.com/yade-dev/trunk/-/issues/172>`_"))
+		((bool,enableRedirection,true,,"let collider switch to optimized algorithm with body redirection when bodies are erased - true by default"))
 		#ifdef YADE_MPI
 		((vector<Body::id_t>,subdomainBodies,vector<Body::id_t>(),,"The list of bounded bodies in the subdomain"))
 		#endif
