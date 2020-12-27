@@ -1713,7 +1713,7 @@ try {
 	                &pyBodyContainer::setEnableRedirection,
 			// FIXME: the same docstring is in two places. But only one is used in docs, py/wrapper/yadeWrapper.cpp and core/BodyContainer.hpp
 			// see https://gitlab.com/yade-dev/trunk/-/issues/173
-	                "let collider switch to optimized algorithm with body redirection when bodies are erased - false by default, because it can cause crashes, see `issue 172 <https://gitlab.com/yade-dev/trunk/-/issues/172>`_");
+	                "let collider switch to optimized algorithm with body redirection when bodies are erased - true by default");
 	py::class_<pyBodyIterator>("BodyIterator", py::init<pyBodyIterator&>())
 	        .def("__iter__", &pyBodyIterator::pyIter)
 	        .def("__next__", &pyBodyIterator::pyNext);
