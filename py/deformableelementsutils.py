@@ -19,7 +19,7 @@ from yade.minieigenHP import *
 
 # c++ implementations for performance reasons
 from yade._utils import *
-from yade.utils import _commonBodySetup
+from yade.utils import _commonBodySetup, randomColor
 
 #Deformable Element Node
 def node(center,radius,dynamic=None,fixed=True,wire=False,color=None,highlight=False,material=-1,mask=1):
@@ -98,10 +98,6 @@ def node(center,radius,dynamic=None,fixed=True,wire=False,color=None,highlight=F
 	b.mask=mask
 	b.bounded=True
 	return b
-
-def randomColor():
-	"""Return random Vector3 with each component in interval 0…1 (uniform distribution)"""
-	return Vector3(random.random(),random.random(),random.random())
 
 # Meshing
 def clear_mesh(gmshmeshhandle_):

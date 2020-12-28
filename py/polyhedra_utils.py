@@ -18,12 +18,7 @@ except ImportError: pass
 
 # c++ implementations for performance reasons
 from yade._polyhedra_utils import *
-
-#**********************************************************************************
-def randomColor(seed=None):
-	random.seed(seed);
-	#Return random Vector3 with each component in interval 0...1 (uniform distribution)
-	return Vector3(random.random(),random.random(),random.random())
+from yade.utils import randomColor
 
 #**********************************************************************************
 #create polyhedra, one can specify vertices directly, or leave it empty for random shape
