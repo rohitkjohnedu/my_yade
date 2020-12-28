@@ -14,16 +14,25 @@ failedScripts=list()
 maxElapsedTime=0
 
 #some scripts are singleCore only because of required 100% reproducibility
-
-singleCore= ['checkVTKRecorder.py' ,'checkPotentialVTKRecorders.py' ,'checkJCFpm.py' ,'checkPolyhedraCrush.py' ,'checkColliderCorrectness.py' ,'checkColliderConstantness.py']
-
+singleCore= ['checkVTKRecorder.py','checkPotentialVTKRecorders.py','checkJCFpm.py','checkPolyhedraCrush.py','checkColliderCorrectness.py','checkColliderConstantness.py']
 
 #some scripts take longer than 30 seconds. Let's allow them, but only with yade --checkall
 slowScripts= ['checkClumpHopper.py']
 
 #checkSpawn.py fails always for now, needs investigations
-skipScripts = ['checkList.py','checkSpawn.py']
+skipScripts = ['checkList.py']
 onlyOneScript = [] # use this if you want to test only one script, it takes precedence over skipScripts.
+
+
+mpiScripts= ['checkMPI.py','checkMPISilo.py','checkMPI4PYcomm.py','checkMPYcomm.py','checkSpawn.py']
+singleCore = singleCore + mpiScripts # ignore hybrid MPIxOMP
+def acceptOMPIVersion(): #filter out specific distros for MPI checks
+	# excludes ubuntu18, suze15, stretch (failed spawn with ompi v2)
+	if yade.libVersions.getAllVersionsCpp()['mpi'][0][0]==2: return False
+	# excludes bullseye (the tests suceed but despawn seem to fail -> system errors)
+	if yade.libVersions.getAllVersionsCpp()['mpi'][0][0]==3 and yade.libVersions.getAllVersionsCpp()['mpi'][0][2]>3: return False
+	return True
+if not acceptOMPIVersion(): skipScripts = skipScripts + mpiScripts
 
 def multiCore(): # multi core --check is running.
 	return ((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1'))
