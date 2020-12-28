@@ -95,8 +95,8 @@ def SpherePWaveTimeStep(radius,density,young):
 	return radius/sqrt(young/density)
 
 def randomColor(seed=None):
-	random.seed(seed);
 	"""Return random Vector3 with each component in interval 0…1 (uniform distribution)"""
+	random.seed(seed);
 	return Vector3(random.random(),random.random(),random.random())
 
 def typedEngine(name):
