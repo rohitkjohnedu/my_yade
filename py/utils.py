@@ -94,7 +94,8 @@ def SpherePWaveTimeStep(radius,density,young):
 	from math import sqrt
 	return radius/sqrt(young/density)
 
-def randomColor():
+def randomColor(seed=None):
+	random.seed(seed);
 	"""Return random Vector3 with each component in interval 0…1 (uniform distribution)"""
 	return Vector3(random.random(),random.random(),random.random())
 
