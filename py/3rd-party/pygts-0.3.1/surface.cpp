@@ -956,8 +956,7 @@ static PyObject* strip(PygtsSurface* self, PyObject* args)
 		f = (GSList*)(s->data);
 		n = g_slist_length(f);
 		for (j = 0; j < n; j++) {
-			if ((face = pygts_face_new(GTS_FACE(f->data))) == NULL) {
-			}
+			if ((face = pygts_face_new(GTS_FACE(f->data))) == NULL) { }
 			PyTuple_SET_ITEM(tuples[i], j, (PyObject*)face);
 			f = g_slist_next(f);
 		}

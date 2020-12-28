@@ -80,7 +80,7 @@ private:
 
 	// dummy function to avoid template resolution failure
 	friend class boost::serialization::access;
-	template <class ArchiveT> void serialize(ArchiveT& ar, unsigned int version) {}
+	template <class ArchiveT> void serialize(ArchiveT& ar, unsigned int version) { }
 
 public:
 	bool          synced    = true;

@@ -11,7 +11,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-CapillaryPhys1::~CapillaryPhys1() {}
+CapillaryPhys1::~CapillaryPhys1() { }
 
 YADE_PLUGIN((CapillaryPhys1));
 

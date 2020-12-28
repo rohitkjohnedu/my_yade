@@ -63,7 +63,7 @@ public:
 REGISTER_SERIALIZABLE(UnsaturatedEngine);
 YADE_PLUGIN((UnsaturatedEngine));
 
-UnsaturatedEngine::~UnsaturatedEngine() {}
+UnsaturatedEngine::~UnsaturatedEngine() { }
 
 /*void UnsaturatedEngine::initialDrainage()
 {

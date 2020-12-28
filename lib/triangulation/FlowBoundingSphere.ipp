@@ -47,7 +47,7 @@ namespace CGT {
 #ifdef XVIEW
 	Vue3D Vue1;
 #endif
-	template <class Tesselation> FlowBoundingSphere<Tesselation>::~FlowBoundingSphere() {}
+	template <class Tesselation> FlowBoundingSphere<Tesselation>::~FlowBoundingSphere() { }
 	template <class Tesselation> FlowBoundingSphere<Tesselation>::FlowBoundingSphere()
 	{
 		xMin = 1000.0, xMax = -10000.0, yMin = 1000.0, yMax = -10000.0, zMin = 1000.0, zMax = -10000.0;
@@ -548,8 +548,8 @@ namespace CGT {
 						boundPos = boundary(newCell->vertex(k)->info().id()).p[coord];
 						center   = CVector(
                                                         coord == 0 ? boundPos : center[0],
-                                                        coord == 1 ? boundPos : center[1],
-                                                        coord == 2 ? boundPos : center[2]);
+						        coord == 1 ? boundPos : center[1],
+						        coord == 2 ? boundPos : center[2]);
 					}
 				}
 			}

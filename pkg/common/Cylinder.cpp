@@ -15,9 +15,9 @@ using math::max;
 using math::min; // using inside .cpp file is ok.
 
 
-Cylinder::~Cylinder() {}
-ChainedCylinder::~ChainedCylinder() {}
-ChainedState::~ChainedState() {}
+Cylinder::~Cylinder() { }
+ChainedCylinder::~ChainedCylinder() { }
+ChainedState::~ChainedState() { }
 // Ig2_Sphere_ChainedCylinder_CylScGeom::~Ig2_Sphere_ChainedCylinder_CylScGeom() {}
 // Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D::~Ig2_ChainedCylinder_ChainedCylinder_ScGeom6D() {}
 

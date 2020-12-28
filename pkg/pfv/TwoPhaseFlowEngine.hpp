@@ -359,7 +359,7 @@ public:
 	void clusterGetFacet(PhaseCluster* cluster, CellHandle cell, int facet); //update cluster inetrfacial area and max entry radius wrt to a facet
 	void clusterGetPore(PhaseCluster* cluster, CellHandle cell);             //simple add pore to cluster, updating flags and cluster volume
 	vector<int>
-	            clusterInvadePore(PhaseCluster* cluster, CellHandle cell); //remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
+	clusterInvadePore(PhaseCluster* cluster, CellHandle cell); //remove pore from cluster, if it splits the cluster in many pieces introduce new one(s)
 	vector<int> clusterInvadePoreFast(
 	        PhaseCluster* cluster,
 	        CellHandle

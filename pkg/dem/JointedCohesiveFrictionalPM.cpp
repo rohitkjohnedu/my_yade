@@ -576,7 +576,7 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::go(const shared_ptr<Material>& b1, const s
 	/* Pass values to JCFpmPhys. In case of a "jointed" interaction, the following values will be replaced by other ones later (in few if(){} blocks)*/
 
 	// elastic properties
-	contactPhysics->kn                            = 2. * E1 * R1 * E2 * R2 / (E1 * R1 + E2 * R2);
+	contactPhysics->kn = 2. * E1 * R1 * E2 * R2 / (E1 * R1 + E2 * R2);
 	((v1 == 0) && (v2 == 0)) ? contactPhysics->ks = 0 : contactPhysics->ks = 2. * E1 * R1 * v1 * E2 * R2 * v2 / (E1 * R1 * v1 + E2 * R2 * v2);
 
 	// cohesive properties
@@ -693,6 +693,6 @@ void Ip2_JCFpmMat_JCFpmMat_JCFpmPhys::distributeCrossSectionsWeibull(shared_ptr<
 	contactPhysics->crossSection = Mathr::PI * pow(interactingRadius, 2);
 }
 
-JCFpmPhys::~JCFpmPhys() {}
+JCFpmPhys::~JCFpmPhys() { }
 
 } // namespace yade

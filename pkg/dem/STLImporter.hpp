@@ -37,7 +37,7 @@ protected:
 
 	struct Vrtx {
 		float pos[3];
-		Vrtx() {}
+		Vrtx() { }
 		Vrtx(float x, float y, float z)
 		{
 			pos[0] = x;

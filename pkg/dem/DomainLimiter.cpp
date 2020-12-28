@@ -423,9 +423,10 @@ void GlExtra_OctreeCubes::render()
 		Vector3r color
 		        = (ob.fill == -2 ? Vector3r(1, 0, 0)
 		                         : (ob.fill == -1 ? Vector3r(1, 1, 0)
-		                                          : (ob.fill == 0 ? Vector3r(0, 0, 1)
-		                                                          : (ob.fill == 1) ? Vector3r(0, 1, 0)
-		                                                                           : (ob.fill == 2) ? Vector3r(0, 1, 1) : Vector3r(1, 1, 1))));
+		                                          : (ob.fill == 0             ? Vector3r(0, 0, 1)
+		                                                     : (ob.fill == 1) ? Vector3r(0, 1, 0)
+		                                                     : (ob.fill == 2) ? Vector3r(0, 1, 1)
+		                                                                      : Vector3r(1, 1, 1))));
 		glColor3v(color);
 		glPushMatrix();
 		glTranslatev(ob.center);

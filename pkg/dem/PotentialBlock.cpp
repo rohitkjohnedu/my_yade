@@ -7,7 +7,7 @@ namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((PotentialBlock));
 
-PotentialBlock::~PotentialBlock() {}
+PotentialBlock::~PotentialBlock() { }
 
 
 void PotentialBlock::addPlaneStruct() { planeStruct.push_back(Planes()); }

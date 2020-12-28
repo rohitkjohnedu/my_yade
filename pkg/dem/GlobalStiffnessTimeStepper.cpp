@@ -31,7 +31,7 @@ using math::min; // using inside .cpp file is ok.
 CREATE_LOGGER(GlobalStiffnessTimeStepper);
 YADE_PLUGIN((GlobalStiffnessTimeStepper));
 
-GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper() {}
+GlobalStiffnessTimeStepper::~GlobalStiffnessTimeStepper() { }
 
 void GlobalStiffnessTimeStepper::findTimeStepFromBody(const shared_ptr<Body>& body, Scene* /*ncb*/)
 {

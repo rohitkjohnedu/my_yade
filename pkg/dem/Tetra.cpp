@@ -31,9 +31,9 @@ YADE_PLUGIN(/* self-contained in hpp: */ (Tetra)(TTetraGeom)(TTetraSimpleGeom)(B
 #endif
 );
 
-Tetra::~Tetra() {}
-TTetraGeom::~TTetraGeom() {}
-TTetraSimpleGeom::~TTetraSimpleGeom() {}
+Tetra::~Tetra() { }
+TTetraGeom::~TTetraGeom() { }
+TTetraSimpleGeom::~TTetraSimpleGeom() { }
 
 
 void Bo1_Tetra_Aabb::go(const shared_ptr<Shape>& ig, shared_ptr<Bound>& bv, const Se3r& se3, const Body*)

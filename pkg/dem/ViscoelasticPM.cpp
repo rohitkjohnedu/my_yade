@@ -21,10 +21,10 @@ using math::isfinite;
 YADE_PLUGIN((ViscElMat)(ViscElPhys)(Ip2_ViscElMat_ViscElMat_ViscElPhys)(Law2_ScGeom_ViscElPhys_Basic));
 
 /* ViscElMat */
-ViscElMat::~ViscElMat() {}
+ViscElMat::~ViscElMat() { }
 
 /* ViscElPhys */
-ViscElPhys::~ViscElPhys() {}
+ViscElPhys::~ViscElPhys() { }
 
 Real Ip2_ViscElMat_ViscElMat_ViscElPhys::epsilon = 1.0e-8;
 

@@ -20,7 +20,7 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((Lin4NodeTetra));
 CREATE_LOGGER(Lin4NodeTetra);
 
-Lin4NodeTetra::~Lin4NodeTetra() {}
+Lin4NodeTetra::~Lin4NodeTetra() { }
 void     Lin4NodeTetra::initialize(void) { maxNodeCount = 4; }
 MatrixXr Lin4NodeTetra::calculateMassMatrix(Real density, Real v)
 {

@@ -19,7 +19,7 @@ namespace yade { // Cannot have #include directive inside.
 CREATE_LOGGER(PartialSatClayEngine);
 YADE_PLUGIN((PartialSatClayEngine));
 
-PartialSatClayEngine::~PartialSatClayEngine() {}
+PartialSatClayEngine::~PartialSatClayEngine() { }
 
 // clang-format off
 void PartialSatClayEngine::action()

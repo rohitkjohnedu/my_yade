@@ -24,7 +24,7 @@ void observer::operator()(const stateVector& x, Real t) const
 //! Integrator's pseudo-ctor (factory), taking nested lists of slave engines (might be moved to real ctor perhaps)
 
 
-void Integrator::action() {}
+void Integrator::action() { }
 
 void Integrator::system(const stateVector& currentstates, stateVector& derivatives, Real time)
 {

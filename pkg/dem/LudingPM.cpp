@@ -9,9 +9,9 @@ namespace yade { // Cannot have #include directive inside.
 
 YADE_PLUGIN((LudingMat)(LudingPhys)(Ip2_LudingMat_LudingMat_LudingPhys)(Law2_ScGeom_LudingPhys_Basic));
 
-LudingMat::~LudingMat() {}
+LudingMat::~LudingMat() { }
 
-LudingPhys::~LudingPhys() {}
+LudingPhys::~LudingPhys() { }
 
 void Ip2_LudingMat_LudingMat_LudingPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction)
 {

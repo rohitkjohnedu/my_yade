@@ -28,7 +28,7 @@ class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys;
 CREATE_LOGGER(TriaxialCompressionEngine);
 YADE_PLUGIN((TriaxialCompressionEngine));
 
-TriaxialCompressionEngine::~TriaxialCompressionEngine() {}
+TriaxialCompressionEngine::~TriaxialCompressionEngine() { }
 
 void TriaxialCompressionEngine::doStateTransition(stateNum nextState)
 {

@@ -24,7 +24,7 @@ YADE_PLUGIN((L3Geom)(L6Geom)(Ig2_Sphere_Sphere_L3Geom)(Ig2_Wall_Sphere_L3Geom)(I
 
 );
 
-L3Geom::~L3Geom() {}
+L3Geom::~L3Geom() { }
 void L3Geom::applyLocalForceTorque(const Vector3r& localF, const Vector3r& localT, const Interaction* I, Scene* scene, NormShearPhys* nsp) const
 {
 	Vector2r foo;                               // avoid undefined ~Vector2r with clang?
@@ -51,7 +51,7 @@ void L3Geom::applyLocalForce(const Vector3r& localF, const Interaction* I, Scene
 }
 
 
-L6Geom::~L6Geom() {}
+L6Geom::~L6Geom() { }
 
 bool Ig2_Sphere_Sphere_L3Geom::go(
         const shared_ptr<Shape>&       s1,

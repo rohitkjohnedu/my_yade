@@ -63,8 +63,8 @@ public:                                                                         
 
 class Factorable {
 public:
-	Factorable() {}
-	virtual ~Factorable() {}
+	Factorable() { }
+	virtual ~Factorable() { }
 
 	virtual string getBaseClassName(unsigned int = 0) const { return ""; }
 	virtual int    getBaseClassNumber() { return 0; }

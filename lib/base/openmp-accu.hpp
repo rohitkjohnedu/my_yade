@@ -246,7 +246,7 @@ template <typename T> class OpenMPArrayAccumulator {
 	std::vector<T> data;
 
 public:
-	OpenMPArrayAccumulator() {}
+	OpenMPArrayAccumulator() { }
 	OpenMPArrayAccumulator(size_t n) { resize(n); }
 	void                        resize(size_t s) { data.resize(s, ZeroInitializer<T>()); }
 	void                        clear() { data.clear(); }

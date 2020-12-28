@@ -18,7 +18,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-DeformableElement::~DeformableElement() {}
+DeformableElement::~DeformableElement() { }
 YADE_PLUGIN((DeformableElement));
 CREATE_LOGGER(DeformableElement);
 

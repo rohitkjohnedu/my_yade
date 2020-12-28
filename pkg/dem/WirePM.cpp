@@ -343,6 +343,6 @@ void Ip2_WireMat_WireMat_WirePhys::go(const shared_ptr<Material>& b1, const shar
 	interaction->phys = contactPhysics;
 }
 
-WirePhys::~WirePhys() {}
+WirePhys::~WirePhys() { }
 
 } // namespace yade

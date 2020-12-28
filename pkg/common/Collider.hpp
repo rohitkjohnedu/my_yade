@@ -42,7 +42,7 @@ public:
 
 		Currently used from Shop::flipCell, which changes cell information for bodies.
 		*/
-	virtual void invalidatePersistentData() {}
+	virtual void invalidatePersistentData() { }
 
 	// ctor with functors for the integrated BoundDispatcher
 	virtual void pyHandleCustomCtorArgs(boost::python::tuple& t, boost::python::dict& d);

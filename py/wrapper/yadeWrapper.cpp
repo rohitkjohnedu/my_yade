@@ -1706,13 +1706,14 @@ try {
 	                "useRedirection",
 	                &pyBodyContainer::getUseRedirection,
 	                &pyBodyContainer::setUseRedirection,
-	                "true if the scene uses up-to-date lists for boundedBodies and realBodies; turned true automatically 1/ after removal of bodies if :yref:`enableRedirection=True <BodyContainer.enableRedirection>`, and 2/ in MPI execution. |yupdate|")
+	                "true if the scene uses up-to-date lists for boundedBodies and realBodies; turned true automatically 1/ after removal of bodies if "
+	                ":yref:`enableRedirection=True <BodyContainer.enableRedirection>`, and 2/ in MPI execution. |yupdate|")
 	        .add_property(
 	                "enableRedirection",
 	                &pyBodyContainer::getEnableRedirection,
 	                &pyBodyContainer::setEnableRedirection,
-			// FIXME: the same docstring is in two places. But only one is used in docs, py/wrapper/yadeWrapper.cpp and core/BodyContainer.hpp
-			// see https://gitlab.com/yade-dev/trunk/-/issues/173
+	                // FIXME: the same docstring is in two places. But only one is used in docs, py/wrapper/yadeWrapper.cpp and core/BodyContainer.hpp
+	                // see https://gitlab.com/yade-dev/trunk/-/issues/173
 	                "let collider switch to optimized algorithm with body redirection when bodies are erased - true by default");
 	py::class_<pyBodyIterator>("BodyIterator", py::init<pyBodyIterator&>())
 	        .def("__iter__", &pyBodyIterator::pyIter)

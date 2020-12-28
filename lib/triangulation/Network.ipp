@@ -25,7 +25,7 @@ namespace CGT {
 	template <class Tesselation> const int  Network<Tesselation>::permut3[3][3]       = { { 0, 1, 2 }, { 1, 2, 0 }, { 2, 0, 1 } };
 	template <class Tesselation> const int  Network<Tesselation>::permut4[4][4]       = { { 0, 1, 2, 3 }, { 1, 2, 3, 0 }, { 2, 3, 0, 1 }, { 3, 0, 1, 2 } };
 
-	template <class Tesselation> Network<Tesselation>::~Network() {}
+	template <class Tesselation> Network<Tesselation>::~Network() { }
 
 	template <class Tesselation> Network<Tesselation>::Network()
 	{

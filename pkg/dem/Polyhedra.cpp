@@ -339,7 +339,7 @@ Polyhedron Polyhedra::GetPolyhedron() const { return P; }
 //****************************************************************************************
 /* Destructor */
 
-Polyhedra::~Polyhedra() {}
+Polyhedra::~Polyhedra() { }
 
 //****************************************************************************************
 Real PolyhedraMat::GetStrength() const { return strength; };
@@ -354,7 +354,7 @@ Real PolyhedraMat::GetP() const { return Wei_P; };
 //****************************************************************************************
 /* Destructor */
 
-PolyhedraGeom::~PolyhedraGeom() {}
+PolyhedraGeom::~PolyhedraGeom() { }
 
 //****************************************************************************************
 /* AaBb overlap checker  */

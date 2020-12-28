@@ -45,7 +45,7 @@ public:
 		ttuple2vvec(aabb(), mn, mx);
 		return .5 * (mn + mx);
 	}
-	virtual ~Predicate() {}
+	virtual ~Predicate() { }
 };
 
 struct PredicateWrap : Predicate, py::wrapper<Predicate> {

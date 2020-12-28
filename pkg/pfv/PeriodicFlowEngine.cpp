@@ -38,7 +38,7 @@ public:
 		baseIndex                         = -1;
 		volumeSign                        = 0;
 	}
-	~PeriodicCellInfo(void) {}
+	~PeriodicCellInfo(void) { }
 
 	inline Real shiftedP(void) const { return isGhost ? (*_pression) + pShift() : (*_pression); }
 	inline Real pShift(void) const { return deltaP[0] * period[0] + deltaP[1] * period[1] + deltaP[2] * period[2]; }
@@ -144,7 +144,7 @@ CVector PeriodicCellInfo::gradP   = CVector();
 
 CREATE_LOGGER(PeriodicFlowEngine);
 
-PeriodicFlowEngine::~PeriodicFlowEngine() {}
+PeriodicFlowEngine::~PeriodicFlowEngine() { }
 
 void PeriodicFlowEngine::action()
 {

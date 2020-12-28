@@ -128,7 +128,7 @@ public:
 	Real                  R;
 	std::vector<TableauD> full_data; // members of full_data are the different TableauD, for different D.
 	MeniscusParameters
-	               Interpolate2(Real D, Real P, int& index1, int& index2); // does the interpolation on d* (returning no meniscus when d* > the greatest D of the file)
+	Interpolate2(Real D, Real P, int& index1, int& index2); // does the interpolation on d* (returning no meniscus when d* > the greatest D of the file)
 	std::ifstream& operator<<(std::ifstream& file);
 	Tableau();
 	Tableau(const char* filename);
@@ -140,7 +140,7 @@ class capillarylaw // class for a whole set of capillary files M(r=..)
 public:
 	capillarylaw();
 	std::vector<Tableau>
-	                   data_complete; // data_complete includes, in ascending order of r, all capillary files: each Tableau of data_complete is one capillary file
+	        data_complete; // data_complete includes, in ascending order of r, all capillary files: each Tableau of data_complete is one capillary file
 	MeniscusParameters interpolate(Real R1, Real R2, Real D, Real P, int* index);
 	void               fill(const char* filename);
 };

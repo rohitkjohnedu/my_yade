@@ -105,7 +105,7 @@ public:
 	DECLARE_LOGGER;
 
 	Omega() { LOG_DEBUG("Constructing Omega."); }
-	~Omega() {}
+	~Omega() { }
 
 	FRIEND_SINGLETON(Omega);
 	friend class pyOmega;

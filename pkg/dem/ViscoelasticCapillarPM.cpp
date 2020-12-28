@@ -11,10 +11,10 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((ViscElCapMat)(ViscElCapPhys)(Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys)(Law2_ScGeom_ViscElCapPhys_Basic));
 
 /* ViscElCapMat */
-ViscElCapMat::~ViscElCapMat() {}
+ViscElCapMat::~ViscElCapMat() { }
 
 /* ViscElCapPhys */
-ViscElCapPhys::~ViscElCapPhys() {}
+ViscElCapPhys::~ViscElCapPhys() { }
 
 /* Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys */
 void Ip2_ViscElCapMat_ViscElCapMat_ViscElCapPhys::go(const shared_ptr<Material>& b1, const shared_ptr<Material>& b2, const shared_ptr<Interaction>& interaction)

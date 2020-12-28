@@ -29,7 +29,7 @@ void GlExtraDrawer::render()
 
 bool      OpenGLRenderer::initDone = false;
 const int OpenGLRenderer::numClipPlanes;
-OpenGLRenderer::~OpenGLRenderer() {}
+OpenGLRenderer::~OpenGLRenderer() { }
 
 void OpenGLRenderer::init()
 {
@@ -490,8 +490,8 @@ void OpenGLRenderer::renderShape()
 				const Vector3r& p  = pos;
 				Vector3r        ext(
                                         viewDirection[0] > 0 ? p[0] - mn[0] : p[0] - mx[0],
-                                        viewDirection[1] > 0 ? p[1] - mn[1] : p[1] - mx[1],
-                                        viewDirection[2] > 0 ? p[2] - mn[2] : p[2] - mx[2]); // signed extents towards the camera
+				        viewDirection[1] > 0 ? p[1] - mn[1] : p[1] - mx[1],
+				        viewDirection[2] > 0 ? p[2] - mn[2] : p[2] - mx[2]); // signed extents towards the camera
 				Vector3r dr = -1.01 * (viewDirection.dot(ext) * viewDirection);
 				GLUtils::GLDrawInt(b->getId(), pos + dr, Vector3r::Ones());
 			}

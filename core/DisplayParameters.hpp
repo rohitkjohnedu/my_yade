@@ -40,8 +40,8 @@ public:
 			values[std::distance(displayTypes.begin(), I)] = value;
 		};
 	}
-	DisplayParameters() {}
-	virtual ~DisplayParameters() {}
+	DisplayParameters() { }
+	virtual ~DisplayParameters() { }
 	REGISTER_ATTRIBUTES(Serializable, (displayTypes)(values));
 	REGISTER_CLASS_AND_BASE(DisplayParameters, Serializable);
 };

@@ -420,9 +420,9 @@ bool Law2_ScGeom_CpmPhys_Cpm::go(shared_ptr<IGeom>& _geom, shared_ptr<IPhys>& _p
 	Real epsNorm = math::sqrt(math::pow(math::max(epsN - epsNPl, 0.), 2) + xi2 * epsT.squaredNorm());
 	kappaD       = math::max(epsNorm, kappaD); /* internal variable, max positive strain (non-decreasing) */
 	omega        = isCohesive ? phys->funcG(kappaD, epsCrackOnset, epsFracture, neverDamage, damLaw)
-	                   : 1.;                                              /* damage variable (non-decreasing, as funcG is also non-decreasing) */
-	sigmaN = (1 - (epsN - epsNPl > 0 ? omega : 0)) * E * (epsN - epsNPl); /* damage taken in account in tension only */
-	if ((epsSoft < 0) && (epsN - epsNPl < epsSoft)) {                     /* plastic slip in compression */
+	                          : 1.;                                             /* damage variable (non-decreasing, as funcG is also non-decreasing) */
+	sigmaN       = (1 - (epsN - epsNPl > 0 ? omega : 0)) * E * (epsN - epsNPl); /* damage taken in account in tension only */
+	if ((epsSoft < 0) && (epsN - epsNPl < epsSoft)) {                           /* plastic slip in compression */
 		Real sigmaNSoft = E * (epsSoft + relKnSoft * (epsN - epsNPl - epsSoft));
 		if (sigmaNSoft > sigmaN) { /*assert(sigmaNSoft>sigmaN);*/
 			epsNPl += (sigmaN - sigmaNSoft) / E;

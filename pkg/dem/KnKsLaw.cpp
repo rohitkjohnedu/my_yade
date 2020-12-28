@@ -221,14 +221,14 @@ bool Law2_SCG_KnKsPhys_KnKsLaw::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys>& ip,
 
 	//	const shared_ptr<Body>& b1=Body::byId(id1,scene);
 	//	const shared_ptr<Body>& b2=Body::byId(id2,scene);
-	Real mbar = (!b1->isDynamic() && b2->isDynamic())
-	        ? de2->mass
-	        : ((!b2->isDynamic() && b1->isDynamic())
-	                   ? de1->mass
-	                   : (de1->mass * de2->mass
-	                      / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
-	Real Cn_crit = 2. * sqrt(mbar * phys->kn);         // Critical damping coefficient (normal direction)
-	Real Cs_crit = 2. * sqrt(mbar * phys->ks);         // Critical damping coefficient (shear direction)
+	Real mbar    = (!b1->isDynamic() && b2->isDynamic())
+	           ? de2->mass
+	           : ((!b2->isDynamic() && b1->isDynamic())
+	                      ? de1->mass
+	                      : (de1->mass * de2->mass
+                              / (de1->mass + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
+	Real Cn_crit = 2. * sqrt(mbar * phys->kn);            // Critical damping coefficient (normal direction)
+	Real Cs_crit = 2. * sqrt(mbar * phys->ks);            // Critical damping coefficient (shear direction)
 	// Note: to compare with the analytical solution you provide cn and cs directly (since here we used a different method to define c_crit)
 	Real cn = Cn_crit * phys->viscousDamping; // Damping normal coefficient
 	Real cs = Cs_crit * phys->viscousDamping; // Damping tangential coefficient
@@ -460,7 +460,7 @@ void Ip2_FrictMat_FrictMat_KnKsPhys::go(const shared_ptr<Material>& b1, const sh
 /** KnKsPhys */
 CREATE_LOGGER(KnKsPhys);
 /* KnKsPhys */
-KnKsPhys::~KnKsPhys() {}
+KnKsPhys::~KnKsPhys() { }
 
 } // namespace yade
 

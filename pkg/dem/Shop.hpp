@@ -138,7 +138,7 @@ public:
 
 	//! Compute the stress tensor in each defined cell, return a stress tensor depth profile
 	static py::tuple
-	                 getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ);
+	getStressProfile(Real volume, int nCell, Real dz, Real zRef, vector<Real> vPartAverageX, vector<Real> vPartAverageY, vector<Real> vPartAverageZ);
 	static py::tuple getStressProfile_contact(Real volume, int nCell, Real dz, Real zRef); //same, only contact contribution
 
 	//! Compute average depth profile of particle velocity (x,y,z) and solid volume fraction. The direction may be specified by direction argument (default is z).

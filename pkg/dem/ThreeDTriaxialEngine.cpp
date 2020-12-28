@@ -26,7 +26,7 @@ class Ip2_CohFrictMat_CohFrictMat_CohFrictPhys;
 CREATE_LOGGER(ThreeDTriaxialEngine);
 YADE_PLUGIN((ThreeDTriaxialEngine));
 
-ThreeDTriaxialEngine::~ThreeDTriaxialEngine() {}
+ThreeDTriaxialEngine::~ThreeDTriaxialEngine() { }
 
 void ThreeDTriaxialEngine::action()
 {

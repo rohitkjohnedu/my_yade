@@ -31,6 +31,6 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((Body)(Bound)(Cell)(Dispatcher)(EnergyTracker)(Engine)(FileGenerator)(Functor)(GlobalEngine)(Interaction)(IGeom)(IPhys)(Material)(PartialEngine)(
         Shape)(State)(TimeStepper));
 
-EnergyTracker::~EnergyTracker() {}
+EnergyTracker::~EnergyTracker() { }
 
 } // namespace yade

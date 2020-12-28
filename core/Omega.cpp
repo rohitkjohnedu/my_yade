@@ -32,7 +32,7 @@ public:
 	        : std::lock_guard<std::mutex>(Omega::instance().renderMutex)
 	{
 	}
-	~RenderMutexLock() {}
+	~RenderMutexLock() { }
 };
 
 CREATE_LOGGER(Omega);

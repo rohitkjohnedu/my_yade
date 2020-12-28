@@ -14,7 +14,7 @@ namespace yade { // Cannot have #include directive inside.
 MarchingCube::MarchingCube() { nbTriangles = 0; }
 
 
-MarchingCube::~MarchingCube() {}
+MarchingCube::~MarchingCube() { }
 
 
 void MarchingCube::init(int sx, int sy, int sz, const Vector3r& min, const Vector3r& max)

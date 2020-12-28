@@ -17,7 +17,7 @@
 
 namespace yade { // Cannot have #include directive inside.
 
-DeformableCohesiveElement::~DeformableCohesiveElement() {}
+DeformableCohesiveElement::~DeformableCohesiveElement() { }
 YADE_PLUGIN((DeformableCohesiveElement));
 CREATE_LOGGER(DeformableCohesiveElement);
 void DeformableCohesiveElement::addPair(const shared_ptr<Body>& nodeBody1, const shared_ptr<Body>& nodeBody2)

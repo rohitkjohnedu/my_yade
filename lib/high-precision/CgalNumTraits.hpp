@@ -46,7 +46,7 @@ public:
 			return Is_valid<long double>()(static_cast<long double>(x));
 		}
 #endif
-		return not::yade::math::isnan(x);
+		return not ::yade::math::isnan(x);
 	}
 };
 

@@ -11,7 +11,7 @@ namespace yade { // Cannot have #include directive inside.
 
 CREATE_LOGGER(Facet);
 
-Facet::~Facet() {}
+Facet::~Facet() { }
 
 
 void Facet::postLoad(Facet&)

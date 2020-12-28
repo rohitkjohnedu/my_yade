@@ -28,7 +28,7 @@ namespace yade { // Cannot have #include directive inside.
 CREATE_LOGGER(TriaxialStressController);
 YADE_PLUGIN((TriaxialStressController));
 
-TriaxialStressController::~TriaxialStressController() {}
+TriaxialStressController::~TriaxialStressController() { }
 
 Vector3r TriaxialStressController::getStress(int boundId)
 {

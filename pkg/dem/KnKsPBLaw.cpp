@@ -206,8 +206,7 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 
 		if (phys->prevSigma > pow(10.0, 15) /* || Fn < 0.0 */) {
 			std::cout << "prevSigma: " << phys->prevSigma /* <<", Fn: "<<Fn*/ << endl;
-			while (1) {
-			}
+			while (1) { }
 		}
 		phys->kn = phys->knVol * math::max(pow(10, -15), phys->contactArea);
 	} else {
@@ -359,9 +358,9 @@ bool Law2_SCG_KnKsPBPhys_KnKsPBLaw::go(shared_ptr<IGeom>& ig /* contact geometry
 	//		mass1 = de1->mass;
 	//		mass2 = de2->mass;
 	//	}
-	Real mbar = (!b1->isDynamic() && b2->isDynamic())
-	        ? mass2
-	        : ((!b2->isDynamic() && b1->isDynamic()) ? mass1 : (mass1 * mass2 / (mass1 + mass2))); // get equivalent mass
+	Real mbar    = (!b1->isDynamic() && b2->isDynamic())
+	           ? mass2
+	           : ((!b2->isDynamic() && b1->isDynamic()) ? mass1 : (mass1 * mass2 / (mass1 + mass2))); // get equivalent mass
 	Real Cn_crit = 2. * sqrt(mbar * phys->kn); // Critical damping coefficient (normal direction) 2.*sqrt(mbar*math::min(phys->kn,phys->ks))
 	Real Cs_crit = Cn_crit;                    // Critical damping coefficient (shear direction)
 	// Real Cs_crit = 2.*sqrt(mbar*phys->ks); //TODO: Calculation of Cs_crit to be revisited, if viscous damping is to be considered in the shear direction @vsangelidakis
@@ -964,7 +963,7 @@ void Ip2_FrictMat_FrictMat_KnKsPBPhys::go(const shared_ptr<Material>& b1, const 
 /** KnKsPBPhys */
 CREATE_LOGGER(KnKsPBPhys);
 /* KnKsPBPhys */
-KnKsPBPhys::~KnKsPBPhys() {}
+KnKsPBPhys::~KnKsPBPhys() { }
 
 } // namespace yade
 

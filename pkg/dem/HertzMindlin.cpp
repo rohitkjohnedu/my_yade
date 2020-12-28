@@ -378,8 +378,8 @@ bool Law2_ScGeom_MindlinPhys_Mindlin::go(shared_ptr<IGeom>& ig, shared_ptr<IPhys
 		                   : (de1->mass * de2->mass
 		                      / (de1->mass
 		                         + de2->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
-		cn = phys->alpha * sqrt(mbar) * pow(uN, 0.25); // normal viscous coefficient, see also [Antypov2011] eq. 10
-		cs = cn;                                       // same value for shear viscous coefficient
+		cn        = phys->alpha * sqrt(mbar) * pow(uN, 0.25); // normal viscous coefficient, see also [Antypov2011] eq. 10
+		cs        = cn;                                       // same value for shear viscous coefficient
 	}
 
 	/***************/

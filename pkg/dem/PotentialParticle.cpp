@@ -9,7 +9,7 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((PotentialParticle));
 
 
-PotentialParticle::~PotentialParticle() {}
+PotentialParticle::~PotentialParticle() { }
 
 } // namespace yade
 

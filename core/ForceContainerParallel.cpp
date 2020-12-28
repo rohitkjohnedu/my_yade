@@ -174,11 +174,11 @@ void ForceContainer::sync()
 		return; // if synced meanwhile
 
 	syncSizesOfContainers();
-	const bool          redirect   = Omega::instance().getScene()->bodies->useRedirection;
-	const auto&         realBodies = Omega::instance().getScene()->bodies->realBodies;
+	const bool  redirect   = Omega::instance().getScene()->bodies->useRedirection;
+	const auto& realBodies = Omega::instance().getScene()->bodies->realBodies;
 	if (redirect)
 		Omega::instance().getScene()->bodies->updateShortLists();
-    const unsigned long len        = redirect ? (unsigned long)realBodies.size() : (unsigned long)size;
+	const unsigned long len = redirect ? (unsigned long)realBodies.size() : (unsigned long)size;
 
 #pragma omp parallel for schedule(static)
 	for (unsigned long k = 0; k < len; k++) {

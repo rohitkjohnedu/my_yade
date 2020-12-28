@@ -96,19 +96,26 @@ Because we need literal functor and class names for registration in python, we p
 	YADE_CLASS_BASE_DOC_ATTRS_CTOR_PY(                                                                                                                     \
 	        DispatcherT,                                                                                                                                   \
 	        Dispatcher,                                                                                                                                    \
-	        "Dispatcher calling :yref:`functors<" BOOST_PP_STRINGIZE(FunctorT) ">` based on received argument type(s).\n\n" doc,                           \
-	        ((vector<shared_ptr<FunctorT>>, functors, , , "Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs,    \
-	        /*ctor*/ ctor, /*py*/                                                                                                                          \
-	        py.add_property(                                                                                                                               \
-	                  "functors",                                                                                                                          \
-	                  &DispatcherT::functors_get,                                                                                                          \
-	                  &DispatcherT::functors_set,                                                                                                          \
-	                  "Functors associated with this dispatcher."                                                                                          \
-	                  " :yattrtype:`vector<shared_ptr<" BOOST_PP_STRINGIZE(FunctorT) "> >` ")                                                              \
-	                .def("dispMatrix", &DispatcherT::dump, boost::python::arg("names") = true, "Return dictionary with contents of the dispatch matrix.")  \
-	                .def("dispFunctor",                                                                                                                    \
-	                     &DispatcherT::getFunctor,                                                                                                         \
-	                     "Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch throws.");)
+	        "Dispatcher calling :yref:`functors<" BOOST_PP_STRINGIZE(FunctorT) ">` based on received argument type(s).\n\n" doc,                                                                            \
+	                ((vector<shared_ptr<FunctorT>>,                                                                                                        \
+	                  functors,                                                                                                                            \
+	                  ,                                                                                                                                    \
+	                  ,                                                                                                                                    \
+	                  "Functors active in the dispatch mechanism [overridden below].")) /*additional attrs*/ attrs,                                        \
+	                /*ctor*/ ctor, /*py*/                                                                                                                  \
+	                py.add_property("functors",                                                                                                            \
+	                                &DispatcherT::functors_get,                                                                                            \
+	                                &DispatcherT::functors_set,                                                                                            \
+	                                "Functors associated with this dispatcher."                                                                            \
+	                                " :yattrtype:`vector<shared_ptr<" BOOST_PP_STRINGIZE(FunctorT) "> >` ")                                                \
+	                                        .def("dispMatrix",                                                                                             \
+	                                             &DispatcherT::dump,                                                                                       \
+	                                             boost::python::arg("names") = true,                                                                       \
+	                                             "Return dictionary with contents of the dispatch matrix.")                                                \
+	                                        .def("dispFunctor",                                                                                            \
+	                                             &DispatcherT::getFunctor,                                                                                 \
+	                                             "Return functor that would be dispatched for given argument(s); None if no dispatch; ambiguous dispatch " \
+	                                             "throws.");)
 
 #define YADE_DISPATCHER1D_FUNCTOR_DOC_ATTRS_CTOR_PY(DispatcherT, FunctorT, doc, attrs, ctor, py)                                                               \
 	_YADE_DIM_DISPATCHER_FUNCTOR_DOC_ATTRS_CTOR_PY(1, DispatcherT, FunctorT, doc, attrs, ctor, py)

@@ -20,8 +20,8 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((Lin4NodeTetra_Lin4NodeTetra_InteractionElement));
 CREATE_LOGGER(Lin4NodeTetra_Lin4NodeTetra_InteractionElement);
 
-Lin4NodeTetra_Lin4NodeTetra_InteractionElement::~Lin4NodeTetra_Lin4NodeTetra_InteractionElement() {}
-void Lin4NodeTetra_Lin4NodeTetra_InteractionElement::initialize(void) {}
+Lin4NodeTetra_Lin4NodeTetra_InteractionElement::~Lin4NodeTetra_Lin4NodeTetra_InteractionElement() { }
+void Lin4NodeTetra_Lin4NodeTetra_InteractionElement::initialize(void) { }
 } // namespace yade
 
 #endif //YADE_FEM

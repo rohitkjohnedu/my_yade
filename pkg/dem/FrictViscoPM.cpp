@@ -16,7 +16,7 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((FrictViscoMat)(FrictViscoPhys)(Ip2_FrictViscoMat_FrictViscoMat_FrictViscoPhys)(Ip2_FrictMat_FrictViscoMat_FrictViscoPhys)(
         Law2_ScGeom_FrictViscoPhys_CundallStrackVisco));
 
-FrictViscoMat::~FrictViscoMat() {}
+FrictViscoMat::~FrictViscoMat() { }
 
 /********************** Ip2_FrictViscoMat_FrictMat_FrictViscoPhys ****************************/
 CREATE_LOGGER(FrictViscoPhys);
@@ -52,8 +52,8 @@ void Ip2_FrictViscoMat_FrictViscoMat_FrictViscoPhys::go(
 	Real Kn = (kn) ? (*kn)(mat1->id, mat2->id) : 2. * Ea * Ra * Eb * Rb / (Ea * Ra + Eb * Rb);
 	Real Ks = (kRatio) ? (*kRatio)(mat1->id, mat2->id) * Kn : 2. * Ea * Ra * Va * Eb * Rb * Vb / (Ea * Ra * Va + Eb * Rb * Vb);
 
-	Real frictionAngle = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
-	                                   : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
+	Real frictionAngle                     = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
+	                                                       : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
 	contactPhysics->tangensOfFrictionAngle = math::tan(frictionAngle);
 	contactPhysics->kn                     = Kn;
 	contactPhysics->ks                     = Ks;
@@ -73,12 +73,12 @@ void Ip2_FrictViscoMat_FrictViscoMat_FrictViscoPhys::go(
 		const shared_ptr<Body>& ba   = Body::byId(ida, scene);
 		const shared_ptr<Body>& bb   = Body::byId(idb, scene);
 		Real                    mbar = (!ba->isDynamic() && bb->isDynamic())
-		        ? deb->mass
-		        : ((!bb->isDynamic() && ba->isDynamic())
-		                   ? dea->mass
-		                   : (dea->mass * deb->mass
-		                      / (dea->mass
-		                         + deb->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
+		                           ? deb->mass
+		                           : ((!bb->isDynamic() && ba->isDynamic())
+		                                      ? dea->mass
+		                                      : (dea->mass * deb->mass
+                                      / (dea->mass
+                                         + deb->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
 		TRVAR2(Kn, mbar);
 		contactPhysics->cn_crit = 2. * sqrt(mbar * Kn); // Critical damping coefficient (normal direction)
 		contactPhysics->cn      = contactPhysics->cn_crit
@@ -116,8 +116,8 @@ void Ip2_FrictMat_FrictViscoMat_FrictViscoPhys::go(const shared_ptr<Material>& b
 	Real Kn = (kn) ? (*kn)(mat1->id, mat2->id) : 2. * Ea * Ra * Eb * Rb / (Ea * Ra + Eb * Rb);
 	Real Ks = (kRatio) ? (*kRatio)(mat1->id, mat2->id) * Kn : 2. * Ea * Ra * Va * Eb * Rb * Vb / (Ea * Ra * Va + Eb * Rb * Vb);
 
-	Real frictionAngle = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
-	                                   : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
+	Real frictionAngle                     = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
+	                                                       : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
 	contactPhysics->tangensOfFrictionAngle = math::tan(frictionAngle);
 	contactPhysics->kn                     = Kn;
 	contactPhysics->ks                     = Ks;
@@ -136,12 +136,12 @@ void Ip2_FrictMat_FrictViscoMat_FrictViscoPhys::go(const shared_ptr<Material>& b
 		const shared_ptr<Body>& ba   = Body::byId(ida, scene);
 		const shared_ptr<Body>& bb   = Body::byId(idb, scene);
 		Real                    mbar = (!ba->isDynamic() && bb->isDynamic())
-		        ? deb->mass
-		        : ((!bb->isDynamic() && ba->isDynamic())
-		                   ? dea->mass
-		                   : (dea->mass * deb->mass
-		                      / (dea->mass
-		                         + deb->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
+		                           ? deb->mass
+		                           : ((!bb->isDynamic() && ba->isDynamic())
+		                                      ? dea->mass
+		                                      : (dea->mass * deb->mass
+                                      / (dea->mass
+                                         + deb->mass))); // get equivalent mass if both bodies are dynamic, if not set it equal to the one of the dynamic body
 		TRVAR2(Kn, mbar);
 		contactPhysics->cn_crit = 2. * sqrt(mbar * Kn);             // Critical damping coefficient (normal direction)
 		contactPhysics->cn      = contactPhysics->cn_crit * betanb; // Damping normal coefficient

@@ -184,7 +184,7 @@ protected:
 	        : vtkImplicitFunction()
 	{
 	}
-	void operator=(const ImpFuncPB&) {}
+	void operator=(const ImpFuncPB&) { }
 
 	// Add parameters/members here if you need
 };

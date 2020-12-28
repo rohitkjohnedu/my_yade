@@ -49,7 +49,7 @@ namespace yade { // Cannot have #include directive inside.
 CREATE_LOGGER(TriaxialTest);
 YADE_PLUGIN((TriaxialTest));
 
-TriaxialTest::~TriaxialTest() {}
+TriaxialTest::~TriaxialTest() { }
 
 bool TriaxialTest::generate(string& message)
 {
@@ -340,6 +340,6 @@ void TriaxialTest::createActors(shared_ptr<Scene>& scene)
 	scene->engines.push_back(newton);
 }
 
-void TriaxialTest::positionRootBody(shared_ptr<Scene>& /*scene*/) {}
+void TriaxialTest::positionRootBody(shared_ptr<Scene>& /*scene*/) { }
 
 } // namespace yade

@@ -64,7 +64,7 @@ MeniscusParameters::MeniscusParameters(const MeniscusParameters& source)
 	nn33   = source.nn33;
 }
 
-MeniscusParameters::~MeniscusParameters() {}
+MeniscusParameters::~MeniscusParameters() { }
 
 void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 {
@@ -263,7 +263,7 @@ void Law2_ScGeom_CapillaryPhys_Capillarity::action()
 	}
 }
 
-capillarylaw::capillarylaw() {}
+capillarylaw::capillarylaw() { }
 
 void capillarylaw::fill(const char* filename) { data_complete.push_back(Tableau(filename)); }
 
@@ -407,7 +407,7 @@ MeniscusParameters capillarylaw::interpolate(Real R1, Real R2, Real D, Real P, i
 	return result;
 }
 
-Tableau::Tableau() {}
+Tableau::Tableau() { }
 
 Tableau::Tableau(const char* filename)
 
@@ -432,7 +432,7 @@ Tableau::Tableau(const char* filename)
 	file.close();
 }
 
-Tableau::~Tableau() {}
+Tableau::~Tableau() { }
 
 MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index2)
 
@@ -468,7 +468,7 @@ MeniscusParameters Tableau::Interpolate2(Real D, Real P, int& index1, int& index
 	return result;
 }
 
-TableauD::TableauD() {}
+TableauD::TableauD() { }
 
 TableauD::TableauD(std::ifstream& file)
 {
@@ -576,7 +576,7 @@ MeniscusParameters TableauD::Interpolate3(Real P, int& index)
 	return result;
 }
 
-TableauD::~TableauD() {}
+TableauD::~TableauD() { }
 
 std::ostream& operator<<(std::ostream& os, Tableau& T)
 {

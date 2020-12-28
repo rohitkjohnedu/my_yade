@@ -37,8 +37,8 @@ void Ip2_FrictMat_FrictMat_FrictPhys::go(const shared_ptr<Material>& b1, const s
 	//same for shear stiffness
 	Real Ks = (!ks) ? 2 * ksa * ksb / (ksa + ksb) : (*ks)(mat1->id, mat2->id, ksa, ksb);
 
-	Real frictionAngle = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
-	                                   : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
+	Real frictionAngle                     = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
+	                                                       : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
 	contactPhysics->tangensOfFrictionAngle = math::tan(frictionAngle);
 	contactPhysics->kn                     = Kn;
 	contactPhysics->ks                     = Ks;
@@ -68,8 +68,8 @@ void Ip2_FrictMat_FrictMat_ViscoFrictPhys::go(const shared_ptr<Material>& b1, co
 	//same for shear stiffness
 	Real Ks = 2 * Ea * Ra * Va * Eb * Rb * Vb / (Ea * Ra * Va + Eb * Rb * Vb);
 
-	Real frictionAngle = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
-	                                   : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
+	Real frictionAngle                     = (!frictAngle) ? math::min(mat1->frictionAngle, mat2->frictionAngle)
+	                                                       : (*frictAngle)(mat1->id, mat2->id, mat1->frictionAngle, mat2->frictionAngle);
 	contactPhysics->tangensOfFrictionAngle = math::tan(frictionAngle);
 	contactPhysics->kn                     = Kn;
 	contactPhysics->ks                     = Ks;

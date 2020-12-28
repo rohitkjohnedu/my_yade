@@ -15,19 +15,19 @@ using math::min; // using inside .cpp file is ok.
 
 //!##################	SHAPES   #####################
 
-GridNode::~GridNode() {}
+GridNode::~GridNode() { }
 YADE_PLUGIN((GridNode));
 
-GridConnection::~GridConnection() {}
+GridConnection::~GridConnection() { }
 YADE_PLUGIN((GridConnection));
 
-GridNodeGeom6D::~GridNodeGeom6D() {}
+GridNodeGeom6D::~GridNodeGeom6D() { }
 YADE_PLUGIN((GridNodeGeom6D));
 
-ScGridCoGeom::~ScGridCoGeom() {}
+ScGridCoGeom::~ScGridCoGeom() { }
 YADE_PLUGIN((ScGridCoGeom));
 
-GridCoGridCoGeom::~GridCoGridCoGeom() {}
+GridCoGridCoGeom::~GridCoGridCoGeom() { }
 YADE_PLUGIN((GridCoGridCoGeom));
 
 void GridNode::addConnection(shared_ptr<Body> GC) { ConnList.push_back(GC); }
@@ -47,7 +47,7 @@ void GridNode::addPFacet(shared_ptr<Body> PF) { pfacetList.push_back(PF); }
 
 void GridConnection::addPFacet(shared_ptr<Body> PF) { pfacetList.push_back(PF); }
 
-PFacet::~PFacet() {}
+PFacet::~PFacet() { }
 YADE_PLUGIN((PFacet));
 
 

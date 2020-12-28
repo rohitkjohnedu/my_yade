@@ -42,7 +42,7 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((SimpleShear))
 CREATE_LOGGER(SimpleShear);
 
-SimpleShear::~SimpleShear() {}
+SimpleShear::~SimpleShear() { }
 
 
 bool SimpleShear::generate(std::string& /*message*/)
@@ -143,7 +143,7 @@ void SimpleShear::createSphere(shared_ptr<Body>& body, Vector3r position, Real r
 
 	iSphere->radius = radius;
 	iSphere->color  = ((int)(floor(8 * position.x() / length))) % 2 ? Vector3r(0.7, 0.7, 0.7)
-	                                                               : Vector3r(0.45, 0.45, 0.45); // so that we have eight different colour bands
+	                                                                : Vector3r(0.45, 0.45, 0.45); // so that we have eight different colour bands
 
 	body->shape = iSphere;
 	body->bound = aabb;

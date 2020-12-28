@@ -84,23 +84,20 @@ template <class C, typename T, T C::*A> void make_setter_postLoad(C& instance, c
 
 
 #define _DEF_READWRITE_BY_VALUE(thisClass, attr, doc)                                                                                                          \
-	add_property(                                                                                                                                          \
-	        /*attr name*/ BOOST_PP_STRINGIZE(attr),                                                                                                        \
+	add_property(/*attr name*/ BOOST_PP_STRINGIZE(attr),                                                                                                                                         \
 	        /*read access*/ ::boost::python::make_getter(&thisClass::attr, ::boost::python::return_value_policy<::boost::python::return_by_value>()),      \
 	        /*write access*/ ::boost::python::make_setter(&thisClass::attr, ::boost::python::return_value_policy<::boost::python::return_by_value>()),     \
 	        /*docstring*/ doc)
 
 // not sure if this is correct: the getter works by value, the setter by reference (the default)...?
 #define _DEF_READWRITE_BY_VALUE_POSTLOAD(thisClass, attr, doc)                                                                                                 \
-	add_property(                                                                                                                                          \
-	        /*attr name*/ BOOST_PP_STRINGIZE(attr),                                                                                                        \
+	add_property(/*attr name*/ BOOST_PP_STRINGIZE(attr),                                                                                                                                         \
 	        /*read access*/ ::boost::python::make_getter(&thisClass::attr, ::boost::python::return_value_policy<::boost::python::return_by_value>()),      \
 	        /*write access*/ make_setter_postLoad<thisClass, decltype(thisClass::attr), &thisClass::attr>,                                                 \
 	        /*docstring*/ doc)
 
 #define _DEF_READONLY_BY_VALUE(thisClass, attr, doc)                                                                                                           \
-	add_property(                                                                                                                                          \
-	        /*attr name*/ BOOST_PP_STRINGIZE(attr),                                                                                                        \
+	add_property(/*attr name*/ BOOST_PP_STRINGIZE(attr),                                                                                                                                         \
 	        /*read access*/ ::boost::python::make_getter(&thisClass::attr, ::boost::python::return_value_policy<::boost::python::return_by_value>()),      \
 	        /*docstring*/ doc)
 
@@ -133,9 +130,8 @@ template <class C, typename T, T C::*A> void make_setter_postLoad(C& instance, c
 		else if (!_ref && _ro)                                                                                                                         \
 			_classObj._DEF_READONLY_BY_VALUE(thisClass, _ATTR_NAM(attr), docStr.c_str());                                                          \
 		if (_ro && _post)                                                                                                                              \
-			std::cerr << "WARN: " BOOST_PP_STRINGIZE(thisClass) "::" _ATTR_NAM_STR(                                                                \
-			        attr) " with the yade::Attr::readonly flag also uselessly sets yade::Attr::triggerPostLoad."                                   \
-			          << std::endl;                                                                                                                \
+			std::cerr << "WARN: " BOOST_PP_STRINGIZE(thisClass) "::" _ATTR_NAM_STR(attr) " with the yade::Attr::readonly flag also uselessly sets yade::Attr::triggerPostLoad."     \
+			        << std::endl;                                                                                                                  \
 	}
 #define _DEF_READWRITE_CUSTOM_STATIC(thisClass, attr, doc)                                                                                                     \
 	{                                                                                                                                                      \
@@ -160,11 +156,10 @@ template <class C, typename T, T C::*A> void make_setter_postLoad(C& instance, c
 #endif
 
 #define _PYATTR_DEPREC_DEF(x, thisClass, z)                                                                                                                    \
-	.add_property(                                                                                                                                         \
-	        BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z)),                                                                                                        \
-	        &thisClass::BOOST_PP_CAT(_getDeprec_, _DEPREC_OLDNAME(z)),                                                                                     \
-	        &thisClass::BOOST_PP_CAT(_setDeprec_, _DEPREC_OLDNAME(z)),                                                                                     \
-	        "|ydeprecated| alias for :yref:`" BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(z)) "<" BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(             \
+	.add_property(BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z)),                                                                                                  \
+	                                 &thisClass::BOOST_PP_CAT(_getDeprec_, _DEPREC_OLDNAME(z)),                                                            \
+	                                 &thisClass::BOOST_PP_CAT(_setDeprec_, _DEPREC_OLDNAME(z)),                                                            \
+	                                 "|ydeprecated| alias for :yref:`" BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(z)) "<" BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(             \
 	                _DEPREC_NEWNAME(z)) ">` (" _DEPREC_COMMENT(z) ")")
 #define _PYHASKEY_ATTR_DEPREC(x, thisClass, z)                                                                                                                 \
 	if (key == BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(z)))                                                                                                     \
@@ -255,13 +250,15 @@ private:                                                                        
 
 // print warning about deprecated attribute; thisClass is type name, not string
 #define _DEPREC_WARN(thisClass, deprec)                                                                                                                        \
-	std::cerr << "WARN: " << getClassName() << "." << BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(deprec)) << " is deprecated, use "                                \
-	          << BOOST_PP_STRINGIZE(thisClass) << "." << BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(deprec)) << " instead. ";                                      \
+	std::cerr << "WARN: " << getClassName() << "."                                                                                                         \
+	          << BOOST_PP_STRINGIZE(_DEPREC_OLDNAME(deprec))                                                                                               \
+	                                << " is deprecated, use "                                                                                              \
+	                                << BOOST_PP_STRINGIZE(thisClass) << "." << BOOST_PP_STRINGIZE(_DEPREC_NEWNAME(deprec)) << " instead. ";                \
 	if (_DEPREC_COMMENT(deprec)) {                                                                                                                         \
 		if (std::string(_DEPREC_COMMENT(deprec))[0] == '!') {                                                                                          \
 			std::cerr << endl;                                                                                                                     \
 			throw std::invalid_argument(BOOST_PP_STRINGIZE(thisClass) "." BOOST_PP_STRINGIZE(                                                      \
-			        _DEPREC_OLDNAME(deprec)) " is deprecated; throwing exception requested. Reason: " _DEPREC_COMMENT(deprec));                    \
+			        _DEPREC_OLDNAME(deprec)) " is deprecated; throwing exception requested. Reason: " _DEPREC_COMMENT(deprec));                                    \
 		} else                                                                                                                                         \
 			std::cerr << "(" << _DEPREC_COMMENT(deprec) << ")";                                                                                    \
 	}                                                                                                                                                      \

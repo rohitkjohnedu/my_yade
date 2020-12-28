@@ -20,7 +20,7 @@ namespace yade { // Cannot have #include directive inside.
 YADE_PLUGIN((SampleCapillaryPressureEngine));
 CREATE_LOGGER(SampleCapillaryPressureEngine);
 
-SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine() {}
+SampleCapillaryPressureEngine::~SampleCapillaryPressureEngine() { }
 
 void SampleCapillaryPressureEngine::updateParameters()
 {
