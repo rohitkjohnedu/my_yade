@@ -137,8 +137,8 @@ stages:
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then xvfb-run -s "-screen 0 1600x1200x24" make doc; fi
     - cd ..
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --test ; fi
-    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --check; fi
-    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci -j5 --check; fi
+    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --checkall; fi
+    - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci -j5 --checkall; fi
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then xvfb-run -a -s "-screen 0 1600x1200x16" scripts/checks-and-tests/gui/testGui.sh; fi
     - if [[ ${TESTS_AFTER_MAKE} == "TESTS_AFTER_MAKE" ]] ; then install/bin/yade-ci --quickperformance -j8; fi
     - cat /etc/os-release
@@ -592,10 +592,10 @@ test_SSE:
 #    - export OMPI_MCA_mpi_yield_when_idle=1 #degraded mode when oversubscribing (https://www.open-mpi.org/faq/?category=running#oversubscribing)
   script:
     - export PYTHONUNBUFFERED=1
-    - echo -e "\n===\n\e[44mSingle core check yade --check\e[0m\n===\n"
-    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this check, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci --check; fi
-    - echo -e "\n===\n\e[44mParallel check yade -j5 --check\e[0m\n===\n"
-    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this check, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci -j5 --check; fi
+    - echo -e "\n===\n\e[44mSingle core check yade --checkall\e[0m\n===\n"
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this check, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci --checkall; fi
+    - echo -e "\n===\n\e[44mParallel check yade -j5 --checkall\e[0m\n===\n"
+    - if [[ ${SKIP_TEST} == "SKIP_TEST" ]] ; then echo -e "\n\e[93m===\nSkipping this check, because it's a WIP merge request.\n===\e[0m\n"; else install/bin/yade-ci -j5 --checkall; fi
     - cat /etc/os-release
     - /usr/bin/dpkg --print-architecture
   timeout: 25 minutes
