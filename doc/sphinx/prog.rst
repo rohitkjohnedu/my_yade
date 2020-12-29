@@ -404,9 +404,13 @@ The upside of this approach is that yade can be compiled in a non-debug build, a
 Regression tests
 ================
 Yade contains two types of regression tests, some are unit tests while others are testing more complex simulations. Although both types can be considered regression tests, the usage is that we name the first simply "regression tests", while the latest are called "check tests".
-Both series of tests can be ran at yade startup by passing the options "test" or "check" ::
+Both series of tests can be ran at yade startup by passing the options "test" or "checkall" ::
 
 	yade --test
+	yade --checkall
+
+The ``yade --checkall`` is a complete check. To skip checks lasting more than 30 seconds one can use this command ::
+
 	yade --check
 
 Unit regression tests
