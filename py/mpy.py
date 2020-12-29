@@ -232,7 +232,7 @@ def initialize(np):
 	if(process_count<np):
 		#TODO: if process_count>numThreads, free some workers
 		# HACK 1: this is to detect when we run regression tests and prevent mpirun to enter a parallel testing spree
-		if "--check" in sys.yade_argv:
+		if(("--check" in sys.yade_argv) or ("--checkall" in sys.yade_argv)):
 			userScriptInCheckList=inspect.stack()[2][1]
 		# END HACK 1 (continued below)
 		
