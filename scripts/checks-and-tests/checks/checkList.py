@@ -16,6 +16,9 @@ maxElapsedTime=0
 #some scripts are singleCore only because of required 100% reproducibility
 singleCore= ['checkVTKRecorder.py' ,'checkPotentialVTKRecorders.py' ,'checkJCFpm.py' ,'checkColliderCorrectness.py' ,'checkColliderConstantness.py']
 
+#some scripts take longer than 30 seconds. Let's allow them, but only with yade --checkall
+slowScripts= ['checkClumpHopper.py']
+
 #checkSpawn.py fails always for now, needs investigations
 skipScripts = ['checkList.py','checkSpawn.py']
 onlyOneScript = [] # use this if you want to test only one script, it takes precedence over skipScripts.
@@ -23,14 +26,16 @@ onlyOneScript = [] # use this if you want to test only one script, it takes prec
 def multiCore(): # multi core --check is running.
 	return ((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1'))
 
-def mustCheck(sc):
-	if(len(onlyOneScript)==1): return sc in onlyOneScript
+def mustCheck(sc): # function returns [ True / False , "reason for making decision to skip the script" ]
+	if(len(onlyOneScript)==1): return [ sc in onlyOneScript , "not in onlyOneScript" ]
+	if((not opts.checkall) and (sc in slowScripts)):
+		return [ False , "in slowScripts" ]
 	if(multiCore()):
-		return (sc not in singleCore) and (sc not in skipScripts)
-	return sc not in skipScripts
+		return [ (sc not in singleCore) and (sc not in skipScripts) , "in singleCore or skipScripts" ]
+	return [ sc not in skipScripts , "in skipScripts" ]
 
 for script in scriptsToRun:
-	if (script[len(script)-3:]==".py" and mustCheck(script)):
+	if (script[len(script)-3:]==".py" and mustCheck(script)[0]):
 		print("###################################")
 		print("running: ",script)
 		try:
@@ -45,12 +50,9 @@ for script in scriptsToRun:
 			failedScripts.append(script)
 			print('\033[91m',script," failure, caught exception ",e.__class__.__name__,": ",e,'\033[0m')
 		O.reset()
-	elif (not mustCheck(script)):
+	elif (not mustCheck(script)[0]):
 		print("###################################")
-		if(multiCore()):
-			print("Skipping %s, because this script only works with -j1 (single core) or is in skipScripts"%script)
-		else:
-			print("Skipping %s, because it is in skipScripts"%script)
+		print("Skipping %s, because it is \033[44m%s\033[0m." % (script,mustCheck(script)[1]))
 
 if(maxElapsedTime > 30):
 	print("\033[95mWARNING: some checks took longer than 30 seconds.\033[0m")
