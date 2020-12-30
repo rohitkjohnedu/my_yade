@@ -149,6 +149,6 @@ if 'MPI' in yade.config.features:
             if(os.path.exists(fileName+'.stl')): # cleanup
                 os.remove(fileName+'.stl')
         else:
-            raise YadeCheckError("Parallel MPI silo -N4 fails")
+            raise YadeCheckError("Parallel MPI silo -N4 fails, numErased=="+str(numErased))
         mp.disconnect()
 
