@@ -146,6 +146,9 @@ if 'MPI' in yade.config.features:
         eraseEscapedParticles()
         if numErased==32:
             mp.mprint("Parallel MPI silo -N4 succeeds")
+            if(os.path.exists(fileName+'.stl')): # cleanup
+                os.remove(fileName+'.stl')
         else:
             raise YadeCheckError("Parallel MPI silo -N4 fails")
         mp.disconnect()
+
