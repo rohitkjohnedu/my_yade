@@ -20,10 +20,26 @@ stages:
   - pages
   - deb
 
+# See: https://docs.gitlab.com/ee/ci/yaml/#retry
+# Skip repeats when:
+#     - always: Retry on any failure (default).
+#     - missing_dependency_failure: Retry if a dependency was missing.
+#     - runner_unsupported: Retry if the runner was unsupported.
+#     - unmet_prerequisites: Retry if the job failed to complete prerequisite tasks.
 .gitlab_runner_retry_template: &gitlab_runner_retry_definition
   retry:
     max: 2
-    when: always
+    when:
+      - unknown_failure
+      - script_failure
+      - api_failure
+      - stuck_or_timeout_failure
+      - runner_system_failure
+      - stale_schedule
+      - job_execution_timeout
+      - archived_failure
+      - scheduler_failure
+      - data_integrity_failure
 
 # If you want to compile everything also on merge_request, change this template.
 .plaftorms_template: &platforms_definition
