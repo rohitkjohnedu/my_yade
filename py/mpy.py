@@ -223,11 +223,11 @@ def disconnect():
 		 # [ 1] /usr/lib/x86_64-linux-gnu/openmpi/lib/openmpi3/mca_pml_ob1.so(mca_pml_ob1_add_comm+0x169)[0x7ff378060789]
 		 # commenting out "Free()" seems to workaround, so let it be. Unclear if it is a bug here or an issue with openmpi
 		
-		#comm.Free() 
 		if comm_slave:
 			comm_slave.Disconnect()
 		elif rank>0:
 			mprint("please report bug in mpy.disconnect()")
+		comm.Free()
 		if rank>0: # kill workers
 			exit
 	else:
