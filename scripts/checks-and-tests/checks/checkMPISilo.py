@@ -5,6 +5,8 @@
 # This script is directly derived from DEM8 benchmark case no.1, with less bodies
 # and less timesteps 
 
+O.reset()
+
 # Configure MPI module if needed
 if 'MPI' in yade.config.features:
 
@@ -144,11 +146,10 @@ if 'MPI' in yade.config.features:
     mp.mpirun(1000,numThreads,True)
     if mp.rank==0:
         eraseEscapedParticles()
-        if numErased==32:
-            mp.mprint("Parallel MPI silo -N4 succeeds")
-            if(os.path.exists(fileName+'.stl')): # cleanup
-                os.remove(fileName+'.stl')
+        multicore = ((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1'))
+        tol =  0.5 if multicore else 0 #50% tolerance on erased particles, I've seen 38 instead of 32 until now
+        if abs(numErased-32)/32 < tol:
+            mp.mprint("Parallel MPI silo -N4 succeeds, erased", numErased)
         else:
-            raise YadeCheckError("Parallel MPI silo -N4 fails, numErased=="+str(numErased))
+            raise YadeCheckError("Parallel MPI silo -N4 fails, erased", numErased)
         mp.disconnect()
-

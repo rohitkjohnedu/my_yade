@@ -25,7 +25,7 @@ onlyOneScript = [] # use this if you want to test only one script, it takes prec
 
 
 mpiScripts= ['checkMPI.py','checkMPISilo.py','checkMPI4PYcomm.py','checkMPYcomm.py','checkSpawn.py']
-singleCore = singleCore + mpiScripts # ignore hybrid MPIxOMP
+#singleCore = singleCore + mpiScripts # ignore hybrid MPIxOMP
 def acceptOMPIVersion(): #filter out specific distros for MPI checks
 	# excludes ubuntu18, suze15, stretch (failed spawn with ompi v2)
 	if not 'MPI' in yade.config.features: return False
