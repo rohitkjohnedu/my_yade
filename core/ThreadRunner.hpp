@@ -70,7 +70,7 @@ public:
 	/// precondition for the loop started with start().
 	bool looping() const;
 	//! last exception thrown by the worker, if any
-	std::exception workerException;
+	std::runtime_error workerException { "placeholder ThreadWorker exception" };
 	//! if true, workerException is copy of the exception thrown by the worker
 	std::atomic_bool workerThrew { false };
 };
