@@ -210,7 +210,7 @@ def disconnect():
 	if rank==0: # exit the interactive mode on master _after_ telling workers to exit
 		wprint("sending exit command")
 		sendCommand(executors="slaves",command="exit",wait=False)
-	if comm:
+	if comm!=MPI.COMM_NULL and comm_slave!=MPI.COMM_NULL: # only true after spawn/merge, false if executed with 'mpirun -np yade'
 		wprint("disconnecting")
 		 # (1) should be a Disconnect(), no a Free(), but we have an issue with openmpi it seems
 		 # https://bitbucket.org/mpi4py/mpi4py/issues/176/disconnect-hangs-with-openmp31-python-38
@@ -222,16 +222,13 @@ def disconnect():
 		 # [ 0] /lib/x86_64-linux-gnu/libc.so.6(+0x46210)[0x7ff3982d3210]
 		 # [ 1] /usr/lib/x86_64-linux-gnu/openmpi/lib/openmpi3/mca_pml_ob1.so(mca_pml_ob1_add_comm+0x169)[0x7ff378060789]
 		 # commenting out "Free()" seems to workaround, so let it be. Unclear if it is a bug here or an issue with openmpi
-		
-		if comm_slave:
-			comm_slave.Disconnect()
-		elif rank>0:
-			mprint("please report bug in mpy.disconnect()")
+		comm.barrier()
 		comm.Free()
+		comm_slave.Disconnect()
 		if rank>0: # kill workers
 			exit
 	else:
-		mprint("mpy already disconnected")
+		mprint("mpy already disconnected, size=", )
 	comm=None
 	comm_slave=None
 	numThreads=None
