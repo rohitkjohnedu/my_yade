@@ -22,6 +22,9 @@ void pyRunString(const std::string& cmd, bool ignoreErrors)
 			//         the memory region of a separate thread. But in fact also the same problem occurs on the barrier
 			//         between ThreadRunner and ThreadWorker in file core/ThreadRunner.cpp:36 where this exception gets
 			//         converted to std::exception. So if someone wants to fix this here, he should also fix it there.
+			// https://stackoverflow.com/questions/62926538/how-to-get-an-error-message-as-string-in-cpython
+			// https://docs.python.org/3/c-api/veryhigh.html#c.PyRun_SimpleStringFlags
+			// ".... no way to get the exception information"
 			throw std::runtime_error("PyRunner → pyRunString encountered error while executing command: '" + cmd + "'");
 		}
 	}
