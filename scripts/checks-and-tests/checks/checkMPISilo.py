@@ -146,9 +146,10 @@ if 'MPI' in yade.config.features:
     mp.mpirun(1000,numThreads,True)
     if mp.rank==0:
         eraseEscapedParticles()
-        multicore = ((opts.threads != None and opts.threads != 1) or (opts.cores != None and opts.cores != '1'))
-        tol =  0.5 if multicore else 0 #50% tolerance on erased particles, I've seen 38 instead of 32 until now
-        if abs(numErased-32)/32 <= tol:
+        # 25% tolerance on erased particles, I've seen 32 to 38 in the pipeline
+        # also fluctuating on the same cpu, without mpi but with yade -jN
+        tol =  0.25 
+        if abs(numErased-35)/35 <= tol:
             mp.mprint("Parallel MPI silo -N4 succeeds, erased", numErased)
         else:
             raise YadeCheckError("Parallel MPI silo -N4 fails, erased", numErased)
