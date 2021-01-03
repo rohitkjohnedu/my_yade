@@ -28,7 +28,6 @@
 #include <boost/random/variate_generator.hpp>
 
 #include "BlockGen.hpp"
-#include <lib/pyutil/gil.hpp>
 #include <pkg/dem/Ig2_PB_PB_ScGeom.hpp>
 #include <pkg/dem/PotentialBlock2AABB.hpp>
 

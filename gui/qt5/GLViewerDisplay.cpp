@@ -14,7 +14,6 @@
 #include <lib/base/TimedLogging.hpp>
 #include <lib/high-precision/Constants.hpp>
 #include <lib/opengl/OpenGLWrapper.hpp>
-#include <lib/pyutil/gil.hpp>
 #include <lib/serialization/ObjectIO.hpp>
 #include <core/Body.hpp>
 #include <core/DisplayParameters.hpp>

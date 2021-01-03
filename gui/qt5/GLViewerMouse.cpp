@@ -12,7 +12,6 @@
 #include "OpenGLManager.hpp"
 
 #include <lib/opengl/OpenGLWrapper.hpp>
-#include <lib/pyutil/gil.hpp>
 #include <lib/serialization/ObjectIO.hpp>
 #include <core/Body.hpp>
 #include <core/DisplayParameters.hpp>
