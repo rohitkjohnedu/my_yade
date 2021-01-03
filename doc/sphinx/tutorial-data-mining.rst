@@ -114,7 +114,7 @@ Save
 PyRunner
 ^^^^^^^^^
 
-To save data that we just learned to access, we need to call Python from within the *simulation loop*. :yref:`PyRunner` is created just for that; it inherits periodicy control from :yref:`PeriodicEngine` and takes the code to run as text (must be quoted, i.e. inside ``'...'``) attributed called *command*. For instance, adding this to :yref:`O.engines<Omega.engines>` will print the current step number every one second wall clock time::
+To save data that we just learned to access, we need to call Python from within the *simulation loop*. :yref:`PyRunner` is created just for that; it inherits periodicy control from :yref:`PeriodicEngine` and takes the code to run as text (must be quoted, i.e. inside ``'...'``) attribute called *command*. For instance, adding this to :yref:`O.engines<Omega.engines>` will print the current step number every one second wall clock time::
 
 	O.engines=O.engines+[ PyRunner(command='print(O.iter)',realPeriod=1) ]
 
@@ -143,7 +143,7 @@ or, in general, like that::
 ..          https://github.com/sphinx-doc/sphinx/issues/2640
 
 .. warning::
-	If a function was declared inside a *live* yade session (`ipython <http://ipython.org>`_) then an error ``NameError: name 'myFunction' is not defined`` will occur unless python globals() are updated with command
+	If a function was declared inside a *live* yade session (`ipython <http://ipython.org>`_) and PyRunner attribute :yref:`updateGlobals is set to False <PyRunner.updateGlobals>` then an error ``NameError: name 'myFunction' is not defined`` will occur unless python globals() are updated with command
 
 	.. code-block:: python
 

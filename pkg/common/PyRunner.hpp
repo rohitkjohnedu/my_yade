@@ -20,9 +20,20 @@ public:
 		"Execute a python command periodically, with defined (and adjustable) periodicity. See :yref:`PeriodicEngine` documentation for details.",
 		((string,command,"",,"Command to be run by python interpreter. Not run if empty."))
 		((bool,ignoreErrors,false,,"Debug only: set this value to true to tell PyRunner to ignore any errors encountered during command execution."))
-		((bool,updateGlobals,true,,"Whether to workaround `ipython not recognizing local variables <https://github.com/ipython/ipython/issues/136>`__ "
-		"by calling globals().update(locals()). When true PyRunner is able to call functions declared later locally in a running (live) yade session. "
-		"The call is a bit slower to update globals() with recently declared python functions."))
+		((bool,updateGlobals,true,,R"""(
+Whether to workaround `ipython not recognizing local variables <https://github.com/ipython/ipython/issues/136>`__
+by calling ``globals().update(locals())``. If ``true`` then PyRunner is able to call functions declared later locally in a running **live** yade session.
+The ``PyRunner`` call is a bit slower because it updates ``globals()`` with recently declared python functions.
+
+.. warning::
+	When ``updateGlobals==False`` and a function was declared inside a *live* yade session (`ipython <http://ipython.org>`_)
+	then an error ``NameError: name 'command' is not defined`` will occur unless python ``globals()`` are updated with command
+
+	.. code-block:: python
+
+		globals().update(locals())
+
+)"""))
 	);
 	// clang-format on
 };
