@@ -98,9 +98,9 @@ void InteractionLoop::action()
 		}
 
 #ifdef YADE_MPI
-		//FIXME: can be removed if scene splitting takes care of it
+		// Skip interactions between remote bodies, and reset them so we don't keep deprecated data
 		if (subDIdx != b1_->subdomain and subDIdx != b2_->subdomain) {
-			scene->interactions->erase(I->getId1(), I->getId2());
+			scene->interactions->requestErase(I->getId1(), I->getId2());
 			continue;
 		}
 #endif
