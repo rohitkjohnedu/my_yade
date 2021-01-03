@@ -1,5 +1,5 @@
 from __future__ import print_function
-1# this module is populated at initialization from the c++ part of PythonUI
+# this module is populated at initialization from the c++ part of PythonUI
 """Runtime variables, populated at yade startup."""
 # default value
 hasDisplay=False 
