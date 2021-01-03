@@ -3,27 +3,23 @@
 #include <boost/python.hpp>
 
 CREATE_CPP_LOCAL_LOGGER("gil.cpp")
-void pyRunString(const std::string& cmd, bool ignoreErrors)
+void pyRunString(const std::string& cmd, bool ignoreErrors, bool updateGlobals)
 {
 	namespace py = ::boost::python;
-	// FIXED: when a new function is declared inside ipython session an extra python command must be called: globals().update(locals())
-	//        https://stackoverflow.com/questions/43956636/internal-function-call-not-working-in-ipython
 	gilLock    lock;
 	py::object main    = py::import("__main__");
 	py::object globals = main.attr("__dict__");
 	py::scope  setScope(main);
 	try {
-		if (PyEval_GetFrame() != nullptr) { // don't bother if there is no frame present. For example inside yade --check
-			py::object ipython = py::import("IPython");
-			py::dict   ipdict  = py::extract<py::dict>(ipython.attr("__dict__"));
-			if (ipdict.has_key("__builtins__")) {
-				py::dict builtins = py::extract<py::dict>(ipdict.get("__builtins__"));
-				if (builtins.has_key("globals") == 1 and builtins.has_key("locals") == 1) {
-					py::object ipglobals = builtins.get("globals")();
-					py::object iplocals  = builtins.get("locals")();
-					ipglobals.attr("update")(iplocals);
-				}
-			}
+		if (updateGlobals and PyEval_GetFrame() != nullptr) { // don't bother if there is no frame present. For example inside yade --check
+			py::object ipython   = py::import("IPython"); // access the running IPython session.
+			py::dict   ipdict    = py::extract<py::dict>(ipython.attr("__dict__"));
+			py::dict   builtins  = py::extract<py::dict>(ipdict.get("__builtins__"));
+			py::object ipglobals = builtins.get("globals")();
+			py::object iplocals  = builtins.get("locals")();
+			// FIXED: when a new function is declared inside ipython session an extra python command must be called: globals().update(locals())
+			//        https://stackoverflow.com/questions/43956636/internal-function-call-not-working-in-ipython
+			ipglobals.attr("update")(iplocals);
 		}
 		py::exec(cmd.c_str(), globals);
 	} catch (const py::error_already_set&) {

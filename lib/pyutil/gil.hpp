@@ -12,4 +12,4 @@ public:
 	~gilLock() { PyGILState_Release(state); }
 };
 //! run string as python command; locks & unlocks GIL automatically
-void pyRunString(const std::string& cmd, bool ignoreErrors = false);
+void pyRunString(const std::string& cmd, bool ignoreErrors = false, bool updateGlobals = false);
