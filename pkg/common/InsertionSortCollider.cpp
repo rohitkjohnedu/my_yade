@@ -72,7 +72,8 @@ void InsertionSortCollider::insertionSort(VecBounds& v, InteractionContainer* in
 void InsertionSortCollider::insertionSortParallel(VecBounds& v, InteractionContainer* interactions, Scene*, bool doCollide)
 {
 	assert(!periodic);
-	if (ompThreads <= 1)
+	///escape parallel sort if 1/ single thread or 2/ not at least 10 bounds per-thread
+	if ((ompThreads <= 1) or (v.size() < size_t(10*ompThreads)))
 		return insertionSort(v, interactions, scene, doCollide);
 
 	Real chunksVerlet = 4 * verletDist; //is 2* the theoretical requirement?
