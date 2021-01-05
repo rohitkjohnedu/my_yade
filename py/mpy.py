@@ -1434,7 +1434,13 @@ def medianFilter(i,j,giveAway):
 		
 	else:
 		pos = projectedBounds(i,j)
+		firstJ, lastI = len(pos),0
+		for n in range(len(pos)):
+			if pos[n][1] == i:    lastI = n
+			elif n<firstJ: firstJ = n
 		finalSize = min( max(0, len(O.subD.intersections[j]) - giveAway) , len(pos))
+		if finalSize > lastI: finalSize=lastI+1
+		if finalSize < firstJ: finalSize=firstJ+1
 		bodiesToSend= [x[2] for x in pos[finalSize:] if x[1]==i]
 		#bodiesToRecv= [x[2] for x in pos[:finalSize] if x[1]==j] #for debugging only
 

@@ -746,7 +746,14 @@ Subdomain::medianFilterCPP(int otherSD, const Vector3r& otherSubDCM, const Vecto
 	std::vector<Body::id_t>         idsToSend;
 	std::vector<projectedBoundElem> pos = projectedBoundsCPP(otherSD, otherSubDCM, subDCM, useAABB);
 	if (!pos.size()) LOG_ERROR("ERROR IN CALCULATING PROJECTED BOUNDS WITH SUBDOMAIN = " << otherSD << "  from Subdomain = " << subdomainRank);
+	int firstJ = pos.size(); int lastI = 0;
+	for (int n=0; n< (int)pos.size() ; n++) {
+		if (pos[n].second.first != subdomainRank and n<firstJ) firstJ = n;
+		if (pos[n].second.first == subdomainRank) lastI = n;
+	}	
 	int finalSize = std::max(0, (int)intersections[otherSD].size() - giveAway); // The desired final number on this side
+	if (finalSize > lastI) finalSize=lastI+1;
+	if (finalSize < firstJ) finalSize=firstJ+1;
 	for (int x=finalSize; x< (int)pos.size() ; x++) // whatever is on the other side is given away
 		if (pos[x].second.first == subdomainRank) idsToSend.push_back(pos[x].second.second);
 	return idsToSend;
