@@ -475,7 +475,7 @@ def receiveForces(subdomains):
 	'''
 	Accumulate forces from subdomains (only executed by master process), should happen after ForceResetter but before Newton and before any other force-dependent engine (e.g. StressController), could be inserted via yade's pyRunner.
 	'''
-	if 1: #non-blocking:
+	if 0: #non-blocking: this should be replaced by isend+recv since irecv may have too small default buffer size, use blocking for now
 		reqForces=[]
 		#for sd in subdomains:
 		for sd in O.subD.intersections[0]:
@@ -1517,10 +1517,10 @@ def reallocateBodiesPairWiseBlocking(_filter,otherDomain):
 	te = time.time() 
 	numSubscribedHere = len(O.subD.ids) #total weigth of this domain, for load balancing after some erase
 		
-	req = comm.irecv(None,otherDomain,tag=_MIRROR_INTERSECTIONS_)
-	timing_comm.send("reallocateBodiesPairWiseBlocking",[O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank],numSubscribedHere],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
-	newMirror = req.wait()
 	
+	req = comm.isend([O.subD.intersections[otherDomain],O.subD._centers_of_mass[rank],numSubscribedHere],dest=otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	newMirror =  comm.recv(source=otherDomain,tag=_MIRROR_INTERSECTIONS_)
+	req.wait()
 	ts = time.time() 
 	
 	if USE_CPP_REALLOC:
