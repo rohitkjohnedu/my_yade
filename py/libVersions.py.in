@@ -19,6 +19,8 @@ When adding a new version please have a look at these three files:
 1. :ysrc:`py/_libVersions.cpp`: detection of versions from ``#include`` files by C++.
 2. :ysrc:`py/libVersions.py.in`: python module which is constructed by cmake during compilation. All ``*.in`` files are processed by cmake.
 3. :ysrc:`cMake/FindMissingVersions.cmake`: forced detection of library with undetectable version.
+
+.. hint:: The safest way to compare versions is to use builtin python tuple comparison e.g. ``if(cgalVer > (4,9,0) and cgalVer < (5,1,1)):``.
 """
 
 # all C++ functions are accessible now:

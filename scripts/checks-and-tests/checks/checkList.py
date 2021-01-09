@@ -30,8 +30,6 @@ def acceptOMPIVersion(): #filter out specific distros for MPI checks
 	# excludes ubuntu18, suze15, stretch (failed spawn with ompi v2)
 	if not 'MPI' in yade.config.features: return False
 	if yade.libVersions.getAllVersionsCpp()['mpi'][0][0]==2: return False
-	# excludes bullseye (the tests suceed but despawn seem to fail -> system errors)
-	#if yade.libVersions.getAllVersionsCpp()['mpi'][0][0]==3 and yade.libVersions.getAllVersionsCpp()['mpi'][0][2]>3: return False
 	return True
 if not acceptOMPIVersion(): skipScripts = skipScripts + mpiScripts
 
