@@ -23,7 +23,10 @@ message( STATUS "Architecture: ${ARCHITECTURE}" )
 ##### I have downloaded all available freeglut versions and did on them: 
 #####       find -type f -name "freeglut_std.h" -exec md5sum {} \;
 
+IF(ENABLE_GUI)
+FIND_PACKAGE(GLUT)
 find_path(FORCE_FREEGLUT_PATH freeglut_std.h ${GLUT_INCLUDE_DIR}/GL)
+message(STATUS "Found freeglut: ${FORCE_FREEGLUT_PATH}")
 
 execute_process(COMMAND "/usr/bin/md5sum" "${FORCE_FREEGLUT_PATH}/freeglut_std.h"
     RESULT_VARIABLE _FORCE_FREEGLUT_SEARCH_SUCCESS
@@ -73,6 +76,7 @@ IF(_FORCE_FREEGLUT_VALUES)
 	
 	MESSAGE(STATUS "freegult version is ${FREEGLUT_VERSION_STR}")
 ENDIF(_FORCE_FREEGLUT_VALUES)
+ENDIF(ENABLE_GUI)
 
 ## Add below md5sums of other source files if necessary.
 

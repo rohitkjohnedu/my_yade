@@ -269,12 +269,14 @@ def printAllVersions(rstFormat=False):
 	if(rstFormat==False): print("```")
 	print("\nLibraries used :\n")
 	print(lines)
+	if(rstFormat==False): print("```")
 	print("Linux version  :  "+str(getLinuxVersion()))
 	print("Architecture   :  "+str(getArchitecture()))
 	try:
 		print("Little endian  :  "+str(yade.math.isThisSystemLittleEndian()))
 	except Exception as e:
 		print("Little endian  :  unknown")
+	if(rstFormat==False): print("```")
 	print("")
 
 def getAllVersions(rstFormat=False):
