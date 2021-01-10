@@ -272,3 +272,105 @@ class TestMatchMaker(unittest.TestCase):
 		self.assertTrue(round(O.interactions[id11,id12].phys.cs, 3) - 0.012== 0)
 		self.assertTrue(round(O.interactions[id21,id22].phys.cs, 3) - 0.007 == 0)
 		self.assertTrue(round(O.interactions[id31,id32].phys.cs, 3) - 0.003 == 0)
+
+class TestPyRunner(unittest.TestCase):
+	def setUp(self):
+		O.reset();
+
+	def testMissingFunction(self):
+		O.engines += [PyRunner(command='missingFunction()',iterPeriod=1)]
+		self.assertRaises(RuntimeError, lambda: O.run(5, True))
+		try:
+			O.run(5, True)
+		except RuntimeError as e:
+			self.assertEqual(str(e),
+"""PyRunner error.
+
+COMMAND: 'missingFunction()'
+
+ERROR:
+name 'missingFunction' is not defined
+
+STACK TRACE:
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+
+NameError: name 'missingFunction' is not defined
+""")
+
+	def testRaisingFunction(self):
+		O.engines += [PyRunner(command='raise RuntimeError("raised RuntimeError")',iterPeriod=1)]
+		self.assertRaises(RuntimeError, lambda: O.run(5, True))
+		try:
+			O.run(5, True)
+		except RuntimeError as e:
+			self.assertEqual(str(e),
+"""PyRunner error.
+
+COMMAND: 'raise RuntimeError("raised RuntimeError")'
+
+ERROR:
+raised RuntimeError
+
+STACK TRACE:
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+
+RuntimeError: raised RuntimeError
+""")
+
+	def testWrongCall(self):
+		from yade import pack
+		pred=pack.inHyperboloid(centerBottom=(0,0,-.1),centerTop=(0,0,.1),radius=.05,skirt=.03)
+		self.assertRaises(RuntimeError, lambda: pack.randomDensePack(pred,spheresInCell=50,radius=8e-2))
+		try:
+			pack.randomDensePack(pred,spheresInCell=50,radius=8e-2)
+		except RuntimeError as e:
+			self.assertEqual(str(e)[0:21],"Unable to shrink cell")
+
+
+	def testRaisingDoneHook(self):
+		from yade import pack
+		radius=0.124 ; initSize=(1,1,1) ; seed=1 ; rRelFuzz=0.0 ; memoizeDb=None ; noPrint=True
+		sp=yade._packSpheres.SpherePack()
+		O.periodic=True
+		O.cell.setBox(initSize)
+		sp.makeCloud(Vector3().Zero,O.cell.refSize,radius,rRelFuzz,-1,True,seed=seed)
+		O.engines=[
+			 ForceResetter()
+			,InsertionSortCollider([Bo1_Sphere_Aabb()]
+			,verletDist=.05*radius)
+			,InteractionLoop([Ig2_Sphere_Sphere_ScGeom()],[Ip2_FrictMat_FrictMat_FrictPhys()],[Law2_ScGeom_FrictPhys_CundallStrack()])
+			,PeriIsoCompressor(charLen=2*radius,stresses=[-100e9,-1e8],maxUnbalanced=1e-2,doneHook='raise RuntimeError("raised RuntimeError")',globalUpdateInt=20,keepProportions=True)
+			,NewtonIntegrator(damping=.8)
+		]
+		O.materials.append(FrictMat(young=30e9,frictionAngle=.1,poisson=.3,density=1e3))
+		for s in sp: O.bodies.append(utils.sphere(s[0],s[1]))
+		O.dt=utils.PWaveTimeStep()
+		O.saveTmp(quiet=True);
+		self.assertRaises(RuntimeError, lambda: O.run(10000, True))
+		print("*******************************1**********************************",O.iter)
+		O.loadTmp(quiet=True)
+		print("********************************2*********************************",O.iter)
+		try:
+			O.run(10000, True)
+		except RuntimeError as e:
+			print("*************************3****************************************",O.iter)
+			self.assertEqual(str(e),
+"""PyRunner error.
+
+COMMAND: 'raise RuntimeError("raised RuntimeError")'
+
+ERROR:
+raised RuntimeError
+
+STACK TRACE:
+Traceback (most recent call last):
+
+  File "<string>", line 1, in <module>
+
+RuntimeError: raised RuntimeError
+""")
+
