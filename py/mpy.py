@@ -730,6 +730,7 @@ def sendRecvStates():
 	global statesCommTime
 	
 	if rank==0 and not MASTER_UPDATE_STATES:
+		comm.barrier()
 		return # master has just nothing to do if workers don't need updated pos/vel
 	
 	start=time.time()
@@ -782,6 +783,8 @@ def sendRecvStates():
 			if otherDomain==0 and not MASTER_UPDATE_STATES: continue
 			timing_comm.mpiWaitReceived("mpiWaitReceived(States)",otherDomain)
 			O.subD.setStateValuesFromBuffer(otherDomain)
+			
+	comm.barrier()
 	statesCommTime+=(time.time()-start)
 
 def isendRecvForces():
