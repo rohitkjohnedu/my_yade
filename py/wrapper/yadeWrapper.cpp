@@ -1067,7 +1067,12 @@ public:
 		OMEGA.simulationLoop->workerThrew = false;
 		throw OMEGA.simulationLoop->workerException;
 	}
-	bool       isRunning() { return OMEGA.isRunning(); }
+	bool isRunning() { return OMEGA.isRunning(); }
+	void throwIfRunning()
+	{
+		if (isRunning())
+			throw std::runtime_error("Please call O.stop() first.");
+	}
 	py::object get_filename()
 	{
 		string f = OMEGA.sceneFile;
@@ -1146,7 +1151,11 @@ public:
 		OMEGA.getScene()->time = 0;
 		OMEGA.timeInit();
 	}
-	void switchScene() { std::swap(OMEGA.scenes[OMEGA.currentSceneNb], OMEGA.sceneAnother); }
+	void switchScene()
+	{
+		throwIfRunning();
+		std::swap(OMEGA.scenes[OMEGA.currentSceneNb], OMEGA.sceneAnother);
+	}
 	void resetAllScenes()
 	{
 		Py_BEGIN_ALLOW_THREADS;
@@ -1155,8 +1164,12 @@ public:
 		OMEGA.resetAllScenes();
 		OMEGA.createSimulationLoop();
 	}
-	void switchToScene(int i) { OMEGA.switchToScene(i); }
-	int  addScene() { return OMEGA.addScene(); }
+	void switchToScene(int i)
+	{
+		throwIfRunning();
+		OMEGA.switchToScene(i);
+	}
+	int addScene() { return OMEGA.addScene(); }
 
 	// Scene manipulation in multithread situations as python object or as a string (e.g. FEMxDEM, MPI, ...)
 	shared_ptr<Scene> scene_get() { return OMEGA.getScene(); }

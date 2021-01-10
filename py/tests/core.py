@@ -330,3 +330,17 @@ RuntimeError: raised RuntimeError
 		except RuntimeError as e:
 			self.assertEqual(str(e)[0:21],"Unable to shrink cell")
 
+	def testPythonToCppToPythonThrow(self):
+		O.engines += [PyRunner(command="from yade import pack;pred=pack.inHyperboloid(centerBottom=(0,0,-.1),centerTop=(0,0,.1),radius=.05,skirt=.03);pack.randomDensePack(pred,spheresInCell=100,radius=8e-2)",iterPeriod=1)]
+		self.assertRaises(RuntimeError, lambda: O.run(5, True))
+		try:
+			O.run(5, True)
+		except RuntimeError as e:
+			self.assertEqual(str(e)[0:230],
+"""PyRunner error.
+
+COMMAND: 'from yade import pack;pred=pack.inHyperboloid(centerBottom=(0,0,-.1),centerTop=(0,0,.1),radius=.05,skirt=.03);pack.randomDensePack(pred,spheresInCell=100,radius=8e-2)'
+
+ERROR:
+Please call O.stop() first.""")
+
