@@ -1004,6 +1004,7 @@ def splitScene():
 			if (ERASE_REMOTE and ERASE_REMOTE_MASTER): eraseRemote()
 		sendRecvStatesRunner.dead = isendRecvForcesRunner.dead = waitForcesRunner.dead = collisionChecker.dead = False
 	
+	if MINIMAL_INTERSECTIONS: shrinkIntersections()
 	O.splitted = True
 
 def updateMirrorOwners():
