@@ -729,7 +729,8 @@ statesCommTime=0
 def sendRecvStates():
 	global statesCommTime
 	
-	if rank==0 and not MASTER_UPDATE_STATES: return # master has just nothing to do if workers don't need updated pos/vel
+	if rank==0 and not MASTER_UPDATE_STATES:
+		return # master has just nothing to do if workers don't need updated pos/vel
 	
 	start=time.time()
 	#____1. get ready to receive positions from other subdomains
@@ -1051,29 +1052,23 @@ def updateAllIntersections():
 					if not O.splittedOnce: mprint("0 already in intersections (should not happen)")
 			reqs=[]
 			
-			#from workers
-			for worker in subD.intersections[rank]:
-				if worker==0: continue #already received above
-				#wprint("subD.intersections["+str(rank)+"]: "+str(subD.intersections[rank]))
-				#buf = bytearray(1<<22) #CRITICAL
-				#FIXME : using 'None' as a buffer
-				reqs.append([worker,comm.irecv(None, worker, tag=_MIRROR_INTERSECTIONS_)])
-
 			for worker in subD.intersections[rank]:
 				if worker==0: continue #we do not send positions to master, only forces
 				#wprint("sending "+str(len(subD.intersections[worker]))+" states to "+str(worker))
-				wprint("Send mirrors to: ", worker)
 				m = O.intrsctToBytes(subD,worker,False) if SEND_BYTEARRAYS else  subD.intersections[worker];
-				timing_comm.send("splitScene_intersections", m, dest=worker, tag=_MIRROR_INTERSECTIONS_)
-			for req in reqs:
-				intrs=req[1].wait()
+				reqs.append(comm.isend(m, dest=worker, tag=_MIRROR_INTERSECTIONS_))
+			for worker in subD.intersections[rank]:
+				if worker==0: continue 
+				intrs=timing_comm.recv("recvAllIntersections",source=worker, tag=_MIRROR_INTERSECTIONS_)
 				if SEND_BYTEARRAYS:
-					wprint("Received mirrors from: ", req[0], " : ",int(len(intrs)/4))
-					O.bufferFromIntrsct(subD,req[0],int(len(intrs)/4),True)[:]=intrs
-					intrs=np.frombuffer(intrs,dtype=np.int32)
+					#wprint("Received mirrors from: ", worker, " : ",int(len(intrs)/4))
+					O.bufferFromIntrsct(subD,worker,int(len(intrs)/4),True)[:]=intrs
+					intrs=np.frombuffer(intrs,dtype=np.int32) 
 				else:
-					subD.mirrorIntersections = subD.mirrorIntersections[0:req[0]]+[intrs]+subD.mirrorIntersections[req[0]+1:]
-				#reboundRemoteBodies(intrs)
+					subD.mirrorIntersections = subD.mirrorIntersections[0:worker]+[intrs]+subD.mirrorIntersections[worker+1:]
+			for req in reqs:
+				req.wait()
+	
 	updateMirrorOwners()
 
 bodiesToImport=[]
