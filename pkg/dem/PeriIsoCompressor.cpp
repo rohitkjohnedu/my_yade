@@ -73,7 +73,7 @@ void PeriIsoCompressor::action()
 			avgGrow = math::sign(avgGrow) * maxDisplPerStep / maxToAvg;
 		Real okGrow = -(minSize - 2.1 * maxSpan) / maxToAvg;
 		if (avgGrow < okGrow)
-			throw runtime_error("Unable to shring cell due to maximum body size (although required by stress condition). Increase particle "
+			throw runtime_error("Unable to shrink cell due to maximum body size (although required by stress condition). Increase particle "
 			                    "rigidity, increase total sample dimensions, or decrease goal stress.");
 		// avgGrow=max(avgGrow,-(minSize-2.1*maxSpan)/maxToAvg);
 		if (avgStiffness > 0) {
