@@ -182,6 +182,8 @@ def configure(): # calling this function will import mpi4py.MPI,
 	'''
 	global comm, comm_slave, rank, numThreads, colorScale, MPI
 	os.environ["OMPI_MCA_rmaps_base_oversubscribe"]="1" # needed here, after importing MPI is too late (or there is a way to update flags before the spawn?)
+	os.environ["OMPI_MCA_pmix_server_max_wait"]="3600"
+	os.environ["OMPI_MCA_pmix_base_exchange_timeout"]="3600"
 	from mpi4py import MPI
 	worldComm = MPI.COMM_WORLD
 	color = 3; key =0;
