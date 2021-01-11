@@ -2,6 +2,7 @@
 #pragma once
 
 #include <lib/base/Math.hpp>
+#include <boost/predef.h>
 #include <boost/serialization/split_free.hpp>
 #include <unistd.h>
 
@@ -143,6 +144,8 @@ public:
 	        , nThreads(omp_get_max_threads())
 	        , eSize(CLS * (sizeof(T) / CLS + (sizeof(T) % CLS == 0 ? 0 : 1)))
 	{
+		// posix_memalign allows us to use reinterpret_cast<T*> below
+		// TODO: consider using https://en.cppreference.com/w/cpp/language/alignof or https://en.cppreference.com/w/cpp/types/alignment_of
 		int succ = posix_memalign(/*where allocated*/ (void**)&data, /*alignment*/ CLS, /*size*/ nThreads * eSize);
 		if (succ != 0)
 			throw std::runtime_error("OpenMPAccumulator: posix_memalign failed to allocate memory.");
@@ -150,15 +153,19 @@ public:
 	}
 	~OpenMPAccumulator() { free((void*)data); }
 	// lock-free addition
-	void operator+=(const T& val) { *((T*)(data + omp_get_thread_num() * eSize)) += val; }
-	void operator-=(const T& val) { *((T*)(data + omp_get_thread_num() * eSize)) -= val; }
+#ifdef BOOST_ARCH_MIPS // https://www.boost.org/doc/libs/1_68_0/doc/html/predef/reference.html#predef.reference.boost_arch_architecture_macros
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align" // skip this warning for mips64el architecture compilation
+#endif
+	void operator+=(const T& val) { *(reinterpret_cast<T*>(data + omp_get_thread_num() * eSize)) += val; }
+	void operator-=(const T& val) { *(reinterpret_cast<T*>(data + omp_get_thread_num() * eSize)) -= val; }
 	// return summary value; must not be used concurrently
 	operator T() const { return get(); }
 	// reset to zeroValue; must NOT be used concurrently
 	void reset()
 	{
 		for (int i = 0; i < nThreads; i++)
-			*(T*)(data + i * eSize) = ZeroInitializer<T>();
+			*reinterpret_cast<T*>(data + i * eSize) = ZeroInitializer<T>();
 	}
 	// this can be used to get the value from python, something like
 	// .def_readonly("myAccu",&OpenMPAccumulator::get,"documentation")
@@ -166,22 +173,25 @@ public:
 	{
 		T ret(ZeroInitializer<T>());
 		for (int i = 0; i < nThreads; i++)
-			ret += *(T*)(data + i * eSize);
+			ret += *reinterpret_cast<T*>(data + i * eSize);
 		return ret;
 	}
 	void set(const T& value)
 	{
 		reset(); /* set value for the 0th thread */
-		*(T*)(data) = value;
+		*reinterpret_cast<T*>(data) = value;
 	}
 	// only useful for debugging
 	std::vector<T> getPerThreadData() const
 	{
 		std::vector<T> ret;
 		for (int i = 0; i < nThreads; i++)
-			ret.push_back(*(T*)(data + i * eSize));
+			ret.push_back(*reinterpret_cast<T*>(data + i * eSize));
 		return ret;
 	}
+#ifdef BOOST_ARCH_MIPS
+#pragma GCC diagnostic pop
+#endif
 };
 
 /* OpenMP implementation of std::vector. 
