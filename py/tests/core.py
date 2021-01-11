@@ -322,6 +322,7 @@ RuntimeError: raised RuntimeError
 """)
 
 	def testPythonToCppToPythonThrow(self):
+		# NOTE: if we used 'spheresInCell=50' argument, then we could also trigger "Unable to shrink cell due to maximum body size ……" exception. But only if switchScene wasn't throwing earlier.
 		O.engines += [PyRunner(command="from yade import pack;pred=pack.inHyperboloid(centerBottom=(0,0,-.1),centerTop=(0,0,.1),radius=.05,skirt=.03);pack.randomDensePack(pred,spheresInCell=100,radius=8e-2)",iterPeriod=1)]
 		self.assertRaises(RuntimeError, lambda: O.run(5, True))
 		try:
