@@ -29,9 +29,11 @@ template <typename> struct EigenCostRealHP {
 	enum { ReadCost = Eigen::HugeCost, AddCost = Eigen::HugeCost, MulCost = Eigen::HugeCost };
 };
 
+#if defined(BOOST_FLOAT80_C)
 template <> struct EigenCostRealHP<boost::float_fast80_t> {
 	enum { ReadCost = 1, AddCost = 1, MulCost = 1 };
 };
+#endif
 #ifdef BOOST_MP_FLOAT128_HPP
 template <> struct EigenCostRealHP<boost::multiprecision::float128> {
 	enum { ReadCost = 1, AddCost = 2, MulCost = 2 };
