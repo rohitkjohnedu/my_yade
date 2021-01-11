@@ -59,6 +59,12 @@ void ThreadRunner::call()
 	m_thread_worker->callSingleAction();
 }
 
+bool ThreadRunner::permissionToDestroy() const
+{
+	// FIXME: think about locking to prevent next ThreadRunner::call() from starting, while this is being destroyed.
+	return m_thread_worker->done();
+}
+
 void ThreadRunner::spawnSingleAction()
 {
 	if (m_looping)

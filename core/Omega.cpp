@@ -119,6 +119,8 @@ void Omega::stop()
 	if (simulationLoop && simulationLoop->looping())
 		simulationLoop->stop();
 	if (simulationLoop)
+		// TODO: throwing from here causes segfault. But sometimes calling the destructor ~ThreadRunner() cannot be done - also causes segfault
+		//       if(simulationLoop->permissionToDestroy()) ....
 		simulationLoop = shared_ptr<ThreadRunner>();
 }
 
