@@ -10,7 +10,6 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-buster
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 # image: registry.gitlab.com/yade-dev/docker-yade:suse15
-# image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-buster
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-i386
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-ppc64el
@@ -211,6 +210,8 @@ make_bullseye:
 mk_bll_i386:
   <<: *make_definition
   <<: *artifacts_definition
+  before_script:
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-i386
   tags:
     - fast
@@ -219,6 +220,8 @@ mk_bll_i386:
 mk_bll_mips64el:
   <<: *make_definition
   <<: *artifacts_definition
+  before_script:
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
   tags:
     - fast
@@ -227,6 +230,8 @@ mk_bll_mips64el:
 mk_bll_ppc64el:
   <<: *make_definition
   <<: *artifacts_definition
+  before_script:
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-ppc64el
   tags:
     - fast
@@ -235,18 +240,12 @@ mk_bll_ppc64el:
 mk_bll_arm64:
   <<: *make_definition
   <<: *artifacts_definition
+  before_script:
+    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
   image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-arm64
   tags:
     - fast
     - qemu
-
-make_32bit_buster:
-  <<: *make_definition
-  <<: *artifacts_definition
-  before_script:
-    # there can be only one before_script:, so the line below cannot be in a separate template
-    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else echo "non-WIP merge request detected"; fi
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-buster
 
 make_no_mpi:
   <<: *make_definition
@@ -504,50 +503,6 @@ test_bullseye:
     - make_bullseye
   needs: ["make_bullseye"]
 
-tst_bll_i386:
-  <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-i386
-  dependencies:
-    - mk_bll_i386
-  needs: ["mk_bll_i386"]
-  tags:
-    - qemu
-
-tst_bll_mips64el:
-  <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
-  dependencies:
-    - mk_bll_mips64el
-  needs: ["mk_bll_mips64el"]
-  tags:
-    - qemu
-
-tst_bll_ppc64el:
-  <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-ppc64el
-  dependencies:
-    - mk_bll_ppc64el
-  needs: ["mk_bll_ppc64el"]
-  tags:
-    - qemu
-
-tst_bll_arm64:
-  <<: *test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-arm64
-  dependencies:
-    - mk_bll_arm64
-  needs: ["mk_bll_arm64"]
-  tags:
-    - qemu
-
-test_32bit_buster:
-  <<: *test_definition
-  <<: *skip_wip_test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-buster
-  dependencies:
-    - make_32bit_buster
-  needs: ["make_32bit_buster"]
-
 test_no_mpi:
   <<: *test_definition
   <<: *skip_wip_test_definition
@@ -734,54 +689,6 @@ check_bullseye:
   dependencies:
     - make_bullseye
   needs: ["make_bullseye"]
-
-ck_bll_i386:
-  <<: *check_definition
-  before_script:
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-i386
-  dependencies:
-    - mk_bll_i386
-  needs: ["mk_bll_i386"]
-  tags:
-    - qemu
-
-ck_bll_mips64el:
-  <<: *check_definition
-  before_script:
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
-  dependencies:
-    - mk_bll_mips64el
-  needs: ["mk_bll_mips64el"]
-  tags:
-    - qemu
-
-ck_bll_ppc64el:
-  <<: *check_definition
-  before_script:
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-ppc64el
-  dependencies:
-    - mk_bll_ppc64el
-  needs: ["mk_bll_ppc64el"]
-  tags:
-    - qemu
-
-ck_bll_arm64:
-  <<: *check_definition
-  before_script:
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-arm64
-  dependencies:
-    - mk_bll_arm64
-  needs: ["mk_bll_arm64"]
-  tags:
-    - qemu
-
-check_32bit_buster:
-  <<: *check_definition
-  <<: *skip_wip_test_definition
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-32bit-buster
-  dependencies:
-    - make_32bit_buster
-  needs: ["make_32bit_buster"]
 
 check_no_mpi:
   <<: *check_definition
