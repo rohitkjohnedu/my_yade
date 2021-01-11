@@ -143,6 +143,9 @@ if 'MPI' in yade.config.features:
         mp.sendCommand("all","bodyErase("+str(ers)+")",True)
         numErased+=count
 
+    def cleanupAfterTest():
+        if(os.path.exists(fileName+'.stl')): os.remove(fileName+'.stl')
+
     mp.mpirun(1000,numThreads,True)
     if mp.rank==0:
         eraseEscapedParticles()
@@ -150,6 +153,7 @@ if 'MPI' in yade.config.features:
         # also fluctuating on the same cpu, without mpi but with yade -jN
 	# 24 happens on debug builds. Temporarily increase tolerance to 32%
         tol =  0.32
+        cleanupAfterTest()
         if abs(numErased-35)/35 <= tol:
             mp.mprint("Parallel MPI silo -N4 succeeds, erased", numErased)
         else:
