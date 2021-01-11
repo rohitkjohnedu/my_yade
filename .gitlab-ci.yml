@@ -130,22 +130,24 @@ stages:
     # So let's assume that JOBSUM*concurrent < 1.3*cores and examine how this works out.
     # Current measurements indicate that non-ccached recompilation full CI job is 34 minutes, while ccached one can be as low as 10 minutes.
     - export JOBSNUM=$(case $CI_RUNNER_DESCRIPTION in
-        "y4pak") echo "17" ;;
-        "c4pak") echo "17" ;;
-        "y6pak") echo "19" ;;
-        "c6pak") echo "19" ;;
-        "y7pak") echo "16" ;;
-        "c7pak") echo "16" ;;
+        "y4pak") echo "12" ;;
+        "c4pak") echo "12" ;;
+        "y6pak") echo "7" ;;
+        "c6pak") echo "7" ;;
+        "y7pak") echo "7" ;;
+        "c7pak") echo "7" ;;
         "y8pak") echo "5"  ;;
         "c8pak") echo "5"  ;;
         "y9pak") echo "5"  ;;
         "c9pak") echo "5"  ;;
+        "atak0") echo "2"  ;;
         "yade-runner") echo "12" ;;
         "yade-runner-01") echo "1" ;;
-        *) echo "8";;
+        *) echo "5";;
         esac)
     - echo $JOBSNUM
     - if [[ ${CI_RUNNER_DESCRIPTION} == "y8pak" || ${CI_RUNNER_DESCRIPTION} == "c8pak" || ${CI_RUNNER_DESCRIPTION} == "y9pak" || ${CI_RUNNER_DESCRIPTION} == "c9pak" ]] ; then export MAX_CCACHE="500.0G"; else export MAX_CCACHE="200.0G"; fi
+    - if [[ ${CI_RUNNER_DESCRIPTION} == "atak0" ]] ; then export MAX_CCACHE="100.0G"; fi
     - echo "max_size = ${MAX_CCACHE}" > ~/.ccache/ccache.conf
     - ccache -s
     - echo $SKIP_TEST
