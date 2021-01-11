@@ -321,15 +321,6 @@ Traceback (most recent call last):
 RuntimeError: raised RuntimeError
 """)
 
-	def testWrongCall(self):
-		from yade import pack
-		pred=pack.inHyperboloid(centerBottom=(0,0,-.1),centerTop=(0,0,.1),radius=.05,skirt=.03)
-		self.assertRaises(RuntimeError, lambda: pack.randomDensePack(pred,spheresInCell=50,radius=8e-2))
-		try:
-			pack.randomDensePack(pred,spheresInCell=50,radius=8e-2)
-		except RuntimeError as e:
-			self.assertEqual(str(e)[0:21],"Unable to shrink cell")
-
 	def testPythonToCppToPythonThrow(self):
 		O.engines += [PyRunner(command="from yade import pack;pred=pack.inHyperboloid(centerBottom=(0,0,-.1),centerTop=(0,0,.1),radius=.05,skirt=.03);pack.randomDensePack(pred,spheresInCell=100,radius=8e-2)",iterPeriod=1)]
 		self.assertRaises(RuntimeError, lambda: O.run(5, True))
