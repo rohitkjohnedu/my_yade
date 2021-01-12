@@ -70,6 +70,7 @@ The following table lists which modules are currently working with high precisio
 ``ENABLE_GTS``                              yes          ``ON``                        supported [#supp2]_
 ``ENABLE_GL2PS``                            yes          ``ON``                        supported [#supp2]_
 ``ENABLE_LINSOLV``                          no           ``OFF``                       not supported [#supp7]_
+``ENABLE_PARTIALSAT``                       no           ``OFF``                       not supported [#supp7]_
 ``ENABLE_PFVFLOW``                          no           ``OFF``                       not supported [#supp7]_
 ``ENABLE_TWOPHASEFLOW``                     no           ``OFF``                       not supported [#supp7]_
 ``ENABLE_THERMAL``                          no           ``OFF``                       not supported [#supp7]_
