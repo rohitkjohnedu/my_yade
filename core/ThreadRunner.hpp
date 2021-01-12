@@ -70,7 +70,7 @@ public:
 	/// precondition for the loop started with start().
 	bool looping() const;
 	/// precondition for invoking destructor. (small step towards fixing problem with ThreadRunner::call())
-	bool permissionToDestroy() const;
+	//bool permissionToDestroy() const;
 	//! last exception thrown by the worker, if any
 	// TODO: https://www.boost.org/doc/libs/1_75_0/libs/exception/doc/tutorial_exception_ptr.html  - Transporting of Exceptions Between Threads
 	std::runtime_error workerException { "placeholder ThreadWorker exception" };
