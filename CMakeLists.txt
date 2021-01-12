@@ -276,17 +276,19 @@ if(ENABLE_USEFUL_ERRORS)
   #   (1) libeigen ver. <=3.3.4 : -Wshadow=compatible-local -Wno-error=float-conversion
   #   (2) numpy    ver. < 1.13  : -Wunused-function
   # These impossible to fix warnings are in ${WORKAROUND_LIBRARY_WARNINGS}
+  # to keep a warning printed as not an error add to WORKAROUND_LIBRARY_WARNINGS -Wno-error=cast-align, to disable the warning and not print it at all add: -Wno-cast-align
   # So depending on compiler version I need to turn these errors off.
   # They will be still printed as warnings. But they will not be an error due to -Werror flag.
 
   # Notes:
   #  -Wfloat-conversion warning: you have to select the int(…) conversion policy: std::floor(…), std::ceil(…), std::round(…), e.g. with int(std::ceil(11.9999999999999993))
 
-  # g++ ver < 11 ; all workarounds are for g++ < ver.11; When version 11 appears I hope that there will be fewer warnigs to disable. This 'IF' is to trigger the re-evealuation when g++ v.11 appears.
+  # g++ ver < 11 ; all workarounds are for g++ < ver.11; When version 11 appears I hope that there will be fewer warnigs to disable.
+  # This 'IF' is to trigger the re-evealuation when g++ v.11 appears.
   IF (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11.0 )
     SET(WORKAROUND_LIBRARY_WARNINGS " -Wno-error=maybe-uninitialized -Wno-comment")
     # g++ ver >= 8
-    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0)
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 8.0) # can't use VERSION_GREATER_EQUAL here, it's not working on ubuntu 16.04
       SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-cast-function-type")
       # g++ ver >= 9
       IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 9.0)
@@ -306,6 +308,12 @@ if(ENABLE_USEFUL_ERRORS)
       ENDIF()
     ENDIF()
   ENDIF()
+
+  # mips64el architecture has different alignments for types than the other architectures. This warning is very good.
+  # It warns about a potential crash, if we don't make sure that the alignment is indeed correct.
+  IF(${ARCHITECTURE} STREQUAL "mips64el")
+    SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cast-align")
+  ENDIF(${ARCHITECTURE} STREQUAL "mips64el")
 
   IF((${EIGEN3_MAJOR_VERSION} LESS 2) OR (${EIGEN3_MAJOR_VERSION} EQUAL 2))
     # eigen <= 3.2, ubuntu 16.04 xenial
