@@ -105,13 +105,13 @@ if 'MPI' in yade.config.features:
         sp_new=sp_new[0:Nspheres]
 
         from yade import ymport
-        if not os.path.exists(fileName+'.stl'):
+        if not os.path.exists('/tmp/'+fileName+'.stl'): # even if test starts as a different user, he will have read permissions. So test won't fail.
             print("Downloading mesh file")
             try:
-                os.system('wget http://perso.3sr-grenoble.fr/users/bchareyre/yade/input/'+fileName+'.stl')
+                os.system('wget http://perso.3sr-grenoble.fr/users/bchareyre/yade/input/'+fileName+'.stl -O /tmp/'+fileName+'.stl')
             except:
                 print("** probably no internet connection, grab the *.stl files by yourself **")
-        facets = ymport.stl(fileName+'.stl',color=(0,1,0),material=Steel)
+        facets = ymport.stl('/tmp/'+fileName+'.stl',color=(0,1,0),material=Steel)
         fctIds = range(len(facets))
         
         O.bodies.append(facets)
@@ -143,9 +143,6 @@ if 'MPI' in yade.config.features:
         mp.sendCommand("all","bodyErase("+str(ers)+")",True)
         numErased+=count
 
-    def cleanupAfterTest():
-        if(os.path.exists(fileName+'.stl')): os.remove(fileName+'.stl')
-
     mp.mpirun(1000,numThreads,True)
     if mp.rank==0:
         eraseEscapedParticles()
@@ -153,7 +150,6 @@ if 'MPI' in yade.config.features:
         # also fluctuating on the same cpu, without mpi but with yade -jN
 	# 24 happens on debug builds. Temporarily increase tolerance to 32%
         tol =  0.32
-        cleanupAfterTest()
         if abs(numErased-35)/35 <= tol:
             mp.mprint("Parallel MPI silo -N4 succeeds, erased", numErased)
         else:
