@@ -192,6 +192,7 @@ public:
 
 bool isThisSystemLittleEndian()
 {
+	// Also see example in https://en.cppreference.com/w/cpp/language/reinterpret_cast
 #if BOOST_ENDIAN_BIG_BYTE
 	return false;
 #elif BOOST_ENDIAN_LITTLE_BYTE
