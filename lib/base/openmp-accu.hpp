@@ -146,6 +146,7 @@ public:
 	{
 		// posix_memalign allows us to use reinterpret_cast<T*> below
 		// TODO: consider using https://en.cppreference.com/w/cpp/language/alignof or https://en.cppreference.com/w/cpp/types/alignment_of
+		// FIXME: This is suspected to not work on mips64el properly.
 		int succ = posix_memalign(/*where allocated*/ (void**)&data, /*alignment*/ CLS, /*size*/ nThreads * eSize);
 		if (succ != 0)
 			throw std::runtime_error("OpenMPAccumulator: posix_memalign failed to allocate memory.");
@@ -153,10 +154,6 @@ public:
 	}
 	~OpenMPAccumulator() { free((void*)data); }
 	// lock-free addition
-#ifdef BOOST_ARCH_MIPS // https://www.boost.org/doc/libs/1_68_0/doc/html/predef/reference.html#predef.reference.boost_arch_architecture_macros
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wcast-align" // skip this warning for mips64el architecture compilation
-#endif
 	void operator+=(const T& val) { *(reinterpret_cast<T*>(data + omp_get_thread_num() * eSize)) += val; }
 	void operator-=(const T& val) { *(reinterpret_cast<T*>(data + omp_get_thread_num() * eSize)) -= val; }
 	// return summary value; must not be used concurrently
@@ -189,9 +186,6 @@ public:
 			ret.push_back(*reinterpret_cast<T*>(data + i * eSize));
 		return ret;
 	}
-#ifdef BOOST_ARCH_MIPS
-#pragma GCC diagnostic pop
-#endif
 };
 
 /* OpenMP implementation of std::vector. 
