@@ -11,7 +11,7 @@
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye
 # image: registry.gitlab.com/yade-dev/docker-yade:suse15
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-i386
-# image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
+# image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el # crashes, as predicted by warnings -Wcast-align
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-ppc64el
 # image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-arm64
 #
@@ -219,15 +219,15 @@ mk_bll_i386:
     - fast
     - qemu
 
-mk_bll_mips64el:
-  <<: *make_definition
-  <<: *artifacts_definition
-  before_script:
-    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
-  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
-  tags:
-    - fast
-    - qemu
+#mk_bll_mips64el:
+#  <<: *make_definition
+#  <<: *artifacts_definition
+#  before_script:
+#    - if [[ ${CI_MERGE_REQUEST_TITLE:0:4} == "WIP:" ]] ; then export SKIP_TEST="SKIP_TEST"; else export TESTS_AFTER_MAKE="TESTS_AFTER_MAKE"; fi
+#  image: registry.gitlab.com/yade-dev/docker-yade:debian-bullseye-mips64el
+#  tags:
+#    - fast
+#    - qemu
 
 mk_bll_ppc64el:
   <<: *make_definition

@@ -310,7 +310,7 @@ if(ENABLE_USEFUL_ERRORS)
   ENDIF()
 
   # mips64el architecture has different alignments for types than the other architectures. This warning is very good.
-  # It warns about a potential crash, if we don't make sure that the alignment is indeed correct.
+  # It warns about a potential crash, if we don't make sure that the alignment is indeed correct. !
   IF(${ARCHITECTURE} STREQUAL "mips64el")
     SET(WORKAROUND_LIBRARY_WARNINGS "${WORKAROUND_LIBRARY_WARNINGS} -Wno-error=cast-align")
   ENDIF(${ARCHITECTURE} STREQUAL "mips64el")
