@@ -52,12 +52,14 @@ stages:
 
 .skip_WIP_template: &skip_WIP
   except:
-    - $CI_MERGE_REQUEST_TITLE =~ /^WIP:.*/
+    variables:
+      - $CI_MERGE_REQUEST_TITLE =~ /^WIP:.*/
 
 .skip_WIP_and_Draft_template: &skip_WIP_and_Draft
   except:
-    - $CI_MERGE_REQUEST_TITLE =~ /^WIP:.*/
-    - $CI_MERGE_REQUEST_TITLE =~ /^Draft:.*/
+    variables:
+      - $CI_MERGE_REQUEST_TITLE =~ /^WIP:.*/
+      - $CI_MERGE_REQUEST_TITLE =~ /^Draft:.*/
 
 .skip_wip_test_template_nogui: &skip_NO_GUI
   before_script: # there can be only one before_script: so if you need NO_GUI and before_script: this line has to be pasted there
