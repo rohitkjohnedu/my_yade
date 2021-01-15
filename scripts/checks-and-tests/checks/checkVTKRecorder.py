@@ -67,10 +67,10 @@ if ('VTK' in features):
 	section=""
 	skippedLines=0
 	vtkVer=yade.libVersions.getVersion('vtk')
-	if(vtkVer[0] not in [6,8]):
+	if(vtkVer[0] not in [6,8,9]):
 		raise YadeCheckError("checkVTKRecorder does not have reference results for VTK version "+str(vtkVer)+", check files in "+vtkSaveDir+", if they are correct add them to: scripts/checks-and-tests/checks/data/vtk_reference_"+str(vtkVer[0])+'/')
 	if(vtkVer[0]==6): fileList=['10.vtm','10/10_0.vtu','10/10_1.vtu','10/10_2.vtp']
-	if(vtkVer[0]==8): fileList=['10.vtm','10/10_0.vtu','10/10_2.vtp']
+	if(vtkVer[0]==8 or vtkVer[0]==9): fileList=['10.vtm','10/10_0.vtu','10/10_2.vtp']
 	verName = str(vtkVer[0])
 	if(vtkVer[0] == 8):
 		if(vtkVer[1] < 2):
@@ -115,11 +115,11 @@ if ('VTK' in features):
 								pass
 							elif(s1 != s2):
 								raise YadeCheckError("checkVTKRecorder failed string comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
-		
+
 	print("non-matching lines: ",skippedLines)
 
-	if(skippedLines > 100):
-		raise YadeCheckError("checkVTKRecorder failed at the end because there were over 100 non-matching lines in sections where non-matching lines were allowed.")
+	if(skippedLines > 160):
+		raise YadeCheckError("checkVTKRecorder failed at the end because there were over 160 non-matching lines in sections where non-matching lines were allowed.")
 
 else:
 	print("skip VTKRecorder check, VTK is not available")

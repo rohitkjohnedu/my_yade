@@ -656,7 +656,7 @@ ENDIF((Boost_MAJOR_VERSION EQUAL 1) OR (Boost_MAJOR_VERSION GREATER 1) AND
      ((Boost_MINOR_VERSION EQUAL 53) OR (Boost_MINOR_VERSION GREATER 53)))
 #===========================================================
 IF(ENABLE_VTK)
-  FIND_PACKAGE(VTK COMPONENTS vtkIOParallelXML vtkCommonCore vtkIOImage vtkIOXML vtkFiltersCore vtkImagingCore vtkRenderingCore vtkImagingGeneral vtkImagingHybrid)
+  FIND_PACKAGE(VTK COMPONENTS vtkIOParallelXML vtkCommonCore vtkIOImage vtkIOXML vtkFiltersCore vtkImagingCore vtkRenderingCore vtkImagingGeneral vtkImagingHybrid vtkFiltersGeneral vtkFiltersSources)
   IF(VTK_FOUND)
     INCLUDE_DIRECTORIES(${VTK_INCLUDE_DIRS})
     LINK_DIRECTORIES( ${VTK_LIBRARY_DIRS} )
@@ -802,7 +802,7 @@ ENDIF(ENABLE_PFVFLOW)
 
 #===========================================================
 IF(ENABLE_PFVFLOW AND ENABLE_LINSOLV)
-  IF(DEFINED SUITESPARSEPATH) 
+  IF(DEFINED SUITESPARSEPATH)
     set(SUITESPARSE_PREFIX_PATH ${SUITESPARSEPATH})
     MESSAGE(STATUS "Using custom suitsparse path " ${SUITESPARSE_PREFIX_PATH})
   ELSE(DEFINED SUITESPARSEPATH)
@@ -873,7 +873,7 @@ IF(ENABLE_MPI)
     SET(CONFIGURED_FEATS "${CONFIGURED_FEATS} MPI")
     # sometimes mpi.h is not found. cmake should find it, but didn't. I'm not sure why. Here I put all directotries where it can be found.
     # it is an OR operation from ubuntu, debian and opensuse of this: https://packages.debian.org/search?suite=sid&arch=any&mode=path&searchon=contents&keywords=include%2Fmpi.h
-#     find_path(MPI_H_INCLUDE_DIR mpi.h /usr/include/openmpi /usr/lib/openmpi /usr/lib/openmpi/include /usr/lib/x86_64-linux-gnu /usr/lib64/mpi/gcc/openmpi 
+#     find_path(MPI_H_INCLUDE_DIR mpi.h /usr/include/openmpi /usr/lib/openmpi /usr/lib/openmpi/include /usr/lib/x86_64-linux-gnu /usr/lib64/mpi/gcc/openmpi
 #     /usr/include/aarch64-linux-gnu /usr/include/arm-linux-gnueabihf /usr/include/i386-kfreebsd-gnu /usr/include/i386-linux-gnu
 #     /usr/include/mips64el-linux-gnuabi64 /usr/include/openblas /usr/include/powerpc64-linux-gnu /usr/include/powerpc64le-linux-gnu
 #     /usr/include/s390x-linux-gnu /usr/include/sparc64-linux-gnu /usr/include/x86_64-kfreebsd-gnu /usr/include/x86_64-linux-gnu
@@ -1145,18 +1145,7 @@ ELSE()
 ENDIF()
 
 IF(ENABLE_VTK)
-  IF(${VTK_MAJOR_VERSION} GREATER 5)
-    TARGET_LINK_LIBRARIES(yade ${VTK_LIBRARIES})
-    ADD_DEFINITIONS("-DYADE_VTK6")
-  IF(${VTK_MAJOR_VERSION} GREATER 7)
-   ADD_DEFINITIONS("-DYADE_VTK8")
-   MESSAGE(STATUS "VTK version >7 is found")
-  ELSE(${VTK_MAJOR_VERSION} GREATER 7)
-   MESSAGE(STATUS "VTK version >5 and <8 is found")
-  ENDIF(${VTK_MAJOR_VERSION} GREATER 7)
-   ELSE(${VTK_MAJOR_VERSION} GREATER 5)
-    TARGET_LINK_LIBRARIES(yade vtkHybrid)
-  ENDIF(${VTK_MAJOR_VERSION} GREATER 5)
+  TARGET_LINK_LIBRARIES(yade ${VTK_LIBRARIES})
 ENDIF(ENABLE_VTK)
 
 IF(ENABLE_GUI)

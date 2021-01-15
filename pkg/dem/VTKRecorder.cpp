@@ -1151,11 +1151,7 @@ void VTKRecorder::action()
 				fn = fileName + "spheres_" + boost::lexical_cast<string>(scene->iter) + "_" + boost::lexical_cast<string>(rank - 1) + ".vtu";
 			}
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(spheresUg);
-#else
-			writer->SetInput(spheresUg);
-#endif
 			writer->Write();
 
 			if (rank == 1 && parallelMode) {
@@ -1166,11 +1162,7 @@ void VTKRecorder::action()
 				pwriter->SetNumberOfPieces(commSize - 1);
 				pwriter->SetStartPiece(0);
 
-#ifdef YADE_VTK6
 				pwriter->SetInputData(spheresUg);
-#else
-				pwriter->SetInput(spheresUg);
-#endif
 				pwriter->Update();
 				pwriter->Write();
 			}
@@ -1184,11 +1176,7 @@ void VTKRecorder::action()
 				writer->SetDataModeToAscii();
 			string fn = fileName + "spheres." + boost::lexical_cast<string>(scene->iter) + ".vtu";
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(spheresUg);
-#else
-			writer->SetInput(spheresUg);
-#endif
 			writer->Write();
 		}
 #endif
@@ -1235,11 +1223,7 @@ void VTKRecorder::action()
 				fn = fileName + "facets_" + boost::lexical_cast<string>(scene->iter) + "_" + boost::lexical_cast<string>(rank) + ".vtu";
 			}
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(facetsUg);
-#else
-			writer->SetInput(facetsUg);
-#endif
 			writer->Write();
 
 			if (rank == 0 && parallelMode) {
@@ -1250,11 +1234,7 @@ void VTKRecorder::action()
 				pwriter->SetNumberOfPieces(commSize);
 				pwriter->SetStartPiece(0);
 
-#ifdef YADE_VTK6
 				pwriter->SetInputData(facetsUg);
-#else
-				pwriter->SetInput(facetsUg);
-#endif
 				pwriter->Update();
 				pwriter->Write();
 			}
@@ -1268,11 +1248,7 @@ void VTKRecorder::action()
 				writer->SetDataModeToAscii();
 			string fn = fileName + "facets." + boost::lexical_cast<string>(scene->iter) + ".vtu";
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(facetsUg);
-#else
-			writer->SetInput(facetsUg);
-#endif
 			writer->Write();
 		}
 #endif
@@ -1314,11 +1290,7 @@ void VTKRecorder::action()
 				writer->SetDataModeToAscii();
 			string fn = fileName + "boxes." + boost::lexical_cast<string>(scene->iter) + ".vtu";
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(boxesUg);
-#else
-			writer->SetInput(boxesUg);
-#endif
 			writer->Write();
 		}
 	}
@@ -1370,11 +1342,7 @@ void VTKRecorder::action()
 				fn = fileName + "intrs_" + boost::lexical_cast<string>(scene->iter) + "_" + boost::lexical_cast<string>(rank) + ".vtp";
 			}
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(intrPd);
-#else
-			writer->SetInput(intrPd);
-#endif
 			writer->Write();
 
 			if (rank == 0) {
@@ -1385,11 +1353,7 @@ void VTKRecorder::action()
 				pwriter->SetNumberOfPieces(commSize);
 				pwriter->SetStartPiece(0);
 
-#ifdef YADE_VTK6
 				pwriter->SetInputData(intrPd);
-#else
-				pwriter->SetInput(intrPd);
-#endif
 				pwriter->Update();
 				pwriter->Write();
 			}
@@ -1403,11 +1367,7 @@ void VTKRecorder::action()
 				writer->SetDataModeToAscii();
 			string fn = fileName + "intrs." + boost::lexical_cast<string>(scene->iter) + ".vtp";
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(intrPd);
-#else
-			writer->SetInput(intrPd);
-#endif
 			writer->Write();
 		}
 #endif
@@ -1433,11 +1393,7 @@ void VTKRecorder::action()
 				writer->SetDataModeToAscii();
 			string fn = fileName + "pericell." + boost::lexical_cast<string>(scene->iter) + ".vtu";
 			writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 			writer->SetInputData(pericellUg);
-#else
-			writer->SetInput(pericellUg);
-#endif
 			writer->Write();
 		}
 	}
@@ -1493,11 +1449,7 @@ void VTKRecorder::action()
 			writer->SetDataModeToAscii();
 		string fn = fileName + "cracks." + boost::lexical_cast<string>(scene->iter) + ".vtu";
 		writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 		writer->SetInputData(crackUg);
-#else
-		writer->SetInput(crackUg);
-#endif
 		writer->Write();
 	}
 
@@ -1545,11 +1497,7 @@ void VTKRecorder::action()
 			writer->SetDataModeToAscii();
 		string fn = fileName + "moments." + boost::lexical_cast<string>(scene->iter) + ".vtu";
 		writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 		writer->SetInputData(momentUg);
-#else
-		writer->SetInput(momentUg);
-#endif
 		writer->Write();
 	}
 
@@ -1579,11 +1527,7 @@ void VTKRecorder::action()
 			fn = fileName + boost::lexical_cast<string>(scene->iter) + "_" + boost::lexical_cast<string>(rank) + ".vtm";
 		}
 		writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 		writer->SetInputData(multiblockDataset);
-#else
-		writer->SetInput(multiblockDataset);
-#endif
 		writer->Write();
 
 		if (parallelMode and rank == 0) {
@@ -1592,11 +1536,7 @@ void VTKRecorder::action()
 			// 					std::string pfn = fileName+boost::lexical_cast<string>(scene->iter+d)+".pvtm";
 			// 					parWriter->EncodeAppendedDataOff();
 			// 					parWriter->SetFileName(pfn.c_str());
-			// 					#ifdef YADE_VTK6
 			// 						parWriter->SetInputData(multiblockDataset);
-			// 					#else
-			// 						parWriter->SetInput(multiblockDataset);
-			// 					#endif
 			// 					parWriter->SetWriteMetaFile(commSize);
 			// 					parWriter->Update();
 			LOG_ERROR("PARALLEL MULTIBLOCKDATA NOT IMPLEMENTED. ");
@@ -1619,11 +1559,7 @@ void VTKRecorder::action()
 			writer->SetDataModeToAscii();
 		string fn = fileName + boost::lexical_cast<string>(scene->iter) + ".vtm";
 		writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 		writer->SetInputData(multiblockDataset);
-#else
-		writer->SetInput(multiblockDataset);
-#endif
 		writer->Write();
 	}
 #endif

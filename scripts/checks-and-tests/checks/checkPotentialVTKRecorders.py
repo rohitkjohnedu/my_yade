@@ -16,10 +16,16 @@ if ('VTK' in features):
 	vtkSaveDir = tmpSaveDir+'/potentialVTKRecorders/'
 	def checkVTK(prefix):
 		vtkVer=yade.libVersions.getVersion('vtk')
-		if(vtkVer[0]==8 and vtkVer[1]==2):
-			extraPath = 'ver8.2/'
-		else:
+
+		if (vtkVer[0] == 6 or vtkVer[0] == 7 or (vtkVer[0]==8 and vtkVer[1]==1)):
 			extraPath = 'ver6-8.1/'
+		elif(vtkVer[0]==8 and vtkVer[1]==2):
+			extraPath = 'ver8.2/'
+		elif(vtkVer[0]==9):
+			extraPath = 'ver9/'
+		else:
+			raise YadeCheckError("checkPotentialVTKRecorders cannot find data files for this VTK-version %d.%d"%(vtkVer[0],vtkVer[1]))
+
 		toSkip=[] # Here we can put sections to ignore, if too sensitive
 		section=""
 		skippedLines=0
@@ -62,7 +68,7 @@ if ('VTK' in features):
 									pass
 								elif(s1 != s2):
 									raise YadeCheckError("checkPotentialVTKRecorders failed string comparison in file "+fname+" line: "+str(lineCount)+" with inputs: '"+str(s1)+ "' vs. '"+str(s2)+"'")
-			
+
 		print("non-matching lines: ",skippedLines)
 
 		if(skippedLines > 100):
@@ -79,7 +85,7 @@ if ('PotentialParticles' in features) and ('VTK' in features):
 		InsertionSortCollider([PotentialParticle2AABB()],verletDist=0.01),
 		InteractionLoop(
 			[Ig2_PP_PP_ScGeom(twoDimension=False, calContactArea=True, areaStep=5)],
-			[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=5e8, ks_i=5e7, Knormal=5e8, Kshear=5e7, useFaceProperties=False, viscousDamping=0.1)], 
+			[Ip2_FrictMat_FrictMat_KnKsPhys(kn_i=5e8, ks_i=5e7, Knormal=5e8, Kshear=5e7, useFaceProperties=False, viscousDamping=0.1)],
 			[Law2_SCG_KnKsPhys_KnKsLaw(label='PPlaw',neverErase=False)]
 		),
 		NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,0,0]), # Here we deactivate gravity,
@@ -142,7 +148,7 @@ if ('PotentialBlocks' in features) and ('VTK' in features):
 		InsertionSortCollider([PotentialBlock2AABB()],verletDist=0.00),
 		InteractionLoop(
 			[Ig2_PB_PB_ScGeom(twoDimension=False, unitWidth2D=1.0, calContactArea=True)],
-			[Ip2_FrictMat_FrictMat_KnKsPBPhys(kn_i=5e8, ks_i=5e7, Knormal=5e8, Kshear=5e7, useFaceProperties=False, viscousDamping=0.1)], 
+			[Ip2_FrictMat_FrictMat_KnKsPBPhys(kn_i=5e8, ks_i=5e7, Knormal=5e8, Kshear=5e7, useFaceProperties=False, viscousDamping=0.1)],
 			[Law2_SCG_KnKsPBPhys_KnKsPBLaw(label='PBlaw',neverErase=False, allowViscousAttraction=True)] # In this example, we do NOT use Talesnick
 		),
 		NewtonIntegrator(damping=0.0,exactAsphericalRot=True,gravity=[0,0,0]), # Here we deactivate gravity

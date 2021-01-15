@@ -893,11 +893,7 @@ void PartialSatClayEngine::saveFractureNetworkVTK(string fileName) // Superceded
 	//if(ascii) writer->SetDataModeToAscii();
 	string fn = fileName + "fracNet." + boost::lexical_cast<string>(scene->iter) + ".vtp";
 	writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 	writer->SetInputData(intrPd);
-#else
-	writer->SetInput(intrPd);
-#endif
 	writer->Write();
 }
 
@@ -970,11 +966,7 @@ void PartialSatClayEngine::savePermeabilityNetworkVTK(string fileName)
 	//if(ascii) writer->SetDataModeToAscii();
 	string fn = fileName + "permNet." + boost::lexical_cast<string>(scene->iter) + ".vtp";
 	writer->SetFileName(fn.c_str());
-#ifdef YADE_VTK6
 	writer->SetInputData(intrPd);
-#else
-	writer->SetInput(intrPd);
-#endif
 	writer->Write();
 }
 

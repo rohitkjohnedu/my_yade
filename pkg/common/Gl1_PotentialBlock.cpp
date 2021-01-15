@@ -677,10 +677,17 @@ void PotentialBlockVTKRecorder::action()
 		pbColors->SetNumberOfComponents(3);
 
 		Vector3r      color = particleColour;
+		#if VTK_MAJOR_VERSION < 9
 		unsigned char c[3]; //c = {color[0],color[1],color[2]};
 		c[0] = (unsigned char)(color[0]);
 		c[1] = (unsigned char)(color[1]);
 		c[2] = (unsigned char)(color[2]);
+		#else
+		float c[3]; //c = {color[0],color[1],color[2]};
+		c[0] = (float)(color[0]);
+		c[1] = (float)(color[1]);
+		c[2] = (float)(color[2]);
+		#endif
 
 		int nbCells = polydata->GetNumberOfPoints();
 		for (int i = 0; i < nbCells; i++) {
@@ -776,7 +783,7 @@ void PotentialBlockVTKRecorder::action()
 			writerA->SetFileName(fn.c_str());
 			writerA->SetInputConnection(appendFilterID->GetOutputPort());//(extrude->GetOutputPort());
 			writerA->Write();
-	
+
 			writerA->Delete();
 #endif
 		//#if 0
