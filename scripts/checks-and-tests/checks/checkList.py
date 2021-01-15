@@ -20,7 +20,7 @@ singleCore= ['checkVTKRecorder.py','checkPotentialVTKRecorders.py','checkJCFpm.p
 slowScripts= ['checkClumpHopper.py']
 
 #checkSpawn.py fails always for now, needs investigations
-skipScripts = ['checkList.py']
+skipScripts = ['checkList.py','checkMPISilo.py']
 onlyOneScript = [] # use this if you want to test only one script, it takes precedence over skipScripts.
 
 
