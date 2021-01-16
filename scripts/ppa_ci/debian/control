@@ -23,7 +23,7 @@ Build-Depends:
  libopenblas-dev [amd64 i386 ia64 kfreebsd-amd64 kfreebsd-i386 powerpc],
  libqglviewer-dev-qt5,
  libsuitesparse-dev [amd64 i386 ia64 kfreebsd-amd64 kfreebsd-i386 powerpc],
- libvtk6-dev,
+ libvtk6-dev | libvtk9-dev,
  libxi-dev,
  libxmu-dev,
  pyqt5-dev-tools,
