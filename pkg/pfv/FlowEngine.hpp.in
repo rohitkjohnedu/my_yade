@@ -155,47 +155,47 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		void computeViscousForces(Solver& flow);
 		Real getCellFlux(unsigned int cond);
 		Real getCellFluxFromId(unsigned long id);
-		std::vector<Real> getCellVelocity(Vector3r pos) {return solver->getCellVelocity(pos[0], pos[1], pos[2]);}
-		Real getCellVolume(Vector3r pos){return solver->getCellVolume(pos[0], pos[1], pos[2]);}
-		Real getBoundaryFlux(unsigned int boundary) {return solver->boundaryFlux(boundary);}
-		Real getBoundaryVolume(unsigned int boundary, Real dt) {return -1.0*solver->boundaryFlux(boundary)*dt;}
-		Real getCellInVolumeFromId(unsigned long id, Real dt) {return -1.0*getCellFluxFromId(id)*dt;}
-		Real getBoundaryArea(unsigned int boundary) {return solver->boundaryArea(boundary);}
-		std::vector<std::vector<Real>> getBoundaryVel(unsigned int boundary) {return solver->boundaryVel(boundary);}
-		Vector3r fluidForce(unsigned int idSph) {
+		std::vector<Real> getCellVelocity(Vector3r pos) const {return solver->getCellVelocity(pos[0], pos[1], pos[2]);}
+		Real getCellVolume(Vector3r pos) const {return solver->getCellVolume(pos[0], pos[1], pos[2]);}
+		Real getBoundaryFlux(unsigned int boundary) const {return solver->boundaryFlux(boundary);}
+		Real getBoundaryVolume(unsigned int boundary, Real dt) const {return -1.0*solver->boundaryFlux(boundary)*dt;}
+		Real getCellInVolumeFromId(unsigned long id, Real dt) const {return -1.0*getCellFluxFromId(id)*dt;}
+		Real getBoundaryArea(unsigned int boundary) const {return solver->boundaryArea(boundary);}
+		std::vector<std::vector<Real>> getBoundaryVel(unsigned int boundary) const {return solver->boundaryVel(boundary);}
+		Vector3r fluidForce(unsigned int idSph) const {
 			const CGT::CVector& f=solver->T[solver->currentTes].vertex(idSph)->info().forces; return Vector3r(f[0],f[1],f[2]);}
 		Vector3r averageVelocity();
 
-		Vector3r shearLubForce(unsigned int id_sph) {
+		Vector3r shearLubForce(unsigned int id_sph) const {
 			return (solver->shearLubricationForces.size()>id_sph)?solver->shearLubricationForces[id_sph]:Vector3r::Zero();}
-		Vector3r shearLubTorque(unsigned int id_sph) {
+		Vector3r shearLubTorque(unsigned int id_sph) const {
 			return (solver->shearLubricationTorques.size()>id_sph)?solver->shearLubricationTorques[id_sph]:Vector3r::Zero();}
-		Vector3r pumpLubTorque(unsigned int id_sph) {
+		Vector3r pumpLubTorque(unsigned int id_sph) const {
 			return (solver->pumpLubricationTorques.size()>id_sph)?solver->pumpLubricationTorques[id_sph]:Vector3r::Zero();}
-		Vector3r twistLubTorque(unsigned int id_sph) {
+		Vector3r twistLubTorque(unsigned int id_sph) const {
 			return (solver->twistLubricationTorques.size()>id_sph)?solver->twistLubricationTorques[id_sph]:Vector3r::Zero();}
-		Vector3r normalLubForce(unsigned int id_sph) {
+		Vector3r normalLubForce(unsigned int id_sph) const {
 			return (solver->normalLubricationForce.size()>id_sph)?solver->normalLubricationForce[id_sph]:Vector3r::Zero();}
-		Matrix3r bodyShearLubStress(unsigned int id_sph) {
+		Matrix3r bodyShearLubStress(unsigned int id_sph) const {
 			return (solver->shearLubricationBodyStress.size()>id_sph)?solver->shearLubricationBodyStress[id_sph]:Matrix3r::Zero();}
-		Matrix3r bodyNormalLubStress(unsigned int id_sph) {
+		Matrix3r bodyNormalLubStress(unsigned int id_sph) const {
 			return (solver->normalLubricationBodyStress.size()>id_sph)?solver->normalLubricationBodyStress[id_sph]:Matrix3r::Zero();}
-		Vector3r shearVelocity(unsigned int interaction) {
+		Vector3r shearVelocity(unsigned int interaction) const {
 			return (solver->deltaShearVel[interaction]);}
-		Vector3r normalVelocity(unsigned int interaction) {
+		Vector3r normalVelocity(unsigned int interaction) const {
 			return (solver->deltaNormVel[interaction]);}
-		Matrix3r normalStressInteraction(unsigned int interaction) {
+		Matrix3r normalStressInteraction(unsigned int interaction) const {
 			return (solver->normalStressInteraction[interaction]);}
-		Matrix3r shearStressInteraction(unsigned int interaction) {
+		Matrix3r shearStressInteraction(unsigned int interaction) const {
 			return (solver->shearStressInteraction[interaction]);}
-		Vector3r normalVect(unsigned int interaction) {
+		Vector3r normalVect(unsigned int interaction) const {
 			return (solver->normalV[interaction]);}
 		Real surfaceDistanceParticle(unsigned int interaction) {
 			return (solver->surfaceDistance[interaction]);}
-		Real edgeSize() {
+		Real edgeSize() const {
 			return (solver->edgeIds.size());}
-		Real getEquivalentCompressibility() {return (solver->equivalentCompressibility);}
-		Real getCavityDensity() {return (solver->cavityFluidDensity);}
+		Real getEquivalentCompressibility() const {return (solver->equivalentCompressibility);}
+		Real getCavityDensity() const {return (solver->cavityFluidDensity);}
 		void printVertices() {solver->printVertices();}
 		Real OSI() {
 			return (solver->onlySpheresInteractions.size());}
@@ -233,9 +233,9 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		Real volumeCellTripleFictious (Cellhandle cell);
 		template<class Cellhandle>
 		Real volumeCell (Cellhandle cell);
-		Real surfaceSolidThroatInPore(int cellId, int throatIndex) {return solver->surfaceSolidThroatInPore(solver->T[solver->currentTes].cellHandles[cellId], throatIndex, false, false);}
+		Real surfaceSolidThroatInPore(int cellId, int throatIndex) const {return solver->surfaceSolidThroatInPore(solver->T[solver->currentTes].cellHandles[cellId], throatIndex, false, false);}
 		template<class Cellhandle>
-		Vector3r cellBarycenterFromHandle (Cellhandle cell) {return makeVector3r(solver->cellBarycenter(cell));}
+		Vector3r cellBarycenterFromHandle (Cellhandle cell) const {return makeVector3r(solver->cellBarycenter(cell));}
 		Vector3r cellBarycenterFromId (unsigned long id) {
 			if (not checkMaxId(id)) return Vector3r(0,0,0);
 			return cellBarycenterFromHandle(solver->T[solver->currentTes].cellHandles[id]);}
@@ -243,15 +243,15 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 		void averageRealCellVelocity();
 		bool isCellNeighbor(unsigned int cell1, unsigned int cell2);
 		void saveVtk(const char* folder, bool withBoundaries) {solver->saveVtk(folder,withBoundaries);}
-		vector<Real> avFlVelOnSph(unsigned int idSph) {return solver->averageFluidVelocityOnSphere(idSph);}
+		vector<Real> avFlVelOnSph(unsigned int idSph) const {return solver->averageFluidVelocityOnSphere(idSph);}
 
 // 		void setBoundaryVel(Vector3r vel) {topBoundaryVelocity=vel; updateTriangulation=true;}
 		void pressureProfile(Real wallUpY, Real wallDownY) {return solver->measurePressureProfile(wallUpY,wallDownY);}
-		Real getPorePressure(Vector3r pos){return solver->getPorePressure(pos[0], pos[1], pos[2]);}
-		Real getPoreTemperature(Vector3r pos){return solver->getPoreTemperature(pos[0], pos[1], pos[2]);}
-		int getCell(Real posX, Real posY, Real posZ){return solver->getCell(posX, posY, posZ);}
-		Real getCavityFlux(){return solver->getCavityFlux();}
-		unsigned int nCells(){return solver->T[solver->currentTes].cellHandles.size();}
+		Real getPorePressure(Vector3r pos) const {return solver->getPorePressure(pos[0], pos[1], pos[2]);}
+		Real getPoreTemperature(Vector3r pos) const {return solver->getPoreTemperature(pos[0], pos[1], pos[2]);}
+		int getCell(Real posX, Real posY, Real posZ) const {return solver->getCell(posX, posY, posZ);}
+		Real getCavityFlux() const {return solver->getCavityFlux();}
+		unsigned int nCells() const {return solver->T[solver->currentTes].cellHandles.size();}
 		CELL_VECTOR_GETTER(,cellCenter)
 		CELL_VECTOR_GETTER(.averageCellVelocity,cellVelocity)
 		CELL_SCALAR_GETTER(Real,.p(),cellPressure)
@@ -274,25 +274,25 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 			solver->T[solver->currentTes].cellHandles[id]->info().blocked=true;
 			solver->T[solver->currentTes].cellHandles[id]->info().Pcondition=blockPressure;
 		}
-		Real getDiffusionCoeff(unsigned cellId, unsigned throat){
+		Real getDiffusionCoeff(unsigned cellId, unsigned throat) {
 			if (not checkMaxId(cellId))  return 0;
 			const CellHandle& cell = solver->tesselation().cellHandles[cellId];
 			Real length = 	sqrt (  (cell->info()
 					- cell->neighbor(throat)->info()).squared_length() );
 			return cell->info().fluidArea(throat) / length;
 		}
-		Real getConductivity(unsigned cell1, unsigned facetIdx) {
+		Real getConductivity(unsigned cell1, unsigned facetIdx) const {
 			const CellHandle& pore1 = solver->tesselation().cellHandles[cell1];
 			return pore1->info().kNorm()[facetIdx];
 		}
 
-		Vector3r getBoundaryNormal(int index) {
+		Vector3r getBoundaryNormal(int index) const {
 		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); return normal[math::max(0,math::min(5,index))];}
 		void setBoundaryNormal(int index, Vector3r v) {
 		  if (index<0 || index>5) LOG_ERROR("index out of range (0-5)"); normal[math::max(0,math::min(5,index))]=v;}
 
-		Real averageSlicePressure(Real posY){return solver->averageSlicePressure(posY);}
-		Real averagePressure(){return solver->averagePressure();}
+		Real averageSlicePressure(Real posY) const {return solver->averageSlicePressure(posY);}
+		Real averagePressure() const {return solver->averagePressure();}
 
 		virtual void emulateAction(){
 			scene = Omega::instance().getScene().get();
@@ -306,7 +306,7 @@ class TemplateFlowEngine_@TEMPLATE_FLOW_NAME@ : public PartialEngine
 					cerr << cholmod_print_common((char*)string("PFV Cholmod factorization").c_str(),&(solver->eSolver.cholmod()))<<endl;
 					cerr << "cholmod method:" << solver->eSolver.cholmod().selected<<endl;
 					cerr << "METIS called:"<<solver->eSolver.cholmod().called_nd<<endl;}
-		bool	metisUsed() {return bool(solver->eSolver.cholmod().called_nd);}
+		bool	metisUsed() const {return bool(solver->eSolver.cholmod().called_nd);}
 		#endif
 
 		virtual ~TemplateFlowEngine_@TEMPLATE_FLOW_NAME@();

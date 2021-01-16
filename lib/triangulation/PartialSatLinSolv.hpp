@@ -74,6 +74,7 @@ namespace CGT {
 		using _N::surfaceSolidThroatInPore;
 		using _N::tesselation;
 
+		using BaseFlowSolver::getGasPerm;
 		using BaseFlowSolver::bIntrinsicPerm;
 		using BaseFlowSolver::checkSphereFacetOverlap;
 		using BaseFlowSolver::clampKValues;
@@ -164,8 +165,8 @@ namespace CGT {
 		using BaseFlowSolver::useSolver;
 		using BaseFlowSolver::xodv;
 
-		vector<int> indices; //redirection vector containing the rank of cell so that T_cells[indices[cell->info().index]]=cell
-		Real        averageK;
+		// vector<int> indices; //redirection vector containing the rank of cell so that T_cells[indices[cell->info().index]]=cell
+		Real        averageK = 0;
 		virtual ~PartialSatLinSolv();
 		PartialSatLinSolv();
 
@@ -182,6 +183,8 @@ namespace CGT {
 		Real              getCellPorosity(Real x, Real y, Real z);
 		Real              getCellVolume(Real x, Real y, Real z);
 		bool              getCellCracked(Real x, Real y, Real z);
+		vector<Real>      getCellGasVelocity(Real X, Real Y, Real Z);
+		Real              getCellGasVolume(Real X, Real Y, Real Z);
 		//Real partialSatBoundaryFlux(unsigned int boundaryId);
 	};
 

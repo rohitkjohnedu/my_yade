@@ -21,6 +21,8 @@
 #include <pkg/dem/ScGeom.hpp>
 #include <Eigen/SparseLU>
 
+#ifdef YADE_VTK
+
 //#include<vtkSmartPointer.h>
 #include <lib/compatibility/VTKCompatibility.hpp>
 #include <vtkCellArray.h>
@@ -37,9 +39,11 @@
 //#include<vtkUnstructuredGrid.h>
 #include <vtkPolyData.h>
 
+#endif
+
 #ifdef FLOW_ENGINE
 //#include<pkg/pfv/FlowEngine.hpp>
-#include "FlowEngine_FlowEngineT.hpp"
+//#include "FlowEngine_FlowEngineT.hpp"
 #include <lib/triangulation/FlowBoundingSphere.hpp>
 #include <lib/triangulation/Network.hpp>
 #include <lib/triangulation/Tesselation.h>
@@ -57,23 +61,28 @@ public:
 	Real saturation; //the saturation of single pore (will be used in quasi-static imbibition and dynamic flow)
 	Real porosity;
 	//Real solidLine [4][4];//the length of intersecting line between sphere and facet. [i][j] is for facet "i" and sphere (facetVertices)"[i][j]". Last component [i][3] for 1/sumLines in the facet "i" (used by chao).
-	Real      dsdp; // the change of saturation for given capillary pressure
-	bool      crack;
-	short int crackNum;
-	Real      crackArea;
-	bool      isExposed;
-	Real      initialPorosity;
-	Real      initialSaturation;
-	Real      Po;      // parameter for water retention curve, unique to cell
-	Real      lambdao; // parameter for water retention curve
-	Real      vSolids;
-	Real      equivalentBulkModulus;
-	Real      oldPressure;
-	bool      clumped;
-	bool      initiallyCracked; // flag to continue computing initial crack perm during simulation without needing displacements or broken bonds
+	Real              dsdp; // the change of saturation for given capillary pressure
+	bool              crack;
+	short int         crackNum;
+	Real              crackArea;
+	bool              isExposed;
+	Real              initialPorosity;
+	Real              initialSaturation;
+	Real              Po;      // parameter for water retention curve, unique to cell
+	Real              lambdao; // parameter for water retention curve
+	Real              vSolids;
+	Real              equivalentBulkModulus;
+	Real              oldPressure;
+	bool              clumped;
+	bool              initiallyCracked; // flag to continue computing initial crack perm during simulation without needing displacements or broken bonds
+	bool              entered;          // flag for a cracked cell that has become fully saturated
+	std::vector<bool> opened;
+	std::vector<bool> entry;
+	std::vector<bool> visited;
 
 	PartialSatCellInfo(void)
 	{
+		entered           = false;
 		initialPorosity   = 0.25;
 		initialSaturation = 0.01;
 		oldPressure       = 0;
@@ -90,6 +99,9 @@ public:
 		clumped           = false;
 		blocked           = false;
 		initiallyCracked  = false;
+		opened.resize(4, 0);
+		entry.resize(4, 0);
+		visited.resize(4, 0);
 	}
 
 	inline Real& sat(void) { return saturation; }
@@ -124,13 +136,14 @@ public:
 
 public:
 	//PartialSatClayEngineT* clayFlow;
-	Real dsdp(CellHandle& cell);
-	void initializeSaturations(FlowSolver& flow);
-	void setSaturationFromPcS(CellHandle& cell);
-	void setCellsDSDP(FlowSolver& flow);
-	Real getTotalVolume();
-	void updateSaturation(FlowSolver& flow);
-	void updateBoundarySaturation(FlowSolver& flow);
+	shared_ptr<FlowSolver> gas_solver;
+	Real                   dsdp(CellHandle& cell);
+	void                   initializeSaturations(FlowSolver& flow);
+	void                   setSaturationFromPcS(CellHandle& cell);
+	void                   setCellsDSDP(FlowSolver& flow);
+	Real                   getTotalVolume();
+	void                   updateSaturation(FlowSolver& flow);
+	void                   updateBoundarySaturation(FlowSolver& flow);
 	//	void triangulate(FlowSolver& flow);
 	//Real diagonalSaturationContribution(CellHandle cell);
 	//Real RHSSaturationContribution(CellHandle cell);
@@ -147,13 +160,16 @@ public:
 	Real weibullDeviate(Real lambda, Real k);
 	Real vanGenuchten(CellHandle& cell, Real pc);
 	void exposureRecursion(CellHandle cell, Real bndPressure);
-	void determineFracturePaths();
+	void determineFracturePaths(FlowSolver& flow);
 	void createSphere(shared_ptr<Body>& body, Vector3r position, Real radius);
 	void insertMicroPores(const Real fracMicroPore);
 	bool findInscribedRadiusAndLocation(CellHandle& cell, std::vector<Real>& coordAndRad);
 	bool checkSphereContainedInTet(CellHandle& cell, std::vector<Real>& coordAndRad);
 	void setPorosityWithImageryGrid(string imageryFilePath, FlowSolver& flow);
 	void resetPoresVolumeSolids(FlowSolver& flow);
+	void getGasPermeability();
+	void artificialParticleSwell(const Real volStrain);
+	void setHomogeneousSuction(FlowSolver& flow);
 
 	void       blockLowPoroRegions(FlowSolver& flow);
 	void       blockMineralCellRecursion(CellHandle cell, std::vector<Body::id_t>& clumpIds);
@@ -163,38 +179,54 @@ public:
 	void       addPermanentForces(FlowSolver& flow);
 
 	// fracture network
-	//void crackCellsAbovePoroThreshold(FlowSolver& flow);
-	void trickPermeability(Solver* flow);
+	void crackCellsAbovePoroThreshold(FlowSolver& flow);
+	void trickPermeability(FlowSolver& flow, bool gasPermFlag);
 	//void trickPermOnCrackedCells(FlowSolver& flow);
 	void interpolateCrack(Tesselation& Tes, Tesselation& NewTes);
-	void computeFracturePerm(RTriangulation::Facet_circulator& facet, Real aperture, RTriangulation::Finite_edges_iterator& edge);
-	void circulateFacets(RTriangulation::Finite_edges_iterator& edge, Real aperture);
-	void saveFractureNetworkVTK(string fileName);
-	void savePermeabilityNetworkVTK(string fileName);
-	void blockCellsAbovePoroThreshold(FlowSolver& flow);
-	void blockIsolatedCells(FlowSolver& flow);
-	void simulateConfinement();
-	void removeForceOnVertices(RTriangulation::Facet_circulator& facet, RTriangulation::Finite_edges_iterator& ed_it);
-	void circulateFacetstoRemoveForces(RTriangulation::Finite_edges_iterator& edge);
-	void removeForcesOnBrokenBonds();
-	void timeStepControl();
-	void computeVertexSphericalArea();
-	void resetParticleSuctions();
+	void computeFracturePerm(
+	        RTriangulation::Facet_circulator&      facet,
+	        Real                                   aperture,
+	        RTriangulation::Finite_edges_iterator& edge,
+	        const Real                             openingPressure,
+	        bool                                   gasPermFlag,
+	        FlowSolver&                            flow);
+	void circulateFacets(RTriangulation::Finite_edges_iterator& edge, Real aperture, const Real openingPressure, bool gasPermFlag, FlowSolver& flow);
+	//void saveFractureNetworkVTK(string fileName);
+	#ifdef YADE_VTK
+	void       savePermeabilityNetworkVTK(string fileName);
+	void 	   saveUnsatVtk(const char* folder, bool withBoundaries);
+	#endif
+	void       blockCellsAbovePoroThreshold(FlowSolver& flow);
+	void       blockIsolatedCells(FlowSolver& flow);
+	void       simulateConfinement();
+	void       removeForceOnVertices(RTriangulation::Facet_circulator& facet, RTriangulation::Finite_edges_iterator& ed_it);
+	void       circulateFacetstoRemoveForces(RTriangulation::Finite_edges_iterator& edge);
+	void       removeForcesOnBrokenBonds();
+	void       timeStepControl();
+	void       computeVertexSphericalArea();
+	void       resetParticleSuctions();
+	Real getEnteredRatio();
 
 	//	void setPositionsBuffer(bool current);
-	Real leakOffRate;
-	Real averageAperture;
-	Real averageFracturePermeability;
-	Real maxAperture;
-	Real crackArea;
-	Real crackVolume;
-	Real totalFractureArea;
-	Real solverDT;
-	bool emulatingAction;
+	Real     leakOffRate                 = 0;
+	Real     averageAperture             = 0;
+	Real     sumOfApertures              = 0;
+	Real     averageFracturePermeability = 0;
+	Real     maxAperture                 = 0;
+	Real     crackArea                   = 0;
+	Real     crackVolume                 = 0;
+	Real     waterVolume                 = 0;
+	int      numCracks                   = 0;
+	Real     totalFractureArea           = 0;
+	Real     solverDT                    = 0;
+	bool     emulatingAction             = false;
+	Real     maxDSDPj                    = 0;
+	Vector3r crack_fabric_vector;
+	Real     crack_fabric_area;
 
 	virtual void initializeVolumes(FlowSolver& flow);
 	virtual void updateVolumes(FlowSolver& flow);
-	virtual void buildTriangulation(Real pZero, Solver& flow);
+	virtual void buildTriangulation(Real pZero, Solver& flow, bool oneTes = false);
 	virtual void initSolver(FlowSolver& flow);
 	virtual void action();
 	virtual void emulateAction()
@@ -208,18 +240,29 @@ public:
 	void reloadSolver(FlowSolver& flow) { this->initSolver(flow); }
 
 	virtual ~PartialSatClayEngine();
-	Real getCrackArea() { return crackArea; }
-	Real getCrackVolume() { return crackVolume; }
-	void printPorosity(string file) { printPorosityToFile(file); }
-	Real getCellSaturation(Vector3r pos) { return solver->getCellSaturation(pos[0], pos[1], pos[2]); }
+	Real getCrackArea() const { return crackArea; }
+	Real getCrackVolume() const { return crackVolume; }
+	Real getWaterVolume() const { return waterVolume; }
+	Real getNumCracks() const { return numCracks; }
+	Real getAverageAperture() const { return averageAperture; }
+	void       printPorosity(string file) { printPorosityToFile(file); }
+	Real getCellSaturation(Vector3r pos) const { return solver->getCellSaturation(pos[0], pos[1], pos[2]); }
 	//Real getCellVelocity(Vector3r pos){return solver->getCellVelocity(pos[0], pos[1], pos[2]);}
-	std::vector<Real> getCellVelocity(Vector3r pos) { return solver->getCellVelocity(pos[0], pos[1], pos[2]); }
-	Real              getCellPorosity(Vector3r pos) { return solver->getCellPorosity(pos[0], pos[1], pos[2]); }
-	Real              getCellVolume(Vector3r pos) { return solver->getCellVolume(pos[0], pos[1], pos[2]); }
-	bool              getCellCracked(Vector3r pos) { return solver->getCellCracked(pos[0], pos[1], pos[2]); }
-	Real              getAverageSaturation() { return solver->getAverageSaturation(); }
-	Real              getAverageSuction() { return solver->getAverageSuction(); }
+	std::vector<Real> getCellVelocity(Vector3r pos) const { return solver->getCellVelocity(pos[0], pos[1], pos[2]); }
+	std::vector<Real> getCellGasVelocity(Vector3r pos) const { return gas_solver->getCellGasVelocity(pos[0], pos[1], pos[2]); }
+	Real              getCellPorosity(Vector3r pos) const { return solver->getCellPorosity(pos[0], pos[1], pos[2]); }
+	Real              getCellVolume(Vector3r pos) const { return solver->getCellVolume(pos[0], pos[1], pos[2]); }
+	Real              getCellGasVolume(Vector3r pos) const { return gas_solver->getCellGasVolume(pos[0], pos[1], pos[2]); }
+	Vector3r          getCellGasCenter(unsigned int id) const { return makeVector3r(gas_solver->T[gas_solver->currentTes].cellHandles[id]->info()); }
+	bool              getCellGasPImposed(unsigned int id) const { return gas_solver->T[gas_solver->currentTes].cellHandles[id]->info().Pcondition; }
+	bool              getCellCracked(Vector3r pos) const { return solver->getCellCracked(pos[0], pos[1], pos[2]); }
+	Real              getAverageSaturation() const { return solver->getAverageSaturation(); }
+	Real              getEnteredThroatRatio() { return getEnteredRatio(); }
+	Real              getAverageSuction() const { return solver->getAverageSuction(); }
 	Real              getTotalSpecimenVolume() { return getTotalVolume(); }
+	Vector3r          getCrackFabricVector() const { return crack_fabric_vector / crack_fabric_area; }
+	Real              getBoundaryGasFlux(unsigned int boundary) const { return gas_solver->boundaryFlux(boundary); }
+	unsigned int      nGasCells() const { return gas_solver->T[gas_solver->currentTes].cellHandles.size(); }
 	CELL_SCALAR_GETTER(Real, .sat(), cellSaturation);
 	CELL_SCALAR_SETTER(Real, .sat(), setCellSaturation);
 
@@ -227,7 +270,7 @@ public:
 
 	//	PartialSatClayEngineT* flow;
 
-	void saveUnsatVtk(const char* folder, bool withBoundaries);
+
 	// clang-format off
 	YADE_CLASS_BASE_DOC_ATTRS_INIT_CTOR_PY(PartialSatClayEngine,PartialSatClayEngineT,"Engine designed to simulate the partial saturation of clay and associated swelling.",
 	((Real,lmbda,0.2,,"Lambda parameter for Van Genuchten model. Free swelling 0.4. If porosity is distributed, this value becomes cell based."))
@@ -251,6 +294,7 @@ public:
 	((Real,manualCrackPerm,0,,"If >0, it overrides the crack perm calculations (useful for setting cracked cells to extremely low perms to avoid fluid movement)"))
 	((Real,permClamp,0,,"If >0, it prevents any permeabilities from increasing beyond this value (useful in case of very close cells"))
 	((Real,crackAreaFactor,1,,"Factors the area used for crack geometry computations and capillary force removal inside cracks"))
+	((Real,permAreaFactor,1,,"Factors the area used for representing roughness in cracks that still conduct flux."))
 	//((bool,freezeRadii,0,,"use to stop swelling debugging purposes only"))
 	((bool,crackModelActive,0,,"Activates the parallel plate approximation model for facets connected to cohesionBroken edges"))
 	((Real,alpham,2.6048e-08,,"alpha parameter for particle volumetric strain model MPa^-1"))
@@ -310,25 +354,50 @@ public:
 	((Real,maxPo,2e6,,"Certain boundary situations where a low volume will develop and interpolate from a cell with high initial porosity leading to Po exponential estimate blowing up."))
 	((Real,minLambdao,0,,"Maybe unnecessary since the lambdao function is a decay exponential for same situation described in maxPo above"))
 	((Real,minParticleSwellFactor,0.1,,"If prevents particles from decreasing too far as their saturation decreases."))
+	((Real,waterSurfaceTension,7.28e-2,,"Water surface tension at 20 degC used to determine entry pressure to cracks"))
+	((bool,computeFracturePaths,1,,"if true, fracture paths connecting to boundary conditions will become pcondition cells and forces will be computed using atmospheric pressure."))
+	((bool,useOpeningPressure,0,,"if true, cracks will be created based on local opening pressure criteria computed by waterSurfaceTension/aperture"))
+	((bool,getGasPerm,0,,"If true, a gas permeability will be extracted during next timestep. This involves building another triangulation with a new conductivity matrix, factorizing the matrix, and solving i.e. this will double computational effort if performed every step."))
+	((bool,gasPermFirst,0,,"Set true each time you want a new gas perm estimate."))
+	((Real,airViscosity,1.8e-5,,"Used with :yref:`PartialSatClayEngine::getGasPerm` for crack permeability estimates."))
+	((Real,timeDimension,0,,"Used to determine stability of system, partialSatEngine computes this value automatically."))
+	((bool,useForceForCracks,0,,"Cracks are only considered if a normal force of 0 is encountered between two particles."))
+	((Real,homogeneousSuctionValue,0,,"Will override the pressure solver and set all cells to the user provided value. Meant for testing non transient swelling conditions."))
+
 	,/*PartialSatClayEngineT()*/,
 	solver = shared_ptr<FlowSolver> (new FlowSolver);
+	gas_solver = shared_ptr<FlowSolver> (new FlowSolver);
 	,
+	.def("getBoundaryGasFlux",&PartialSatClayEngine::getBoundaryGasFlux,(boost::python::arg("boundary")),"Get total Gas flux through boundary defined by its body id.\n\n.. Only useful if also useing :yref:`PartialSatClayEngine::getGasPerm` correctly. note:: The flux may be not zero even for no-flow condition. This artifact comes from cells which are incident to two or more boundaries (along the edges of the sample, typically). Such flux evaluation on impermeable boundary is just irrelevant, it does not imply that the boundary condition is not applied properly.")
 	.def("setCellSaturation",&PartialSatClayEngine::setCellSaturation,(boost::python::arg("id"),boost::python::arg("temperature")),"set temperature in cell 'id'.")
 	.def("getCellSaturation",&PartialSatClayEngine::getCellSaturation,(boost::python::arg("pos")),"Measure cell saturation in position pos[0],pos[1],pos[2]")
 	.def("getCellVelocity", &PartialSatClayEngine::getCellVelocity,(boost::python::arg("pos")),"Get relative cell velocity at position pos[0] pos [1] pos[2].")
+	.def("getCellGasVelocity", &PartialSatClayEngine::getCellGasVelocity,(boost::python::arg("pos")),"Get relative cell gas velocity at position pos[0] pos [1] pos[2]. Can only be used if :yref:`PartialSatEngine::getGasPerm`=True.")
+	.def("getCellGasPImposed", &PartialSatClayEngine::getCellGasPImposed,(boost::python::arg("id")),"Get pressure condition of gas cell with id. Can only be used if :yref:`PartialSatEngine::getGasPerm`=True.")
+	.def("getCellGasCenter", &PartialSatClayEngine::getCellGasCenter,(boost::python::arg("id")),"Get cell center of gas mesh with id. Can only be used if :yref:`PartialSatEngine::getGasPerm`=True.")
+	.def("getCellGasVolume", &PartialSatClayEngine::getCellGasVolume,(boost::python::arg("id")),"Get volume of gas cell with id. Can only be used if :yref:`PartialSatEngine::getGasPerm`=True.")
+	.def("nGasCells", &PartialSatClayEngine::nGasCells,"Get number of cells in gas mesh. Can only be used if :yref:`PartialSatEngine::getGasPerm`=True.")
 	//.def("getBoundaryVel",&TemplateFlowEngine_@TEMPLATE_FLOW_NAME@::getBoundaryVel,(boost::python::arg("boundary")),"Get total avg cell velocity associated with boundary defined by its body id.")
 	.def("getCrackArea",&PartialSatClayEngine::getCrackArea,"get the total cracked area.")
+	.def("getCrackFabricVector",&PartialSatClayEngine::getCrackFabricVector,"get the crack fabric vector.")
+	.def("getAverageAperture",&PartialSatClayEngine::getAverageAperture,"get the averageaperture.")
 	.def("printPorosity",&PartialSatClayEngine::printPorosity,(boost::python::arg("file")="./porosity"),"save the porosity of the cell network.")
 	.def("getCrackVolume",&PartialSatClayEngine::getCrackVolume,"get the total cracked volume.")
+	.def("getWaterVolume",&PartialSatClayEngine::getWaterVolume,"get the total water volume (entered cracks only).")
+	.def("getNumCracks",&PartialSatClayEngine::getNumCracks,"get the number of cracks.")
 	.def("getCellPorosity",&PartialSatClayEngine::getCellPorosity,(boost::python::arg("pos")),"Measure cell porosity in position pos[0],pos[1],pos[2].")
 	.def("getCellVolume",&PartialSatClayEngine::getCellVolume,(boost::python::arg("pos")),"Get cell volume in position pos[0],pos[1],pos[2].")
 	.def("getCellCracked",&PartialSatClayEngine::getCellCracked,(boost::python::arg("pos")),"Get cell cracked in position pos[0],pos[1],pos[2].")
 //	.def("getCellSaturation",&TwoPhaseFlowEngine::getCellSaturation,"Get saturation of cell")
 	.def("getAverageSaturation",&PartialSatClayEngine::getAverageSaturation,"Get average saturation of entire specimen.")
 	.def("getAverageSuction",&PartialSatClayEngine::getAverageSuction,"Get average suction of entire specimen.")
+	.def("getEnteredThroatRatio",&PartialSatClayEngine::getEnteredThroatRatio,"Get ratio of entered to total cracked cells.")
+	.def("artificialParticleSwell",&PartialSatClayEngine::artificialParticleSwell,(boost::python::arg("volStrain")),"Artificially swell all particles by the strain provided during next time step. Does not reactivate itself for next time step, user must call for each timestep they want to use it.")
+	#ifdef YADE_VTK
 	.def("saveUnsatVtk",&PartialSatClayEngine::saveUnsatVtk,(boost::python::arg("folder")="./VTK",boost::python::arg("withBoundaries")=false),"Save pressure and saturation field in vtk format. Specify a folder name for output. The cells adjacent to the bounding spheres are generated conditionally based on :yref:`withBoundaries` (not compatible with periodic boundaries)")
-	.def("saveFractureNetworkVTK",&PartialSatClayEngine::saveFractureNetworkVTK,(boost::python::arg("fileName")="./VTK"),"Save fracturenetwork as connections between cell centers")
+	//.def("saveFractureNetworkVTK",&PartialSatClayEngine::saveFractureNetworkVTK,(boost::python::arg("fileName")="./VTK"),"Save fracturenetwork as connections between cell centers")
 	.def("savePermeabilityNetworkVTK",&PartialSatClayEngine::savePermeabilityNetworkVTK,(boost::python::arg("fileName")="./VTK"),"Save permeability network as connections between cell centers")
+	#endif
 	.def("insertMicroPores",&PartialSatClayEngine::insertMicroPores,(boost::python::arg("fracMicroPores")),"run to inscribe spheres in a desired fraction of existing pores.")
 	.def("reloadSolver",&PartialSatClayEngine::reloadSolver,(boost::python::arg("solver")=solver),"use after reloading a partialSat simulation and before running next step")
 	//.def("resetOriginalParticleValues",&PartialSatClayEngine::resetOriginalParticleValues,"reset the initial valume and radii values for particles.")
@@ -337,6 +406,7 @@ public:
 	DECLARE_LOGGER;
 };
 REGISTER_SERIALIZABLE(PartialSatClayEngine);
+YADE_PLUGIN((PartialSatClayEngine));
 // clang-format on
 } //namespaceyade
 #endif

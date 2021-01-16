@@ -151,7 +151,7 @@ namespace CGT {
 					// 				vs[T_nnz] = (cell->info().kNorm())[0]+ (cell->info().kNorm())[1]+ (cell->info().kNorm())[2]+ (cell->info().kNorm())[3];
 					if (fluidBulkModulus > 0)
 						vs[T_nnz] += (1.f / (dt * fluidBulkModulus * cell->info().invVoidVolume()));
-					if (!freezeSaturation && partialSatEngine && !isnan(cell->info().dsdp)) {
+					if (!freezeSaturation && partialSatEngine && !math::isnan(cell->info().dsdp)) {
 						vs[T_nnz] += cell->info().dsdp / (cell->info().invVoidVolume() * dt);
 						//if (useKeq) vs[T_nnz] += 1./(dt*cell->info().equivalentBulkModulus*cell->info().invVoidVolume());
 					}
@@ -237,7 +237,7 @@ namespace CGT {
 			T_bv[ii - 1] = T_b [ii - 1]; // - T_cells[ii]->info().dv(); // considering the volume change of tetrahedrals and the contribution to pressure change
 			if (fluidBulkModulus > 0)
 				T_bv[ii - 1] += T_cells[ii]->info().p() / (fluidBulkModulus * dt * T_cells[ii]->info().invVoidVolume());
-			if (!freezeSaturation && partialSatEngine && !isnan(T_cells[ii]->info().invVoidVolume())) {
+			if (!freezeSaturation && partialSatEngine && !math::isnan(T_cells[ii]->info().invVoidVolume())) {
 				T_bv[ii - 1] += T_cells[ii]->info().p() * T_cells[ii]->info().dsdp
 				        / (T_cells[ii]->info().invVoidVolume() * dt); // positive or negative??
 				//if (useKeq) T_bv[ii-1] += T_cells[ii]->info().p()/(T_cells[ii]->info().equivalentBulkModulus*dt*T_cells[ii]->info().invVoidVolume());
@@ -319,6 +319,9 @@ namespace CGT {
 			newCell->info().Po = oldCell->info().Po;
 			newCell->info().lambdao = oldCell->info().lambdao;
 			newCell->info().oldPressure = oldCell->info().oldPressure;
+			newCell->info().entered = oldCell->info().entered;
+			newCell->info().opened = oldCell->info().opened;
+			newCell->info().entry = oldCell->info().entry;
 			//cout << "blocked interp" << endl;
 			/*		if (freezePorosity) {*/
 			/*			newCell->info().lambdao = oldCell->info().lambdao;*/
@@ -350,19 +353,17 @@ namespace CGT {
 			for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 				CellHandle& cell = *cellIt;
 				//reset cache
-				for (int k = 0; k < 4; k++)
-					cell->info().unitForceVectors[k] = nullVect;
+				for (int k = 0; k < 4; k++) cell->info().unitForceVectors[k] = nullVect;
 
 				for (int j = 0; j < 4; j++)
-					if (!Tri.is_infinite(cell->neighbor(j))) {
+					if (!Tri.is_infinite(cell->neighbor(j)) and !cell->vertex(j)->info().isFictious) {
 						neighbourCell        = cell->neighbor(j);
 						const CVector& Surfk = cell->info().facetSurfaces[j];
 						//FIXME : later compute that fluidSurf only once in hydraulicRadius, for now keep full surface not modified in cell->info for comparison with other forces schemes
 						//The ratio void surface / facet surface
 						//Area of the facet (i.e. the triangle)
 						Real area = sqrt(Surfk.squared_length());
-						if (area <= 0)
-							cerr << "AREA <= 0!!" << endl;
+						if (area <= 0) cerr << "AREA <= 0!!" << endl;
 						CVector                     facetNormal   = Surfk / area;
 						const std::vector<CVector>& crossSections = cell->info().facetSphereCrossSections;
 						//This is the cross-sectional area of the throat
@@ -379,14 +380,14 @@ namespace CGT {
 						/// Apply weighted forces f_k=sqRad_k/sumSqRad*f
 						CVector facetUnitForce = -fluidSurfk * cell->info().solidSurfaces[j][3];
 						CVector facetForce;
-						if (((cell->info().isFictious or cell->info().isAlpha) && freeSwelling) /*|| cell->info().isExposed*/)
+						if (0) //((cell->info().isFictious or cell->info().isAlpha) && freeSwelling) /*|| cell->info().isExposed*/)
 							facetForce = pAir * facetUnitForce; // forces computed on boundaries of free swelling case based on air pressure only
 						else {
 							facetForce = cell->info().p() * facetUnitForce * cell->info().sat() * matricSuctionRatio;
-							if (useKeq) {
-								Real delP = -cell->info().dv() * cell->info().equivalentBulkModulus/ cell->info().volume(); // assume that each step starts with 0facet force due to volume changes (if there was no volume change, then there should be no force due to compressible mixture in cell)
-								facetForce += delP * facetUnitForce;
-							}
+							// if (useKeq) {
+							// 	Real delP = -cell->info().dv() * cell->info().equivalentBulkModulus/ cell->info().volume(); // assume that each step starts with 0facet force due to volume changes (if there was no volume change, then there should be no force due to compressible mixture in cell)
+							// 	facetForce += delP * facetUnitForce;
+							// }
 						}
 
 
@@ -400,8 +401,7 @@ namespace CGT {
 							//2nd the partial integral of pore pressure, which boils down to weighting by partial cross-sectional area
 							//uncomment to get total force / comment to get only viscous forces (Bruno)
 							if (!cell->vertex(facetVertices[j][y])->info().isFictious and !cell->vertex(facetVertices[j][y])->info().isAlpha) {
-								if (((cell->info().isFictious or cell->info().isAlpha)
-								     && freeSwelling) /*|| cell->info().isExposed*/) {
+								if (0){ // (((cell->info().isFictious or cell->info().isAlpha) && freeSwelling) /*|| cell->info().isExposed*/) {
 									cell->vertex(facetVertices[j][y])->info().forces
 									        = cell->vertex(facetVertices[j][y])->info().forces
 									        - facetNormal * pAir* crossSections [j][y]; // forces exerted by boundary cells computed not according to suction
@@ -431,7 +431,7 @@ namespace CGT {
 			//	#pragma omp parallel for
 			for (FiniteCellsIterator cell = Tri.finite_cells_begin(); cell != Tri.finite_cells_end(); cell++) {
 				for (int yy = 0; yy < 4; yy++) {
-					if (((cell->info().isFictious or cell->info().isAlpha) && freeSwelling) /*|| cell->info().isExposed*/) {
+					if (0){ //(((cell->info().isFictious or cell->info().isAlpha) && freeSwelling) /*|| cell->info().isExposed*/) {
 						cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces + cell->info().unitForceVectors[yy] * pAir;
 					} else {
 						cell->vertex(yy)->info().forces = cell->vertex(yy)->info().forces
@@ -471,7 +471,7 @@ namespace CGT {
 			cout << "totalForce = " << totalForce << endl;
 		}
 	}
-	// clang-format on
+
 
 	template <class _Tesselation> void PartialSatLinSolv<_Tesselation>::computePermeability()
 	{
@@ -532,14 +532,10 @@ namespace CGT {
 					pass += 1;
 					CVector l = p1 - p2;
 					distance  = sqrt(l.squared_length());
-					if (!rAverage)
-						radius = 2 * computeHydraulicRadius(cell, j);
-					else
-						radius = (computeEffectiveRadius(cell, j) + computeEquivalentRadius(cell, j)) * 0.5;
-					if (radius < 0)
-						NEG++;
-					else
-						POS++;
+					if (!rAverage) radius = 2 * computeHydraulicRadius(cell, j);
+					else radius = (computeEffectiveRadius(cell, j) + computeEquivalentRadius(cell, j)) * 0.5;
+					if (radius < 0) NEG++;
+					else POS++;
 					if (radius == 0) {
 						cout << "INS-INS PROBLEM!!!!!!!" << endl;
 					}
@@ -565,11 +561,10 @@ namespace CGT {
 						else if (partialSatEngine) {
 							Real avgSat = (cell->info().sat() + neighbourCell->info().sat()) / 2.;
 							//cout << "avgSat" << avgSat << endl;
-							if (avgSat < SrM)
-								avgSat = SrM;
+							if (avgSat < SrM) avgSat = SrM;
 							Real SeM = (avgSat - SrM) / (SsM - SrM);
-							if (SeM < SrM)
-								SeM = SrM;
+							if (SeM < SrM) SeM = SrM;
+							if (getGasPerm) SeM = 1 - SeM; // essentially grabs the opposite permeability.
 							Real avgPoro     = (cell->info().porosity + neighbourCell->info().porosity) / 2.;
 							Real avgPoroOrig = (cell->info().initialPorosity + neighbourCell->info().initialPorosity) / 2.;
 							if (useKozeny) { // Kozeny 1927
@@ -577,12 +572,8 @@ namespace CGT {
 								cell->info().kNorm()[j] = -kFactor * (pow(avgPoro, 3) / OneMinusPoroSqed)
 								        * (OneMinusPoroSqed / pow(avgPoroOrig, 3));
 							} else {
-								if (SeM < 0)
-									cerr << "negative equivalent saturation, linear system will be unstable" << endl;
-								Real kM = -kFactor
-								        * exp(bIntrinsicPerm
-								              * (avgPoro
-								                 - meanInitialPorosity)); //avgPoroOrig)); consider making all perm relative to the mean instaed of the initial...
+								if (SeM < 0) cerr << "negative equivalent saturation, linear system will be unstable" << endl;
+								Real kM = -kFactor * exp(bIntrinsicPerm* (avgPoro - meanInitialPorosity)); //avgPoroOrig)); consider making all perm relative to the mean instaed of the initial...
 								Real perm               = kM * pow(SeM, nUnsatPerm) * area / distance;
 								cell->info().kNorm()[j] = (permClamp > 0 and perm > permClamp) ? permClamp : perm;
 								//cout << "id " << cell->info().id <<  " perm " << cell->info().kNorm()[j] << " SeM " << SeM << " kM " << kM << " avgPoro " << avgPoro << endl;
@@ -731,8 +722,17 @@ namespace CGT {
 
 	template <class _Tesselation> std::vector<Real> PartialSatLinSolv<_Tesselation>::getCellVelocity(Real X, Real Y, Real Z)
 	{
-		//if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
 		RTriangulation& Tri  = T[noCache ? (!currentTes) : currentTes].Triangulation();
+		CellHandle      cell = Tri.locate(CGT::Sphere(X, Y, Z));
+		//if ( cell->info().averageVelocity().squared_length() == 0 ) return 0;
+		std::vector<Real> velocityVector { cell->info().averageVelocity()[0], cell->info().averageVelocity()[1], cell->info().averageVelocity()[2] };
+		return velocityVector;
+	}
+
+	template <class _Tesselation> std::vector<Real> PartialSatLinSolv<_Tesselation>::getCellGasVelocity(Real X, Real Y, Real Z)
+	{
+		//if (noCache && T[!currentTes].Max_id()<=0) return 0;//the engine never solved anything
+		RTriangulation& Tri  = T[currentTes].Triangulation();  //T[noCache ? (!currentTes) : currentTes].Triangulation();
 		CellHandle      cell = Tri.locate(CGT::Sphere(X, Y, Z));
 		//if ( cell->info().averageVelocity().squared_length() == 0 ) return 0;
 		std::vector<Real> velocityVector { cell->info().averageVelocity()[0], cell->info().averageVelocity()[1], cell->info().averageVelocity()[2] };
@@ -744,6 +744,15 @@ namespace CGT {
 		if (noCache && T[!currentTes].Max_id() <= 0)
 			return 0; //the engine never solved anything
 		RTriangulation& Tri  = T[noCache ? (!currentTes) : currentTes].Triangulation();
+		CellHandle      cell = Tri.locate(CGT::Sphere(X, Y, Z));
+		return cell->info().volume(); //sqrt( cell->info().averageVelocity().squared_length());
+	}
+
+	template <class _Tesselation> Real PartialSatLinSolv<_Tesselation>::getCellGasVolume(Real X, Real Y, Real Z)
+	{
+		//if (noCache && T[!currentTes].Max_id() <= 0)
+		//	return 0; //the engine never solved anything
+		RTriangulation& Tri  = T[currentTes].Triangulation();  // T[noCache ? (!currentTes) : currentTes].Triangulation();
 		CellHandle      cell = Tri.locate(CGT::Sphere(X, Y, Z));
 		return cell->info().volume(); //sqrt( cell->info().averageVelocity().squared_length());
 	}
@@ -775,12 +784,13 @@ namespace CGT {
 		int  numCells        = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
-			if (cell->info().Pcondition or cell->info().blocked)
-				continue;
+			if (cell->info().Pcondition or cell->info().blocked) continue;
 			saturationTotal += cell->info().sat();
 			numCells += 1;
 		}
-		return saturationTotal / numCells; //sqrt( cell->info().averageVelocity().squared_length());
+		const Real avgSaturation = saturationTotal / numCells;
+		if (math::isnan(avgSaturation)) return 0; //this is a bit of a hack, but testing around it
+		else return saturationTotal / numCells; //sqrt( cell->info().averageVelocity().squared_length());
 	}
 
 	template <class _Tesselation> Real PartialSatLinSolv<_Tesselation>::getAverageSuction()
@@ -792,13 +802,29 @@ namespace CGT {
 		int  numCells     = 0;
 		for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
 			CellHandle& cell = *cellIt;
-			if (cell->info().Pcondition or cell->info().blocked)
-				continue;
+			if (cell->info().Pcondition or cell->info().blocked) continue;
 			suctionTotal += pAir - cell->info().p();
 			numCells += 1;
 		}
 		return suctionTotal / numCells; //sqrt( cell->info().averageVelocity().squared_length());
 	}
+
+	// template <class _Tesselation> Real PartialSatLinSolv<_Tesselation>::getEnteredRatio()
+	// {
+	// 	if (noCache && T[!currentTes].Max_id() <= 0)
+	// 		return 0; //the engine never solved anything
+	// 	//RTriangulation& Tri = T[noCache?(!currentTes):currentTes].Triangulation();
+	// 	Real numEntered = 0;
+	// 	Real  numCells     = 0;
+	// 	for (VCellIterator cellIt = T[currentTes].cellHandles.begin(); cellIt != T[currentTes].cellHandles.end(); cellIt++) {
+	// 		CellHandle& cell = *cellIt;
+	// 		if (cell->info().Pcondition or cell->info().blocked or !cell->info().crack) continue;
+	// 		if (cell->info().entered) numEntered += 1;
+	// 		numCells += 1;
+	// 	}
+	// 	if (numCells == 0) return 0;
+	// 	else return numEntered / numCells;
+	// }
 
 
 	// need to make sure the flux considers the saturation change between pores
