@@ -3,13 +3,18 @@
 # This script checks collider correctness and performance in bouncing spheres with heavy erase/insert along with iterations
 
 import time
+# after https://gitlab.com/yade-dev/trunk/-/merge_requests/599 is merged it can be:
+# yade.math.Real
+from yade.math import toHP1
+from yade.math import HP1
 
+# integers are converted to HP without any problem.
 newton.gravity=(0,-10,0) 
 newton.damping=0
 
 O.engines=[ #this reproduces the yade default, not present during checkList.py execution
         ForceResetter(),
-        InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()],verletDist=0.3,label="collider"),
+        InsertionSortCollider([Bo1_Sphere_Aabb(),Bo1_Facet_Aabb(),Bo1_Box_Aabb()],verletDist=toHP1('0.3'),label="collider"),
         InteractionLoop(
             [Ig2_Facet_Sphere_ScGeom(),Ig2_Box_Sphere_ScGeom()], # <====== disable sphere-sphere contacts, they will be virtual interactions
             [Ip2_FrictMat_FrictMat_FrictPhys()],
@@ -20,17 +25,17 @@ O.engines=[ #this reproduces the yade default, not present during checkList.py e
     ]
 
 O.dynDt=False
-O.dt=3e-3
+O.dt=toHP1('3e-3')
 
 O.bodies.append(box(center=[0,0,0],extents=[500,0,500],color=[0,0,1],fixed=True))
 N=40
 # bunch of non-interacting spheres crossing each other in the air
-O.bodies.append( sphere((N/3,6,N/3),6))
-O.bodies.append( sphere((6+N/3,12,6+N/3),6))
+O.bodies.append( sphere((N/toHP1(3),6,N/toHP1(3)),6))
+O.bodies.append( sphere((6+N/toHP1(3),12,6+N/toHP1(3)),6))
 for i in range(N):
     for j in range(N):
-        O.bodies.append( sphere((i,2+cos(0.6*(i+j)),j),1))
-        O.bodies.append( sphere((i+0.1,6+1.5*cos(2*(i+j)+1),j+0.3),1))
+        O.bodies.append( sphere((i,2+HP1.cos(toHP1('0.6')*(i+j)),j),1))
+        O.bodies.append( sphere((i+toHP1('0.1'),6+toHP1('1.5')*HP1.cos(2*(i+j)+1),j+toHP1('0.3')),1))
         
 O.saveTmp()
 
@@ -103,10 +108,10 @@ def signature():
         # identify overlapping boxes disregarding verletDist, this is the minimal list that any AABB collider should find
         # it means result of the check will not depend on collider optimizations giving more or less virtual interactions
         d = O.bodies[i.id1].state.pos - O.bodies[i.id2].state.pos
-        sumRad=yade.math.toHP1(0) # after https://gitlab.com/yade-dev/trunk/-/merge_requests/599 is merged it can be: yade.math.Real(0)
+        sumRad=toHP1(0)
         if i.id1 > 0: sumRad+=O.bodies[i.id1].shape.radius
         if i.id2 > 0: sumRad+=O.bodies[i.id2].shape.radius
-        away = abs(d[0])>sumRad or  abs(d[1])>sumRad or abs(d[2])>sumRad
+        away = (HP1.abs(d[0])>sumRad or  HP1.abs(d[1])>sumRad or HP1.abs(d[2])>sumRad)
         
         if (not away) or i.isReal: #isReal is for sphere-box
             sig+=i.id1+i.id2
@@ -155,7 +160,7 @@ for enableRedirection in [False,True]:
     for k in range(7):
         t=0
         for k in range(Nc):
-            t+= cycle(substeps,int(0.4*N*N*2/substeps),doCheck=False,iterations=Niter)
+            t+= cycle(substeps,int(toHP1('0.4')*N*N*2/substeps),doCheck=False,iterations=Niter)
         print("time for ",Nc," erase/insert cycles in",2*Niter*substeps*Nc,"iterations:", t,"sec")
     print("====== TOTAL CYCLING TIME", time.time() - start,"for ",len([b for b in O.bodies]), "real bodies in len(O.bodies)=",len(O.bodies)," =======")
     print("")
