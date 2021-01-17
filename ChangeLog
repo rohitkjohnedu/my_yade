@@ -1,4 +1,245 @@
 ==================================================
+yade-2021.01a
+Sun, Jan 17 18:45:12 2021 +0100
+
+Short summary of 2021.01a release:
+short title (Merge Request count)
+
+Documentation                         (41 MRs)
+Bug fixes                             (45 MRs)
+High precision RealHP<N>              (31 MRs)
+Small improvements                    (27 MRs)
+Fluid & thermal & particle saturation (15 MRs)
+Tests & checks                        (13 MRs)
+OpenMPI calculations                  (13 MRs)
+clang-format in the pipeline          ( 7 MRs)
+Packaging improvements                ( 7 MRs)
+GUI                                   ( 3 MRs)
+
+
+Documentation (41 MRs):
+  Update installation.rst (asan builds + stuff)
+  Add recent publications
+  point youtube's 'related videos' to the same channel
+  Update front page link to videos: tutorial-more-examples.html more up to date.
+  Fix bug and documentation FlowEngine invVoidVolume wrapper
+  Fix recent build failures on master with latest docker bullseye image.
+  Small docs fix
+  Doc typo: missing norm in trial shear force
+  Doc Body.groupMask
+  User doc
+  Update high precision documentation
+  Miscellanea doc
+  Add example script for opengeomechanics paper
+  clarify thermalengine doc
+  Documentation makeCloud and makeClumpCloud
+  ViscoelasticPM doc update
+  Prog doc typo
+  ProgDocTypos
+  Formulation doc typo
+  improve cellDist doc
+  small addition to the doc to mention verletDist explicitely
+  Doc prog.rst update
+  FlowEngine.getCell doc
+  Doc update of VTKRecorder.fileName
+  ymport.textPolyhedra-doc
+  Prog doc typos and minor changes
+  Doc Law2_Polyhedra*
+  residualFrictionAngle in radians in JCFpmMat docstring
+  Sphinx doc broken link in Prog doc
+  O.forces.f doc
+  Two Docstrings
+  BaselineTypo
+  adding open geomechanics reference to doc and pubs
+  Add --stdperformance, --quickperformance explanation to documentation.
+  Polyhedra Ip2 doc
+  MaterialContainer doc typo
+  timing.runtimeDoc
+  Added Hicham Benniou PhD reference
+  Add references to article describing lubrication law
+  update publications
+  !463 alternative : Added article February 2020 Computational Particle Mechanics
+
+Bug fixes (45 MRs):
+  fix #145 seed in makeCloud FIX makeCloud doesn't use "seed"
+  Fix pygts module import in python3.9
+  Fix PyRunner. Now it can propagate errors upwards.
+  Fix #110 FIX Graph yade.plot.live matplotlib numpy update exception
+  Fix compilation with python3.9
+  fix #157 FIX O.stopAtTime does not do anything useful
+  Fix #140 FIX ForceContainerParallel::sync() can count permanent forces twice or more
+  Fix https://gitlab.com/yade-dev/docker-yade/issues/1 FIX yade-ci crashes
+  export.text2vtk - fixed a bug + refactoring
+  Fix #146 FIX "to-Python converter already registered" RuntimeWarning
+  Fix even more warnings, print only 'maybe-uninitialized' and '#warning' (!270), faster compilation. (!273)   18 of 18 tasks completed
+  fix clang formating mistake, change remaining doubles to Real
+  fix tutorial script https://answers.launchpad.net/yade/+question/689537
+  Fix printing Vectors by LOG macros.
+  Fix GCC-10 compilation #958006
+  Fix_PBs_orientations
+  #153 fix FIX O.energy['nonViscDamp'] misses gravity forces
+  Skip url ping-pong for "getting help" page
+  fix yade crash, when closing 3D view via "X" window frame button, in Ubuntu 20.04, fixes #164 FIX yade crash when closing the 3D view.
+  Fix close view crash
+  small mailmap fix and test cleanup
+  Little bit of work on #97 : lib/base/Math.hpp should be math only 
+  Fix compilation against newer QT5.
+  Some small fixes for Sacha : Fix compilation with boost 1.65 and g++ 9.3 combination
+  Fix denser grid in GLViewer.
+  clumpId type should be Body::id_t, not int. Add fixme note in Math.hpp about issue #97
+  Fix #162 - fix building master pipeline due to recent VTK upgrade in OpenSuse 15.
+  Fix build on latest bullseye
+  Fix doc generation for newer sphinx. #955097
+  Workaround MPFR boost bug on ubuntu focal
+  Enable OpenMP for MPFR
+  SpatialQuickSortCollider is nice, because it's only 70 lines long. But has one bug. FIX groupMask treatment.
+  comment out buggy heat flux boundary condition for now
+  GCAL version 5.1.1 produces different results (again), but maybe the old results are back?
+  Qt::MidButton is deprecated, use MiddleButton instead
+  Use boost::filter_iterator for BodyContainer instead of home-backed. #122
+  workaround #183
+  Add compilation on multiarch: ppc64el, arm64. Workaround #179
+  workaround #178 , use /tmp/SiloLargeOrifice.stl
+  Fix #180
+  Fix https://gitlab.com/yade-dev/docker-yade/issues/1
+  make checkPolyhedraCrush.py single core only
+  Disable three tries if there was a "script failure" reason to fail the job
+  Fix #174 add --checkall option.
+  Fix #150 : OpenMP crash when deleting bodies in yade -j4 ./examples/clumps/clump-hopper-test.py
+
+High precision RealHP<N> (31 MRs):
+  Finalize high precision Real - finished, really :) documentation + put minieigen sources into Yade
+  Add check test for Runge Kutta Cash Karp 54 time integrator, error tolerance 1e-147, 147 correct decimal places :)
+  checkGravity.py : reduce error tolerance from 1e-3 → 1e-10
+  Use the minieigen ↔ yade.minieigenHP redirection when necessary.
+  Add High Precision to the gitlab CI pipeline
+  Ensure that VTK is compatibile with Real - Without Macros.
+  std::weibull_distribution can't understand Real type so use boost::weibull_distribution
+  OpenGL Real compatibility
+  Lapack Compatibility with Real type.
+  Remove Real from global namespace.
+  Another step towards enabling high precision Real
+  Adapt checks and tests to high precision Real.
+  Add RealHP<N> : double, quadruple and more precisions.
+  Bit correctness: extra tests for RealHP<N>
+  Small HP cleanup: don't use std::to_string.
+  The last remaining double to Real changes (2/2)
+  The last remaining double to Real changes (1/2)
+  Remove #DEFINEs from MathFunctions.hpp
+  Remove unused variables uN, uT.
+  don't use operator++ for floating point type.
+  Replace std:: with math:: when invoking math functions. (6/4) - optional, remove even more using std::min, std::max.
+  Replace std:: with math:: when invoking math functions. (2/4)
+  Replace std:: with math:: when invoking math functions. (3/4)
+  Replace std:: with math:: when invoking math functions. (4/4)
+  Replace std:: with math:: when invoking math functions. (5+6/4) - optional, remove more using
+  Replace std:: with math:: when invoking math functions. (1/4)
+  put minieigen sources back into Yade
+  Remove a couple of non-math:: using directives.
+  If necessary use mpmath.linspace instead of numpy.linspace. (high precision on python side)
+  Enable high precision CGAL
+  Avoid raw memory access for high precision types.
+
+Small improvements (27 MRs):
+  added utils.randomOrientation function
+  libVersions detects architecture.
+  Use std::ofstream in pkg/dem/PDFEngine.cpp instead of old C interface for writing data files.
+  Use C++17 standard, remove Loki dependency.
+  Use vtkSmartPointer to handle memory release
+  small mailmap update.
+  Merge PotentialBlockVTKRecorder and PotentialBlockVTKRecorderTunnel engines
+  A better Wall-Polyhedra normal
+  Update warning message for deprecated GravityEngine
+  Clean shape: Add #ifdef YADE_FEM in core/Shape.hpp
+  Add seed value for periodic packings
+  improved O.stopAtTime
+  frictionAngle in radians for examples
+  exportPotentialBlocks
+  Removing Vector4r definition from Lin4NodeTetra
+  Add ymport.stl.shift
+  Add ymport.stl.scale parameter
+  change Shop::aabbExtrema from a Python tuple to a C++ pair.
+  Add seed parameter to MakeClumpCloud
+  Un-expose breakOccurred to avoid user confusion
+  remove remaining FOREACH loops on bodies
+  consistent use of 'et' in ViscoelasticPM (LP Answer 691009)
+  VTK9 support
+  fix body redirection using updated vector length
+  PyRunner improvements
+  Add example using the PBs
+  Remove randomColor duplicates
+
+Fluid & thermal & particle saturation (15 MRs):
+  Adding flux type boundary condition (thermalEngine) for Luc Scholtes and Ahmed Mostafa
+  Protect from segfault after looping on erased particles in thermalengine
+  improving the particle sat field estimate, other small improvements
+  Partial sat clay patch
+  Partial sat update
+  add Ip2 functor for PartialSatMat
+  Add lubrication examples
+  add the packing used in thermalengine examples
+  add example scripts demonstrating ThermalEngine functionality
+  decouple mechanical and partialsat timesteps
+  Update conductionVerification.py
+  add fully coupled THM example, add citation to thermalengine publication
+  a more robust cmake when cgal or pfvflow are disabled and dependent modules...
+  add PFV tools for getting cell velocity and volume
+  PartialSatEngine update adding various features and bug fixes
+
+Tests & checks (13 MRs):
+  Improve multithread debugging and logging. Add TRVARn(…), LOG_TIMED_*(5seconds,msg)
+  Make sure gitlab CI pipeline shows all the output.
+  improve error checking
+  Print time spent on each of the --checks
+  Add VTKRecorder check.
+  Add vectorized compilation to the pipeline
+  checkPotentialVTKRecorders
+  make runtime of two checkScripts acceptable
+  Improve performance test, add it to the pipeline.
+  Add multi core check
+  add enum tests and fix .deb builds
+  Add 32bit architecture to the pipeline.
+  Reduce test load a bit.
+
+OpenMPI calculations (13 MRs):
+  Correct and improve two methods in domaindecomposition.py
+  Mpy update
+  cleaner exit and spawn/despawn
+  MpiDoc rebased
+  One Py3-required LOG_TRACE, Making Py3 mandatory for MPI compilation. Fix #144 Py2 (no-)support
+  fix thread-unsafe assignment of permForceSynced (fix #156, setPermF broken)
+  Temporarily disable insertionSortParallel() until #138 is solved.
+  fix parallel collision detection (fix #138) : FIX Out-of-bounds access in insertionSortParallel
+  escape most mpi issues by removing just one checkScript
+  Adjust checkMPISilo.py tolerance a little.
+  Parallel body erase, load balance, MPI disconnect and more checkScripts
+  increase timeout for MPI spawn
+  Mpi small fix
+
+clang-format in the pipeline (7 MRs):
+  clang-format ./pkg
+  clang-format ./py
+  clang-format ./lib
+  clang-format ./core
+  clang-format gui/qt5. Remove qt4.
+  Add clang-format test to the CI pipeline.
+  clang-format discussion.
+
+Packaging improvements (7 MRs):
+  Prepare 20.04 deb-packages
+  Add instructions for yadedaily Ubuntu 20.04 packages
+  Update scripts for uploading daily-packages
+  Fix deb packages
+  build deb also on master pipeline
+  Clean aptly DB after update
+  Use yade --checkall in autopkgtests
+
+GUI (3 MRs):
+  Draw grid label coordinates, allow custom change of grid density.
+  remove unaligned margins in GUI inspect.
+  Add enum support for GUI dropdown menus.
+
+==================================================
 yade-2020.01a
 Sun, Jan 12 09:36:24 2020 +0100
 
