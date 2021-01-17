@@ -112,3 +112,12 @@ def radiansHP1(arg):
 	"""
 	return yade.math.HP1.Pi() * toHP1(arg) / toHP1(180)
 
+# Create convenience compatibility aliases for all n ∈ getSupportedByMinieigen()
+#    yade.math.Real2 → yade._math.HP2.toHP2
+Real  = toHP1
+Real1 = toHP1
+# The loop below is the same as the commands above. But for higher n.
+for n in yade._math.RealHPConfig.getSupportedByMinieigen():
+	if(n==1): continue
+	exec('Real'+str(n)+'=yade._math.HP'+str(n)+'.toHP'+str(n),globals(),globals())
+
