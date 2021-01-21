@@ -1,7 +1,5 @@
-
 # bruno.chareyre@grenoble-inp.fr
 # This script checks collider correctness and performance in bouncing spheres with heavy erase/insert along with iterations
-
 
 import time
 
@@ -104,12 +102,12 @@ def signature():
         # identify overlapping boxes disregarding verletDist, this is the minimal list that any AABB collider should find
         # it means result of the check will not depend on collider optimizations giving more or less virtual interactions
         d = O.bodies[i.id1].state.pos - O.bodies[i.id2].state.pos
-        sumRad=0
+        sumRad=yade.math.Real(0)
         if i.id1 > 0: sumRad+=O.bodies[i.id1].shape.radius
         if i.id2 > 0: sumRad+=O.bodies[i.id2].shape.radius
-        away = abs(d[0])>sumRad or  abs(d[1])>sumRad or abs(d[2])>sumRad
+        away = abs(d[0])>=sumRad or  abs(d[1])>=sumRad or abs(d[2])>=sumRad
         
-        if (not away) or i.isReal: #isReal is for sphere-box
+        if (not away or i.isReal): #isReal is for sphere-box
             sig+=i.id1+i.id2
             count+=1
     return count,sig
@@ -165,6 +163,4 @@ for enableRedirection in [False,True]:
         t=testFraction(fraction,True)
         print("fraction=",fraction,"collider time:", t[0],"vs. initSort",t[1])
         #if (t[0]>3*t[1]): raise YadeCheckError("collider run in more than twice the initSort time, ratio:"+str(times[0]/times[1]))
-
-
-
+    
