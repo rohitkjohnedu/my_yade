@@ -21,7 +21,8 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.testLevelsHP = mne.RealHPConfig.getSupportedByMinieigen()
 		self.baseDigits   = mne.RealHPConfig.getDigits10(1)
 		self.skip33       = mne.RealHPConfig.isFloat128Broken        # this is for local testing only. It's here because with older compiler and -O0 the float128 is segfaulting
-		self.builtinHP    = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
+		self.use33or30    = (33 if mne.RealHPConfig.isFloat128Present else 30)
+		self.builtinHP    = { 6 : [6,15,18,24,self.use33or30] , 15 : [15,self.use33or30] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 
 	def getDigitsHP(self,N):
 		ret = None
@@ -51,10 +52,10 @@ class ExtendedMinieigenTests(unittest.TestCase):
 		self.MPnHelper = MPn
 		if(N==1):
 			self.adjustDigs0(N,mne,MPn)
-			if((self.digs0 == 33) and self.skip33): return
+			if((self.digs0 == self.use33or30) and self.skip33): return
 			func(N,mne,"mne.",MPn)       # test global scope functions with RealHP<1>
 		self.adjustDigs0(N,HPn,MPn)
-		if((self.digs0 == 33) and self.skip33): return
+		if((self.digs0 == self.use33or30) and self.skip33): return
 		print('RealHP<'+str(N)+'>', end=' ')
 		func(N,HPn,"mne."+nameHP+".",MPn)    # test scopes HP1, HP2, etc
 

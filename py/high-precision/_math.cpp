@@ -271,7 +271,7 @@ template <int N> struct IfConstexprForSlowFunctions<N, true> {
 
 template <int, bool> struct IfConstexprForEigen;
 
-#ifndef __clang__ // problem with clang 9.0.1-12. It tries to instatinate an explicitly illegal/disabled code. Produces errors that some types don't exist. But they shouldn't exist.
+//#ifndef __clang__ // problem with clang 9.0.1-12. It tries to instatinate an explicitly illegal/disabled code. Produces errors that some types don't exist. But they shouldn't exist.
 template <int N> struct IfConstexprForEigen<N, true> {
 	static void work(const py::scope& scopeHP, const long& defprec)
 	{
@@ -318,7 +318,7 @@ template <int N> struct IfConstexprForEigen<N, true> {
 		        R"""(:return: ``Real`` the smallest number greater than zero. Wraps `std::numeric_limits<Real>::min() <https://en.cppreference.com/w/cpp/types/numeric_limits/min>`__)""");
 	}
 };
-#endif
+//#endif
 
 template <int N> struct IfConstexprForEigen<N, false> {
 	static void work(const py::scope& scopeHP, const long& defprec)

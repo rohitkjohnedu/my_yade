@@ -16,7 +16,7 @@ if(yade.config.highPrecisionMpmath):
 class SimpleTests(unittest.TestCase):
 	def needsMpmathAtN(self,N): return yade.math.needsMpmathAtN(N)
 	def hasMpfr(self): return ('MPFR' in yade.config.features)
-	def nowUsesBoostBinFloat(self,N): return (not self.hasMpfr()) and ((yade.math.RealHPConfig.getDigits10(N) > 33) or (yade.math.RealHPConfig.getDigits10(N)==24))
+	def nowUsesBoostBinFloat(self,N): return (not self.hasMpfr()) and ((yade.math.RealHPConfig.getDigits10(N) > 33) or (yade.math.RealHPConfig.getDigits10(N) in [24,30]))
 	def setUp(self):
 		self.testRecordingMode=False # if 'True' then it will record 'self.newTolerances' maximum errors encountered, to be put later in place of 'self.defaultTolerances'. See function tearDown() below.
 		self.printedAlready=set()
@@ -92,7 +92,8 @@ class SimpleTests(unittest.TestCase):
 			 }
 		self.testLevelsHP = mth.RealHPConfig.getSupportedByMinieigen()
 		self.baseDigits   = mth.RealHPConfig.getDigits10(1)
-		self.builtinHP    = { 6 : [6,15,18,24,33] , 15 : [15,33] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
+		self.use33or30    = (33 if mth.RealHPConfig.isFloat128Present else 30)
+		self.builtinHP    = { 6 : [6,15,18,24,self.use33or30] , 15 : [15,self.use33or30] } # higher precisions are multiplies of baseDigits, see NthLevelRealHP in lib/high-precision/RealHP.hpp
 		if(self.testRecordingMode):
 			self.startRecordingErrors()
 
@@ -117,7 +118,7 @@ class SimpleTests(unittest.TestCase):
 		if(key in dictForThisFunc):
 			return dictForThisFunc[key]*mult
 		## lower than 33 digits are all hardware precision: 6, 15, 18, 33 digits. But 4*float is 24 digits, and it can be achieved by MPFR only so add exception for 24 also.
-		self.assertTrue(self.digs0 > 33 or self.digs0==24) ## 33 was here before
+		self.assertTrue(self.digs0 > 33 or self.digs0 in [24,30]) ## 33 was here before
 		low = dictForThisFunc["100"+self.extraName]
 		high= dictForThisFunc["150"+self.extraName]
 		import numpy

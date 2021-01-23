@@ -66,7 +66,9 @@ namespace math { // store info that ThinRealWrapper is not used.
 }
 }
 #endif
-#if ((YADE_REAL_BIT <= 64) and (not defined(YADE_DISABLE_REAL_MULTI_HP)))
+// clang currently does not support float128   https://github.com/boostorg/math/issues/181
+// another similar include is in ThinRealWrapper.hpp, all other checks if we have float128 should be #ifdef BOOST_MP_FLOAT128_HPP or yade::math::isFloat128<T>
+#if ((((YADE_REAL_BIT <= 64) and (not defined(YADE_DISABLE_REAL_MULTI_HP)))) and (not defined(__clang__)))
 #include <boost/multiprecision/float128.hpp>
 #endif
 
@@ -102,7 +104,11 @@ namespace math {
 #elif YADE_REAL_BIT <= 64
 	// Real == double
 	// later quad-double will be added to this list, https://github.com/boostorg/multiprecision/issues/184, so that RealHP<2> and RealHP<4> will be quite fast.
+#ifdef BOOST_MP_FLOAT128_HPP
 	using RealHPLadder = boost::mpl::vector<Real, boost::multiprecision::float128>;
+#else // clang does not support float128   https://github.com/boostorg/math/issues/181
+	using RealHPLadder = boost::mpl::vector<Real>; // when float128 is not available the RealHPLadder does not include it.
+#endif
 #elif YADE_REAL_BIT <= 80
 	// Real == long double
 	// Here it might become interesting in few years when templatized versions of doubling-* and quadding-* of types are implemented in boost::multiprecision.

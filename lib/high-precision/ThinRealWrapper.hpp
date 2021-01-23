@@ -58,7 +58,11 @@
 #else
 #include <boost/multiprecision/cpp_bin_float.hpp>
 #endif
+// clang currently does not support float128   https://github.com/boostorg/math/issues/181
+// another similar include is in RealHP.hpp, all other checks if we have float128 should be #ifdef BOOST_MP_FLOAT128_HPP or yade::math::isFloat128<T>
+#ifndef __clang__
 #include <boost/multiprecision/float128.hpp>
+#endif
 #endif
 
 namespace yade {
@@ -128,16 +132,20 @@ namespace math {
 		{
 			return static_cast<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>(val);
 		}
+#ifdef BOOST_MP_FLOAT128_HPP
 		explicit operator ::boost::multiprecision::float128() const { return static_cast<::boost::multiprecision::float128>(val); }
+#endif
 		template <unsigned int Num>
 		ThinRealWrapper(const ::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>& otherVal)
 		        : val(static_cast<WrappedReal>(otherVal))
 		{
 		}
+#ifdef BOOST_MP_FLOAT128_HPP
 		ThinRealWrapper(const ::boost::multiprecision::float128& otherVal)
 		        : val(static_cast<WrappedReal>(otherVal))
 		{
 		}
+#endif
 #endif
 		explicit operator const WrappedReal&() const { return val; }
 		explicit operator WrappedReal&() { return val; }

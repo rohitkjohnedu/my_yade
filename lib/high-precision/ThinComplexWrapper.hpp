@@ -22,16 +22,6 @@
 
 // ComplexHP<…> note:
 //   If ComplexHP<N> is supported then ThinComplexWrapper needs explicit conversion operators to all other higher precision types, so provide them here.
-//   These include headers are necessary to make it work.
-//   If other types (e.g. boost quad_double) appear, they will have to be added here.
-#ifndef YADE_DISABLE_REAL_MULTI_HP
-#ifdef YADE_MPFR
-#include <boost/multiprecision/mpfr.hpp>
-#else
-#include <boost/multiprecision/cpp_bin_float.hpp>
-#endif
-#include <boost/multiprecision/float128.hpp>
-#endif
 
 namespace yade {
 namespace math {
@@ -158,10 +148,12 @@ namespace math {
 		{
 			return static_cast<::std::complex<::boost::multiprecision::number<HPBackend<Num>, boost::multiprecision::et_off>>>(val);
 		}
+#ifdef BOOST_MP_FLOAT128_HPP
 		explicit operator ::std::complex<::boost::multiprecision::float128>() const
 		{
 			return static_cast<::std::complex<::boost::multiprecision::float128>>(val);
 		}
+#endif
 #endif
 		explicit operator const WrappedComplex&() const { return val; }
 		explicit operator WrappedComplex&() { return val; }

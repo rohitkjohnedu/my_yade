@@ -48,7 +48,15 @@ struct Constants { // for ctags
 
 namespace yade {
 namespace math {
-	template <typename Rr> const constexpr bool useConstexprConstants = (std::numeric_limits<Rr>::digits10 <= 33);
+	template <typename Rr>
+	const constexpr bool useConstexprConstants
+	        = (std::numeric_limits<Rr>::digits10 <=
+#ifdef BOOST_MP_FLOAT128_HPP
+	           33
+#else
+	           15
+#endif
+	        );
 
 	// constexpr whenever possible
 	template <int N> struct ConstexprConstantsHP {

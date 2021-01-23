@@ -81,14 +81,19 @@ This is a yade.math.RealHPConfig diagnostic function.
 		// So this is for local testing only. With flag -O0 most of RealHP<…> works, except for float128 which is always segfaulting.
 		py::scope().attr("isFloat128Broken") = true;
 #else
-		py::scope().attr("isFloat128Broken") = false;
+		py::scope().attr("isFloat128Broken")  = false;
 #endif
 #ifndef YADE_DISABLE_REAL_MULTI_HP
 		py::scope().attr("isEnabledRealHP") = true;
 #else
-		py::scope().attr("isEnabledRealHP")  = false;
+		py::scope().attr("isEnabledRealHP")   = false;
 #endif
 		py::scope().attr("workaroundSlowBoostBinFloat") = int(workaroundSlowBoostBinFloat);
+#ifdef BOOST_MP_FLOAT128_HPP
+		py::scope().attr("isFloat128Present") = true;
+#else
+		py::scope().attr("isFloat128Present") = false;
+#endif
 	}
 
 } // namespace math
