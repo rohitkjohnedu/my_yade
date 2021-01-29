@@ -110,6 +110,10 @@ public:
 		((int,bendingDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for bending dissipation (with O.trackEnergy)"))
 		((int,twistDissipIx,-1,(Attr::hidden|Attr::noSave),"Index for twist dissipation (with O.trackEnergy)"))
 		((Real,creep_viscosity,1,,"creep viscosity [Pa.s/m]. probably should be moved to Ip2_CohFrictMat_CohFrictMat_CohFrictPhys."))
+		((Real,dampingFraction,0,,"The damping is calculated as a fraction of the stiffness"))
+		// ((Real,damping_coefficient,0,,"The damping coefficient for bending dissipation"))
+		// ((Real,shearViscDamping,0,,"The damping coefficient for shear viscous dissipation"))
+		// ((Real,normalViscDamping,0,,"The damping coefficient for normal viscous dissipation"))
 		,,
 		.def("normElastEnergy",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::normElastEnergy,"Compute normal elastic energy.")
 		.def("shearElastEnergy",&Law2_ScGeom6D_CohFrictPhys_CohesionMoment::shearElastEnergy,"Compute shear elastic energy.")
